@@ -24,3 +24,7 @@ packages/chronodivide-bot-launcher/
 # maps - only allow maps directly in the test data 
 *.map
 !packages/chronodivide-bot-driver/data/*.map
+packages/chronodivide-bot-driver/benchmark-results/
+packages/chronodivide-bot-driver/demo-videos/
+packages/chronodivide-bot-driver/packages/chronodivide-bot-driver/benchmark-results/
+*.bak
