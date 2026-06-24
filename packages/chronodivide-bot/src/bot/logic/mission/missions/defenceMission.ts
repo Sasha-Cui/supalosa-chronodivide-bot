@@ -10,6 +10,24 @@ import { MissionContext, SupabotContext } from "../../common/context.js";
 export const MAX_PRIORITY = 100;
 export const PRIORITY_INCREASE_PER_TICK_RATIO = 1.025;
 
+export type DefenceMissionFactoryOptions = {
+    checkTicks?: number;
+    startingRadius?: number;
+    radiusIncreasePerTick?: number;
+    defendProduction?: boolean;
+    missionPriority?: number;
+    activePriority?: number;
+};
+
+const DEFAULT_DEFENCE_OPTIONS: Required<DefenceMissionFactoryOptions> = {
+    checkTicks: 30,
+    startingRadius: 6,
+    radiusIncreasePerTick: 0.0001,
+    defendProduction: false,
+    missionPriority: 10,
+    activePriority: MAX_PRIORITY,
+};
+
 /**
  * A mission that tries to defend a certain area.
  */
@@ -22,6 +40,7 @@ export class DefenceMission extends Mission<CombatSquad> {
         rallyArea: Vector2,
         private defenceArea: Vector2,
         private radius: number,
+        private activePriority: number,
         logger: DebugLogger,
     ) {
         super(uniqueName, logger);
@@ -58,7 +77,7 @@ export class DefenceMission extends Mission<CombatSquad> {
             } found in area ${this.radius})`,
         );
         this.squad.setAttackArea(new Vector2(foundTargets[0].tile.rx, foundTargets[0].tile.ry));
-        this.priority = MAX_PRIORITY;
+        this.priority = this.activePriority;
         return grabCombatants(this.defenceArea, this.priority);
     }
 
@@ -80,8 +99,11 @@ const DEFENCE_RADIUS_INCREASE_PER_GAME_TICK = 0.0001;
 
 export class DefenceMissionFactory {
     private lastDefenceCheckAt = 0;
+    private options: Required<DefenceMissionFactoryOptions>;
 
-    constructor() {}
+    constructor(options: DefenceMissionFactoryOptions = {}) {
+        this.options = { ...DEFAULT_DEFENCE_OPTIONS, ...options };
+    }
 
     getName(): string {
         return "DefenceMissionFactory";
@@ -89,7 +111,7 @@ export class DefenceMissionFactory {
 
     maybeCreateMissions(context: SupabotContext, missionController: MissionController, logger: DebugLogger): void {
         const { game, matchAwareness } = context;
-        if (game.getCurrentTick() < this.lastDefenceCheckAt + DEFENCE_CHECK_TICKS) {
+        if (game.getCurrentTick() < this.lastDefenceCheckAt + this.options.checkTicks) {
             return;
         }
         this.lastDefenceCheckAt = game.getCurrentTick();
@@ -97,7 +119,7 @@ export class DefenceMissionFactory {
         const defendablePoints = this.getDefendablePoints(context);
 
         const defendableRadius =
-            DEFENCE_STARTING_RADIUS + DEFENCE_RADIUS_INCREASE_PER_GAME_TICK * game.getCurrentTick();
+            this.options.startingRadius + this.options.radiusIncreasePerTick * game.getCurrentTick();
         for (const defendablePoint of defendablePoints) {
             const enemiesNearPoint = matchAwareness
                 .getHostilesNearPoint2d(defendablePoint, defendableRadius)
@@ -113,10 +135,11 @@ export class DefenceMissionFactory {
                 missionController.addMission(
                     new DefenceMission(
                         `globalDefence.${defendablePoint.x}.${defendablePoint.y}`,
-                        10,
+                        this.options.missionPriority,
                         matchAwareness.getMainRallyPoint(),
                         defendablePoint,
                         defendableRadius,
+                        this.options.activePriority,
                         logger,
                     ),
                 );
@@ -127,7 +150,15 @@ export class DefenceMissionFactory {
     private getDefendablePoints(context: SupabotContext) {
         const { game, player } = context;
         return game
-            .getVisibleUnits(player.name, "self", (r) => r.constructionYard || r.name === "AMCV" || r.name === "SMCV")
+            .getVisibleUnits(
+                player.name,
+                "self",
+                (r) =>
+                    r.constructionYard ||
+                    r.name === "AMCV" ||
+                    r.name === "SMCV" ||
+                    (this.options.defendProduction && (r.refinery || r.weaponsFactory)),
+            )
             .map((unitId) => game.getGameObjectData(unitId))
             .filter((unit): unit is GameObjectData => unit != null)
             .map((unit) => toVector2(unit.tile));

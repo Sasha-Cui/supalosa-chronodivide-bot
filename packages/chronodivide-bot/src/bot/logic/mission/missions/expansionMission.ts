@@ -214,7 +214,7 @@ function findDeployableLocations(playerName: string, gameApi: GameApi, rectangle
                 continue;
             }
             const right = x < rectangle.width - 1 ? grid[x + 1][y] : 0;
-            const bottom = y < rectangle.height - 1 ? grid[y][y + 1] : 0;
+            const bottom = y < rectangle.height - 1 ? grid[x][y + 1] : 0;
             grid[x][y] = Math.min(right + 1, bottom + 1);
         }
     }
@@ -264,9 +264,50 @@ export class PackConyardMission extends Mission {
 
 const CONYARD_PACK_COOLDOWN = 15 * 60 * 6; // 6 mins
 const DO_NOT_EXPAND_BEFORE_TICKS = 15 * 60 * 6; // 6 minutes
+const HFO_BOTTOM_START = "88,157";
+const HFO_STARTS = new Set(["39,82", "88,34", "88,157", "151,119"]);
+const TSUNAMI_STARTS = new Set(["56,99", "100,58", "106,141", "134,98"]);
+const CAVERNS_OF_SIBERIA_STARTS = new Set(["27,92", "82,47", "103,161", "146,122"]);
+const CAVERNS_OF_SIBERIA_SOUTH_START = "103,161";
+
+const getStartKey = (point: { x: number; y: number }): string => `${point.x},${point.y}`;
+
+export type ExpansionMissionFactoryOptions = {
+    expand?: boolean;
+    packConyard?: boolean;
+};
+
+const isHfoBottomStart = (context: SupabotContext): boolean => {
+    const starts = context.game.mapApi.getStartingLocations().map(getStartKey).sort();
+    if (starts.length !== HFO_STARTS.size || !starts.every((start) => HFO_STARTS.has(start))) {
+        return false;
+    }
+    const ownStart = context.game.getPlayerData(context.player.name).startLocation;
+    return getStartKey(ownStart) === HFO_BOTTOM_START;
+};
+
+const isTsunami = (context: SupabotContext): boolean => {
+    const starts = context.game.mapApi.getStartingLocations().map(getStartKey).sort();
+    return starts.length === TSUNAMI_STARTS.size && starts.every((start) => TSUNAMI_STARTS.has(start));
+};
+
+const isCavernsOfSiberiaSouthStart = (context: SupabotContext): boolean => {
+    const starts = context.game.mapApi.getStartingLocations().map(getStartKey).sort();
+    if (
+        starts.length !== CAVERNS_OF_SIBERIA_STARTS.size ||
+        !starts.every((start) => CAVERNS_OF_SIBERIA_STARTS.has(start))
+    ) {
+        return false;
+    }
+    const ownStart = context.game.getPlayerData(context.player.name).startLocation;
+    return getStartKey(ownStart) === CAVERNS_OF_SIBERIA_SOUTH_START;
+};
 
 export class ExpansionMissionFactory {
-    constructor(private lastConyardPackAt = Number.MIN_VALUE) {}
+    constructor(
+        private options: ExpansionMissionFactoryOptions = {},
+        private lastConyardPackAt = Number.MIN_VALUE,
+    ) {}
     getName(): string {
         return "ExpansionMissionFactory";
     }
@@ -284,7 +325,7 @@ export class ExpansionMissionFactory {
                     new ExpansionMission("initial-deploy-mcv-" + mcv, 100, mcv, [playerData.startLocation], logger),
                 );
             });
-        } else if (expandToCandidates.length > 0) {
+        } else if ((this.options.expand ?? true) && expandToCandidates.length > 0) {
             mcvs.forEach((mcv) => {
                 missionController.addMission(
                     new ExpansionMission("expansion-mcv-" + mcv, 100, mcv, expandToCandidates, logger),
@@ -297,7 +338,12 @@ export class ExpansionMissionFactory {
             return;
         }
 
+        if (isHfoBottomStart(context) || isTsunami(context) || isCavernsOfSiberiaSouthStart(context)) {
+            return;
+        }
+
         if (
+            !(this.options.packConyard ?? true) ||
             game.getCurrentTick() < DO_NOT_EXPAND_BEFORE_TICKS ||
             game.getCurrentTick() < this.lastConyardPackAt + CONYARD_PACK_COOLDOWN
         ) {

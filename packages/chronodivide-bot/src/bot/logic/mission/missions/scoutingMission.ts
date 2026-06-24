@@ -140,10 +140,30 @@ export class ScoutingMission extends Mission {
     }
 }
 
-const SCOUT_COOLDOWN_TICKS = 300;
+const SCOUT_COOLDOWN_TICKS = 180;
+const MAX_CONCURRENT_SCOUT_MISSIONS = 3;
+const SCOUT_MISSION_PRIORITY = 10;
+
+export type ScoutingMissionFactoryOptions = {
+    cooldownTicks?: number;
+    maxConcurrentMissions?: number;
+    missionPriority?: number;
+};
 
 export class ScoutingMissionFactory {
-    constructor(private lastScoutAt: number = -SCOUT_COOLDOWN_TICKS) {}
+    private activeScoutMissions = new Set<string>();
+    private nextScoutMissionId = 0;
+    private readonly cooldownTicks: number;
+    private readonly maxConcurrentMissions: number;
+    private readonly missionPriority: number;
+    private lastScoutAt: number;
+
+    constructor(options: ScoutingMissionFactoryOptions = {}, lastScoutAt?: number) {
+        this.cooldownTicks = options.cooldownTicks ?? SCOUT_COOLDOWN_TICKS;
+        this.maxConcurrentMissions = options.maxConcurrentMissions ?? MAX_CONCURRENT_SCOUT_MISSIONS;
+        this.missionPriority = options.missionPriority ?? SCOUT_MISSION_PRIORITY;
+        this.lastScoutAt = lastScoutAt ?? -this.cooldownTicks;
+    }
 
     getName(): string {
         return "ScoutingMissionFactory";
@@ -151,13 +171,23 @@ export class ScoutingMissionFactory {
 
     maybeCreateMissions(context: SupabotContext, missionController: MissionController, logger: DebugLogger): void {
         const { game, matchAwareness } = context;
-        if (game.getCurrentTick() < this.lastScoutAt + SCOUT_COOLDOWN_TICKS) {
+        if (this.activeScoutMissions.size >= this.maxConcurrentMissions) {
+            return;
+        }
+        if (game.getCurrentTick() < this.lastScoutAt + this.cooldownTicks) {
             return;
         }
         if (!matchAwareness.getScoutingManager().hasScoutTargets()) {
             return;
         }
-        if (!missionController.addMission(new ScoutingMission("globalScout", 10, logger))) {
+        const missionName = `globalScout.${this.nextScoutMissionId++}`;
+        const mission = new ScoutingMission(missionName, this.missionPriority, logger).withOnFinish(() => {
+            this.activeScoutMissions.delete(missionName);
+        });
+        if (missionController.addMission(mission)) {
+            this.activeScoutMissions.add(missionName);
+            this.lastScoutAt = game.getCurrentTick();
+        } else {
             this.lastScoutAt = game.getCurrentTick();
         }
     }

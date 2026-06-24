@@ -10,7 +10,7 @@ import {
     Vector2,
 } from "@chronodivide/game-api";
 import { MatchAwareness } from "../../../awareness.js";
-import { getAttackWeight, manageAttackMicro, manageMoveMicro } from "./common.js";
+import { CombatTargetPriority, getAttackWeight, manageAttackMicro, manageMoveMicro } from "./common.js";
 import { DebugLogger, isOwnedByNeutral, maxBy, minBy } from "../../../common/utils.js";
 import { ActionBatcher, BatchableAction } from "../../actionBatcher.js";
 import { Squad } from "./squad.js";
@@ -53,6 +53,7 @@ export class CombatSquad implements Squad {
         private rallyArea: Vector2,
         private targetArea: Vector2,
         private radius: number,
+        private targetPriority: CombatTargetPriority = "distance",
     ) {}
 
     public getGlobalDebugText(): string | undefined {
@@ -129,7 +130,7 @@ export class CombatSquad implements Squad {
                     .filter((unit) => !isOwnedByNeutral(unit)) as UnitData[];
 
                 for (const unit of units) {
-                    const bestUnit = maxBy(nearbyHostiles, (target) => getAttackWeight(unit, target));
+                    const bestUnit = maxBy(nearbyHostiles, (target) => getAttackWeight(unit, target, this.targetPriority));
                     if (bestUnit) {
                         this.submitActionIfNew(actionBatcher, manageAttackMicro(unit, bestUnit));
                         this.debugLastTarget = `Unit ${bestUnit.id.toString()}`;

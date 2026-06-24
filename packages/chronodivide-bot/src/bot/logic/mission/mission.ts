@@ -165,6 +165,10 @@ export abstract class Mission<FailureReasons = undefined> {
         return true;
     }
 
+    public canDonateLockedUnitsTo(_requestingMission: Mission<any>): boolean {
+        return false;
+    }
+
     abstract getPriority(): number;
 }
 

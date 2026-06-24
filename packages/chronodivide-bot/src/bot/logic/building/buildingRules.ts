@@ -17,6 +17,7 @@ import { ArtilleryUnit } from "./artilleryUnit.js";
 import { BasicAirUnit } from "./basicAirUnit.js";
 import { BasicBuilding } from "./basicBuilding.js";
 import { BasicGroundUnit } from "./basicGroundUnit.js";
+import { NavalBuilding } from "./navalBuilding.js";
 import { PowerPlant } from "./powerPlant.js";
 import { ResourceCollectionBuilding } from "./resourceCollectionBuilding.js";
 import { Harvester } from "./harvester.js";
@@ -173,7 +174,7 @@ export const BUILDING_NAME_TO_RULES = new Map<string, AiBuildingRules>([
     ["AMRADR", new BasicBuilding(10, 1, 500)], // Airforce Command (USA)
 
     ["GATECH", new BasicBuilding(20, 1, 4000)], // Allied Battle Lab
-    ["GAYARD", new BasicBuilding(0, 0, 0)], // Naval Yard, disabled
+    ["GAYARD", new NavalBuilding(0, 0, 0)], // Naval Yard, disabled unless requested by a plan
 
     ["GAPILL", new AntiGroundStaticDefence(2, 1, 7.5, 5)], // Pillbox
     ["ATESLA", new AntiGroundStaticDefence(2, 1, 10, 3)], // Prism Cannon
@@ -200,7 +201,7 @@ export const BUILDING_NAME_TO_RULES = new Map<string, AiBuildingRules>([
     ["NADEPT", new BasicBuilding(1, 1, 10000)], // Repair Depot
     ["NARADR", new BasicBuilding(10, 1, 500)], // Radar
     ["NANRCT", new PowerPlant()], // Nuclear Reactor
-    ["NAYARD", new BasicBuilding(0, 0, 0)], // Naval Yard, disabled
+    ["NAYARD", new NavalBuilding(0, 0, 0)], // Naval Yard, disabled unless requested by a plan
 
     ["NATECH", new BasicBuilding(20, 1, 4000)], // Soviet Battle Lab
 
@@ -219,4 +220,14 @@ export const BUILDING_NAME_TO_RULES = new Map<string, AiBuildingRules>([
     ["HTK", new BasicGroundUnit(5, 2, 0.33, 1.5)], // Flak Track
     ["ZEP", new BasicAirUnit(5, 1, 5, 1)], // Kirov
     ["V3", new ArtilleryUnit(9, 10, 0, 3)], // V3 Rocket Launcher
+    ["SUB", new BasicGroundUnit(8, 3, 2, 0)], // Typhoon Attack Sub
+    ["HYD", new BasicGroundUnit(6, 2, 1, 1)], // Sea Scorpion
+    ["DRED", new ArtilleryUnit(10, 5, 3, 1)], // Dreadnought
+    ["SQD", new BasicGroundUnit(4, 1, 1, 0)], // Giant Squid
+    ["SAPC", new BasicGroundUnit(1, 1, 0, 0)], // Amphibious Transport
+
+    ["DEST", new ArtilleryUnit(8, 3, 2, 1)], // Destroyer
+    ["AEGIS", new BasicGroundUnit(5, 2, 0, 2)], // Aegis Cruiser
+    ["CARRIER", new ArtilleryUnit(10, 4, 3, 1)], // Aircraft Carrier
+    ["DLPH", new BasicGroundUnit(4, 1, 1, 0)], // Dolphin
 ]);

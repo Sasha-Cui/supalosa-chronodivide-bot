@@ -1,5 +1,6 @@
 import { GameApi, ObjectType, PlayerData, UnitData, Vector2 } from "@chronodivide/game-api";
 import { CombatSquad } from "./squads/combatSquad.js";
+import { CombatTargetPriority } from "./squads/common.js";
 import { Mission, MissionAction, disbandMission, noop, requestUnits } from "../mission.js";
 import { MatchAwareness } from "../../awareness.js";
 import { MissionController } from "../missionController.js";
@@ -22,6 +23,16 @@ enum AttackMissionState {
     Attacking = 1,
     Retreating = 2,
 }
+
+export type AttackMissionFactoryOptions = {
+    allowDefenceSteal?: boolean;
+    targetPriority?: CombatTargetPriority;
+};
+
+const DEFAULT_ATTACK_MISSION_FACTORY_OPTIONS: Required<AttackMissionFactoryOptions> = {
+    allowDefenceSteal: false,
+    targetPriority: "distance",
+};
 
 const NO_TARGET_RETARGET_TICKS = 450;
 const NO_TARGET_IDLE_TIMEOUT_TICKS = 900;
@@ -51,10 +62,11 @@ export class AttackMission extends Mission<AttackFailReason> {
         private attackArea: Vector2,
         private radius: number,
         private composition: SideComposition,
+        private options: Required<AttackMissionFactoryOptions>,
         logger: DebugLogger,
     ) {
         super(uniqueName, logger);
-        this.squad = new CombatSquad(rallyArea, attackArea, radius);
+        this.squad = new CombatSquad(rallyArea, attackArea, radius, options.targetPriority);
         this.requestedUnitCount = composition.maximumUnits;
     }
 
@@ -157,6 +169,10 @@ export class AttackMission extends Mission<AttackFailReason> {
         return this.state !== AttackMissionState.Preparing;
     }
 
+    public override canDonateLockedUnitsTo(requestingMission: Mission<any>): boolean {
+        return this.options.allowDefenceSteal && requestingMission.getUniqueName().startsWith("globalDefence.");
+    }
+
     public getPriority() {
         return this.priority;
     }
@@ -257,7 +273,14 @@ const BASE_ATTACK_COOLDOWN_TICKS = 1800;
 const ATTACK_MISSION_INITIAL_PRIORITY = 1;
 
 export class AttackMissionFactory {
-    constructor(private lastAttackAt: number = -VISIBLE_TARGET_ATTACK_COOLDOWN_TICKS) {}
+    private options: Required<AttackMissionFactoryOptions>;
+
+    constructor(
+        options: AttackMissionFactoryOptions = {},
+        private lastAttackAt: number = -VISIBLE_TARGET_ATTACK_COOLDOWN_TICKS,
+    ) {
+        this.options = { ...DEFAULT_ATTACK_MISSION_FACTORY_OPTIONS, ...options };
+    }
 
     getName(): string {
         return "AttackMissionFactory";
@@ -311,6 +334,7 @@ export class AttackMissionFactory {
                 attackArea,
                 attackRadius,
                 composition,
+                this.options,
                 logger,
             ).withOnFinish((unitIds, reason) => {
                 logger(

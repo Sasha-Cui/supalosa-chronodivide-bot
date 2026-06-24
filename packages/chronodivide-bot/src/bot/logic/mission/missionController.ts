@@ -193,29 +193,30 @@ export class MissionController {
         // Request combat-capable units in an area
         const grabRequests = missionActions.filter(isGrabCombatants);
 
-        // Find un-assigned units and distribute them among all the requesting missions.
+        // Find units and distribute them among all the requesting missions.
         const unitIds = context.game.getVisibleUnits(context.player.name, "self");
         type UnitWithMission = {
             unit: GameObjectData;
             mission: Mission<any> | undefined;
         };
-        // List of units that are unassigned or not in a locked mission.
-        const freeUnits: UnitWithMission[] = unitIds
+        const candidateUnits: UnitWithMission[] = unitIds
             .map((unitId) => context.game.getGameObjectData(unitId))
             .filter((unit): unit is GameObjectData => !!unit)
             .map((unit) => ({
                 unit,
                 mission: this.unitIdToMission.get(unit.id),
-            }))
-            .filter((unitWithMission) => !unitWithMission.mission || unitWithMission.mission.isUnitsLocked() === false);
+            }));
 
-        // Sort free units so that unassigned units get chosen before assigned (but unlocked) units.
-        freeUnits.sort((u1, u2) => (u1.mission?.getPriority() ?? 0) - (u2.mission?.getPriority() ?? 0));
+        // Sort units so that unassigned units get chosen before assigned units.
+        candidateUnits.sort((u1, u2) => (u1.mission?.getPriority() ?? 0) - (u2.mission?.getPriority() ?? 0));
 
         type AssignmentWithType = { unitName: string; missionName: string; method: "type" | "grab" };
-        const newAssignmentsByType = freeUnits
+        const newAssignmentsByType = candidateUnits
             .flatMap(({ unit: freeUnit, mission: donatingMission }) => {
                 if (unitTypeToHighestRequest.hasOwnProperty(freeUnit.name)) {
+                    if (donatingMission?.isUnitsLocked()) {
+                        return [];
+                    }
                     const { mission: requestingMission, priority: requestedPriority } =
                         unitTypeToHighestRequest[freeUnit.name];
                     if (donatingMission) {
@@ -238,8 +239,13 @@ export class MissionController {
                 } else if (grabRequests.length > 0) {
                     const grantedMission = grabRequests.find((request) => {
                         const canGrabUnit = isSelectableCombatant(freeUnit);
+                        const canDonateUnit =
+                            !donatingMission ||
+                            !donatingMission.isUnitsLocked() ||
+                            donatingMission.canDonateLockedUnitsTo(request.mission);
                         return (
                             canGrabUnit &&
+                            canDonateUnit &&
                             request.action.point.distanceTo(new Vector2(freeUnit.tile.rx, freeUnit.tile.ry)) <=
                                 request.action.radius
                         );
@@ -297,7 +303,7 @@ export class MissionController {
             const { rulesName, rx, ry } = a.action;
             if (rulesName in unitTypeToHighestRequest) {
                 const currentPriority = unitTypeToHighestRequest[rulesName].priority;
-                if (a.mission.getPriority() > currentPriority) {
+                if (a.action.priority > currentPriority) {
                     unitTypeToHighestRequest[rulesName] = {
                         mission: a.mission,
                         priority: a.action.priority,

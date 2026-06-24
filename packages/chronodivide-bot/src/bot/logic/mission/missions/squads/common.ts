@@ -5,6 +5,8 @@ import { BatchableAction } from "../../actionBatcher.js";
 const NONCE_GI_DEPLOY = 0;
 const NONCE_GI_UNDEPLOY = 1;
 
+export type CombatTargetPriority = "distance" | "strategic";
+
 // Micro methods
 export function manageMoveMicro(attacker: UnitData, attackPoint: Vector2): BatchableAction {
     if (attacker.name === "E1") {
@@ -29,6 +31,15 @@ export function manageAttackMicro(attacker: UnitData, target: UnitData): Batchab
             return BatchableAction.noTarget(attacker.id, OrderType.DeploySelected, NONCE_GI_UNDEPLOY);
         }
     }
+    if (attacker.name === "DESO") {
+        const deployedWeaponRange = attacker.secondaryWeapon?.maxRange || 4;
+        const isDeployed = attacker.stance === StanceType.Deployed;
+        if (!isDeployed && distance <= deployedWeaponRange) {
+            return BatchableAction.noTarget(attacker.id, OrderType.DeploySelected, NONCE_GI_DEPLOY);
+        } else if (isDeployed && distance > deployedWeaponRange) {
+            return BatchableAction.noTarget(attacker.id, OrderType.DeploySelected, NONCE_GI_UNDEPLOY);
+        }
+    }
     let targetData = target;
     let orderType: OrderType = OrderType.Attack;
     const primaryWeaponRange = attacker.primaryWeapon?.maxRange || 5;
@@ -47,17 +58,55 @@ export function manageAttackMicro(attacker: UnitData, target: UnitData): Batchab
  * @param target
  * @returns A number describing the weight of the given target for the attacker, or null if it should not attack it.
  */
-export function getAttackWeight(attacker: UnitData, target: UnitData): number | null {
+export function getAttackWeight(
+    attacker: UnitData,
+    target: UnitData,
+    targetPriority: CombatTargetPriority = "distance",
+): number | null {
     const { rx: x, ry: y } = attacker.tile;
     const { rx: hX, ry: hY } = target.tile;
 
-    if (!attacker.primaryWeapon?.projectileRules.isAntiAir && target.zone === ZoneType.Air) {
+    if (target.zone !== undefined && !canAttackZone(attacker, target.zone)) {
         return null;
     }
 
-    if (!attacker.primaryWeapon?.projectileRules.isAntiGround && target.zone === ZoneType.Ground) {
-        return null;
+    const distanceWeight = 1000000 - getDistanceBetweenPoints(new Vector2(x, y), new Vector2(hX, hY));
+    if (targetPriority === "distance") {
+        return distanceWeight;
     }
 
-    return 1000000 - getDistanceBetweenPoints(new Vector2(x, y), new Vector2(hX, hY));
+    return getStrategicTargetWeight(target) + distanceWeight;
+}
+
+function canAttackZone(attacker: UnitData, targetZone: ZoneType): boolean {
+    const weapons = [attacker.primaryWeapon, attacker.secondaryWeapon];
+    if (targetZone === ZoneType.Air) {
+        return weapons.some((weapon) => !!weapon?.projectileRules.isAntiAir);
+    }
+    if (targetZone === ZoneType.Ground) {
+        return weapons.some((weapon) => !!weapon?.projectileRules.isAntiGround);
+    }
+    return true;
+}
+
+function getStrategicTargetWeight(target: UnitData): number {
+    if (target.rules.isSelectableCombatant) {
+        return 9000000 + (target.maxHitPoints ?? 0);
+    }
+    if (target.rules.constructionYard) {
+        return 8000000 + (target.maxHitPoints ?? 0);
+    }
+    if (target.rules.weaponsFactory) {
+        return 7000000 + (target.maxHitPoints ?? 0);
+    }
+    if (target.rules.refinery) {
+        return 6000000 + (target.maxHitPoints ?? 0);
+    }
+    if (target.rules.harvester) {
+        return 5000000 + (target.maxHitPoints ?? 0);
+    }
+    if (target.type === ObjectType.Building) {
+        return 4000000 + (target.maxHitPoints ?? 0);
+    }
+    return target.maxHitPoints ?? 0;
 }
