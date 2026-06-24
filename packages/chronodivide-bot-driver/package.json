@@ -9,6 +9,9 @@
     "scripts": {
         "build": "tsc -p .",
         "start": "node . --es-module-specifier-resolution=node",
+        "benchmark": "node dist/benchmark/headToHead.js --es-module-specifier-resolution=node",
+        "train:params": "node dist/training/parameterTrainer.js --es-module-specifier-resolution=node",
+        "analyze:training": "node dist/training/analyzeTrainingResults.js --es-module-specifier-resolution=node",
         "test": "vitest"
     },
     "peerDependencies": {
