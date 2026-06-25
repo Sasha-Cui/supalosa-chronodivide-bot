@@ -175,6 +175,8 @@ export const BUILDING_NAME_TO_RULES = new Map<string, AiBuildingRules>([
 
     ["GATECH", new BasicBuilding(20, 1, 4000)], // Allied Battle Lab
     ["GAYARD", new NavalBuilding(0, 0, 0)], // Naval Yard, disabled unless requested by a plan
+    ["GACSPH", new BasicBuilding(0, 1, 5000)], // Chronosphere, disabled unless requested by a plan
+    ["GAWEAT", new BasicBuilding(0, 1, 5000)], // Weather Control Device, disabled unless requested by a plan
 
     ["GAPILL", new AntiGroundStaticDefence(2, 1, 7.5, 5)], // Pillbox
     ["ATESLA", new AntiGroundStaticDefence(2, 1, 10, 3)], // Prism Cannon
@@ -202,6 +204,8 @@ export const BUILDING_NAME_TO_RULES = new Map<string, AiBuildingRules>([
     ["NARADR", new BasicBuilding(10, 1, 500)], // Radar
     ["NANRCT", new PowerPlant()], // Nuclear Reactor
     ["NAYARD", new NavalBuilding(0, 0, 0)], // Naval Yard, disabled unless requested by a plan
+    ["NAIRON", new BasicBuilding(0, 1, 5000)], // Iron Curtain, disabled unless requested by a plan
+    ["NAMISL", new BasicBuilding(0, 1, 5000)], // Nuclear Missile Silo, disabled unless requested by a plan
 
     ["NATECH", new BasicBuilding(20, 1, 4000)], // Soviet Battle Lab
 

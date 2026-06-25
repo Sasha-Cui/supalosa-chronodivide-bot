@@ -9,6 +9,7 @@ import { SupabotContext } from "./logic/common/context.js";
 import { Strategy } from "./strategy/strategy.js";
 import { DefaultStrategy } from "./strategy/defaultStrategy.js";
 import { BaseBuildingMission } from "./logic/mission/missions/baseBuildingMission.js";
+import { SuperWeaponMission } from "./logic/mission/missions/superWeaponMission.js";
 
 const DEBUG_STATE_UPDATE_INTERVAL_SECONDS = 6;
 
@@ -62,6 +63,9 @@ export class SupalosaBot extends Bot {
         );
         this.missionController.addMission(
             new BaseBuildingMission(QueueType.Armory, (message, sayInGame) => this.logBotStatus(message, sayInGame)),
+        );
+        this.missionController.addMission(
+            new SuperWeaponMission((message, sayInGame) => this.logBotStatus(message, sayInGame)),
         );
 
         this.matchAwareness = new MatchAwarenessImpl(

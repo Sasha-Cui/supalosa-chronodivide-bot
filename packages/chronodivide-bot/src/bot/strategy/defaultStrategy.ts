@@ -9,6 +9,7 @@ import { SupabotContext } from "../logic/common/context.js";
 import { MissionController } from "../logic/mission/missionController.js";
 import { Countries, DebugLogger, isOwnedByNeutral } from "../logic/common/utils.js";
 import { Compositions, getValidCompositions, SideComposition } from "./compositionUtils.js";
+import { getAiIniAttackCompositions } from "./aiIniCompositions.js";
 
 // These could be loaded from ai.ini
 export type AttackCompositionPolicy =
@@ -21,6 +22,7 @@ export type AttackCompositionPolicy =
     | "artillery"
     | "desolator"
     | "naval"
+    | "aiIni"
     | "hfo";
 
 export type AttackGateOptions = {
@@ -386,6 +388,7 @@ const ATTACK_COMPOSITION_PREFERENCES: Record<Exclude<AttackCompositionPolicy, "r
         "kirovs",
         "rocketeers",
     ],
+    aiIni: [],
 };
 
 export class DefaultStrategy implements Strategy {
@@ -547,7 +550,10 @@ export class DefaultStrategy implements Strategy {
             return null;
         }
 
-        const validCompositions = getValidCompositions(context, DEFAULT_COMPOSITIONS);
+        const policy = this.resolveAttackCompositionPolicy(context);
+        const aiIniCompositions = policy === "aiIni" ? getAiIniAttackCompositions() : {};
+        const compositions = { ...DEFAULT_COMPOSITIONS, ...aiIniCompositions };
+        const validCompositions = getValidCompositions(context, compositions);
 
         if (validCompositions.length === 0) {
             return null;
@@ -555,19 +561,24 @@ export class DefaultStrategy implements Strategy {
 
         logger(`Valid compositions: ${validCompositions.join(", ")}`);
 
-        const policy = this.resolveAttackCompositionPolicy(context);
-        if (policy !== "random") {
+        if (policy === "aiIni") {
+            const aiIniCompositionIds = validCompositions.filter((compositionId) => compositionId.startsWith("aiIni."));
+            if (aiIniCompositionIds.length > 0) {
+                const randomIndex = context.game.generateRandomInt(0, aiIniCompositionIds.length - 1);
+                return compositions[aiIniCompositionIds[randomIndex]];
+            }
+        } else if (policy !== "random") {
             const preferredCompositionId = ATTACK_COMPOSITION_PREFERENCES[policy].find((compositionId) =>
                 validCompositions.includes(compositionId),
             );
             if (preferredCompositionId) {
-                return DEFAULT_COMPOSITIONS[preferredCompositionId];
+                return compositions[preferredCompositionId];
             }
         }
 
         const randomIndex = context.game.generateRandomInt(0, validCompositions.length - 1);
         const compositionId = validCompositions[randomIndex];
-        return DEFAULT_COMPOSITIONS[compositionId];
+        return compositions[compositionId];
     }
     private resolveAttackCompositionPolicy(context: SupabotContext): Exclude<AttackCompositionPolicy, "hfo"> {
         const policy = this.options.attackCompositionPolicy ?? "random";

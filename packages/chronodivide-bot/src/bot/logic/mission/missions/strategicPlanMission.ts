@@ -286,6 +286,8 @@ const sovietTechStructures: StructurePlanItem[] = [
     { name: "NARADR", targetCount: 1, priority: 72 },
     { name: "NATECH", targetCount: 1, priority: 88, requireCredits: 1800 },
     { name: "NANRCT", targetCount: 1, priority: 46, requireCredits: 1200 },
+    { name: "NAIRON", targetCount: 1, priority: 32, startTick: 30000, requireCredits: 3500 },
+    { name: "NAMISL", targetCount: 1, priority: 44, startTick: 42000, requireCredits: 5000 },
 ];
 
 const alliedTechStructures: StructurePlanItem[] = [
@@ -295,6 +297,8 @@ const alliedTechStructures: StructurePlanItem[] = [
     { name: "GAWEAP", targetCount: 4, priority: 66 },
     { name: "GAAIRC", targetCount: 1, priority: 72 },
     { name: "GATECH", targetCount: 1, priority: 88, requireCredits: 1800 },
+    { name: "GACSPH", targetCount: 1, priority: 32, startTick: 30000, requireCredits: 3500 },
+    { name: "GAWEAT", targetCount: 1, priority: 44, startTick: 42000, requireCredits: 5000 },
 ];
 
 const sovietIslandTechStructures: StructurePlanItem[] = [
