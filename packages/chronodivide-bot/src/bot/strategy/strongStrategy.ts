@@ -43,6 +43,7 @@ const DRY_HEAT_STARTS = new Set(["47,46", "86,85"]);
 const DRY_HEAT_EAST_START = "86,85";
 const SOUTH_PACIFIC_STARTS = new Set(["57,98", "152,96"]);
 const TIKAL_STARTS = new Set(["50,119", "92,22"]);
+const SIMPLE_1V1_STARTS = new Set(["37,63", "62,39"]);
 const TIKAL_LOWER_START = "50,119";
 const ALLIED_COUNTRIES = new Set<string>([
     Countries.USA,
@@ -104,6 +105,73 @@ const NAVAL_PROFILE: StrongStrategyOptions = {
     },
     allIn: {
         enabled: false,
+    },
+    macroBoost: {
+        enabled: false,
+    },
+};
+
+const SIMPLE_INFANTRY_PROFILE: StrongStrategyOptions = {
+    base: {
+        attackCompositionPolicy: "infantry",
+        attackGate: {
+            enabled: false,
+            minTick: 0,
+            minCombatants: 10,
+            hfoBottomMinCombatants: 45,
+            combatantAdvantage: 0,
+            maxEnemyCombatants: 999,
+        },
+        attackSuppression: {
+            enabled: false,
+            radius: 24,
+        },
+        attackMission: {
+            allowDefenceSteal: false,
+        },
+        defence: {
+            checkTicks: 30,
+            startingRadius: 24,
+            radiusIncreasePerTick: 0.0003,
+            defendProduction: true,
+            missionPriority: 60,
+            activePriority: 120,
+        },
+        scouting: {
+            cooldownTicks: 180,
+            maxConcurrentMissions: 1,
+            missionPriority: 10,
+        },
+        engineer: {
+            useKnownTechBuildings: true,
+            techMaxTargets: 1,
+            techMaxDistanceFromStart: 30,
+            techPriority: 96,
+            techEscortLevel: 3,
+        },
+    },
+    strategicPlan: {
+        enabled: false,
+        plan: "off",
+        rushSellTick: 7200,
+        rushSellMinCombatants: 12,
+        dogTargetCount: 2,
+        hfoBottomDogTargetCount: 3,
+        antiInfantryDogTargetCount: 5,
+    },
+    staticDefenseBoost: {
+        enabled: false,
+        startTick: 1800,
+        targetCount: 4,
+        priority: 28,
+    },
+    allIn: {
+        enabled: true,
+        minTick: 12600,
+        minCombatants: 8,
+        combatantAdvantage: 4,
+        disbandExistingAttacks: false,
+        directVisibleAttack: true,
     },
     macroBoost: {
         enabled: false,
@@ -714,6 +782,10 @@ export class StrongStrategy implements Strategy {
 
     onAiUpdate(context: SupabotContext, missionController: MissionController, logger: DebugLogger): Strategy {
         if (!hasExplicitProfileOptions(this.options)) {
+            if (this.isSimple1v1Map(context)) {
+                logger("Strong strategy profile: simpleInfantry");
+                return new StrongStrategy(SIMPLE_INFANTRY_PROFILE).onAiUpdate(context, missionController, logger);
+            }
             if (context.matchAwareness.isNavalMap()) {
                 logger("Strong strategy profile: naval");
                 return new StrongStrategy(NAVAL_PROFILE).onAiUpdate(context, missionController, logger);
@@ -768,6 +840,12 @@ export class StrongStrategy implements Strategy {
 
     private isYinYangUpperStart(context: SupabotContext): boolean {
         return this.isKnownStartProfile(context, YIN_YANG_STARTS, YIN_YANG_UPPER_START);
+    }
+
+    private isSimple1v1Map(context: SupabotContext): boolean {
+        const playerData = context.game.getPlayerData(context.player.name);
+        const countryName = (playerData.country as { name?: string } | undefined)?.name;
+        return countryName === Countries.IRAQ && this.isKnownMapProfile(context, SIMPLE_1V1_STARTS);
     }
 
     private isPeakOfPerfectionWeakStart(context: SupabotContext): boolean {

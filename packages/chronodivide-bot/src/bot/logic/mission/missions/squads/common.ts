@@ -90,6 +90,10 @@ export function getAttackWeight(
         }
     }
 
+    if ((attacker.name === "DOG" || attacker.name === "ADOG") && target.type === ObjectType.Infantry) {
+        return 7000000 + distanceWeight;
+    }
+
     if (target.zone !== undefined && !canAttackZone(attacker, target.zone)) {
         return null;
     }

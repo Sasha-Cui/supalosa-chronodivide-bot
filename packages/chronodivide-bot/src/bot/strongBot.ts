@@ -365,6 +365,7 @@ const DEFAULT_HFO_BOTTOM_DEMOLITION_OPTIONS: Required<HfoBottomDemolitionOptions
 
 const HFO_STARTS = new Set(["39,82", "88,34", "151,119", "88,157"]);
 const TSUNAMI_STARTS = new Set(["56,99", "100,58", "106,141", "134,98"]);
+const SIMPLE_1V1_STARTS = new Set(["37,63", "62,39"]);
 const PEAK_OF_PERFECTION_STARTS = new Set(["37,73", "118,73"]);
 const PEAK_OF_PERFECTION_WEAK_START = "37,73";
 const OTMQ_STARTS = new Set(["48,123", "134,56"]);
@@ -1313,7 +1314,9 @@ export class StrongBot extends SupalosaBot {
     override onGameStart(game: GameApi): void {
         this.lastGameApi = game;
         if (this.enableDefaultMapProfiles) {
-            if (this.isRiverRampageLowerStart(game)) {
+            if (this.isSimple1v1Map(game)) {
+                this.applySimpleInfantryProfile();
+            } else if (this.isRiverRampageLowerStart(game)) {
                 this.applyRiverRampageLowerProfile();
             } else if (this.isYinYangUpperStart(game)) {
                 this.applyYinYangUpperProfile();
@@ -3508,6 +3511,115 @@ export class StrongBot extends SupalosaBot {
         return starts.length === TSUNAMI_STARTS.size && starts.every((start) => TSUNAMI_STARTS.has(start));
     }
 
+    private applySimpleInfantryProfile(): void {
+        this.forceAttackOptions = {
+            ...this.forceAttackOptions,
+            enabled: false,
+            minTick: 16200,
+            minCombatants: 12,
+            combatantAdvantage: -3,
+            maxEnemyCombatants: 4,
+            orderIntervalTicks: 60,
+            directAttackKnownTargets: true,
+            maxTargets: 1,
+            hfoWestVsEastOnly: false,
+        };
+        this.harassOptions = {
+            ...this.harassOptions,
+            enabled: false,
+            minTick: 12600,
+            minCombatants: 4,
+            maxUnits: 4,
+            combatantAdvantage: -3,
+            maxEnemyCombatants: 8,
+            orderIntervalTicks: 120,
+            directAttackKnownTargets: true,
+        };
+        this.routeAttackOptions = {
+            ...this.routeAttackOptions,
+            enabled: false,
+            minTick: 12600,
+            minCombatants: 10,
+            orderIntervalTicks: 60,
+            advanceIntervalTicks: 1200,
+            waypoints: [
+                new Vector2(74, 95),
+                new Vector2(103, 116),
+                new Vector2(128, 122),
+                new Vector2(151, 119),
+            ],
+            directAttackKnownTargets: false,
+            hfoWestVsEastOnly: false,
+        };
+        this.hfoCloseoutOptions = {
+            ...this.hfoCloseoutOptions,
+            enabled: false,
+            minTick: 9000,
+            minUnits: 6,
+            maxEnemyBuildings: 8,
+            maxEnemyCombatants: 2,
+            orderIntervalTicks: 8,
+            includeHarvesters: false,
+        };
+        this.hfoWestSweepOptions = {
+            ...this.hfoWestSweepOptions,
+            enabled: false,
+            minTick: 16200,
+            minCombatants: 4,
+            combatantAdvantage: 14,
+            maxEnemyCombatants: 4,
+            orderIntervalTicks: 60,
+            advanceIntervalTicks: 600,
+            waypoints: [
+                { x: 76, y: 95 },
+                { x: 103, y: 116 },
+                { x: 127, y: 122 },
+                { x: 147, y: 121 },
+                { x: 151, y: 119 },
+                { x: 151, y: 129 },
+                { x: 140, y: 134 },
+            ],
+            directAttackKnownTargets: false,
+            maxTargets: 1,
+        };
+        this.hfoEastSweepOptions = {
+            ...this.hfoEastSweepOptions,
+            enabled: false,
+        };
+        this.hfoBottomSweepOptions = {
+            ...this.hfoBottomSweepOptions,
+            enabled: false,
+        };
+        this.hfoBottomPincerOptions = {
+            ...this.hfoBottomPincerOptions,
+            enabled: false,
+        };
+        this.hfoBottomCloseoutOptions = {
+            ...this.hfoBottomCloseoutOptions,
+            enabled: false,
+        };
+        this.hfoBottomDemolitionOptions = {
+            ...this.hfoBottomDemolitionOptions,
+            enabled: false,
+        };
+        this.hfoBottomHomeGuardOptions = {
+            ...this.hfoBottomHomeGuardOptions,
+            enabled: false,
+        };
+        this.emergencyDefenseOptions = {
+            ...this.emergencyDefenseOptions,
+            enabled: false,
+            radius: 24,
+            minCombatants: 1,
+            maxDefenders: 999,
+            orderIntervalTicks: 30,
+            directAttackKnownTargets: true,
+            mapSignatures: [],
+            hfoWestVsEastOnly: false,
+            hfoBottomOnly: false,
+        };
+    }
+
     private applyRiverRampageLowerProfile(): void {
         this.forceAttackOptions = {
             ...this.forceAttackOptions,
@@ -3804,6 +3916,14 @@ export class StrongBot extends SupalosaBot {
             hfoWestVsEastOnly: false,
             hfoBottomOnly: false,
         };
+    }
+
+    private isSimple1v1Map(game: GameApi): boolean {
+        if (this.country !== Countries.IRAQ) {
+            return false;
+        }
+        const starts = game.mapApi.getStartingLocations().map((start) => this.getStartKey(start)).sort();
+        return starts.length === SIMPLE_1V1_STARTS.size && starts.every((start) => SIMPLE_1V1_STARTS.has(start));
     }
 
     private isRiverRampageLowerStart(game: GameApi): boolean {
