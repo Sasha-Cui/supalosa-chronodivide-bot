@@ -677,22 +677,24 @@ const PLANS: Record<ConcreteStrategicPlanName, ConcreteStrategicPlan> = {
         },
         units: {
             [SideType.Nod]: [
-                { name: "HARV", targetCount: 5, priority: 78 },
-                { name: "HTNK", targetCount: 8, priority: 30, startTick: 900 },
-                { name: "SUB", targetCount: 12, priority: 94, startTick: 5400 },
-                { name: "HYD", targetCount: 8, priority: 58, startTick: 7800 },
-                { name: "ZEP", targetCount: 6, priority: 118, startTick: 10800 },
-                { name: "DRED", targetCount: 8, priority: 156, startTick: 12000 },
-                { name: "SQD", targetCount: 3, priority: 42, startTick: 15000 },
+                { name: "HARV", targetCount: 4, priority: 72 },
+                { name: "HTNK", targetCount: 4, priority: 24, startTick: 900 },
+                { name: "SUB", targetCount: 16, priority: 140, startTick: 3600 },
+                { name: "HYD", targetCount: 10, priority: 84, startTick: 5400 },
+                { name: "SAPC", targetCount: 2, priority: 36, startTick: 7200 },
+                { name: "DRED", targetCount: 10, priority: 170, startTick: 9000 },
+                { name: "ZEP", targetCount: 4, priority: 96, startTick: 12000 },
+                { name: "SQD", targetCount: 4, priority: 60, startTick: 12600 },
             ],
             [SideType.GDI]: [
-                { name: "CMIN", targetCount: 5, priority: 78 },
-                { name: "MTNK", targetCount: 8, priority: 30, startTick: 900 },
-                { name: "DEST", targetCount: 12, priority: 94, startTick: 5400 },
-                { name: "AEGIS", targetCount: 6, priority: 52, startTick: 7800 },
-                { name: "SREF", targetCount: 5, priority: 98, startTick: 10800 },
-                { name: "CARRIER", targetCount: 6, priority: 150, startTick: 12000 },
-                { name: "DLPH", targetCount: 3, priority: 38, startTick: 15000 },
+                { name: "CMIN", targetCount: 4, priority: 72 },
+                { name: "MTNK", targetCount: 4, priority: 24, startTick: 900 },
+                { name: "DEST", targetCount: 16, priority: 140, startTick: 3600 },
+                { name: "AEGIS", targetCount: 8, priority: 78, startTick: 5400 },
+                { name: "LCRF", targetCount: 2, priority: 36, startTick: 7200 },
+                { name: "CARRIER", targetCount: 8, priority: 166, startTick: 9000 },
+                { name: "SREF", targetCount: 4, priority: 86, startTick: 12000 },
+                { name: "DLPH", targetCount: 4, priority: 58, startTick: 12600 },
             ],
         },
     },
@@ -778,7 +780,7 @@ const getPrimaryEnemySide = (context: SupabotContext): SideType | null => {
 };
 
 const resolveHfoPlanName = (context: SupabotContext): ConcreteStrategicPlanName | null => {
-    if (isTsunami(context)) {
+    if (isTsunami(context) || context.matchAwareness.isNavalMap()) {
         return "islandTech";
     }
     const start = getStartKey(context.game.getPlayerData(context.player.name).startLocation);

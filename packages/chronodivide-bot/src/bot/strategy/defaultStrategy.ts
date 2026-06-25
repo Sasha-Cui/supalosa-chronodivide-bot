@@ -20,6 +20,7 @@ export type AttackCompositionPolicy =
     | "heavy"
     | "artillery"
     | "desolator"
+    | "naval"
     | "hfo";
 
 export type AttackGateOptions = {
@@ -150,6 +151,56 @@ const LEGACY_BASELINE_COMPOSITIONS: Compositions = {
         minimumUnits: 4,
         maximumUnits: 10,
     },
+    sovietSubPack: {
+        composition: {
+            SUB: 1,
+        },
+        minimumUnits: 2,
+        maximumUnits: 6,
+    },
+    alliedDestroyerPack: {
+        composition: {
+            DEST: 1,
+        },
+        minimumUnits: 2,
+        maximumUnits: 6,
+    },
+    sovietNavy: {
+        composition: {
+            DRED: 1,
+            HYD: 2,
+            SUB: 2,
+        },
+        minimumUnits: 3,
+        maximumUnits: 10,
+    },
+    alliedNavy: {
+        composition: {
+            CARRIER: 1,
+            DEST: 2,
+            AEGIS: 1,
+        },
+        minimumUnits: 3,
+        maximumUnits: 9,
+    },
+    sovietAmphibious: {
+        composition: {
+            SAPC: 1,
+            HTNK: 4,
+            E2: 4,
+        },
+        minimumUnits: 6,
+        maximumUnits: 14,
+    },
+    alliedAmphibious: {
+        composition: {
+            LCRF: 1,
+            MTNK: 4,
+            E1: 4,
+        },
+        minimumUnits: 6,
+        maximumUnits: 14,
+    },
 };
 
 const DEFAULT_COMPOSITIONS: Compositions = {
@@ -262,6 +313,56 @@ const DEFAULT_COMPOSITIONS: Compositions = {
         minimumUnits: 4,
         maximumUnits: 10,
     },
+    sovietSubPack: {
+        composition: {
+            SUB: 1,
+        },
+        minimumUnits: 2,
+        maximumUnits: 6,
+    },
+    alliedDestroyerPack: {
+        composition: {
+            DEST: 1,
+        },
+        minimumUnits: 2,
+        maximumUnits: 6,
+    },
+    sovietNavy: {
+        composition: {
+            DRED: 1,
+            HYD: 2,
+            SUB: 2,
+        },
+        minimumUnits: 3,
+        maximumUnits: 10,
+    },
+    alliedNavy: {
+        composition: {
+            CARRIER: 1,
+            DEST: 2,
+            AEGIS: 1,
+        },
+        minimumUnits: 3,
+        maximumUnits: 9,
+    },
+    sovietAmphibious: {
+        composition: {
+            SAPC: 1,
+            HTNK: 4,
+            E2: 4,
+        },
+        minimumUnits: 6,
+        maximumUnits: 14,
+    },
+    alliedAmphibious: {
+        composition: {
+            LCRF: 1,
+            MTNK: 4,
+            E1: 4,
+        },
+        minimumUnits: 6,
+        maximumUnits: 14,
+    },
 };
 
 const hasAnyDefinedOption = (options: DefaultStrategyOptions): boolean =>
@@ -275,6 +376,16 @@ const ATTACK_COMPOSITION_PREFERENCES: Record<Exclude<AttackCompositionPolicy, "r
     heavy: ["heavySovietTanks", "heavyAlliedTanks", "sovietTanks", "alliedTanks"],
     artillery: ["sovietArtillery", "alliedArtillery", "sovietTanks", "alliedTanks"],
     desolator: ["iraqDesolators", "pureDesolators", "sovietTanks"],
+    naval: [
+        "sovietSubPack",
+        "alliedDestroyerPack",
+        "sovietNavy",
+        "alliedNavy",
+        "sovietAmphibious",
+        "alliedAmphibious",
+        "kirovs",
+        "rocketeers",
+    ],
 };
 
 export class DefaultStrategy implements Strategy {
@@ -469,8 +580,8 @@ export class DefaultStrategy implements Strategy {
         if (this.isOtmqSouthwestStart(context)) {
             return "assault";
         }
-        if (this.isTsunami(context)) {
-            return "artillery";
+        if (context.matchAwareness.isNavalMap() || this.isTsunami(context)) {
+            return "naval";
         }
         if (this.isDryHeat(context)) {
             return "tanks";

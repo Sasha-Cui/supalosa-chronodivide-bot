@@ -3,6 +3,7 @@ import { AllInAttackMissionFactory, AllInAttackMissionFactoryOptions } from "../
 import { MacroBoostMissionFactory } from "../logic/mission/missions/macroBoostMission.js";
 import { StaticDefenseBoostMissionFactory, StaticDefenseBoostOptions } from "../logic/mission/missions/staticDefenseBoostMission.js";
 import { StrategicPlanMissionFactory, StrategicPlanOptions } from "../logic/mission/missions/strategicPlanMission.js";
+import { NavalAssaultMissionFactory } from "../logic/mission/missions/navalAssaultMission.js";
 import { SupabotContext } from "../logic/common/context.js";
 import { MissionController } from "../logic/mission/missionController.js";
 import { Countries, DebugLogger } from "../logic/common/utils.js";
@@ -50,6 +51,64 @@ const ALLIED_COUNTRIES = new Set<string>([
     Countries.GERMANY,
     Countries.GREAT_BRITAIN,
 ]);
+
+const NAVAL_PROFILE: StrongStrategyOptions = {
+    base: {
+        attackCompositionPolicy: "naval",
+        attackGate: {
+            enabled: true,
+            hfoOnly: false,
+            minTick: 7200,
+            minCombatants: 3,
+            combatantAdvantage: -10,
+            maxEnemyCombatants: 999,
+        },
+        attackMission: {
+            allowDefenceSteal: false,
+            targetPriority: "strategic",
+        },
+        scouting: {
+            cooldownTicks: 210,
+            maxConcurrentMissions: 2,
+            missionPriority: 12,
+        },
+        defence: {
+            checkTicks: 18,
+            startingRadius: 34,
+            radiusIncreasePerTick: 0.0003,
+            defendProduction: true,
+            missionPriority: 84,
+            activePriority: 150,
+        },
+        engineer: {
+            useKnownTechBuildings: true,
+            techMaxTargets: 1,
+            techMaxDistanceFromStart: 45,
+            techPriority: 72,
+            techEscortLevel: 1,
+        },
+    },
+    strategicPlan: {
+        enabled: true,
+        plan: "islandTech",
+        dogTargetCount: 1,
+        hfoBottomDogTargetCount: 1,
+        antiInfantryDogTargetCount: 1,
+    },
+    staticDefenseBoost: {
+        enabled: true,
+        hfoBottomOnly: false,
+        startTick: 5400,
+        targetCount: 3,
+        priority: 72,
+    },
+    allIn: {
+        enabled: false,
+    },
+    macroBoost: {
+        enabled: false,
+    },
+};
 
 const RIVER_RAMPAGE_LOWER_PROFILE: StrongStrategyOptions = {
     base: {
@@ -580,6 +639,7 @@ export class StrongStrategy implements Strategy {
     private staticDefenseBoostFactory: StaticDefenseBoostMissionFactory;
     private strategicPlanFactory: StrategicPlanMissionFactory;
     private allInAttackFactory: AllInAttackMissionFactory;
+    private navalAssaultFactory = new NavalAssaultMissionFactory();
 
     constructor(private options: StrongStrategyOptions = {}) {
         const strategicPlan = options.strategicPlan ?? { enabled: true, plan: "hfo" as const };
@@ -654,6 +714,10 @@ export class StrongStrategy implements Strategy {
 
     onAiUpdate(context: SupabotContext, missionController: MissionController, logger: DebugLogger): Strategy {
         if (!hasExplicitProfileOptions(this.options)) {
+            if (context.matchAwareness.isNavalMap()) {
+                logger("Strong strategy profile: naval");
+                return new StrongStrategy(NAVAL_PROFILE).onAiUpdate(context, missionController, logger);
+            }
             if (this.isRiverRampageLowerStart(context)) {
                 logger("Strong strategy profile: riverRampageLower");
                 return new StrongStrategy(RIVER_RAMPAGE_LOWER_PROFILE).onAiUpdate(context, missionController, logger);
@@ -692,6 +756,7 @@ export class StrongStrategy implements Strategy {
         }
         this.staticDefenseBoostFactory.maybeCreateMissions(context, missionController, logger);
         this.strategicPlanFactory.maybeCreateMissions(context, missionController, logger);
+        this.navalAssaultFactory.maybeCreateMissions(context, missionController, logger);
         this.baseStrategy = this.baseStrategy.onAiUpdate(context, missionController, logger);
         this.allInAttackFactory.maybeCreateMissions(context, missionController, logger);
         return this;

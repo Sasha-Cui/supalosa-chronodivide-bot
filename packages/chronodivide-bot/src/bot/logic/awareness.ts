@@ -1,4 +1,4 @@
-import { BotContext, GameApi, GameObjectData, MapApi, PathNode, PlayerData, Size, SpeedType, Vector2 } from "@chronodivide/game-api";
+import { BotContext, GameApi, GameObjectData, LandType, MapApi, PathNode, PlayerData, Size, SpeedType, Vector2 } from "@chronodivide/game-api";
 import { calculateConnectedSectorIds, SectorCache } from "./map/sector.js";
 import { GlobalThreat } from "./threat/threat.js";
 import { calculateGlobalThreat } from "./threat/threatCalculator.js";
@@ -11,6 +11,67 @@ import { BuildSpaceCache } from "./map/buildSpaceCache.js";
 import { getSectorId } from "./map/sectorUtils.js";
 
 export type UnitPositionQuery = { x: number; y: number; unitId: number };
+
+export type MapAnalysis = {
+    validTiles: number;
+    waterTiles: number;
+    beachTiles: number;
+    waterTileRatio: number;
+    ownStartWaterTiles: number;
+    ownStartBeachTiles: number;
+    navalMap: boolean;
+};
+
+const NAVAL_WATER_RATIO = 0.08;
+const START_WATER_SCAN_RADIUS = 24;
+const MIN_START_WATER_TILES = 12;
+
+const isWaterTile = (tile: { landType: LandType }): boolean => tile.landType === LandType.Water;
+const isBeachTile = (tile: { landType: LandType }): boolean => tile.landType === LandType.Beach;
+
+function calculateMapAnalysis(mapApi: MapApi, playerData: PlayerData): MapAnalysis {
+    const mapSize = mapApi.getRealMapSize();
+    let validTiles = 0;
+    let waterTiles = 0;
+    let beachTiles = 0;
+    let ownStartWaterTiles = 0;
+    let ownStartBeachTiles = 0;
+    const start = playerData.startLocation;
+    for (let x = 0; x < mapSize.width; x++) {
+        for (let y = 0; y < mapSize.height; y++) {
+            const tile = mapApi.getTile(x, y);
+            if (!tile) {
+                continue;
+            }
+            validTiles++;
+            if (isWaterTile(tile)) {
+                waterTiles++;
+            }
+            if (isBeachTile(tile)) {
+                beachTiles++;
+            }
+            if (new Vector2(x, y).distanceTo(start) <= START_WATER_SCAN_RADIUS) {
+                if (isWaterTile(tile)) {
+                    ownStartWaterTiles++;
+                }
+                if (isBeachTile(tile)) {
+                    ownStartBeachTiles++;
+                }
+            }
+        }
+    }
+    const waterTileRatio = validTiles > 0 ? waterTiles / validTiles : 0;
+    const navalMap = waterTileRatio >= NAVAL_WATER_RATIO && ownStartWaterTiles >= MIN_START_WATER_TILES;
+    return {
+        validTiles,
+        waterTiles,
+        beachTiles,
+        waterTileRatio,
+        ownStartWaterTiles,
+        ownStartBeachTiles,
+        navalMap,
+    };
+}
 
 /**
  * The bot's understanding of the current state of the game.
@@ -27,6 +88,10 @@ export interface MatchAwareness {
     getSectorCache(): SectorCache;
 
     getBuildSpaceCache(): BuildSpaceCache;
+
+    getMapAnalysis(): MapAnalysis;
+
+    isNavalMap(): boolean;
 
     /**
      * Returns the enemy unit IDs in a certain radius of a point.
@@ -92,6 +157,7 @@ export class MatchAwarenessImpl implements MatchAwareness {
     private scoutingManager: ScoutingManager;
     private sectorCache: SectorCache;
     private buildSpaceCache: BuildSpaceCache;
+    private mapAnalysis: MapAnalysis;
 
     private expansionCandidates: Vector2[] = [];
 
@@ -106,6 +172,11 @@ export class MatchAwarenessImpl implements MatchAwareness {
         const diagonalBounds = getDiagonalMapBounds(gameApi.mapApi);
         this.hostileQuadTree = new Quadtree(mapSize);
         this.scoutingManager = new ScoutingManager(logger);
+        this.mapAnalysis = calculateMapAnalysis(gameApi.mapApi, playerData);
+        this.logger(
+            `Map analysis: ${Math.round(this.mapAnalysis.waterTileRatio * 1000) / 10}% water, ` +
+                `${this.mapAnalysis.ownStartWaterTiles} water tiles near start, naval=${this.mapAnalysis.navalMap}`,
+        );
         this.sectorCache = new SectorCache(
             mapSize, 
             diagonalBounds,
@@ -171,6 +242,12 @@ export class MatchAwarenessImpl implements MatchAwareness {
     }
     getBuildSpaceCache(): BuildSpaceCache {
         return this.buildSpaceCache;
+    }
+    getMapAnalysis(): MapAnalysis {
+        return this.mapAnalysis;
+    }
+    isNavalMap(): boolean {
+        return this.mapAnalysis.navalMap;
     }
 
     shouldAttack(): boolean {
@@ -310,7 +387,9 @@ export class MatchAwarenessImpl implements MatchAwareness {
             )}.\n` +
             `Threat AIR: Them ${Math.round(this.threatCache.totalOffensiveAirThreat)}, us: ${Math.round(
                 this.threatCache.totalAvailableAntiAirFirepower,
-            )}.`
+            )}.
+` +
+            `Map: ${Math.round(this.mapAnalysis.waterTileRatio * 1000) / 10}% water, naval=${this.mapAnalysis.navalMap}.`
         );
     }
 }

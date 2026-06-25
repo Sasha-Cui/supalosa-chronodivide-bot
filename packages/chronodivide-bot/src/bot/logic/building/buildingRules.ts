@@ -225,6 +225,7 @@ export const BUILDING_NAME_TO_RULES = new Map<string, AiBuildingRules>([
     ["DRED", new ArtilleryUnit(10, 5, 3, 1)], // Dreadnought
     ["SQD", new BasicGroundUnit(4, 1, 1, 0)], // Giant Squid
     ["SAPC", new BasicGroundUnit(1, 1, 0, 0)], // Amphibious Transport
+    ["LCRF", new BasicGroundUnit(1, 1, 0, 0)], // Allied Amphibious Transport
 
     ["DEST", new ArtilleryUnit(8, 3, 2, 1)], // Destroyer
     ["AEGIS", new BasicGroundUnit(5, 2, 0, 2)], // Aegis Cruiser
