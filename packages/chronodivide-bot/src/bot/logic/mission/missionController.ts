@@ -14,7 +14,7 @@ import {
     isRequestSpecificUnits,
     isRequestUnits,
 } from "./mission.js";
-import { ActionBatcher } from "./actionBatcher.js";
+import { ActionBatcher, SubmittedBatchableAction } from "./actionBatcher.js";
 import { countBy, isSelectableCombatant } from "../common/utils.js";
 import { MissionContext, SupabotContext } from "../common/context.js";
 
@@ -42,6 +42,8 @@ export class MissionController {
 
     // Tracks missions to be externally disbanded the next time the mission update loop occurs.
     private forceDisbandedMissions: string[] = [];
+
+    private recentBatchableActions: Map<number, SubmittedBatchableAction> = new Map();
 
     constructor(private logger: (message: string, sayInGame?: boolean) => void) {}
 
@@ -71,7 +73,7 @@ export class MissionController {
         this.updateUnitIds(context);
 
         // Batch actions to reduce spamming of actions for larger armies.
-        const actionBatcher = new ActionBatcher();
+        const actionBatcher = new ActionBatcher(context.game.getCurrentTick(), this.recentBatchableActions);
 
         const missionContext = {
             ...context,
