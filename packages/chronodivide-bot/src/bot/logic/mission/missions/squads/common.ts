@@ -21,6 +21,17 @@ export function manageMoveMicro(attacker: UnitData, attackPoint: Vector2): Batch
 
 export function manageAttackMicro(attacker: UnitData, target: UnitData): BatchableAction {
     const distance = getDistanceBetweenUnits(attacker, target);
+    if (target.type === ObjectType.Building) {
+        if (attacker.rules.engineer && (target.rules.capturable || target.rules.needsEngineer)) {
+            return BatchableAction.toTargetId(attacker.id, OrderType.Capture, target.id);
+        }
+        if ((attacker.rules.agent || attacker.rules.infiltrate) && target.rules.spyable) {
+            return BatchableAction.toTargetId(attacker.id, OrderType.Capture, target.id);
+        }
+        if ((attacker.rules.c4 || attacker.rules.ivan) && target.rules.canC4) {
+            return BatchableAction.toTargetId(attacker.id, OrderType.PlaceBomb, target.id);
+        }
+    }
     if (attacker.name === "E1") {
         // Para (deployed weapon) range is 5.
         const deployedWeaponRange = attacker.secondaryWeapon?.maxRange || 5;
@@ -66,11 +77,23 @@ export function getAttackWeight(
     const { rx: x, ry: y } = attacker.tile;
     const { rx: hX, ry: hY } = target.tile;
 
+    const distanceWeight = 1000000 - getDistanceBetweenPoints(new Vector2(x, y), new Vector2(hX, hY));
+    if (target.type === ObjectType.Building) {
+        if (attacker.rules.engineer && (target.rules.capturable || target.rules.needsEngineer)) {
+            return 9000000 + distanceWeight;
+        }
+        if ((attacker.rules.agent || attacker.rules.infiltrate) && target.rules.spyable) {
+            return 8500000 + distanceWeight;
+        }
+        if ((attacker.rules.c4 || attacker.rules.ivan) && target.rules.canC4) {
+            return 8200000 + distanceWeight;
+        }
+    }
+
     if (target.zone !== undefined && !canAttackZone(attacker, target.zone)) {
         return null;
     }
 
-    const distanceWeight = 1000000 - getDistanceBetweenPoints(new Vector2(x, y), new Vector2(hX, hY));
     if (targetPriority === "distance") {
         return distanceWeight;
     }
