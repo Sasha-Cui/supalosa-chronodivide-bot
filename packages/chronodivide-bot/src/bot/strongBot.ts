@@ -936,6 +936,46 @@ const WEAK_START_HOME_GUARDS: WeakStartHomeGuard[] = [
     },
     {
         starts: new Set(["50,119", "92,22"]),
+        ownStart: "50,119",
+        guardPoints: [
+            { x: 53, y: 111 },
+            { x: 56, y: 109 },
+            { x: 56, y: 116 },
+            { x: 50, y: 115 },
+            { x: 60, y: 97 },
+            { x: 62, y: 96 },
+            { x: 47, y: 109 },
+            { x: 49, y: 118 },
+        ],
+        untilTick: 12000,
+        radius: 58,
+        orderIntervalTicks: 6,
+        closeoutMinTick: 12000,
+        closeoutMaxEnemyBuildings: 20,
+        closeoutMaxEnemyCombatants: 12,
+        closeoutCombatantAdvantage: 8,
+        closeoutMaxTargets: 10,
+        closeoutDirectAttackKnownTargets: false,
+        closeoutUseGenericOrders: true,
+        closeoutTargetProfile: "economyBreak",
+        pressureMinTick: 9000,
+        pressureMinCombatants: 18,
+        pressureCombatantAdvantage: 0,
+        pressureMaxEnemyCombatants: 999,
+        pressureOrderIntervalTicks: 36,
+        pressureDirectAttackKnownTargets: false,
+        pressureMaxTargets: 6,
+        pressureTargetProfile: "economyBreak",
+        proxyAttackMinTick: 6600,
+        proxyAttackRadius: 58,
+        proxyAttackMinCombatants: 6,
+        proxyAttackOrderIntervalTicks: 10,
+        proxyAttackDirectAttackKnownTargets: true,
+        proxyAttackMaxTargets: 4,
+        homeGuardHoldPositionUntilTick: 8400,
+    },
+    {
+        starts: new Set(["50,119", "92,22"]),
         ownStart: "92,22",
         guardPoints: [
             { x: 92, y: 24 },
@@ -2301,24 +2341,33 @@ export class StrongBot extends SupalosaBot {
 
         const enemyUnits = this.getKnownEnemyUnits(game);
         const enemyBuildings = enemyUnits.filter((unit) => unit.rules.type === ObjectType.Building);
-        const maxEnemyBuildings = tick >= 72000 ? 30 : tick >= 42000 ? 18 : 6;
-        if (enemyBuildings.length === 0 || enemyBuildings.length > maxEnemyBuildings) {
+        if (enemyBuildings.length === 0) {
             return false;
         }
         const enemyCombatants = enemyUnits.filter(
             (unit) => !!unit.rules.isSelectableCombatant && !unit.rules.harvester && unit.rules.type !== ObjectType.Building,
         );
-        const maxEnemyCombatants = tick >= 60000 ? 8 : tick >= 36000 ? 5 : 2;
+        const includeHarvesters = tick >= 48000 && enemyCombatants.length <= 2 && enemyBuildings.length <= 16;
+        const attackers = (includeHarvesters ? this.getHfoCloseoutUnits(game, true) : this.getMobileCombatants(game)).filter(
+            (unit) => unit.rules.name !== "DOG" && unit.rules.name !== "ADOG",
+        );
+        const armyLead = attackers.length - enemyCombatants.length;
+        const enemyIsNearlyDead = enemyCombatants.length === 0 || (enemyCombatants.length <= 2 && armyLead >= 18);
+        const maxEnemyBuildings = enemyIsNearlyDead
+            ? tick >= 60000 ? 36 : tick >= 42000 ? 28 : tick >= 30000 ? 18 : 10
+            : tick >= 72000 ? 30 : tick >= 42000 ? 18 : 6;
+        if (enemyBuildings.length > maxEnemyBuildings) {
+            return false;
+        }
+        const maxEnemyCombatants = tick >= 60000 ? 10 : tick >= 36000 ? 6 : 2;
         if (enemyCombatants.length > maxEnemyCombatants) {
             return false;
         }
 
-        const includeHarvesters = tick >= 60000 && enemyCombatants.length <= 2 && enemyBuildings.length <= 12;
-        const attackers = (includeHarvesters ? this.getHfoCloseoutUnits(game, true) : this.getMobileCombatants(game)).filter(
-            (unit) => unit.rules.name !== "DOG" && unit.rules.name !== "ADOG",
-        );
-        const minAttackers = tick >= 60000 ? 4 : tick >= 42000 ? 6 : tick >= 30000 ? 8 : 12;
-        const combatantAdvantage = tick >= 60000 ? 2 : tick >= 36000 ? 4 : 8;
+        const minAttackers = enemyIsNearlyDead
+            ? tick >= 42000 ? 6 : 10
+            : tick >= 60000 ? 4 : tick >= 42000 ? 6 : tick >= 30000 ? 8 : 12;
+        const combatantAdvantage = enemyIsNearlyDead ? 4 : tick >= 60000 ? 2 : tick >= 36000 ? 4 : 8;
         if (attackers.length < Math.max(minAttackers, enemyCombatants.length + combatantAdvantage)) {
             return false;
         }
@@ -2326,7 +2375,7 @@ export class StrongBot extends SupalosaBot {
             return true;
         }
 
-        const targetLimit = tick >= 60000 ? 16 : tick >= 36000 ? 12 : 8;
+        const targetLimit = enemyIsNearlyDead ? 20 : tick >= 60000 ? 16 : tick >= 36000 ? 12 : 8;
         const targets = this.selectWeakStartEconomyBreakTargets(
             [...enemyBuildings, ...enemyCombatants],
             Math.min(targetLimit, enemyBuildings.length + enemyCombatants.length),

@@ -376,6 +376,33 @@ const PEAK_OF_PERFECTION_WEAK_PROFILE: StrongStrategyOptions = {
 
 
 const TIKAL_LOWER_PROFILE: StrongStrategyOptions = {
+    base: {
+        attackCompositionPolicy: "tanks",
+        attackGate: {
+            enabled: true,
+            hfoOnly: false,
+            minTick: 9600,
+            minCombatants: 6,
+            combatantAdvantage: -4,
+            maxEnemyCombatants: 999,
+        },
+        attackMission: {
+            allowDefenceSteal: true,
+        },
+        defence: {
+            checkTicks: 12,
+            startingRadius: 44,
+            radiusIncreasePerTick: 0.00025,
+            defendProduction: true,
+            missionPriority: 92,
+            activePriority: 160,
+        },
+        scouting: {
+            cooldownTicks: 999999,
+            maxConcurrentMissions: 0,
+            missionPriority: 4,
+        },
+    },
     strategicPlan: {
         enabled: true,
         plan: "rush",
@@ -386,14 +413,19 @@ const TIKAL_LOWER_PROFILE: StrongStrategyOptions = {
         antiInfantryDogTargetCount: 5,
     },
     staticDefenseBoost: {
-        enabled: false,
+        enabled: true,
+        hfoBottomOnly: false,
+        startTick: 3300,
+        targetCount: 2,
+        priority: 150,
+        placementAnchors: [{ x: 56, y: 111 }, { x: 56, y: 116 }],
     },
     allIn: {
-        enabled: false,
-        minTick: 10800,
-        minCombatants: 4,
-        combatantAdvantage: -3,
-        disbandExistingAttacks: false,
+        enabled: true,
+        minTick: 9000,
+        minCombatants: 20,
+        combatantAdvantage: 8,
+        disbandExistingAttacks: true,
         directVisibleAttack: false,
     },
     macroBoost: {

@@ -262,17 +262,33 @@ const alliedOtmqAntiInfantryStructures: StructurePlanItem[] = [
 ];
 
 const sovietRushStructures: StructurePlanItem[] = [
-    { name: "NAPOWR", targetCount: 3, priority: 42 },
-    { name: "NAREFN", targetCount: 2, priority: 64 },
-    { name: "NAHAND", targetCount: 1, priority: 28 },
-    { name: "NAWEAP", targetCount: 3, priority: 88 },
+    { name: "NAPOWR", targetCount: 1, priority: 88 },
+    { name: "NAREFN", targetCount: 1, priority: 128 },
+    { name: "NAHAND", targetCount: 1, priority: 72 },
+    { name: "NAWEAP", targetCount: 1, priority: 146 },
+    { name: "NAPOWR", targetCount: 2, priority: 82 },
+    { name: "NAWEAP", targetCount: 2, priority: 134, startTick: 3600 },
+    { name: "NAREFN", targetCount: 2, priority: 96, startTick: 4800 },
+    { name: "NAPOWR", targetCount: 3, priority: 72, startTick: 6000 },
+    { name: "NAWEAP", targetCount: 3, priority: 116, startTick: 7200 },
+    { name: "NARADR", targetCount: 1, priority: 54, startTick: 12000, requireCredits: 900 },
+    { name: "NAREFN", targetCount: 3, priority: 62, startTick: 15000 },
+    { name: "NAPOWR", targetCount: 5, priority: 42, startTick: 15000 },
 ];
 
 const alliedRushStructures: StructurePlanItem[] = [
-    { name: "GAPOWR", targetCount: 3, priority: 42 },
-    { name: "GAREFN", targetCount: 2, priority: 64 },
-    { name: "GAPILE", targetCount: 1, priority: 28 },
-    { name: "GAWEAP", targetCount: 3, priority: 88 },
+    { name: "GAPOWR", targetCount: 1, priority: 88 },
+    { name: "GAREFN", targetCount: 1, priority: 128 },
+    { name: "GAPILE", targetCount: 1, priority: 72 },
+    { name: "GAWEAP", targetCount: 1, priority: 146 },
+    { name: "GAPOWR", targetCount: 2, priority: 82 },
+    { name: "GAWEAP", targetCount: 2, priority: 134, startTick: 3600 },
+    { name: "GAREFN", targetCount: 2, priority: 96, startTick: 4800 },
+    { name: "GAPOWR", targetCount: 3, priority: 72, startTick: 6000 },
+    { name: "GAWEAP", targetCount: 3, priority: 116, startTick: 7200 },
+    { name: "GAAIRC", targetCount: 1, priority: 54, startTick: 12000, requireCredits: 900 },
+    { name: "GAREFN", targetCount: 3, priority: 62, startTick: 15000 },
+    { name: "GAPOWR", targetCount: 5, priority: 42, startTick: 15000 },
 ];
 
 const sovietTankBoomStructures: StructurePlanItem[] = [
@@ -625,13 +641,19 @@ const PLANS: Record<ConcreteStrategicPlanName, ConcreteStrategicPlan> = {
         units: {
             [SideType.Nod]: [
                 { name: "DOG", targetCount: 2, priority: 108, startTick: 600 },
+                { name: "E2", targetCount: 16, priority: 132, startTick: 900 },
                 { name: "HARV", targetCount: 4, priority: 48 },
                 { name: "HTNK", targetCount: 42, priority: 96, startTick: 900 },
+                { name: "HTK", targetCount: 4, priority: 36, startTick: 5400 },
+                { name: "E2", targetCount: 24, priority: 52, startTick: 7200 },
             ],
             [SideType.GDI]: [
                 { name: "ADOG", targetCount: 2, priority: 108, startTick: 600 },
+                { name: "E1", targetCount: 16, priority: 132, startTick: 900 },
                 { name: "CMIN", targetCount: 4, priority: 48 },
                 { name: "MTNK", targetCount: 42, priority: 96, startTick: 900 },
+                { name: "FV", targetCount: 4, priority: 36, startTick: 5400 },
+                { name: "E1", targetCount: 24, priority: 52, startTick: 7200 },
             ],
         },
         sellYard: { enabled: true, tick: 7200, minCombatants: 12, maxFactories: 3 },
