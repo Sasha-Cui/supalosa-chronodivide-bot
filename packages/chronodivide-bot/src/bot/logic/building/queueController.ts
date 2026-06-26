@@ -52,6 +52,7 @@ type QueueState = {
 };
 
 const REPAIR_CHECK_INTERVAL = 30;
+const FLOATING_CREDITS_RESUME_THRESHOLD = 2500;
 
 export class QueueController {
     private queueStates: QueueState[] = [];
@@ -80,10 +81,10 @@ export class QueueController {
             };
         });
         const totalWeightAcrossQueues = this.queueStates
-            .map((decision) => decision.topItem?.priority!)
+            .map((decision) => decision.topItem?.priority ?? 0)
             .reduce((pV, cV) => pV + cV, 0);
         const totalCostAcrossQueues = this.queueStates
-            .map((decision) => decision.topItem?.unit.cost!)
+            .map((decision) => decision.topItem?.unit.cost ?? 0)
             .reduce((pV, cV) => pV + cV, 0);
 
         this.queueStates.forEach((decision) => {
@@ -180,7 +181,11 @@ export class QueueController {
                 }
             } else {
                 // Not changing our mind, but maybe other queues are more important for now.
-                if (totalCostAcrossQueues > myCredits && decision.priority < totalWeightAcrossQueues * 0.25) {
+                if (
+                    myCredits < FLOATING_CREDITS_RESUME_THRESHOLD &&
+                    totalCostAcrossQueues > myCredits &&
+                    decision.priority < totalWeightAcrossQueues * 0.25
+                ) {
                     logger(
                         `Pausing queue ${queueTypeToName(queueData.type)} because weight is low (${
                             decision.priority
@@ -191,7 +196,7 @@ export class QueueController {
             }
         } else if (queueData.status == QueueStatus.OnHold) {
             // Consider resuming queue if priority is high relative to other queues.
-            if (myCredits >= totalCostAcrossQueues) {
+            if (decision && myCredits >= Math.min(totalCostAcrossQueues, FLOATING_CREDITS_RESUME_THRESHOLD)) {
                 logger(`Resuming queue ${queueTypeToName(queueData.type)} because credits are high`);
                 actionsApi.resumeProduction(queueData.type);
             } else if (decision && decision.priority >= totalWeightAcrossQueues * 0.25) {
