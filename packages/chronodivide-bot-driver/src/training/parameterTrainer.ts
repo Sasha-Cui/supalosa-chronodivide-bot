@@ -42,6 +42,7 @@ type AttackCompositionPolicy =
     | "heavy"
     | "artillery"
     | "desolator"
+    | "naval"
     | "hfo";
 type StrategicPlanPolicy =
     | "off"
@@ -317,6 +318,7 @@ const ATTACK_COMPOSITION_POLICIES: AttackCompositionPolicy[] = [
     "heavy",
     "artillery",
     "desolator",
+    "naval",
 ];
 const ROUTE_ATTACK_WAYPOINT_VALUES = [
     "74,95;103,116;128,122;151,119",

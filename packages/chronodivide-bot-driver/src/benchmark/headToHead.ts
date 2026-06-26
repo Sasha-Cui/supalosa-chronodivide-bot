@@ -197,7 +197,18 @@ const parseAttackTargetPriority = (): StrongStrategyOptions["base"] extends { at
 
 const parseAttackCompositionPolicy = (): StrongStrategyOptions["base"] => {
     const raw = process.env.ATTACK_COMPOSITION_POLICY;
-    const policies = new Set(["random", "infantry", "assault", "tanks", "air", "heavy", "artillery", "desolator", "hfo"]);
+    const policies = new Set([
+        "random",
+        "infantry",
+        "assault",
+        "tanks",
+        "air",
+        "heavy",
+        "artillery",
+        "desolator",
+        "naval",
+        "hfo",
+    ]);
     if (raw && !policies.has(raw)) {
         throw new Error(`ATTACK_COMPOSITION_POLICY contains unknown policy ${raw}`);
     }
