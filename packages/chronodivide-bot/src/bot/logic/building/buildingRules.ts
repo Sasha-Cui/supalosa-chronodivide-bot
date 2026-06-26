@@ -166,7 +166,7 @@ export const BUILDING_NAME_TO_RULES = new Map<string, AiBuildingRules>([
     // Allied
     ["GAPOWR", new PowerPlant()],
     ["GAREFN", new ResourceCollectionBuilding(10, 3)], // Refinery
-    ["GAWEAP", new BasicBuilding(15, 3)], // War Factory
+    ["GAWEAP", new BasicBuilding(15, 4)], // War Factory
     ["GAPILE", new BasicBuilding(12, 1)], // Barracks
     ["CMIN", new Harvester(15, 4, 2)], // Chrono Miner
     ["GADEPT", new BasicBuilding(1, 1, 10000)], // Repair Depot
@@ -197,7 +197,7 @@ export const BUILDING_NAME_TO_RULES = new Map<string, AiBuildingRules>([
     // Soviet
     ["NAPOWR", new PowerPlant()],
     ["NAREFN", new ResourceCollectionBuilding(10, 3)], // Refinery
-    ["NAWEAP", new BasicBuilding(15, 3)], // War Factory
+    ["NAWEAP", new BasicBuilding(15, 4)], // War Factory
     ["NAHAND", new BasicBuilding(12, 1)], // Barracks
     ["HARV", new Harvester(15, 4, 2)], // War Miner
     ["NADEPT", new BasicBuilding(1, 1, 10000)], // Repair Depot

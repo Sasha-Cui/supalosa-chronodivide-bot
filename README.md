@@ -152,7 +152,7 @@ Useful benchmark environment variables:
 - `CANDIDATE_SLOTS`: `0`, `1`, or `0,1`.
 - `MAX_TICKS`: match cap.
 - `ATTACK_COMPOSITION_POLICY`: `random`, `infantry`, `assault`, `tanks`, `air`, `heavy`, `artillery`, `desolator`, `naval`, `aiIni`, or `hfo` where supported.
-- `STRATEGIC_PLAN`: `off`, `hfo`, `islandTech`, `adaptive`, and other plan names accepted by the harness.
+- `STRATEGIC_PLAN`: `off`, `hfo`, `ecoBoom`, `islandTech`, `adaptive`, and other plan names accepted by the harness.
 - `DEFAULT_MAP_PROFILES_ENABLED=false`: useful when isolating a single strategy option from built-in map profiles.
 - `TRACE_INTERVAL_TICKS`: emit periodic trace snapshots for debugging long draws.
 

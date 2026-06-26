@@ -49,6 +49,7 @@ type StrategicPlanPolicy =
     | "macro"
     | "macroSiege"
     | "macroLateSiege"
+    | "ecoBoom"
     | "hfoBottom"
     | "rush"
     | "tankBoom"

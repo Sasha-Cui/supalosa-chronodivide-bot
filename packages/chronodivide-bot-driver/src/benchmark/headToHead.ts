@@ -273,6 +273,7 @@ const parseStrategicPlan = (): StrongStrategyOptions["strategicPlan"] => {
         "macro",
         "macroSiege",
         "macroLateSiege",
+        "ecoBoom",
         "hfoBottom",
         "hfoWestRush",
         "rush",
@@ -288,7 +289,7 @@ const parseStrategicPlan = (): StrongStrategyOptions["strategicPlan"] => {
     ]);
     if (!plans.has(raw)) {
         throw new Error(
-            `STRATEGIC_PLAN must be off, macro, macroSiege, macroLateSiege, hfoBottom, hfoWestRush, rush, tankBoom, otmqAntiInfantry, otmqTankSiege, tech, siege, westSiege, islandTech, adaptive, or hfo, got ${raw}`,
+            `STRATEGIC_PLAN must be off, macro, macroSiege, macroLateSiege, ecoBoom, hfoBottom, hfoWestRush, rush, tankBoom, otmqAntiInfantry, otmqTankSiege, tech, siege, westSiege, islandTech, adaptive, or hfo, got ${raw}`,
         );
     }
     return {

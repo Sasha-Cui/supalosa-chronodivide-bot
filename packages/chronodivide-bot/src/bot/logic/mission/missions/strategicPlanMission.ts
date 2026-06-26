@@ -10,6 +10,7 @@ export type StrategicPlanName =
     | "macro"
     | "macroSiege"
     | "macroLateSiege"
+    | "ecoBoom"
     | "hfoBottom"
     | "hfoWestRush"
     | "rush"
@@ -115,6 +116,44 @@ const alliedMacroLateSiegeStructures: StructurePlanItem[] = [
     { name: "GAPILE", targetCount: 1, priority: 24 },
     { name: "GAWEAP", targetCount: 6, priority: 76 },
     { name: "GAAIRC", targetCount: 1, priority: 90, startTick: 15000, requireCredits: 1200 },
+];
+
+const sovietEcoBoomStructures: StructurePlanItem[] = [
+    { name: "NAPOWR", targetCount: 1, priority: 92 },
+    { name: "NAREFN", targetCount: 1, priority: 138 },
+    { name: "NAHAND", targetCount: 1, priority: 70 },
+    { name: "NAWEAP", targetCount: 1, priority: 144 },
+    { name: "NAPOWR", targetCount: 2, priority: 86 },
+    { name: "NAWEAP", targetCount: 2, priority: 140, startTick: 3600 },
+    { name: "NAREFN", targetCount: 2, priority: 116, startTick: 4800 },
+    { name: "NAPOWR", targetCount: 4, priority: 86, startTick: 6000 },
+    { name: "NAWEAP", targetCount: 3, priority: 128, startTick: 7200 },
+    { name: "NAREFN", targetCount: 3, priority: 94, startTick: 9000 },
+    { name: "NAWEAP", targetCount: 4, priority: 112, startTick: 13200, requireCredits: 700 },
+    { name: "NAPOWR", targetCount: 7, priority: 58, startTick: 15000 },
+    { name: "NAREFN", targetCount: 4, priority: 72, startTick: 15000 },
+    { name: "NARADR", targetCount: 1, priority: 54, startTick: 15000, requireCredits: 1200 },
+    { name: "NAWEAP", targetCount: 5, priority: 94, startTick: 19200, requireCredits: 1000 },
+    { name: "NAREFN", targetCount: 5, priority: 56, startTick: 21000, requireCredits: 1500 },
+];
+
+const alliedEcoBoomStructures: StructurePlanItem[] = [
+    { name: "GAPOWR", targetCount: 1, priority: 92 },
+    { name: "GAREFN", targetCount: 1, priority: 138 },
+    { name: "GAPILE", targetCount: 1, priority: 70 },
+    { name: "GAWEAP", targetCount: 1, priority: 144 },
+    { name: "GAPOWR", targetCount: 2, priority: 86 },
+    { name: "GAWEAP", targetCount: 2, priority: 140, startTick: 3600 },
+    { name: "GAREFN", targetCount: 2, priority: 116, startTick: 4800 },
+    { name: "GAPOWR", targetCount: 4, priority: 86, startTick: 6000 },
+    { name: "GAWEAP", targetCount: 3, priority: 128, startTick: 7200 },
+    { name: "GAREFN", targetCount: 3, priority: 94, startTick: 9000 },
+    { name: "GAWEAP", targetCount: 4, priority: 112, startTick: 13200, requireCredits: 700 },
+    { name: "GAPOWR", targetCount: 7, priority: 58, startTick: 15000 },
+    { name: "GAREFN", targetCount: 4, priority: 72, startTick: 15000 },
+    { name: "GAAIRC", targetCount: 1, priority: 54, startTick: 15000, requireCredits: 1200 },
+    { name: "GAWEAP", targetCount: 5, priority: 94, startTick: 19200, requireCredits: 1000 },
+    { name: "GAREFN", targetCount: 5, priority: 56, startTick: 21000, requireCredits: 1500 },
 ];
 
 const sovietHfoBottomStructures: StructurePlanItem[] = [
@@ -390,6 +429,35 @@ const PLANS: Record<ConcreteStrategicPlanName, ConcreteStrategicPlan> = {
                 { name: "MTNK", targetCount: 70, priority: 64, startTick: 900 },
                 { name: "SREF", targetCount: 8, priority: 118, startTick: 18000 },
                 { name: "FV", targetCount: 10, priority: 24, startTick: 4200 },
+            ],
+        },
+    },
+    ecoBoom: {
+        name: "ecoBoom",
+        structures: {
+            [SideType.Nod]: sovietEcoBoomStructures,
+            [SideType.GDI]: alliedEcoBoomStructures,
+        },
+        units: {
+            [SideType.Nod]: [
+                { name: "DOG", targetCount: 2, priority: 108, startTick: 600 },
+                { name: "HARV", targetCount: 2, priority: 132 },
+                { name: "HTNK", targetCount: 36, priority: 126, startTick: 900 },
+                { name: "HTK", targetCount: 6, priority: 36, startTick: 4200 },
+                { name: "HARV", targetCount: 4, priority: 84, startTick: 7200 },
+                { name: "HTNK", targetCount: 96, priority: 132, startTick: 7200 },
+                { name: "HARV", targetCount: 7, priority: 52, startTick: 15000 },
+                { name: "V3", targetCount: 8, priority: 76, startTick: 16800 },
+            ],
+            [SideType.GDI]: [
+                { name: "ADOG", targetCount: 2, priority: 108, startTick: 600 },
+                { name: "CMIN", targetCount: 2, priority: 132 },
+                { name: "MTNK", targetCount: 34, priority: 126, startTick: 900 },
+                { name: "FV", targetCount: 8, priority: 36, startTick: 4200 },
+                { name: "CMIN", targetCount: 4, priority: 84, startTick: 7200 },
+                { name: "MTNK", targetCount: 88, priority: 132, startTick: 7200 },
+                { name: "CMIN", targetCount: 7, priority: 52, startTick: 15000 },
+                { name: "SREF", targetCount: 8, priority: 76, startTick: 16800 },
             ],
         },
     },
