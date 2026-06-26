@@ -28,6 +28,14 @@ type MatchResult = {
     baselineBuildings: number;
     candidateCombatants: number;
     baselineCombatants: number;
+    candidateHarvesters: number;
+    baselineHarvesters: number;
+    candidateFactories: number;
+    baselineFactories: number;
+    candidateRefineries: number;
+    baselineRefineries: number;
+    candidateConyards: number;
+    baselineConyards: number;
 };
 
 type BenchmarkSummary = {
@@ -78,20 +86,6 @@ class InspectableSupalosaBot extends SupalosaBot {
         super.onGameTick(game);
     }
 }
-
-const countVisible = (game: GameApi | null, playerName: string, filter: "units" | "buildings" | "combatants"): number => {
-    if (!game) {
-        return 0;
-    }
-    switch (filter) {
-        case "units":
-            return game.getVisibleUnits(playerName, "self").length;
-        case "buildings":
-            return game.getVisibleUnits(playerName, "self", (rules) => rules.type === ObjectType.Building).length;
-        case "combatants":
-            return game.getVisibleUnits(playerName, "self", (rules) => rules.isSelectableCombatant).length;
-    }
-};
 
 const getPlayerSnapshot = (game: GameApi | null, playerName: string): PlayerSnapshot => {
     if (!game) {
@@ -673,6 +667,8 @@ const runMatch = async (
 
     const candidateDefeated = candidateStats.defeated;
     const baselineDefeated = baselineStats.defeated;
+    const candidateSnapshot = getPlayerSnapshot(candidate.lastGameApi, candidateName);
+    const baselineSnapshot = getPlayerSnapshot(baseline.lastGameApi, baselineName);
     const result: MatchResult = {
         match,
         mapName,
@@ -694,12 +690,20 @@ const runMatch = async (
         baselineDefeated,
         candidateCredits: candidateStats.credits,
         baselineCredits: baselineStats.credits,
-        candidateUnits: countVisible(candidate.lastGameApi, candidateName, "units"),
-        baselineUnits: countVisible(baseline.lastGameApi, baselineName, "units"),
-        candidateBuildings: countVisible(candidate.lastGameApi, candidateName, "buildings"),
-        baselineBuildings: countVisible(baseline.lastGameApi, baselineName, "buildings"),
-        candidateCombatants: countVisible(candidate.lastGameApi, candidateName, "combatants"),
-        baselineCombatants: countVisible(baseline.lastGameApi, baselineName, "combatants"),
+        candidateUnits: candidateSnapshot.units,
+        baselineUnits: baselineSnapshot.units,
+        candidateBuildings: candidateSnapshot.buildings,
+        baselineBuildings: baselineSnapshot.buildings,
+        candidateCombatants: candidateSnapshot.combatants,
+        baselineCombatants: baselineSnapshot.combatants,
+        candidateHarvesters: candidateSnapshot.harvesters,
+        baselineHarvesters: baselineSnapshot.harvesters,
+        candidateFactories: candidateSnapshot.factories,
+        baselineFactories: baselineSnapshot.factories,
+        candidateRefineries: candidateSnapshot.refineries,
+        baselineRefineries: baselineSnapshot.refineries,
+        candidateConyards: candidateSnapshot.conyards,
+        baselineConyards: baselineSnapshot.conyards,
     };
     game.dispose();
     return result;

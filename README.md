@@ -158,6 +158,14 @@ Useful benchmark environment variables:
 
 Benchmark outputs are written under `OUT_DIR` as JSON summaries. Large generated result folders and copied map data should not be committed.
 
+Run the smoke regression suite after behavior changes:
+
+```sh
+OUT_DIR=benchmark-results/regression-smoke npm --workspace packages/chronodivide-bot-driver run benchmark:suite
+```
+
+Use `REGRESSION_SCENARIOS=simple-arabs-core` to run a subset. The suite writes `regression-summary.json` and fails when a required scenario drops below its threshold.
+
 ## Parameter Training
 
 The parameter trainer searches over strategy and tactical settings. Keep early experiments small, then validate promising policies with direct benchmarks.
