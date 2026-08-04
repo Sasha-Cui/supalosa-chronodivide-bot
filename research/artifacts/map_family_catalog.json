@@ -44321,6 +44321,12 @@
     }
   ],
   "outcomeBlind": true,
+  "partitionValidation": {
+    "uniqueContentHashes": 313,
+    "uniqueFamilyIds": 145,
+    "uniqueMapPaths": 333,
+    "uniqueRevisionKeys": 155
+  },
   "referenceSourceCategories": [
     {
       "adaptiveDevelopment": true,
@@ -44483,6 +44489,18 @@
       {
         "adaptiveDevelopment": true,
         "category": "adaptive_benchmark_or_regression",
+        "path": "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProbe.ts",
+        "rationale": "Benchmark, regression, or result-configuration source."
+      },
+      {
+        "adaptiveDevelopment": true,
+        "category": "adaptive_benchmark_or_regression",
+        "path": "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProtocol.ts",
+        "rationale": "Benchmark, regression, or result-configuration source."
+      },
+      {
+        "adaptiveDevelopment": true,
+        "category": "adaptive_benchmark_or_regression",
         "path": "packages/chronodivide-bot-driver/src/benchmark/provenance.ts",
         "rationale": "Benchmark, regression, or result-configuration source."
       },
@@ -44520,6 +44538,12 @@
         "adaptiveDevelopment": true,
         "category": "adaptive_test_or_regression",
         "path": "packages/chronodivide-bot-driver/src/test/fullMatch.test.ts",
+        "rationale": "Behavioral or match-regression test source."
+      },
+      {
+        "adaptiveDevelopment": true,
+        "category": "adaptive_test_or_regression",
+        "path": "packages/chronodivide-bot-driver/src/test/mapFidelityProtocol.test.ts",
         "rationale": "Behavioral or match-regression test source."
       },
       {
@@ -44891,8 +44915,56 @@
       {
         "adaptiveDevelopment": true,
         "category": "research_configuration_or_job",
+        "path": "research/configs/provisional_family_split_v1.json",
+        "rationale": "Research configuration, launcher, or job script."
+      },
+      {
+        "adaptiveDevelopment": true,
+        "category": "research_configuration_or_job",
+        "path": "research/scripts/audit_existing_results.py",
+        "rationale": "Research configuration, launcher, or job script."
+      },
+      {
+        "adaptiveDevelopment": false,
+        "category": "administrative_catalog_tooling",
+        "path": "research/scripts/catalog_map_families.py",
+        "rationale": "Outcome-blind catalog implementation or its synthetic unit tests."
+      },
+      {
+        "adaptiveDevelopment": true,
+        "category": "research_configuration_or_job",
+        "path": "research/scripts/check_seed_replay_gate.py",
+        "rationale": "Research configuration, launcher, or job script."
+      },
+      {
+        "adaptiveDevelopment": true,
+        "category": "research_configuration_or_job",
+        "path": "research/scripts/design_power.py",
+        "rationale": "Research configuration, launcher, or job script."
+      },
+      {
+        "adaptiveDevelopment": true,
+        "category": "research_configuration_or_job",
+        "path": "research/scripts/inventory_maps.py",
+        "rationale": "Research configuration, launcher, or job script."
+      },
+      {
+        "adaptiveDevelopment": true,
+        "category": "research_configuration_or_job",
+        "path": "research/scripts/map_fidelity_gate.py",
+        "rationale": "Research configuration, launcher, or job script."
+      },
+      {
+        "adaptiveDevelopment": true,
+        "category": "research_configuration_or_job",
         "path": "research/scripts/prepare_external_baseline.sh",
         "rationale": "Research configuration, launcher, or job script."
+      },
+      {
+        "adaptiveDevelopment": false,
+        "category": "administrative_catalog_tooling",
+        "path": "research/scripts/propose_map_family_split.py",
+        "rationale": "Outcome-blind catalog implementation or its synthetic unit tests."
       },
       {
         "adaptiveDevelopment": true,
@@ -44915,7 +44987,19 @@
       {
         "adaptiveDevelopment": true,
         "category": "research_configuration_or_job",
+        "path": "research/scripts/summarize_audit_pilot.py",
+        "rationale": "Research configuration, launcher, or job script."
+      },
+      {
+        "adaptiveDevelopment": true,
+        "category": "research_configuration_or_job",
         "path": "research/slurm/audit_pilot_v1.sbatch",
+        "rationale": "Research configuration, launcher, or job script."
+      },
+      {
+        "adaptiveDevelopment": true,
+        "category": "research_configuration_or_job",
+        "path": "research/slurm/map_fidelity_gate_v1.sbatch",
         "rationale": "Research configuration, launcher, or job script."
       },
       {
@@ -44923,6 +45007,30 @@
         "category": "research_configuration_or_job",
         "path": "research/slurm/seed_replay_gate_v1.sbatch",
         "rationale": "Research configuration, launcher, or job script."
+      },
+      {
+        "adaptiveDevelopment": false,
+        "category": "administrative_catalog_tooling",
+        "path": "research/tests/test_catalog_map_families.py",
+        "rationale": "Outcome-blind catalog implementation or its synthetic unit tests."
+      },
+      {
+        "adaptiveDevelopment": true,
+        "category": "ambiguous_project_source",
+        "path": "research/tests/test_design_power.py",
+        "rationale": "Unclassified project source defaults to adaptive and disqualifying."
+      },
+      {
+        "adaptiveDevelopment": true,
+        "category": "ambiguous_project_source",
+        "path": "research/tests/test_map_fidelity_gate.py",
+        "rationale": "Unclassified project source defaults to adaptive and disqualifying."
+      },
+      {
+        "adaptiveDevelopment": false,
+        "category": "administrative_catalog_tooling",
+        "path": "research/tests/test_propose_map_family_split.py",
+        "rationale": "Outcome-blind catalog implementation or its synthetic unit tests."
       },
       {
         "adaptiveDevelopment": true,
@@ -44937,7 +45045,7 @@
         "rationale": "Unclassified project source defaults to adaptive and disqualifying."
       }
     ],
-    "fileCount": 84,
+    "fileCount": 101,
     "files": [
       "README-CN.md",
       "README.md",
@@ -44947,6 +45055,8 @@
       "packages/chronodivide-bot-driver/package.json",
       "packages/chronodivide-bot-driver/src/benchmark/baselineLoader.ts",
       "packages/chronodivide-bot-driver/src/benchmark/headToHead.ts",
+      "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProbe.ts",
+      "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProtocol.ts",
       "packages/chronodivide-bot-driver/src/benchmark/provenance.ts",
       "packages/chronodivide-bot-driver/src/benchmark/regressionSuite.ts",
       "packages/chronodivide-bot-driver/src/benchmark/seededOfflineGame.ts",
@@ -44954,6 +45064,7 @@
       "packages/chronodivide-bot-driver/src/index.ts",
       "packages/chronodivide-bot-driver/src/test/behaviourTests.test.ts",
       "packages/chronodivide-bot-driver/src/test/fullMatch.test.ts",
+      "packages/chronodivide-bot-driver/src/test/mapFidelityProtocol.test.ts",
       "packages/chronodivide-bot-driver/src/test/researchFlags.test.ts",
       "packages/chronodivide-bot-driver/src/test/seedControl.test.ts",
       "packages/chronodivide-bot-driver/src/training/analyzeTrainingResults.ts",
@@ -45015,16 +45126,30 @@
       "packages/chronodivide-bot/src/bot/strategy/strongStrategy.ts",
       "packages/chronodivide-bot/src/bot/strongBot.ts",
       "packages/chronodivide-bot/tsconfig.json",
+      "research/configs/provisional_family_split_v1.json",
+      "research/scripts/audit_existing_results.py",
+      "research/scripts/catalog_map_families.py",
+      "research/scripts/check_seed_replay_gate.py",
+      "research/scripts/design_power.py",
+      "research/scripts/inventory_maps.py",
+      "research/scripts/map_fidelity_gate.py",
       "research/scripts/prepare_external_baseline.sh",
+      "research/scripts/propose_map_family_split.py",
       "research/scripts/run_audit_pilot_task.sh",
       "research/scripts/run_determinism_screen_task.sh",
       "research/scripts/run_seed_replay_gate_task.sh",
+      "research/scripts/summarize_audit_pilot.py",
       "research/slurm/audit_pilot_v1.sbatch",
+      "research/slurm/map_fidelity_gate_v1.sbatch",
       "research/slurm/seed_replay_gate_v1.sbatch",
+      "research/tests/test_catalog_map_families.py",
+      "research/tests/test_design_power.py",
+      "research/tests/test_map_fidelity_gate.py",
+      "research/tests/test_propose_map_family_split.py",
       "tsconfig.base.json",
       "tsconfig.json"
     ],
-    "sha256": "0d9e1784db631c4137828349c267db5217b67874e8966fc8e11f3bb21c28426c"
+    "sha256": "67145ac404a2010c1fa108bcc4d570983da265970a23d7781c07c56ab9789898"
   },
   "summary": {
     "adaptiveTextReferenceFamilies": 16,
@@ -45074,10 +45199,24 @@
     "strictProvisionalFamilies": 7,
     "strictProvisionalFamiliesWithPassedLoadMetadata": 4,
     "unresolvedHistoricalMapReferences": 0,
-    "unresolvedTextFilenameReferences": 130
+    "unresolvedTextFilenameReferences": 181
   },
   "unresolvedHistoricalMapReferences": [],
   "unresolvedTextFilenameReferences": [
+    "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProbe.ts:220:manifest.inputs.sourceFiles.map",
+    "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProbe.ts:228:...manifest.inputs.sourceFiles.map",
+    "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProbe.ts:240:...manifest.inputs.compiledRuntime.map",
+    "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProbe.ts:285:...manifest.inputs.sourceFiles.map",
+    "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProbe.ts:305:...manifest.inputs.compiledRuntime.map",
+    "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProbe.ts:362:order.map",
+    "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProbe.ts:456:family.declaredStartLocations.map",
+    "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProbe.ts:468:capturedWarnings.map",
+    "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProbe.ts:539:initialization.warnings.map",
+    "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProtocol.ts:333:record.entries.map",
+    "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProtocol.ts:355:expectedEntries.map",
+    "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProtocol.ts:380:record.members.map",
+    "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProtocol.ts:392:members.map",
+    "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProtocol.ts:766:declaredStarts.map",
     "packages/chronodivide-bot-driver/src/benchmark/provenance.ts:375:args.maps.map",
     "packages/chronodivide-bot-driver/src/benchmark/regressionSuite.ts:208:selectedScenarios.map",
     "packages/chronodivide-bot-driver/src/index.ts:35:c1m1a.map",
@@ -45207,6 +45346,43 @@
     "packages/chronodivide-bot/src/bot/strongBot.ts:3388:attackers.map",
     "packages/chronodivide-bot/src/bot/strongBot.ts:3408:attackers.map",
     "packages/chronodivide-bot/src/bot/strongBot.ts:4170:ownCombatants.map",
-    "packages/chronodivide-bot/src/bot/strongBot.ts:4303:attackers.map"
+    "packages/chronodivide-bot/src/bot/strongBot.ts:4303:attackers.map",
+    "research/tests/test_catalog_map_families.py:117:fixture.map",
+    "research/tests/test_catalog_map_families.py:27:cd_chrono_4_alpha_valley_le_v2.map",
+    "research/tests/test_catalog_map_families.py:28:cd_4_alpha_valley_le.map",
+    "research/tests/test_catalog_map_families.py:30:alphavalleyfixed.map",
+    "research/tests/test_catalog_map_families.py:40:cd_chrono_mp99du.map",
+    "research/tests/test_catalog_map_families.py:43:cd_chrono_mp99t4.map",
+    "research/tests/test_catalog_map_families.py:76:one.map",
+    "research/tests/test_catalog_map_families.py:82:two.map",
+    "research/tests/test_catalog_map_families.py:87:one.map",
+    "research/tests/test_catalog_map_families.py:87:two.map",
+    "research/tests/test_map_fidelity_gate.py:108:compat.map",
+    "research/tests/test_map_fidelity_gate.py:108:raw.map",
+    "research/tests/test_map_fidelity_gate.py:110:raw.map",
+    "research/tests/test_map_fidelity_gate.py:114:compat.map",
+    "research/tests/test_map_fidelity_gate.py:120:compat.map",
+    "research/tests/test_map_fidelity_gate.py:134:packages/chronodivide-bot-driver/data/cd_fixture.map",
+    "research/tests/test_map_fidelity_gate.py:182:packages/chronodivide-bot-driver/data/cd_fixture.map",
+    "research/tests/test_map_fidelity_gate.py:189:packages/chronodivide-bot-driver/data/cd_fixture.map",
+    "research/tests/test_map_fidelity_gate.py:198:packages/chronodivide-bot-driver/data/cd_fixture.map",
+    "research/tests/test_map_fidelity_gate.py:55:fixture.map",
+    "research/tests/test_map_fidelity_gate.py:69:fixture.map",
+    "research/tests/test_propose_map_family_split.py:369:fixture.map",
+    "research/tests/test_propose_map_family_split.py:407:data/fixture.map",
+    "research/tests/test_propose_map_family_split.py:421:data/fixture.map",
+    "research/tests/test_propose_map_family_split.py:442:data/fixture.map",
+    "research/tests/test_propose_map_family_split.py:458:data/incompatible.map",
+    "research/tests/test_propose_map_family_split.py:459:incompatible.map",
+    "research/tests/test_propose_map_family_split.py:481:data/fixture.map",
+    "research/tests/test_propose_map_family_split.py:513:data/wrong.map",
+    "research/tests/test_propose_map_family_split.py:549:data/fixture.map",
+    "research/tests/test_propose_map_family_split.py:573:compat.map",
+    "research/tests/test_propose_map_family_split.py:573:raw.map",
+    "research/tests/test_propose_map_family_split.py:575:raw.map",
+    "research/tests/test_propose_map_family_split.py:576:raw.map",
+    "research/tests/test_propose_map_family_split.py:580:compat.map",
+    "research/tests/test_propose_map_family_split.py:581:compat.map",
+    "research/tests/test_propose_map_family_split.py:587:compat.map"
   ]
 }

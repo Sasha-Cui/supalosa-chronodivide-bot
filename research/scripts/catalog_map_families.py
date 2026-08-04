@@ -21,7 +21,7 @@ from typing import Iterable, Sequence
 MAP_EXTENSIONS = {".map", ".mpr"}
 TEXT_EXTENSIONS = {
     ".cjs", ".env", ".js", ".json", ".json5", ".md", ".mjs", ".sbatch",
-    ".sh", ".toml", ".ts", ".tsx", ".yaml", ".yml",
+    ".py", ".sh", ".toml", ".ts", ".tsx", ".yaml", ".yml",
 }
 PREFIXES = ("cd_chrono_", "cd_")
 REVISION_TOKENS = {
@@ -390,7 +390,9 @@ def classify_reference_source(path_relative: str) -> dict[str, object]:
         }
     if path_relative in {
         "research/scripts/catalog_map_families.py",
+        "research/scripts/propose_map_family_split.py",
         "research/tests/test_catalog_map_families.py",
+        "research/tests/test_propose_map_family_split.py",
     }:
         return {
             "category": "administrative_catalog_tooling",
@@ -505,6 +507,67 @@ def family_symbol_patterns(
                         )
                         seen.add(key)
     return output
+
+
+def validate_family_partition(
+    families: list[dict[str, object]],
+    maps: list[dict[str, object]],
+) -> dict[str, int]:
+    """Fail closed on cross-family ownership collisions."""
+
+    family_ids = [str(family["familyId"]) for family in families]
+    if len(family_ids) != len(set(family_ids)):
+        raise ValueError("family IDs are not unique")
+
+    def assert_unique_owners(
+        field_name: str,
+        values_by_family: Iterable[tuple[str, Iterable[str]]],
+    ) -> int:
+        owners: dict[str, str] = {}
+        for family_id, values in values_by_family:
+            for value in values:
+                prior = owners.setdefault(str(value), family_id)
+                if prior != family_id:
+                    raise ValueError(
+                        f"{field_name} {value!r} belongs to both "
+                        f"{prior} and {family_id}"
+                    )
+        return len(owners)
+
+    path_count = assert_unique_owners(
+        "map path",
+        (
+            (str(family["familyId"]), family["mapPaths"])
+            for family in families
+        ),
+    )
+    expected_paths = {str(row["path"]) for row in maps}
+    family_paths = {
+        str(path) for family in families for path in family["mapPaths"]
+    }
+    if family_paths != expected_paths:
+        raise ValueError("family map paths do not exactly partition catalog maps")
+
+    hash_count = assert_unique_owners(
+        "content hash",
+        (
+            (str(family["familyId"]), family["contentHashes"])
+            for family in families
+        ),
+    )
+    revision_key_count = assert_unique_owners(
+        "revision key",
+        (
+            (str(family["familyId"]), family["revisionKeys"])
+            for family in families
+        ),
+    )
+    return {
+        "uniqueFamilyIds": len(family_ids),
+        "uniqueMapPaths": path_count,
+        "uniqueContentHashes": hash_count,
+        "uniqueRevisionKeys": revision_key_count,
+    }
 
 
 def catalog(
@@ -911,6 +974,7 @@ def catalog(
 
     families.sort(key=lambda family: str(family["familyId"]))
     maps.sort(key=lambda row: str(row["path"]))
+    partition_validation = validate_family_partition(families, maps)
     strict_ineligible = [
         family for family in families
         if not family["strictDevelopmentEligibility"]["eligible"]
@@ -1056,6 +1120,7 @@ def catalog(
             "fileClassifications": reference_file_metadata,
         },
         "referenceSourceCategories": reference_source_categories,
+        "partitionValidation": partition_validation,
         "summary": {
             "mapFiles": len(maps),
             "contentHashes": len({

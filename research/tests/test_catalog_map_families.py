@@ -64,6 +64,30 @@ class ReferenceClassificationTests(unittest.TestCase):
         self.assertTrue(behavior["adaptiveDevelopment"])
         self.assertTrue(unknown["adaptiveDevelopment"])
 
+    def test_python_tooling_is_in_reference_corpus(self) -> None:
+        self.assertIn(".py", CATALOG.TEXT_EXTENSIONS)
+
+
+class PartitionValidationTests(unittest.TestCase):
+    def test_cross_family_hash_overlap_fails_closed(self) -> None:
+        families = [
+            {
+                "familyId": "one",
+                "mapPaths": ["one.map"],
+                "contentHashes": ["a" * 64],
+                "revisionKeys": ["one"],
+            },
+            {
+                "familyId": "two",
+                "mapPaths": ["two.map"],
+                "contentHashes": ["a" * 64],
+                "revisionKeys": ["two"],
+            },
+        ]
+        maps = [{"path": "one.map"}, {"path": "two.map"}]
+        with self.assertRaisesRegex(ValueError, "content hash"):
+            CATALOG.validate_family_partition(families, maps)
+
 
 class IniDescriptorTests(unittest.TestCase):
     def test_extracts_safe_descriptors_without_game_imports(self) -> None:

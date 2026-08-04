@@ -1,0 +1,905 @@
+{
+  "catalogSha256": "8f378ee52a2d8a6d45e5d23a1e521aa6b2e08e9ab174adc8066cce8a1824bd54",
+  "finalSplit": false,
+  "inclusionPolicy": "Include every catalog family with evidence-based Tier-B development eligibility, independent of load metadata, grouping ambiguity, fidelity result, or capacity-dry-run role.",
+  "isSplit": false,
+  "outcomeBlind": true,
+  "populationCommitmentRule": "SHA-256 of canonical JSON for the ordered target list containing only familyId and representative path/SHA-256.",
+  "populationCommitmentSha256": "3e8c35b104c35c1b790df1b2da0521b167613a22d4bbd5c23ea8c14b4fa7d86b",
+  "representativeFidelityPolicy": "Screen exactly the recorded representative path and SHA-256 for each family. Other revisions enforce family disjointness but are not substituted evaluation content.",
+  "roleBlind": true,
+  "schemaVersion": 3,
+  "status": "ROLE_BLIND_FIDELITY_SCREEN_TARGETS_NOT_A_SPLIT",
+  "targetCount": 127,
+  "targets": [
+    {
+      "familyId": "mf_07877146265d45dd",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_eb1.map",
+        "sha256": "bede2400a55a61c6cd0e49eb850ee14096ffb91231cc2aefc7e1d1bffa354724"
+      }
+    },
+    {
+      "familyId": "mf_536b69726d6973682047616d65",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp01du.map",
+        "sha256": "216f04b7b86cb0364c2bf466772ef7d56355c386837d42db5d331b03d0a3ee4c"
+      }
+    },
+    {
+      "familyId": "mf_578665553189c1cb",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_eb3.map",
+        "sha256": "578665553189c1cb7213c0ee62a7c165ccdf248b22c90c42b097362ebbe9d4d5"
+      }
+    },
+    {
+      "familyId": "mf_69962e7efc29cb5b",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_eb2.map",
+        "sha256": "9365eac0294f775bc2252f01ee235dc8b82bde352e53348648a3b1605e1b4439"
+      }
+    },
+    {
+      "familyId": "mf_892c5f7a62ab723d",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_eb4.map",
+        "sha256": "892c5f7a62ab723d7fec9206891d64573607147afa556a767c6165fa84b645d9"
+      }
+    },
+    {
+      "familyId": "mf_amazon01",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_amazon01.map",
+        "sha256": "0b445fc0aa5279344317f9bcc081937041a8ff5d166f109bd9c46b334ca83f5b"
+      }
+    },
+    {
+      "familyId": "mf_arena",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_arena.map",
+        "sha256": "533f8364307486a366a8c78c93e6bdd3848515e2b4c53b5ce661cf364f0a5508"
+      }
+    },
+    {
+      "familyId": "mf_barrel",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_barrel.map",
+        "sha256": "5121fc63449169106ba942fd31cbdf17c34bbd3e104215c1405010213cfe5b44"
+      }
+    },
+    {
+      "familyId": "mf_bayopigs",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_bayopigs.map",
+        "sha256": "4bf9aff529b36b279a46a09cf339abe1d3488fad04da7780a2ec6f404674cf45"
+      }
+    },
+    {
+      "familyId": "mf_bermuda",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_bermuda.map",
+        "sha256": "fbc8daad420a2d6aa1d31bfefae2cea05bd4702d36220bc96c0441da543e2ed4"
+      }
+    },
+    {
+      "familyId": "mf_break",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_break.map",
+        "sha256": "fadd48bbccb24fcdec0ce8efdd398fb97558f5a398664d161ccad3d78b4af01b"
+      }
+    },
+    {
+      "familyId": "mf_carville",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_carville.map",
+        "sha256": "66affe6326013480aa7d1d483d047e1fd8b924725f1da0f27dace922bf2c8b65"
+      }
+    },
+    {
+      "familyId": "mf_countryswing",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_4_country_swing_le.map",
+        "sha256": "bf285cba01b86101909882498ee6c9546b1c20af399a16ffe961316559ca7176"
+      }
+    },
+    {
+      "familyId": "mf_dc29052d730e0060",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_eb5.map",
+        "sha256": "dc29052d730e00604f9105e82a1f0d63aac36bc9f2b5c1b513692fce998243b2"
+      }
+    },
+    {
+      "familyId": "mf_deadman",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_deadman.map",
+        "sha256": "7e636299689e1f52d351f845e1af049b38937d17b05ffa1400608a67e1909e2d"
+      }
+    },
+    {
+      "familyId": "mf_death",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_death.map",
+        "sha256": "c3462abff6a0be9dffbd87c89bc7e2a1507b4a5828ee7d593e06d1f22910337e"
+      }
+    },
+    {
+      "familyId": "mf_disaster",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_disaster.map",
+        "sha256": "1986034baf44189f8071c085dc8ea4210fced3d744b1e7918450291d3a1765eb"
+      }
+    },
+    {
+      "familyId": "mf_doradodescent",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_dorado_descent_yr_port.mpr",
+        "sha256": "e13497c4aa5822e82e7c61cb91e043641f90454feb22a1f75f781e93ca110d32"
+      }
+    },
+    {
+      "familyId": "mf_dryheat",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_dryheat.map",
+        "sha256": "de82913e3a0368687632b1bbc4a9aa60d785034cc8ed906fe3268d2cbe4aeac6"
+      }
+    },
+    {
+      "familyId": "mf_dunepatrol",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_dunepatrolremake.map",
+        "sha256": "3f0371778d40c387f197a65111d4195d2a02bed89d35353a0bf92950b2bd30fc"
+      }
+    },
+    {
+      "familyId": "mf_dustbowl",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_dustbowl.map",
+        "sha256": "e1d66f99af69a0b41165991ebb522de8be0c834db899f1bbc6d5773646640ef4"
+      }
+    },
+    {
+      "familyId": "mf_goldst",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_goldst.map",
+        "sha256": "83a5b81ee45ed73ef23f64f9c3d29e776eefdd815ad00535eaab4efa6f40ec57"
+      }
+    },
+    {
+      "familyId": "mf_grinder",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_grinder.map",
+        "sha256": "ce2f3778889ff34dc97a13f4c0892dc223d99d471f7373fe5d6542461d4c27b9"
+      }
+    },
+    {
+      "familyId": "mf_hailmary",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_hailmary.map",
+        "sha256": "010f8b961abccd1f3679ecf6580c7e9304335e61fdd1c99170af9c3fbd06da1e"
+      }
+    },
+    {
+      "familyId": "mf_hammerandsickle",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_4_hammer_and_sickle_le.map",
+        "sha256": "e80c24b2043ecf4e1502102880f311b4b261d07da51b6cd5c393f562186d34af"
+      }
+    },
+    {
+      "familyId": "mf_heckbvb",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_heckbvb.map",
+        "sha256": "5a7554fb64a16bd345cb42bf3bcbccd376fa92ad1c0356058f0427e9f0910f04"
+      }
+    },
+    {
+      "familyId": "mf_heckcorners",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_heckcorners.map",
+        "sha256": "3aa63da555db30d0d97d9319057650c440ebf57f655c8c001705e312768e628a"
+      }
+    },
+    {
+      "familyId": "mf_heckfreezesoverlvl",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_hecklvl.map",
+        "sha256": "aa0b71473092d701834920275f8d42aeeb2614d4ad1244d6fb3741e8f62f7efc"
+      }
+    },
+    {
+      "familyId": "mf_heckfreezesoverrvr",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_heckrvr.map",
+        "sha256": "8f17a78d2de245716b33c78b848dff13ae3db5b7ebb08d2efa4da165ac995488"
+      }
+    },
+    {
+      "familyId": "mf_heckfreezesovertvt",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_hecktvt.map",
+        "sha256": "084d215b1ccb2a30cfb467e5f009d51b77e91c6a441ed24b4a6aef24d68c0c74"
+      }
+    },
+    {
+      "familyId": "mf_hills",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_hills.map",
+        "sha256": "d674520bba62402d1679b5e97d391f238d9dbdd410ff22303ebf5549f26d8d3b"
+      }
+    },
+    {
+      "familyId": "mf_invasion",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_invasion.map",
+        "sha256": "327f053a939660de733fe634a5befc5cf0ef4da3380ca7d0ab6abae6bff120b9"
+      }
+    },
+    {
+      "familyId": "mf_isleland",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_isleland.map",
+        "sha256": "7de23f062644e5047e94b33a08de5b80623db8cd52a92b5ac46461e674a3e2c7"
+      }
+    },
+    {
+      "familyId": "mf_jungleofvietnam",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_4_jungle_of_vietnam_le.map",
+        "sha256": "abff68b92a9f6b025564030af326d6c492bc29f1f9d505adc4865d464f958c75"
+      }
+    },
+    {
+      "familyId": "mf_kaliforn",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_kaliforn.map",
+        "sha256": "fc778d5e16758cce5d7554efc2268f9e5dab8efe2857920defee21491ec9cac3"
+      }
+    },
+    {
+      "familyId": "mf_killer",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_killer.map",
+        "sha256": "66013838c2f39ac27cd40751773996b2b0b153611fe4e19d5c6ce769bb6e82bc"
+      }
+    },
+    {
+      "familyId": "mf_lakeisland",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_4_lake_island.map",
+        "sha256": "3fa32cfbb07196789b65be0b5cba40ca3babe272826b883ad003a9fe361ce8a4"
+      }
+    },
+    {
+      "familyId": "mf_lostlake",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_lostlake.map",
+        "sha256": "8ca9695ddaa88466963689ee2dab8f0dc2e84d7d839fa836a2e2362c7007a83a"
+      }
+    },
+    {
+      "familyId": "mf_mojosprt",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mojosprt.map",
+        "sha256": "31666d0c6c860ec653194089c9f6da9bf4e8adddf81259d0ff8023ec4b232adf"
+      }
+    },
+    {
+      "familyId": "mf_montanadmz",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_2_montana_dmz_le.map",
+        "sha256": "0fd3c3be7f2ccecb625d590ad23eea946e94045e967bf87a39006d507ae3d05f"
+      }
+    },
+    {
+      "familyId": "mf_mp01t4",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp01t4.map",
+        "sha256": "89a428f214d5ca2a5f650b94e2847fc493d51805aac04f869f1fcc76e4db3381"
+      }
+    },
+    {
+      "familyId": "mf_mp02t2",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp02t2.map",
+        "sha256": "6ea7272f1b212b5137ceafbdf153b38e46bdd798d24483a136ded05bda8b77a4"
+      }
+    },
+    {
+      "familyId": "mf_mp03t4",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp03t4.map",
+        "sha256": "d351893a97e0c63ce89426226f2721b0c9b7186ff87d6c481090c7440df5e329"
+      }
+    },
+    {
+      "familyId": "mf_mp05du",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp05du.map",
+        "sha256": "71057c80b4b00bbc2a3114791d2a544711d40b6dfa402b06b7b24feabb508e38"
+      }
+    },
+    {
+      "familyId": "mf_mp05mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp05mw.map",
+        "sha256": "c041f38963d61fbfbbacd17f8d379b87c444f3e51776b508df41364f0f66187b"
+      }
+    },
+    {
+      "familyId": "mf_mp05t4",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp05t4.map",
+        "sha256": "7792b2868ef190d7ebd60041ca33483860b13ede5bde4d493e847606e060d129"
+      }
+    },
+    {
+      "familyId": "mf_mp06mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp06mw.map",
+        "sha256": "dc821fdf2dd91db135fd4474c15341d8d8a4b4cf54a1b8ef852a4d9ae2c3d2f1"
+      }
+    },
+    {
+      "familyId": "mf_mp06t2",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp06t2.map",
+        "sha256": "12a138ff5f8d1d57cd83a3973c9b6feb0a372ec8f3115fe69d4d9c5649e0cde7"
+      }
+    },
+    {
+      "familyId": "mf_mp08mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp08mw.map",
+        "sha256": "4dc715d3a3c5f7573076327cbdf82c69c504d1e4a4ac2be6eccb18193ca8f702"
+      }
+    },
+    {
+      "familyId": "mf_mp08t2",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp08t2.map",
+        "sha256": "5fa43498375c5495428cac19cd472ad7fc5ff98ed38b68fc7e611e3ad8453eda"
+      }
+    },
+    {
+      "familyId": "mf_mp09du",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp09du.map",
+        "sha256": "9df4ef3111b244d06c7353f676792c829b9dc6f2cd1615cd64d6ff5a0f9b99df"
+      }
+    },
+    {
+      "familyId": "mf_mp09t3",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp09t3.map",
+        "sha256": "64b912b52bfb6c2c89a705715a81da2b928c8e6774e4773d4c5b710c581baff2"
+      }
+    },
+    {
+      "familyId": "mf_mp10s4",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp10s4.map",
+        "sha256": "ecad2e5d9e2f483a0cece1f28ff4c493525c565eead033e7854b053880a45f5b"
+      }
+    },
+    {
+      "familyId": "mf_mp11t2",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp11t2.map",
+        "sha256": "9591bac77b15650a712474202fc99191b6df59c45f06ba9f81753db27bc2ccff"
+      }
+    },
+    {
+      "familyId": "mf_mp12s4",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp12s4.map",
+        "sha256": "fd8f49e97e151d0d267b473d1276bb9e1c1e37f2a21d33ef6e1e84545423d1e0"
+      }
+    },
+    {
+      "familyId": "mf_mp13du",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp13du.map",
+        "sha256": "3e8cfbbc64a639d4e8251ec55352687721d7111a2a0865bc37b7b81e81980589"
+      }
+    },
+    {
+      "familyId": "mf_mp13mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp13mw.map",
+        "sha256": "bb7c1c6d63daca7c4d2e399f1180bd9137e48b164c74bb37c842343b2b5b406c"
+      }
+    },
+    {
+      "familyId": "mf_mp13s4",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp13s4.map",
+        "sha256": "ed36bfd879645bc5f449a66435c15ad865798ac275c3eab49f0422690d2642ef"
+      }
+    },
+    {
+      "familyId": "mf_mp14mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp14mw.map",
+        "sha256": "e4b39cd29dc1450fad5a8c8f0ef28961b5f307b78667fe9cda9923ba8ccf47d1"
+      }
+    },
+    {
+      "familyId": "mf_mp14t2",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp14t2.map",
+        "sha256": "dd95dfd6c1f13816436cc0509da5fc9065bb8e45667fd6b35363747faa9c21c4"
+      }
+    },
+    {
+      "familyId": "mf_mp15du",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp15du.map",
+        "sha256": "ea41c15ace3c0e9cc5fccfd70ce81b165e748cad93e8555aa1377f5a1ee62bb9"
+      }
+    },
+    {
+      "familyId": "mf_mp15mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp15mw.map",
+        "sha256": "d94d8f7941410f126d1b15cdc270a9b29f2deffdfd251696bfc57269ee5f1f74"
+      }
+    },
+    {
+      "familyId": "mf_mp15s4",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp15s4.map",
+        "sha256": "81062c84b3458a81178275f337052da455b0e7fbd6f76d6259ee567679a3dd60"
+      }
+    },
+    {
+      "familyId": "mf_mp16mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp16mw.map",
+        "sha256": "13b6c77e2d4c2c618768d63f0a63e26e8895fd328b3c05c2b1ec4da2763243f5"
+      }
+    },
+    {
+      "familyId": "mf_mp16s4",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp16s4.map",
+        "sha256": "c11ba9765192edb15599aa3efe375b4a61a05d71312dc4809b3b5b91be9d0d16"
+      }
+    },
+    {
+      "familyId": "mf_mp17du",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp17du.map",
+        "sha256": "4c0000acc75d9d06d97cf74c6196d9c13bac0e1ca39fa9ee358ffd5f60265037"
+      }
+    },
+    {
+      "familyId": "mf_mp17mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp17mw.map",
+        "sha256": "e55a460f8d519ae2685d93cd7891b23c2268d20100afaae10c82e9d011e8a25e"
+      }
+    },
+    {
+      "familyId": "mf_mp17t6",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp17t6.map",
+        "sha256": "56b211feb4c0595dbea8c7fcf62b9309a084e916c75957aaa460ea52d56f7f8d"
+      }
+    },
+    {
+      "familyId": "mf_mp18du",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp18du.map",
+        "sha256": "b208a574e419b0d9290b0e7494a456be723c1f33445633e7f7125ec2411dafb6"
+      }
+    },
+    {
+      "familyId": "mf_mp18s3",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp18s3.map",
+        "sha256": "53e65d6a53704ee8f3238d764b474ce4fd12d5f20e616f86166d474887b776fe"
+      }
+    },
+    {
+      "familyId": "mf_mp19t4",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp19t4.map",
+        "sha256": "2b872256387aa40e90c3240cee3eb9cc28e9b34db61e76353daf1063e092732f"
+      }
+    },
+    {
+      "familyId": "mf_mp20t6",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp20t6.map",
+        "sha256": "4ea88c77433b2fa629f1d3aa01d1ec75b85838568c6907dfd982cf4295475e09"
+      }
+    },
+    {
+      "familyId": "mf_mp21s2",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp21s2.map",
+        "sha256": "08625729c6f51c6c85ceb961e0e5728d124cfba475bc134389d269fe0e59860f"
+      }
+    },
+    {
+      "familyId": "mf_mp22mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp22mw.map",
+        "sha256": "ed187cd73fed804f29c0ff5b7e2a88bd03386daa3f7313c33981fb08072686b3"
+      }
+    },
+    {
+      "familyId": "mf_mp22s8",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp22s8.map",
+        "sha256": "91edc30586e0fa8a3dc6789b09b3311c1c8123d8aec7f9048a44fc36180c0399"
+      }
+    },
+    {
+      "familyId": "mf_mp23mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp23mw.map",
+        "sha256": "a28a14ef521c6be7d2a3cf149ace4dd25e98873d5e31ddd37db657a138f96cb2"
+      }
+    },
+    {
+      "familyId": "mf_mp23t4",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp23t4.map",
+        "sha256": "6e053a3df5a9d3b54410ade694e0d61065109bdb44cde44e746181f5c678c722"
+      }
+    },
+    {
+      "familyId": "mf_mp24du",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp24du.map",
+        "sha256": "90726c1579cccc89ef4b713fc7dfe378feddec954a3942abc1f9c2122b915c18"
+      }
+    },
+    {
+      "familyId": "mf_mp25du",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp25du.map",
+        "sha256": "cc82b12ea40d16f9e30211b904a173d6db0bd79a5c6049585610c7cca0754a7c"
+      }
+    },
+    {
+      "familyId": "mf_mp25mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp25mw.map",
+        "sha256": "4b90f4eb66bdc19721b9033a268cbafd1b839ea93ed0ad35d6728485e8a177bf"
+      }
+    },
+    {
+      "familyId": "mf_mp25t6",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp25t6.map",
+        "sha256": "e915d5062525ca40ed9f5bb7cfe8396dc0695255fb21820b1b2844607d6ac3b4"
+      }
+    },
+    {
+      "familyId": "mf_mp26s6",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp26s6.map",
+        "sha256": "1ae5e1e7c157d502c325762ff3e2c4c34bf42b49649774f7ffb690a11085c0c8"
+      }
+    },
+    {
+      "familyId": "mf_mp27du",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp27du.map",
+        "sha256": "b18438ee54c6f5eceacc80fe76952de2cb75d51d81da8a820ddd65d8680e8492"
+      }
+    },
+    {
+      "familyId": "mf_mp27mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp27mw.map",
+        "sha256": "f238bd0ea4b011bd770cada4a7383fc2719f7df0ae27b0e865576ff518244d1b"
+      }
+    },
+    {
+      "familyId": "mf_mp27t8",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp27t8.map",
+        "sha256": "bb862e9348b018fd3048d15bf0a73a680cc5b6822b6a52f9d5c4cf494b7706e1"
+      }
+    },
+    {
+      "familyId": "mf_mp29mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp29mw.map",
+        "sha256": "def83954fec211e0f5d85f4a3ac74c97fabc2132b756541f13fb264bee2d82aa"
+      }
+    },
+    {
+      "familyId": "mf_mp29u2",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp29u2.map",
+        "sha256": "8b7b8bdb04c568f181435ca51a51cfad02a773e52ef5c8a13426b80c398bc788"
+      }
+    },
+    {
+      "familyId": "mf_mp30mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp30mw.map",
+        "sha256": "4ae6bf76a689d90b269b1a213235bc2e7963b0c806f843371c39337e323a11aa"
+      }
+    },
+    {
+      "familyId": "mf_mp30s6",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp30s6.map",
+        "sha256": "aff1f8688eb1523ad94e08c900558f28280c95e9fbae94e89acd1189f8652199"
+      }
+    },
+    {
+      "familyId": "mf_mp31s2",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp31s2.map",
+        "sha256": "558b7dd57b9cb06c11487e2ed89935ebd688d6dcfffab1df22148185534aba4e"
+      }
+    },
+    {
+      "familyId": "mf_mp32du",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp32du.map",
+        "sha256": "2cdaa26f0c46b078d93b0a7b540888d7b6a824ee7cdfc8a0262ec7816fce2d2f"
+      }
+    },
+    {
+      "familyId": "mf_mp32mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp32mw.map",
+        "sha256": "2560e711249cbba88f494bcb76cb7450c99cc76b8780a7dae9740944377ca7a3"
+      }
+    },
+    {
+      "familyId": "mf_mp32s8",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp32s8.map",
+        "sha256": "907e5ab677a03c50f375da1bec4871880240de2fab790a38dac85674d0f65bf1"
+      }
+    },
+    {
+      "familyId": "mf_mp33u4",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp33u4.map",
+        "sha256": "3970377f2c7ca4d5efc7f89321e5d74dd4f2cc21e65c4af1bbd298487a6a333a"
+      }
+    },
+    {
+      "familyId": "mf_mp34u4",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp34u4.map",
+        "sha256": "97c1e3a937e1e839460203862a4dfbe4b88374fc47d6404629728394ce820f65"
+      }
+    },
+    {
+      "familyId": "mf_nearorefar",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_6_near_ore_far.map",
+        "sha256": "0d608a5c1a48752280751477bf18803caea47edca3af90b975b700a419bbccaf"
+      }
+    },
+    {
+      "familyId": "mf_newhghts",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_newhghts.map",
+        "sha256": "70e394895a4dcc7c94ba8462ed8be7e9ac0e86ad6820beea799292c8379d400e"
+      }
+    },
+    {
+      "familyId": "mf_oceansid",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_oceansid.map",
+        "sha256": "c55c496ffae77441cca43adba4e9eef544e791ee42362872c70c6ef9f61ab489"
+      }
+    },
+    {
+      "familyId": "mf_offensedefense",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_offensedefense.map",
+        "sha256": "94043927a79a30df9394ac6d6195e0d2926863fdad9c412556d0cc7af409f11a"
+      }
+    },
+    {
+      "familyId": "mf_ore2",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_ore2_startfixed.map",
+        "sha256": "af9749ef2f9d085d5406b00fd518cafb29d8e7d58a3f76218280c0e0735cb761"
+      }
+    },
+    {
+      "familyId": "mf_parksidegardens",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_4_parkside_gardens.map",
+        "sha256": "619bc56c6f2866ad54a7815d5d226f4a58a8518ecb547f76e2c37c32e23a70b4"
+      }
+    },
+    {
+      "familyId": "mf_potomac",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_potomac.map",
+        "sha256": "858ba474ae52b628743f72cebbc3c33ff0257a01dde8083bec871dc67d5b134c"
+      }
+    },
+    {
+      "familyId": "mf_powdrkeg",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_powdrkeg.map",
+        "sha256": "baf91400f73d8900ace60158c1d8b1ed0e5c3b57ed5757845388b3597904c9b1"
+      }
+    },
+    {
+      "familyId": "mf_reconcile",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_2_reconcile.map",
+        "sha256": "248a459912518fa46aad82387c232e51ca5e287fabe0c1d913ba4d26ed78373a"
+      }
+    },
+    {
+      "familyId": "mf_redvalley",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_4_red_valley.map",
+        "sha256": "61f9568b2eec46cac6e1cc3a1d9a1b1d0a052d790aa5072454e4296c71c555e8"
+      }
+    },
+    {
+      "familyId": "mf_rekoool6playersfast",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_rekoool_fast_6players.mpr",
+        "sha256": "cf78f0125fe5421f00d67becd96efc2921cc5accfe6fa50fdb1243dcb62498cc"
+      }
+    },
+    {
+      "familyId": "mf_rekoool8playersfast",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_rekoool_fast_8players.mpr",
+        "sha256": "46863919f5fbc581e85d5a9ee461d41660b64e89700bd943396e7d90fc6c48ff"
+      }
+    },
+    {
+      "familyId": "mf_riverram",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_riverram.map",
+        "sha256": "392b2b75ca02a6de6684c759ad29d3b9bc168dc4f9a97a56f0e74c2f6973b25f"
+      }
+    },
+    {
+      "familyId": "mf_rockets",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_rockets.map",
+        "sha256": "6912f72da7ed7fbaefd19ffaf5df088272ee3c94b58083063ca60b619472454d"
+      }
+    },
+    {
+      "familyId": "mf_roulette",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_roulette.map",
+        "sha256": "64cfd4a3b84b98ea4274caede06b9247d36e502ab4c0577812fb70a57bcd92b9"
+      }
+    },
+    {
+      "familyId": "mf_round",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_round.map",
+        "sha256": "6d92d95ea386f76e39d9cbfbdd1a067009eb0706773812a066f7d84a7c9fd8aa"
+      }
+    },
+    {
+      "familyId": "mf_seaofiso",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_seaofiso.map",
+        "sha256": "8a54a12fb5fe7fa51d6687d8aa6e684443d6d30d621773057f3f2e42cc20753f"
+      }
+    },
+    {
+      "familyId": "mf_senriver",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_2_sen_river.map",
+        "sha256": "56813d5e2889bdc7ca7500de1edfb03a0e6b88c1d974582e6efb4821d872d579"
+      }
+    },
+    {
+      "familyId": "mf_shrapnel",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_shrapnel.map",
+        "sha256": "15e3d2c273ea34e0b4857e735a16f8b51d297a92f18b5c52f3674512c7b35f83"
+      }
+    },
+    {
+      "familyId": "mf_splitlevel",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_2_split_level.map",
+        "sha256": "c86bc03e9cd43464ab387a8995190c85e35a209cbcbfc1008113ef8080d0b9d0"
+      }
+    },
+    {
+      "familyId": "mf_tanyas",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_tanyas.map",
+        "sha256": "f9b24a87212d795235f7b344f42babf6cd98bf11118f29ecc7b6dcb6e9da5a42"
+      }
+    },
+    {
+      "familyId": "mf_tn01mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_tn01mw.map",
+        "sha256": "d725dbde625b057de4f184d277fae58c3d03bb41b6049eeedc105f0e24409071"
+      }
+    },
+    {
+      "familyId": "mf_tn02mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_tn02mw.map",
+        "sha256": "1cbddc013fbd4e6e7705415390e7f06147a04fe6d2dfc3661be7bba388b59bb8"
+      }
+    },
+    {
+      "familyId": "mf_tn02s4",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_tn02s4.map",
+        "sha256": "66d8bb43e9ddcd7f71944799992a4ef284d300b105fb15b8a157ab8ec2266257"
+      }
+    },
+    {
+      "familyId": "mf_tn04mw",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_tn04mw.map",
+        "sha256": "9304bcea0fb21467aad63f8b968bb7158ee8ed2b9859ab04a87dd20c4bf79fd0"
+      }
+    },
+    {
+      "familyId": "mf_tn04t2",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_tn04t2.map",
+        "sha256": "8f1452ba46263a35b1fa5bea662ca2a74f1e367a8033929815059f1f9470b4e4"
+      }
+    },
+    {
+      "familyId": "mf_tourofegypt",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_tourofegypt.map",
+        "sha256": "2e660f22cf5ef994ca7453d14b9f68349063f9086b7c7c038f58e2067706236e"
+      }
+    },
+    {
+      "familyId": "mf_tower",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_tower.map",
+        "sha256": "3abd594569fb2de8b2905f18f9804ede4cdffa0ed30ba870df694132e8e97342"
+      }
+    },
+    {
+      "familyId": "mf_unrepent",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_unrepent.map",
+        "sha256": "980a402f2f1cd6d92c3008deaa0fea38368e0a4353e548173922a312c34c7ff2"
+      }
+    },
+    {
+      "familyId": "mf_valley",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_valley.map",
+        "sha256": "b3b4ea1ff6dc6e2918d17fd03215ac62a2b1b65d688a67a652f67d6a199053c2"
+      }
+    },
+    {
+      "familyId": "mf_xmas",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_xmas.map",
+        "sha256": "a41752210807f1af105ff61ee839258a28282fe8bcc8110037718a4fb4d0a25d"
+      }
+    },
+    {
+      "familyId": "mf_yuriplot",
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_yuriplot.map",
+        "sha256": "43d5fe46f288e579cf5e50698c51e7b953fb61d6460880ce17d89a6a136a3c19"
+      }
+    }
+  ]
+}

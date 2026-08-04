@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 2,
+  "status": "DRAFT_NOT_FROZEN",
+  "purpose": "COMPROMISED_CAPACITY_DRY_RUN_ONLY",
+  "finalReuseProhibited": true,
+  "capacityDryRunSeedCommitmentSha256": "8ef9b34beaf2fb7186981a6581eebf5d6f2d4429c6bb17c489c71f90361ae50f",
+  "capacityDryRunSeedFile": "/nfs/roberts/scratch/pi_jss233/zc362/chrono-divide-paper-audit/private/provisional_compromised_capacity_v1.seed",
+  "capacityDryRunAssignmentOutput": "/nfs/roberts/scratch/pi_jss233/zc362/chrono-divide-paper-audit/private/provisional_compromised_capacity_dry_run_v1.private.json",
+  "roleBlindFidelityTargetOutput": "research/artifacts/role_blind_fidelity_targets_v1.json",
+  "targetCounts": {
+    "dry_run_train_candidate": 16,
+    "dry_run_validation_candidate": 8,
+    "dry_run_test_candidate": 26
+  },
+  "reserveRole": "dry_run_unassigned_reserve",
+  "capacityIdentityBurnPolicy": "SELECTED_16_8_26_ONLY_RESERVES_NOT_RECORDED",
+  "minimumUnexposedEligibleFamiliesForFinalSplit": 50,
+  "requirePassedLoadMetadataForDryRun": true,
+  "requireFullMapFidelityBeforeFreeze": true,
+  "futureFinalSplitSeedPolicy": "NEW_PROSPECTIVE_SEED_COMMITMENT_AFTER_FIDELITY_ADJUDICATION_AND_POLICY_SOURCE_METHOD_PROTOCOL_FREEZE",
+  "familyAdjudications": {}
+}

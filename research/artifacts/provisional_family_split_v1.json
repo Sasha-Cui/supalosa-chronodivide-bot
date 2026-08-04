@@ -1,0 +1,161 @@
+{
+  "ambiguityFlagSummary": [
+    {
+      "blocking": true,
+      "code": "conflicting_start_counts",
+      "familyCount": 6
+    },
+    {
+      "blocking": true,
+      "code": "conflicting_theaters",
+      "familyCount": 1
+    },
+    {
+      "blocking": false,
+      "code": "exact_duplicate_or_compatibility_copies",
+      "familyCount": 17
+    },
+    {
+      "blocking": false,
+      "code": "multiple_content_revisions",
+      "familyCount": 134
+    },
+    {
+      "blocking": true,
+      "code": "multiple_revision_keys",
+      "familyCount": 14
+    },
+    {
+      "blocking": true,
+      "code": "uninformative_hash_like_family_key",
+      "familyCount": 6
+    }
+  ],
+  "areaTercileThresholds": {
+    "mediumMaxArea": 9180.0,
+    "smallMaxArea": 6715.0
+  },
+  "canBeUsedAsSealedTestSplit": false,
+  "capacityDryRunAssignment": {
+    "candidateIdsAndPathsPublic": false,
+    "commitmentRule": "SHA-256 of canonical JSON with sorted keys, compact separators, ASCII escaping, and no trailing newline.",
+    "commitmentSha256": "ec32a5de8eb95602b54441ca06c42513ed043c3ddc69cd14bdc7eef640b23ae1",
+    "excludedIdentityCount": 50,
+    "finalReuseProhibited": true,
+    "outputPath": "/nfs/roberts/scratch/pi_jss233/zc362/chrono-divide-paper-audit/private/provisional_compromised_capacity_dry_run_v1.private.json",
+    "requiredMode": "0600",
+    "reserveIdentitiesRecorded": false,
+    "status": "PROVISIONAL_COMPROMISED_DRY_RUN_EXCLUDE_FROM_FINAL"
+  },
+  "capacityDryRunSeed": {
+    "commitmentSha256": "8ef9b34beaf2fb7186981a6581eebf5d6f2d4429c6bb17c489c71f90361ae50f",
+    "eligibleForFinalSplitReuse": false,
+    "rankingRule": "SHA-256(seed, structural-stratum key, familyId), ascending",
+    "revealed": false,
+    "scope": "compromised capacity/determinism dry run only"
+  },
+  "containsCandidateFamilyIdsOrPaths": false,
+  "finalReuseProhibited": true,
+  "finalReuseProhibitionScope": "selected_capacity_identities_only",
+  "freezeGate": {
+    "blockingReasons": [
+      "This tool cannot emit a frozen split.",
+      "All Tier-B representatives require role-blind full-map fidelity screening before pool freeze.",
+      "Grouping and eligibility adjudications must be completed before pool freeze.",
+      "Policy, source revision, methods, metrics, baselines, and the evaluation protocol must be frozen before role generation.",
+      "A new prospective final-split seed must be committed after freeze and before final role generation.",
+      "Exactly the 50 selected capacity identities are excluded from final role reuse; reserve identities are not recorded in the capacity artifact.",
+      "Author-history and legal/release review remain external gates."
+    ],
+    "satisfied": false,
+    "toolCanFreeze": false
+  },
+  "futureFinalSplit": {
+    "mayReuseCapacityDryRunSeedOrRoles": false,
+    "mustUseNewProspectiveSeed": true,
+    "requiredOrder": [
+      "complete role-blind fidelity screening for all Tier-B representatives",
+      "complete eligibility and grouping adjudication",
+      "freeze policy, source revision, methods, and evaluation protocol",
+      "create and publish a new prospective seed commitment",
+      "generate final train/validation/test roles once"
+    ],
+    "seedCommitmentCreated": false,
+    "status": "DEFERRED_UNTIL_FIDELITY_ADJUDICATION_AND_POLICY_SOURCE_PROTOCOL_FREEZE"
+  },
+  "inputs": {
+    "catalogSchemaVersion": 2,
+    "catalogSha256": "8f378ee52a2d8a6d45e5d23a1e521aa6b2e08e9ab174adc8066cce8a1824bd54",
+    "configSha256": "76c1697f834d3ca1f061ec72616d92bf766ac926c144b23192b50b4535cd9a2f",
+    "partitionValidation": {
+      "uniqueContentHashes": 313,
+      "uniqueFamilyIds": 145,
+      "uniqueMapPaths": 333,
+      "uniqueRevisionKeys": 155
+    }
+  },
+  "outcomeBlind": true,
+  "policy": {
+    "capacityAllocatedFamilyCount": 50,
+    "capacityAllocationRule": "Fail-closed exact allocation: test, validation, then train round-robin across deterministic structural-stratum queues.",
+    "capacityAssignmentFinalReuseProhibited": true,
+    "capacityDryRunTargetCounts": {
+      "dry_run_test_candidate": 26,
+      "dry_run_train_candidate": 16,
+      "dry_run_validation_candidate": 8
+    },
+    "capacityIdentityBurnPolicy": "SELECTED_16_8_26_ONLY_RESERVES_NOT_RECORDED",
+    "eligibilityTier": "evidence_based",
+    "minimumUnexposedEligibleFamiliesForFinalSplit": 50,
+    "reserveRole": "dry_run_unassigned_reserve",
+    "roleBlindFidelityTargetPolicy": "Include every catalog family with evidence-based Tier-B development eligibility, independent of load metadata, grouping ambiguity, fidelity result, or capacity-dry-run role."
+  },
+  "reviewerFacingLimitations": [
+    "The aggregate split artifact hides capacity identities; the separate immutable role-blind fidelity manifest openly records only Tier-B family IDs and representative path/SHA values, without roles or fidelity outcomes.",
+    "Fidelity pass/review/fail is an outcome-blind compatibility filter: a complete screen may exclude incompatible families without invalidating other passing families.",
+    "Role-by-stratum capacity cells are withheld because sparse cells could indirectly reveal selected identities.",
+    "Exactly the 16/8/26 selected identities test feasibility and determinism and are permanently excluded from final use; capacity-reserve identities are not recorded.",
+    "At least 50 capacity-role-unexposed eligible families must remain before this dry run can be generated.",
+    "The final candidate pool may change after fidelity or family adjudication and therefore requires a new prospective seed commitment.",
+    "Structural strata use only INI theater, start count, and rectangular area, not difficulty, topology, resources, water, or symmetry.",
+    "Area terciles are corpus-relative.",
+    "Name/revision ambiguity flags are heuristic.",
+    "A smoke/load pass is not a full-map fidelity pass.",
+    "Fidelity binds one exact representative path and content SHA per Tier-B family; it does not validate every revision in the leakage family."
+  ],
+  "roleBlindFidelityTargets": {
+    "commitmentRule": "SHA-256 of canonical JSON with sorted keys, compact separators, ASCII escaping, and no trailing newline.",
+    "commitmentSha256": "2ebdb5a6a0583b8ed23a61047255842aee243afc597bcd13b78fd451293a0f7f",
+    "familyIdsAndPathsPublic": true,
+    "outputPath": "research/artifacts/role_blind_fidelity_targets_v1.json",
+    "populationCommitmentSha256": "3e8c35b104c35c1b790df1b2da0521b167613a22d4bbd5c23ea8c14b4fa7d86b",
+    "requiredMode": "0644",
+    "status": "ROLE_BLIND_FIDELITY_SCREEN_TARGETS_NOT_A_SPLIT",
+    "targetCount": 127
+  },
+  "schemaVersion": 2,
+  "status": "COMPROMISED_CAPACITY_DRY_RUN_NOT_FROZEN",
+  "summary": {
+    "capacityAllocatedFamilies": 50,
+    "capacityBurnedIdentityFamilies": 50,
+    "capacityDryRunEligibleFamilies": 105,
+    "capacityRoleCounts": {
+      "dry_run_test_candidate": 26,
+      "dry_run_train_candidate": 16,
+      "dry_run_unassigned_reserve": 55,
+      "dry_run_validation_candidate": 8
+    },
+    "capacityStrata": 22,
+    "catalogFamilies": 145,
+    "evidenceBasedEligibleFamilies": 127,
+    "manualGroupingReviewRequiredFamilies": 24,
+    "minimumFamiliesRequiredForFinalSplit": 50,
+    "remainingEligiblePoolSufficientForFinalSplit": true,
+    "roleBlindFidelityStatusCounts": {
+      "not_assessed": 127
+    },
+    "roleBlindFidelityTargetFamilies": 127,
+    "roleBlindFidelityTargetsWithBoundPass": 0,
+    "unexposedEligibleFamiliesRemaining": 55
+  }
+}
