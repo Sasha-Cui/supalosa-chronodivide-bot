@@ -22,6 +22,9 @@ Contents:
   family eligibility counts and reference-source classification.
 - `PROVISIONAL_FAMILY_SPLIT.md`: compromised capacity-only 16/8/26 allocation,
   exact 50-identity burn scope, and deferred prospective final-split order.
+- `FULL_SCREEN_READINESS_REVIEW.md`: independent P0/P1/P2 acceptance review for
+  exact map-byte attestation, process isolation, start coverage, and durable
+  evidence retention.
 - `MAP_FIDELITY_GATE.md`: role-blind, outcome-free Slurm preflight/full-map
   parser/load/progress protocol and its deliberately narrow interpretation.
 - `VENUE_STRATEGY.md`: verified venue fit and deadlines as of 2026-08-04.
@@ -70,6 +73,9 @@ Contents:
   non-clearance interpretation.
 - `artifacts/pi_jss233_readiness_2026-08-04.json`: current submit-limit
   evidence and non-fallback decision.
+- `artifacts/storage_visibility_incident_2026-08-04.json`: raw scratch
+  visibility incident, successful private split-artifact mirror, and mandatory
+  future project-storage remediation.
 - `scripts/prepare_external_baseline.sh`: clean-baseline runtime preparation.
 - `slurm/audit_pilot_v1.sbatch`: four-task, paired-physical-start CPU pilot.
 - `slurm/seed_replay_gate_v1.sbatch`: packaged 10-same/1-different fresh-
@@ -78,6 +84,8 @@ Contents:
 - `slurm/map_fidelity_gate_v1.sbatch`: pinned CPU-only, role-blind three-map
   preflight entry point; a preflight can never clear full-map fidelity.
 
-Generated pilot outputs are append-only under
-`/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit`. Proprietary
-maps, MIX archives, and copied game data are not duplicated into this layer.
+Historical pilot outputs were intended to be append-only under scratch, but
+their inconsistent visibility is now a recorded retention incident. Future
+authoritative evidence must be atomically staged under versioned project
+storage and independently reverified. Proprietary maps, MIX archives, and
+copied game data are not duplicated into the Git research layer.

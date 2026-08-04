@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "status": "RAW_EVIDENCE_STORAGE_UNSTABLE",
+  "observedAt": "2026-08-04",
+  "host": "a1114u05n01.mghpcc.ycrc.yale.edu",
+  "filesystem": {
+    "pathPrefix": "/nfs/roberts/scratch/pi_jss233/zc362/chrono-divide-paper-audit",
+    "mountType": "nfs",
+    "role": "working_storage_not_authoritative_evidence"
+  },
+  "affectedExecutions": [
+    {
+      "jobId": "21291720",
+      "kind": "seed-replay-gate-v1",
+      "registeredAggregate": "research/artifacts/seed_replay_gate_v1_execution.json",
+      "rawRootConsistentlyReadable": false
+    },
+    {
+      "jobId": "21296136",
+      "kind": "map-fidelity-preflight-v1-failed-attempt",
+      "registeredAggregate": "research/artifacts/map_fidelity_preflight_v1_execution.json",
+      "rawRootConsistentlyReadable": false
+    },
+    {
+      "jobId": "21296316",
+      "kind": "map-fidelity-preflight-v1-corrected",
+      "registeredAggregate": "research/artifacts/map_fidelity_preflight_v1_execution.json",
+      "rawRootConsistentlyReadable": false
+    }
+  ],
+  "observations": [
+    "The registered raw roots were read successfully after execution and every recorded artifact hash was verified.",
+    "Subsequent reads on the same host alternated between the populated tree and ENOENT; later repeated reads exposed only the private split directory.",
+    "Multiple no-overwrite mirror attempts could not obtain a consistently readable source tree.",
+    "Authoritative sacct records and committed aggregate/hash records remained available."
+  ],
+  "interpretation": "The completed jobs and committed aggregates remain credible, but raw scratch retention is not reliable enough for future paper evidence.",
+  "successfulPrivateMirror": {
+    "destination": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/private/provisional-family-split-v1",
+    "assignmentSha256": "81db064af5fdad84ebe2c9d6060c47534865631da08d29fd513849eeb9372728",
+    "seedSha256": "8ef9b34beaf2fb7186981a6581eebf5d6f2d4429c6bb17c489c71f90361ae50f",
+    "identitiesDisclosed": false
+  },
+  "requiredRemediation": [
+    "Write authoritative future evidence to a versioned project-storage run root.",
+    "Use scratch only for replaceable working files.",
+    "Atomically stage manifest, shards, aggregate, logs, and scheduler record before job exit.",
+    "Verify every staged hash from a separate session before registration.",
+    "Rerun critical readiness gates under the remediated storage protocol before protocol freeze."
+  ],
+  "scientificOutcomeDataPresent": false
+}
