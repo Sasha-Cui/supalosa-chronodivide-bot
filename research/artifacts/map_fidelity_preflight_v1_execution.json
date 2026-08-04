@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "gate": "map-fidelity-gate-v1",
+  "outcomeFree": true,
+  "evaluatedSource": {
+    "gitCommit": "3f605eb38bc21db00a3bab930ae05bddd305ae5a",
+    "gitBranch": "codex/chrono-divide-paper-audit",
+    "trackedDirty": false
+  },
+  "targetPopulation": {
+    "familyCount": 127,
+    "targetManifestSha256": "51af273b38e6c8e63012e75f708a9600d5d2749faf57d986b715440bb7025834",
+    "targetPopulationCommitmentSha256": "3e8c35b104c35c1b790df1b2da0521b167613a22d4bbd5c23ea8c14b4fa7d86b",
+    "catalogSha256": "8f378ee52a2d8a6d45e5d23a1e521aa6b2e08e9ab174adc8066cce8a1824bd54"
+  },
+  "failedAttempt": {
+    "jobId": "21296136",
+    "account": "pi_jss233",
+    "partition": "devel",
+    "state": "FAILED",
+    "exitCode": "1:0",
+    "submittedAt": "2026-08-04T13:53:26-04:00",
+    "startedAt": "2026-08-04T13:53:27-04:00",
+    "endedAt": "2026-08-04T13:54:30-04:00",
+    "elapsed": "00:01:03",
+    "totalCpu": "00:00:09.079",
+    "batchMaxRssKiB": 1109372,
+    "sourceCommit": "06dece0b8f31f8855ec0f49fcf2f18797c90a11a",
+    "requestedFamilies": 3,
+    "attemptedEngineSessions": 6,
+    "loadedEngineSessions": 0,
+    "familyCounts": {
+      "pass": 0,
+      "review": 0,
+      "fail": 3
+    },
+    "cause": "The manifest used the display label Iraq instead of the pinned game-API internal country identifier Arabs; every attempted session failed before map load.",
+    "artifactRoot": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/map-fidelity-preflight-v1/21296136",
+    "inputManifestSha256": "723dc02798f6a840b5fd0557670effb316b0ced31ae36224b05d7a78758ec377",
+    "probeResultsSha256": "a7bb719c06995356b42fc9aad9f8f01589b237f2ca85f6260b2975cbda2e3418",
+    "gateSummarySha256": "3074f04feba8c76db9687f0584dea7b01fb8936d479ba7035c01ef287cf6947b"
+  },
+  "successfulPreflight": {
+    "jobId": "21296316",
+    "account": "pi_jss233",
+    "partition": "devel",
+    "qos": "normal",
+    "state": "COMPLETED",
+    "exitCode": "0:0",
+    "submittedAt": "2026-08-04T13:57:19-04:00",
+    "startedAt": "2026-08-04T13:57:20-04:00",
+    "endedAt": "2026-08-04T13:58:09-04:00",
+    "elapsed": "00:00:49",
+    "totalCpu": "00:00:11.814",
+    "batchMaxRssKiB": 1249852,
+    "scope": "preflight",
+    "requestedFamilies": 3,
+    "engineSessions": 6,
+    "targetTickPerSession": 250,
+    "familyCounts": {
+      "pass": 3,
+      "review": 0,
+      "fail": 0
+    },
+    "warningCategoryCounts": {},
+    "globalFailures": [],
+    "globalReviews": [],
+    "technicalChecksPassed": true,
+    "screenComplete": false,
+    "eligibleForFidelityClearance": false,
+    "gateVerdict": "PASS"
+  },
+  "passedFamilies": [
+    "mf_arena",
+    "mf_mp08mw",
+    "mf_mp09du"
+  ],
+  "resultRoot": {
+    "path": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/map-fidelity-preflight-v1/21296316",
+    "files": 5,
+    "fileBytes": 767931,
+    "directoryBytes": 772027
+  },
+  "artifacts": {
+    "inputManifestSha256": "88999c9a1b00a5a224031334c2c489aaeee9bea62e02b3f93d13631140a38ae0",
+    "probeResultsSha256": "b0e8b9a8e8f3e5ff2f646ae8d1ebcf3a73d9b5a4050a5bfcaf6e2bad0bb7283e",
+    "gateSummarySha256": "ebe5968b892cafed4ce2333e7b33c87a8a678b4da7d7b5d35579d1986262b5ac",
+    "stdoutSha256": "a9a13b68b975d51be36ab993951f7da1979abd88ebc8a1ce68a0feea269766d7",
+    "stderrSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "provenance": {
+    "sourceBundleSha256": "9e4c1dddc9e473606c3b37547cbf9e7a69917b8ae374616cadaf0656234e0ac0",
+    "runtimeBundleSha256": "2f2dd805e5fb0eb59d58feef210175474a8610372a8b0f0b9844fbabe694f146"
+  },
+  "checks": {
+    "schedulerProvenanceAuthoritative": true,
+    "schedulerAccountPiJss233": true,
+    "roleBlindSelection": true,
+    "outcomeFieldsAbsent": true,
+    "reciprocalOrdersPass3of3": true,
+    "targetTickReached6of6": true,
+    "capturedWarningsAbsent": true,
+    "fullPopulationClearance": false
+  },
+  "interpretation": "The three-map passive-bot Slurm preflight passed its internal parser, load, progress, reciprocal-start, warning, and provenance checks. It contains no StrongBot or Supalosa policy outcomes and cannot clear the unscreened 124 families or support a gameplay claim."
+}

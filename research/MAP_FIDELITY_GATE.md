@@ -47,7 +47,13 @@ to Red Alert 2, strategic suitability, or sealed-test validity.
 The only engine entry point is `research/slurm/map_fidelity_gate_v1.sbatch`.
 Both the static preparer/checker and the Node runner require `SLURM_JOB_ID`,
 query `scontrol`, and reject any authoritative account other than
-`pi_jss233`. The job has not been submitted as part of packaging.
+`pi_jss233`. Preflight job 21296136 failed closed before map load because the
+manifest used display label `Iraq`, not the pinned API's internal country ID
+`Arabs`. Commit `3f605eb` fixed and regression-tested that configuration.
+Corrected job 21296316 completed under `pi_jss233`: 3/3 role-blind families and
+6/6 reciprocal passive sessions passed through tick 250 with no warning
+category or global provenance finding. This is preflight evidence only; it is
+not full-map clearance or policy-strength evidence.
 
 Preparation also fails closed if tracked source is dirty, if source/build/
 research-control directories contain untracked files, if a required Git query
@@ -85,6 +91,9 @@ items are implemented: collision-free proof of the exact VFS-resolved map bytes
 and per-family process isolation with timeout/atomic checkpointing. The full
 script remains packaged for review but is not yet authorized as clearance
 evidence.
+
+The corrected preflight's registered aggregate and exact hashes are in
+`research/artifacts/map_fidelity_preflight_v1_execution.json`.
 
 Artifacts are written without overwrite to
 `/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/map-fidelity-gate-v1/<job-id>/`:

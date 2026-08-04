@@ -65,6 +65,9 @@ Contents:
 - `artifacts/seed_replay_gate_v1_{summary,execution}.json`: exact deterministic
   fresh-process gate output and its Slurm/job/source/log provenance, including
   two zero-game launcher failures.
+- `artifacts/map_fidelity_preflight_v1_execution.json`: failed and corrected
+  three-map Slurm preflight accounting, exact artifact hashes, and the explicit
+  non-clearance interpretation.
 - `artifacts/pi_jss233_readiness_2026-08-04.json`: current submit-limit
   evidence and non-fallback decision.
 - `scripts/prepare_external_baseline.sh`: clean-baseline runtime preparation.

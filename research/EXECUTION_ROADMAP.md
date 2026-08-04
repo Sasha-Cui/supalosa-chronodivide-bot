@@ -38,12 +38,12 @@ archive before later edits or rebuilds.
    control has unit and same-process evidence; Slurm job 21291720 passed the
    packaged `seed_replay_gate_v1` under `pi_jss233` with 10/10
    fresh-process trace identity and different-seed divergence.
-2. **Packaged, preflight pending:** the role-blind fidelity gate statically
-   binds all 127 Tier-B representatives and independently recomputes seeds,
-   ticks, reciprocal starts, warning policy, and source/runtime provenance. Run
-   only its three-map Slurm preflight now. Before the 127-map clearance run,
-   add collision-free proof of VFS-resolved map bytes and per-family timeout/
-   atomic checkpoint isolation.
+2. **Three-map preflight passed:** Slurm job 21296316 passed 3/3 role-blind
+   representatives and 6/6 reciprocal passive sessions through tick 250 under
+   `pi_jss233`, with no captured warning category or global provenance finding.
+   This does not clear the remaining 124 families. Before the 127-map clearance
+   run, add collision-free proof of VFS-resolved map bytes and per-family
+   timeout/atomic checkpoint isolation.
 3. The outcome-blind catalog currently groups 333 files into 145 conservative
    families. Preserve both the strict 7-family ceiling and the evidence-based
    127-family provisional pool; manually adjudicate revision links and exclude
