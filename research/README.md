@@ -25,6 +25,9 @@ Contents:
 - `FULL_SCREEN_READINESS_REVIEW.md`: independent P0/P1/P2 acceptance review for
   exact map-byte attestation, process isolation, start coverage, and durable
   evidence retention.
+- `METHOD_INTERFACE_GATE.md`: source-based rejection of the historical trainer
+  as a confirmatory runner and the required coordinate-free, seed-controlled,
+  equal-budget replacement contract.
 - `MAP_FIDELITY_GATE.md`: role-blind, outcome-free Slurm preflight/full-map
   parser/load/progress protocol and its deliberately narrow interpretation.
 - `VENUE_STRATEGY.md`: verified venue fit and deadlines as of 2026-08-04.
