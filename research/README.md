@@ -20,6 +20,10 @@ Contents:
 - `ENVIRONMENT.md`: observed runtime, dependency, and randomness constraints.
 - `MAP_FAMILY_ELIGIBILITY.md`: outcome-blind strict and evidence-based map
   family eligibility counts and reference-source classification.
+- `PROVISIONAL_FAMILY_SPLIT.md`: compromised capacity-only 16/8/26 allocation,
+  exact 50-identity burn scope, and deferred prospective final-split order.
+- `MAP_FIDELITY_GATE.md`: role-blind, outcome-free Slurm preflight/full-map
+  parser/load/progress protocol and its deliberately narrow interpretation.
 - `VENUE_STRATEGY.md`: verified venue fit and deadlines as of 2026-08-04.
 - `EXECUTION_ROADMAP.md`: compute budget, experiment gates, and weekly plan.
 - `DIAGNOSTIC_PROTOCOL.md`: fixed 1,000-launch pre-confirmatory allocation,
@@ -31,6 +35,10 @@ Contents:
 - `scripts/inventory_maps.py`: exact map-hash and duplicate inventory.
 - `scripts/catalog_map_families.py`: outcome-blind family grouping, safe INI
   descriptors, provenance, and two-tier adaptive-exposure catalog.
+- `scripts/propose_map_family_split.py`: role-blind fidelity-target generation
+  plus a private, compromised capacity test that cannot freeze a split.
+- `scripts/map_fidelity_gate.py`: strict Slurm-only fidelity manifest builder
+  and independent, schema-allowlisted checker.
 - `scripts/design_power.py`: assumption-only crossed family/run power analysis.
 - `scripts/check_seed_replay_gate.py`: exact fresh-process replay-gate checker.
 - `scripts/run_audit_pilot_task.sh`: shared Slurm/allocation task runner.
@@ -48,6 +56,10 @@ Contents:
   correction for the fallback diagnostics and schema-3 remediation.
 - `artifacts/map_family_catalog.json`: 333-file/145-family outcome-blind
   catalog with strict and evidence-based provisional eligibility.
+- `artifacts/provisional_family_split_v1.json`: aggregate-only compromised
+  capacity check; it contains no candidate identities or paths.
+- `artifacts/role_blind_fidelity_targets_v1.json`: all 127 Tier-B exact
+  representatives without train/validation/test roles.
 - `artifacts/design_power_{assumption_example,selected_draft}.json`:
   prospective sensitivity reports that use no outcomes.
 - `artifacts/seed_replay_gate_v1_{summary,execution}.json`: exact deterministic
@@ -60,6 +72,8 @@ Contents:
 - `slurm/seed_replay_gate_v1.sbatch`: packaged 10-same/1-different fresh-
   process deterministic replay gate; passed as job 21291720 under
   `pi_jss233`.
+- `slurm/map_fidelity_gate_v1.sbatch`: pinned CPU-only, role-blind three-map
+  preflight entry point; a preflight can never clear full-map fidelity.
 
 Generated pilot outputs are append-only under
 `/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit`. Proprietary

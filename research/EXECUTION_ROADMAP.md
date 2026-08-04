@@ -38,14 +38,20 @@ archive before later edits or rebuilds.
    control has unit and same-process evidence; Slurm job 21291720 passed the
    packaged `seed_replay_gate_v1` under `pi_jss233` with 10/10
    fresh-process trace identity and different-seed divergence.
-2. Validate full-map fidelity beyond tick 1 and turn parser warnings into
-   explicit failure categories.
+2. **Packaged, preflight pending:** the role-blind fidelity gate statically
+   binds all 127 Tier-B representatives and independently recomputes seeds,
+   ticks, reciprocal starts, warning policy, and source/runtime provenance. Run
+   only its three-map Slurm preflight now. Before the 127-map clearance run,
+   add collision-free proof of VFS-resolved map bytes and per-family timeout/
+   atomic checkpoint isolation.
 3. The outcome-blind catalog currently groups 333 files into 145 conservative
    families. Preserve both the strict 7-family ceiling and the evidence-based
    127-family provisional pool; manually adjudicate revision links and exclude
    all 18 families with adaptive evidence.
-4. Freeze a provisional 16-train/8-validation/26-test family split and test-
-   access policy only after family adjudication and fidelity screening.
+4. **Capacity checked, not frozen:** the compromised 16/8/26 dry run burns
+   exactly 50 selected identities and leaves 55 eligible identities unexposed.
+   Generate actual roles only with a new prospective seed after fidelity,
+   adjudication, policy/source/method/protocol freeze, and test-access policy.
 5. Implement fixed generic, clean upstream, random search, and a current
    profiled development-only upper bound with equal launched-simulation
    accounting; never fit the upper bound on a sealed zero-shot map.
@@ -59,8 +65,12 @@ Do not launch the MVP until all eight gates pass.
 
 ### P2 — workshop MVP
 
-1. Use 100–300 launched simulations total for diagnostic calibration across
-   methods/contexts; this is not the final 1,000-game-per-optimizer-run budget.
+1. Execute the fixed, at-most-1,000-launch diagnostic in
+   `DIAGNOSTIC_PROTOCOL.md`: 64 seed/trace checks, 96 blinded compatibility/
+   timing launches, 800 effect/variance launches, and at most 40 exact-block
+   retries. Unblind once and continue only if every technical gate passes and
+   the one-sided 80% lower clustered confidence bound for family-macro
+   development improvement is above zero.
 2. Run ten independent optimizer repetitions for the primary global and
    conditioned methods. Use five-run screens only for development and secondary
    methods; add SMAC, irace, or NTBEA only after a small integration test.
