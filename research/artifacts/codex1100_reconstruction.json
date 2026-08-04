@@ -1,0 +1,650 @@
+{
+  "aggregate": {
+    "baselineWins": 7,
+    "candidateScoreRate": 0.9557291666666666,
+    "candidateWinRate": 0.9479166666666666,
+    "candidateWins": 182,
+    "draws": 3,
+    "n": 192,
+    "naiveGameLevelWilson95ForWinIndicator": [
+      0.9067948899639535,
+      0.9714665416845791
+    ],
+    "unfinished": 3
+  },
+  "byCandidateSlot": {
+    "0": {
+      "baselineWins": 4,
+      "candidateScoreRate": 0.953125,
+      "candidateWinRate": 0.9479166666666666,
+      "candidateWins": 91,
+      "draws": 1,
+      "n": 96,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.8838152196850738,
+        0.9775503995257587
+      ],
+      "unfinished": 1
+    },
+    "1": {
+      "baselineWins": 3,
+      "candidateScoreRate": 0.9583333333333334,
+      "candidateWinRate": 0.9479166666666666,
+      "candidateWins": 91,
+      "draws": 2,
+      "n": 96,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.8838152196850738,
+        0.9775503995257587
+      ],
+      "unfinished": 2
+    }
+  },
+  "byCandidateStart": {
+    "107,161": {
+      "baselineWins": 1,
+      "candidateScoreRate": 0.9090909090909091,
+      "candidateWinRate": 0.9090909090909091,
+      "candidateWins": 10,
+      "draws": 0,
+      "n": 11,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.6226415635484043,
+        0.9837678271141151
+      ],
+      "unfinished": 0
+    },
+    "107,50": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 12,
+      "draws": 0,
+      "n": 12,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.7575059933447592,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "111,178": {
+      "baselineWins": 0,
+      "candidateScoreRate": 0.9444444444444444,
+      "candidateWinRate": 0.8888888888888888,
+      "candidateWins": 8,
+      "draws": 1,
+      "n": 9,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.5650002944233439,
+        0.9801091123614551
+      ],
+      "unfinished": 1
+    },
+    "117,99": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 9,
+      "draws": 0,
+      "n": 9,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.7008549515804559,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "118,73": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 6,
+      "draws": 0,
+      "n": 6,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.6096657120978346,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "127,128": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 9,
+      "draws": 0,
+      "n": 9,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.7008549515804559,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "128,89": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 8,
+      "draws": 0,
+      "n": 8,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.6755924351161198,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "134,56": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 9,
+      "draws": 0,
+      "n": 9,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.7008549515804559,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "151,89": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 7,
+      "draws": 0,
+      "n": 7,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.6456695649333126,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "152,96": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 6,
+      "draws": 0,
+      "n": 6,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.6096657120978346,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "31,101": {
+      "baselineWins": 3,
+      "candidateScoreRate": 0.5714285714285714,
+      "candidateWinRate": 0.5714285714285714,
+      "candidateWins": 4,
+      "draws": 0,
+      "n": 7,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.2504583645276572,
+        0.8417801447485302
+      ],
+      "unfinished": 0
+    },
+    "32,102": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 9,
+      "draws": 0,
+      "n": 9,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.7008549515804559,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "37,73": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 10,
+      "draws": 0,
+      "n": 10,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.7224672001371107,
+        0.9999999999999999
+      ],
+      "unfinished": 0
+    },
+    "41,102": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 4,
+      "draws": 0,
+      "n": 4,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.5101091635454027,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "48,123": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 7,
+      "draws": 0,
+      "n": 7,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.6456695649333126,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "50,119": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 9,
+      "draws": 0,
+      "n": 9,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.7008549515804559,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "51,97": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 11,
+      "draws": 0,
+      "n": 11,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.7411670330319684,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "57,98": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 10,
+      "draws": 0,
+      "n": 10,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.7224672001371107,
+        0.9999999999999999
+      ],
+      "unfinished": 0
+    },
+    "61,73": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 7,
+      "draws": 0,
+      "n": 7,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.6456695649333126,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "83,27": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 5,
+      "draws": 0,
+      "n": 5,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.5655175352168251,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "92,22": {
+      "baselineWins": 0,
+      "candidateScoreRate": 0.9285714285714286,
+      "candidateWinRate": 0.8571428571428571,
+      "candidateWins": 6,
+      "draws": 1,
+      "n": 7,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.4868721707256811,
+        0.9743203756552565
+      ],
+      "unfinished": 1
+    },
+    "96,51": {
+      "baselineWins": 3,
+      "candidateScoreRate": 0.3,
+      "candidateWinRate": 0.2,
+      "candidateWins": 1,
+      "draws": 1,
+      "n": 5,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.03622410863243014,
+        0.6244653702374747
+      ],
+      "unfinished": 1
+    },
+    "96,64": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 7,
+      "draws": 0,
+      "n": 7,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.6456695649333126,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "98,125": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 8,
+      "draws": 0,
+      "n": 8,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.6755924351161198,
+        1.0
+      ],
+      "unfinished": 0
+    }
+  },
+  "byMap": {
+    "cd_2_malibu_cliffs_le.map": {
+      "baselineWins": 0,
+      "candidateScoreRate": 0.96875,
+      "candidateWinRate": 0.9375,
+      "candidateWins": 15,
+      "draws": 1,
+      "n": 16,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.7167126242970107,
+        0.9888806552353576
+      ],
+      "unfinished": 1
+    },
+    "cd_2_official_tournament_map_q.map": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 16,
+      "draws": 0,
+      "n": 16,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.8063923194655637,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "cd_2_peak_of_perfection.map": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 16,
+      "draws": 0,
+      "n": 16,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.8063923194655637,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "cd_2_pinch_point_le.map": {
+      "baselineWins": 3,
+      "candidateScoreRate": 0.78125,
+      "candidateWinRate": 0.75,
+      "candidateWins": 12,
+      "draws": 1,
+      "n": 16,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.5050168346449122,
+        0.8981793250878696
+      ],
+      "unfinished": 1
+    },
+    "cd_2_reconcile.map": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 16,
+      "draws": 0,
+      "n": 16,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.8063923194655637,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "cd_2_river_rampage_le.map": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 16,
+      "draws": 0,
+      "n": 16,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.8063923194655637,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "cd_2_south_pacific.map": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 16,
+      "draws": 0,
+      "n": 16,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.8063923194655637,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "cd_2_split_level.map": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 16,
+      "draws": 0,
+      "n": 16,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.8063923194655637,
+        1.0
+      ],
+      "unfinished": 0
+    },
+    "cd_2_tiger_bay.map": {
+      "baselineWins": 3,
+      "candidateScoreRate": 0.8125,
+      "candidateWinRate": 0.8125,
+      "candidateWins": 13,
+      "draws": 0,
+      "n": 16,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.5699111903802586,
+        0.9340840092857187
+      ],
+      "unfinished": 0
+    },
+    "cd_2_tikal.map": {
+      "baselineWins": 0,
+      "candidateScoreRate": 0.96875,
+      "candidateWinRate": 0.9375,
+      "candidateWins": 15,
+      "draws": 1,
+      "n": 16,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.7167126242970107,
+        0.9888806552353576
+      ],
+      "unfinished": 1
+    },
+    "cd_2_watering_hole_ra2.map": {
+      "baselineWins": 1,
+      "candidateScoreRate": 0.9375,
+      "candidateWinRate": 0.9375,
+      "candidateWins": 15,
+      "draws": 0,
+      "n": 16,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.7167126242970107,
+        0.9888806552353576
+      ],
+      "unfinished": 0
+    },
+    "cd_2_yin_yang_precap.map": {
+      "baselineWins": 0,
+      "candidateScoreRate": 1.0,
+      "candidateWinRate": 1.0,
+      "candidateWins": 16,
+      "draws": 0,
+      "n": 16,
+      "naiveGameLevelWilson95ForWinIndicator": [
+        0.8063923194655637,
+        1.0
+      ],
+      "unfinished": 0
+    }
+  },
+  "cautions": [
+    "The game-level Wilson interval assumes independent Bernoulli observations and treats draws as non-wins.",
+    "The bootstrap clusters by map filename, not deduplicated map family; clones can leak across groups.",
+    "Historical summaries lack a source revision, game RNG seed, clean-baseline identity, and rejection logs.",
+    "Use these intervals only as descriptive sensitivity checks for preserved artifacts."
+  ],
+  "ignoredJsonFiles": [],
+  "macroAverageMapScoreRate": 0.9557291666666666,
+  "mapClusterBootstrap": {
+    "clusters": 12,
+    "repetitions": 10000,
+    "scoreRatePercentile95": [
+      0.9088541666666666,
+      0.9921875
+    ],
+    "seed": 20260802,
+    "unit": "map name (not deduplicated map family)"
+  },
+  "purpose": "retrospective reconstruction, not confirmatory inference",
+  "repeatedCompositeSignatures": 0,
+  "schemaVersion": 1,
+  "sourceFiles": [
+    {
+      "discrepancies": {},
+      "generatedAt": "2026-06-24T04:26:30.299Z",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/packages/chronodivide-bot-driver/benchmark-results/campaigns/codex1100-current-broad/16021104_0/head-to-head-1782275190300.json",
+      "results": 24,
+      "schemaVersion": 1,
+      "sha256": "566fb09251f451a4a554243188bab369c5c4f5e795bc74a46a09f8b43cd6996d",
+      "storedCounts": {
+        "baselineWins": 0,
+        "candidateWinRate": 0.9583333333333334,
+        "candidateWins": 23,
+        "draws": 1
+      }
+    },
+    {
+      "discrepancies": {},
+      "generatedAt": "2026-06-24T04:26:23.708Z",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/packages/chronodivide-bot-driver/benchmark-results/campaigns/codex1100-current-broad/16021105_1/head-to-head-1782275183755.json",
+      "results": 24,
+      "schemaVersion": 1,
+      "sha256": "6fb9662bca8547232472041de26683e8f0b2ffe0f3db6ee91023ac6e18db7abf",
+      "storedCounts": {
+        "baselineWins": 0,
+        "candidateWinRate": 0.9583333333333334,
+        "candidateWins": 23,
+        "draws": 1
+      }
+    },
+    {
+      "discrepancies": {},
+      "generatedAt": "2026-06-24T04:34:02.785Z",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/packages/chronodivide-bot-driver/benchmark-results/campaigns/codex1100-current-broad/16021436_2/head-to-head-1782275642788.json",
+      "results": 24,
+      "schemaVersion": 1,
+      "sha256": "f5e15befb69964060bddd960dd207e8846f5b8c994c9ecb76dabe0bf24debbfa",
+      "storedCounts": {
+        "baselineWins": 0,
+        "candidateWinRate": 1,
+        "candidateWins": 24,
+        "draws": 0
+      }
+    },
+    {
+      "discrepancies": {},
+      "generatedAt": "2026-06-24T04:37:49.489Z",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/packages/chronodivide-bot-driver/benchmark-results/campaigns/codex1100-current-broad/16021490_3/head-to-head-1782275869491.json",
+      "results": 24,
+      "schemaVersion": 1,
+      "sha256": "e09108bb821f323a94c621a5cc7bada2e7e057f283acda652db77e148742b4ba",
+      "storedCounts": {
+        "baselineWins": 3,
+        "candidateWinRate": 0.875,
+        "candidateWins": 21,
+        "draws": 0
+      }
+    },
+    {
+      "discrepancies": {},
+      "generatedAt": "2026-06-24T04:42:15.269Z",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/packages/chronodivide-bot-driver/benchmark-results/campaigns/codex1100-current-broad/16021740_4/head-to-head-1782276135278.json",
+      "results": 24,
+      "schemaVersion": 1,
+      "sha256": "778a6e282663af7c436fee964e23021ea868d4ef178a1171863a1ea603c6b27d",
+      "storedCounts": {
+        "baselineWins": 0,
+        "candidateWinRate": 1,
+        "candidateWins": 24,
+        "draws": 0
+      }
+    },
+    {
+      "discrepancies": {},
+      "generatedAt": "2026-06-24T04:45:47.732Z",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/packages/chronodivide-bot-driver/benchmark-results/campaigns/codex1100-current-broad/16021922_5/head-to-head-1782276347735.json",
+      "results": 24,
+      "schemaVersion": 1,
+      "sha256": "3f43fe60d584cbd5dc966ae39be94a63fe7f9e99302934f76bb6dc280e352f04",
+      "storedCounts": {
+        "baselineWins": 0,
+        "candidateWinRate": 0.9583333333333334,
+        "candidateWins": 23,
+        "draws": 1
+      }
+    },
+    {
+      "discrepancies": {},
+      "generatedAt": "2026-06-24T04:52:24.850Z",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/packages/chronodivide-bot-driver/benchmark-results/campaigns/codex1100-current-broad/16022155_6/head-to-head-1782276744853.json",
+      "results": 24,
+      "schemaVersion": 1,
+      "sha256": "6f1369fa999131c10a91e37b863ea8bba15c001897d1775a5c52bb0a30c4df9f",
+      "storedCounts": {
+        "baselineWins": 2,
+        "candidateWinRate": 0.9166666666666666,
+        "candidateWins": 22,
+        "draws": 0
+      }
+    },
+    {
+      "discrepancies": {},
+      "generatedAt": "2026-06-24T04:55:46.805Z",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/packages/chronodivide-bot-driver/benchmark-results/campaigns/codex1100-current-broad/16022521_7/head-to-head-1782276946808.json",
+      "results": 24,
+      "schemaVersion": 1,
+      "sha256": "f91f7a33017ab4bd29045ce1433e50f32132bd79b6a00a4a97703b2334590896",
+      "storedCounts": {
+        "baselineWins": 2,
+        "candidateWinRate": 0.9166666666666666,
+        "candidateWins": 22,
+        "draws": 0
+      }
+    }
+  ]
+}

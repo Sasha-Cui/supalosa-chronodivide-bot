@@ -1,0 +1,129 @@
+{
+  "analysis_model": {
+    "alpha": 0.05,
+    "alternative": "two-sided",
+    "clusters": [
+      "map_family",
+      "optimizer_run"
+    ],
+    "critical_value": "Monte Carlo calibrated under delta=0 using the same assumed random-effects model",
+    "non_positive_variance_policy": "preserve and count as non-rejection; never clamp to zero",
+    "sandwich": "finite-cluster CGM: V_family + V_optimizer_run - V_family_by_optimizer_run",
+    "test": "intercept-only two-way cluster-robust test on paired differences"
+  },
+  "data_generating_model": {
+    "distribution": "independent zero-mean Gaussian random effects",
+    "equation": "D[f,r,b] = delta + U_family[f] + V_run[r] + W_family_run[f,r] + E_game[f,r,b]",
+    "variance_components": {
+      "E_game": 0.16,
+      "U_family": 0.0025,
+      "V_run": 0.0009,
+      "W_family_run": 0.0016
+    }
+  },
+  "design": {
+    "alpha": 0.05,
+    "alternative": "two-sided",
+    "families": 9,
+    "null_replicates": 20000,
+    "optimizer_runs": 5,
+    "paired_blocks": 8,
+    "seed": 20260804,
+    "simulations": 20000,
+    "variance_family": 0.0025,
+    "variance_family_optimizer": 0.0016,
+    "variance_game": 0.16,
+    "variance_optimizer_run": 0.0009
+  },
+  "endpoint": {
+    "contrast": "conditioned score minus global score",
+    "name": "family-macro conditioned-minus-global score difference",
+    "score": "win=1, draw=0.5, loss=0",
+    "weighting": "equal weight per map family; the simulated design is balanced over optimizer runs and paired seed/start blocks"
+  },
+  "label": "ASSUMPTION-BASED PROSPECTIVE DESIGN ANALYSIS; NOT AN OBSERVED RESULT",
+  "limitations": [
+    "This is design sensitivity under supplied assumptions, not evidence that the effect exists.",
+    "No historical, validation, sealed-test, map, or game outcome is read by this tool.",
+    "Gaussian paired differences can fall outside the physical [-1, 1] score-difference range.",
+    "Variance components are treated as fixed assumptions; misspecification can materially change power.",
+    "The balanced complete design does not model missing games, adaptive stopping, failed runs, or map-family misclassification.",
+    "Few family or optimizer-run clusters can make two-way sandwich variances unstable; the reported invalid-analysis fraction is part of the result.",
+    "The simulation calibrates its cutoff under the same model used to generate alternatives, so it does not establish robustness to non-Gaussian or heteroskedastic outcomes.",
+    "Final confirmatory inference should be frozen before sealed-test evaluation and accompanied by sensitivity analyses at the family and optimizer-run levels."
+  ],
+  "null_calibration": {
+    "conditional_tail_fraction_at_cutoff": 0.04996706025439619,
+    "critical_value": 2.690763732265662,
+    "invalid_fraction": 0.01335,
+    "invalid_replicates": 267,
+    "valid_replicates": 19733
+  },
+  "observed_or_test_outcomes_used": false,
+  "planned_sample_units": {
+    "minimum_component_game_outcomes": 720,
+    "note": "One paired contrast compares conditioned and global scores within a prespecified seed/start block. Extra side or country mirrors increase the component-game count unless folded into a block mean.",
+    "paired_score_contrasts": 360
+  },
+  "prospective": true,
+  "scenarios": [
+    {
+      "effect_size": 0.05,
+      "invalid_analyses": 287,
+      "invalid_analysis_fraction": 0.01435,
+      "mean_simulated_endpoint": 0.05038045543035831,
+      "monte_carlo_95_interval": [
+        0.2437507518808604,
+        0.25574924811913957
+      ],
+      "monte_carlo_standard_error": 0.0030608408771120397,
+      "oracle_known_variance_standard_error": 0.03062315754094894,
+      "oracle_normal_power_reference": 0.37191713534531645,
+      "rejections": 4995,
+      "scenario_seed": 20365533,
+      "simulated_power_conditional_on_positive_variance": 0.25338609039719984,
+      "simulated_power_unconditional": 0.24975,
+      "valid_analyses": 19713
+    },
+    {
+      "effect_size": 0.1,
+      "invalid_analyses": 297,
+      "invalid_analysis_fraction": 0.01485,
+      "mean_simulated_endpoint": 0.1003845294721302,
+      "monte_carlo_95_interval": [
+        0.7172508497092102,
+        0.7296491502907899
+      ],
+      "monte_carlo_standard_error": 0.0031628317810152343,
+      "oracle_known_variance_standard_error": 0.03062315754094894,
+      "oracle_normal_power_reference": 0.9041453301818803,
+      "rejections": 14469,
+      "scenario_seed": 20470262,
+      "simulated_power_conditional_on_positive_variance": 0.7343551743389332,
+      "simulated_power_unconditional": 0.72345,
+      "valid_analyses": 19703
+    },
+    {
+      "effect_size": 0.15,
+      "invalid_analyses": 274,
+      "invalid_analysis_fraction": 0.0137,
+      "mean_simulated_endpoint": 0.15005326757153062,
+      "monte_carlo_95_interval": [
+        0.9549620786964119,
+        0.9605379213035881
+      ],
+      "monte_carlo_standard_error": 0.0014224088283612416,
+      "oracle_known_variance_standard_error": 0.03062315754094894,
+      "oracle_normal_power_reference": 0.9983498586229285,
+      "rejections": 19155,
+      "scenario_seed": 20574991,
+      "simulated_power_conditional_on_positive_variance": 0.9710534320186556,
+      "simulated_power_unconditional": 0.95775,
+      "valid_analyses": 19726
+    }
+  ],
+  "schema_version": 1,
+  "source_data_used": false,
+  "tool": "chrono_divide_design_power",
+  "tool_version": "1.0.0"
+}

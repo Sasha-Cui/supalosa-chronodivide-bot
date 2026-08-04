@@ -1,0 +1,269 @@
+{
+  "aggregate": {
+    "draws": 12,
+    "gameWallTimeSeconds": 684.864,
+    "games": 32,
+    "losses": 9,
+    "scoreRate": 0.53125,
+    "unfinished": 12,
+    "wins": 11
+  },
+  "baselineCommits": [
+    "165b77a71d0cf5ebd27c65b19d0486bcbae78d0f"
+  ],
+  "byCondition": {
+    "generic": {
+      "draws": 5,
+      "gameWallTimeSeconds": 304.71,
+      "games": 16,
+      "losses": 7,
+      "scoreRate": 0.40625,
+      "unfinished": 5,
+      "wins": 4
+    },
+    "profiled": {
+      "draws": 7,
+      "gameWallTimeSeconds": 380.154,
+      "games": 16,
+      "losses": 2,
+      "scoreRate": 0.65625,
+      "unfinished": 7,
+      "wins": 7
+    }
+  },
+  "byConditionAndPhysicalStart": {
+    "generic:37,63": {
+      "draws": 3,
+      "gameWallTimeSeconds": 114.171,
+      "games": 8,
+      "losses": 5,
+      "scoreRate": 0.1875,
+      "unfinished": 3,
+      "wins": 0
+    },
+    "generic:62,39": {
+      "draws": 2,
+      "gameWallTimeSeconds": 190.539,
+      "games": 8,
+      "losses": 2,
+      "scoreRate": 0.625,
+      "unfinished": 2,
+      "wins": 4
+    },
+    "profiled:37,63": {
+      "draws": 2,
+      "gameWallTimeSeconds": 156.79,
+      "games": 8,
+      "losses": 0,
+      "scoreRate": 0.875,
+      "unfinished": 2,
+      "wins": 6
+    },
+    "profiled:62,39": {
+      "draws": 5,
+      "gameWallTimeSeconds": 223.364,
+      "games": 8,
+      "losses": 2,
+      "scoreRate": 0.4375,
+      "unfinished": 5,
+      "wins": 1
+    }
+  },
+  "candidateCommits": [
+    "d942016ccef021f16f79402756f2487e58cd9c21"
+  ],
+  "cautions": [
+    "One simple map, one country matchup, one opponent policy, and eight accepted games per cell.",
+    "Pinned API 0.75.0 exposes no public seed; engine determinism and trial dependence are unresolved.",
+    "The candidate is a tracked-dirty research branch; exact runtime trees and tracked diff are fingerprinted, and this schema-2 rerun has a separately registered source/runtime archive.",
+    "This run validates isolation, pairing, logging, and ablation plumbing only.",
+    "Raw schema-2 manifests label account pi_jss233 from an overridden environment variable; Slurm accounting shows fallback job 20965700 was charged to prio_btk22."
+  ],
+  "completeDesign": true,
+  "profiledMinusGenericScoreRate": 0.25,
+  "provenanceConsistency": {
+    "baselineRuntimeTreeSha256": [
+      "34349919500c8019f9d9b1c2b2a7e2269dd57dde6b3414216bb6336e02977199"
+    ],
+    "candidateRuntimeTreeSha256": [
+      "0a334cd304f0fe99e9c007fd4082a9615dcfcdd92494ec3d7dfa06d83f2a7fca",
+      "a0f8d027c13f1a52897a8b7ec7d944049ee9274e5ec3dcb2cb754747e2151026"
+    ],
+    "candidateTrackedDiffSha256": [
+      "001e9e85f19a38134bf85388020a3a6c03882374c0f5f97f061c0936ad880391"
+    ],
+    "gameApiRuntimeTreeSha256": [
+      "2498499d8d029a0b008e1a4fcc9e04a1a4630f7eb2eb20d179c278fa409f9e2b"
+    ],
+    "lockfileSha256": [
+      "59ad1d212f1ebe8fba5913ced9c096c97d5840c93abc76bfa863737c6589458d"
+    ],
+    "manifestSchemas": [
+      2
+    ],
+    "mapSha256": [
+      "bd61bb9ab4412b15895c89188336ab53b03dd20879936b92aaf4418e091cf7fc"
+    ],
+    "schedulerAccountingValid": false,
+    "uniform": false,
+    "uniformMeaning": "False overall because schema-2 scheduler account labels were not authoritative; runtime/content hash sets remain uniform.",
+    "uniformRuntimeAndContent": true
+  },
+  "purpose": "infrastructure diagnostic; not paper evidence",
+  "runs": [
+    {
+      "baseline": {
+        "gitCommit": "165b77a71d0cf5ebd27c65b19d0486bcbae78d0f",
+        "kind": "external-package",
+        "packageRoot": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/supalosa-chronodivide-bot/packages/chronodivide-bot",
+        "packageVersion": "0.6.8-beta.3",
+        "runtimeTree": {
+          "bytes": 438907,
+          "exists": true,
+          "files": 172,
+          "root": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/supalosa-chronodivide-bot/packages/chronodivide-bot/dist",
+          "sha256": "34349919500c8019f9d9b1c2b2a7e2269dd57dde6b3414216bb6336e02977199"
+        },
+        "trackedDirty": false
+      },
+      "baselineStarts": [
+        "62,39"
+      ],
+      "candidateStarts": [
+        "37,63"
+      ],
+      "completedMatches": 8,
+      "condition": "profiled",
+      "rejectedStartAttempts": 13,
+      "requestedMatches": 8,
+      "runId": "audit-pilot-v1-profiled-start_a-allocation-20965700-v2-0",
+      "scheduler": {
+        "account": "pi_jss233",
+        "arrayJobId": null,
+        "arrayTaskId": null,
+        "jobId": "20965700",
+        "partition": null
+      },
+      "summary": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/pilot/audit-pilot-v1/allocation-20965700-v2/0-profiled-start_a/summary-audit-pilot-v1-profiled-start_a-allocation-20965700-v2-0.json",
+      "trackedDirty": true
+    },
+    {
+      "baseline": {
+        "gitCommit": "165b77a71d0cf5ebd27c65b19d0486bcbae78d0f",
+        "kind": "external-package",
+        "packageRoot": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/supalosa-chronodivide-bot/packages/chronodivide-bot",
+        "packageVersion": "0.6.8-beta.3",
+        "runtimeTree": {
+          "bytes": 438907,
+          "exists": true,
+          "files": 172,
+          "root": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/supalosa-chronodivide-bot/packages/chronodivide-bot/dist",
+          "sha256": "34349919500c8019f9d9b1c2b2a7e2269dd57dde6b3414216bb6336e02977199"
+        },
+        "trackedDirty": false
+      },
+      "baselineStarts": [
+        "37,63"
+      ],
+      "candidateStarts": [
+        "62,39"
+      ],
+      "completedMatches": 8,
+      "condition": "profiled",
+      "rejectedStartAttempts": 29,
+      "requestedMatches": 8,
+      "runId": "audit-pilot-v1-profiled-start_b-allocation-20965700-v2-1",
+      "scheduler": {
+        "account": "pi_jss233",
+        "arrayJobId": null,
+        "arrayTaskId": null,
+        "jobId": "20965700",
+        "partition": null
+      },
+      "summary": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/pilot/audit-pilot-v1/allocation-20965700-v2/1-profiled-start_b/summary-audit-pilot-v1-profiled-start_b-allocation-20965700-v2-1.json",
+      "trackedDirty": true
+    },
+    {
+      "baseline": {
+        "gitCommit": "165b77a71d0cf5ebd27c65b19d0486bcbae78d0f",
+        "kind": "external-package",
+        "packageRoot": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/supalosa-chronodivide-bot/packages/chronodivide-bot",
+        "packageVersion": "0.6.8-beta.3",
+        "runtimeTree": {
+          "bytes": 438907,
+          "exists": true,
+          "files": 172,
+          "root": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/supalosa-chronodivide-bot/packages/chronodivide-bot/dist",
+          "sha256": "34349919500c8019f9d9b1c2b2a7e2269dd57dde6b3414216bb6336e02977199"
+        },
+        "trackedDirty": false
+      },
+      "baselineStarts": [
+        "62,39"
+      ],
+      "candidateStarts": [
+        "37,63"
+      ],
+      "completedMatches": 8,
+      "condition": "generic",
+      "rejectedStartAttempts": 26,
+      "requestedMatches": 8,
+      "runId": "audit-pilot-v1-generic-start_a-allocation-20965700-v2-2",
+      "scheduler": {
+        "account": "pi_jss233",
+        "arrayJobId": null,
+        "arrayTaskId": null,
+        "jobId": "20965700",
+        "partition": null
+      },
+      "summary": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/pilot/audit-pilot-v1/allocation-20965700-v2/2-generic-start_a/summary-audit-pilot-v1-generic-start_a-allocation-20965700-v2-2.json",
+      "trackedDirty": true
+    },
+    {
+      "baseline": {
+        "gitCommit": "165b77a71d0cf5ebd27c65b19d0486bcbae78d0f",
+        "kind": "external-package",
+        "packageRoot": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/supalosa-chronodivide-bot/packages/chronodivide-bot",
+        "packageVersion": "0.6.8-beta.3",
+        "runtimeTree": {
+          "bytes": 438907,
+          "exists": true,
+          "files": 172,
+          "root": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/supalosa-chronodivide-bot/packages/chronodivide-bot/dist",
+          "sha256": "34349919500c8019f9d9b1c2b2a7e2269dd57dde6b3414216bb6336e02977199"
+        },
+        "trackedDirty": false
+      },
+      "baselineStarts": [
+        "37,63"
+      ],
+      "candidateStarts": [
+        "62,39"
+      ],
+      "completedMatches": 8,
+      "condition": "generic",
+      "rejectedStartAttempts": 10,
+      "requestedMatches": 8,
+      "runId": "audit-pilot-v1-generic-start_b-allocation-20965700-v2-3",
+      "scheduler": {
+        "account": "pi_jss233",
+        "arrayJobId": null,
+        "arrayTaskId": null,
+        "jobId": "20965700",
+        "partition": null
+      },
+      "summary": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/pilot/audit-pilot-v1/allocation-20965700-v2/3-generic-start_b/summary-audit-pilot-v1-generic-start_b-allocation-20965700-v2-3.json",
+      "trackedDirty": true
+    }
+  ],
+  "schedulerAccountingCorrection": {
+    "artifact": "research/artifacts/scheduler_accounting_correction.json",
+    "authoritativeAccount": "prio_btk22",
+    "authoritativeSource": "scontrol-and-sacct",
+    "impact": "diagnostic executed outside requested allocation; raw manifests preserved; no paper inference",
+    "jobId": "20965700",
+    "manifestEnvironmentAccount": "pi_jss233",
+    "requestedProjectAllocation": "pi_jss233"
+  },
+  "schemaVersion": 1
+}

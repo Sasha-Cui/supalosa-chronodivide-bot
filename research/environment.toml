@@ -1,0 +1,49 @@
+[environment]
+name = "chrono-divide-research"
+platform = "Bouchet Linux x86_64"
+allocation = "pi_jss233"
+module = "nodejs/20.13.1-GCCcore-13.3.0"
+activation = "module load nodejs/20.13.1-GCCcore-13.3.0"
+
+[node]
+observed_version = "20.13.1"
+npm_version = "10.5.2"
+project_version = "0.6.8-beta.3"
+lockfile = "package-lock.json"
+lockfile_sha256 = "59ad1d212f1ebe8fba5913ced9c096c97d5840c93abc76bfa863737c6589458d"
+
+[dependencies]
+game_api = "0.75.0"
+typescript = "4.9.5"
+vitest = "4.0.18"
+canvas = "3.2.0"
+install = "npm ci --ignore-scripts"
+build = "npm run build"
+test = "npm --workspace packages/chronodivide-bot-driver test -- --run"
+
+[compatibility]
+vite_engine_warning = true
+release_retest_node = ">=20.19.0 <21 or >=22.12.0"
+game_seed_api = "unavailable in CreateOfflineOpts for game-api 0.75.0"
+engine_seed_impl = "internal Mersenne Twister; offline seed derived from game ID 0 and epoch seconds"
+engine_seed_control = "validated Date.now seed-to-epoch shim; requested seed logged per match and trace"
+bot_seed_control = "identity-keyed candidate/baseline Mulberry32 streams wrap synchronous bot callbacks"
+paired_seed_schedule = "reciprocal slots reuse seedBlockIndex; paired mode rejects start-filter rejection sampling"
+seed_unit_evidence = "same-process identity, divergence, participant isolation, slot invariance, and restoration pass"
+engine_variability = "old unseeded fresh-process variability established; those calls are not seeded replicates"
+required_gate = "10/10 fresh-process same-seed normalized trace identity and different-seed divergence"
+
+[scheduler]
+requested_account = "pi_jss233"
+manifest_schema = 3
+authoritative_account_source = "scontrol with environment fallback"
+corrected_fallback_job = "20965700: actual prio_btk22; schema-2 environment label pi_jss233 invalid"
+submit_readiness = "blocked by QOSMaxSubmitJobPerUserLimit as of 2026-08-04T11:54:56-04:00"
+blocking_unrelated_job = "21247181: prio_btk22; scheduled end 2026-08-05T02:19:04-04:00; do not use or cancel"
+readiness_artifact = "research/artifacts/pi_jss233_readiness_2026-08-04.json"
+
+[security]
+npm_audit_low = 2
+npm_audit_high = 6
+npm_audit_critical = 1
+automatic_audit_fix_allowed = false

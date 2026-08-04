@@ -1,0 +1,728 @@
+{
+  "additionalHistoricalAggregates": {
+    "broadCampaign": {
+      "games": 192,
+      "jobDirectories": 8,
+      "jobs": [
+        16021104,
+        16021105,
+        16021436,
+        16021490,
+        16021740,
+        16021922,
+        16022155,
+        16022521
+      ],
+      "path": "packages/chronodivide-bot-driver/benchmark-results/campaigns/codex1100-current-broad"
+    },
+    "cancelledTrainingJobs": [
+      14660611,
+      14666135,
+      14678132,
+      14681118
+    ],
+    "driverAnalysisBytesApprox": 254000000,
+    "driverAnalysisFiles": 337,
+    "hardMapMatches": 654,
+    "hardMapSummaries": 327,
+    "rootAnalysisBytesApprox": 7100000,
+    "rootAnalysisFiles": 87,
+    "rootVerificationImmediateEntries": 384318
+  },
+  "auditDate": "2026-08-02",
+  "candidateSource": {
+    "approxDeletionsVsUpstream": 247,
+    "approxInsertionsVsUpstream": 12644,
+    "customCommitsAheadOfOriginMaster": 15,
+    "preAuditHead": "d942016ccef021f16f79402756f2487e58cd9c21",
+    "preAuditTrackedFiles": 86,
+    "researchBranch": "codex/chrono-divide-paper-audit"
+  },
+  "centralReconstructions": [
+    "research/artifacts/codex1100_reconstruction.json",
+    "research/artifacts/audit_pilot_v1_summary.json",
+    "research/artifacts/audit_pilot_v1_snapshot.json",
+    "research/RESULT_REGISTRY.tsv"
+  ],
+  "coverageAndExclusions": [
+    "The experiment JSONL indexes all 1,109 immediate training directories and 366 file-bearing driver campaign directories.",
+    "Settings JSON and all 118 Slurm scripts are SHA-256 hashed; large event/evaluation/checkpoint files retain paths, sizes, and mtimes to avoid redundant high-I/O hashing.",
+    "The 384,318-entry verification tree was counted once and not recursively rescanned; this is a declared coverage limit, not an inferred inventory.",
+    "Proprietary map/MIX bytes are not copied into research artifacts."
+  ],
+  "evidenceStandard": "Observed counts and hashes are separated from interpretations; historical result trees were not modified.",
+  "experimentInventory": {
+    "collections": {
+      "driver-campaign": 366,
+      "driver-training": 592,
+      "root-training": 517
+    },
+    "contentHashPolicy": "settings.json and Slurm scripts are SHA-256 hashed; large checkpoints/event/evaluation files retain path, size, and mtime to avoid a redundant high-I/O NFS pass",
+    "indexedBytes": 297019629,
+    "indexedRuns": 1475,
+    "limitations": [
+      "Every immediate historical training run and every file-bearing driver campaign directory is indexed.",
+      "The 384,318-entry verification tree is represented by the forensic aggregate and intentionally not rescanned.",
+      "Job IDs are extracted conservatively from paths; missing IDs are not inferred.",
+      "An inventory row is not evidence of an independent or completed experiment."
+    ],
+    "output": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/research/artifacts/experiment_inventory.jsonl",
+    "repo": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot",
+    "runsWithCheckpoint": 499,
+    "runsWithEpisodes": 1090,
+    "runsWithEvaluations": 1090,
+    "runsWithSettings": 1106,
+    "schemaVersion": 1,
+    "slurmScriptCount": 118,
+    "slurmScripts": [
+      {
+        "bytes": 1445,
+        "path": "benchmark-results/slurm_jobs/codex1100_current_broad_devel.sbatch",
+        "sha256": "e46dc0c885576cef31e29c6053dde259e040c4440be6ff4d7472912cd2146d6b"
+      },
+      {
+        "bytes": 1370,
+        "path": "benchmark-results/slurm_jobs/codex1100_current_broad_devel.sbatch.pre-absolute-outdir-20260624_003356",
+        "sha256": "4baf14e8a29a6b8e3623e6e82a274c5a77cd1f60586cfa8ea8434012f2c1d031"
+      },
+      {
+        "bytes": 2391,
+        "path": "benchmark-results/slurm_jobs/codex1101_hardmap_confidence_devel.sbatch",
+        "sha256": "e1ba0bdd739da4285fbd4af6102a827cab917aa4929db75d3610b6ae89a947cb"
+      },
+      {
+        "bytes": 2058,
+        "path": "benchmark-results/slurm_jobs/codex1101_hardmap_confidence_devel.sbatch.pre-absolute-outdir-20260624_003356",
+        "sha256": "cc6990fcbcea87ed713a202f7228d910c962197b3c21fd6a0581729a6cd98cb8"
+      },
+      {
+        "bytes": 2266,
+        "path": "benchmark-results/slurm_jobs/codex1101_hardmap_confidence_devel.sbatch.pre-fix-index-lines-20260624_003557",
+        "sha256": "3e52483411262b443b564d270ef0b8e48185a7ad9f92d13cc8a8b93ab7612750"
+      },
+      {
+        "bytes": 2133,
+        "path": "benchmark-results/slurm_jobs/codex1101_hardmap_confidence_devel.sbatch.pre-tikal-upper-20260624_003545",
+        "sha256": "d0c5407be1034db422e4b13901cc90a13d8e20f095174844de4fe7783b902c2d"
+      },
+      {
+        "bytes": 2208,
+        "path": "benchmark-results/slurm_jobs/codex1101_hardmap_confidence_devel.sbatch.pre-water-malibu-20260624_005742",
+        "sha256": "8c4160eec587f32b7055d9b1e35382223edc0f862390ca55c0e9ce0855a7d5d8"
+      },
+      {
+        "bytes": 3930,
+        "path": "benchmark-results/slurm_jobs/codex1102_tiger_env_screen_devel.sbatch",
+        "sha256": "886cef6de7ca29cbe5399c9571c5fecc5c9e2e0c3ac1c8906987200d535971e0"
+      },
+      {
+        "bytes": 3855,
+        "path": "benchmark-results/slurm_jobs/codex1102_tiger_env_screen_devel.sbatch.pre-absolute-outdir-20260624_003356",
+        "sha256": "b51fa83ee11726c6be56044c5ba8b7a8741b0895a78deefb6fea85a53efd6c4f"
+      },
+      {
+        "bytes": 1426,
+        "path": "benchmark-results/slurm_jobs/codex1103_tiger_param_trainer_day.sbatch",
+        "sha256": "451f3d6f87dc27823c93c90362d1c10e9301a8019625378562752030991b2b65"
+      },
+      {
+        "bytes": 1351,
+        "path": "benchmark-results/slurm_jobs/codex1103_tiger_param_trainer_day.sbatch.pre-absolute-outdir-20260624_003356",
+        "sha256": "1de3710ff4bb463178eeb4be5510b04cb5c75672711db7a4509a0fe16cd04d33"
+      },
+      {
+        "bytes": 1616,
+        "path": "benchmark-results/slurm_jobs/codex1111_tiger_pinch_focus_devel.sbatch",
+        "sha256": "9c770528230bfa5d92d15dc4b56f66dd2c38dbd3066a4eebe35f762959e6089f"
+      },
+      {
+        "bytes": 1618,
+        "path": "benchmark-results/slurm_jobs/codex1114_extra_tankboom_focus_devel.sbatch",
+        "sha256": "60021d4a321c96df5470bccb0698624502ea9c05a614debda57102ab3d40b6a7"
+      },
+      {
+        "bytes": 1196,
+        "path": "benchmark-results/slurm_jobs/hfo1011_otmq_hfobottom_static2_trace.sbatch",
+        "sha256": "5a75113500bf33f67d092e3a3b4c798f56b49b577be12f3a4a99ed8d63b107b9"
+      },
+      {
+        "bytes": 1166,
+        "path": "benchmark-results/slurm_jobs/hfo1012_otmq_hfobottom_static2_100.sbatch",
+        "sha256": "95ab0794f4d9fc6e6bc1e9060401ad0b66db264983412d4e56df9dffd5240065"
+      },
+      {
+        "bytes": 1206,
+        "path": "benchmark-results/slurm_jobs/hfo1013_otmq-hfobottom-static1.sbatch",
+        "sha256": "b0162a25eb91865ee88c5da7491788e1c5b405cecac0ef2a281dc4a30b59e1ab"
+      },
+      {
+        "bytes": 1206,
+        "path": "benchmark-results/slurm_jobs/hfo1014_otmq-hfobottom-static3.sbatch",
+        "sha256": "87c33f3eedcf367dc2cb87004522a19301a10bf298af827909edcee4a9e59543"
+      },
+      {
+        "bytes": 1224,
+        "path": "benchmark-results/slurm_jobs/hfo1015_otmq-hfobottom-dogs3-static2.sbatch",
+        "sha256": "f13bf558552483c96a53469a905e53f4607ff40f21d912e5fc5b43eb5face530"
+      },
+      {
+        "bytes": 1224,
+        "path": "benchmark-results/slurm_jobs/hfo1016_otmq-hfobottom-dogs2-static2.sbatch",
+        "sha256": "28c3b336a83bc8522f83e519b36632198152faee00e71a38b9c6c75940823395"
+      },
+      {
+        "bytes": 1224,
+        "path": "benchmark-results/slurm_jobs/hfo1017_otmq-hfobottom-dogs3-static3.sbatch",
+        "sha256": "b6d6cad61737b50b93505fb3b27c0d0d4919574473c9d77203423aaf1d2a780d"
+      },
+      {
+        "bytes": 1323,
+        "path": "benchmark-results/slurm_jobs/hfo1018_otmq_failure_traces.sbatch",
+        "sha256": "e50c64600dc1523a8af4c270c28b53720c325a5d6ff677b4fe1d04eda09ac8ce"
+      },
+      {
+        "bytes": 1328,
+        "path": "benchmark-results/slurm_jobs/hfo1019_otmq_failure_traces_scavenge.sbatch",
+        "sha256": "adbc45f690fa51efc242d526e1f21411f809504cfef65e654c2d0908688acd97"
+      },
+      {
+        "bytes": 1179,
+        "path": "benchmark-results/slurm_jobs/hfo1020_otmq_source_dog3_static2_100.sbatch",
+        "sha256": "3a4e4ef0b359a8d490f135be2cfa26edf7b3240667df1930bb13dbd540fb9f3a"
+      },
+      {
+        "bytes": 1120,
+        "path": "benchmark-results/slurm_jobs/hfo1021_otmq_10203001_trace.sbatch",
+        "sha256": "3690dbbd3e5e9e5fcf69b43e1aa03a017c224664a52397446c5ae3e01ca9f692"
+      },
+      {
+        "bytes": 1120,
+        "path": "benchmark-results/slurm_jobs/hfo1022_otmq_10201008_draw_trace.sbatch",
+        "sha256": "574d641e146682d471f34b36672d29ebc8793c1dea07649b69ccde8bad7361f4"
+      },
+      {
+        "bytes": 1262,
+        "path": "benchmark-results/slurm_jobs/hfo1023_otmq_tanksiege_failure_replay.sbatch",
+        "sha256": "cb2a69cfd6af53b8dce594ff4107aeb78c5c30d87c55a504f3f2abb659302c37"
+      },
+      {
+        "bytes": 1256,
+        "path": "benchmark-results/slurm_jobs/hfo1024_otmq_tanksiege_radar_replay.sbatch",
+        "sha256": "bfc083d5d67f152a0d0196367d78e26a5708c21be748af8cb8f778a2f611049c"
+      },
+      {
+        "bytes": 1154,
+        "path": "benchmark-results/slurm_jobs/hfo1025_otmq_tanksiege_radar_100.sbatch",
+        "sha256": "7bae217a08bb1beb3ae9db8e3289f413665f53fe8e07b123d3241e074e375ff2"
+      },
+      {
+        "bytes": 1151,
+        "path": "benchmark-results/slurm_jobs/hfo1026_otmq_10252003_earlyloss_trace.sbatch",
+        "sha256": "3ed8eb62649186f3bde745e0ce6d57e8de4f1ad89ee697f47afed4347e625241"
+      },
+      {
+        "bytes": 1192,
+        "path": "benchmark-results/slurm_jobs/hfo1027_otmq_tanksiege_forcedradar_100.sbatch",
+        "sha256": "630f637efa1e9d18f4849e6353cc48e0693324352ed46d3c6f4d780a10e444b5"
+      },
+      {
+        "bytes": 1280,
+        "path": "benchmark-results/slurm_jobs/hfo1028_otmq_forceradar_loss_traces.sbatch",
+        "sha256": "6390fb51879620dc86112fb95df653669e82144993d7f6c72aa5ceaee331ea0c"
+      },
+      {
+        "bytes": 1243,
+        "path": "benchmark-results/slurm_jobs/hfo1029_otmq_tanksiege_delayedtech_cleanup_100.sbatch",
+        "sha256": "60504a97f196d981d87a313418e3bd18f11a5b42d16255816dfde2e0c53d74f3"
+      },
+      {
+        "bytes": 1275,
+        "path": "benchmark-results/slurm_jobs/hfo1030_otmq_tanksiege_delayedtech_cleanup_scavenge_100.sbatch",
+        "sha256": "beea754b373f7694e2d6469180586fef8169239f337c46db1fb41373e0d1ba99"
+      },
+      {
+        "bytes": 1279,
+        "path": "benchmark-results/slurm_jobs/hfo1031_otmq_delayedtech_failure_traces.sbatch",
+        "sha256": "086d3d4a0e7bc7dd2628a0f7443d0490172958aae5ab8110a7191518fe6af601"
+      },
+      {
+        "bytes": 1324,
+        "path": "benchmark-results/slurm_jobs/hfo1032_otmq_delayedtech_failure_traces_postcleanupfix.sbatch",
+        "sha256": "ab773a44d7ad47c9942c68c5e78178f382f178eac7b8fa98f3fc5d882089f598"
+      },
+      {
+        "bytes": 1308,
+        "path": "benchmark-results/slurm_jobs/hfo1033_otmq_earlybarracks_failure_traces.sbatch",
+        "sha256": "5406f77efe8fdddc39b9ee8f4900c00494e3cdf1a0b389f22049d69e437b3aa8"
+      },
+      {
+        "bytes": 1243,
+        "path": "benchmark-results/slurm_jobs/hfo1034_otmq_earlybarracks_delayedtech_scavenge_100.sbatch",
+        "sha256": "987fc80c58b13865d599fba2f36a1a44d3fe8410e521a0a6bc2df28daa1e6617"
+      },
+      {
+        "bytes": 1223,
+        "path": "benchmark-results/slurm_jobs/hfo1035_otmq_earlybarracks_delayedtech_day_100.sbatch",
+        "sha256": "276810402d7ae743dbf3c2cab51ddfafbfdf47373180f838d7ac778e52e59d2a"
+      },
+      {
+        "bytes": 1321,
+        "path": "benchmark-results/slurm_jobs/hfo1036_otmq_earlybarracks_midgame_loss_traces.sbatch",
+        "sha256": "7784d49dca277db17e3054d626aa48e9ff93c4fec522082783864649513c6d4f"
+      },
+      {
+        "bytes": 1316,
+        "path": "benchmark-results/slurm_jobs/hfo1037_otmq_earlybarracks_midgame_loss_replay_notrace.sbatch",
+        "sha256": "aa5133b80d4f9c136318fef41b77819464f7e97c7f425de1298581399a07696b"
+      },
+      {
+        "bytes": 1341,
+        "path": "benchmark-results/slurm_jobs/hfo1038_otmq_earlybarracks_gate_radar_replay_notrace.sbatch",
+        "sha256": "2cc645f0cc7ef902f68153d3a1bf870ecb763e45842f904aba07f822fb072724"
+      },
+      {
+        "bytes": 1269,
+        "path": "benchmark-results/slurm_jobs/hfo1039_otmq_earlybarracks_gate_radar_scavenge_100.sbatch",
+        "sha256": "be93f49c1ccfba8c9897b23fa15e0f7bcd1fe8d64bb2f274dfa8efb748ac82a1"
+      },
+      {
+        "bytes": 1249,
+        "path": "benchmark-results/slurm_jobs/hfo1040_otmq_earlybarracks_gate_radar_day_100.sbatch",
+        "sha256": "2af9612c101d465c1d9232cb5a8f7958da07a942428c9699a4faa3205c184e97"
+      },
+      {
+        "bytes": 1319,
+        "path": "benchmark-results/slurm_jobs/hfo1041_otmq_gate_radar_failure_traces.sbatch",
+        "sha256": "377f3cf62a616fa0e1d3608d4b9faf4e83b0eab46f7153c50af1411044f8a269"
+      },
+      {
+        "bytes": 1293,
+        "path": "benchmark-results/slurm_jobs/hfo1042_otmq_defensive_margin_replay_notrace.sbatch",
+        "sha256": "b6a75fd6703632f5f82fc694b62c87f916ba1b7a66e868778dbf0c91753de066"
+      },
+      {
+        "bytes": 1271,
+        "path": "benchmark-results/slurm_jobs/hfo1043_otmq_defensive_margin_scavenge_100.sbatch",
+        "sha256": "ba64d40e8b2fa573c0b49dc4f6b5c4a975f2dd02aeebb39ec03e65f7f548278e"
+      },
+      {
+        "bytes": 1251,
+        "path": "benchmark-results/slurm_jobs/hfo1044_otmq_defensive_margin_day_100.sbatch",
+        "sha256": "01726402ba28d13d003398b3f7fe8735d303a41a08ff1ff42ad8705a79685ef9"
+      },
+      {
+        "bytes": 1349,
+        "path": "benchmark-results/slurm_jobs/hfo1045_otmq_defensive_margin_failure_traces.sbatch",
+        "sha256": "73d1c2aa06c894b69e34fee4d6572d0a1507af97309a7c875c8eacba43a0649a"
+      },
+      {
+        "bytes": 1225,
+        "path": "benchmark-results/slurm_jobs/hfo1046_otmq_tiny_cleanup_replay_notrace.sbatch",
+        "sha256": "491cf449b9b61326622c30712f5807e1e0511c550454f239a0409f89eb1fb962"
+      },
+      {
+        "bytes": 1202,
+        "path": "benchmark-results/slurm_jobs/hfo1047_otmq_late_loss_traces.sbatch",
+        "sha256": "64166553f4024f1079e19b2dd8da10e21b8ef251ce8314bdb162517a47c0a9dc"
+      },
+      {
+        "bytes": 1268,
+        "path": "benchmark-results/slurm_jobs/hfo1048_otmq_tank_replenish_failure_replay_notrace.sbatch",
+        "sha256": "869fad8e865d56b0457ce3cdf0bc5c81098efe866c2b102134f5818f043bc547"
+      },
+      {
+        "bytes": 1293,
+        "path": "benchmark-results/slurm_jobs/hfo1049_otmq_tank_replenish_scavenge_100.sbatch",
+        "sha256": "d8fc359066b96022c516430e001f81a954abd232797e4d100fa694b9eb6d530d"
+      },
+      {
+        "bytes": 1273,
+        "path": "benchmark-results/slurm_jobs/hfo1050_otmq_tank_replenish_day_100.sbatch",
+        "sha256": "6a1851658e0c9f8e8469c1db02234032beb62d948e8567068c67b75451abc772"
+      },
+      {
+        "bytes": 1235,
+        "path": "benchmark-results/slurm_jobs/hfo1051_otmq_remaining_failure_traces.sbatch",
+        "sha256": "c8d12d0f20393925dba83bde208ce216567e8538d07c4453fd4e93e8511f5d1d"
+      },
+      {
+        "bytes": 1247,
+        "path": "benchmark-results/slurm_jobs/hfo1052_otmq_tank_replenish_regression_traces.sbatch",
+        "sha256": "29e5a48828bfe7086943d8ff2868f743b0324f935bac2021a2e2f41649311e71"
+      },
+      {
+        "bytes": 1344,
+        "path": "benchmark-results/slurm_jobs/hfo1053_otmq_hybrid_failure_replay_notrace.sbatch",
+        "sha256": "60d0370b32c9518c580657e1a6301a41faf5b8059c7dbb88a3783779bc5c2947"
+      },
+      {
+        "bytes": 1367,
+        "path": "benchmark-results/slurm_jobs/hfo1054_otmq_hybrid_gated_failure_replay_notrace.sbatch",
+        "sha256": "a2a7246e854b6bbcd54192d4caff484ab0cf369e0a91e2b0bbb39f4151a2ad8d"
+      },
+      {
+        "bytes": 1365,
+        "path": "benchmark-results/slurm_jobs/hfo1055_otmq_hybrid_static4_failure_replay_notrace.sbatch",
+        "sha256": "fc0c610f4209628bc23a830ecb83d45848675b418f924ed368028fd29d34aea5"
+      },
+      {
+        "bytes": 1412,
+        "path": "benchmark-results/slurm_jobs/hfo1056_otmq_medium_tank_floor_failure_replay_notrace.sbatch",
+        "sha256": "af2408635a6d86203cbf3cfdbb2ec2b8757adcb2a2386f32f6464da5a7a7955e"
+      },
+      {
+        "bytes": 1369,
+        "path": "benchmark-results/slurm_jobs/hfo1057_otmq_harv_floor_cleanup_replay_notrace.sbatch",
+        "sha256": "c8c7dbc13ce822cb578f92b5f200c5ac1c24eaf93f05b73398b95a532d996106"
+      },
+      {
+        "bytes": 1383,
+        "path": "benchmark-results/slurm_jobs/hfo1058_otmq_late_infantry_cleanup_replay_notrace.sbatch",
+        "sha256": "f002226d4b5df1020c522cfcfd9ea2631a721cfaa65f567e7672bb6864615f5d"
+      },
+      {
+        "bytes": 1353,
+        "path": "benchmark-results/slurm_jobs/hfo1059_otmq_relaxed_cleanup_replay_notrace.sbatch",
+        "sha256": "19567bd5cebcf6abe1c4d24bfcbc7cb03c060dbab7e77aec70e5d4fc5a042437"
+      },
+      {
+        "bytes": 1254,
+        "path": "benchmark-results/slurm_jobs/hfo1060_otmq_lateinf_scavenge_100.sbatch",
+        "sha256": "819a530e58dd57d9eb1819edd3c30e4d1055097819ea842a470de5e4e4be19dd"
+      },
+      {
+        "bytes": 1234,
+        "path": "benchmark-results/slurm_jobs/hfo1061_otmq_lateinf_day_100.sbatch",
+        "sha256": "c8dec6420800f40ddd9b2410b22c4193cf1451f0b9ee5c46ad0c780a31e16ef2"
+      },
+      {
+        "bytes": 1266,
+        "path": "benchmark-results/slurm_jobs/hfo1062_otmq_lateinf_regression_traces.sbatch",
+        "sha256": "75b8688ede49b2cfa749ebc59feef2bb716df9802f99a5f0f3aa6ad95e690249"
+      },
+      {
+        "bytes": 1308,
+        "path": "benchmark-results/slurm_jobs/hfo1063_otmq_lateharv_replay_notrace.sbatch",
+        "sha256": "221de8ad7d6b2dd4e5f4c36385cf1be49788ae6e23e175aec02a762d005bda77"
+      },
+      {
+        "bytes": 1358,
+        "path": "benchmark-results/slurm_jobs/hfo1064_otmq_mildgate_replay_notrace.sbatch",
+        "sha256": "9448fba74197af06949e2a299bf8a2c9f8b665887689ce556fcba74d7efe801f"
+      },
+      {
+        "bytes": 1341,
+        "path": "benchmark-results/slurm_jobs/hfo1065_otmq_highadv_cleanup_replay_notrace.sbatch",
+        "sha256": "61597faa499009c6bb706057d8c884ffbd63ddd66c970d7eb5a0dbd03a784181"
+      },
+      {
+        "bytes": 1221,
+        "path": "benchmark-results/slurm_jobs/hfo1066_otmq_one_building_draw_trace.sbatch",
+        "sha256": "47d785138f4df417422a1955453500c5d87ae69d8877f422fa2593a179d4f01b"
+      },
+      {
+        "bytes": 1201,
+        "path": "benchmark-results/slurm_jobs/hfo1067_otmq_highadv_scavenge_100.sbatch",
+        "sha256": "6c63c718575c5a1077d98b1de877e4b6f909528a6a4afec5c5efffe0c9299703"
+      },
+      {
+        "bytes": 1181,
+        "path": "benchmark-results/slurm_jobs/hfo1068_otmq_highadv_day_100.sbatch",
+        "sha256": "c04d7505070f32ce5236ba036676427140e7ff30b4ba9a1248e50f5b5bb0448c"
+      },
+      {
+        "bytes": 1354,
+        "path": "benchmark-results/slurm_jobs/hfo1069_otmq_fullmap_cleanup_replay_notrace.sbatch",
+        "sha256": "6537855a7d0b336975548552bb7fdb8f2151f61a1cc4c8c5d5e0a0867b17783f"
+      },
+      {
+        "bytes": 1381,
+        "path": "benchmark-results/slurm_jobs/hfo1070_otmq_reserve_fullmap_cleanup_replay_notrace.sbatch",
+        "sha256": "7b32394bad490584fcaecfed9c0345d1bbbdcc1c76ec2c344697da4ca1ef7365"
+      },
+      {
+        "bytes": 1238,
+        "path": "benchmark-results/slurm_jobs/hfo1071_otmq_hidden_building_draw_trace.sbatch",
+        "sha256": "317f17858c980feaf4f6a152b6fbb21025d41f383ae0adcdc89dc912c8158636"
+      },
+      {
+        "bytes": 1241,
+        "path": "benchmark-results/slurm_jobs/hfo1072_otmq_reserve_cleanup_scavenge_100.sbatch",
+        "sha256": "3c7fe44e0430db5dc786416b2f2cb8fc543627d301ddaf2b78a5a571cb467567"
+      },
+      {
+        "bytes": 1221,
+        "path": "benchmark-results/slurm_jobs/hfo1073_otmq_reserve_cleanup_day_100.sbatch",
+        "sha256": "c6ec63a0c27c5179b008041eab1e0ed82e64b6b6c694251aabed6b0c9c69e00f"
+      },
+      {
+        "bytes": 1224,
+        "path": "benchmark-results/slurm_jobs/hfo1074_otmq_reserve_loss_trace.sbatch",
+        "sha256": "a8b424ba3417b2310a4e07c56c8efcd45d1240493a3f111c40c5acdb6860d199"
+      },
+      {
+        "bytes": 1242,
+        "path": "benchmark-results/slurm_jobs/hfo1075_otmq_reserve_loss_trace.sbatch",
+        "sha256": "475fd43dbd5014ffae49b1c40d7c4d25c6931d48ab091ad4dc4187ad4a7f1b29"
+      },
+      {
+        "bytes": 1272,
+        "path": "benchmark-results/slurm_jobs/hfo1076_otmq_armor_pivot_targeted.sbatch",
+        "sha256": "8279832276d8bb7956c39ed8e81906b5c0f8dc9ba05114926c7765503f6068ab"
+      },
+      {
+        "bytes": 1283,
+        "path": "benchmark-results/slurm_jobs/hfo1077_otmq_armor_pivot_targeted_day.sbatch",
+        "sha256": "f5b3014145a294a93aa00f075f5a8fd57f6638f7aab71270bffcf8b223c270bf"
+      },
+      {
+        "bytes": 1242,
+        "path": "benchmark-results/slurm_jobs/hfo1078_otmq_armor_pivot_bad_trace.sbatch",
+        "sha256": "e66e77743890353cba2d45c23e1f3dc4cccb1788ee39a49cc79085638d4821b2"
+      },
+      {
+        "bytes": 1289,
+        "path": "benchmark-results/slurm_jobs/hfo1079_otmq_balanced_pivot_targeted_day.sbatch",
+        "sha256": "24649e2a4c73290cd3722d558d4cc92cbaf2d205fd6cb7a8dc866e8877f0220d"
+      },
+      {
+        "bytes": 1172,
+        "path": "benchmark-results/slurm_jobs/hfo1080_otmq_balanced_draw_trace.sbatch",
+        "sha256": "1df4155a1a212479e974a06b28bd7fc526f62780e02db240823ea93e9a95c7a1"
+      },
+      {
+        "bytes": 1282,
+        "path": "benchmark-results/slurm_jobs/hfo1081_otmq_late_sell_targeted_day.sbatch",
+        "sha256": "9c68768efe4c5cf4fb94451e575ae84eef14aa87dca640c802feb0f5aa947861"
+      },
+      {
+        "bytes": 1303,
+        "path": "benchmark-results/slurm_jobs/hfo1082_otmq_late_sell_fixed_targeted_day.sbatch",
+        "sha256": "fdee7ab018eb238de140bc5065e126e15b0786ebc8848d5d324e85a1178be427"
+      },
+      {
+        "bytes": 1097,
+        "path": "benchmark-results/slurm_jobs/hfo966_splitcleanup_auto200.sbatch",
+        "sha256": "a8a9bb487ba96b3c13588b5a7d889a677783a895843caab2f582677392a45114"
+      },
+      {
+        "bytes": 1264,
+        "path": "benchmark-results/slurm_jobs/hfo967_splitcleanup_r22f14_400.sbatch",
+        "sha256": "0607eaebc2e517837b4e1ad24cb80201a732c29187e7378800438001eea3009b"
+      },
+      {
+        "bytes": 1276,
+        "path": "benchmark-results/slurm_jobs/hfo968_split_r24f16_36000_400.sbatch",
+        "sha256": "754a6fac85323d8a5dc66741b2ad84adcbd270f490c7cdb1371652a442cf1c05"
+      },
+      {
+        "bytes": 1276,
+        "path": "benchmark-results/slurm_jobs/hfo969_split_r24f16_39000_200.sbatch",
+        "sha256": "797e3eebf8559df351e326409c0834baad64056aad3fc00ca5f551793f4f79d0"
+      },
+      {
+        "bytes": 3010,
+        "path": "benchmark-results/slurm_jobs/hfo970_emergency_sweep_300.sbatch",
+        "sha256": "46ef1b36af2fafc0a63a9c42c51ac506ba4a487cb68e64aa367884faf4700e38"
+      },
+      {
+        "bytes": 1445,
+        "path": "benchmark-results/slurm_jobs/hfo971_edmin3_r22f14_400.sbatch",
+        "sha256": "bdd9e35f5552464d42aa9bfc4fb6dcf0e6177798525d5462b61dc62d4787d99b"
+      },
+      {
+        "bytes": 1457,
+        "path": "benchmark-results/slurm_jobs/hfo972_edmin2_r24f16t36_400.sbatch",
+        "sha256": "ef39d933b4858586022fb754d1a465c377d2c0faae9922d4d02fd70d28c3c0a0"
+      },
+      {
+        "bytes": 1508,
+        "path": "benchmark-results/slurm_jobs/hfo973_edmin3_r22f14_trace100.sbatch",
+        "sha256": "d2c1e328a004e5fc903c879a2288a434f9fa697b2b4e3e2186814058e6f00cb0"
+      },
+      {
+        "bytes": 1281,
+        "path": "benchmark-results/slurm_jobs/hfo974_mixedcleanup_r22f14_400.sbatch",
+        "sha256": "adba9282e407b2534d4028c51d2ea7b87e8bb06329a2ee76e9085087377c19a2"
+      },
+      {
+        "bytes": 1502,
+        "path": "benchmark-results/slurm_jobs/hfo975_mixedcleanup_edmin3_r22f14_400.sbatch",
+        "sha256": "0eb0ce0649a75170e9671c4f872803c4cab614e047938450366caa5ebb271520"
+      },
+      {
+        "bytes": 1281,
+        "path": "benchmark-results/slurm_jobs/hfo976_promoted_otmq_default_400.sbatch",
+        "sha256": "3887a2d7d79a7fed004c3ff6605568806394ad9c0169b6225a4df31c6295a56e"
+      },
+      {
+        "bytes": 1328,
+        "path": "benchmark-results/slurm_jobs/hfo977_promoted_otmq_trace100.sbatch",
+        "sha256": "9efd81fee6ce70c47fc202cdf7380ca6017b08109d81a3e287d04024704c468a"
+      },
+      {
+        "bytes": 3102,
+        "path": "benchmark-results/slurm_jobs/hfo978_otmq_plan_composition_sweep_200.sbatch",
+        "sha256": "f4772ede902db87aab2fa78c9c5921d94437b70df8515666025c5c69b0539b63"
+      },
+      {
+        "bytes": 2509,
+        "path": "benchmark-results/slurm_jobs/hfo979_otmq_tank_composition_400.sbatch",
+        "sha256": "25433d0397158893f834ae56a35208212c3e9e3daac60a89ad48352129253a0a"
+      },
+      {
+        "bytes": 3766,
+        "path": "benchmark-results/slurm_jobs/hfo980_otmq_strategy_sweep_200.sbatch",
+        "sha256": "7ad5b957dfd2bd4fc3db96cd0204c026ff3fcdca43585be1f172a1e99866f3f4"
+      },
+      {
+        "bytes": 1296,
+        "path": "benchmark-results/slurm_jobs/hfo981_corrected_promoted_otmq_400.sbatch",
+        "sha256": "1f4ca7913eb244ee463ffaa1e311ea90f2ea9cc4a2843d9397527658a247e10b"
+      },
+      {
+        "bytes": 2510,
+        "path": "benchmark-results/slurm_jobs/hfo982_corrected_tank_composition_400.sbatch",
+        "sha256": "65138350d1ff16007485961d83549d72f2bdc564663b352a76a6ff55d858d39b"
+      },
+      {
+        "bytes": 3662,
+        "path": "benchmark-results/slurm_jobs/hfo983_corrected_strategy_sweep_200.sbatch",
+        "sha256": "efd4ebd4c5ad0a8236cd436f625783871e02c4504aff35c39d0548427a5bb035"
+      },
+      {
+        "bytes": 1392,
+        "path": "benchmark-results/slurm_jobs/hfo984_corrected_default_failure_traces.sbatch",
+        "sha256": "3d64f10546513834e6d4b51f07e20a60e2c62386aa0891b8aaf67ebabe2834eb"
+      },
+      {
+        "bytes": 1648,
+        "path": "benchmark-results/slurm_jobs/hfo985_strategy_profile_only_emergency_400.sbatch",
+        "sha256": "9e7c65cbea82171a1853bf04a1df0cdd7eebfcec03f601227365ac10906a3ada"
+      },
+      {
+        "bytes": 1249,
+        "path": "benchmark-results/slurm_jobs/hfo986_patched_default_400.sbatch",
+        "sha256": "5a2ccf5f4ee30b77168d73a6df00dbbc0557d8a91bfe7f4fcbdece1ea24d73e6"
+      },
+      {
+        "bytes": 2369,
+        "path": "benchmark-results/slurm_jobs/hfo987_patched_tank_400.sbatch",
+        "sha256": "c21d1413de5f5c0428e2e160189b2e66c8ca99c0723f75fdd55c3f67bf1e7ec2"
+      },
+      {
+        "bytes": 1516,
+        "path": "benchmark-results/slurm_jobs/hfo988_patched_strategy_only_400.sbatch",
+        "sha256": "7035cc6711a4c8b3d9d454f948b8aea8fb3f47c43ea9530874d25c75339bce10"
+      },
+      {
+        "bytes": 2537,
+        "path": "benchmark-results/slurm_jobs/hfo989_patched_tank_failure_traces.sbatch",
+        "sha256": "0a2c1d32260c4917cf5dc8d341251f91526a2dbdb5b034014ff6b2b8f82be337"
+      },
+      {
+        "bytes": 1236,
+        "path": "benchmark-results/slurm_jobs/hfo990_posthold_default_400.sbatch",
+        "sha256": "1e9dfd04b98f0c555e80382607b9f9c72eb7ead759873072bf77db0c0529b070"
+      },
+      {
+        "bytes": 2356,
+        "path": "benchmark-results/slurm_jobs/hfo991_posthold_tank_400.sbatch",
+        "sha256": "2f7be52f3e235f10e100bd80a8580243ebe424f229d30b5bbf7cc536ee1a7eee"
+      },
+      {
+        "bytes": 1627,
+        "path": "benchmark-results/slurm_jobs/hfo992_posthold_strategy_only_400.sbatch",
+        "sha256": "b535d22438051050d9d27e1630849c80c84c714c331b36de0b90e212d0251719"
+      },
+      {
+        "bytes": 1225,
+        "path": "benchmark-results/slurm_jobs/hfo993_nohold_default_100.sbatch",
+        "sha256": "852e5ec8a694e65b2bc99a92b0cb9cbe45715b1efcfbe41a3a752285a20e82b2"
+      },
+      {
+        "bytes": 2345,
+        "path": "benchmark-results/slurm_jobs/hfo994_nohold_tank_100.sbatch",
+        "sha256": "10b7966fed34b728bf6e51486c9a842b88d74bb677aca095b44c28cfecb62b3c"
+      },
+      {
+        "bytes": 1616,
+        "path": "benchmark-results/slurm_jobs/hfo995_nohold_strategy_only_100.sbatch",
+        "sha256": "75034b6046868b344a4ffbf2f43e3fe19b1d0bdfee061c47af0cdda39b656243"
+      },
+      {
+        "bytes": 1254,
+        "path": "benchmark-results/slurm_jobs/hfo996_restorebaseline_default_100.sbatch",
+        "sha256": "09eb2110441509c03121f71afd8dc6f92825859b05203bf1fce194ca7f86d895"
+      },
+      {
+        "bytes": 2374,
+        "path": "benchmark-results/slurm_jobs/hfo997_restorebaseline_tank_100.sbatch",
+        "sha256": "28a8cb54e0528c8dcf71b44d6788b8b5ad7ba97c70c0c7b8c83d43594ac186dc"
+      },
+      {
+        "bytes": 1645,
+        "path": "benchmark-results/slurm_jobs/hfo998_restorebaseline_strategy_only_100.sbatch",
+        "sha256": "ec1384d6d00d5b831e802cc4a34a7d94ab3ac73010721f227b265dedd75707e1"
+      }
+    ]
+  },
+  "generatedAt": "2026-08-03T00:31:21.614759+00:00",
+  "maps": {
+    "artifact": "research/artifacts/map_inventory.json",
+    "duplicateOccurrences": 39,
+    "exactDuplicateGroups": 19,
+    "paths": 196,
+    "uniqueContentHashes": 176
+  },
+  "paperAndNotebookSearch": {
+    "bibFilesFound": 0,
+    "latexFilesFound": 0,
+    "notebooksFound": 0,
+    "paperDraftFound": false
+  },
+  "projectRoot": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide",
+  "schemaVersion": 1,
+  "topLevelEntries": [
+    {
+      "name": "environment.toml",
+      "role": "inadequate root environment pointer; no environments/spec"
+    },
+    {
+      "name": "game-api-playground",
+      "role": "API experimentation area; no central paper result"
+    },
+    {
+      "name": "strong-chronodivide-bot",
+      "role": "main candidate fork; pre-audit HEAD d942016ccef021f16f79402756f2487e58cd9c21"
+    },
+    {
+      "name": "supalosa-chronodivide-bot",
+      "role": "clean upstream source baseline; HEAD 165b77a71d0cf5ebd27c65b19d0486bcbae78d0f"
+    },
+    {
+      "name": "strong-chronodivide-bot-hfo275",
+      "role": "preserved dirty upstream-based experiment snapshot; 12 tracked files modified"
+    },
+    {
+      "name": "strong-chronodivide-bot-hfo284",
+      "role": "preserved dirty upstream-based experiment snapshot; 13 tracked files modified"
+    },
+    {
+      "name": "strong-chronodivide-bot-caponly-exp-20260611-0835",
+      "role": "timestamped code snapshot"
+    },
+    {
+      "name": "strong-chronodivide-bot-cleanexp-20260611-0605",
+      "role": "timestamped code snapshot"
+    },
+    {
+      "name": "strong-chronodivide-bot-cleanexp-lite-20260611-0610",
+      "role": "timestamped code snapshot"
+    },
+    {
+      "name": "strong-chronodivide-bot-cleanup-exp-20260611-0735",
+      "role": "timestamped code snapshot"
+    }
+  ]
+}

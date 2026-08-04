@@ -1,0 +1,5 @@
+task	variant	start_label	candidate_start	baseline_start	default_profiles	exact_map_tactics
+0	profiled	start_a	37,63	62,39	true	true
+1	profiled	start_b	62,39	37,63	true	true
+2	generic	start_a	37,63	62,39	false	false
+3	generic	start_b	62,39	37,63	false	false

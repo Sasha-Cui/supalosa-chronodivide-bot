@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-08-04T11:54:56-04:00",
+  "requestedAccount": "pi_jss233",
+  "check": {
+    "command": "sbatch --test-only research/slurm/audit_pilot_v1.sbatch",
+    "exitStatus": 1,
+    "stderr": [
+      "sbatch: error: QOSMaxSubmitJobPerUserLimit",
+      "allocation failure: Job violates accounting/QOS policy (job submit limit, user's size and/or time limits)"
+    ]
+  },
+  "activeUserJob": {
+    "jobId": "21247181",
+    "name": "codex_compute",
+    "account": "prio_btk22",
+    "qos": "prio_btk22",
+    "partition": "priority",
+    "state": "RUNNING",
+    "startTime": "2026-08-04T02:19:04-04:00",
+    "scheduledEndTime": "2026-08-05T02:19:04-04:00",
+    "command": "/nfs/roberts/project/pi_btk22/zc362/slurm/slurm_scripts/codex_compute_priority.sbatch"
+  },
+  "decision": "Do not use or cancel the unrelated active job. Submit no scientific work until Slurm accepts pi_jss233 as the authoritative account.",
+  "readiness": "blocked_pending_submit_limit_release"
+}

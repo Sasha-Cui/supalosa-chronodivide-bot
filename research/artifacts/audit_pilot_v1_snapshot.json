@@ -1,0 +1,74 @@
+{
+  "archive": {
+    "bytes": 1137989,
+    "path": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/snapshots/audit-pilot-v1-schema2-source-runtime.tar.gz",
+    "sha256": "494c5d38e32f0f73edf6ebd368c2ee8650b8b8d52e8763938340779c61834149",
+    "tarEntries": 603
+  },
+  "baseline": {
+    "gitCommit": "165b77a71d0cf5ebd27c65b19d0486bcbae78d0f",
+    "kind": "external-package",
+    "packageRoot": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/supalosa-chronodivide-bot/packages/chronodivide-bot",
+    "packageVersion": "0.6.8-beta.3",
+    "runtimeTree": {
+      "bytes": 438907,
+      "exists": true,
+      "files": 172,
+      "root": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/supalosa-chronodivide-bot/packages/chronodivide-bot/dist",
+      "sha256": "34349919500c8019f9d9b1c2b2a7e2269dd57dde6b3414216bb6336e02977199"
+    },
+    "trackedDirty": false
+  },
+  "candidate": {
+    "archivedRawTrackedPatchSha256": "997863e071ff7ebf8905ceed275f80dfcbc6bef5eef5ce1e6a7f664bff57f2b7",
+    "branch": "codex/chrono-divide-paper-audit",
+    "gitCommit": "d942016ccef021f16f79402756f2487e58cd9c21",
+    "manifestNormalizedTrackedDiffSha256": "001e9e85f19a38134bf85388020a3a6c03882374c0f5f97f061c0936ad880391",
+    "runtimeTrees": [
+      {
+        "bytes": 1116679,
+        "exists": true,
+        "files": 220,
+        "root": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/packages/chronodivide-bot/dist",
+        "sha256": "a0f8d027c13f1a52897a8b7ec7d944049ee9274e5ec3dcb2cb754747e2151026"
+      },
+      {
+        "bytes": 103890,
+        "exists": true,
+        "files": 16,
+        "root": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/packages/chronodivide-bot-driver/dist/benchmark",
+        "sha256": "0a334cd304f0fe99e9c007fd4082a9615dcfcdd92494ec3d7dfa06d83f2a7fca"
+      }
+    ]
+  },
+  "createdAt": "2026-08-03T00:24:11.340788+00:00",
+  "exclusions": [
+    "Proprietary map and MIX bytes are not copied into the archive; their existing paths, sizes, and SHA-256 descriptors remain in run manifests.",
+    "The archive is a pilot reconstruction aid, not a redistribution grant for upstream or game-derived content."
+  ],
+  "gameApiRuntimeTree": {
+    "bytes": 1138631,
+    "exists": true,
+    "files": 3,
+    "root": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/node_modules/@chronodivide/game-api/dist",
+    "sha256": "2498499d8d029a0b008e1a4fcc9e04a1a4630f7eb2eb20d179c278fa409f9e2b"
+  },
+  "mapDescriptors": [
+    {
+      "bytes": 2968,
+      "exists": true,
+      "name": "simple-1v1-no-preview.map",
+      "resolvedPath": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/packages/chronodivide-bot-driver/data/simple-1v1-no-preview.map",
+      "sha256": "bd61bb9ab4412b15895c89188336ab53b03dd20879936b92aaf4418e091cf7fc"
+    }
+  ],
+  "packageLockSha256": "59ad1d212f1ebe8fba5913ced9c096c97d5840c93abc76bfa863737c6589458d",
+  "purpose": "reconstructive source/runtime snapshot for the schema-2 infrastructure pilot; not paper evidence",
+  "runRoot": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/pilot/audit-pilot-v1/allocation-20965700-v2",
+  "schemaVersion": 1,
+  "verification": {
+    "allFourRunProvenanceUniform": true,
+    "archiveCreatedBeforeSubsequentRebuild": true,
+    "trackedDiffMatchedManifestImmediatelyBeforeArchive": true
+  }
+}

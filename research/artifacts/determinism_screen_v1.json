@@ -1,0 +1,366 @@
+{
+  "aggregate": {
+    "acceptedGames": 4,
+    "baselineWins": 3,
+    "candidateScoreRate": 0.125,
+    "candidateWins": 0,
+    "draws": 1,
+    "gameWallTimeMs": 57342,
+    "launchedGameCreations": 27,
+    "rejectedStartAttempts": 23
+  },
+  "comparison": {
+    "firstAttemptRuns": 3,
+    "identicalTerminalResults": false,
+    "outcomesAmongAllRuns": [
+      "draw",
+      "baseline",
+      "baseline",
+      "baseline"
+    ],
+    "uniqueTerminalSignatures": 4,
+    "uniqueTerminalSignaturesAmongFirstAttemptRuns": 3
+  },
+  "conclusion": {
+    "established": [
+      "Identical requested effective configurations can yield different terminal results across fresh processes.",
+      "Three first-attempt runs with the same accepted match counter still had three distinct terminal signatures.",
+      "Repeated identical calls cannot be treated as deterministic duplicates."
+    ],
+    "notEstablished": [
+      "Statistical independence of runs",
+      "Exact engine seed for any run",
+      "Within-process repeatability",
+      "Same-seed reproducibility",
+      "The first divergent action or event"
+    ],
+    "requiredNextStep": "Expose and log an explicit engine PRNG seed in a pinned API fork, verify action-trace identity under the same seed, and use prespecified common-random-number seed blocks across policies."
+  },
+  "createdAt": "2026-08-03T00:44:55.385275+00:00",
+  "design": {
+    "effectiveConfig": {
+      "baselineCountries": [
+        "Arabs"
+      ],
+      "baselineStarts": [
+        "62,39"
+      ],
+      "candidateCountries": [
+        "Arabs"
+      ],
+      "candidateSlots": [
+        0
+      ],
+      "candidateStarts": [
+        "37,63"
+      ],
+      "gameOptions": {
+        "buildOffAlly": false,
+        "cratesAppear": false,
+        "credits": 10000,
+        "gameSpeed": 6,
+        "mcvRepacks": true,
+        "online": false,
+        "shortGame": true,
+        "superWeapons": false,
+        "unitCount": 0
+      },
+      "maps": [
+        "simple-1v1-no-preview.map"
+      ],
+      "matchStartOffset": 8200000,
+      "matchesPerPair": 1,
+      "maxTicks": 18000,
+      "startFilterMaxAttempts": 80,
+      "strongBotOptions": {
+        "defaultMapProfiles": false,
+        "emergencyDefense": {},
+        "exactMapTactics": false,
+        "forceAttack": {},
+        "harass": {},
+        "harvesterHarass": {},
+        "hfoBottomCloseout": {},
+        "hfoBottomDemolition": {},
+        "hfoBottomHomeGuard": {},
+        "hfoBottomPincer": {},
+        "hfoBottomSweep": {},
+        "hfoCloseout": {},
+        "hfoEastSweep": {},
+        "hfoWestSweep": {},
+        "routeAttack": {}
+      },
+      "strongStrategyOptions": {
+        "base": {
+          "attackGate": {},
+          "attackMission": {},
+          "attackSuppression": {},
+          "defence": {},
+          "engineer": {},
+          "scouting": {}
+        },
+        "defaultMapProfiles": false,
+        "macroBoost": {
+          "enabled": false
+        },
+        "staticDefenseBoost": {}
+      },
+      "traceIntervalTicks": 0
+    },
+    "normalization": "Terminal signatures exclude run metadata, accepted match counter, and wall-clock duration; they retain requested context, outcome, ticks, and all logged terminal material/state fields.",
+    "sameBaselineApiAndSoftware": true,
+    "sameCandidateSourceAndRuntime": true,
+    "sameRequestedEffectiveConfig": true,
+    "varyingManifestFields": [
+      "runId",
+      "OUT_DIR",
+      "RUN_ID",
+      "createdAt"
+    ]
+  },
+  "evidenceClass": "infrastructure-diagnostic",
+  "execution": {
+    "concurrentFreshNodeProcesses": true,
+    "manifestEnvironmentAccount": "pi_jss233",
+    "processes": 4,
+    "requestedProjectAllocation": "pi_jss233",
+    "runRoot": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/pilot/determinism-screen-v1/allocation-20965700",
+    "schedulerAccount": "prio_btk22",
+    "schedulerAccountSource": "scontrol-and-sacct",
+    "schedulerJobId": "20965700",
+    "taskScript": "research/scripts/run_determinism_screen_task.sh",
+    "taskScriptSha256": "95912adcfe47056ca294c2c5a907810500184d9058c748f417c0e711c6aa7ce0"
+  },
+  "purpose": "Fresh-process terminal-state variability screen; this is an infrastructure diagnostic, not an action-trace determinism test or paper evidence.",
+  "runs": [
+    {
+      "acceptedMatchId": 8200001,
+      "rejectedStartAttempts": 0,
+      "runDirectory": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/pilot/determinism-screen-v1/allocation-20965700/task-0",
+      "runId": "determinism-screen-v1-allocation-20965700-0",
+      "taskId": 0,
+      "terminal": {
+        "baselineBuildings": 7,
+        "baselineCombatants": 7,
+        "baselineConyards": 1,
+        "baselineCountry": "Arabs",
+        "baselineCredits": 0,
+        "baselineDefeated": false,
+        "baselineFactories": 2,
+        "baselineHarvesters": 1,
+        "baselineRefineries": 1,
+        "baselineStart": {
+          "x": 62,
+          "y": 39
+        },
+        "baselineUnits": 15,
+        "candidateBuildings": 9,
+        "candidateCombatants": 4,
+        "candidateConyards": 1,
+        "candidateCountry": "Arabs",
+        "candidateCredits": 0,
+        "candidateDefeated": false,
+        "candidateFactories": 2,
+        "candidateHarvesters": 1,
+        "candidateRefineries": 1,
+        "candidateSlot": 0,
+        "candidateStart": {
+          "x": 37,
+          "y": 63
+        },
+        "candidateUnits": 14,
+        "finished": false,
+        "mapName": "simple-1v1-no-preview.map",
+        "ticks": 18000,
+        "winner": "draw"
+      },
+      "terminalSignatureSha256": "920e927d5c035f945509454e5a5eee53c6b2bfe7a75c5e3708a3b3d7cf8d13d8",
+      "wallTimeMs": 27652
+    },
+    {
+      "acceptedMatchId": 8200024,
+      "rejectedStartAttempts": 23,
+      "runDirectory": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/pilot/determinism-screen-v1/allocation-20965700/task-1",
+      "runId": "determinism-screen-v1-allocation-20965700-1",
+      "taskId": 1,
+      "terminal": {
+        "baselineBuildings": 6,
+        "baselineCombatants": 4,
+        "baselineConyards": 1,
+        "baselineCountry": "Arabs",
+        "baselineCredits": 0,
+        "baselineDefeated": false,
+        "baselineFactories": 1,
+        "baselineHarvesters": 1,
+        "baselineRefineries": 1,
+        "baselineStart": {
+          "x": 62,
+          "y": 39
+        },
+        "baselineUnits": 11,
+        "candidateBuildings": 0,
+        "candidateCombatants": 0,
+        "candidateConyards": 0,
+        "candidateCountry": "Arabs",
+        "candidateCredits": 69,
+        "candidateDefeated": true,
+        "candidateFactories": 0,
+        "candidateHarvesters": 0,
+        "candidateRefineries": 0,
+        "candidateSlot": 0,
+        "candidateStart": {
+          "x": 37,
+          "y": 63
+        },
+        "candidateUnits": 0,
+        "finished": true,
+        "mapName": "simple-1v1-no-preview.map",
+        "ticks": 8068,
+        "winner": "baseline"
+      },
+      "terminalSignatureSha256": "b3aec40b666a4b26680fc2d1aa2405e9f85d815519705e7b8de13c566c9e9cbd",
+      "wallTimeMs": 9084
+    },
+    {
+      "acceptedMatchId": 8200001,
+      "rejectedStartAttempts": 0,
+      "runDirectory": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/pilot/determinism-screen-v1/allocation-20965700/task-2",
+      "runId": "determinism-screen-v1-allocation-20965700-2",
+      "taskId": 2,
+      "terminal": {
+        "baselineBuildings": 6,
+        "baselineCombatants": 10,
+        "baselineConyards": 1,
+        "baselineCountry": "Arabs",
+        "baselineCredits": 0,
+        "baselineDefeated": false,
+        "baselineFactories": 1,
+        "baselineHarvesters": 1,
+        "baselineRefineries": 1,
+        "baselineStart": {
+          "x": 62,
+          "y": 39
+        },
+        "baselineUnits": 17,
+        "candidateBuildings": 0,
+        "candidateCombatants": 0,
+        "candidateConyards": 0,
+        "candidateCountry": "Arabs",
+        "candidateCredits": 0,
+        "candidateDefeated": true,
+        "candidateFactories": 0,
+        "candidateHarvesters": 0,
+        "candidateRefineries": 0,
+        "candidateSlot": 0,
+        "candidateStart": {
+          "x": 37,
+          "y": 63
+        },
+        "candidateUnits": 0,
+        "finished": true,
+        "mapName": "simple-1v1-no-preview.map",
+        "ticks": 7956,
+        "winner": "baseline"
+      },
+      "terminalSignatureSha256": "16864b744dda9bee0dbd525df6592d8d976d7b372222bb7ea64fb0f348e6d758",
+      "wallTimeMs": 10173
+    },
+    {
+      "acceptedMatchId": 8200001,
+      "rejectedStartAttempts": 0,
+      "runDirectory": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/pilot/determinism-screen-v1/allocation-20965700/task-3",
+      "runId": "determinism-screen-v1-allocation-20965700-3",
+      "taskId": 3,
+      "terminal": {
+        "baselineBuildings": 6,
+        "baselineCombatants": 5,
+        "baselineConyards": 1,
+        "baselineCountry": "Arabs",
+        "baselineCredits": 0,
+        "baselineDefeated": false,
+        "baselineFactories": 1,
+        "baselineHarvesters": 1,
+        "baselineRefineries": 1,
+        "baselineStart": {
+          "x": 62,
+          "y": 39
+        },
+        "baselineUnits": 12,
+        "candidateBuildings": 0,
+        "candidateCombatants": 0,
+        "candidateConyards": 0,
+        "candidateCountry": "Arabs",
+        "candidateCredits": 7,
+        "candidateDefeated": true,
+        "candidateFactories": 0,
+        "candidateHarvesters": 0,
+        "candidateRefineries": 0,
+        "candidateSlot": 0,
+        "candidateStart": {
+          "x": 37,
+          "y": 63
+        },
+        "candidateUnits": 0,
+        "finished": true,
+        "mapName": "simple-1v1-no-preview.map",
+        "ticks": 9092,
+        "winner": "baseline"
+      },
+      "terminalSignatureSha256": "79efcaf5bdce56bb336bf7c839f7fa5bee70d2487be028070a01a4437ef869e9",
+      "wallTimeMs": 10433
+    }
+  ],
+  "schedulerAccountingCorrection": {
+    "artifact": "research/artifacts/scheduler_accounting_correction.json",
+    "authoritativeAccount": "prio_btk22",
+    "authoritativeSource": "scontrol-and-sacct",
+    "impact": "diagnostic executed outside requested allocation; raw manifests preserved; no paper inference",
+    "jobId": "20965700",
+    "manifestEnvironmentAccount": "pi_jss233",
+    "requestedProjectAllocation": "pi_jss233"
+  },
+  "schemaVersion": 1,
+  "snapshot": {
+    "bytes": 1127201,
+    "contains": [
+      "candidate source and compiled runtime",
+      "clean upstream baseline source and compiled runtime",
+      "shared game API runtime",
+      "package manifests and lockfile",
+      "diagnostic task script and environment manifest"
+    ],
+    "excludes": [
+      "proprietary map and MIX bytes"
+    ],
+    "path": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/snapshots/determinism-screen-v1-source-runtime.tar.gz",
+    "sha256": "4d5c626afed805a9cf6c7aedd7ae187845be14cfb7b9cc01f20f9d56db4c501d",
+    "tarEntries": 607
+  },
+  "sourceInspection": {
+    "apiJavascript": {
+      "bytes": 940639,
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/node_modules/@chronodivide/game-api/dist/index.js",
+      "sha256": "dd398f5c8c2b4c3e3d6eb0f9ca6d7549bf70fee16c5950cd8902616ac922497d"
+    },
+    "apiTypes": {
+      "bytes": 68379,
+      "createOfflineOptsExposesSeed": false,
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/node_modules/@chronodivide/game-api/dist/index.d.ts",
+      "sha256": "aef856afbaf990f9610ca201bce0fd5b8fc77603d7230e831b6bf0cda29d2f5f"
+    },
+    "interpretation": "The bundled implementation contains a Mersenne-Twister PRNG. Its factory derives a seed from game ID and start timestamp; the offline create path passes game ID \"0\" and floor(Date.now()/1000). This makes wall-clock-second seeding the likely source of cross-process variation, but exact per-run seed values were not exposed or logged and the inference was not verified by a controlled same-seed replay.",
+    "matches": [
+      {
+        "byteOffset": 705635,
+        "label": "prngFactory",
+        "matched": true,
+        "snippet": "class Prng{static factory(e,t){t=Number.isNaN(Number(e))?Crc32.calculateCrc(binaryStringToUint8Array(e)):Number(e+\"\"+t);return new Prng(t)}"
+      },
+      {
+        "byteOffset": 931934,
+        "label": "offlineTimestamp",
+        "matched": true,
+        "snippet": "s=Math.floor(Date.now()/1e3),a=await PublicApi_classPrivateFieldGet(this,_PublicApi_instances,\"m\",_PublicApi_initializeGame).call(this,\"0\",s,t,r,void 0)"
+      }
+    ]
+  }
+}

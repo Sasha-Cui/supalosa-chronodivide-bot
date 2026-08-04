@@ -1,0 +1,68 @@
+{
+  "affectedResultIds": [
+    "external-profile-on-v2",
+    "external-profile-off",
+    "external-profile-on-initial",
+    "audit-pilot-v1-prehash",
+    "audit-pilot-v1-schema2",
+    "preflight-generic-fixed-a",
+    "preflight-generic-fixed-a-v2",
+    "determinism-screen-v1"
+  ],
+  "attemptedScientificSubmission": {
+    "jobId": null,
+    "reason": "QOSMaxSubmitJobPerUserLimit",
+    "requestedAccount": "pi_jss233",
+    "result": "rejected-before-job-creation",
+    "script": "research/slurm/audit_pilot_v1.sbatch"
+  },
+  "createdAt": "2026-08-03T00:51:02.285234+00:00",
+  "fallbackExecution": {
+    "accountEvidence": [
+      "scontrol show job -o 20965700",
+      "sacct -j 20965700 --format=JobIDRaw,JobName,Account,AllocCPUS,Elapsed,State -P"
+    ],
+    "authoritativeAccount": "prio_btk22",
+    "authoritativeQos": "prio_btk22",
+    "cause": "The interactive fallback command manually overrode SLURM_JOB_ACCOUNT. Schema-2 manifests trusted that mutable environment field instead of querying Slurm.",
+    "impact": "The diagnostics ran successfully but were charged to prio_btk22, not the user-requested pi_jss233 allocation. Their evidence class remains infrastructure-only. Raw manifests are preserved and must be read with this correction.",
+    "jobId": "20965700",
+    "jobName": "codex_compute",
+    "partition": "priority",
+    "rawManifestEnvironmentAccount": "pi_jss233",
+    "stateWhenChecked": "RUNNING"
+  },
+  "historicalBroadCampaign": {
+    "authoritativeAccount": "pi_jss233",
+    "evidence": "sacct queried 2026-08-03 UTC; all eight parent jobs reported pi_jss233",
+    "jobIds": [
+      "16021104",
+      "16021105",
+      "16021436",
+      "16021490",
+      "16021740",
+      "16021922",
+      "16022155",
+      "16022521"
+    ],
+    "state": "COMPLETED"
+  },
+  "remediation": {
+    "change": "Future manifests query scontrol for Account, QOS, and Partition, retain environment labels separately, and fall back to the environment only when scheduler accounting is unavailable.",
+    "executionPolicy": "Do not run further project diagnostics outside pi_jss233. Wait for the submit limit to clear or obtain user direction; do not cancel unrelated jobs.",
+    "manifestSchema": 3,
+    "runtimeSelfTest": {
+      "inputEnvironmentAccount": "pi_jss233",
+      "jobId": "20965700",
+      "manifestSchema": 3,
+      "passed": true,
+      "reportedAccount": "prio_btk22",
+      "reportedPartition": "priority",
+      "reportedQos": "prio_btk22",
+      "reportedSource": "scontrol"
+    },
+    "test": "researchFlags.test.ts checks parsing of the observed scontrol record."
+  },
+  "requestedProjectAllocation": "pi_jss233",
+  "schemaVersion": 1
+}

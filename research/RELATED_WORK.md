@@ -1,0 +1,83 @@
+# Related work and novelty map
+
+This is a verified seed bibliography, not a systematic review. Each link below
+resolves to the publisher or DOI record. A submission requires forward/backward
+citation search and coverage of work published after these papers.
+
+| Work | What it establishes | Consequence for this project |
+|---|---|---|
+| Fernández-Ares et al. (2011), [“Optimizing Strategy Parameters in a Game Bot”](https://doi.org/10.1007/978-3-642-21498-1_41), IWANN, pp. 325–332 | Evolutionary optimization of constants, weights, and probabilities in a hand-designed Planet Wars rule system, evaluated across maps. | Evolving scripted-bot parameters is prior art, not this project's novelty. |
+| Mora et al. (2012), [“Effect of Noisy Fitness in Real-Time Strategy Games Player Behaviour Optimisation Using Evolutionary Algorithms”](https://doi.org/10.1007/s11390-012-1281-5), JCST 27(5):1007–1023 | Repeated combats, multiple maps, and elite/incumbent reevaluation mitigate noisy fitness in RTS bot tuning. | Chrono Divide outcomes vary under an uncontrolled wall-clock-derived seed; the current one-pass sequential trainer lacks explicit seeds, paired reevaluation, and known noisy-fitness controls. |
+| Young & Hawes (2012), [“Evolutionary Learning of Goal Priorities in a Real-Time Strategy Game”](https://doi.org/10.1609/aiide.v8i1.12503), AIIDE 8(1):87–92 | Case-injected genetic optimization of StarCraft goal-priority profiles and comparison to static knowledge. | Seeded evolutionary tuning of high-level scripted priorities is established. |
+| Othman et al. (2012), [“Simulation-based Optimization of StarCraft Tactical AI through Evolutionary Computation”](https://doi.org/10.1109/CIG.2012.6374182), IEEE CIG, pp. 394–401 | Simulation-based evolutionary refinement of XML-configured StarCraft tactical behavior. | A simulator plus evolutionary tactical tuning is established; equal-launched-budget comparisons and transfer are needed. |
+| Liu, Louis & Ballinger (2016), [“Evolving Effective Microbehaviors in Real-Time Strategy Games”](https://doi.org/10.1109/TCIAIG.2016.2544844), IEEE TCIAIG 8(4):351–362 | GA tuning of 14 potential-field/influence-map parameters, including limited transfer to unseen combat scenarios. | Unseen-scenario transfer has direct precedent; this paper must go beyond a single tuned map and compare mechanisms. |
+| Hutter, Hoos & Leyton-Brown (2011), [“Sequential Model-Based Optimization for General Algorithm Configuration”](https://doi.org/10.1007/978-3-642-25566-3_40), LION 5, pp. 507–523 | Introduces random-forest SMAC for mixed configuration spaces and sets of instances. | SMAC is an essential standard configurator baseline if the paper discusses optimization quality. |
+| López-Ibáñez et al. (2016), [“The irace Package: Iterated Racing for Automatic Algorithm Configuration”](https://doi.org/10.1016/j.orp.2016.09.002), OR Perspectives 3:43–58 | Iterated racing for mixed/conditional parameters; explicitly separates tuning instances from unseen test instances. | Family-disjoint tuning/test data are established algorithm-configuration practice, not an optional refinement. |
+| Lucas, Liu & Pérez-Liébana (2018), [“The N-Tuple Bandit Evolutionary Algorithm for Game Agent Optimisation”](https://doi.org/10.1109/CEC.2018.8477869), IEEE CEC, pp. 1–9 | NTBEA uses n-tuple statistics, UCB exploration, and evolutionary neighborhoods for noisy, expensive game-agent configuration. | NTBEA is a particularly relevant game-oriented comparison for the discrete configuration space. |
+| Fernández-Ares et al. (2012), [“Adaptive Bots for Real-Time Strategy Games via Map Characterization”](https://doi.org/10.1109/CIG.2012.6374185), IEEE CIG, pp. 417–423 | Evolves bots for map types and selects among them using online map characterization, outperforming a general offline-trained bot. | This is the closest novelty collision: map-conditioned portfolios and their comparison to a generalist are prior art; the contribution must be leakage-controlled held-out and worst-group evaluation, not map selection itself. |
+| Lucas et al. (2019), [“Efficient Evolutionary Methods for Game Agent Optimisation: Model-Based is Best”](https://arxiv.org/abs/1901.00723), AAAI Games and Simulations workshop | Directly compares NTBEA and SMAC on Fast Planet Wars and finds both competitive while exposing useful parameter interactions. | A game-agent study should compare configurators under equal launched-simulation budgets rather than presenting the local GA alone. |
+| Eggensperger, Lindauer & Hutter (2019), [“Pitfalls and Best Practices in Algorithm Configuration”](https://doi.org/10.1613/jair.1.11420), JAIR 64:861–893 | Catalogues failures in configuration scenario design, configurator comparison, over-tuning, and validation. | The sealed family split, equal launched-attempt ledger, repeated optimizer runs, and final validation are core validity requirements, not merely artifact polish. |
+
+## RTS benchmark and inference landscape
+
+- Vinyals et al. (2017), [*StarCraft II: A New Challenge for Reinforcement
+  Learning*](https://arxiv.org/abs/1708.04782), introduced SC2LE/PySC2,
+  mini-games, expert replays, and standardized supervised/RL interfaces. It is
+  a heavier commercial-game precedent for task standardization.
+- Ontañón et al. (2018), [*The First microRTS Artificial Intelligence
+  Competition*](https://doi.org/10.1609/aimag.v39i1.2777), established μRTS as
+  a shared simplified RTS competition substrate. Its deterministic setting
+  contrasts with Chrono Divide's observed, uncontrolled cross-process variability.
+- Andersen, Goodwin & Granmo (2018), [*Deep RTS: A Game Environment for Deep
+  Reinforcement Learning in Real-Time Strategy Games*](https://doi.org/10.1109/CIG.2018.8490409),
+  foregrounded the speed/fidelity tradeoff in accelerated RTS simulation.
+- Samvelyan et al. (2019), [*The StarCraft Multi-Agent
+  Challenge*](https://arxiv.org/abs/1902.04043), standardized decentralized
+  micromanagement scenarios and MARL evaluation. This SMAC benchmark is
+  distinct from the SMAC algorithm configurator cited above.
+- Agarwal et al. (2021), [*Deep Reinforcement Learning at the Edge of the
+  Statistical Precipice*](https://proceedings.neurips.cc/paper/2021/hash/f514cec81cb148559cf475e7426eed5e-Abstract.html),
+  motivates task-stratified intervals, performance profiles, and probability of
+  improvement; raw matches sharing a policy/run are not independent samples.
+- Menzel (2021), [*Bootstrap With Cluster-Dependence in Two or More
+  Dimensions*](https://doi.org/10.3982/ECTA15383), is the relevant reference
+  when maps and opponents are crossed dependence dimensions. Neither method
+  compensates for having only a few unique map/opponent clusters.
+
+OpenRA-RL is not included as scholarly prior art: as of the audit, its own
+[research page](https://openra-rl.dev/research/) said an academic paper was
+forthcoming and no archival paper was verified.
+
+## What is and is not novel
+
+Not novel on present evidence:
+
+- use of a genetic/evolutionary algorithm;
+- tuning numeric or categorical parameters in a scripted RTS bot;
+- simulation-based head-to-head evaluation;
+- map-specific policies;
+- observing that stochastic match fitness is noisy;
+- testing transfer to unseen scenarios in principle.
+
+Potentially novel if demonstrated rigorously:
+
+- an exact-provenance framework and reconstruction showing how RTS bot development
+  practices create baseline, map-family, start, and adaptive-test leakage;
+- an equal-launched-budget decomposition of map-profile, exact-coordinate, pooled, and
+  robust configuration effects on held-out and worst-group performance;
+- a low-cost evaluation protocol with physical-start pairing, family-disjoint
+  maps, repeated optimizer runs, and hierarchical uncertainty in Chrono Divide;
+- a legally releasable manifest/hash benchmark that produces stable ranking
+  changes across multiple independently authored agents.
+
+The strongest novelty sentence is deliberately conditional:
+
+> If confirmed, this study shows that the apparent strength of a scripted RTS
+> agent depends materially on configuration context, and that pooled or
+> risk-aware tuning changes held-out and worst-group performance under the same
+> launched-simulation budget.
+
+A full review should additionally cover generalization across procedural game
+levels, benchmark overfitting, multi-task algorithm configuration, group
+robustness, and statistical evaluation under deterministic or dependent game
+simulation. Do not claim a literature gap until that review is complete.
