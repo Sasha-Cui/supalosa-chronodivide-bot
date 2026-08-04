@@ -31,6 +31,7 @@ class DesignConfig:
     families: int = 9
     optimizer_runs: int = 5
     paired_blocks: int = 8
+    reciprocal_starts_per_block: int = 2
     variance_family: float = 0.0025
     variance_optimizer_run: float = 0.0009
     variance_family_optimizer: float = 0.0016
@@ -50,6 +51,8 @@ class DesignConfig:
             )
         if self.paired_blocks < 1:
             raise ValueError("paired_blocks must be at least 1")
+        if self.reciprocal_starts_per_block < 1:
+            raise ValueError("reciprocal_starts_per_block must be at least 1")
         variances = (
             self.variance_family,
             self.variance_optimizer_run,
@@ -81,8 +84,9 @@ def draw_cluster_statistic(
 ) -> Tuple[float, Optional[float], Optional[float]]:
     """Draw one balanced study and return estimate, standard error, statistic.
 
-    The simulated paired contrast for family f, optimizer run r, and paired block b
-    is
+    Each D[f,r,b] is the average conditioned-minus-global score difference over
+    the prespecified reciprocal starts in block b.  The simulated block-level
+    paired contrast for family f, optimizer run r, and paired block b is
 
         D[f,r,b] = effect + U[f] + V[r] + W[f,r] + E[f,r,b].
 
@@ -301,9 +305,13 @@ def build_report(config: DesignConfig, effect_sizes: Iterable[float]) -> dict:
         simulate_power(config, effect, calibration["critical_value"], index)
         for index, effect in enumerate(effects)
     ]
-    paired_contrasts = (
+    paired_block_contrasts = (
         config.families * config.optimizer_runs * config.paired_blocks
     )
+    start_level_paired_contrasts = (
+        paired_block_contrasts * config.reciprocal_starts_per_block
+    )
+    component_games = 2 * start_level_paired_contrasts
     return {
         "schema_version": 1,
         "tool": "chrono_divide_design_power",
@@ -314,12 +322,18 @@ def build_report(config: DesignConfig, effect_sizes: Iterable[float]) -> dict:
         "observed_or_test_outcomes_used": False,
         "design": asdict(config),
         "planned_sample_units": {
-            "paired_score_contrasts": paired_contrasts,
-            "minimum_component_game_outcomes": 2 * paired_contrasts,
+            "paired_score_contrasts": paired_block_contrasts,
+            "paired_block_contrasts": paired_block_contrasts,
+            "reciprocal_starts_per_block": config.reciprocal_starts_per_block,
+            "start_level_paired_method_contrasts": start_level_paired_contrasts,
+            "component_game_outcomes": component_games,
+            "minimum_component_game_outcomes": component_games,
             "note": (
-                "One paired contrast compares conditioned and global scores within "
-                "a prespecified seed/start block. Extra side or country mirrors "
-                "increase the component-game count unless folded into a block mean."
+                "One statistical paired-block contrast is the mean of the "
+                "conditioned-minus-global contrasts at each prespecified reciprocal "
+                "start. Each start-level method contrast requires two component "
+                "games (conditioned and global). Country mirrors increase the game "
+                "count unless folded into the prespecified block mean."
             ),
         },
         "endpoint": {
@@ -330,19 +344,29 @@ def build_report(config: DesignConfig, effect_sizes: Iterable[float]) -> dict:
                 "equal weight per map family; the simulated design is balanced over "
                 "optimizer runs and paired seed/start blocks"
             ),
+            "block_definition": (
+                "D[f,r,b] is the arithmetic mean of the conditioned-minus-global "
+                "score contrasts over reciprocal starts within engine-seed block b"
+            ),
         },
         "data_generating_model": {
             "equation": (
                 "D[f,r,b] = delta + U_family[f] + V_run[r] + "
-                "W_family_run[f,r] + E_game[f,r,b]"
+                "W_family_run[f,r] + E_block[f,r,b]"
             ),
             "distribution": "independent zero-mean Gaussian random effects",
             "variance_components": {
                 "U_family": config.variance_family,
                 "V_run": config.variance_optimizer_run,
                 "W_family_run": config.variance_family_optimizer,
-                "E_game": config.variance_game,
+                "E_block_after_reciprocal_start_averaging": config.variance_game,
             },
+            "variance_game_cli_note": (
+                "For backward compatibility, --variance-game denotes the residual "
+                "variance of the already reciprocal-start-averaged D block, not the "
+                "variance of one component game. Reciprocal starts therefore change "
+                "launch accounting but not the simulated number of analysis units."
+            ),
         },
         "analysis_model": {
             "test": (
@@ -389,6 +413,15 @@ def parse_args(argv: Optional[Sequence[str]] = None) -> argparse.Namespace:
     parser.add_argument("--optimizer-runs", type=int, default=5)
     parser.add_argument("--paired-blocks", type=int, default=8)
     parser.add_argument(
+        "--reciprocal-starts-per-block",
+        type=int,
+        default=2,
+        help=(
+            "Prespecified reciprocal starts averaged into each block contrast "
+            "(default: 2)."
+        ),
+    )
+    parser.add_argument(
         "--effect-size",
         type=float,
         action="append",
@@ -421,6 +454,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         families=args.families,
         optimizer_runs=args.optimizer_runs,
         paired_blocks=args.paired_blocks,
+        reciprocal_starts_per_block=args.reciprocal_starts_per_block,
         variance_family=args.variance_family,
         variance_optimizer_run=args.variance_optimizer_run,
         variance_family_optimizer=args.variance_family_optimizer,

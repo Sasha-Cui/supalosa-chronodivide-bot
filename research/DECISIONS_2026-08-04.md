@@ -126,8 +126,12 @@ comparisons will use a prespecified correction or simultaneous interval method.
   provisional families, 124 with load-pass metadata. No test family is selected.
 - The assumption-only power tool uses no outcomes. Under its current conservative
   variance settings, 26 test families, 10 optimizer runs, and 8 paired blocks
-  give simulated power 0.80885 for a true five-point effect and require 4,160
-  component games for the final primary comparison.
+  give simulated power 0.80885 for a true five-point effect and require 8,320
+  component games for the final primary comparison. The 26 x 10 x 8 design has
+  2,080 statistical block contrasts; each averages two reciprocal-start method
+  contrasts, and each method contrast requires two component games. This
+  accounting correction does not change simulated power because the analysis
+  unit remains the reciprocal-start-averaged block contrast.
 - The earlier user-level submission limit cleared without using or cancelling
   unrelated allocation work. Job 21291720 completed under `pi_jss233`,
   QOS `normal`, partition `devel`, in 12 minutes 8 seconds. Two preceding
@@ -151,8 +155,9 @@ comparisons will use a prespecified correction or simultaneous interval method.
    the test split.
 6. Under the current conservative assumption model, at least 26 independent
    eligible test families, 10 primary optimizer runs, and 8 paired blocks exist.
-   The resulting 4,160 component-game draft design has simulated power 0.80885
-   for a 0.05 effect (20,000 prospective simulations; no outcomes used). These
+   The resulting 8,320 component-game draft design has 2,080
+   reciprocal-start-averaged block contrasts and simulated power 0.80885 for a
+   0.05 effect (20,000 prospective simulations; no outcomes used). These
    counts may be recalibrated from development-only variance before protocol
    freeze, but never from sealed-test outcomes. The test-family selection script
    and seed are committed before test access.

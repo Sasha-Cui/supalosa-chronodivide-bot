@@ -291,9 +291,12 @@ Target a scoped map-generalization claim, not a universal game-AI claim.
   contrast; five-run screens are development-only.
 - Approximately 1,000 launched simulation attempts per primary optimizer run,
   with every rejected creation, timeout, and failure charged to the budget.
-  The draft 26-family by 10-run by 8-block final comparison contains 4,160
-  component games and has assumption-only simulated power 0.80885 for a
-  five-point effect.
+  The draft 26-family by 10-run by 8-block final comparison contains 2,080
+  reciprocal-start-averaged statistical block contrasts and 8,320 component
+  games: two methods at each of two reciprocal starts. It has assumption-only
+  simulated power 0.80885 for a five-point effect. The component-game accounting
+  correction does not change power because the analysis unit remains the block
+  contrast.
 - Expected search plus diagnostic total: about 30,000–45,000 launched attempts,
   subject to recalibration before the protocol is frozen.
 

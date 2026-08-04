@@ -27,6 +27,7 @@ class DesignPowerTests(unittest.TestCase):
             families=8,
             optimizer_runs=5,
             paired_blocks=6,
+            reciprocal_starts_per_block=2,
             variance_family=0.0025,
             variance_optimizer_run=0.0009,
             variance_family_optimizer=0.0016,
@@ -45,6 +46,10 @@ class DesignPowerTests(unittest.TestCase):
             self.small_config(families=1).validate()
         with self.assertRaisesRegex(ValueError, "optimizer_runs must be at least 2"):
             self.small_config(optimizer_runs=1).validate()
+        with self.assertRaisesRegex(
+            ValueError, "reciprocal_starts_per_block must be at least 1"
+        ):
+            self.small_config(reciprocal_starts_per_block=0).validate()
 
     def test_statistic_is_invariant_to_constant_effect_in_its_standard_error(self):
         config = self.small_config()
@@ -67,6 +72,13 @@ class DesignPowerTests(unittest.TestCase):
         self.assertFalse(first["observed_or_test_outcomes_used"])
         self.assertIn("ASSUMPTION-BASED", first["label"])
         self.assertEqual(first["planned_sample_units"]["paired_score_contrasts"], 240)
+        self.assertEqual(
+            first["planned_sample_units"]["start_level_paired_method_contrasts"],
+            480,
+        )
+        self.assertEqual(
+            first["planned_sample_units"]["component_game_outcomes"], 960
+        )
 
     def test_larger_design_effect_has_higher_simulated_power(self):
         report = design_power.build_report(self.small_config(), [0.0, 0.20])

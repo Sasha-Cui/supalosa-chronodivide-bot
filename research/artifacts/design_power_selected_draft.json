@@ -13,13 +13,14 @@
   },
   "data_generating_model": {
     "distribution": "independent zero-mean Gaussian random effects",
-    "equation": "D[f,r,b] = delta + U_family[f] + V_run[r] + W_family_run[f,r] + E_game[f,r,b]",
+    "equation": "D[f,r,b] = delta + U_family[f] + V_run[r] + W_family_run[f,r] + E_block[f,r,b]",
     "variance_components": {
-      "E_game": 0.16,
+      "E_block_after_reciprocal_start_averaging": 0.16,
       "U_family": 0.0025,
       "V_run": 0.0009,
       "W_family_run": 0.0016
-    }
+    },
+    "variance_game_cli_note": "For backward compatibility, --variance-game denotes the residual variance of the already reciprocal-start-averaged D block, not the variance of one component game. Reciprocal starts therefore change launch accounting but not the simulated number of analysis units."
   },
   "design": {
     "alpha": 0.05,
@@ -28,6 +29,7 @@
     "null_replicates": 20000,
     "optimizer_runs": 10,
     "paired_blocks": 8,
+    "reciprocal_starts_per_block": 2,
     "seed": 20260804,
     "simulations": 20000,
     "variance_family": 0.0025,
@@ -36,6 +38,7 @@
     "variance_optimizer_run": 0.0009
   },
   "endpoint": {
+    "block_definition": "D[f,r,b] is the arithmetic mean of the conditioned-minus-global score contrasts over reciprocal starts within engine-seed block b",
     "contrast": "conditioned score minus global score",
     "name": "family-macro conditioned-minus-global score difference",
     "score": "win=1, draw=0.5, loss=0",
@@ -61,9 +64,13 @@
   },
   "observed_or_test_outcomes_used": false,
   "planned_sample_units": {
-    "minimum_component_game_outcomes": 4160,
-    "note": "One paired contrast compares conditioned and global scores within a prespecified seed/start block. Extra side or country mirrors increase the component-game count unless folded into a block mean.",
-    "paired_score_contrasts": 2080
+    "component_game_outcomes": 8320,
+    "minimum_component_game_outcomes": 8320,
+    "note": "One statistical paired-block contrast is the mean of the conditioned-minus-global contrasts at each prespecified reciprocal start. Each start-level method contrast requires two component games (conditioned and global). Country mirrors increase the game count unless folded into the prespecified block mean.",
+    "paired_block_contrasts": 2080,
+    "paired_score_contrasts": 2080,
+    "reciprocal_starts_per_block": 2,
+    "start_level_paired_method_contrasts": 4160
   },
   "prospective": true,
   "scenarios": [
