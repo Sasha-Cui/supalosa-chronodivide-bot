@@ -9,8 +9,14 @@
 #SBATCH --error=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/slurm/seed-replay-gate-v1-%j.err
 
 set -euo pipefail
-source /etc/profile.d/modules.sh
-module load nodejs/20.13.1-GCCcore-13.3.0
+NODE_RUNTIME_ROOT=/apps/software/2024a/software/nodejs/20.13.1-GCCcore-13.3.0
+ICU_RUNTIME_ROOT=/apps/software/2024a/software/ICU/75.1-GCCcore-13.3.0
+GCC_RUNTIME_ROOT=/apps/software/system/software/GCCcore/13.3.0
+OPENSSL_RUNTIME_ROOT=/apps/software/system/software/OpenSSL/3
+export PATH="$NODE_RUNTIME_ROOT/bin:/opt/slurm/current/bin:${PATH:-/usr/bin:/bin}"
+export LD_LIBRARY_PATH="$ICU_RUNTIME_ROOT/lib:$GCC_RUNTIME_ROOT/lib64:$OPENSSL_RUNTIME_ROOT/lib64:$NODE_RUNTIME_ROOT/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+node --version
+npm --version
 
 REPO=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot
 SCRATCH=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit
