@@ -5,8 +5,9 @@ presentation instructions immediately before submission.
 
 ## Decision
 
-**Primary target: EvoApplications 2027, Soft Computing Applied to Games
-(SCAG) special session.** Its scope explicitly includes empirical analysis of
+**Provisional primary target: EvoApplications 2027, Soft Computing Applied
+to Games (SCAG) special session, conditional on written confirmation of remote
+presentation.** Its scope explicitly includes empirical analysis of
 computational-intelligence techniques, game-based benchmarking, and competitive
 coevolution. That is a close fit for a leakage-controlled comparison of global
 and map-structure-conditioned StrongBot configurations.
@@ -15,8 +16,12 @@ and map-structure-conditioned StrongBot configurations.
 - Internal paper-ready deadline: **2026-10-20**.
 - Format: double-blind Springer LNCS, 14 pages plus unlimited references.
 - Conference: 2027-03-31 through 2027-04-02 in Mainz, Germany.
-- Attendance: EvoStar 2027 is explicitly hybrid, so remote presentation satisfies
-  the owner's no-required-travel constraint.
+- Attendance: EvoStar 2027 is explicitly hybrid, and the 2026 event published
+  dedicated instructions and registration for online presenters. The 2027
+  presenter and registration instructions are not yet posted, however, so
+  remote presentation is highly plausible but not yet guaranteed. Obtain
+  written confirmation before submission; do not submit if physical attendance
+  is required.
 - Official pages: [SCAG scope](https://www.evostar.org/2027/evoapps/scag/),
   [important dates](https://www.evostar.org/2027/important-dates/),
   [submission instructions](https://www.evostar.org/2027/submit-paper/), and
@@ -80,10 +85,12 @@ and use it only if the new call confirms both scope and remote presentation.
 Submit to SCAG only if all of the following are true by 2026-10-20:
 
 1. Explicit seed control and same-seed deterministic replay tests pass.
-2. At least six family-disjoint held-out map families survive contamination and
-   fidelity screening.
+2. At least 26 family-disjoint held-out map families survive contamination and
+   fidelity screening, unless a development-only variance recalibration made
+   before protocol freeze justifies and records a different minimum.
 3. The global and conditioned methods receive equal launched-attempt budgets.
-4. Five optimizer runs and the fixed-count sealed evaluation are complete.
+4. Ten independent primary optimizer runs and the fixed-count sealed
+   evaluation are complete; five-run screens remain development-only.
 5. The primary estimate, uncertainty analysis, and all prespecified ablations
    are generated from registered manifests.
 6. The paper states the one-Supalosa-opponent limitation and does not imply
