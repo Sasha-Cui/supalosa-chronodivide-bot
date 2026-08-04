@@ -1,0 +1,307 @@
+{
+  "artifactKind": "role_blind_expanded_map_compatibility_preflight_plan",
+  "catalogSha256": "8f378ee52a2d8a6d45e5d23a1e521aa6b2e08e9ab174adc8066cce8a1824bd54",
+  "interpretation": "This plan selects outcome-free infrastructure stress cases only. A family pass, review, or fail is not a StrongBot result, a split assignment, or clearance for unscreened families.",
+  "isSplit": false,
+  "notPolicyEvidence": true,
+  "outcomeBlind": true,
+  "roleBlind": true,
+  "schemaVersion": 1,
+  "selected": [
+    {
+      "coverage": {
+        "axis": "theater",
+        "value": "DESERT"
+      },
+      "familyId": "mf_redvalley",
+      "preflightOrdinal": 0,
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_4_red_valley.map",
+        "sha256": "61f9568b2eec46cac6e1cc3a1d9a1b1d0a052d790aa5072454e4296c71c555e8"
+      },
+      "safeDescriptors": {
+        "bytes": 228876,
+        "mapArea": 9600,
+        "startCount": 4,
+        "theater": "DESERT"
+      }
+    },
+    {
+      "coverage": {
+        "axis": "theater",
+        "value": "SNOW"
+      },
+      "familyId": "mf_mp12s4",
+      "preflightOrdinal": 1,
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp12s4.map",
+        "sha256": "fd8f49e97e151d0d267b473d1276bb9e1c1e37f2a21d33ef6e1e84545423d1e0"
+      },
+      "safeDescriptors": {
+        "bytes": 194263,
+        "mapArea": 9153,
+        "startCount": 4,
+        "theater": "SNOW"
+      }
+    },
+    {
+      "coverage": {
+        "axis": "theater",
+        "value": "TEMPERATE"
+      },
+      "familyId": "mf_mp24du",
+      "preflightOrdinal": 2,
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp24du.map",
+        "sha256": "90726c1579cccc89ef4b713fc7dfe378feddec954a3942abc1f9c2122b915c18"
+      },
+      "safeDescriptors": {
+        "bytes": 120599,
+        "mapArea": 4730,
+        "startCount": 4,
+        "theater": "TEMPERATE"
+      }
+    },
+    {
+      "coverage": {
+        "axis": "theater",
+        "value": "URBAN"
+      },
+      "familyId": "mf_potomac",
+      "preflightOrdinal": 3,
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_potomac.map",
+        "sha256": "858ba474ae52b628743f72cebbc3c33ff0257a01dde8083bec871dc67d5b134c"
+      },
+      "safeDescriptors": {
+        "bytes": 184139,
+        "mapArea": 8100,
+        "startCount": 6,
+        "theater": "URBAN"
+      }
+    },
+    {
+      "coverage": {
+        "axis": "start_count",
+        "value": 2
+      },
+      "familyId": "mf_mp06mw",
+      "preflightOrdinal": 4,
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp06mw.map",
+        "sha256": "dc821fdf2dd91db135fd4474c15341d8d8a4b4cf54a1b8ef852a4d9ae2c3d2f1"
+      },
+      "safeDescriptors": {
+        "bytes": 69658,
+        "mapArea": 2756,
+        "startCount": 2,
+        "theater": "TEMPERATE"
+      }
+    },
+    {
+      "coverage": {
+        "axis": "start_count",
+        "value": 3
+      },
+      "familyId": "mf_killer",
+      "preflightOrdinal": 5,
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_killer.map",
+        "sha256": "66013838c2f39ac27cd40751773996b2b0b153611fe4e19d5c6ce769bb6e82bc"
+      },
+      "safeDescriptors": {
+        "bytes": 186362,
+        "mapArea": 9000,
+        "startCount": 3,
+        "theater": "TEMPERATE"
+      }
+    },
+    {
+      "coverage": {
+        "axis": "start_count",
+        "value": 4
+      },
+      "familyId": "mf_parksidegardens",
+      "preflightOrdinal": 6,
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_4_parkside_gardens.map",
+        "sha256": "619bc56c6f2866ad54a7815d5d226f4a58a8518ecb547f76e2c37c32e23a70b4"
+      },
+      "safeDescriptors": {
+        "bytes": 204692,
+        "mapArea": 9700,
+        "startCount": 4,
+        "theater": "URBAN"
+      }
+    },
+    {
+      "coverage": {
+        "axis": "start_count",
+        "value": 6
+      },
+      "familyId": "mf_isleland",
+      "preflightOrdinal": 7,
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_isleland.map",
+        "sha256": "7de23f062644e5047e94b33a08de5b80623db8cd52a92b5ac46461e674a3e2c7"
+      },
+      "safeDescriptors": {
+        "bytes": 161961,
+        "mapArea": 7832,
+        "startCount": 6,
+        "theater": "TEMPERATE"
+      }
+    },
+    {
+      "coverage": {
+        "axis": "start_count",
+        "value": 8
+      },
+      "familyId": "mf_powdrkeg",
+      "preflightOrdinal": 8,
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_powdrkeg.map",
+        "sha256": "baf91400f73d8900ace60158c1d8b1ed0e5c3b57ed5757845388b3597904c9b1"
+      },
+      "safeDescriptors": {
+        "bytes": 324132,
+        "mapArea": 15000,
+        "startCount": 8,
+        "theater": "URBAN"
+      }
+    },
+    {
+      "coverage": {
+        "axis": "global_extrema",
+        "value": [
+          "minimum_map_area",
+          "minimum_representative_bytes"
+        ]
+      },
+      "familyId": "mf_ore2",
+      "preflightOrdinal": 9,
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_ore2_startfixed.map",
+        "sha256": "af9749ef2f9d085d5406b00fd518cafb29d8e7d58a3f76218280c0e0735cb761"
+      },
+      "safeDescriptors": {
+        "bytes": 43917,
+        "mapArea": 2500,
+        "startCount": 8,
+        "theater": "TEMPERATE"
+      }
+    },
+    {
+      "coverage": {
+        "axis": "global_extrema",
+        "value": [
+          "maximum_map_area",
+          "maximum_representative_bytes"
+        ]
+      },
+      "familyId": "mf_mp20t6",
+      "preflightOrdinal": 10,
+      "representative": {
+        "path": "packages/chronodivide-bot-driver/data/cd_chrono_mp20t6.map",
+        "sha256": "4ea88c77433b2fa629f1d3aa01d1ec75b85838568c6907dfd982cf4295475e09"
+      },
+      "safeDescriptors": {
+        "bytes": 420058,
+        "mapArea": 19126,
+        "startCount": 6,
+        "theater": "TEMPERATE"
+      }
+    }
+  ],
+  "selectedCommitmentSha256": "2a299da93a3b359adc193b51ee7866a0274517596e6b4056ae68d26c578c0d7d",
+  "selectedFamilyCount": 11,
+  "selectionPolicy": {
+    "anchorPolicy": "Explicit distinct outcome-free technical anchors exercise each observed theater and start count; identities do not alter the full 127-family population.",
+    "axisOrder": [
+      "theater",
+      "start_count",
+      "global_extrema"
+    ],
+    "extremaPolicy": "Across the immutable target representatives, select global minimum and maximum map area and byte count, tie-breaking by familyId ascending.",
+    "trace": [
+      {
+        "axis": "theater",
+        "familyId": "mf_redvalley",
+        "selectionMethod": "explicit_outcome_free_technical_anchor",
+        "value": "DESERT"
+      },
+      {
+        "axis": "theater",
+        "familyId": "mf_mp12s4",
+        "selectionMethod": "explicit_outcome_free_technical_anchor",
+        "value": "SNOW"
+      },
+      {
+        "axis": "theater",
+        "familyId": "mf_mp24du",
+        "selectionMethod": "explicit_outcome_free_technical_anchor",
+        "value": "TEMPERATE"
+      },
+      {
+        "axis": "theater",
+        "familyId": "mf_potomac",
+        "selectionMethod": "explicit_outcome_free_technical_anchor",
+        "value": "URBAN"
+      },
+      {
+        "axis": "start_count",
+        "familyId": "mf_mp06mw",
+        "selectionMethod": "explicit_outcome_free_technical_anchor",
+        "value": 2
+      },
+      {
+        "axis": "start_count",
+        "familyId": "mf_killer",
+        "selectionMethod": "explicit_outcome_free_technical_anchor",
+        "value": 3
+      },
+      {
+        "axis": "start_count",
+        "familyId": "mf_parksidegardens",
+        "selectionMethod": "explicit_outcome_free_technical_anchor",
+        "value": 4
+      },
+      {
+        "axis": "start_count",
+        "familyId": "mf_isleland",
+        "selectionMethod": "explicit_outcome_free_technical_anchor",
+        "value": 6
+      },
+      {
+        "axis": "start_count",
+        "familyId": "mf_powdrkeg",
+        "selectionMethod": "explicit_outcome_free_technical_anchor",
+        "value": 8
+      },
+      {
+        "axis": "global_extrema",
+        "familyId": "mf_ore2",
+        "selectionMethod": "deterministic_extremum_then_family_id_ascending",
+        "value": [
+          "minimum_map_area",
+          "minimum_representative_bytes"
+        ]
+      },
+      {
+        "axis": "global_extrema",
+        "familyId": "mf_mp20t6",
+        "selectionMethod": "deterministic_extremum_then_family_id_ascending",
+        "value": [
+          "maximum_map_area",
+          "maximum_representative_bytes"
+        ]
+      }
+    ],
+    "version": "expanded-map-compatibility-preflight-v2"
+  },
+  "selectionPolicySha256": "60c2558abca1c242bd7d57520d9d61cfdc6d92172f1b74b98530ad3e969ac037",
+  "status": "FROZEN_ROLE_BLIND_TECHNICAL_PREFLIGHT_NOT_CLEARANCE",
+  "targetManifestSha256": "51af273b38e6c8e63012e75f708a9600d5d2749faf57d986b715440bb7025834",
+  "targetPopulationCommitmentSha256": "3e8c35b104c35c1b790df1b2da0521b167613a22d4bbd5c23ea8c14b4fa7d86b",
+  "targetPopulationFamilyCount": 127
+}

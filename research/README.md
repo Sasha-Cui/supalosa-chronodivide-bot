@@ -43,6 +43,9 @@ Contents:
   descriptors, provenance, and two-tier adaptive-exposure catalog.
 - `scripts/propose_map_family_split.py`: role-blind fidelity-target generation
   plus a private, compromised capacity test that cannot freeze a split.
+- `scripts/select_map_fidelity_preflight.py`: deterministic validator/generator
+  for the explicit 11-family, all-theater/start-count/extrema technical
+  preflight; its identities do not assign dataset roles.
 - `scripts/map_fidelity_gate.py`: strict Slurm-only fidelity manifest builder
   and independent, schema-allowlisted checker.
 - `scripts/design_power.py`: assumption-only crossed family/run power analysis.
@@ -66,6 +69,9 @@ Contents:
   capacity check; it contains no candidate identities or paths.
 - `artifacts/role_blind_fidelity_targets_v1.json`: all 127 Tier-B exact
   representatives without train/validation/test roles.
+- `artifacts/map_fidelity_expanded_preflight_v2.json`: committed outcome-free
+  11-family technical stress plan covering all observed theaters, start counts,
+  and global representative area/byte extrema.
 - `artifacts/design_power_{assumption_example,selected_draft}.json`:
   prospective sensitivity reports that use no outcomes.
 - `artifacts/seed_replay_gate_v1_{summary,execution}.json`: exact deterministic
