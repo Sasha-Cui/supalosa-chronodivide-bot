@@ -24,6 +24,8 @@
     },
     "dependencies": {
         "@supalosa/chronodivide-bot": "file:../chronodivide-bot",
-        "canvas": "^3.2.0"
+        "canvas": "^3.2.0",
+        "fetch-blob": "3.2.0",
+        "file-system-access": "1.0.4"
     }
 }
