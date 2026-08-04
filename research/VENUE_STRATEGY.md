@@ -20,8 +20,8 @@ and map-structure-conditioned StrongBot configurations.
   dedicated instructions and registration for online presenters. The 2027
   presenter and registration instructions are not yet posted, however, so
   remote presentation is highly plausible but not yet guaranteed. Obtain
-  written confirmation before submission; do not submit if physical attendance
-  is required.
+  written confirmation by early September 2026 and retain it with the
+  submission records; do not submit if physical attendance is required.
 - Official pages: [SCAG scope](https://www.evostar.org/2027/evoapps/scag/),
   [important dates](https://www.evostar.org/2027/important-dates/),
   [submission instructions](https://www.evostar.org/2027/submit-paper/), and
@@ -55,12 +55,35 @@ speaker cannot travel. It is therefore not an unconditional fit for the owner's
 attendance requirement. Use it only after obtaining written remote-presentation
 approval from the organizers. Official pages:
 [call and dates](https://icaart.scitevents.org/CallforPapers.aspx?y=2027),
-[presentation policy](https://icaart.scitevents.org/?y=2027), and
+[presentation policy](https://icaart.scitevents.org/presentationdetails.aspx), and
 [paper categories](https://icaart.scitevents.org/Guidelines.aspx?y=2027).
 
 The SPIKE eSports special session has a 2026-12-03 deadline, but its emphasis on
 player/team performance and strategy prediction is weaker than SCAG for this
 agent-configuration study.
+
+### Entertainment Computing — guaranteed no-travel fallback
+
+Elsevier's *Entertainment Computing* is a rolling journal with no conference
+attendance or presentation requirement. Its scope explicitly includes computer
+and video games and theoretical, technical, and empirical work in entertainment
+computing. It is the strongest fallback if remote presentation is not confirmed
+or the SCAG deadline is missed.
+
+This route requires the comprehensive study rather than a thin workshop MVP:
+family-disjoint evaluation, powered uncertainty, mechanism ablations, exact
+reproducibility, and a candid one-game/one-opponent scope. Subscription
+publication does not require an author fee; open access is optional. Official
+page: [Entertainment Computing](https://www.sciencedirect.com/journal/entertainment-computing).
+
+### IOCAC 2027 — remote dissemination fallback only
+
+The International Online Conference on Applied Computing is fully virtual and
+free, with an abstract deadline of 2027-02-26 and a later 4--8 page proceedings
+option. Its game-AI fit and archival value are substantially weaker than SCAG
+or *Entertainment Computing*, so use it only as a no-travel dissemination
+fallback, not as the primary publication target. Official page:
+[IOCAC 2027](https://sciforum.net/event/IOCAC2027/home).
 
 ### FDG 2027 — watch list
 
@@ -99,5 +122,6 @@ Submit to SCAG only if all of the following are true by 2026-10-20:
    reproduce every table and figure.
 
 If these gates miss the deadline, do not convert exploratory results into a
-confirmatory claim. Hold for a hybrid FDG 2027 call or another verified
-remote-friendly specialist workshop.
+confirmatory claim. Prefer *Entertainment Computing* as the guaranteed
+no-travel route; use FDG 2027 only if its eventual call explicitly permits
+remote presentation, and treat IOCAC as dissemination rather than the main paper.

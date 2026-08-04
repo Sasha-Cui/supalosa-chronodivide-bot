@@ -42,8 +42,11 @@ internal paper-ready deadline is 2026-10-20.
 
 EXAG 2026 is excluded because accepted work is presented in person. ICAART 2027
 is only a fallback if its organizers give written permission for remote
-presentation. FDG 2027 remains a watch-list fallback if its eventual call
-confirms hybrid participation.
+presentation. *Entertainment Computing* is the guaranteed no-travel, rolling
+journal fallback if SCAG remote participation is not confirmed or the deadline
+is missed. FDG 2027 remains a watch-list fallback if its eventual call confirms
+hybrid participation; the fully online IOCAC 2027 is a weaker dissemination
+fallback rather than the primary archival target.
 
 ## Positive claim to test
 
