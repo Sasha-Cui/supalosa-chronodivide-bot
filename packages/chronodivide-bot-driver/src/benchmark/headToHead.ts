@@ -2,13 +2,30 @@ import fs from "node:fs";
 import path from "node:path";
 import { CreateOfflineOpts, GameApi, ObjectType, cdapi } from "@chronodivide/game-api";
 import { SupalosaBot } from "@supalosa/chronodivide-bot/dist/bot/bot.js";
-import { DefaultStrategy } from "@supalosa/chronodivide-bot/dist/bot/strategy/defaultStrategy.js";
 import { StrongStrategy, StrongStrategyOptions } from "@supalosa/chronodivide-bot/dist/bot/strategy/strongStrategy.js";
 import { StrongBot, StrongBotOptions } from "@supalosa/chronodivide-bot/dist/bot/strongBot.js";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
+import { BaselineFactory, loadBaselineFactory } from "./baselineLoader.js";
+import { ExperimentManifest, createExperimentManifest } from "./provenance.js";
+import {
+    MAX_ENGINE_SEED,
+    createReciprocalSeedBlock,
+    deriveBotRandomSeed,
+    derivePairedEngineSeed,
+    deriveParticipantBotRandomSeed,
+    engineSeedToEpochMs,
+    withSeededOfflineGame,
+} from "./seededOfflineGame.js";
 
 type MatchResult = {
     match: number;
+    seedBlockIndex: number;
+    pairedSeedBlock: boolean;
+    requestedEngineSeed: number;
+    botRandomSeed: number;
+    candidateBotRandomSeed: number;
+    baselineBotRandomSeed: number;
+    engineSeedEpochMs: number;
     mapName: string;
     candidateCountry: Countries;
     baselineCountry: Countries;
@@ -16,6 +33,7 @@ type MatchResult = {
     candidateStart: { x: number; y: number };
     baselineStart: { x: number; y: number };
     ticks: number;
+    wallTimeMs: number;
     finished: boolean;
     winner: "candidate" | "baseline" | "draw";
     candidateDefeated: boolean;
@@ -39,15 +57,21 @@ type MatchResult = {
 };
 
 type BenchmarkSummary = {
+    schemaVersion: 2;
     generatedAt: string;
+    runId: string;
+    manifest: ExperimentManifest;
     maps: string[];
     matchesPerPair: number;
     maxTicks: number;
+    requestedMatches: number;
+    rejectedStartAttempts: number;
     results: MatchResult[];
     candidateWins: number;
     baselineWins: number;
     draws: number;
     candidateWinRate: number;
+    candidateScoreRate: number;
 };
 
 type PlayerSnapshot = {
@@ -66,26 +90,19 @@ type PlayerSnapshot = {
 type MatchTraceSnapshot = {
     trace: true;
     match: number;
+    seedBlockIndex: number;
+    pairedSeedBlock: boolean;
+    requestedEngineSeed: number;
+    botRandomSeed: number;
+    candidateBotRandomSeed: number;
+    baselineBotRandomSeed: number;
+    engineSeedEpochMs: number;
     tick: number;
     candidateStart: { x: number; y: number };
     baselineStart: { x: number; y: number };
     candidate: PlayerSnapshot;
     baseline: PlayerSnapshot;
 };
-
-class InspectableSupalosaBot extends SupalosaBot {
-    public lastGameApi: GameApi | null = null;
-
-    override onGameStart(game: GameApi): void {
-        this.lastGameApi = game;
-        super.onGameStart(game);
-    }
-
-    override onGameTick(game: GameApi): void {
-        this.lastGameApi = game;
-        super.onGameTick(game);
-    }
-}
 
 const getPlayerSnapshot = (game: GameApi | null, playerName: string): PlayerSnapshot => {
     if (!game) {
@@ -177,7 +194,11 @@ const parseOptionalBoolEnv = (name: string): boolean | undefined => {
     return raw ? parseBoolValue(name, raw) : undefined;
 };
 
-const parseAttackTargetPriority = (): StrongStrategyOptions["base"] extends { attackMission?: infer T } ? T extends { targetPriority?: infer U } ? U | undefined : undefined : undefined => {
+const parseAttackTargetPriority = (): StrongStrategyOptions["base"] extends { attackMission?: infer T }
+    ? T extends { targetPriority?: infer U }
+        ? U | undefined
+        : undefined
+    : undefined => {
     const raw = process.env.ATTACK_TARGET_PRIORITY;
     if (!raw) {
         return undefined;
@@ -207,7 +228,7 @@ const parseAttackCompositionPolicy = (): StrongStrategyOptions["base"] => {
         throw new Error(`ATTACK_COMPOSITION_POLICY contains unknown policy ${raw}`);
     }
     return {
-        attackCompositionPolicy: raw ? raw as any : undefined,
+        attackCompositionPolicy: raw ? (raw as any) : undefined,
         attackGate: {
             enabled: parseOptionalBoolEnv("ATTACK_GATE_ENABLED"),
             hfoOnly: parseOptionalBoolEnv("ATTACK_GATE_HFO_ONLY"),
@@ -298,6 +319,7 @@ const parseStrategicPlan = (): StrongStrategyOptions["strategicPlan"] => {
 };
 
 const parseStrongStrategyOptions = (): StrongStrategyOptions => ({
+    defaultMapProfiles: parseOptionalBoolEnv("DEFAULT_MAP_PROFILES_ENABLED"),
     base: parseAttackCompositionPolicy(),
     allIn: parseAllInOptions(),
     macroBoost: {
@@ -329,6 +351,7 @@ const parseAllInOptions = (): StrongStrategyOptions["allIn"] => {
 
 const parseStrongBotOptions = (): StrongBotOptions => ({
     defaultMapProfiles: parseOptionalBoolEnv("DEFAULT_MAP_PROFILES_ENABLED"),
+    exactMapTactics: parseOptionalBoolEnv("EXACT_MAP_TACTICS_ENABLED"),
     harass: {
         enabled: parseOptionalBoolEnv("HARASS_ENABLED"),
         minTick: parseOptionalIntEnv("HARASS_MIN_TICK"),
@@ -485,6 +508,15 @@ const parseIntEnv = (name: string, defaultValue: number): number => {
     return parsed;
 };
 
+const parseEngineSeedEnv = (name: string, defaultValue: number): number => {
+    const raw = process.env[name];
+    const parsed = raw === undefined ? defaultValue : Number(raw);
+    if (!Number.isSafeInteger(parsed) || parsed < 0 || parsed > MAX_ENGINE_SEED) {
+        throw new Error(`${name} must be an integer in [0, ${MAX_ENGINE_SEED}], got ${raw ?? defaultValue}`);
+    }
+    return parsed;
+};
+
 const parseStringListEnv = (name: string): string[] | undefined => {
     const raw = process.env[name];
     if (!raw) {
@@ -499,7 +531,9 @@ const parseStringListEnv = (name: string): string[] | undefined => {
         .filter((value) => value.length > 0);
 };
 
-const parseWaypointListEnv = (name: string): StrongBotOptions["routeAttack"] extends { waypoints?: infer T } ? T | undefined : undefined => {
+const parseWaypointListEnv = (
+    name: string,
+): StrongBotOptions["routeAttack"] extends { waypoints?: infer T } ? T | undefined : undefined => {
     const raw = process.env[name];
     if (!raw) {
         return undefined;
@@ -610,6 +644,9 @@ const buildGameSettings = (
 
 const runMatch = async (
     match: number,
+    seedBlockIndex: number,
+    pairedSeedBlock: boolean,
+    requestedEngineSeed: number,
     mapName: string,
     candidateCountry: Countries,
     baselineCountry: Countries,
@@ -619,110 +656,160 @@ const runMatch = async (
     strongBotOptions: StrongBotOptions,
     candidateStarts: string[] | undefined,
     baselineStarts: string[] | undefined,
+    baselineFactory: BaselineFactory,
     traceIntervalTicks: number,
+    onTraceSnapshot: (snapshot: MatchTraceSnapshot) => void,
 ): Promise<MatchResult | null> => {
-    const candidateName = `Strong_${match}_${candidateSlot}`;
-    const baselineName = `Supalosa_${match}_${candidateSlot}`;
-    const candidate = new StrongBot(candidateName, candidateCountry, [], false, new StrongStrategy(strongStrategyOptions), strongBotOptions);
-    const baseline = new InspectableSupalosaBot(baselineName, baselineCountry, [], false, new DefaultStrategy());
-    const game = await cdapi.createGame(buildGameSettings(mapName, candidate, baseline, candidateSlot));
-
-    let ticks = 0;
-    await game.update();
-    ticks++;
-    const candidateStart = candidate.lastGameApi?.getPlayerData(candidateName).startLocation;
-    const baselineStart = baseline.lastGameApi?.getPlayerData(baselineName).startLocation;
-    if (!candidateStart || !baselineStart) {
-        game.dispose();
-        throw new Error(`Missing start locations for match ${match}`);
-    }
-    if (!isAllowedStart(candidateStarts, candidateStart) || !isAllowedStart(baselineStarts, baselineStart)) {
-        game.dispose();
-        return null;
-    }
-
-    while (!game.isFinished() && ticks < maxTicks) {
-        await game.update();
-        ticks++;
-        if (traceIntervalTicks > 0 && ticks % traceIntervalTicks === 0) {
-            emitTraceSnapshot({
-                trace: true,
-                match,
-                tick: ticks,
-                candidateStart: { x: candidateStart.x, y: candidateStart.y },
-                baselineStart: { x: baselineStart.x, y: baselineStart.y },
-                candidate: getPlayerSnapshot(candidate.lastGameApi, candidateName),
-                baseline: getPlayerSnapshot(baseline.lastGameApi, baselineName),
-            });
-        }
-    }
-
-    const stats = game.getPlayerStats();
-    const candidateStats = stats.find((stat) => stat.name === candidateName);
-    const baselineStats = stats.find((stat) => stat.name === baselineName);
-    if (!candidateStats || !baselineStats) {
-        game.dispose();
-        throw new Error(`Missing player stats for match ${match}`);
-    }
-
-    const candidateDefeated = candidateStats.defeated;
-    const baselineDefeated = baselineStats.defeated;
-    const candidateSnapshot = getPlayerSnapshot(candidate.lastGameApi, candidateName);
-    const baselineSnapshot = getPlayerSnapshot(baseline.lastGameApi, baselineName);
-    const result: MatchResult = {
-        match,
-        mapName,
+    const startedAt = Date.now();
+    const candidateName = `Strong_seed_block_${seedBlockIndex}`;
+    const baselineName = `Supalosa_seed_block_${seedBlockIndex}`;
+    const candidate = new StrongBot(
+        candidateName,
         candidateCountry,
-        baselineCountry,
-        candidateSlot,
-        candidateStart: {
-            x: candidateStart.x,
-            y: candidateStart.y,
+        [],
+        false,
+        new StrongStrategy(strongStrategyOptions),
+        strongBotOptions,
+    );
+    const baseline = baselineFactory.create(baselineName, baselineCountry);
+    const botRandomSeed = deriveBotRandomSeed(requestedEngineSeed);
+    const candidateBotRandomSeed = deriveParticipantBotRandomSeed(requestedEngineSeed, "candidate");
+    const baselineBotRandomSeed = deriveParticipantBotRandomSeed(requestedEngineSeed, "baseline");
+    const engineSeedEpochMs = engineSeedToEpochMs(requestedEngineSeed);
+    return withSeededOfflineGame(
+        cdapi,
+        buildGameSettings(mapName, candidate, baseline, candidateSlot),
+        requestedEngineSeed,
+        [
+            { agent: candidate, identity: "candidate" },
+            { agent: baseline, identity: "baseline" },
+        ],
+        async (game) => {
+            let ticks = 0;
+            await game.update();
+            ticks++;
+            const candidateStart = candidate.lastGameApi?.getPlayerData(candidateName).startLocation;
+            const baselineStart = baseline.lastGameApi?.getPlayerData(baselineName).startLocation;
+            if (!candidateStart || !baselineStart) {
+                throw new Error(`Missing start locations for match ${match}`);
+            }
+            if (!isAllowedStart(candidateStarts, candidateStart) || !isAllowedStart(baselineStarts, baselineStart)) {
+                return null;
+            }
+
+            while (!game.isFinished() && ticks < maxTicks) {
+                await game.update();
+                ticks++;
+                if (traceIntervalTicks > 0 && ticks % traceIntervalTicks === 0) {
+                    const snapshot: MatchTraceSnapshot = {
+                        trace: true,
+                        match,
+                        seedBlockIndex,
+                        pairedSeedBlock,
+                        requestedEngineSeed,
+                        botRandomSeed,
+                        candidateBotRandomSeed,
+                        baselineBotRandomSeed,
+                        engineSeedEpochMs,
+                        tick: ticks,
+                        candidateStart: { x: candidateStart.x, y: candidateStart.y },
+                        baselineStart: { x: baselineStart.x, y: baselineStart.y },
+                        candidate: getPlayerSnapshot(candidate.lastGameApi, candidateName),
+                        baseline: getPlayerSnapshot(baseline.lastGameApi, baselineName),
+                    };
+                    emitTraceSnapshot(snapshot);
+                    onTraceSnapshot(snapshot);
+                }
+            }
+
+            const stats = game.getPlayerStats();
+            const candidateStats = stats.find((stat) => stat.name === candidateName);
+            const baselineStats = stats.find((stat) => stat.name === baselineName);
+            if (!candidateStats || !baselineStats) {
+                throw new Error(`Missing player stats for match ${match}`);
+            }
+
+            const candidateDefeated = candidateStats.defeated;
+            const baselineDefeated = baselineStats.defeated;
+            const candidateSnapshot = getPlayerSnapshot(candidate.lastGameApi, candidateName);
+            const baselineSnapshot = getPlayerSnapshot(baseline.lastGameApi, baselineName);
+            return {
+                match,
+                seedBlockIndex,
+                pairedSeedBlock,
+                requestedEngineSeed,
+                botRandomSeed,
+                candidateBotRandomSeed,
+                baselineBotRandomSeed,
+                engineSeedEpochMs,
+                mapName,
+                candidateCountry,
+                baselineCountry,
+                candidateSlot,
+                candidateStart: {
+                    x: candidateStart.x,
+                    y: candidateStart.y,
+                },
+                baselineStart: {
+                    x: baselineStart.x,
+                    y: baselineStart.y,
+                },
+                ticks,
+                wallTimeMs: Date.now() - startedAt,
+                finished: game.isFinished(),
+                winner: getWinner(candidateDefeated, baselineDefeated),
+                candidateDefeated,
+                baselineDefeated,
+                candidateCredits: candidateStats.credits,
+                baselineCredits: baselineStats.credits,
+                candidateUnits: candidateSnapshot.units,
+                baselineUnits: baselineSnapshot.units,
+                candidateBuildings: candidateSnapshot.buildings,
+                baselineBuildings: baselineSnapshot.buildings,
+                candidateCombatants: candidateSnapshot.combatants,
+                baselineCombatants: baselineSnapshot.combatants,
+                candidateHarvesters: candidateSnapshot.harvesters,
+                baselineHarvesters: baselineSnapshot.harvesters,
+                candidateFactories: candidateSnapshot.factories,
+                baselineFactories: baselineSnapshot.factories,
+                candidateRefineries: candidateSnapshot.refineries,
+                baselineRefineries: baselineSnapshot.refineries,
+                candidateConyards: candidateSnapshot.conyards,
+                baselineConyards: baselineSnapshot.conyards,
+            };
         },
-        baselineStart: {
-            x: baselineStart.x,
-            y: baselineStart.y,
-        },
-        ticks,
-        finished: game.isFinished(),
-        winner: getWinner(candidateDefeated, baselineDefeated),
-        candidateDefeated,
-        baselineDefeated,
-        candidateCredits: candidateStats.credits,
-        baselineCredits: baselineStats.credits,
-        candidateUnits: candidateSnapshot.units,
-        baselineUnits: baselineSnapshot.units,
-        candidateBuildings: candidateSnapshot.buildings,
-        baselineBuildings: baselineSnapshot.buildings,
-        candidateCombatants: candidateSnapshot.combatants,
-        baselineCombatants: baselineSnapshot.combatants,
-        candidateHarvesters: candidateSnapshot.harvesters,
-        baselineHarvesters: baselineSnapshot.harvesters,
-        candidateFactories: candidateSnapshot.factories,
-        baselineFactories: baselineSnapshot.factories,
-        candidateRefineries: candidateSnapshot.refineries,
-        baselineRefineries: baselineSnapshot.refineries,
-        candidateConyards: candidateSnapshot.conyards,
-        baselineConyards: baselineSnapshot.conyards,
-    };
-    game.dispose();
-    return result;
+    );
 };
 
-const summarize = (results: MatchResult[], maps: string[], matchesPerPair: number, maxTicks: number): BenchmarkSummary => {
-    const candidateWins = results.filter((result) => result.winner === "candidate").length;
-    const baselineWins = results.filter((result) => result.winner === "baseline").length;
-    const draws = results.filter((result) => result.winner === "draw").length;
+const summarize = (args: {
+    results: MatchResult[];
+    maps: string[];
+    matchesPerPair: number;
+    maxTicks: number;
+    runId: string;
+    manifest: ExperimentManifest;
+    requestedMatches: number;
+    rejectedStartAttempts: number;
+}): BenchmarkSummary => {
+    const candidateWins = args.results.filter((result) => result.winner === "candidate").length;
+    const baselineWins = args.results.filter((result) => result.winner === "baseline").length;
+    const draws = args.results.filter((result) => result.winner === "draw").length;
     return {
+        schemaVersion: 2,
         generatedAt: new Date().toISOString(),
-        maps,
-        matchesPerPair,
-        maxTicks,
-        results,
+        runId: args.runId,
+        manifest: args.manifest,
+        maps: args.maps,
+        matchesPerPair: args.matchesPerPair,
+        maxTicks: args.maxTicks,
+        requestedMatches: args.requestedMatches,
+        rejectedStartAttempts: args.rejectedStartAttempts,
+        results: args.results,
         candidateWins,
         baselineWins,
         draws,
-        candidateWinRate: results.length > 0 ? candidateWins / results.length : 0,
+        candidateWinRate: args.results.length > 0 ? candidateWins / args.results.length : 0,
+        candidateScoreRate: args.results.length > 0 ? (candidateWins + 0.5 * draws) / args.results.length : 0,
     };
 };
 
@@ -736,25 +823,117 @@ const main = async () => {
     const baselineStarts = parseStartFilters("BASELINE_STARTS");
     const startFilterMaxAttempts = parseIntEnv("START_FILTER_MAX_ATTEMPTS", 40);
     const outDir = process.env.OUT_DIR || "benchmark-results";
+    const mixDir = process.env.MIX_DIR || "./data";
     const traceIntervalTicks = parseIntEnv("TRACE_INTERVAL_TICKS", 0);
     const matchStartOffset = parseOptionalIntEnv("MATCH_START_OFFSET") ?? 0;
+    const seedBlockStartOffset = parseOptionalIntEnv("SEED_BLOCK_START_OFFSET") ?? 0;
+    if (seedBlockStartOffset < 0) {
+        throw new Error(`SEED_BLOCK_START_OFFSET must be non-negative, got ${seedBlockStartOffset}`);
+    }
+    const gameSeedBase = parseEngineSeedEnv("GAME_SEED_BASE", 7331);
     const candidateSlots = parseCandidateSlots();
+    const usesPairedSeedBlocks = candidateSlots.length === 2;
+    if (usesPairedSeedBlocks && (candidateStarts || baselineStarts)) {
+        throw new Error(
+            "Reciprocal candidate slots use one paired seed block and do not allow rejection-based start filters; " +
+                "prevalidate the seed-to-start mapping instead",
+        );
+    }
     const strongStrategyOptions = parseStrongStrategyOptions();
     const strongBotOptions = parseStrongBotOptions();
+    const runId =
+        process.env.RUN_ID ??
+        [
+            process.env.SLURM_ARRAY_JOB_ID ?? process.env.SLURM_JOB_ID ?? "local",
+            process.env.SLURM_ARRAY_TASK_ID ?? Date.now(),
+        ].join("-");
+    if (!/^[A-Za-z0-9._-]+$/.test(runId)) {
+        throw new Error(`RUN_ID may contain only letters, digits, dot, underscore, and hyphen; got ${runId}`);
+    }
 
-    await cdapi.init(process.env.MIX_DIR || "./data");
+    const localPackageRoot = path.resolve(process.cwd(), "..", "chronodivide-bot");
+    const baselineFactory = await loadBaselineFactory(localPackageRoot);
+    const effectiveConfig = {
+        maps,
+        matchesPerPair,
+        maxTicks,
+        candidateCountries,
+        baselineCountries,
+        candidateStarts: candidateStarts ?? null,
+        baselineStarts: baselineStarts ?? null,
+        startFilterMaxAttempts,
+        candidateSlots,
+        matchStartOffset,
+        seedBlockStartOffset,
+        usesPairedSeedBlocks,
+        engineSeedBase: gameSeedBase,
+        engineSeedDerivation:
+            "(GAME_SEED_BASE + seedBlockIndex) mod 2^32; reciprocal candidate slots reuse the same seedBlockIndex",
+        engineSeedToEpochMapping: "Date.now() = requestedEngineSeed * 1000 milliseconds",
+        botRandomSeedDerivation:
+            "root = requestedEngineSeed xor 0x9e3779b9; participant = root xor fnv1a32(candidate|baseline)",
+        traceIntervalTicks,
+        gameOptions: {
+            buildOffAlly: false,
+            cratesAppear: false,
+            credits: 10000,
+            gameSpeed: 6,
+            mcvRepacks: true,
+            shortGame: true,
+            superWeapons: parseBoolEnv("SUPERWEAPONS", false),
+            unitCount: 0,
+            online: false,
+        },
+        strongStrategyOptions,
+        strongBotOptions,
+    };
+    const manifest = createExperimentManifest({
+        runId,
+        mixDir,
+        maps,
+        effectiveConfig,
+        baseline: baselineFactory.descriptor,
+        gameSeedBase,
+    });
+
+    fs.mkdirSync(outDir, { recursive: true });
+    const manifestPath = path.join(outDir, `manifest-${runId}.json`);
+    const eventsPath = path.join(outDir, `events-${runId}.jsonl`);
+    if (fs.existsSync(manifestPath) || fs.existsSync(eventsPath)) {
+        throw new Error(`Refusing to overwrite an existing run with RUN_ID=${runId} in ${outDir}`);
+    }
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+    fs.writeFileSync(eventsPath, JSON.stringify({ event: "run_start", manifest }) + "\n");
+
+    await cdapi.init(mixDir);
 
     const results: MatchResult[] = [];
+    const requestedMatches =
+        maps.length * candidateCountries.length * baselineCountries.length * matchesPerPair * candidateSlots.length;
+    let rejectedStartAttempts = 0;
     let match = matchStartOffset + 1;
+    let seedBlockCursor = seedBlockStartOffset;
     for (const mapName of maps) {
         for (const candidateCountry of candidateCountries) {
             for (const baselineCountry of baselineCountries) {
                 for (let repeat = 0; repeat < matchesPerPair; repeat++) {
+                    const reciprocalSeedBlock = usesPairedSeedBlocks
+                        ? createReciprocalSeedBlock(gameSeedBase, seedBlockCursor++)
+                        : null;
+                    const pairedSeedBlockIndex = reciprocalSeedBlock?.seedBlockIndex ?? null;
+                    const pairedEngineSeed = reciprocalSeedBlock?.requestedEngineSeed ?? null;
                     for (const candidateSlot of candidateSlots) {
                         let result: MatchResult | null = null;
                         for (let attempt = 0; attempt < startFilterMaxAttempts && !result; attempt++) {
+                            const attemptMatch = match;
+                            const seedBlockIndex = pairedSeedBlockIndex ?? seedBlockCursor++;
+                            const requestedEngineSeed =
+                                pairedEngineSeed ?? derivePairedEngineSeed(gameSeedBase, seedBlockIndex);
                             result = await runMatch(
                                 match++,
+                                seedBlockIndex,
+                                usesPairedSeedBlocks,
+                                requestedEngineSeed,
                                 mapName,
                                 candidateCountry,
                                 baselineCountry,
@@ -764,8 +943,43 @@ const main = async () => {
                                 strongBotOptions,
                                 candidateStarts,
                                 baselineStarts,
+                                baselineFactory,
                                 traceIntervalTicks,
+                                (snapshot) =>
+                                    fs.appendFileSync(
+                                        eventsPath,
+                                        JSON.stringify({ event: "trace_snapshot", snapshot }) + "\n",
+                                    ),
                             );
+                            if (!result) {
+                                rejectedStartAttempts++;
+                                fs.appendFileSync(
+                                    eventsPath,
+                                    JSON.stringify({
+                                        event: "match_rejected_start",
+                                        match: attemptMatch,
+                                        seedBlockIndex,
+                                        pairedSeedBlock: usesPairedSeedBlocks,
+                                        attempt: attempt + 1,
+                                        repeat,
+                                        mapName,
+                                        candidateCountry,
+                                        baselineCountry,
+                                        candidateSlot,
+                                        requestedEngineSeed,
+                                        botRandomSeed: deriveBotRandomSeed(requestedEngineSeed),
+                                        candidateBotRandomSeed: deriveParticipantBotRandomSeed(
+                                            requestedEngineSeed,
+                                            "candidate",
+                                        ),
+                                        baselineBotRandomSeed: deriveParticipantBotRandomSeed(
+                                            requestedEngineSeed,
+                                            "baseline",
+                                        ),
+                                        engineSeedEpochMs: engineSeedToEpochMs(requestedEngineSeed),
+                                    }) + "\n",
+                                );
+                            }
                         }
                         if (!result) {
                             throw new Error(
@@ -775,6 +989,7 @@ const main = async () => {
                             );
                         }
                         results.push(result);
+                        fs.appendFileSync(eventsPath, JSON.stringify({ event: "match_complete", result }) + "\n");
                         console.log(JSON.stringify(result));
                     }
                 }
@@ -782,18 +997,54 @@ const main = async () => {
         }
     }
 
-    const summary = summarize(results, maps, matchesPerPair, maxTicks);
-    fs.mkdirSync(outDir, { recursive: true });
-    const outPath = path.join(outDir, `head-to-head-${Date.now()}.json`);
+    const summary = summarize({
+        results,
+        maps,
+        matchesPerPair,
+        maxTicks,
+        runId,
+        manifest,
+        requestedMatches,
+        rejectedStartAttempts,
+    });
+    const outPath = path.join(outDir, `summary-${runId}.json`);
     fs.writeFileSync(outPath, JSON.stringify(summary, null, 2));
+    fs.appendFileSync(eventsPath, JSON.stringify({ event: "run_complete", summaryPath: outPath }) + "\n");
+    console.log(`manifest=${manifestPath}`);
+    console.log(`events=${eventsPath}`);
     console.log(`summary=${outPath}`);
     console.log(
         `candidate ${summary.candidateWins}-${summary.baselineWins}-${summary.draws} ` +
-            `winRate=${(summary.candidateWinRate * 100).toFixed(1)}%`,
+            `winRate=${(summary.candidateWinRate * 100).toFixed(1)}% ` +
+            `scoreRate=${(summary.candidateScoreRate * 100).toFixed(1)}%`,
     );
 };
 
 main().catch((error) => {
     console.error(error);
+    const outDir = process.env.OUT_DIR;
+    if (outDir) {
+        try {
+            fs.mkdirSync(outDir, { recursive: true });
+            const failurePath = path.join(outDir, `failure-${Date.now()}.json`);
+            fs.writeFileSync(
+                failurePath,
+                JSON.stringify(
+                    {
+                        event: "run_failure",
+                        generatedAt: new Date().toISOString(),
+                        runId: process.env.RUN_ID ?? null,
+                        slurmJobId: process.env.SLURM_JOB_ID ?? null,
+                        message: error instanceof Error ? error.message : String(error),
+                        stack: error instanceof Error ? error.stack : null,
+                    },
+                    null,
+                    2,
+                ),
+            );
+        } catch (writeError) {
+            console.error("Unable to write structured failure record", writeError);
+        }
+    }
     process.exit(1);
 });

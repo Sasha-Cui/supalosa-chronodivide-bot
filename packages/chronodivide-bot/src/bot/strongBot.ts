@@ -163,6 +163,7 @@ export type StrongBotOptions = {
     hfoBottomDemolition?: HfoBottomDemolitionOptions;
     hfoBottomHomeGuard?: HfoBottomHomeGuardOptions;
     defaultMapProfiles?: boolean;
+    exactMapTactics?: boolean;
 };
 
 const DEFAULT_FORCE_ATTACK_OPTIONS: Required<ForceAttackOptions> = {
@@ -1256,6 +1257,7 @@ export class StrongBot extends SupalosaBot {
     private lastWonGameCloseoutOrderAt = 0;
     private lastOtmqFinalSweepOrderAt = 0;
     private readonly enableDefaultMapProfiles: boolean;
+    private readonly enableExactMapTactics: boolean;
     private readonly explicitOptionOverrides: StrongBotOptions;
 
     constructor(
@@ -1269,6 +1271,7 @@ export class StrongBot extends SupalosaBot {
         super(name, country, tryAllyWith, enableLogging, strategy);
         this.explicitOptionOverrides = options;
         this.enableDefaultMapProfiles = options.defaultMapProfiles ?? true;
+        this.enableExactMapTactics = options.exactMapTactics ?? true;
         this.forceAttackOptions = { ...DEFAULT_FORCE_ATTACK_OPTIONS, ...definedOptions(options.forceAttack) };
         this.harassOptions = { ...DEFAULT_HARASS_OPTIONS, ...definedOptions(options.harass) };
         const emergencyDefenseOverrides = definedOptions(options.emergencyDefense);
@@ -1373,94 +1376,94 @@ export class StrongBot extends SupalosaBot {
     override onGameTick(game: GameApi): void {
         this.lastGameApi = game;
         super.onGameTick(game);
-        if (this.maybeHfoBottomCriticalCleanup(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoBottomCriticalCleanup(game)) {
             return;
         }
-        if (this.maybeHfoBottomHomeGuard(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoBottomHomeGuard(game)) {
             return;
         }
-        if (this.maybeOtmqFinalSweep(game)) {
+        if (this.enableExactMapTactics && this.maybeOtmqFinalSweep(game)) {
             return;
         }
-        if (this.maybeWeakStartCloseout(game, true)) {
+        if (this.enableExactMapTactics && this.maybeWeakStartCloseout(game, true)) {
             return;
         }
-        if (this.maybeWeakStartProxyAttack(game)) {
+        if (this.enableExactMapTactics && this.maybeWeakStartProxyAttack(game)) {
             return;
         }
-        if (this.maybeWeakStartHomeGuard(game)) {
+        if (this.enableExactMapTactics && this.maybeWeakStartHomeGuard(game)) {
             return;
         }
-        if (this.maybeWeakStartCloseout(game)) {
+        if (this.enableExactMapTactics && this.maybeWeakStartCloseout(game)) {
             return;
         }
-        if (this.maybePeakCloseout(game)) {
+        if (this.enableExactMapTactics && this.maybePeakCloseout(game)) {
             return;
         }
-        if (this.maybeHfoSideCloseout(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoSideCloseout(game)) {
             return;
         }
         if (this.maybeWonGameCloseout(game)) {
             return;
         }
-        if (this.maybePeakEmergencyDefend(game)) {
+        if (this.enableExactMapTactics && this.maybePeakEmergencyDefend(game)) {
             return;
         }
         if (this.maybeEmergencyDefend(game)) {
             return;
         }
-        if (this.maybeHfoBottomChokeIntercept(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoBottomChokeIntercept(game)) {
             return;
         }
-        if (this.maybeHfoBottomSiegeControl(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoBottomSiegeControl(game)) {
             return;
         }
-        if (this.maybeHfoBottomTopBaseBreak(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoBottomTopBaseBreak(game)) {
             return;
         }
-        if (this.maybeHfoBottomLastBuildingCleanup(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoBottomLastBuildingCleanup(game)) {
             return;
         }
-        if (this.maybeHfoFinalBuildingAttack(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoFinalBuildingAttack(game)) {
             return;
         }
-        if (this.maybeHfoWestSweep(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoWestSweep(game)) {
             return;
         }
-        if (this.maybeHfoEastSweep(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoEastSweep(game)) {
             return;
         }
-        if (this.maybeHfoBottomDesperationFinish(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoBottomDesperationFinish(game)) {
             return;
         }
-        if (this.maybeHfoLateMopUp(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoLateMopUp(game)) {
             return;
         }
-        if (this.maybeHfoBottomWestExpansionAttack(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoBottomWestExpansionAttack(game)) {
             return;
         }
-        if (this.maybeHfoBottomPincer(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoBottomPincer(game)) {
             return;
         }
-        if (this.maybeHfoBottomDemolition(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoBottomDemolition(game)) {
             return;
         }
-        if (this.maybeHfoBottomCloseout(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoBottomCloseout(game)) {
             return;
         }
-        if (this.maybeHfoBottomSweep(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoBottomSweep(game)) {
             return;
         }
-        if (this.maybeHfoCloseout(game)) {
+        if (this.enableExactMapTactics && this.maybeHfoCloseout(game)) {
             return;
         }
-        if (this.maybeIslandTechAttack(game)) {
+        if (this.enableExactMapTactics && this.maybeIslandTechAttack(game)) {
             return;
         }
         this.maybeRouteAttack(game);
         this.maybeHarvesterHarass(game);
         this.maybeHarass(game);
-        if (this.maybeWeakStartPressure(game)) {
+        if (this.enableExactMapTactics && this.maybeWeakStartPressure(game)) {
             return;
         }
         this.maybeForceAttack(game);

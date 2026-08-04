@@ -131,7 +131,9 @@ Build first:
 npm run build
 ```
 
-Run a simple candidate-vs-stock baseline benchmark:
+Run a simple candidate-vs-local-baseline benchmark. This is an engineering
+smoke test: both bots come from the modified local package, so it is not an
+independent scientific control.
 
 ```sh
 OUT_DIR=benchmark-results/simple-smoke MAPS=simple-1v1-no-preview.map CANDIDATE_COUNTRIES=Arabs BASELINE_COUNTRIES=Arabs,French MATCHES_PER_PAIR=2 CANDIDATE_SLOTS=0,1 MAX_TICKS=18000 npm --workspace packages/chronodivide-bot-driver run benchmark
@@ -151,12 +153,37 @@ Useful benchmark environment variables:
 - `MATCHES_PER_PAIR`: repeats per map/country pairing.
 - `CANDIDATE_SLOTS`: `0`, `1`, or `0,1`.
 - `MAX_TICKS`: match cap.
+- `GAME_SEED_BASE`: uint32 base seed. Block `i` uses `(GAME_SEED_BASE + i) mod 2^32`.
+- `SEED_BLOCK_START_OFFSET`: non-negative seed-block cursor; reciprocal slots reuse one block seed.
 - `ATTACK_COMPOSITION_POLICY`: `random`, `infantry`, `assault`, `tanks`, `air`, `heavy`, `artillery`, `desolator`, `naval`, `aiIni`, or `hfo` where supported.
 - `STRATEGIC_PLAN`: `off`, `hfo`, `ecoBoom`, `islandTech`, `adaptive`, and other plan names accepted by the harness.
-- `DEFAULT_MAP_PROFILES_ENABLED=false`: useful when isolating a single strategy option from built-in map profiles.
+- `DEFAULT_MAP_PROFILES_ENABLED=false`: disable automatic map-profile selection in both `StrongBot` and `StrongStrategy`.
+- `EXACT_MAP_TACTICS_ENABLED=false`: disable hard-coded HFO, OTMQ, Peak, and weak-start tick tactics. Use both switches for the generic research condition.
+- `BASELINE_PACKAGE_ROOT=/absolute/clean/repo/packages/chronodivide-bot`: load baseline source from a separate built package.
+- `REQUIRE_EXTERNAL_BASELINE=true`: fail instead of silently using the shared modified package.
+- `RUN_ID`: append-only identifier containing only letters, digits, dot, underscore, and hyphen.
+- `DEFAULT_MAP_PROFILES_ENABLED=false` alone is not a generic-policy ablation.
 - `TRACE_INTERVAL_TICKS`: emit periodic trace snapshots for debugging long draws.
 
-Benchmark outputs are written under `OUT_DIR` as JSON summaries. Large generated result folders and copied map data should not be committed.
+New benchmark outputs include a provenance manifest, append-only JSONL event
+stream, structured failure record, and JSON summary. Although the public game
+API exposes no offline seed, the harness validates the exact pinned 0.75.0
+implementation before mapping each requested engine seed to
+`Date.now() = seed * 1000` during game creation. External bot randomness in this
+API version uses `Math.random`, so synchronous candidate and baseline callbacks
+run under separate identity-keyed Mulberry32 streams. Candidate draw counts do
+not advance the baseline stream, and reciprocal agent-array slot swaps preserve
+participant streams. Matches and traces record `requestedEngineSeed`, the root
+`botRandomSeed`, `candidateBotRandomSeed`, `baselineBotRandomSeed`, and
+`engineSeedEpochMs`; global shims and callback wrappers are restored in
+`finally`, and concurrent seeded sessions fail closed. Reciprocal `0,1` slot
+runs reuse one explicit seed block and reject outcome-dependent start filtering.
+Same-process same-seed/different-seed trace tests pass, but the prespecified
+10/10 fresh-process trace check remains required before confirmatory
+experiments. Schema-3 manifests query `scontrol` for authoritative Slurm
+accounting instead of trusting mutable environment labels. See `research/` for
+the clean-baseline preparation and Slurm protocol. Large generated result
+folders and copied map data should not be committed.
 
 Run the smoke regression suite after behavior changes:
 

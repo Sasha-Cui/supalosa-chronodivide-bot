@@ -10,6 +10,7 @@ import { Countries, DebugLogger } from "../logic/common/utils.js";
 import { DefaultStrategy, DefaultStrategyOptions } from "./defaultStrategy.js";
 
 export type StrongStrategyOptions = {
+    defaultMapProfiles?: boolean;
     base?: DefaultStrategyOptions;
     allIn?: AllInAttackMissionFactoryOptions;
     macroBoost?: {
@@ -813,7 +814,7 @@ export class StrongStrategy implements Strategy {
     }
 
     onAiUpdate(context: SupabotContext, missionController: MissionController, logger: DebugLogger): Strategy {
-        if (!hasExplicitProfileOptions(this.options)) {
+        if ((this.options.defaultMapProfiles ?? true) && !hasExplicitProfileOptions(this.options)) {
             if (this.isSimple1v1Map(context)) {
                 logger("Strong strategy profile: simpleInfantry");
                 return new StrongStrategy(SIMPLE_INFANTRY_PROFILE).onAiUpdate(context, missionController, logger);
