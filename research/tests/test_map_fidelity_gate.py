@@ -233,6 +233,12 @@ class GateFixture(unittest.TestCase):
     def tearDown(self) -> None:
         self.temporary.cleanup()
 
+    def test_manifest_uses_pinned_game_api_country_identifier(self) -> None:
+        self.assertEqual(GATE.PARTICIPANT_COUNTRY, "Arabs")
+        self.assertEqual(
+            self.manifest["protocol"]["participantCountry"], "Arabs"
+        )
+
     def result(self) -> dict[str, object]:
         family = self.manifest["families"][0]
         first = {"x": 37, "y": 63}

@@ -18,6 +18,9 @@ from typing import Any, Iterable
 
 
 GATE = "map-fidelity-gate-v1"
+# @supalosa/chronodivide-bot Countries.IRAQ and the pinned game API use this
+# internal country identifier; "Iraq" is only a display label.
+PARTICIPANT_COUNTRY = "Arabs"
 EXPECTED_EVIDENCE_FAMILIES = 127
 TOOL_SOURCE_PATHS = (
     "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProbe.ts",
@@ -750,7 +753,7 @@ def build_manifest(
         "protocol": {
             "targetTick": target_tick,
             "engineSeedBase": engine_seed_base,
-            "participantCountry": "Iraq",
+            "participantCountry": PARTICIPANT_COUNTRY,
             "reciprocalOrders": [["alpha", "beta"], ["beta", "alpha"]],
             "dynamicStartCoverageClaim": (
                 "One deterministic reciprocal pair per map; all declared starts "
