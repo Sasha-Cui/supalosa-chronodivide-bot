@@ -48,12 +48,16 @@ Contents:
   catalog with strict and evidence-based provisional eligibility.
 - `artifacts/design_power_{assumption_example,selected_draft}.json`:
   prospective sensitivity reports that use no outcomes.
+- `artifacts/seed_replay_gate_v1_{summary,execution}.json`: exact deterministic
+  fresh-process gate output and its Slurm/job/source/log provenance, including
+  two zero-game launcher failures.
 - `artifacts/pi_jss233_readiness_2026-08-04.json`: current submit-limit
   evidence and non-fallback decision.
 - `scripts/prepare_external_baseline.sh`: clean-baseline runtime preparation.
 - `slurm/audit_pilot_v1.sbatch`: four-task, paired-physical-start CPU pilot.
 - `slurm/seed_replay_gate_v1.sbatch`: packaged 10-same/1-different fresh-
-  process deterministic replay gate; not submitted while allocation is blocked.
+  process deterministic replay gate; passed as job 21291720 under
+  `pi_jss233`.
 
 Generated pilot outputs are append-only under
 `/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit`. Proprietary

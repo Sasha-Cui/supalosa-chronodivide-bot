@@ -111,8 +111,14 @@ comparisons will use a prespecified correction or simultaneous interval method.
 ## Readiness implementation state on 2026-08-04
 
 - Explicit uint32 engine control and identity-separated candidate/baseline bot
-  RNG streams are implemented and unit-tested against the pinned API. The
-  10/10 fresh-process replay gate is packaged but not yet run.
+  RNG streams are implemented and unit-tested against the pinned API. Slurm job
+  21291720 passed the fresh-process replay gate under authoritative account
+  `pi_jss233`: all ten seed-424242 processes produced the same 73-record
+  normalized trace (SHA-256
+  `448b3ed3ef2e46b82848b90d9e8a820ce2864dea0e7aeaf1004cfa58c86da873`),
+  while seed 424243 produced a different trace. All eleven matches were
+  tick-cap draws, so this is reproducibility evidence rather than gameplay
+  evidence.
 - The outcome-blind map catalog groups 333 files and 313 hashes into 145
   conservative families. Tier A's maximally strict rule leaves 7 provisional
   families. Tier B, which distinguishes administrative inventories from
@@ -122,16 +128,20 @@ comparisons will use a prespecified correction or simultaneous interval method.
   variance settings, 26 test families, 10 optimizer runs, and 8 paired blocks
   give simulated power 0.80885 for a true five-point effect and require 4,160
   component games for the final primary comparison.
-- Slurm currently rejects even `sbatch --test-only` under `pi_jss233` with
-  `QOSMaxSubmitJobPerUserLimit` while unrelated job 21247181 occupies the
-  user-level slot under `prio_btk22`. It is scheduled to end
-  2026-08-05 02:19:04-04:00 and has not been used or cancelled.
+- The earlier user-level submission limit cleared without using or cancelling
+  unrelated allocation work. Job 21291720 completed under `pi_jss233`,
+  QOS `normal`, partition `devel`, in 12 minutes 8 seconds. Two preceding
+  launcher-only attempts (21291567 and 21291713) failed at time zero before any
+  game because the compute-node shell did not expose the module function; the
+  final script pins its Node runtime dependency paths directly.
 
 ## Readiness gates before a sealed test exists
 
-1. An explicit engine seed is recorded in every manifest, and 10/10 fresh
-   same-seed processes produce identical normalized traces.
-2. Different requested seeds demonstrably change at least one normalized trace.
+1. **Passed (job 21291720):** an explicit engine seed is recorded in every
+   manifest, and 10/10 fresh same-seed processes produce identical normalized
+   traces.
+2. **Passed (job 21291720):** different requested seeds demonstrably change
+   the normalized trace.
 3. Valid reciprocal spawn pairs are enumerated before outcomes are generated;
    no outcome-dependent rejection sampling is allowed.
 4. Required map sections load beyond tick 1, warning policy is frozen, and
@@ -162,10 +172,12 @@ a favorable result.
 
 ## Immediate execution sequence
 
-1. Finish explicit engine-seed control and deterministic replay tests.
-2. Create a machine-readable map provenance/reference/structure inventory.
-3. Define family grouping and eligible development/validation/test pools without
-   running StrongBot on candidate test maps.
+1. **Completed:** explicit engine-seed control and deterministic fresh-process
+   replay gate.
+2. **Completed:** machine-readable, outcome-blind map provenance/reference/
+   structure inventory.
+3. Adjudicate family grouping and define eligible development/validation/test
+   pools without running StrongBot on candidate test maps.
 4. Implement global and coordinate-free conditioned configuration interfaces.
 5. Run at most 1,000 diagnostic attempts under `pi_jss233` and calibrate
    runtime, failure, start, warning, variance, and power assumptions.

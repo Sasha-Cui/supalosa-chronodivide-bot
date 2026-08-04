@@ -195,11 +195,14 @@ state is restored in `finally`, and concurrent seeded games fail closed.
 
 One `seedBlockIndex` is reused for both reciprocal candidate slots. Paired mode
 forbids rejection-based start filters; valid seed-to-start assignments must be
-enumerated before outcome generation. The remaining readiness gate is the
-packaged `seed_replay_gate_v1`: 10/10 fresh processes must have identical
-normalized traces for seed 424242 and the seed-424243 trace must differ, with
-authoritative Slurm account `pi_jss233`. Until it passes, the implementation is
-seed-controlled in unit/in-process evidence but not yet confirmatory-ready.
+enumerated before outcome generation. The packaged `seed_replay_gate_v1`
+passed in Slurm job 21291720 under authoritative account `pi_jss233`: all ten
+fresh processes had identical normalized traces for seed 424242, and the
+seed-424243 trace differed. This closes the deterministic fresh-process
+randomness gate for evaluated source revision
+`57b81f9ea4345edd2e955d1e1c6d343abba6c85b`. It does not close the remaining
+map-fidelity, family-adjudication, split, or policy-interface gates, and the
+eleven tick-cap draws from this test are not gameplay evidence.
 
 ### Outcomes and inference
 

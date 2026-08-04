@@ -1,0 +1,73 @@
+{
+  "schemaVersion": 1,
+  "gate": "seed-replay-gate-v1",
+  "evaluatedSource": {
+    "gitCommit": "57b81f9ea4345edd2e955d1e1c6d343abba6c85b",
+    "gitBranch": "codex/chrono-divide-paper-audit",
+    "trackedDirty": false
+  },
+  "successfulJob": {
+    "jobId": "21291720",
+    "account": "pi_jss233",
+    "qos": "normal",
+    "partition": "devel",
+    "state": "COMPLETED",
+    "exitCode": "0:0",
+    "submittedAt": "2026-08-04T12:34:44-04:00",
+    "startedAt": "2026-08-04T12:34:45-04:00",
+    "endedAt": "2026-08-04T12:46:53-04:00",
+    "elapsed": "00:12:08",
+    "totalCpu": "00:08:19.425",
+    "batchMaxRssKiB": 468048
+  },
+  "failedLauncherAttempts": [
+    {
+      "jobId": "21291567",
+      "state": "FAILED",
+      "exitCode": "127:0",
+      "elapsed": "00:00:00",
+      "completedGames": 0,
+      "cause": "module function unavailable in non-login batch shell"
+    },
+    {
+      "jobId": "21291713",
+      "state": "FAILED",
+      "exitCode": "127:0",
+      "elapsed": "00:00:00",
+      "completedGames": 0,
+      "cause": "Lmod initialization remained unavailable on the compute-node batch image"
+    }
+  ],
+  "resultRoot": {
+    "path": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/seed-replay-gate-v1/21291720",
+    "files": 34,
+    "fileBytes": 1574945,
+    "directoryBytes": 1624097
+  },
+  "registeredSummary": {
+    "path": "research/artifacts/seed_replay_gate_v1_summary.json",
+    "sha256": "5d14958a72cd66a34e6b04090e5814787cfa40aa081a9afb6276b076c9ee4f14"
+  },
+  "slurmLogs": {
+    "stdout": {
+      "path": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/slurm/seed-replay-gate-v1-21291720.out",
+      "sha256": "0dd6dde11ec3db0d3f0fd159e186cb00c56b70e3301b17ca9c9b65aa9612e575"
+    },
+    "stderr": {
+      "path": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/slurm/seed-replay-gate-v1-21291720.err",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "checks": {
+    "schedulerProvenanceAuthoritative": true,
+    "schedulerAccountPiJss233": true,
+    "sameSeedTraceIdentity10of10": true,
+    "differentSeedTraceDiverges": true,
+    "participantSeedFieldsValid": true,
+    "passed": true
+  },
+  "sameSeedTraceSha256": "448b3ed3ef2e46b82848b90d9e8a820ce2864dea0e7aeaf1004cfa58c86da873",
+  "differentSeedTraceSha256": "e220a7d7f516bc7e297eb80167f784c429292c64770e26f9d1300143ad371571",
+  "interpretation": "Deterministic engine and identity-separated bot RNG control pass the fresh-process gate. All 11 games were tick-cap draws; match quality was not the gate endpoint."
+}

@@ -34,10 +34,10 @@ archive before later edits or rebuilds.
 
 ### P1 — scientific readiness gates
 
-1. Explicit engine and identity-separated candidate/baseline RNG control is
-   implemented with unit and same-process evidence. Run the packaged
-   `seed_replay_gate_v1` under `pi_jss233` and require 10/10 fresh-process
-   trace identity plus different-seed divergence.
+1. **Passed:** explicit engine and identity-separated candidate/baseline RNG
+   control has unit and same-process evidence; Slurm job 21291720 passed the
+   packaged `seed_replay_gate_v1` under `pi_jss233` with 10/10
+   fresh-process trace identity and different-seed divergence.
 2. Validate full-map fidelity beyond tick 1 and turn parser warnings into
    explicit failure categories.
 3. The outcome-blind catalog currently groups 333 files into 145 conservative
@@ -181,6 +181,19 @@ independence, same-seed replay, and first trace divergence remain unknown. The
 screen also used corrected fallback job `20965700` (`prio_btk22`). See
 `research/artifacts/determinism_screen_v1.json`.
 
+The defect was subsequently remediated and tested from clean source revision
+`57b81f9ea4345edd2e955d1e1c6d343abba6c85b`. Slurm job 21291720, charged to
+`pi_jss233`, launched ten fresh seed-424242 processes and one seed-424243
+process. The ten same-seed normalized 73-record traces were byte-identical
+(SHA-256
+`448b3ed3ef2e46b82848b90d9e8a820ce2864dea0e7aeaf1004cfa58c86da873`);
+the different seed trace diverged. The job completed in 12:08 with 8:19.425
+total CPU and 468,048 KiB batch peak RSS. All eleven matches were tick-cap
+draws; the gate tested deterministic execution, not policy quality. Attempts
+21291567 and 21291713 failed at time zero with no games before the batch runtime
+paths were pinned. Exact evidence is in
+`research/artifacts/seed_replay_gate_v1_{summary,execution}.json`.
+
 ## Week-by-week roadmap
 
 ### Week 1 — audit closure and pilot
@@ -195,8 +208,8 @@ screen also used corrected fallback job `20965700` (`prio_btk22`). See
 
 - Manually family-group candidate maps and document sources/rights.
 - Select development and candidate-held-out families.
-- Expose/log the wall-clock-derived engine seed in a pinned API fork and prove
-  same-seed trace identity within and across fresh processes.
+- Preserve the passed deterministic seed gate while building the next clean
+  source snapshot.
 - Run parser/fidelity checks and 20-attempt timing calibrations.
 - Gate: no exact/revised map crosses splits; warning policy is frozen.
 

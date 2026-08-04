@@ -33,12 +33,16 @@ the interactive fallback overrode `SLURM_JOB_ACCOUNT`, while `scontrol` and
 Slurm for account, QOS, and partition and records environment labels separately;
 see `artifacts/scheduler_accounting_correction.json`.
 
-A 2026-08-04 `sbatch --test-only` check still failed with
-`QOSMaxSubmitJobPerUserLimit` while unrelated persistent job 21247181 occupied
-the user's sole submission slot under `prio_btk22`. That job is scheduled to
-end 2026-08-05 at 02:19:04-04:00. It was neither used nor cancelled; no
-scientific job may fall back from `pi_jss233`. See
-`artifacts/pi_jss233_readiness_2026-08-04.json`.
+The transient 2026-08-04 `QOSMaxSubmitJobPerUserLimit` later cleared without
+using or cancelling unrelated work. Seed replay job 21291720 then completed
+under authoritative account `pi_jss233`, QOS `normal`, and partition
+`devel`. Attempts 21291567 and 21291713 failed at time zero with exit 127 and
+zero games because the compute-node batch shell did not expose the module
+function, even after explicit Lmod initialization. The successful script pins
+the Node, ICU, GCC, and OpenSSL dependency paths directly. See
+`artifacts/pi_jss233_readiness_2026-08-04.json` for the earlier blocked state
+and `artifacts/seed_replay_gate_v1_execution.json` for the completed gate and
+both failed launcher attempts.
 
 The pinned game API 0.75.0 has no public game-seed field in
 `CreateOfflineOpts`; `TRAIN_SEED` controls only policy mutation. Inspection of
@@ -69,15 +73,19 @@ propagation, failure-path restoration, participant-stream isolation, and slot
 invariance; an in-process engine/bot probe produces an identical trace for
 repeated seed 424242 and a different trace for 424243. Reciprocal `0,1` slot
 runs now reuse one explicit `seedBlockIndex`, while paired runs reject
-rejection-based start filtering. This closes the in-process control defect, not
-the full confirmatory gate. Before scientific runs, require 10/10 identical
-normalized traces from fresh processes for the same requested seed and verify
-that different seeds diverge.
+rejection-based start filtering.
 
-That remaining check is packaged, but not submitted, as
-`research/slurm/seed_replay_gate_v1.sbatch`. It refuses any authoritative
-account other than `pi_jss233`, launches ten fresh benchmark processes with
-seed 424242 plus one with seed 424243, records state traces every 250 ticks, and
-runs `research/scripts/check_seed_replay_gate.py` to require exact normalized
-trace identity for all ten same-seed runs and divergence for the different
-seed.
+The fresh-process gate passed in Slurm job 21291720 under `pi_jss233`.
+`research/slurm/seed_replay_gate_v1.sbatch` launched ten fresh benchmark
+processes with seed 424242 plus one with seed 424243 and recorded state every
+250 ticks. All ten same-seed processes yielded the identical 73-record
+normalized trace (SHA-256
+`448b3ed3ef2e46b82848b90d9e8a820ce2864dea0e7aeaf1004cfa58c86da873`);
+the different seed yielded SHA-256
+`e220a7d7f516bc7e297eb80167f784c429292c64770e26f9d1300143ad371571`.
+All seed fields and authoritative scheduler fields validated. The eleven
+matches were all tick-cap draws, which is acceptable for the deterministic
+trace endpoint but supplies no evidence about match strength. The exact
+registered outputs are
+`artifacts/seed_replay_gate_v1_summary.json` and
+`artifacts/seed_replay_gate_v1_execution.json`.

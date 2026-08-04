@@ -31,16 +31,19 @@ bot_seed_control = "identity-keyed candidate/baseline Mulberry32 streams wrap sy
 paired_seed_schedule = "reciprocal slots reuse seedBlockIndex; paired mode rejects start-filter rejection sampling"
 seed_unit_evidence = "same-process identity, divergence, participant isolation, slot invariance, and restoration pass"
 engine_variability = "old unseeded fresh-process variability established; those calls are not seeded replicates"
-required_gate = "10/10 fresh-process same-seed normalized trace identity and different-seed divergence"
+required_gate = "passed: Slurm job 21291720; 10/10 same-seed normalized trace identity and different-seed divergence"
+gate_source_revision = "57b81f9ea4345edd2e955d1e1c6d343abba6c85b"
+gate_summary_sha256 = "5d14958a72cd66a34e6b04090e5814787cfa40aa081a9afb6276b076c9ee4f14"
 
 [scheduler]
 requested_account = "pi_jss233"
 manifest_schema = 3
 authoritative_account_source = "scontrol with environment fallback"
 corrected_fallback_job = "20965700: actual prio_btk22; schema-2 environment label pi_jss233 invalid"
-submit_readiness = "blocked by QOSMaxSubmitJobPerUserLimit as of 2026-08-04T11:54:56-04:00"
+submit_readiness = "passed for seed gate: job 21291720 completed under pi_jss233/normal/devel"
 blocking_unrelated_job = "21247181: prio_btk22; scheduled end 2026-08-05T02:19:04-04:00; do not use or cancel"
 readiness_artifact = "research/artifacts/pi_jss233_readiness_2026-08-04.json"
+seed_gate_execution_artifact = "research/artifacts/seed_replay_gate_v1_execution.json"
 
 [security]
 npm_audit_low = 2
