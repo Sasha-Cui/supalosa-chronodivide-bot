@@ -1,0 +1,610 @@
+#!/usr/bin/env python3
+"""Mock-only tests for the per-family map-fidelity supervisor."""
+
+from __future__ import annotations
+
+import copy
+import importlib.util
+import json
+import os
+import signal
+import sys
+import tempfile
+import time
+import unittest
+from pathlib import Path
+
+
+MODULE_PATH = Path(__file__).resolve().parents[1] / "scripts/map_fidelity_supervisor.py"
+SPEC = importlib.util.spec_from_file_location("map_fidelity_supervisor", MODULE_PATH)
+assert SPEC is not None and SPEC.loader is not None
+SUPERVISOR = importlib.util.module_from_spec(SPEC)
+SPEC.loader.exec_module(SUPERVISOR)
+
+
+SCHEDULER = {
+    "jobId": "12345",
+    "account": "pi_jss233",
+    "partition": "day",
+    "qos": "normal",
+    "source": "scontrol",
+}
+
+
+MOCK_WORKER = r"""
+import argparse
+import json
+import os
+import signal
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--mode", required=True)
+parser.add_argument("--state-file", type=Path)
+parser.add_argument("--invocations", type=Path)
+parser.add_argument("--statuses", type=Path)
+parser.add_argument("--descendant-pid", type=Path)
+parser.add_argument("--manifest", type=Path, required=True)
+parser.add_argument("--attestation", type=Path, required=True)
+parser.add_argument("--family-ordinal", type=int, required=True)
+parser.add_argument("--intent", type=Path, required=True)
+parser.add_argument("--output", type=Path, required=True)
+args = parser.parse_args()
+
+if args.invocations:
+    with args.invocations.open("a", encoding="utf-8") as handle:
+        handle.write(f"{args.family_ordinal}\n")
+
+if args.mode == "crash":
+    raise SystemExit(7)
+
+if args.mode == "retry":
+    count = int(args.state_file.read_text()) if args.state_file.exists() else 0
+    args.state_file.write_text(str(count + 1))
+    if count == 0:
+        raise SystemExit(9)
+
+if args.mode == "timeout":
+    child_code = (
+        "import os,signal,time,pathlib;"
+        f"pathlib.Path({str(args.descendant_pid)!r}).write_text(str(os.getpid()));"
+        "signal.signal(signal.SIGTERM,signal.SIG_IGN);"
+        "time.sleep(60)"
+    )
+    subprocess.Popen([sys.executable, "-c", child_code])
+    signal.signal(signal.SIGTERM, signal.SIG_IGN)
+    deadline = time.time() + 2
+    while not args.descendant_pid.exists() and time.time() < deadline:
+        time.sleep(0.01)
+    time.sleep(60)
+
+if args.mode == "orphan-pipe":
+    child_code = (
+        "import os,signal,time,pathlib;"
+        f"pathlib.Path({str(args.descendant_pid)!r}).write_text(str(os.getpid()));"
+        "signal.signal(signal.SIGTERM,signal.SIG_IGN);"
+        "time.sleep(60)"
+    )
+    subprocess.Popen([sys.executable, "-c", child_code])
+    deadline = time.time() + 2
+    while not args.descendant_pid.exists() and time.time() < deadline:
+        time.sleep(0.01)
+
+if args.mode == "env-leak":
+    if "WINNER" in os.environ or "DRY_RUN_ROLE" in os.environ:
+        raise SystemExit(12)
+
+if args.mode == "noisy":
+    sys.stdout.write("x" * 4096)
+    sys.stdout.flush()
+
+if args.mode == "malformed":
+    args.output.write_text("{", encoding="utf-8")
+    os.chmod(args.output, 0o600)
+    raise SystemExit(0)
+
+if args.mode == "partial":
+    partial = args.output.with_name(args.output.name + ".tmp")
+    partial.write_text('{"partial":true}', encoding="utf-8")
+    os.chmod(partial, 0o600)
+    raise SystemExit(0)
+
+intent_bytes = args.intent.read_bytes()
+intent = json.loads(intent_bytes)
+attestation_bytes = args.attestation.read_bytes()
+manifest_bytes = args.manifest.read_bytes()
+status = "pass"
+if args.statuses:
+    statuses = json.loads(args.statuses.read_text(encoding="utf-8"))
+    status = statuses[str(args.family_ordinal)]
+payload = {"fidelityStatus": status}
+if args.mode == "outcome-key":
+    payload["winner"] = "alpha"
+if args.mode == "role-key":
+    payload["dryRunRole"] = "test"
+shard = {
+    "schemaVersion": 1,
+    "gate": "map-fidelity-gate-v1",
+    "artifactKind": "map_fidelity_family_worker_shard",
+    "outcomeFree": True,
+    "manifestSha256": __import__("hashlib").sha256(manifest_bytes).hexdigest(),
+    "attestationSha256": __import__("hashlib").sha256(attestation_bytes).hexdigest(),
+    "family": intent["family"],
+    "attemptNumber": intent["attemptNumber"],
+    "intentSha256": __import__("hashlib").sha256(intent_bytes).hexdigest(),
+    "scheduler": intent["scheduler"],
+    "payload": payload,
+}
+args.output.write_text(json.dumps(shard) + "\n", encoding="utf-8")
+os.chmod(args.output, 0o600)
+"""
+
+
+def process_is_gone(pid: int) -> bool:
+    try:
+        os.kill(pid, 0)
+    except ProcessLookupError:
+        return True
+    stat_path = Path(f"/proc/{pid}/stat")
+    if stat_path.exists():
+        fields = stat_path.read_text(encoding="utf-8").split()
+        if len(fields) > 2 and fields[2] == "Z":
+            return True
+    return False
+
+
+class SupervisorFixture(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temporary = tempfile.TemporaryDirectory()
+        self.root = Path(self.temporary.name)
+        os.chmod(self.root, 0o700)
+        self.manifest_path = self.root / "manifest.json"
+        self.manifest = {
+            "schemaVersion": 1,
+            "gate": "map-fidelity-gate-v1",
+            "outcomeFree": True,
+            "scheduler": SCHEDULER,
+            "families": [
+                {
+                    "index": index * 3,
+                    "familyId": f"mf_{index}",
+                    "representativeMapPath": f"maps/map_{index}.map",
+                    "mapName": f"map_{index}.map",
+                    "sha256": f"{index + 1:064x}",
+                }
+                for index in range(3)
+            ],
+        }
+        self._write_json(self.manifest_path, self.manifest)
+        self.attestation_path = self.root / "attestation.json"
+        self.attestation = {
+            "schemaVersion": 1,
+            "gate": "map-fidelity-gate-v1",
+            "artifactKind": "map_fidelity_job_attestation",
+            "outcomeFree": True,
+            "manifest": {
+                "path": str(self.manifest_path.resolve()),
+                "sha256": SUPERVISOR.sha256_file(self.manifest_path),
+            },
+            "scheduler": SCHEDULER,
+            "runtimeHashes": {"runtimeBundleSha256": "a" * 64},
+        }
+        self._write_json(self.attestation_path, self.attestation)
+        self.worker_path = self.root / "mock_worker.py"
+        self.worker_path.write_text(MOCK_WORKER, encoding="utf-8")
+        os.chmod(self.worker_path, 0o700)
+        self.invocations = self.root / "invocations.txt"
+
+    def tearDown(self) -> None:
+        self.temporary.cleanup()
+
+    @staticmethod
+    def _write_json(path: Path, value: dict[str, object]) -> None:
+        path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
+        os.chmod(path, 0o600)
+
+    def command(
+        self,
+        mode: str,
+        *,
+        state_file: Path | None = None,
+        statuses: Path | None = None,
+        descendant_pid: Path | None = None,
+    ) -> list[str]:
+        command = [
+            sys.executable,
+            str(self.worker_path),
+            "--mode",
+            mode,
+            "--invocations",
+            str(self.invocations),
+        ]
+        if state_file is not None:
+            command.extend(["--state-file", str(state_file)])
+        if statuses is not None:
+            command.extend(["--statuses", str(statuses)])
+        if descendant_pid is not None:
+            command.extend(["--descendant-pid", str(descendant_pid)])
+        return command
+
+    def supervisor(
+        self,
+        run_name: str,
+        command: list[str],
+        *,
+        max_attempts: int = 2,
+        timeout: float = 1.0,
+        grace: float = 0.1,
+        stream_bytes: int = 1024,
+    ) -> object:
+        return SUPERVISOR.MapFidelitySupervisor(
+            manifest_path=self.manifest_path,
+            attestation_path=self.attestation_path,
+            run_root=self.root / run_name,
+            worker_command_prefix=command,
+            scheduler=SCHEDULER,
+            timeout_seconds=timeout,
+            termination_grace_seconds=grace,
+            max_stream_bytes=stream_bytes,
+            max_attempts=max_attempts,
+        )
+
+    def invocation_ordinals(self) -> list[int]:
+        if not self.invocations.exists():
+            return []
+        return [
+            int(line)
+            for line in self.invocations.read_text(encoding="utf-8").splitlines()
+        ]
+
+    def test_success_is_checkpointed_in_manifest_order_with_private_files(self) -> None:
+        supervisor = self.supervisor("success", self.command("success"))
+        summary = supervisor.run()
+        self.assertEqual(summary["completedCount"], 3)
+        self.assertEqual(summary["pendingCount"], 0)
+        self.assertEqual(self.invocation_ordinals(), [0, 1, 2])
+        for ordinal in range(3):
+            family_dir = supervisor.family_directory(ordinal)
+            checkpoint = family_dir / "completion-checkpoint.json"
+            terminal = family_dir / "attempts/01/attempt-terminal.json"
+            for path in (checkpoint, terminal):
+                self.assertTrue(path.is_file())
+                self.assertEqual(path.stat().st_mode & 0o077, 0)
+            checkpoint_value = json.loads(checkpoint.read_text(encoding="utf-8"))
+            self.assertNotIn("fidelityStatus", json.dumps(checkpoint_value))
+
+    def test_timeout_kills_process_group_and_descendant(self) -> None:
+        self.manifest["families"] = self.manifest["families"][:1]
+        self._write_json(self.manifest_path, self.manifest)
+        self.attestation["manifest"]["sha256"] = SUPERVISOR.sha256_file(
+            self.manifest_path
+        )
+        self._write_json(self.attestation_path, self.attestation)
+        descendant_pid_path = self.root / "descendant.pid"
+        supervisor = self.supervisor(
+            "timeout",
+            self.command("timeout", descendant_pid=descendant_pid_path),
+            max_attempts=1,
+            timeout=0.25,
+            grace=0.1,
+        )
+        summary = supervisor.run()
+        self.assertEqual(summary["pendingCount"], 1)
+        terminal_path = (
+            supervisor.family_directory(0)
+            / "attempts/01/attempt-terminal.json"
+        )
+        terminal = json.loads(terminal_path.read_text(encoding="utf-8"))
+        self.assertTrue(terminal["process"]["timedOut"])
+        self.assertTrue(terminal["process"]["termSent"])
+        self.assertTrue(terminal["process"]["killSent"])
+        self.assertIn(
+            "worker_timeout",
+            terminal["technicalDisposition"]["categories"],
+        )
+        pid = int(descendant_pid_path.read_text(encoding="utf-8"))
+        deadline = time.time() + 2
+        while time.time() < deadline and not process_is_gone(pid):
+            time.sleep(0.02)
+        self.assertTrue(process_is_gone(pid), f"descendant {pid} survived group kill")
+
+    def test_crash_retries_once_then_accepts_second_attempt(self) -> None:
+        self.manifest["families"] = self.manifest["families"][:1]
+        self._write_json(self.manifest_path, self.manifest)
+        self.attestation["manifest"]["sha256"] = SUPERVISOR.sha256_file(
+            self.manifest_path
+        )
+        self._write_json(self.attestation_path, self.attestation)
+        state_file = self.root / "retry-count.txt"
+        supervisor = self.supervisor(
+            "retry", self.command("retry", state_file=state_file)
+        )
+        summary = supervisor.run()
+        self.assertEqual(summary["completedCount"], 1)
+        self.assertEqual(summary["launchedAttemptCount"], 2)
+        checkpoint = json.loads(
+            (
+                supervisor.family_directory(0) / "completion-checkpoint.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(checkpoint["accepted"]["attemptNumber"], 2)
+        first_terminal = json.loads(
+            (
+                supervisor.family_directory(0)
+                / "attempts/01/attempt-terminal.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            first_terminal["technicalDisposition"]["status"],
+            "retryable_failure",
+        )
+
+    def test_malformed_and_partial_shards_are_never_checkpointed(self) -> None:
+        for mode in ("malformed", "partial"):
+            with self.subTest(mode=mode):
+                if self.invocations.exists():
+                    self.invocations.unlink()
+                supervisor = self.supervisor(
+                    f"bad-{mode}", self.command(mode), max_attempts=1
+                )
+                summary = supervisor.run()
+                self.assertEqual(summary["completedCount"], 0)
+                self.assertEqual(summary["pendingCount"], 3)
+                for ordinal in range(3):
+                    self.assertFalse(
+                        (
+                            supervisor.family_directory(ordinal)
+                            / "completion-checkpoint.json"
+                        ).exists()
+                    )
+
+    def test_fixed_retry_budget_is_not_reset_by_resume(self) -> None:
+        supervisor = self.supervisor("crash", self.command("crash"))
+        first = supervisor.run()
+        self.assertEqual(first["launchedAttemptCount"], 6)
+        before = self.invocation_ordinals()
+        second = self.supervisor("crash", self.command("crash")).run()
+        self.assertEqual(second["launchedAttemptCount"], 0)
+        self.assertEqual(second["pendingCount"], 3)
+        self.assertEqual(self.invocation_ordinals(), before)
+
+    def test_resume_is_status_blind_and_launches_no_completed_family(self) -> None:
+        statuses = self.root / "statuses.json"
+        self._write_json(
+            statuses,
+            {"0": "pass", "1": "review", "2": "fail"},
+        )
+        command = self.command("success", statuses=statuses)
+        first_supervisor = self.supervisor("resume", command)
+        first = first_supervisor.run()
+        self.assertEqual(first["completedCount"], 3)
+        self.invocations.write_text("", encoding="utf-8")
+        second = self.supervisor("resume", command).run()
+        self.assertEqual(second["resumedCount"], 3)
+        self.assertEqual(second["launchedAttemptCount"], 0)
+        self.assertEqual(self.invocation_ordinals(), [])
+
+    def test_tampered_checkpoint_fails_closed(self) -> None:
+        command = self.command("success")
+        supervisor = self.supervisor("tamper", command)
+        supervisor.run()
+        checkpoint_path = (
+            supervisor.family_directory(0) / "completion-checkpoint.json"
+        )
+        checkpoint = json.loads(checkpoint_path.read_text(encoding="utf-8"))
+        checkpoint["winner"] = "alpha"
+        self._write_json(checkpoint_path, checkpoint)
+        with self.assertRaises(SUPERVISOR.ValidationError):
+            self.supervisor("tamper", command).run()
+
+    def test_manifest_or_attestation_tampering_invalidates_resume(self) -> None:
+        command = self.command("success")
+        supervisor = self.supervisor("binding", command)
+        supervisor.run()
+        changed = copy.deepcopy(self.attestation)
+        changed["runtimeHashes"]["runtimeBundleSha256"] = "b" * 64
+        self._write_json(self.attestation_path, changed)
+        with self.assertRaises(SUPERVISOR.ValidationError):
+            self.supervisor("binding", command).run()
+
+    def test_outcome_and_role_keys_in_shard_are_rejected(self) -> None:
+        for mode in ("outcome-key", "role-key"):
+            with self.subTest(mode=mode):
+                if self.invocations.exists():
+                    self.invocations.unlink()
+                supervisor = self.supervisor(
+                    f"forbidden-{mode}", self.command(mode), max_attempts=1
+                )
+                summary = supervisor.run()
+                self.assertEqual(summary["completedCount"], 0)
+                terminal = json.loads(
+                    (
+                        supervisor.family_directory(0)
+                        / "attempts/01/attempt-terminal.json"
+                    ).read_text(encoding="utf-8")
+                )
+                self.assertIn(
+                    "shard_malformed_or_binding_invalid",
+                    terminal["technicalDisposition"]["categories"],
+                )
+
+    def test_unknown_intent_terminal_and_checkpoint_keys_are_rejected(self) -> None:
+        command = self.command("success")
+        supervisor = self.supervisor("strict", command)
+        supervisor.run()
+        family_dir = supervisor.family_directory(0)
+        cases = [
+            (
+                family_dir / "attempts/01/attempt-intent.json",
+                SUPERVISOR.validate_attempt_intent,
+            ),
+            (
+                family_dir / "attempts/01/attempt-terminal.json",
+                None,
+            ),
+            (
+                family_dir / "completion-checkpoint.json",
+                None,
+            ),
+        ]
+        for path, validator in cases:
+            value = json.loads(path.read_text(encoding="utf-8"))
+            value["unknownField"] = True
+            if validator is not None:
+                with self.assertRaises(SUPERVISOR.ValidationError):
+                    validator(value)
+            else:
+                SUPERVISOR.reject_forbidden_keys(value, "fixture")
+                expected_keys = (
+                    SUPERVISOR.TERMINAL_KEYS
+                    if "terminal" in path.name
+                    else SUPERVISOR.CHECKPOINT_KEYS
+                )
+                with self.assertRaises(SUPERVISOR.ValidationError):
+                    SUPERVISOR.require_exact_keys(value, expected_keys, "fixture")
+
+    def test_spawn_failure_is_retryable_and_bounded(self) -> None:
+        command = [str(self.root / "missing-worker")]
+        supervisor = self.supervisor("spawn-failure", command)
+        summary = supervisor.run()
+        self.assertEqual(summary["pendingCount"], 3)
+        self.assertEqual(summary["launchedAttemptCount"], 6)
+        terminal = json.loads(
+            (
+                supervisor.family_directory(0)
+                / "attempts/01/attempt-terminal.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertIn(
+            "worker_spawn_failed",
+            terminal["technicalDisposition"]["categories"],
+        )
+
+    def test_residual_descendant_pipe_is_killed_without_unbounded_join(self) -> None:
+        descendant_pid = self.root / "orphan-descendant.pid"
+        supervisor = self.supervisor(
+            "orphan-pipe",
+            self.command("orphan-pipe", descendant_pid=descendant_pid),
+            max_attempts=1,
+            grace=0.1,
+        )
+        started = time.monotonic()
+        summary = supervisor.run()
+        self.assertLess(time.monotonic() - started, 5)
+        self.assertEqual(summary["pendingCount"], 3)
+        terminal = json.loads(
+            (
+                supervisor.family_directory(0)
+                / "attempts/01/attempt-terminal.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertIn(
+            "descendant_stream_timeout",
+            terminal["technicalDisposition"]["categories"],
+        )
+        pid = int(descendant_pid.read_text(encoding="utf-8"))
+        deadline = time.time() + 2
+        while time.time() < deadline and not process_is_gone(pid):
+            time.sleep(0.02)
+        self.assertTrue(process_is_gone(pid))
+
+    def test_worker_output_is_hash_only_and_never_accepted(self) -> None:
+        supervisor = self.supervisor(
+            "noisy",
+            self.command("noisy"),
+            max_attempts=1,
+            stream_bytes=64,
+        )
+        summary = supervisor.run()
+        self.assertEqual(summary["pendingCount"], 3)
+        attempt_dir = supervisor.family_directory(0) / "attempts/01"
+        terminal = json.loads(
+            (attempt_dir / "attempt-terminal.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(terminal["streams"]["stdout"]["bytes"], 4096)
+        self.assertEqual(
+            terminal["streams"]["stdout"]["sha256"],
+            __import__("hashlib").sha256(b"x" * 4096).hexdigest(),
+        )
+        self.assertIn(
+            "unexpected_worker_output",
+            terminal["technicalDisposition"]["categories"],
+        )
+        self.assertFalse((attempt_dir / "worker.stdout.log").exists())
+        self.assertFalse((attempt_dir / "worker.stderr.log").exists())
+
+    def test_worker_environment_is_allowlisted_and_bound(self) -> None:
+        command = self.command("env-leak")
+        source_environment = {
+            "PATH": os.environ.get("PATH", ""),
+            "TZ": "UTC",
+            "WINNER": "alpha",
+            "DRY_RUN_ROLE": "test",
+        }
+        supervisor = SUPERVISOR.MapFidelitySupervisor(
+            manifest_path=self.manifest_path,
+            attestation_path=self.attestation_path,
+            run_root=self.root / "environment",
+            worker_command_prefix=command,
+            scheduler=SCHEDULER,
+            worker_environment=source_environment,
+            timeout_seconds=1,
+            termination_grace_seconds=0.1,
+            max_stream_bytes=1024,
+            max_attempts=1,
+        )
+        summary = supervisor.run()
+        self.assertEqual(summary["completedCount"], 3)
+        intent = json.loads(
+            (
+                supervisor.family_directory(0)
+                / "attempts/01/attempt-intent.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(intent["environment"]["values"], {"PATH": source_environment["PATH"], "TZ": "UTC"})
+        self.assertEqual(
+            intent["environment"]["sha256"],
+            SUPERVISOR.canonical_sha256(intent["environment"]["values"]),
+        )
+
+    def test_manifest_forbidden_key_and_symlinked_run_root_fail_closed(self) -> None:
+        manifest = copy.deepcopy(self.manifest)
+        manifest["families"][0]["splitRole"] = "test"
+        self._write_json(self.manifest_path, manifest)
+        self.attestation["manifest"]["sha256"] = SUPERVISOR.sha256_file(
+            self.manifest_path
+        )
+        self._write_json(self.attestation_path, self.attestation)
+        with self.assertRaises(SUPERVISOR.ValidationError):
+            self.supervisor("forbidden-manifest", self.command("success"))
+
+        self._write_json(self.manifest_path, self.manifest)
+        self.attestation["manifest"]["sha256"] = SUPERVISOR.sha256_file(
+            self.manifest_path
+        )
+        self._write_json(self.attestation_path, self.attestation)
+        target = self.root / "real-run-root"
+        target.mkdir(mode=0o700)
+        symlink = self.root / "symlink-run-root"
+        symlink.symlink_to(target, target_is_directory=True)
+        with self.assertRaises(SUPERVISOR.ValidationError):
+            SUPERVISOR.MapFidelitySupervisor(
+                manifest_path=self.manifest_path,
+                attestation_path=self.attestation_path,
+                run_root=symlink,
+                worker_command_prefix=self.command("success"),
+                scheduler=SCHEDULER,
+            )
+
+    def test_campaign_lock_is_exclusive(self) -> None:
+        supervisor = self.supervisor("locked", self.command("success"))
+        with SUPERVISOR.CampaignLock(supervisor.run_root / "campaign.lock"):
+            with self.assertRaises(SUPERVISOR.CampaignBusyError):
+                supervisor.run()
+
+
+if __name__ == "__main__":
+    unittest.main()
