@@ -22,6 +22,8 @@ Contents:
   family eligibility counts and reference-source classification.
 - `VENUE_STRATEGY.md`: verified venue fit and deadlines as of 2026-08-04.
 - `EXECUTION_ROADMAP.md`: compute budget, experiment gates, and weekly plan.
+- `DIAGNOSTIC_PROTOCOL.md`: fixed 1,000-launch pre-confirmatory allocation,
+  technical stops, one-unblinding signal gate, and variance recalibration.
 - `DECISIONS_2026-08-04.md`: owner decisions, venue choice, positive primary
   hypothesis, and the not-yet-frozen confirmatory protocol.
 - `RESULT_REGISTRY.tsv`: result-to-configuration/job provenance ledger.

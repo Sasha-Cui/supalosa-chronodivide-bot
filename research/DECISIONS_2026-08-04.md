@@ -33,10 +33,12 @@ allocation gates pass and the analysis implementation is hashed.
 
 ## Venue decision
 
-The primary target is the Soft Computing Applied to Games special session at
-EvoApplications 2027. The official deadline is 2026-11-01, papers are limited
-to 14 LNCS pages plus references, and EvoStar 2027 is hybrid. The internal
-paper-ready deadline is 2026-10-20, leaving time for review and formatting.
+The provisional primary target is the Soft Computing Applied to Games special
+session at EvoApplications 2027. The official deadline is 2026-11-01, papers
+are limited to 14 LNCS pages plus references, and EvoStar 2027 is hybrid. The
+2027 online-presenter instructions are not yet posted, so submission is
+conditional on written confirmation that presentation may be remote. The
+internal paper-ready deadline is 2026-10-20.
 
 EXAG 2026 is excluded because accepted work is presented in person. ICAART 2027
 is only a fallback if its organizers give written permission for remote
@@ -159,11 +161,14 @@ comparisons will use a prespecified correction or simultaneous interval method.
    reciprocal-start-averaged block contrasts and simulated power 0.80885 for a
    0.05 effect (20,000 prospective simulations; no outcomes used). These
    counts may be recalibrated from development-only variance before protocol
-   freeze, but never from sealed-test outcomes. The test-family selection script
-   and seed are committed before test access.
-7. Validation evidence reaches a 0.07 conditioned-minus-global difference, a
-   conditioned score of at least 0.55, and a positive direction on most
-   validation families.
+   freeze, but never from sealed-test outcomes. The test-family selection
+   generator, eligible-pool hash, config, and a prospective seed commitment are
+   committed before seed reveal. The exact split is generated only after the
+   source, policies, and protocol are frozen.
+7. The fixed 800-launch development signal phase passes every technical gate
+   and its single prespecified family-macro contrast has a one-sided 80% lower
+   clustered confidence bound above zero. This is a permissive futility screen,
+   not confirmatory evidence or a paper claim.
 8. A design-stage power simulation estimates at least 80% power for the 0.05
    primary effect under the authorized attempt budget.
 9. Source, dependency, map, split, protocol, and analysis hashes are frozen.
