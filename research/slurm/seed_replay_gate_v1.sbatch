@@ -9,6 +9,7 @@
 #SBATCH --error=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/slurm/seed-replay-gate-v1-%j.err
 
 set -euo pipefail
+source /etc/profile.d/modules.sh
 module load nodejs/20.13.1-GCCcore-13.3.0
 
 REPO=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot
