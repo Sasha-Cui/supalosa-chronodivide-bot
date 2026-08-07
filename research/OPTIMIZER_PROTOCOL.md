@@ -110,3 +110,23 @@ The reducer fails unless every campaign shard has:
 Private campaign, result, ranking, and survivor artifacts remain outside Git.
 Only job-level provenance and aggregate methodological facts may enter the
 public registry before the planned development unblinding.
+
+## Frozen downstream method pair
+
+After stage 2, the global and conditioned methods use the same six finalists
+and every accumulated finalist result from the nested training stages.
+
+The global method selects the finalist with the highest equal-family mean
+training utility, breaking ties by worst-family utility and policy hash. The
+conditioned method fits one ridge response surface per finalist with fixed
+penalty λ=1. Its only features are standardized log map area, absolute log
+width-to-height ratio, and log start count. For a new family it uses the global
+policy unless another finalist's predicted utility exceeds the global
+prediction by more than 0.02.
+
+This margin is fixed before optimizer outcomes. The selector cannot receive a
+map name, family ID, coordinate, start location, gameplay trace, development
+outcome, or extra simulation. The global and conditioned artifacts therefore
+have identical search budgets; they differ only in how the same finalist data
+are converted into a deployment policy. Training assignments are fit
+diagnostics, not held-out evidence.

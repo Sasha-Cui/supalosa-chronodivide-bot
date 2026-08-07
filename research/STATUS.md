@@ -24,6 +24,11 @@ policy interface, prospective splits, and sealed confirmatory games.
 | Strict research runner | Commits `f3569f4`, `6dfbc9e`, `5db7f4c`, `74f868c`: policy gate, seeded runner, plans, and reducer | Historical parameter trainer is superseded for new evidence |
 | End-to-end training smoke | Job 21655228: 2/2 launches accounted, no technical failures, 529 MiB peak RSS | Default policy lost both reciprocal training games; calibration only, not a paper result |
 
+The first stage-zero submission attempt (jobs 21655409--21655413) was cancelled
+within 11 seconds when a subsequent selector build changed the runtime tree.
+No runner event file or counted engine launch was created. Those job IDs and
+their superseded `37c9358` plans are retained but are not training evidence.
+
 The two Temperate evidence trees are committed by SHA-256 values
 `68e51b29b0d96f395d48142f8cdb4a89bab00ddec6d0ab4b235e266d2e8364e3`
 and `c8b8e94da46e494258896f934608a53ac7f15e3be8bbc1c2cd92c7795c7f12f4`.
