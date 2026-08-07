@@ -1757,12 +1757,6 @@ const assertCurrentFamilyInputs = (manifest: WorkerManifest, family: WorkerManif
         sha256: family.sha256,
     };
     assertWorkerFileDescriptor(sourceDescriptor, "selected representative");
-    const mixCopy: ExactFileDescriptor = {
-        path: path.resolve(manifest.inputs.mixDir, family.mapName),
-        bytes: family.bytes,
-        sha256: family.sha256,
-    };
-    assertWorkerFileDescriptor(mixCopy, "selected representative MIX copy");
     return sourcePath;
 };
 

@@ -1023,12 +1023,6 @@ def build_manifest(
         if map_name in seen_names:
             raise RuntimeError(f"Duplicate representative basename: {map_name}")
         seen_names.add(map_name)
-        runtime_path = mix_dir / map_name
-        runtime_exact = exact_file(runtime_path)
-        if runtime_exact["sha256"] != source_exact["sha256"]:
-            raise RuntimeError(
-                f"MIX_DIR copy does not match representative: {map_name}"
-            )
         parsed = parse_map(source_path)
         families.append({
             "index": population_index,

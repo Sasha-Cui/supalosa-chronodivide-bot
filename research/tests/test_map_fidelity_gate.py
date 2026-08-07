@@ -234,7 +234,6 @@ class GateFixture(unittest.TestCase):
         )
         representative.parent.mkdir(parents=True)
         representative.write_text(MAP_TEXT, encoding="latin-1")
-        (self.mix / representative.name).write_bytes(representative.read_bytes())
         (self.mix / "ra2.mix").write_bytes(b"fixture-assets")
         (self.repo / "package-lock.json").write_text("{}\n", encoding="utf-8")
         game_api = self.repo / "node_modules/@chronodivide/game-api"
@@ -352,6 +351,12 @@ class GateFixture(unittest.TestCase):
         self.assertEqual(GATE.PARTICIPANT_COUNTRY, "Arabs")
         self.assertEqual(
             self.manifest["protocol"]["participantCountry"], "Arabs"
+        )
+
+    def test_private_alias_does_not_require_shared_mix_basename_copy(self) -> None:
+        self.assertFalse((self.mix / "cd_fixture.map").exists())
+        self.assertEqual(
+            self.manifest["families"][0]["mapName"], "cd_fixture.map"
         )
 
     def result(self) -> dict[str, object]:
