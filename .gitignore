@@ -1,6 +1,13 @@
 .vs/
 .vscode/
 .idea/
+.DS_Store
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+coverage/
+.vitest/
 dist/
 game-client/
 node_modules/
