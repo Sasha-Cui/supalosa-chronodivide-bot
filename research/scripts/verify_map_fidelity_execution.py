@@ -30,9 +30,10 @@ SPEC.loader.exec_module(GATE)
 
 SCHEMA_VERSION = 1
 ARTIFACT_KIND = "independent_map_fidelity_execution_verification"
-DURABLE_GATE_ROOT = (
-    GATE.DURABLE_EVIDENCE_ROOT / "map-compatibility-gate-v2"
-)
+DURABLE_GATE_ROOTS = {
+    "original": GATE.DURABLE_EVIDENCE_ROOT / "map-compatibility-gate-v2",
+    "temperate": GATE.DURABLE_EVIDENCE_ROOT / "map-compatibility-temperate-v1",
+}
 DEFAULT_SACCT = Path("/opt/slurm/25.11.6/bin/sacct")
 JOB_ID_PATTERN = re.compile(r"^[1-9][0-9]*$")
 SACCT_FIELDS = (
@@ -181,11 +182,17 @@ def validate_accounting(
     }
 
 
-def validate_run_root(run_root: Path, scope: str, job_id: str) -> Path:
+def validate_run_root(
+    run_root: Path, profile: str, scope: str, job_id: str
+) -> Path:
     strict_job_id(job_id)
+    if profile not in DURABLE_GATE_ROOTS:
+        raise VerificationError("profile must be original or temperate")
     if scope not in {"preflight", "full"}:
         raise VerificationError("scope must be preflight or full")
-    expected = DURABLE_GATE_ROOT / scope / job_id
+    if profile == "temperate" and scope != "full":
+        raise VerificationError("temperate profile requires full scope")
+    expected = DURABLE_GATE_ROOTS[profile] / scope / job_id
     GATE.reject_symlink_components(expected, "durable execution root")
     try:
         resolved = run_root.resolve(strict=True)
@@ -340,10 +347,11 @@ def validate_live_nonsource_runtime(manifest: dict[str, Any]) -> dict[str, Any]:
 
 
 def independently_verify(
-    *, job_id: str, scope: str, run_root: Path, output: Path, sacct: Path
+    *, job_id: str, profile: str, scope: str, run_root: Path, output: Path,
+    sacct: Path
 ) -> dict[str, Any]:
     job_id = strict_job_id(job_id)
-    root = validate_run_root(run_root, scope, job_id)
+    root = validate_run_root(run_root, profile, scope, job_id)
     output_absolute = output.absolute()
     expected_output = root / "execution-verification.json"
     if output_absolute != expected_output:
@@ -407,6 +415,7 @@ def independently_verify(
         "artifactKind": ARTIFACT_KIND,
         "outcomeFree": True,
         "verifiedAt": verified_at,
+        "profile": profile,
         "scope": scope,
         "jobId": job_id,
         "runRoot": str(root),
@@ -454,6 +463,9 @@ def independently_verify(
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--job-id", required=True)
+    parser.add_argument(
+        "--profile", choices=tuple(DURABLE_GATE_ROOTS), required=True
+    )
     parser.add_argument("--scope", choices=("preflight", "full"), required=True)
     parser.add_argument("--run-root", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
@@ -465,6 +477,7 @@ def main() -> None:
     args = parse_args()
     record = independently_verify(
         job_id=args.job_id,
+        profile=args.profile,
         scope=args.scope,
         run_root=args.run_root,
         output=args.output,
@@ -473,6 +486,7 @@ def main() -> None:
     print(json.dumps({
         "artifact": str(args.output.absolute()),
         "jobId": record["jobId"],
+        "profile": record["profile"],
         "scope": record["scope"],
         "verdict": record["result"]["verdict"],
         "familyCounts": record["result"]["familyCounts"],

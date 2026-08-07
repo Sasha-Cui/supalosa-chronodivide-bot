@@ -58,6 +58,46 @@ class AccountingTests(unittest.TestCase):
         with self.assertRaisesRegex(VERIFIER.VerificationError, "did not complete"):
             VERIFIER.validate_accounting(rows, SCHEDULER)
 
+
+class RunRootTests(unittest.TestCase):
+    def test_profiles_resolve_only_their_fixed_private_roots(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            original = root / "original"
+            temperate = root / "temperate"
+            original_run = original / "full" / JOB_ID
+            temperate_run = temperate / "full" / JOB_ID
+            original_run.mkdir(parents=True, mode=0o700)
+            temperate_run.mkdir(parents=True, mode=0o700)
+            previous = VERIFIER.DURABLE_GATE_ROOTS
+            VERIFIER.DURABLE_GATE_ROOTS = {
+                "original": original,
+                "temperate": temperate,
+            }
+            try:
+                self.assertEqual(
+                    VERIFIER.validate_run_root(
+                        temperate_run, "temperate", "full", JOB_ID
+                    ),
+                    temperate_run,
+                )
+                with self.assertRaisesRegex(
+                    VERIFIER.VerificationError, "canonical path"
+                ):
+                    VERIFIER.validate_run_root(
+                        original_run, "temperate", "full", JOB_ID
+                    )
+                with self.assertRaisesRegex(
+                    VERIFIER.VerificationError, "requires full scope"
+                ):
+                    VERIFIER.validate_run_root(
+                        temperate_run, "temperate", "preflight", JOB_ID
+                    )
+            finally:
+                VERIFIER.DURABLE_GATE_ROOTS = previous
+
+
+class AdditionalAccountingTests(unittest.TestCase):
     def test_unrelated_or_missing_batch_rows_are_rejected(self) -> None:
         with self.assertRaisesRegex(VERIFIER.VerificationError, "unrelated row"):
             VERIFIER.parse_sacct_output(
