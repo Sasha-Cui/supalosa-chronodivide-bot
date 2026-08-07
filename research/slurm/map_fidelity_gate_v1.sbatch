@@ -33,9 +33,7 @@ export DEBUG_LOGGING
 
 REPO=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot
 MIX_DIR="$REPO/packages/chronodivide-bot-driver/data"
-EVIDENCE_BASE=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/map-compatibility-gate-v2
 CATALOG="$REPO/research/artifacts/map_family_catalog.json"
-TARGETS="$REPO/research/artifacts/role_blind_fidelity_targets_v1.json"
 PREFLIGHT_PLAN="$REPO/research/artifacts/map_fidelity_expanded_preflight_v2.json"
 GATE_SCRIPT="$REPO/research/scripts/map_fidelity_gate.py"
 SUPERVISOR_SCRIPT="$REPO/research/scripts/map_fidelity_supervisor.py"
@@ -44,9 +42,30 @@ WORKER="$REPO/packages/chronodivide-bot-driver/dist/benchmark/mapFidelityProbe.j
 TARGET_TICK=250
 readonly TARGET_TICK
 export TARGET_TICK
+MAP_FIDELITY_PROFILE=${MAP_FIDELITY_PROFILE:-original}
 MAP_FIDELITY_SCOPE=${MAP_FIDELITY_SCOPE:-preflight}
 MAP_FIDELITY_MAX_ATTEMPTS=${MAP_FIDELITY_MAX_ATTEMPTS:-2}
 MAP_FIDELITY_TIMEOUT_SECONDS=${MAP_FIDELITY_TIMEOUT_SECONDS:-125}
+case "$MAP_FIDELITY_PROFILE" in
+    original)
+        EVIDENCE_BASE=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/map-compatibility-gate-v2
+        TARGETS="$REPO/research/artifacts/role_blind_fidelity_targets_v1.json"
+        EXPECTED_FAMILIES=127
+        ;;
+    temperate)
+        EVIDENCE_BASE=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/map-compatibility-temperate-v1
+        TARGETS="$REPO/research/artifacts/role_blind_temperate_fidelity_targets_v1.json"
+        EXPECTED_FAMILIES=67
+        if [[ "$MAP_FIDELITY_SCOPE" != "full" ]]; then
+            echo "The temperate profile requires MAP_FIDELITY_SCOPE=full" >&2
+            exit 2
+        fi
+        ;;
+    *)
+        echo "MAP_FIDELITY_PROFILE must be original or temperate" >&2
+        exit 2
+        ;;
+esac
 case "$MAP_FIDELITY_SCOPE" in
     full)
         PLAN_ARGS=()
@@ -111,7 +130,7 @@ cd "$REPO"
     --catalog "$CATALOG" \
     --mix-dir "$MIX_DIR" \
     --target-tick "$TARGET_TICK" \
-    --expected-families 127 \
+    --expected-families "$EXPECTED_FAMILIES" \
     "${PLAN_ARGS[@]}" \
     --output "$RUN_ROOT/input-manifest.json"
 
