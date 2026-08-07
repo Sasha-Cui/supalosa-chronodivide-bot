@@ -817,6 +817,34 @@ class GateFixture(unittest.TestCase):
             verify_runtime_inputs=False,
         )
 
+    def test_aggregate_revalidation_preserves_existing_legacy_artifact(self) -> None:
+        evidence = self.create_pipeline_evidence()
+        legacy_path = self.run_root / "probe-results.json"
+        first = GATE.aggregate_supervisor_evidence(
+            self.manifest_path,
+            evidence["pre"],
+            evidence["post"],
+            self.run_root,
+            legacy_path,
+            SCHEDULER,
+            durable_root=self.durable_root,
+            verify_runtime_inputs=False,
+        )
+        before = legacy_path.read_bytes()
+        second = GATE.aggregate_supervisor_evidence(
+            self.manifest_path,
+            evidence["pre"],
+            evidence["post"],
+            self.run_root,
+            legacy_path,
+            SCHEDULER,
+            durable_root=self.durable_root,
+            verify_runtime_inputs=False,
+            write_legacy_result=False,
+        )
+        self.assertEqual(legacy_path.read_bytes(), before)
+        self.assertEqual(GATE.canonical_sha256(second), GATE.canonical_sha256(first))
+
     def test_clean_mock_probe_passes(self) -> None:
         summary = self.check(self.result())
         self.assertEqual(summary["verdict"], "PASS")

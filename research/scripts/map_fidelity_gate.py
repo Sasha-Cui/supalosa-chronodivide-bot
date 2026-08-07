@@ -3799,6 +3799,7 @@ def aggregate_supervisor_evidence(
     *,
     durable_root: Path = DURABLE_EVIDENCE_ROOT,
     verify_runtime_inputs: bool = True,
+    write_legacy_result: bool = True,
 ) -> dict[str, Any]:
     for path in (
         manifest_path, pre_attestation_path, post_attestation_path,
@@ -3829,7 +3830,12 @@ def aggregate_supervisor_evidence(
         durable_root=durable_root,
     )
     legacy = legacy_probe_aggregate(manifest, manifest_path, payloads, scheduler)
-    write_exclusive(legacy_result_path, legacy)
+    if write_legacy_result:
+        write_exclusive(legacy_result_path, legacy)
+    elif canonical_sha256(load_json(legacy_result_path)) != canonical_sha256(legacy):
+        raise RuntimeError(
+            "Stored legacy probe aggregate differs from independent recomputation"
+        )
     summary = check_gate(
         manifest_path,
         legacy_result_path,

@@ -310,6 +310,7 @@ def independently_verify(
         scheduler,
         durable_root=GATE.DURABLE_EVIDENCE_ROOT,
         verify_runtime_inputs=True,
+        write_legacy_result=False,
     )
     if GATE.canonical_sha256(stored_summary) != GATE.canonical_sha256(recomputed_summary):
         raise VerificationError("stored gate summary differs from independent recomputation")
