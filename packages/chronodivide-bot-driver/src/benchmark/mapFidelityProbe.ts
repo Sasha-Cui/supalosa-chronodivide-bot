@@ -1849,6 +1849,27 @@ export const removeEmptyWorkerSandbox = (
     return !fs.existsSync(resolvedSandbox);
 };
 
+const manifestValidationOnlyMain = async (): Promise<void> => {
+    setWorkerTechnicalStage("parse_arguments");
+    const argumentsAfterEntry = process.argv.slice(2);
+    if (
+        argumentsAfterEntry.length !== 3 ||
+        argumentsAfterEntry[0] !== "--validate-manifest-only" ||
+        argumentsAfterEntry[1] !== "--manifest"
+    ) {
+        throw new Error(
+            "Manifest-only validation requires exactly --validate-manifest-only --manifest <path>",
+        );
+    }
+    const manifestPath = path.resolve(argumentsAfterEntry[2]);
+    setWorkerTechnicalStage("scheduler_validate");
+    const scheduler = getAuthoritativeScheduler();
+    setWorkerTechnicalStage("manifest_read");
+    const manifestArtifact = readWorkerJson(manifestPath, "Manifest");
+    setWorkerTechnicalStage("manifest_validate");
+    assertWorkerManifest(manifestArtifact.value, scheduler);
+};
+
 const familyWorkerMain = async (): Promise<void> => {
     setWorkerTechnicalStage("parse_arguments");
     const manifestPath = path.resolve(requireStringArg("--manifest"));
@@ -1962,7 +1983,11 @@ const familyWorkerMain = async (): Promise<void> => {
 };
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-    familyWorkerMain().catch((error: unknown) => {
+    const selectedMain =
+        process.argv[2] === "--validate-manifest-only"
+            ? manifestValidationOnlyMain
+            : familyWorkerMain;
+    selectedMain().catch((error: unknown) => {
         // Only canonical stage metadata and hashes cross stderr; raw diagnostic
         // text, roles, paths, stacks, and outcomes are never emitted.
         try {

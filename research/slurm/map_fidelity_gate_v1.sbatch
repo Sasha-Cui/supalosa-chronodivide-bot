@@ -109,6 +109,12 @@ cd "$REPO"
     "${PLAN_ARGS[@]}" \
     --output "$RUN_ROOT/input-manifest.json"
 
+# Cross-language schema/provenance validation only; this mode cannot initialize
+# the simulator or create a game.
+"$NODE_BIN" --es-module-specifier-resolution=node "$WORKER" \
+    --validate-manifest-only \
+    --manifest "$RUN_ROOT/input-manifest.json"
+
 "$PYTHON_BIN" "$GATE_SCRIPT" attest \
     --manifest "$RUN_ROOT/input-manifest.json" \
     --phase pre_workers \
