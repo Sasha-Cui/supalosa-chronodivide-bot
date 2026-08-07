@@ -5,6 +5,7 @@ import path from "node:path";
 import { FileHandle as NodeAdapterFileHandle } from "file-system-access/lib/adapters/node.js";
 import { describe, expect, it } from "vitest";
 import {
+    assertWorkerManifestFamily,
     buildWorkerTechnicalDiagnostic,
     completeAttestedMapSettingsReadPair,
     removeEmptyWorkerSandbox,
@@ -91,6 +92,51 @@ const readAlias = async (materialized: MaterializedMapAlias, count: number): Pro
 };
 
 describe("collision-free map-load attestation", () => {
+    it("accepts the Python manifest family schema and rejects reversed field types", () => {
+        const family = {
+            index: 32,
+            familyId: "mf_fixture",
+            representativeMapPath: "packages/chronodivide-bot-driver/data/cd_fixture.map",
+            representativeSelectionRule: "fixture",
+            mapName: "cd_fixture.map",
+            bytes: 123,
+            sha256: "a".repeat(64),
+            sections: ["basic", "map", "waypoints"],
+            requiredSections: {
+                basic: true,
+                map: true,
+                waypoints: true,
+            },
+            requiredKeys: {
+                "basic.gamemode": true,
+                "map.size": true,
+            },
+            payloadEntryCounts: {
+                isomappack5: 10,
+                overlaydatapack: 2,
+                overlaypack: 2,
+            },
+            declaredStartLocations: [
+                { waypoint: 0, encoded: 63037, x: 37, y: 63 },
+                { waypoint: 1, encoded: 39062, x: 62, y: 39 },
+            ],
+            staticChecks: {
+                requiredSectionsPresent: true,
+                requiredKeysPresent: true,
+                payloadSectionsNonempty: true,
+                startEnumerationValid: true,
+                failures: [],
+            },
+        };
+        expect(() => assertWorkerManifestFamily(family, "fixture family")).not.toThrow();
+        expect(() =>
+            assertWorkerManifestFamily(
+                { ...family, requiredSections: ["basic", "map"] },
+                "fixture family",
+            ),
+        ).toThrow(/must be an object/);
+    });
+
     it("emits only a fixed technical stage and hashes for worker failures", () => {
         const diagnostic = buildWorkerTechnicalDiagnostic(
             "manifest_validate",

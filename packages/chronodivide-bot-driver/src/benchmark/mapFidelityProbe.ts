@@ -209,11 +209,11 @@ type WorkerGitBlob = {
     sha256: string;
 };
 
-type WorkerManifestFamily = ManifestFamily & {
+export type WorkerManifestFamily = ManifestFamily & {
     representativeSelectionRule: string;
-    sections: Record<string, number>;
-    requiredSections: string[];
-    requiredKeys: Record<string, string[]>;
+    sections: string[];
+    requiredSections: Record<string, boolean>;
+    requiredKeys: Record<string, boolean>;
     payloadEntryCounts: Record<string, number>;
 };
 
@@ -603,14 +603,16 @@ const assertWorkerIntegerRecord = (value: unknown, label: string): void => {
     }
 };
 
-const assertWorkerStringArrayRecord = (value: unknown, label: string): void => {
+const assertWorkerBooleanRecord = (value: unknown, label: string): void => {
     const record = assertWorkerRecord(value, label);
     for (const [key, entry] of Object.entries(record)) {
-        requireWorkerStringArray(entry, `${label}.${key}`);
+        if (typeof entry !== "boolean") {
+            throw new Error(`${label}.${key} must be boolean`);
+        }
     }
 };
 
-const assertWorkerManifestFamily = (value: unknown, label: string): WorkerManifestFamily => {
+export const assertWorkerManifestFamily = (value: unknown, label: string): WorkerManifestFamily => {
     const family = assertWorkerExactKeys(
         value,
         [
@@ -640,9 +642,12 @@ const assertWorkerManifestFamily = (value: unknown, label: string): WorkerManife
     requireWorkerString(family.mapName, `${label}.mapName`);
     requireWorkerInteger(family.bytes, `${label}.bytes`);
     requireWorkerHash(family.sha256, `${label}.sha256`);
-    assertWorkerIntegerRecord(family.sections, `${label}.sections`);
-    requireWorkerStringArray(family.requiredSections, `${label}.requiredSections`);
-    assertWorkerStringArrayRecord(family.requiredKeys, `${label}.requiredKeys`);
+    const sections = requireWorkerStringArray(family.sections, `${label}.sections`);
+    if (JSON.stringify(sections) !== JSON.stringify([...new Set(sections)].sort())) {
+        throw new Error(`${label}.sections must be sorted and unique`);
+    }
+    assertWorkerBooleanRecord(family.requiredSections, `${label}.requiredSections`);
+    assertWorkerBooleanRecord(family.requiredKeys, `${label}.requiredKeys`);
     assertWorkerIntegerRecord(family.payloadEntryCounts, `${label}.payloadEntryCounts`);
     if (!Array.isArray(family.declaredStartLocations) || family.declaredStartLocations.length < 2) {
         throw new Error(`${label}.declaredStartLocations must contain at least two points`);
@@ -960,7 +965,7 @@ const assertWorkerExpandedPreflightPlan = (
     }
 };
 
-const assertWorkerManifest = (
+export const assertWorkerManifest = (
     value: unknown,
     scheduler: SchedulerDescriptor,
 ): WorkerManifest => {
