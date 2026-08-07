@@ -1926,7 +1926,7 @@ def validate_probe_run_v2(
             raise RuntimeError(f"{label}.{key} is inconsistent")
     starts = strict_object(probe["starts"], {"alpha", "beta"}, f"{label}.starts")
     for identity in ("alpha", "beta"):
-        if coordinate(starts[identity]) is None:
+        if starts[identity] is not None and coordinate(starts[identity]) is None:
             raise RuntimeError(f"{label}.starts.{identity} is invalid")
     strict_nonnegative_integer(probe["wallTimeMs"], f"{label}.wallTimeMs")
     failures: list[str] = []

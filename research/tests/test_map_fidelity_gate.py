@@ -64,6 +64,36 @@ SCHEDULER = {
 
 
 class MapParseTests(unittest.TestCase):
+    def test_probe_validator_allows_null_starts_after_failed_load(self) -> None:
+        probe = {
+            "order": ["alpha", "beta"],
+            "loaded": False,
+            "initialTick": None,
+            "finalTick": None,
+            "updates": 0,
+            "initialTickIsZero": False,
+            "tickUpdateArithmeticConsistent": False,
+            "progressedBeyondTickOne": False,
+            "reachedTargetTick": False,
+            "starts": {"alpha": None, "beta": None},
+            "wallTimeMs": 1,
+            "warningCaptureTruncated": False,
+            "error": {
+                "category": "missing_asset",
+                "name": "captured_error",
+                "messageSha256": "0" * 64,
+            },
+        }
+        validated, failures = GATE.validate_probe_run_v2(
+            probe,
+            label="forward",
+            expected_order=["alpha", "beta"],
+            target_tick=250,
+        )
+        self.assertEqual(validated, probe)
+        self.assertIn("forward_load_failed", failures)
+        self.assertIn("forward_missing_asset", failures)
+
     def test_engine_asset_directory_rejects_missing_files(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             with self.assertRaisesRegex(RuntimeError, "Engine asset directory is incomplete"):
