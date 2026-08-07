@@ -1,0 +1,182 @@
+{
+  "candidateAssignmentCount": 4096,
+  "catalogSha256": "8f378ee52a2d8a6d45e5d23a1e521aa6b2e08e9ab174adc8066cce8a1824bd54",
+  "descriptorSummaries": {
+    "development": {
+      "area": {
+        "max": 17160,
+        "mean": 8115.833333,
+        "min": 2756
+      },
+      "count": 12,
+      "localArea": {
+        "max": 15080,
+        "mean": 6806.916667,
+        "min": 1974
+      },
+      "startCounts": {
+        "2": 4,
+        "3": 1,
+        "4": 4,
+        "6": 2,
+        "8": 1
+      }
+    },
+    "reserve": {
+      "area": {
+        "max": 13400,
+        "mean": 9272.0,
+        "min": 3960
+      },
+      "count": 4,
+      "localArea": {
+        "max": 11446,
+        "mean": 7671.0,
+        "min": 2968
+      },
+      "startCounts": {
+        "2": 1,
+        "4": 2,
+        "6": 1
+      }
+    },
+    "test": {
+      "area": {
+        "max": 17160,
+        "mean": 8725.25,
+        "min": 2850
+      },
+      "count": 16,
+      "localArea": {
+        "max": 15080,
+        "mean": 7252.875,
+        "min": 2070
+      },
+      "startCounts": {
+        "2": 5,
+        "3": 1,
+        "4": 6,
+        "6": 2,
+        "8": 2
+      }
+    },
+    "train": {
+      "area": {
+        "max": 17160,
+        "mean": 7956.681818,
+        "min": 2500
+      },
+      "count": 22,
+      "localArea": {
+        "max": 15080,
+        "mean": 6692.136364,
+        "min": 1974
+      },
+      "startCounts": {
+        "2": 6,
+        "3": 2,
+        "4": 8,
+        "6": 4,
+        "8": 2
+      }
+    }
+  },
+  "developmentDiagnosticCounts": {
+    "primary": 10,
+    "substitute": 2
+  },
+  "developmentSubstituteStartCounts": [
+    2,
+    4
+  ],
+  "identitiesPrivate": true,
+  "interpretation": "This is an outcome-blind role commitment. Family identities remain in separate private manifests. Training and development commands must never read the test or reserve manifest.",
+  "outcomeBlind": true,
+  "privateArtifacts": {
+    "development": {
+      "bytes": 6998,
+      "file": "development-families.json",
+      "sha256": "701ee56f8700448b452f1398f07757ed2e0472af151cc78ef9351b5ea6cd857c"
+    },
+    "reserve": {
+      "bytes": 2393,
+      "file": "reserve-families.json",
+      "sha256": "737aa435e9d753319981d98ef42a3ccd88d8cf9af6468eaaeeb6276c8c398b4d"
+    },
+    "salt": {
+      "bytes": 65,
+      "file": "split-salt.hex",
+      "sha256": "1e98b4f845906e4b679e2ac56edf6233d2423632ba545d21fee1d16dabd724ac"
+    },
+    "test": {
+      "bytes": 8150,
+      "file": "test-families.json",
+      "sha256": "63c22710de11e3490260fb78ed9246456eaf0bca9dec6bffdf266b7e5cf4e8b2"
+    },
+    "train": {
+      "bytes": 10971,
+      "file": "train-families.json",
+      "sha256": "25eac7233b2667b157c5026c66412d6becf947785bb8a528c86c18fc559d77c0"
+    }
+  },
+  "roleCommitments": {
+    "development": "46aaf1ebf64e42391a97346794ecdcee5672be60a9c1feb6c6d82f9816948516",
+    "reserve": "9576ebc83157fe6bbcae30a474c185f69d6570a421bde8de8237e4f31d3db1d1",
+    "test": "2f6dcce3c9021f050bc84eae69ea12b9fd094af8b78bf0567724ac4a156f4716",
+    "train": "567570741d55e7fc0ae3a302fbbaf7e7f570220bfa260b5f2143e5ff8a122cfa"
+  },
+  "roleCounts": {
+    "development": 12,
+    "reserve": 4,
+    "test": 16,
+    "train": 22
+  },
+  "roleOrder": [
+    "train",
+    "development",
+    "test",
+    "reserve"
+  ],
+  "roleStartQuotas": {
+    "2": {
+      "development": 4,
+      "reserve": 1,
+      "test": 5,
+      "train": 6
+    },
+    "3": {
+      "development": 1,
+      "reserve": 0,
+      "test": 1,
+      "train": 2
+    },
+    "4": {
+      "development": 4,
+      "reserve": 2,
+      "test": 6,
+      "train": 8
+    },
+    "6": {
+      "development": 2,
+      "reserve": 1,
+      "test": 2,
+      "train": 4
+    },
+    "8": {
+      "development": 1,
+      "reserve": 0,
+      "test": 2,
+      "train": 2
+    }
+  },
+  "saltSha256": "849be668920e01ab6af2e43164c4236eee63d8e26c619b314ae9d0b77f7e087e",
+  "schemaVersion": 1,
+  "selectedAssignmentIndex": 2933,
+  "sourcePopulationArtifactSha256": "d280138b124e0d1665151189a1dd9ad74b92f646a8c523d25cef4c634b2e90c1",
+  "sourcePopulationCommitmentSha256": "ece688c14d8c02b98754a88f04e42581f4c6c6044d742a7b8d4e0feaa5177fa5",
+  "splitCommitmentSha256": "6b78f6c550096a4a3fffe5b2c4d1f2128e33b0f80e6462e541b98d6408d1fe0a",
+  "splitPolicy": "Within exact start-count strata, evaluate a fixed number of HMAC-SHA256 permutations keyed by a private 256-bit salt and select the lowest predeclared structural-balance score over log map area and absolute log aspect ratio. Enforce fixed role/start quotas. Designate one two-start and one four-start development family as ordered technical substitutes using a separate HMAC domain. Do not inspect compatibility details beyond the frozen pass-only population, policy identity, gameplay outcome, or dataset role history.",
+  "splitPolicySha256": "82b4a8b085449a31dc95fa20814b4839aad95823b451532648dc3a1122118315",
+  "status": "FROZEN_FAMILY_ROLE_COMMITMENTS_IDENTITIES_PRIVATE",
+  "structuralBalanceScore": 10.339956659864
+}
