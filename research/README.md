@@ -48,6 +48,9 @@ Contents:
   preflight; its identities do not assign dataset roles.
 - `scripts/map_fidelity_gate.py`: strict Slurm-only fidelity manifest builder
   and independent, schema-allowlisted checker.
+- `scripts/verify_map_fidelity_execution.py`: separate-session verifier for
+  final `sacct` state, exact durable evidence recomputation, private tree
+  hashing, and an exclusive post-job execution record.
 - `scripts/design_power.py`: assumption-only crossed family/run power analysis.
 - `scripts/check_seed_replay_gate.py`: exact fresh-process replay-gate checker.
 - `scripts/run_audit_pilot_task.sh`: shared Slurm/allocation task runner.
@@ -90,11 +93,14 @@ Contents:
 - `slurm/seed_replay_gate_v1.sbatch`: packaged 10-same/1-different fresh-
   process deterministic replay gate; passed as job 21291720 under
   `pi_jss233`.
-- `slurm/map_fidelity_gate_v1.sbatch`: pinned CPU-only, role-blind three-map
-  preflight entry point; a preflight can never clear full-map fidelity.
+- `slurm/map_fidelity_gate_v1.sbatch`: pinned CPU-only, role-blind 11-family
+  calibration/confirmation entry point with per-family isolation, exact map-byte
+  attestation, bounded technical retry, and durable project evidence; a
+  preflight can never clear the 127-family population.
 
 Historical pilot outputs were intended to be append-only under scratch, but
-their inconsistent visibility is now a recorded retention incident. Future
-authoritative evidence must be atomically staged under versioned project
-storage and independently reverified. Proprietary maps, MIX archives, and
+their inconsistent visibility is now a recorded retention incident. New
+map-compatibility evidence is written directly under the private versioned
+project root `research-evidence/map-compatibility-gate-v2` and must be
+independently reverified after job exit. Proprietary maps, MIX archives, and
 copied game data are not duplicated into the Git research layer.

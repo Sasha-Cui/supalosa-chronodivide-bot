@@ -1,117 +1,120 @@
-# Outcome-free full-map fidelity gate
+# Outcome-free simulator-compatibility gate
 
-`map-fidelity-gate-v1` is an infrastructure gate, not a policy benchmark. It
-uses passive `Bot` subclasses, never queries game completion or player stats,
-and rejects result JSON containing outcome fields such as winners, defeats,
-credits, scores, or unit/building counts.
+`map-fidelity-gate-v1` is an infrastructure gate, not a policy benchmark.
+It uses passive bots, never reads game outcomes or player statistics, and
+rejects outcome-bearing JSON. A pass establishes only that the pinned Chrono
+Divide simulator can parse, load, advance, and assign one reciprocal start pair
+on an exact map artifact. It does not establish Red Alert 2 behavioral fidelity,
+strategic suitability, StrongBot strength, or sealed-test validity.
 
-## Scope
+## Frozen population and technical preflight
 
--   Input families: all 127 records in the committed, outcome-blind
-    `research/artifacts/role_blind_fidelity_targets_v1.json`. It declares
-    `roleBlind=true`, `finalSplit=false`, and `isSplit=false`; no split, role,
-    fidelity status, or adjudication is an input. Its immutable target projection
-    contains only family ID and representative path/SHA and has a canonical
-    population commitment. The gate cross-validates that its family set equals
-    every evidence-based eligible family in `map_family_catalog.json`.
--   Representative: selected directly from cataloged contents by the committed
-    role-blind rule: passed-load content first, then failed-load content, then
-    unverified content, with path depth/length/lexical tie-breaks. Its exact path
-    and SHA-256 are bound before execution.
--   Static checks: exact map hash, required INI sections/keys, nonempty terrain
-    payloads, and enumeration of indexed start waypoints 0 through 7.
--   Engine checks: two passive 1v1 sessions per map at the same explicit seed,
-    with participant order reversed. Both must load, advance through target tick
-    250, return distinct declared starts, and preserve the physical-slot pair
-    under the reciprocal participant order.
--   Dynamic start limit: one deterministic reciprocal pair is exercised per map.
-    All declared starts are enumerated statically, but maps with more than two
-    starts do not receive exhaustive dynamic start coverage in this gate.
+The full role-blind population is the 127 Tier-B families in
+`research/artifacts/role_blind_fidelity_targets_v1.json`. The target artifact
+contains family IDs and exact representative path/SHA bindings but no
+train/validation/test role, policy outcome, or compatibility adjudication. The
+gate independently cross-checks it against `map_family_catalog.json`.
 
-The gate captures warning-like console messages and assigns `fail` or `review`
-categories. Released records retain only the category, severity, phase, and a
-SHA-256 of the diagnostic; raw text is not serialized. A full 127-family run may
-be `screenComplete=true` even when some families are classified `review` or
-`fail`, provided every family was classified and there was no global
-infrastructure/provenance finding. Only an individual family whose original
-automated status is `pass` may enter the later eligible pool; `review` cannot be
-converted into a pass by informal adjudication. This outcome-blind compatibility
-filter avoids making one incompatible map invalidate every passing map.
+Before a 127-family screen, the committed
+`research/artifacts/map_fidelity_expanded_preflight_v2.json` selects exactly 11
+families. The selection is outcome-free and covers every observed theater and
+declared-start count plus global representative area and byte-size extrema.
+Selected families retain their full-population indices and engine seeds. The
+plan and its selected-family commitment are exact-hash-bound in the manifest.
 
-A family `pass` establishes only internal parser/load/progress behavior under
-the pinned Chrono Divide simulator. It does not establish behavioral equivalence
-to Red Alert 2, strategic suitability, or sealed-test validity.
+The historical three-family job 21296316 passed its narrower legacy smoke test.
+It remains useful provenance, but it does not authorize the new full screen.
 
-## Slurm package
+## Per-family execution contract
 
-The only engine entry point is `research/slurm/map_fidelity_gate_v1.sbatch`.
-Both the static preparer/checker and the Node runner require `SLURM_JOB_ID`,
-query `scontrol`, and reject any authoritative account other than
-`pi_jss233`. Preflight job 21296136 failed closed before map load because the
-manifest used display label `Iraq`, not the pinned API's internal country ID
-`Arabs`. Commit `3f605eb` fixed and regression-tested that configuration.
-Corrected job 21296316 completed under `pi_jss233`: 3/3 role-blind families and
-6/6 reciprocal passive sessions passed through tick 250 with no warning
-category or global provenance finding. This is preflight evidence only; it is
-not full-map clearance or policy-strength evidence.
+Each family runs in a fresh child process under one authoritative Slurm job.
+The worker creates a private content-addressed map alias, rejects case-folded
+filesystem collisions, intercepts the pinned Node filesystem adapter, and
+attests the exact bytes returned to the engine. A complete family attempt
+requires five attested map-settings reads: one initialization read, two forward
+session reads, and two reverse session reads.
 
-Preparation also fails closed if tracked source is dirty, if source/build/
-research-control directories contain untracked files, if a required Git query
-fails, or if the gate sources, role-blind target manifest, or family catalog are
-not committed. The input manifest records the commit, exact source and compiled
-files, the complete installed `@chronodivide/game-api` tree (including
-`dist/res/ra2cd.mix`), the complete installed dependency tree, every map and
-asset hash, pinned `DEBUG_LOGGING=1`, and the authoritative Slurm job ID.
-Untracked map assets are allowed only because their bytes are independently
-bound by SHA-256.
+The two passive 1v1 sessions use the same explicit seed with participant order
+reversed. Both must reach target tick 250, use distinct declared starts, and
+preserve the physical-slot pair under reversal. Static checks validate exact
+map bytes, required INI sections and payloads, and declared waypoints.
 
-Reserved resources are one CPU, 4 GiB RAM, two hours on `day`, and no GPU. The
-engine workload is 127 maps times two reciprocal sessions times 250 target
-ticks (63,500 target ticks, plus map construction). The existing full asset
-tree is about 370 MiB; the gate hashes it before and after the probe. Expected
-new output is JSON and scheduler logs, ordinarily well below 10 MiB. Warning
-text is not retained, and a 100-warning-per-session cap hit is itself a gate
-failure.
+The supervisor enforces a 125-second monotonic timeout per attempt, terminates
+the process group, bounds and hashes child stdout/stderr, and writes atomic
+intent, terminal, shard, checkpoint, and campaign ledgers. At most two
+prospectively allowed attempts may repair technical incompletion. A
+schema-valid compatibility `review` or `fail` is technically complete and is
+never retried.
 
-When execution is authorized, first run the deterministic, role-blind three-map
-preflight. The three representatives are chosen by a committed SHA-256 ranking,
-and retain their full-run population indices and seeds:
+## Provenance and durable evidence
+
+Preparation fails closed on dirty tracked control source, untracked files in
+critical source/control directories, Git-query failure, source-blob mismatch,
+runtime drift, asset-tree drift, or invalid preflight binding. The manifest
+binds the Git commit, source and compiled files, runtime executables, installed
+game API and dependency trees, MIX tree, every selected map, environment
+allowlist, scheduler identity, and canonical source/runtime bundles.
+
+All new evidence is written directly, without overwrite and with private
+permissions, under:
+
+```text
+/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/
+  map-compatibility-gate-v2/{preflight|full}/<job-id>/
+```
+
+The job records private stdout/stderr, manifest, pre-worker attestation, every
+attempt ledger and shard, campaign terminal, post-worker attestation, legacy
+probe aggregate, gate summary, and supervisor exit code. A technical failure
+returns nonzero and retains partial evidence. Compatibility `review` or `fail`
+can still be a technically complete aggregate.
+
+## Authorized execution sequence
+
+The job requests one CPU, 4 GiB RAM, no GPU, and uses only `pi_jss233`. First
+run scheduler validation and the one-attempt calibration:
 
 ```bash
+/opt/slurm/current/bin/sbatch --test-only \
+  --partition=devel --time=00:30:00 \
+  --export=ALL,MAP_FIDELITY_SCOPE=preflight,MAP_FIDELITY_MAX_ATTEMPTS=1 \
+  research/slurm/map_fidelity_gate_v1.sbatch
+
 /opt/slurm/current/bin/sbatch \
   --partition=devel --time=00:30:00 \
-  --export=MAP_FIDELITY_SCOPE=preflight \
+  --export=ALL,MAP_FIDELITY_SCOPE=preflight,MAP_FIDELITY_MAX_ATTEMPTS=1 \
   research/slurm/map_fidelity_gate_v1.sbatch
 ```
 
-A preflight `PASS` has `fullCoverage=false`, `passed=false`, and
-`eligibleForFidelityClearance=false`; it is infrastructure evidence only. Do
-not submit the complete role-blind 127-map run until two full-run hardening
-items are implemented: collision-free proof of the exact VFS-resolved map bytes
-and per-family process isolation with timeout/atomic checkpointing. The full
-script remains packaged for review but is not yet authorized as clearance
-evidence.
+At the 125-second cap, 11 one-attempt families require about 23 minutes before
+build and hashing overhead. If calibration is technically complete and the
+durable bundle independently revalidates, run the two-attempt confirmation:
 
-The corrected preflight's registered aggregate and exact hashes are in
-`research/artifacts/map_fidelity_preflight_v1_execution.json`.
+```bash
+/opt/slurm/current/bin/sbatch \
+  --partition=day --time=01:00:00 \
+  --export=ALL,MAP_FIDELITY_SCOPE=preflight,MAP_FIDELITY_MAX_ATTEMPTS=2 \
+  research/slurm/map_fidelity_gate_v1.sbatch
+```
 
-Artifacts are written without overwrite to
-`/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/map-fidelity-gate-v1/<job-id>/`:
+After either job exits successfully, run the independent verifier from a new
+session, substituting the returned job ID:
 
--   `input-manifest.json`: exact source, runtime, map, and asset hashes;
--   `probe-results.json`: outcome-free load/progress/spawn records;
--   `gate-summary.json`: per-family pass/review/fail categorization.
+```bash
+JOB_ID=<job-id>
+RUN_ROOT=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/map-compatibility-gate-v2/preflight/$JOB_ID
+python3 research/scripts/verify_map_fidelity_execution.py \
+  --job-id "$JOB_ID" --scope preflight \
+  --run-root "$RUN_ROOT" \
+  --output "$RUN_ROOT/execution-verification.json"
+```
 
-Preflight artifacts use the parallel `map-fidelity-preflight-v1/<job-id>/`
-root. Both roots are created mode 0700 and files mode 0600. Scheduler stdout is
-role-free and reports only aggregate counts; neither mode consumes or emits any
-train/validation/test role assignment.
+Eleven families with two capped attempts require about 46 minutes before
+overhead. A preflight pass always has `fullCoverage=false`, `passed=false`, and
+`eligibleForFidelityClearance=false`; it is infrastructure evidence only.
 
-The checker exits nonzero for overall `REVIEW` or `FAIL`, so a complete
-screen containing incompatible families can appear as a nonzero Slurm job while
-still writing a valid `screenComplete=true` summary. For a preflight, a zero
-exit means only that its selected infrastructure checks passed. For a full run,
-per-family eligibility additionally requires `scope=full`, complete population
-classification, no global infrastructure finding, matching source/runtime and
-immutable target-population commitments, and an exact passing family
-path/SHA/job binding.
+The 127-family screen remains unauthorized until calibration and confirmation
+are technically complete, the evidence is reverified from a separate session,
+and `FULL_SCREEN_READINESS_REVIEW.md` is updated. If authorized, its worst-case
+two-attempt timeout budget is about 8.8 hours before overhead, so it requires a
+separate reviewed submission with an approximately ten-hour wall-time request.

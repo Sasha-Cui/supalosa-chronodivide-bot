@@ -1,130 +1,101 @@
 # Full-screen readiness review
 
-Status: **hard no-go for the 127-family screen** as of 2026-08-04.
+Status: **hard no-go for the 127-family screen** as of 2026-08-06.
 
-This review follows the successful three-family, outcome-free preflight in
-Slurm job 21296316. That job is credible infrastructure evidence: all three
-role-blind representatives and all six reciprocal passive sessions reached tick
-250 under `pi_jss233`, with no captured warning category or global provenance
-finding. It remains a preflight, not a StrongBot result or population clearance.
+The legacy three-family job 21296316 passed a narrow, outcome-free smoke test.
+The replacement 11-family protocol is implemented and passes mock/no-engine
+tests, but it has not yet produced engine evidence. No StrongBot result or
+population clearance follows from either state.
 
-## P0 requirements before another engine screen
+## P0 implementation status
 
-### Exact map-load attestation
+### Exact map-load attestation: implemented, engine confirmation pending
 
-The current runner hashes `mixDir/mapName`, but the pinned game API resolves the
-requested name through three case-insensitive real-filesystem roots and then
-ordered archives. Its roots are `mixDir`, package resources, and
-`process.cwd()`. The preflight ran with the repository as cwd, whose complete
-contents were not bound as a VFS input. Matching starts are indirect evidence,
-not proof of the exact bytes passed to the engine.
+The worker now creates a private content-addressed map alias, enumerates every
+real-filesystem lookup root, rejects case-fold collisions, intercepts the
+pinned filesystem adapter, and hashes the exact bytes supplied to the engine.
+It requires one initialization plus two forward and two reverse map-settings
+reads. Adapter, marker, count, path, byte-size, or hash drift fails closed.
+Adversarial no-engine tests include same-basename/case-variant decoys and exact
+read-count checks.
 
-The replacement must:
+### Per-family isolation and durability: implemented, engine confirmation pending
 
-1. create a deterministic, content-addressed map alias as a new regular file in
-   a private per-family cwd;
-2. enumerate all real-filesystem roots and reject every case-fold collision;
-3. intercept the pinned Node filesystem adapter at the map read;
-4. hash and retain the exact bytes returned to the engine in memory;
-5. require one attested read during initialization and two during each of the
-   forward and reverse game creations; and
-6. independently validate the resulting five-event attestation.
+A sequential supervisor launches one fresh process group per family, imposes a
+monotonic timeout, escalates termination after a fixed grace period, reaps the
+child, and retains only bounded byte counts and SHA-256 values for streams.
+Intent, terminal, shard, checkpoint, and campaign records are strict,
+role-free, atomically written, fsynced, and independently re-read by the gate.
+Only technical incompletion is retryable, with a prospective maximum of two
+attempts. A compatibility `review` or `fail` is complete and cannot trigger a
+retry.
 
-Any API, adapter, marker, version, path, count, size, or hash drift must fail
-closed. A same-basename/case-variant decoy test is required. No patch to the
-unlicensed game-API bundle will be distributed.
+### Durable evidence storage: implemented, external recheck pending
 
-### Per-family isolation and durability
+Future artifacts are written directly to versioned private project storage at
+`research-evidence/map-compatibility-gate-v2`, rather than relying on unstable
+scratch retention. The job preserves its logs, scheduler-bound manifest,
+pre/post attestations, complete attempt ledger, aggregate, and gate summary.
+After the job exits, a separate session must verify scheduler accounting and
+rehash the durable bundle with
+`scripts/verify_map_fidelity_execution.py` before it is entered in
+`RESULT_REGISTRY.tsv`.
 
-The current Node process initializes one global engine, loops over every map,
-and writes only the final aggregate. A hang, crash, or contaminated engine state
-could therefore lose or bias the whole screen.
+## Expanded preflight coverage
 
-Use one sequential child process per family under one authoritative Slurm job.
-A parent supervisor must enforce a monotonic wall-clock timeout, terminate the
-child process group, escalate to `SIGKILL` after a fixed grace period, reap the
-child, and retain only bounded byte counts and SHA-256 values for stdout/stderr.
-It must write strict, role-free intent, terminal, shard, and completion records
-with file `fsync`, atomic rename, and directory `fsync`. At most two
-prospectively allowed attempts may repair technical incompletion. A schema-valid
-compatibility `review` or `fail` is complete and must never trigger a retry.
+The committed `map_fidelity_expanded_preflight_v2.json` contains 11 role-blind
+families selected without outcomes or dataset roles. It covers all observed
+theaters and declared-start counts and includes global area and byte-size
+extrema. Identities, catalog descriptors, the target-population commitment,
+and the selected-set commitment are fixed before engine execution.
 
-The final schema-1 aggregate remains in immutable manifest order and is checked
-independently. Full tree provenance is verified once before workers and again
-after aggregation, rather than re-reading roughly 500 MiB for every child.
+The expanded preflight is a technical stress test, not a random sample and not
+scientific evidence about policy quality. Compatibility status may be examined
+because it is the declared purpose of this infrastructure gate; gameplay
+outcomes are neither consumed nor emitted.
 
-### Durable evidence stage-out
+## P1 requirements before policy evaluation
 
-The scratch roots for jobs 21291720, 21296136, and 21296316 were readable and
-hash-validated, then repeatedly alternated between readable and `ENOENT` on the
-same host. The raw roots are currently not consistently accessible. The
-committed summaries and exact hashes remain, but raw evidence retention must be
-treated as unstable.
+The 127 representatives contain 33 two-start, 6 three-start, 55 four-start,
+20 six-start, and 13 eight-start families. The population compatibility screen
+checks one reciprocal pair, so it cannot certify every later evaluation start.
+The study therefore requires a second outcome-free gate over every frozen
+engine-seed/start pair used by policy evaluation. Only prospectively enumerated
+pairs that pass may enter the benchmark.
 
-All future manifests, shards, summaries, logs, scheduler records, and attempt
-ledgers must be atomically staged into versioned project storage before job exit
-and then reverified from a separate session. Scratch may hold working data but
-cannot be the sole evidence store. Stage-out must run even when compatible maps
-produce `review` or `fail` classifications.
+The confirmatory runner must also satisfy `METHOD_INTERFACE_GATE.md`: no map
+identity or coordinates in the conditioned policy interface, equal launched
+budgets, prospective family roles, deterministic seeds, fixed retry rules, and
+no test-period hyperparameter selection.
 
-## P1 requirements for scientific use
+## Remaining paper-freeze improvements
 
-### Evaluation-relevant start coverage
-
-The 127 representatives have this declared-start distribution:
-
-| Declared starts | Families |
-|---:|---:|
-| 2 | 33 |
-| 3 | 6 |
-| 4 | 55 |
-| 6 | 20 |
-| 8 | 13 |
-
-Thus 94/127 families have more than two starts, while the present screen checks
-one reciprocal pair at one seed. A map-level compatibility pass does not prove
-every later evaluation start.
-
-The study will use a two-stage rule: the population screen establishes basic
-load/progress compatibility for one attested pair, then an outcome-free gate
-checks every frozen engine-seed/start pair that an evaluation can use. Only
-those prospectively enumerated pairs may enter policy evaluation. Exhaustive
-coverage of unused starts is not claimed.
-
-### Diagnostics and schemas
-
-- Capture child stdout, stderr, and `process.emitWarning` in addition to
-  `console.*`; unexplained nonempty output is a prespecified finding.
-- Enforce exact required fields and types for manifests, child artifacts,
-  aggregates, and summaries, not merely unknown-key rejection.
-- Reload the role-blind target artifact and independently recompute its
-  population commitment and every representative path/SHA.
-- Verify source blobs against the recorded Git commit.
-- Distinguish infrastructure completion from the scientific fact that some
-  families are incompatible. A complete screen may contain per-family
-  `review`/`fail` without losing stage-out.
-- The next role-blind preflight must cover every theater plus start-count and
-  map-size extremes. The first preflight covered two TEMPERATE and one URBAN
-  representative; the full eligible pool contains 67 TEMPERATE, 41 SNOW, 18
-  URBAN, and 1 DESERT representative.
-
-## P2 improvements before paper freeze
-
-- Call this a simulator-compatibility screen, not behavioral fidelity.
-- Require `initialTick == 0` and consistent update/tick arithmetic.
+- Record final Slurm state, exit code, node, allocation, elapsed time, and
+  resource use after each job exits.
 - Align the static INI parser with engine duplicate-section, duplicate-key, and
-  inline-comment behavior.
-- Bind native libraries and OS/runtime metadata, preferably in an Apptainer
-  image, before confirmatory execution.
-- Add a longer outcome-free scripted smoke test for building, pathfinding, and
-  delayed triggers, or explicitly include those failures in the estimand.
-- Record final scheduler state, exit code, node, resources, Slurm version, and
-  every attempt/retry in the durable evidence bundle.
+  inline-comment behavior or bound the discrepancy as a limitation.
+- Bind OS/native-library metadata, preferably through an immutable container,
+  before confirmatory policy evaluation.
+- Add an outcome-free delayed-trigger/build/pathfinding smoke test or narrow the
+  estimand explicitly to parser/load/early-progress compatibility.
+- Release only original code and derived metadata; do not redistribute maps,
+  MIX archives, copied game assets, or other third-party material without
+  permission.
 
-## Authorization criterion
+## Authorization sequence
 
-Do not submit the 127-family run until all three P0 controls and their
-adversarial no-engine tests pass, an isolated role-blind preflight covers the
-technical strata above, every checkpoint is role-free and exact-hash-bound, and
-the durable bundle is independently reverified. The later StrongBot diagnostic
-remains separately blocked on method-interface and baseline gates.
+1. Commit a clean source state and pass build, focused TypeScript tests, all
+   research Python tests, shell syntax checks, and `sbatch --test-only`.
+2. Run the 11-family calibration with one attempt per family on `pi_jss233`.
+3. Rehash the durable bundle from a separate session and diagnose every
+   technical failure; code or protocol changes invalidate that calibration
+   source commitment and require a new calibration.
+4. If technically complete, run the same committed plan with at most two
+   attempts and independently verify it again.
+5. Review family compatibility classifications and all P0 evidence. Only then
+   may this document change from hard no-go to a scoped authorization for the
+   127-family compatibility screen.
+
+The later StrongBot diagnostic remains separately blocked until the
+method-interface runner and evaluation-seed/start gate pass. No compatibility
+preflight, including a perfect one, is a positive paper result.
