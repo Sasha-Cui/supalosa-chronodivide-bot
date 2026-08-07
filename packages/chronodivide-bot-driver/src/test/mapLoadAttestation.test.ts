@@ -4,6 +4,8 @@ import os from "node:os";
 import path from "node:path";
 import { FileHandle as NodeAdapterFileHandle } from "file-system-access/lib/adapters/node.js";
 import { describe, expect, it } from "vitest";
+import { completeAttestedMapSettingsReadPair, removeEmptyWorkerSandbox } from "../benchmark/mapFidelityProbe.js";
+import { captureConsoleWarnings } from "../benchmark/mapFidelityProtocol.js";
 import {
     MAP_LOAD_ATTESTATION_PROTOCOL,
     MAP_LOAD_PHASE_READ_COUNTS,
@@ -14,6 +16,7 @@ import {
     createMapLoadAlias,
     findAliasCollisions,
     materializeMapAlias,
+    removeMaterializedMapAlias,
     resolveMapLoadCompatibilityPaths,
     validateMapLoadCompatibility,
     withMapLoadAttestation,
@@ -141,6 +144,25 @@ describe("collision-free map-load attestation", () => {
         expect(() => createMapLoadAlias(-1, digest)).toThrow(/familyIndex/);
         expect(() => createMapLoadAlias(1_000_000, digest)).toThrow(/familyIndex/);
         expect(() => createMapLoadAlias(1, "A".repeat(64))).toThrow(/lowercase hexadecimal/);
+    });
+
+    it("removes only an empty authenticated worker sandbox", () => {
+        const root = fs.mkdtempSync(path.join(os.tmpdir(), "worker-sandbox-cleanup-"));
+        const outputParent = path.join(root, "attempt");
+        const sandbox = path.join(outputParent, "map-sandbox");
+        try {
+            fs.mkdirSync(outputParent, { mode: 0o700 });
+            fs.mkdirSync(sandbox, { mode: 0o700 });
+            expect(removeEmptyWorkerSandbox(sandbox, outputParent)).toBe(true);
+            expect(fs.existsSync(sandbox)).toBe(false);
+
+            fs.mkdirSync(sandbox, { mode: 0o700 });
+            fs.writeFileSync(path.join(sandbox, "retained.map"), "private evidence");
+            expect(removeEmptyWorkerSandbox(sandbox, outputParent)).toBe(false);
+            expect(fs.existsSync(sandbox)).toBe(true);
+        } finally {
+            fs.rmSync(root, { recursive: true, force: true });
+        }
     });
 
     it("fails on finite-root case collisions and exclusively materializes one regular alias", () => {
@@ -272,6 +294,48 @@ describe("collision-free map-load attestation", () => {
             fs.chmodSync(map.aliasPath, 0o600);
             fs.writeFileSync(map.aliasPath, "mutated on disk");
             expect(Buffer.from(await (finalSnapshot as unknown as File).arrayBuffer())).toEqual(fixture.bytes);
+        } finally {
+            fs.rmSync(fixture.root, { recursive: true, force: true });
+        }
+    });
+
+    it("preserves 1+2+2 evidence when each order fails after its first engine preparation read", async () => {
+        const fixture = makeFixture();
+        try {
+            const map = materialize(fixture);
+            const result = await withMapLoadAttestation({
+                materialized: map,
+                operation: async (session) => {
+                    await session.runPhase("initialization", async () => void (await readAlias(map, 1)));
+                    const captures = [];
+                    for (const phase of ["forward_create", "reverse_create"] as const) {
+                        const captured = await session.runPhase(phase, async () =>
+                            captureConsoleWarnings(`mock-engine:${phase}`, async () => {
+                                await completeAttestedMapSettingsReadPair(async () => {
+                                    await readAlias(map, 1);
+                                    throw new Error("synthetic first-read map compatibility failure");
+                                });
+                            }),
+                        );
+                        captures.push(captured);
+                    }
+                    return captures;
+                },
+            });
+
+            expect(result.value).toHaveLength(2);
+            expect(result.value.every((capture) => capture.error instanceof Error)).toBe(true);
+            expect(result.evidence.phases).toEqual([
+                { phase: "initialization", expectedReads: 1, observedReads: 1 },
+                { phase: "forward_create", expectedReads: 2, observedReads: 2 },
+                { phase: "reverse_create", expectedReads: 2, observedReads: 2 },
+            ]);
+            expect(result.evidence.reads).toHaveLength(5);
+            expect(result.evidence.complete).toBe(true);
+
+            removeMaterializedMapAlias(map);
+            expect(fs.existsSync(map.aliasPath)).toBe(false);
+            expect(fs.existsSync(map.sandboxDirectory)).toBe(false);
         } finally {
             fs.rmSync(fixture.root, { recursive: true, force: true });
         }

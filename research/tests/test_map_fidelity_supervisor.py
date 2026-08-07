@@ -116,15 +116,137 @@ intent_bytes = args.intent.read_bytes()
 intent = json.loads(intent_bytes)
 attestation_bytes = args.attestation.read_bytes()
 manifest_bytes = args.manifest.read_bytes()
+manifest = json.loads(manifest_bytes)
+family = manifest["families"][args.family_ordinal]
+target_tick = manifest["protocol"]["targetTick"]
 status = "pass"
 if args.statuses:
     statuses = json.loads(args.statuses.read_text(encoding="utf-8"))
     status = statuses[str(args.family_ordinal)]
-payload = {"fidelityStatus": status}
+
+warning = None
+failure_categories = []
+review_categories = []
+if status == "review":
+    warning = {
+        "phase": f"{family['familyId']}:forward",
+        "level": "warn",
+        "category": "invalid_terrain",
+        "severity": "review",
+        "diagnosticSha256": "d" * 64,
+    }
+    review_categories = ["warning_invalid_terrain"]
+elif status == "fail":
+    warning = {
+        "phase": f"{family['familyId']}:forward",
+        "level": "warn",
+        "category": "missing_asset",
+        "severity": "fail",
+        "diagnosticSha256": "e" * 64,
+    }
+    failure_categories = ["warning_missing_asset"]
+
+declared = family["declaredStartLocations"]
+alpha_start = {"x": declared[0]["x"], "y": declared[0]["y"]}
+beta_start = {"x": declared[1]["x"], "y": declared[1]["y"]}
+
+def probe(order, alpha, beta):
+    return {
+        "order": order,
+        "loaded": True,
+        "initialTick": 0,
+        "finalTick": target_tick,
+        "updates": target_tick,
+        "initialTickIsZero": True,
+        "tickUpdateArithmeticConsistent": True,
+        "progressedBeyondTickOne": target_tick > 1,
+        "reachedTargetTick": True,
+        "starts": {"alpha": alpha, "beta": beta},
+        "wallTimeMs": 1,
+        "warningCaptureTruncated": False,
+        "error": None,
+    }
+
+alias = f"cdfid-{family['index']:06d}-{family['sha256']}.map"
+alias_path = str((args.output.parent / "sandbox" / alias).resolve())
+read_sequence = [
+    ("initialization", 1),
+    ("forward_create", 1),
+    ("forward_create", 2),
+    ("reverse_create", 1),
+    ("reverse_create", 2),
+]
+map_load_attestation = {
+    "protocol": "unique-rfs-alias-adapter-snapshot-v1",
+    "alias": alias,
+    "aliasPath": alias_path,
+    "expectedBytes": family["bytes"],
+    "expectedSha256": family["sha256"],
+    "phases": [
+        {"phase": "initialization", "expectedReads": 1, "observedReads": 1},
+        {"phase": "forward_create", "expectedReads": 2, "observedReads": 2},
+        {"phase": "reverse_create", "expectedReads": 2, "observedReads": 2},
+    ],
+    "reads": [
+        {
+            "phase": phase,
+            "ordinal": ordinal,
+            "alias": alias,
+            "resolvedPath": alias_path,
+            "bytes": family["bytes"],
+            "sha256": family["sha256"],
+            "adapter": "file-system-access/node.FileHandle.getFile",
+            "inMemorySnapshot": True,
+        }
+        for phase, ordinal in read_sequence
+    ],
+    "complete": True,
+}
+family_result = {
+    "familyIndex": family["index"],
+    "familyId": family["familyId"],
+    "representativeMapPath": family["representativeMapPath"],
+    "mapName": family["mapName"],
+    "executedMapAlias": alias,
+    "mapBytes": family["bytes"],
+    "mapSha256": family["sha256"],
+    "slurmJobId": intent["scheduler"]["jobId"],
+    "requestedEngineSeed": (
+        manifest["protocol"]["engineSeedBase"] + family["index"]
+    ) % (2**32),
+    "targetTick": target_tick,
+    "declaredStartLocations": declared,
+    "forward": probe(["alpha", "beta"], alpha_start, beta_start),
+    "reverse": probe(["beta", "alpha"], beta_start, alpha_start),
+    "reciprocalStartCheck": {
+        "declaredStartCountValid": True,
+        "forwardStartsDistinct": True,
+        "reverseStartsDistinct": True,
+        "allObservedStartsDeclared": True,
+        "reciprocalPhysicalSlots": True,
+        "failures": [],
+    },
+    "warnings": [] if warning is None else [warning],
+    "failureCategories": failure_categories,
+    "reviewCategories": review_categories,
+    "fidelityStatus": status,
+}
+payload = {
+    "engineInitialization": {
+        "succeeded": True,
+        "warnings": [],
+        "warningCaptureTruncated": False,
+        "error": None,
+    },
+    "familyResult": family_result,
+    "mapLoadAttestation": map_load_attestation,
+}
 if args.mode == "outcome-key":
-    payload["winner"] = "alpha"
+    payload["familyResult"]["winner"] = "alpha"
 if args.mode == "role-key":
-    payload["dryRunRole"] = "test"
+    payload["mapLoadAttestation"]["dryRunRole"] = "test"
+if args.mode == "malformed-nested":
+    payload["mapLoadAttestation"]["reads"][-1]["sha256"] = "not-a-sha256"
 shard = {
     "schemaVersion": 1,
     "gate": "map-fidelity-gate-v1",
@@ -162,18 +284,51 @@ class SupervisorFixture(unittest.TestCase):
         self.root = Path(self.temporary.name)
         os.chmod(self.root, 0o700)
         self.manifest_path = self.root / "manifest.json"
+        runtime_hashes = {
+            key: f"{index + 10:064x}"
+            for index, key in enumerate(sorted(SUPERVISOR.RUNTIME_HASH_KEYS))
+        }
         self.manifest = {
-            "schemaVersion": 1,
+            "schemaVersion": 2,
             "gate": "map-fidelity-gate-v1",
             "outcomeFree": True,
             "scheduler": SCHEDULER,
+            "protocol": {"targetTick": 250, "engineSeedBase": 10_000},
+            "runtimeHashes": runtime_hashes,
+            "inputs": {
+                "git": {"commit": "1" * 40},
+                "targetPopulationCommitmentSha256": "2" * 64,
+                "familySequenceSha256": "3" * 64,
+                "sourceBundle": {
+                    "sha256": runtime_hashes["sourceBundleSha256"]
+                },
+                "runtimeBundle": {
+                    "sha256": runtime_hashes["runtimeBundleSha256"]
+                },
+            },
             "families": [
                 {
                     "index": index * 3,
                     "familyId": f"mf_{index}",
                     "representativeMapPath": f"maps/map_{index}.map",
                     "mapName": f"map_{index}.map",
+                    "bytes": 10_000 + index,
                     "sha256": f"{index + 1:064x}",
+                    "declaredStartLocations": [
+                        {
+                            "x": index * 100 + 10,
+                            "y": index * 100 + 20,
+                            "waypoint": 0,
+                            "encoded": 20_000 + index,
+                        },
+                        {
+                            "x": index * 100 + 30,
+                            "y": index * 100 + 40,
+                            "waypoint": 1,
+                            "encoded": 40_000 + index,
+                        },
+                    ],
+                    "staticChecks": {"failures": []},
                 }
                 for index in range(3)
             ],
@@ -185,12 +340,23 @@ class SupervisorFixture(unittest.TestCase):
             "gate": "map-fidelity-gate-v1",
             "artifactKind": "map_fidelity_job_attestation",
             "outcomeFree": True,
-            "manifest": {
-                "path": str(self.manifest_path.resolve()),
-                "sha256": SUPERVISOR.sha256_file(self.manifest_path),
-            },
+            "phase": "pre_workers",
+            "manifest": SUPERVISOR.exact_file_binding(self.manifest_path),
             "scheduler": SCHEDULER,
-            "runtimeHashes": {"runtimeBundleSha256": "a" * 64},
+            "runtimeHashes": runtime_hashes,
+            "bindings": {
+                "sourceCommit": self.manifest["inputs"]["git"]["commit"],
+                "targetPopulationCommitmentSha256": self.manifest["inputs"][
+                    "targetPopulationCommitmentSha256"
+                ],
+                "familySequenceSha256": self.manifest["inputs"][
+                    "familySequenceSha256"
+                ],
+                "sourceBundleSha256": runtime_hashes["sourceBundleSha256"],
+                "runtimeBundleSha256": runtime_hashes["runtimeBundleSha256"],
+            },
+            "preAttestation": None,
+            "checkpointLedger": None,
         }
         self._write_json(self.attestation_path, self.attestation)
         self.worker_path = self.root / "mock_worker.py"
@@ -205,6 +371,12 @@ class SupervisorFixture(unittest.TestCase):
     def _write_json(path: Path, value: dict[str, object]) -> None:
         path.write_text(json.dumps(value, indent=2) + "\n", encoding="utf-8")
         os.chmod(path, 0o600)
+
+    def _refresh_attestation_manifest_binding(self) -> None:
+        self.attestation["manifest"] = SUPERVISOR.exact_file_binding(
+            self.manifest_path
+        )
+        self._write_json(self.attestation_path, self.attestation)
 
     def command(
         self,
@@ -260,6 +432,19 @@ class SupervisorFixture(unittest.TestCase):
             for line in self.invocations.read_text(encoding="utf-8").splitlines()
         ]
 
+    def test_schema_domains_are_explicit(self) -> None:
+        self.assertEqual(SUPERVISOR.MANIFEST_SCHEMA_VERSION, 2)
+        self.assertEqual(SUPERVISOR.INTERNAL_EVIDENCE_SCHEMA_VERSION, 1)
+        self.assertEqual(SUPERVISOR.LEGACY_AGGREGATE_SCHEMA_VERSION, 1)
+        self.assertEqual(self.manifest["schemaVersion"], 2)
+        self.assertEqual(
+            set(self.attestation["runtimeHashes"]),
+            SUPERVISOR.RUNTIME_HASH_KEYS,
+        )
+        self.assertEqual(
+            self.attestation["runtimeHashes"], self.manifest["runtimeHashes"]
+        )
+
     def test_success_is_checkpointed_in_manifest_order_with_private_files(self) -> None:
         supervisor = self.supervisor("success", self.command("success"))
         summary = supervisor.run()
@@ -276,13 +461,60 @@ class SupervisorFixture(unittest.TestCase):
             checkpoint_value = json.loads(checkpoint.read_text(encoding="utf-8"))
             self.assertNotIn("fidelityStatus", json.dumps(checkpoint_value))
 
+        campaign_path = supervisor.run_root / "campaign-terminal.json"
+        self.assertEqual(
+            summary["campaignTerminal"],
+            SUPERVISOR.private_exact_file(campaign_path),
+        )
+        self.assertEqual(campaign_path.stat().st_mode & 0o077, 0)
+        campaign = json.loads(campaign_path.read_text(encoding="utf-8"))
+        self.assertEqual(campaign["manifestSha256"], supervisor.manifest_sha256)
+        self.assertEqual(campaign["attestationSha256"], supervisor.attestation_sha256)
+        self.assertEqual(
+            [entry["manifestOrdinal"] for entry in campaign["checkpoints"]],
+            [0, 1, 2],
+        )
+        self.assertEqual(campaign["technicalAttemptCount"], 3)
+        self.assertEqual(
+            [
+                (
+                    entry["family"]["manifestOrdinal"],
+                    entry["attemptNumber"],
+                )
+                for entry in campaign["attempts"]
+            ],
+            [(0, 1), (1, 1), (2, 1)],
+        )
+        for ordinal, entry in enumerate(campaign["attempts"]):
+            attempt_dir = supervisor.family_directory(ordinal) / "attempts/01"
+            self.assertEqual(
+                entry["intent"],
+                SUPERVISOR.private_exact_file(
+                    attempt_dir / "attempt-intent.json"
+                ),
+            )
+            self.assertEqual(
+                entry["terminal"],
+                SUPERVISOR.private_exact_file(
+                    attempt_dir / "attempt-terminal.json"
+                ),
+            )
+            self.assertEqual(
+                entry["shard"],
+                SUPERVISOR.exact_file_binding(
+                    attempt_dir / "family-shard.json"
+                ),
+            )
+        self.assertNotIn("fidelityStatus", json.dumps(campaign))
+        tampered = copy.deepcopy(campaign)
+        tampered["attempts"][0]["terminal"]["sha256"] = "f" * 64
+        with self.assertRaises(SUPERVISOR.ValidationError):
+            supervisor._validate_campaign_terminal(tampered)
+
     def test_timeout_kills_process_group_and_descendant(self) -> None:
         self.manifest["families"] = self.manifest["families"][:1]
         self._write_json(self.manifest_path, self.manifest)
-        self.attestation["manifest"]["sha256"] = SUPERVISOR.sha256_file(
-            self.manifest_path
-        )
-        self._write_json(self.attestation_path, self.attestation)
+        self._refresh_attestation_manifest_binding()
         descendant_pid_path = self.root / "descendant.pid"
         supervisor = self.supervisor(
             "timeout",
@@ -314,10 +546,7 @@ class SupervisorFixture(unittest.TestCase):
     def test_crash_retries_once_then_accepts_second_attempt(self) -> None:
         self.manifest["families"] = self.manifest["families"][:1]
         self._write_json(self.manifest_path, self.manifest)
-        self.attestation["manifest"]["sha256"] = SUPERVISOR.sha256_file(
-            self.manifest_path
-        )
-        self._write_json(self.attestation_path, self.attestation)
+        self._refresh_attestation_manifest_binding()
         state_file = self.root / "retry-count.txt"
         supervisor = self.supervisor(
             "retry", self.command("retry", state_file=state_file)
@@ -341,9 +570,35 @@ class SupervisorFixture(unittest.TestCase):
             first_terminal["technicalDisposition"]["status"],
             "retryable_failure",
         )
+        campaign = json.loads(
+            Path(summary["campaignTerminal"]["path"]).read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(campaign["technicalAttemptCount"], 2)
+        self.assertEqual(
+            [
+                (
+                    entry["family"]["manifestOrdinal"],
+                    entry["attemptNumber"],
+                )
+                for entry in campaign["attempts"]
+            ],
+            [(0, 1), (0, 2)],
+        )
+        accepted_attempt = campaign["attempts"][1]
+        self.assertEqual(
+            accepted_attempt["intent"]["sha256"],
+            checkpoint["accepted"]["intentSha256"],
+        )
+        self.assertEqual(
+            accepted_attempt["terminal"]["sha256"],
+            checkpoint["accepted"]["terminalSha256"],
+        )
+        self.assertEqual(accepted_attempt["shard"], checkpoint["accepted"]["shard"])
 
     def test_malformed_and_partial_shards_are_never_checkpointed(self) -> None:
-        for mode in ("malformed", "partial"):
+        for mode in ("malformed", "partial", "malformed-nested"):
             with self.subTest(mode=mode):
                 if self.invocations.exists():
                     self.invocations.unlink()
@@ -380,6 +635,26 @@ class SupervisorFixture(unittest.TestCase):
         command = self.command("success", statuses=statuses)
         first_supervisor = self.supervisor("resume", command)
         first = first_supervisor.run()
+        self.assertEqual(first["launchedAttemptCount"], 3)
+        for ordinal, expected_status in enumerate(("pass", "review", "fail")):
+            family_dir = first_supervisor.family_directory(ordinal)
+            attempt_names = sorted(
+                path.name for path in (family_dir / "attempts").iterdir()
+            )
+            self.assertEqual(attempt_names, ["01"])
+            checkpoint = json.loads(
+                (family_dir / "completion-checkpoint.json").read_text(encoding="utf-8")
+            )
+            self.assertEqual(checkpoint["accepted"]["attemptNumber"], 1)
+            shard = json.loads(
+                (family_dir / "attempts/01/family-shard.json").read_text(
+                    encoding="utf-8"
+                )
+            )
+            self.assertEqual(
+                shard["payload"]["familyResult"]["fidelityStatus"],
+                expected_status,
+            )
         self.assertEqual(first["completedCount"], 3)
         self.invocations.write_text("", encoding="utf-8")
         second = self.supervisor("resume", command).run()
@@ -564,28 +839,33 @@ class SupervisorFixture(unittest.TestCase):
                 / "attempts/01/attempt-intent.json"
             ).read_text(encoding="utf-8")
         )
-        self.assertEqual(intent["environment"]["values"], {"PATH": source_environment["PATH"], "TZ": "UTC"})
+        self.assertEqual(
+            intent["environment"]["values"],
+            {"PATH": source_environment["PATH"], "TZ": "UTC"},
+        )
         self.assertEqual(
             intent["environment"]["sha256"],
             SUPERVISOR.canonical_sha256(intent["environment"]["values"]),
+        )
+        self.assertEqual(
+            intent["worker"]["commandPrefixSha256"],
+            SUPERVISOR.canonical_sha256(command),
+        )
+        self.assertEqual(
+            intent["worker"]["executable"],
+            SUPERVISOR.exact_file_binding(Path(sys.executable)),
         )
 
     def test_manifest_forbidden_key_and_symlinked_run_root_fail_closed(self) -> None:
         manifest = copy.deepcopy(self.manifest)
         manifest["families"][0]["splitRole"] = "test"
         self._write_json(self.manifest_path, manifest)
-        self.attestation["manifest"]["sha256"] = SUPERVISOR.sha256_file(
-            self.manifest_path
-        )
-        self._write_json(self.attestation_path, self.attestation)
+        self._refresh_attestation_manifest_binding()
         with self.assertRaises(SUPERVISOR.ValidationError):
             self.supervisor("forbidden-manifest", self.command("success"))
 
         self._write_json(self.manifest_path, self.manifest)
-        self.attestation["manifest"]["sha256"] = SUPERVISOR.sha256_file(
-            self.manifest_path
-        )
-        self._write_json(self.attestation_path, self.attestation)
+        self._refresh_attestation_manifest_binding()
         target = self.root / "real-run-root"
         target.mkdir(mode=0o700)
         symlink = self.root / "symlink-run-root"

@@ -5,8 +5,12 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
+import re
+import subprocess
 import tempfile
 import unittest
+from copy import deepcopy
 from pathlib import Path
 
 
@@ -77,27 +81,122 @@ class MapParseTests(unittest.TestCase):
             parsed["staticChecks"]["failures"],
         )
 
-    def test_three_map_preflight_is_deterministic_and_role_blind(self) -> None:
+    def test_expanded_preflight_retains_full_population_indices(self) -> None:
         records = [
             {"familyId": f"mf_{index}", "dryRunRole": role}
-            for index, role in enumerate(
-                ["test", "train", "validation", "test", "train", "test"]
-            )
+            for index, role in enumerate(["test", "train", "validation"] * 5)
         ]
-        first, scope = GATE.select_run_population(records, 3)
+        preflight_ids = [
+            f"mf_{index}" for index in (13, 2, 11, 0, 9, 4, 14, 6, 12, 1, 8)
+        ]
+        first, scope = GATE.select_run_population(records, preflight_ids)
         second, _ = GATE.select_run_population(
-            [{**record, "dryRunRole": "changed"} for record in records], 3
+            [{**record, "dryRunRole": "changed"} for record in records],
+            list(reversed(preflight_ids)),
         )
         self.assertEqual(scope, "preflight")
         self.assertEqual(
             [(index, record["familyId"]) for index, record in first],
             [(index, record["familyId"]) for index, record in second],
         )
-        self.assertEqual(len(first), 3)
+        self.assertEqual(len(first), 11)
+        self.assertEqual(
+            [index for index, _ in first],
+            sorted(index for index, _ in first),
+        )
+
+    def test_committed_expanded_plan_is_independently_validated(self) -> None:
+        repo = MODULE_PATH.parents[2]
+        catalog_path = repo / "research/artifacts/map_family_catalog.json"
+        targets_path = (
+            repo / "research/artifacts/role_blind_fidelity_targets_v1.json"
+        )
+        plan_path = (
+            repo / "research/artifacts/map_fidelity_expanded_preflight_v2.json"
+        )
+        catalog = GATE.load_json(catalog_path)
+        targets = GATE.load_json(targets_path)
+        plan = GATE.load_json(plan_path)
+        selected_ids = GATE.validate_expanded_preflight_plan(
+            plan,
+            catalog=catalog,
+            target_records=targets["targets"],
+            catalog_sha256=GATE.sha256_file(catalog_path),
+            target_manifest_sha256=GATE.sha256_file(targets_path),
+            target_population_commitment_sha256=targets[
+                "populationCommitmentSha256"
+            ],
+        )
+        self.assertEqual(len(selected_ids), 11)
+        tampered = deepcopy(plan)
+        tampered["selected"][0]["safeDescriptors"]["bytes"] += 1
+        with self.assertRaisesRegex(RuntimeError, "catalog binding"):
+            GATE.validate_expanded_preflight_plan(
+                tampered,
+                catalog=catalog,
+                target_records=targets["targets"],
+                catalog_sha256=GATE.sha256_file(catalog_path),
+                target_manifest_sha256=GATE.sha256_file(targets_path),
+                target_population_commitment_sha256=targets[
+                    "populationCommitmentSha256"
+                ],
+            )
+
+    def test_python_typescript_manifest_contracts_match(self) -> None:
+        repo = MODULE_PATH.parents[2]
+        probe_source = (
+            repo
+            / "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProbe.ts"
+        ).read_text(encoding="utf-8")
+        protocol_source = (
+            repo
+            / "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProtocol.ts"
+        ).read_text(encoding="utf-8")
+
+        source_match = re.search(
+            r"const WORKER_SOURCE_PATHS = \[(.*?)\] as const;",
+            probe_source,
+            flags=re.DOTALL,
+        )
+        self.assertIsNotNone(source_match)
+        worker_sources = tuple(re.findall(r'"([^"]+)"', source_match.group(1)))
+        self.assertEqual(worker_sources, GATE.TOOL_SOURCE_PATHS)
+
+        runtime_match = re.search(
+            r"const RUNTIME_HASH_KEYS = \[(.*?)\] as const;",
+            probe_source,
+            flags=re.DOTALL,
+        )
+        self.assertIsNotNone(runtime_match)
+        worker_runtime_keys = set(
+            re.findall(r'"([^"]+)"', runtime_match.group(1))
+        )
+        self.assertEqual(
+            worker_runtime_keys,
+            {key for key, _kind, _lookup in GATE.RUNTIME_HASH_BINDINGS},
+        )
+
+        count_match = re.search(
+            r"EXPANDED_PREFLIGHT_FAMILY_COUNT = (\d+);", protocol_source
+        )
+        self.assertIsNotNone(count_match)
+        self.assertEqual(
+            int(count_match.group(1)), GATE.EXPANDED_PREFLIGHT_FAMILY_COUNT
+        )
+        rule_match = re.search(
+            r"export const EXPANDED_PREFLIGHT_RULE =\s*(.*?)\n\nexport type FidelityScope",
+            protocol_source,
+            flags=re.DOTALL,
+        )
+        self.assertIsNotNone(rule_match)
+        worker_rule = "".join(re.findall(r'"([^"]*)"', rule_match.group(1)))
+        self.assertEqual(worker_rule, GATE.EXPANDED_PREFLIGHT_RULE)
 
     def test_tracked_dirty_source_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
-            with self.assertRaisesRegex(RuntimeError, "dirty or untracked critical source"):
+            with self.assertRaisesRegex(
+                RuntimeError, "dirty or untracked critical source"
+            ):
                 GATE.assert_clean_committed_source(
                     Path(temporary),
                     {"commit": "fixture", "status": [" M tracked.ts"]},
@@ -150,28 +249,21 @@ class GateFixture(unittest.TestCase):
             self.repo / "packages/chronodivide-bot-driver/dist/benchmark"
         )
         driver_dist.mkdir(parents=True)
-        for name in (
-            "mapFidelityProbe.js",
-            "mapFidelityProtocol.js",
-            "seededOfflineGame.js",
-        ):
+        for name in GATE.COMPILED_RUNTIME_NAMES:
             (driver_dist / name).write_text(f"// {name}\n", encoding="utf-8")
-        for relative_path in (
-            "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProbe.ts",
-            "packages/chronodivide-bot-driver/src/benchmark/mapFidelityProtocol.ts",
-            "packages/chronodivide-bot-driver/src/benchmark/seededOfflineGame.ts",
-            "research/scripts/map_fidelity_gate.py",
-            "research/slurm/map_fidelity_gate_v1.sbatch",
-        ):
+        for relative_path in GATE.TOOL_SOURCE_PATHS:
             source = self.repo / relative_path
             source.parent.mkdir(parents=True, exist_ok=True)
             source.write_text(f"// {relative_path}\n", encoding="utf-8")
         self.node = self.root / "node"
         self.node.write_bytes(b"fixture-node")
+        os.chmod(self.node, 0o700)
         self.python = self.root / "python"
         self.python.write_bytes(b"fixture-python")
+        os.chmod(self.python, 0o700)
         self.scontrol = self.root / "scontrol"
         self.scontrol.write_bytes(b"fixture-scontrol")
+        os.chmod(self.scontrol, 0o700)
 
         self.catalog_path = self.repo / "catalog.json"
         map_hash = GATE.sha256_file(representative)
@@ -211,6 +303,25 @@ class GateFixture(unittest.TestCase):
             "targetCount": 1,
             "targets": target_records,
         }), encoding="utf-8")
+        subprocess.run(["git", "init", "-q"], cwd=self.repo, check=True)
+        subprocess.run(
+            ["git", "config", "user.email", "fixture@example.invalid"],
+            cwd=self.repo,
+            check=True,
+        )
+        subprocess.run(
+            ["git", "config", "user.name", "Map Fidelity Fixture"],
+            cwd=self.repo,
+            check=True,
+        )
+        tracked = [
+            "package-lock.json",
+            "catalog.json",
+            "targets.json",
+            *GATE.TOOL_SOURCE_PATHS,
+        ]
+        subprocess.run(["git", "add", "--", *tracked], cwd=self.repo, check=True)
+        subprocess.run(["git", "commit", "-qm", "fixture"], cwd=self.repo, check=True)
         self.manifest = GATE.build_manifest(
             self.repo,
             self.targets_path,
@@ -225,10 +336,14 @@ class GateFixture(unittest.TestCase):
             require_clean_source=False,
             debug_logging="1",
         )
-        self.manifest_path = self.root / "manifest.json"
+        self.durable_root = self.root / "durable"
+        self.run_root = self.durable_root / "run"
+        self.run_root.mkdir(parents=True, mode=0o700)
+        self.manifest_path = self.run_root / "input-manifest.json"
         self.manifest_path.write_text(
             json.dumps(self.manifest, indent=2) + "\n", encoding="utf-8"
         )
+        os.chmod(self.manifest_path, 0o600)
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
@@ -325,6 +440,253 @@ class GateFixture(unittest.TestCase):
             }],
         }
 
+    def pipeline_payload(self, attempt_dir: Path) -> dict[str, object]:
+        family = self.manifest["families"][0]
+        result = deepcopy(self.result()["families"][0])
+        alias = GATE.map_load_alias(family["index"], family["sha256"])
+        result["executedMapAlias"] = alias
+        for probe_name in ("forward", "reverse"):
+            result[probe_name]["initialTickIsZero"] = True
+            result[probe_name]["tickUpdateArithmeticConsistent"] = True
+        alias_path = str((attempt_dir / "sandbox" / alias).absolute())
+        phase_counts = [
+            ("initialization", 1),
+            ("forward_create", 2),
+            ("reverse_create", 2),
+        ]
+        read_sequence = [
+            ("initialization", 1),
+            ("forward_create", 1),
+            ("forward_create", 2),
+            ("reverse_create", 1),
+            ("reverse_create", 2),
+        ]
+        return {
+            "engineInitialization": {
+                "succeeded": True,
+                "warnings": [],
+                "warningCaptureTruncated": False,
+                "error": None,
+            },
+            "familyResult": result,
+            "mapLoadAttestation": {
+                "protocol": GATE.MAP_LOAD_ATTESTATION_PROTOCOL,
+                "alias": alias,
+                "aliasPath": alias_path,
+                "expectedBytes": family["bytes"],
+                "expectedSha256": family["sha256"],
+                "phases": [
+                    {"phase": phase, "expectedReads": count, "observedReads": count}
+                    for phase, count in phase_counts
+                ],
+                "reads": [{
+                    "phase": phase,
+                    "ordinal": ordinal,
+                    "alias": alias,
+                    "resolvedPath": alias_path,
+                    "bytes": family["bytes"],
+                    "sha256": family["sha256"],
+                    "adapter": "file-system-access/node.FileHandle.getFile",
+                    "inMemorySnapshot": True,
+                } for phase, ordinal in read_sequence],
+                "complete": True,
+            },
+        }
+
+    def create_pipeline_evidence(self) -> dict[str, Path | dict[str, object]]:
+        pre_path = self.run_root / "job-pre-attestation.json"
+        pre = GATE.build_job_attestation(
+            self.manifest_path,
+            SCHEDULER,
+            phase="pre_workers",
+            durable_root=self.durable_root,
+            verify_runtime_inputs=False,
+        )
+        GATE.write_exclusive(pre_path, pre)
+        manifest_sha = GATE.sha256_file(self.manifest_path)
+        pre_sha = GATE.sha256_file(pre_path)
+        binding = GATE.family_binding(self.manifest, 0)
+        families_root = self.run_root / "families"
+        families_root.mkdir(mode=0o700)
+        family_dir = families_root / f"0000-{binding['familyIdSha256'][:16]}"
+        family_dir.mkdir(mode=0o700)
+        attempts_root = family_dir / "attempts"
+        attempts_root.mkdir(mode=0o700)
+        attempt_dir = attempts_root / "01"
+        attempt_dir.mkdir(mode=0o700)
+        intent_path = attempt_dir / "attempt-intent.json"
+        terminal_path = attempt_dir / "attempt-terminal.json"
+        shard_path = attempt_dir / "family-shard.json"
+        environment_values = {
+            "PATH": "/bin",
+            "DEBUG_LOGGING": "1",
+            "SLURM_JOB_ID": SCHEDULER["jobId"],
+        }
+        policy = {
+            "timeoutSeconds": 120.0,
+            "terminationGraceSeconds": 5.0,
+            "maxTechnicalAttempts": 2,
+            "maxStreamBytes": 1024,
+        }
+        command_prefix = [
+            self.manifest["inputs"]["nodeRuntime"]["path"],
+            self.manifest["inputs"]["compiledProbe"]["path"],
+        ]
+        command = [
+            *command_prefix,
+            "--manifest", str(self.manifest_path),
+            "--attestation", str(pre_path),
+            "--family-ordinal", "0",
+            "--intent", str(intent_path),
+            "--output", str(shard_path),
+        ]
+        prefix_sha = GATE.canonical_sha256(command_prefix)
+        intent = {
+            "schemaVersion": 1,
+            "gate": GATE.GATE,
+            "artifactKind": "map_fidelity_family_attempt_intent",
+            "outcomeFree": True,
+            "manifest": {"path": str(self.manifest_path), "sha256": manifest_sha},
+            "attestation": {"path": str(pre_path), "sha256": pre_sha},
+            "family": binding,
+            "attemptNumber": 1,
+            "executionPolicy": policy,
+            "scheduler": SCHEDULER,
+            "environment": {
+                "allowedKeys": list(GATE.ALLOWED_WORKER_ENV_KEYS),
+                "values": environment_values,
+                "sha256": GATE.canonical_sha256(environment_values),
+            },
+            "worker": {
+                "argumentProtocol": "map-fidelity-family-worker-v1",
+                "commandPrefixSha256": prefix_sha,
+                "commandSha256": GATE.canonical_sha256(command),
+                "executable": self.manifest["inputs"]["nodeRuntime"],
+                "shardPath": str(shard_path),
+            },
+        }
+        GATE.write_exclusive(intent_path, intent)
+        intent_sha = GATE.sha256_file(intent_path)
+        payload = self.pipeline_payload(attempt_dir)
+        shard = {
+            "schemaVersion": 1,
+            "gate": GATE.GATE,
+            "artifactKind": "map_fidelity_family_worker_shard",
+            "outcomeFree": True,
+            "manifestSha256": manifest_sha,
+            "attestationSha256": pre_sha,
+            "family": binding,
+            "attemptNumber": 1,
+            "intentSha256": intent_sha,
+            "scheduler": SCHEDULER,
+            "payload": payload,
+        }
+        GATE.write_exclusive(shard_path, shard)
+        shard_record = GATE.private_evidence_file(
+            shard_path, durable_root=self.durable_root
+        )
+        empty_stream = {
+            "bytes": 0,
+            "sha256": GATE.hashlib.sha256(b"").hexdigest(),
+            "truncated": False,
+        }
+        terminal = {
+            "schemaVersion": 1,
+            "gate": GATE.GATE,
+            "artifactKind": "map_fidelity_family_attempt_terminal",
+            "outcomeFree": True,
+            "manifestSha256": manifest_sha,
+            "attestationSha256": pre_sha,
+            "family": binding,
+            "attemptNumber": 1,
+            "intentSha256": intent_sha,
+            "scheduler": SCHEDULER,
+            "timing": {"wallTimeMs": 10},
+            "process": {
+                "exitCode": 0,
+                "termSignal": None,
+                "timedOut": False,
+                "termSent": False,
+                "killSent": False,
+            },
+            "streams": {"stdout": empty_stream, "stderr": empty_stream},
+            "shard": shard_record,
+            "technicalDisposition": {"status": "complete", "categories": []},
+        }
+        GATE.write_exclusive(terminal_path, terminal)
+        checkpoint_path = family_dir / "completion-checkpoint.json"
+        checkpoint = {
+            "schemaVersion": 1,
+            "gate": GATE.GATE,
+            "artifactKind": "map_fidelity_family_completion_checkpoint",
+            "outcomeFree": True,
+            "manifestSha256": manifest_sha,
+            "attestationSha256": pre_sha,
+            "family": binding,
+            "scheduler": SCHEDULER,
+            "accepted": {
+                "attemptNumber": 1,
+                "intentSha256": intent_sha,
+                "terminalSha256": GATE.sha256_file(terminal_path),
+                "shard": shard_record,
+            },
+        }
+        GATE.write_exclusive(checkpoint_path, checkpoint)
+        intent_record = GATE.private_evidence_file(intent_path, durable_root=self.durable_root)
+        terminal_record = GATE.private_evidence_file(terminal_path, durable_root=self.durable_root)
+        checkpoint_record = GATE.private_evidence_file(checkpoint_path, durable_root=self.durable_root)
+        campaign_path = self.run_root / "campaign-terminal.json"
+        campaign = {
+            "schemaVersion": 1,
+            "gate": GATE.GATE,
+            "artifactKind": "map_fidelity_campaign_terminal",
+            "outcomeFree": True,
+            "manifestSha256": manifest_sha,
+            "attestationSha256": pre_sha,
+            "scheduler": SCHEDULER,
+            "configuration": {
+                "executionPolicy": policy,
+                "environmentSha256": GATE.canonical_sha256(environment_values),
+                "workerCommandPrefixSha256": prefix_sha,
+                "workerExecutable": self.manifest["inputs"]["nodeRuntime"],
+            },
+            "familyCount": 1,
+            "completedCount": 1,
+            "pendingCount": 0,
+            "technicalAttemptCount": 1,
+            "pendingManifestOrdinals": [],
+            "checkpoints": [{"manifestOrdinal": 0, **checkpoint_record}],
+            "attempts": [{
+                "family": binding,
+                "attemptNumber": 1,
+                "intent": intent_record,
+                "terminal": terminal_record,
+                "shard": shard_record,
+            }],
+        }
+        GATE.write_exclusive(campaign_path, campaign)
+        post_path = self.run_root / "job-post-attestation.json"
+        post = GATE.build_job_attestation(
+            self.manifest_path,
+            SCHEDULER,
+            phase="post_workers",
+            pre_attestation_path=pre_path,
+            run_root=self.run_root,
+            durable_root=self.durable_root,
+            verify_runtime_inputs=False,
+        )
+        GATE.write_exclusive(post_path, post)
+        return {
+            "pre": pre_path,
+            "post": post_path,
+            "campaign": campaign_path,
+            "checkpoint": checkpoint_path,
+            "intent": intent_path,
+            "terminal": terminal_path,
+            "shard": shard_path,
+            "payload": payload,
+        }
+
     def check(self, result: dict[str, object]) -> dict[str, object]:
         result_path = self.root / "result.json"
         result_path.write_text(
@@ -375,8 +737,11 @@ class GateFixture(unittest.TestCase):
         self.assertIn("requested_engine_seed_mismatch", failures)
         self.assertIn("forward_reachedTargetTick_inconsistent", failures)
 
-    def test_preflight_pass_is_never_fidelity_clearance(self) -> None:
+    def test_unbound_preflight_mutation_fails_closed(self) -> None:
         self.manifest["selection"]["scope"] = "preflight"
+        self.manifest["selection"]["preflightRule"] = (
+            GATE.EXPANDED_PREFLIGHT_RULE
+        )
         self.manifest["status"] = "SLURM_MAP_FIDELITY_PREFLIGHT_NOT_CLEARANCE"
         self.manifest_path.write_text(
             json.dumps(self.manifest, indent=2) + "\n", encoding="utf-8"
@@ -387,12 +752,8 @@ class GateFixture(unittest.TestCase):
         )
         result["scope"] = "preflight"
         result["fullCoverage"] = False
-        summary = self.check(result)
-        self.assertEqual(summary["verdict"], "PASS")
-        self.assertTrue(summary["technicalChecksPassed"])
-        self.assertFalse(summary["screenComplete"])
-        self.assertFalse(summary["passed"])
-        self.assertFalse(summary["eligibleForFidelityClearance"])
+        with self.assertRaisesRegex(RuntimeError, "lacks its committed plan"):
+            self.check(result)
 
     def test_review_warning_requires_adjudication(self) -> None:
         result = self.result()

@@ -2,7 +2,7 @@
 #SBATCH --job-name=chrono-map-fidelity
 #SBATCH --account=pi_jss233
 #SBATCH --partition=day
-#SBATCH --time=02:00:00
+#SBATCH --time=01:00:00
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=4G
 #SBATCH --output=/dev/null
@@ -15,82 +15,137 @@ NODE_RUNTIME_ROOT=/apps/software/2024a/software/nodejs/20.13.1-GCCcore-13.3.0
 ICU_RUNTIME_ROOT=/apps/software/2024a/software/ICU/75.1-GCCcore-13.3.0
 GCC_RUNTIME_ROOT=/apps/software/system/software/GCCcore/13.3.0
 OPENSSL_RUNTIME_ROOT=/apps/software/system/software/OpenSSL/3
-export PATH="$NODE_RUNTIME_ROOT/bin:/opt/slurm/current/bin:/usr/local/bin:/usr/bin:/bin"
+NODE_BIN="$NODE_RUNTIME_ROOT/bin/node"
+NPM_BIN="$NODE_RUNTIME_ROOT/bin/npm"
+PYTHON_BIN=/usr/bin/python3.9
+SCONTROL=/opt/slurm/25.11.6/bin/scontrol
+export PATH="$NODE_RUNTIME_ROOT/bin:/opt/slurm/25.11.6/bin:/usr/local/bin:/usr/bin:/bin"
 export LD_LIBRARY_PATH="$ICU_RUNTIME_ROOT/lib:$GCC_RUNTIME_ROOT/lib64:$OPENSSL_RUNTIME_ROOT/lib64:$NODE_RUNTIME_ROOT/lib"
-export SCONTROL=/opt/slurm/current/bin/scontrol
+export SCONTROL
 export TZ=UTC
 export LC_ALL=C
 export PYTHONHASHSEED=0
+export PYTHONDONTWRITEBYTECODE=1
 unset NODE_OPTIONS
-# Warning-level engine diagnostics are part of the fidelity evidence. Overwrite
-# any submit-shell value, then prevent later script code from changing the mode.
 DEBUG_LOGGING=1
 readonly DEBUG_LOGGING
 export DEBUG_LOGGING
 
 REPO=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot
 MIX_DIR=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-assets/headless-data-full-ra2
-SCRATCH=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit
+EVIDENCE_BASE=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/map-compatibility-gate-v2
 CATALOG="$REPO/research/artifacts/map_family_catalog.json"
 TARGETS="$REPO/research/artifacts/role_blind_fidelity_targets_v1.json"
+PREFLIGHT_PLAN="$REPO/research/artifacts/map_fidelity_expanded_preflight_v2.json"
+GATE_SCRIPT="$REPO/research/scripts/map_fidelity_gate.py"
+SUPERVISOR_SCRIPT="$REPO/research/scripts/map_fidelity_supervisor.py"
+WORKER="$REPO/packages/chronodivide-bot-driver/dist/benchmark/mapFidelityProbe.js"
+
 TARGET_TICK=250
 readonly TARGET_TICK
 export TARGET_TICK
-MAP_FIDELITY_SCOPE=${MAP_FIDELITY_SCOPE:-full}
-PREPARE_SCOPE_ARGS=()
+MAP_FIDELITY_SCOPE=${MAP_FIDELITY_SCOPE:-preflight}
+MAP_FIDELITY_MAX_ATTEMPTS=${MAP_FIDELITY_MAX_ATTEMPTS:-2}
+MAP_FIDELITY_TIMEOUT_SECONDS=${MAP_FIDELITY_TIMEOUT_SECONDS:-125}
 case "$MAP_FIDELITY_SCOPE" in
     full)
-        RUN_ROOT="$SCRATCH/map-fidelity-gate-v1/$SLURM_JOB_ID"
+        PLAN_ARGS=()
         ;;
     preflight)
-        RUN_ROOT="$SCRATCH/map-fidelity-preflight-v1/$SLURM_JOB_ID"
-        PREPARE_SCOPE_ARGS=(--family-limit 3)
+        PLAN_ARGS=(--preflight-plan "$PREFLIGHT_PLAN")
         ;;
     *)
         echo "MAP_FIDELITY_SCOPE must be full or preflight" >&2
         exit 2
         ;;
 esac
+case "$MAP_FIDELITY_MAX_ATTEMPTS" in
+    1|2) ;;
+    *)
+        echo "MAP_FIDELITY_MAX_ATTEMPTS must be 1 or 2" >&2
+        exit 2
+        ;;
+esac
 
-# Slurm opens its directive logs before this script can set umask. Discard those
-# handles and reopen private logs only after creating the job-specific 0700 root.
-install -d -m 0700 "$(dirname "$RUN_ROOT")"
+RUN_ROOT="$EVIDENCE_BASE/$MAP_FIDELITY_SCOPE/$SLURM_JOB_ID"
+install -d -m 0700 "$EVIDENCE_BASE" "$EVIDENCE_BASE/$MAP_FIDELITY_SCOPE"
+if [[ -e "$RUN_ROOT" ]]; then
+    echo "Refusing to overwrite existing evidence root: $RUN_ROOT" >&2
+    exit 2
+fi
 mkdir -m 0700 "$RUN_ROOT"
 exec >"$RUN_ROOT/job.stdout.log" 2>"$RUN_ROOT/job.stderr.log"
 chmod 0600 "$RUN_ROOT/job.stdout.log" "$RUN_ROOT/job.stderr.log"
 
-JOB_LINE=$($SCONTROL show job -o "$SLURM_JOB_ID")
+JOB_LINE=$("$SCONTROL" show job -o "$SLURM_JOB_ID")
 JOB_ACCOUNT=$(tr ' ' '\n' <<< "$JOB_LINE" | awk -F= '$1 == "Account" {print $2; exit}')
 if [[ "$JOB_ACCOUNT" != "pi_jss233" ]]; then
     echo "Refusing map fidelity gate: authoritative Slurm account is $JOB_ACCOUNT, expected pi_jss233" >&2
     exit 2
 fi
+for executable in "$NODE_BIN" "$NPM_BIN" "$PYTHON_BIN" "$SCONTROL"; do
+    if [[ ! -x "$executable" ]]; then
+        echo "Required pinned executable is unavailable: $executable" >&2
+        exit 2
+    fi
+done
 if [[ ! -d "$MIX_DIR" ]]; then
     echo "Required full RA2 asset directory is missing: $MIX_DIR" >&2
     exit 2
 fi
 
 cd "$REPO"
-node --version
-npm --version
-npm run build --workspace=@supalosa/chronodivide-bot-driver
+"$NODE_BIN" --version
+"$NPM_BIN" --version
+"$NPM_BIN" run build --workspace=@supalosa/chronodivide-bot-driver
 
-python3 "$REPO/research/scripts/map_fidelity_gate.py" prepare \
+"$PYTHON_BIN" "$GATE_SCRIPT" prepare \
     --repo-root "$REPO" \
     --targets "$TARGETS" \
     --catalog "$CATALOG" \
     --mix-dir "$MIX_DIR" \
     --target-tick "$TARGET_TICK" \
     --expected-families 127 \
-    "${PREPARE_SCOPE_ARGS[@]}" \
+    "${PLAN_ARGS[@]}" \
     --output "$RUN_ROOT/input-manifest.json"
 
-node --es-module-specifier-resolution=node \
-    "$REPO/packages/chronodivide-bot-driver/dist/benchmark/mapFidelityProbe.js" \
+"$PYTHON_BIN" "$GATE_SCRIPT" attest \
     --manifest "$RUN_ROOT/input-manifest.json" \
-    --output "$RUN_ROOT/probe-results.json"
+    --phase pre_workers \
+    --output "$RUN_ROOT/job-pre-attestation.json"
 
-python3 "$REPO/research/scripts/map_fidelity_gate.py" check \
+set +e
+"$PYTHON_BIN" "$SUPERVISOR_SCRIPT" \
     --manifest "$RUN_ROOT/input-manifest.json" \
-    --result "$RUN_ROOT/probe-results.json" \
+    --attestation "$RUN_ROOT/job-pre-attestation.json" \
+    --run-root "$RUN_ROOT" \
+    --timeout-seconds "$MAP_FIDELITY_TIMEOUT_SECONDS" \
+    --termination-grace-seconds 5 \
+    --max-stream-bytes 1048576 \
+    --max-attempts "$MAP_FIDELITY_MAX_ATTEMPTS" \
+    -- "$NODE_BIN" --es-module-specifier-resolution=node "$WORKER"
+SUPERVISOR_RC=$?
+set -e
+printf '%s\n' "$SUPERVISOR_RC" >"$RUN_ROOT/supervisor.exit-code"
+chmod 0600 "$RUN_ROOT/supervisor.exit-code"
+if [[ "$SUPERVISOR_RC" -ne 0 ]]; then
+    echo "Supervisor ended with technical status $SUPERVISOR_RC; evidence retained at $RUN_ROOT" >&2
+    exit "$SUPERVISOR_RC"
+fi
+
+"$PYTHON_BIN" "$GATE_SCRIPT" attest \
+    --manifest "$RUN_ROOT/input-manifest.json" \
+    --phase post_workers \
+    --pre-attestation "$RUN_ROOT/job-pre-attestation.json" \
+    --run-root "$RUN_ROOT" \
+    --output "$RUN_ROOT/job-post-attestation.json"
+
+"$PYTHON_BIN" "$GATE_SCRIPT" aggregate \
+    --manifest "$RUN_ROOT/input-manifest.json" \
+    --pre-attestation "$RUN_ROOT/job-pre-attestation.json" \
+    --post-attestation "$RUN_ROOT/job-post-attestation.json" \
+    --run-root "$RUN_ROOT" \
+    --legacy-result "$RUN_ROOT/probe-results.json" \
     --output "$RUN_ROOT/gate-summary.json"
+
+echo "Durable map-fidelity evidence complete: $RUN_ROOT"

@@ -6,10 +6,13 @@ import { describe, expect, it } from "vitest";
 import {
     BUNDLE_HASH_ALGORITHM,
     BundleDescriptor,
+    EXPANDED_PREFLIGHT_RULE,
     TREE_HASH_ALGORITHM,
     TreeDescriptor,
     assertPinnedLoggingMode,
+    assertStrictFamilyWorkerShard,
     assertStrictFidelityProbeResult,
+    canonicalJson,
     captureConsoleWarnings,
     classifyConsoleMessage,
     deriveProbeCoverage,
@@ -19,6 +22,7 @@ import {
     serializeCapturedError,
     serializeCapturedWarning,
     sha256File,
+    treeCompositeSha256,
     validateReciprocalStarts,
     verifyBundleDescriptor,
     verifyTreeDescriptor,
@@ -77,6 +81,40 @@ describe("outcome-free map fidelity protocol", () => {
         expect(console.warn).toBe(originalWarn);
     });
 
+    it("suppresses and hashes emitWarning plus direct process stream writes", async () => {
+        const originalEmitWarning = process.emitWarning;
+        const originalStdoutWrite = process.stdout.write;
+        const originalStderrWrite = process.stderr.write;
+        let callbackRan = false;
+        const captured = await captureConsoleWarnings("all-diagnostics", async () => {
+            process.emitWarning("Unknown waypoint reference");
+            process.stdout.write("plain direct stdout diagnostic", () => {
+                callbackRan = true;
+            });
+            process.stderr.write("plain direct stderr diagnostic");
+            return "done";
+        });
+
+        expect(captured.value).toBe("done");
+        expect(captured.error).toBeNull();
+        expect(callbackRan).toBe(true);
+        expect(captured.warnings.map(({ level, category, severity }) => ({ level, category, severity }))).toEqual([
+            { level: "warn", category: "invalid_waypoint", severity: "fail" },
+            { level: "info", category: "other_warning", severity: "review" },
+            { level: "error", category: "engine_error", severity: "fail" },
+        ]);
+        expect(process.emitWarning).toBe(originalEmitWarning);
+        expect(process.stdout.write).toBe(originalStdoutWrite);
+        expect(process.stderr.write).toBe(originalStderrWrite);
+    });
+
+    it("matches Python ensure_ascii canonical JSON for evidence bindings", () => {
+        expect(canonicalJson({ é: "🙂", z: 1 })).toBe(
+            '{"z":1,"\\u00e9":"\\ud83d\\ude42"}',
+        );
+        expect(() => canonicalJson({ timeout: 120.5 })).toThrow(/safe integers/);
+    });
+
     it("hashes fatal diagnostics without serializing raw names, messages, or stacks", () => {
         const rawMessage = "WinnerError_score_total: alpha was defeated";
         const serialized = serializeCapturedError(new Error(rawMessage));
@@ -95,6 +133,7 @@ describe("outcome-free map fidelity protocol", () => {
         expect(() => assertPinnedLoggingMode({ debugLogging: "1", source: "sbatch_pinned" }, "0")).toThrow(
             /DEBUG_LOGGING/,
         );
+        const zeroHash = "0".repeat(64);
         const coverage = deriveProbeCoverage(
             {
                 criterion: "all role-blind targets",
@@ -102,18 +141,20 @@ describe("outcome-free map fidelity protocol", () => {
                 roleBlind: true,
                 scope: "preflight",
                 populationFamilyCount: 127,
-                familyCount: 3,
+                familyCount: 11,
                 representativeField: "representativeMapPath",
-                preflightRule: "deterministic hash rule",
+                preflightRule: EXPANDED_PREFLIGHT_RULE,
+                preflightPlanSha256: zeroHash,
+                preflightSelectedCommitmentSha256: zeroHash,
             },
-            3,
-            3,
+            11,
+            11,
         );
         expect(coverage).toMatchObject({
             artifactKind: "infrastructure_fidelity_preflight_probe_not_clearance",
             scope: "preflight",
             populationFamilyCount: 127,
-            runFamilyCount: 3,
+            runFamilyCount: 11,
             fullCoverage: false,
             eligibleForFidelityClearance: false,
         });
@@ -127,6 +168,8 @@ describe("outcome-free map fidelity protocol", () => {
                 familyCount: 127,
                 representativeField: "representativeMapPath",
                 preflightRule: null,
+                preflightPlanSha256: null,
+                preflightSelectedCommitmentSha256: null,
             },
             127,
             127,
@@ -147,21 +190,32 @@ describe("outcome-free map fidelity protocol", () => {
             fs.writeFileSync(first, "alpha");
             fs.writeFileSync(second, Buffer.from([0, 1, 2]));
             const entries = [
-                { path: "a.txt", bytes: 5, sha256: sha256File(first) },
-                { path: "nested/b.bin", bytes: 3, sha256: sha256File(second) },
+                { path: "a.txt", kind: "regular_file" as const, bytes: 5, sha256: sha256File(first), target: null },
+                {
+                    path: "nested/b.bin",
+                    kind: "regular_file" as const,
+                    bytes: 3,
+                    sha256: sha256File(second),
+                    target: null,
+                },
             ];
             const treeDigest = createHash("sha256");
             for (const entry of entries) {
                 treeDigest.update(entry.path);
                 treeDigest.update("\0");
+                treeDigest.update(entry.kind);
+                treeDigest.update("\0");
                 treeDigest.update(String(entry.bytes));
                 treeDigest.update("\0");
                 treeDigest.update(entry.sha256);
+                treeDigest.update("\0");
+                treeDigest.update(entry.target ?? "");
                 treeDigest.update("\0");
             }
             const descriptor: TreeDescriptor = {
                 root,
                 fileCount: 2,
+                symlinkCount: 0,
                 bytes: 8,
                 sha256: treeDigest.digest("hex"),
                 hashAlgorithm: TREE_HASH_ALGORITHM,
@@ -189,6 +243,45 @@ describe("outcome-free map fidelity protocol", () => {
             };
             expect(verifyBundleDescriptor(bundle, members, "fixtureBundle")).toBe(bundle.sha256);
             expect(() => verifyBundleDescriptor(bundle, [...members].reverse(), "fixtureBundle")).toThrow(/in order/);
+        } finally {
+            fs.rmSync(root, { recursive: true, force: true });
+        }
+    });
+
+    it("binds symbolic-link targets without traversing them", () => {
+        const root = fs.mkdtempSync(path.join(os.tmpdir(), "map-fidelity-symlink-tree-"));
+        try {
+            const targetPath = path.join(root, "target.txt");
+            fs.writeFileSync(targetPath, "payload");
+            fs.symlinkSync("target.txt", path.join(root, "link.txt"));
+            const target = "target.txt";
+            const targetBytes = Buffer.from(target, "utf8");
+            const entries = [
+                {
+                    path: "link.txt",
+                    kind: "symbolic_link" as const,
+                    bytes: targetBytes.byteLength,
+                    sha256: createHash("sha256").update(targetBytes).digest("hex"),
+                    target,
+                },
+                {
+                    path: "target.txt",
+                    kind: "regular_file" as const,
+                    bytes: 7,
+                    sha256: sha256File(targetPath),
+                    target: null,
+                },
+            ];
+            const descriptor: TreeDescriptor = {
+                root,
+                fileCount: 2,
+                symlinkCount: 1,
+                bytes: targetBytes.byteLength + 7,
+                sha256: treeCompositeSha256(entries),
+                hashAlgorithm: TREE_HASH_ALGORITHM,
+                entries,
+            };
+            expect(verifyTreeDescriptor(descriptor, "symlinkTree")).toBe(descriptor.sha256);
         } finally {
             fs.rmSync(root, { recursive: true, force: true });
         }
@@ -228,6 +321,185 @@ describe("outcome-free map fidelity protocol", () => {
         };
         expect(() => assertStrictFidelityProbeResult(result)).not.toThrow();
         expect(() => assertStrictFidelityProbeResult({ ...result, score: 1 })).toThrow(/keys must be exactly/);
+    });
+
+    it("strictly validates a complete one-family 1+2+2 worker shard", () => {
+        const zeroHash = "0".repeat(64);
+        const oneHash = "1".repeat(64);
+        const familyId = "mf_fixture";
+        const familyIndex = 7;
+        const alias = `cdfid-000007-${zeroHash}.map`;
+        const aliasPath = `/private/attempt/map-sandbox/${alias}`;
+        const starts = {
+            alpha: { x: 1, y: 2 },
+            beta: { x: 3, y: 4 },
+        };
+        const probe = (order: ["alpha", "beta"] | ["beta", "alpha"], reverse: boolean) => ({
+            order,
+            loaded: true,
+            initialTick: 0,
+            finalTick: 10,
+            updates: 10,
+            initialTickIsZero: true,
+            tickUpdateArithmeticConsistent: true,
+            progressedBeyondTickOne: true,
+            reachedTargetTick: true,
+            starts: reverse ? { alpha: starts.beta, beta: starts.alpha } : starts,
+            wallTimeMs: 5,
+            warningCaptureTruncated: false,
+            error: null,
+        });
+        const phaseSequence = [
+            { phase: "initialization", count: 1 },
+            { phase: "forward_create", count: 2 },
+            { phase: "reverse_create", count: 2 },
+        ] as const;
+        const shard = {
+            schemaVersion: 1,
+            gate: "map-fidelity-gate-v1",
+            artifactKind: "map_fidelity_family_worker_shard",
+            outcomeFree: true,
+            manifestSha256: zeroHash,
+            attestationSha256: oneHash,
+            family: {
+                manifestOrdinal: 0,
+                familyIndex,
+                familyIdSha256: createHash("sha256").update(familyId).digest("hex"),
+                familyEntrySha256: oneHash,
+            },
+            attemptNumber: 1,
+            intentSha256: zeroHash,
+            scheduler: {
+                jobId: "123",
+                account: "pi_jss233",
+                partition: "devel",
+                qos: null,
+                source: "scontrol",
+            },
+            payload: {
+                engineInitialization: {
+                    succeeded: true,
+                    warnings: [],
+                    warningCaptureTruncated: false,
+                    error: null,
+                },
+                familyResult: {
+                    familyIndex,
+                    familyId,
+                    representativeMapPath: "packages/chronodivide-bot-driver/data/fixture.map",
+                    mapName: "fixture.map",
+                    executedMapAlias: alias,
+                    mapBytes: 123,
+                    mapSha256: zeroHash,
+                    slurmJobId: "123",
+                    requestedEngineSeed: 11,
+                    targetTick: 10,
+                    declaredStartLocations: [
+                        { x: 1, y: 2, waypoint: 0, encoded: 2001 },
+                        { x: 3, y: 4, waypoint: 1, encoded: 4003 },
+                    ],
+                    forward: probe(["alpha", "beta"], false),
+                    reverse: probe(["beta", "alpha"], true),
+                    reciprocalStartCheck: {
+                        declaredStartCountValid: true,
+                        forwardStartsDistinct: true,
+                        reverseStartsDistinct: true,
+                        allObservedStartsDeclared: true,
+                        reciprocalPhysicalSlots: true,
+                        failures: [],
+                    },
+                    warnings: [],
+                    failureCategories: [],
+                    reviewCategories: [],
+                    fidelityStatus: "pass",
+                },
+                mapLoadAttestation: {
+                    protocol: "unique-rfs-alias-adapter-snapshot-v1",
+                    alias,
+                    aliasPath,
+                    expectedBytes: 123,
+                    expectedSha256: zeroHash,
+                    phases: phaseSequence.map(({ phase, count }) => ({
+                        phase,
+                        expectedReads: count,
+                        observedReads: count,
+                    })),
+                    reads: phaseSequence.flatMap(({ phase, count }) =>
+                        Array.from({ length: count }, (_, index) => ({
+                            phase,
+                            ordinal: index + 1,
+                            alias,
+                            resolvedPath: aliasPath,
+                            bytes: 123,
+                            sha256: zeroHash,
+                            adapter: "file-system-access/node.FileHandle.getFile",
+                            inMemorySnapshot: true,
+                        })),
+                    ),
+                    complete: true,
+                },
+            },
+        };
+
+        expect(() => assertStrictFamilyWorkerShard(shard)).not.toThrow();
+        const firstReadCompatibilityFailure = JSON.parse(JSON.stringify(shard));
+        for (const order of ["forward", "reverse"]) {
+            Object.assign(firstReadCompatibilityFailure.payload.familyResult[order], {
+                loaded: false,
+                initialTick: null,
+                finalTick: null,
+                updates: 0,
+                initialTickIsZero: false,
+                tickUpdateArithmeticConsistent: false,
+                progressedBeyondTickOne: false,
+                reachedTargetTick: false,
+                starts: { alpha: null, beta: null },
+                error: {
+                    category: "engine_error",
+                    name: "captured_error",
+                    messageSha256: zeroHash,
+                },
+            });
+        }
+        Object.assign(firstReadCompatibilityFailure.payload.familyResult.reciprocalStartCheck, {
+            forwardStartsDistinct: false,
+            reverseStartsDistinct: false,
+            allObservedStartsDeclared: false,
+            reciprocalPhysicalSlots: false,
+            failures: [
+                "forward_duplicate_or_missing_start",
+                "observed_start_not_declared",
+                "reciprocal_physical_slot_mismatch",
+                "reverse_duplicate_or_missing_start",
+            ],
+        });
+        firstReadCompatibilityFailure.payload.familyResult.failureCategories = [
+            "forward_engine_error",
+            "forward_initial_tick_not_zero",
+            "forward_load_failed",
+            "forward_no_progress_beyond_tick_1",
+            "forward_target_tick_not_reached",
+            "forward_tick_update_arithmetic_mismatch",
+            ...firstReadCompatibilityFailure.payload.familyResult.reciprocalStartCheck.failures,
+            "reverse_engine_error",
+            "reverse_initial_tick_not_zero",
+            "reverse_load_failed",
+            "reverse_no_progress_beyond_tick_1",
+            "reverse_target_tick_not_reached",
+            "reverse_tick_update_arithmetic_mismatch",
+        ].sort();
+        firstReadCompatibilityFailure.payload.familyResult.fidelityStatus = "fail";
+        expect(() => assertStrictFamilyWorkerShard(firstReadCompatibilityFailure)).not.toThrow();
+
+        const unknownPayload = JSON.parse(JSON.stringify(shard));
+        unknownPayload.payload.policyResult = {};
+        expect(() => assertStrictFamilyWorkerShard(unknownPayload)).toThrow(/keys must be exactly/);
+        const missingRead = JSON.parse(JSON.stringify(shard));
+        missingRead.payload.mapLoadAttestation.reads.pop();
+        expect(() => assertStrictFamilyWorkerShard(missingRead)).toThrow(/exactly 5/);
+        const badArithmetic = JSON.parse(JSON.stringify(shard));
+        badArithmetic.payload.familyResult.forward.updates = 9;
+        expect(() => assertStrictFamilyWorkerShard(badArithmetic)).toThrow(/ArithmeticConsistent/);
     });
 
     it("accepts a reciprocal physical-slot assignment", () => {

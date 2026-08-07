@@ -2,10 +2,16 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import util from "node:util";
+import {
+    MAP_LOAD_ATTESTATION_PROTOCOL,
+    MAP_LOAD_PHASE_READ_COUNTS,
+    MapLoadAttestationEvidence,
+} from "./mapLoadAttestation.js";
 
 export const MAP_FIDELITY_GATE = "map-fidelity-gate-v1" as const;
 export const PINNED_DEBUG_LOGGING = "1" as const;
-export const TREE_HASH_ALGORITHM = "sha256(relative_path NUL bytes NUL file_sha256 NUL)" as const;
+export const TREE_HASH_ALGORITHM =
+    "sha256(relative_path NUL kind NUL bytes NUL content_or_target_sha256 NUL target_or_empty NUL)" as const;
 export const BUNDLE_HASH_ALGORITHM = "sha256(label NUL value NUL), ordered as recorded" as const;
 export const MAX_CAPTURED_WARNINGS_PER_SESSION = 100;
 
@@ -52,13 +58,16 @@ export type ExactFileDescriptor = {
 
 export type TreeEntryDescriptor = {
     path: string;
+    kind: "regular_file" | "symbolic_link";
     bytes: number;
     sha256: string;
+    target: string | null;
 };
 
 export type TreeDescriptor = {
     root: string;
     fileCount: number;
+    symlinkCount: number;
     bytes: number;
     sha256: string;
     hashAlgorithm: typeof TREE_HASH_ALGORITHM;
@@ -71,6 +80,12 @@ export type BundleDescriptor = {
     sha256: string;
 };
 
+export const EXPANDED_PREFLIGHT_FAMILY_COUNT = 11;
+export const EXPANDED_PREFLIGHT_RULE =
+    "committed role-blind expanded-map-compatibility-preflight-v2 plan; " +
+    "execute its 11 selected families in full-population order while retaining " +
+    "full-population indices and engine seeds";
+
 export type FidelityScope = "full" | "preflight";
 export type ManifestSelection = {
     criterion: string;
@@ -81,6 +96,8 @@ export type ManifestSelection = {
     familyCount: number;
     representativeField: string;
     preflightRule: string | null;
+    preflightPlanSha256: string | null;
+    preflightSelectedCommitmentSha256: string | null;
 };
 
 export type ProbeCoverage = {
@@ -156,10 +173,10 @@ export const classifyConsoleMessage = (level: ConsoleLevel, rawText: string): Ca
 };
 
 /**
- * Captures warning-like console messages for one isolated engine phase and
- * always restores the process-global console methods. The helper deliberately
- * does not forward captured text to stdout/stderr, where raw diagnostics could
- * escape the outcome-redaction boundary.
+ * Captures all process-global diagnostic channels used by the engine for one
+ * isolated phase. Nothing is forwarded to stdout/stderr: the worker supervisor
+ * requires both streams to stay empty, and only hashed/redacted records cross
+ * the evidence boundary.
  */
 export const captureConsoleWarnings = async <T>(
     phase: string,
@@ -167,19 +184,56 @@ export const captureConsoleWarnings = async <T>(
 ): Promise<{ value: T | null; error: unknown | null; warnings: PhaseWarning[]; truncated: boolean }> => {
     const levels: ConsoleLevel[] = ["debug", "info", "log", "warn", "error"];
     const originals = new Map<ConsoleLevel, (...args: unknown[]) => void>();
+    const originalEmitWarning = process.emitWarning;
+    const originalStdoutWrite = process.stdout.write;
+    const originalStderrWrite = process.stderr.write;
     const warnings: PhaseWarning[] = [];
     let truncated = false;
+
+    const record = (level: ConsoleLevel, rawText: string, force: boolean): void => {
+        const classified =
+            classifyConsoleMessage(level, rawText) ??
+            (force
+                ? {
+                      level,
+                      category: level === "error" ? ("engine_error" as const) : ("other_warning" as const),
+                      severity: level === "error" ? ("fail" as const) : ("review" as const),
+                      text: sanitizeDiagnosticText(rawText),
+                  }
+                : null);
+        if (!classified || classified.text.length === 0) return;
+        if (warnings.length < MAX_CAPTURED_WARNINGS_PER_SESSION) warnings.push({ phase, ...classified });
+        else truncated = true;
+    };
+
+    const writeCapture = (level: "info" | "error") =>
+        ((chunk: unknown, ...args: unknown[]): boolean => {
+            const text =
+                typeof chunk === "string"
+                    ? chunk
+                    : Buffer.isBuffer(chunk) || chunk instanceof Uint8Array
+                      ? Buffer.from(chunk).toString("utf8")
+                      : util.format(chunk);
+            record(level, text, true);
+            const callback = [...args].reverse().find((entry) => typeof entry === "function") as
+                | (() => void)
+                | undefined;
+            if (callback) callback();
+            return true;
+        }) as typeof process.stdout.write;
 
     for (const level of levels) {
         const original = console[level] as (...args: unknown[]) => void;
         originals.set(level, original);
         console[level] = ((...args: unknown[]) => {
-            const classified = classifyConsoleMessage(level, util.format(...args));
-            if (!classified) return;
-            if (warnings.length < MAX_CAPTURED_WARNINGS_PER_SESSION) warnings.push({ phase, ...classified });
-            else truncated = true;
+            record(level, util.format(...args), false);
         }) as (typeof console)[typeof level];
     }
+    process.emitWarning = ((warning: string | Error, ...args: unknown[]) => {
+        record("warn", warning instanceof Error ? warning.message : util.format(warning, ...args), true);
+    }) as typeof process.emitWarning;
+    process.stdout.write = writeCapture("info");
+    process.stderr.write = writeCapture("error");
 
     try {
         return { value: await action(), error: null, warnings, truncated };
@@ -189,6 +243,9 @@ export const captureConsoleWarnings = async <T>(
         for (const level of levels) {
             console[level] = originals.get(level) as (typeof console)[typeof level];
         }
+        process.emitWarning = originalEmitWarning;
+        process.stdout.write = originalStdoutWrite;
+        process.stderr.write = originalStderrWrite;
     }
 };
 
@@ -284,19 +341,37 @@ export const verifyExactFileDescriptor = (descriptor: ExactFileDescriptor, label
 const collectTreeEntries = (root: string): TreeEntryDescriptor[] => {
     const entries: TreeEntryDescriptor[] = [];
     const visit = (directory: string): void => {
-        for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
-            const absolute = path.join(directory, entry.name);
-            if (entry.isDirectory()) {
+        for (const name of fs.readdirSync(directory)) {
+            const absolute = path.join(directory, name);
+            const stat = fs.lstatSync(absolute);
+            if (stat.isDirectory()) {
                 visit(absolute);
                 continue;
             }
-            const stat = fs.statSync(absolute);
-            if (!stat.isFile()) continue;
-            entries.push({
-                path: path.relative(root, absolute).split(path.sep).join("/"),
-                bytes: stat.size,
-                sha256: sha256File(absolute),
-            });
+            const relativePath = path.relative(root, absolute).split(path.sep).join("/");
+            if (stat.isFile()) {
+                entries.push({
+                    path: relativePath,
+                    kind: "regular_file",
+                    bytes: stat.size,
+                    sha256: sha256File(absolute),
+                    target: null,
+                });
+                continue;
+            }
+            if (stat.isSymbolicLink()) {
+                const target = fs.readlinkSync(absolute);
+                const targetBytes = Buffer.from(target, "utf8");
+                entries.push({
+                    path: relativePath,
+                    kind: "symbolic_link",
+                    bytes: targetBytes.byteLength,
+                    sha256: createHash("sha256").update(targetBytes).digest("hex"),
+                    target,
+                });
+                continue;
+            }
+            throw new Error(`Runtime tree contains a special filesystem entry: ${absolute}`);
         }
     };
     visit(root);
@@ -308,9 +383,13 @@ export const treeCompositeSha256 = (entries: TreeEntryDescriptor[]): string => {
     for (const entry of entries) {
         digest.update(entry.path, "utf8");
         digest.update("\0");
+        digest.update(entry.kind, "ascii");
+        digest.update("\0");
         digest.update(String(entry.bytes), "ascii");
         digest.update("\0");
         digest.update(entry.sha256, "ascii");
+        digest.update("\0");
+        digest.update(entry.target ?? "", "utf8");
         digest.update("\0");
     }
     return digest.digest("hex");
@@ -319,7 +398,7 @@ export const treeCompositeSha256 = (entries: TreeEntryDescriptor[]): string => {
 export const verifyTreeDescriptor = (descriptor: TreeDescriptor, label: string): string => {
     const record = assertExactKeys(
         descriptor,
-        ["root", "fileCount", "bytes", "sha256", "hashAlgorithm", "entries"],
+        ["root", "fileCount", "symlinkCount", "bytes", "sha256", "hashAlgorithm", "entries"],
         label,
     );
     if (typeof record.root !== "string" || !path.isAbsolute(record.root) || !fs.statSync(record.root).isDirectory()) {
@@ -327,11 +406,12 @@ export const verifyTreeDescriptor = (descriptor: TreeDescriptor, label: string):
     }
     if (record.hashAlgorithm !== TREE_HASH_ALGORITHM) throw new Error(`${label}.hashAlgorithm is unsupported`);
     const expectedCount = assertNonnegativeInteger(record.fileCount, `${label}.fileCount`);
+    const expectedSymlinkCount = assertNonnegativeInteger(record.symlinkCount, `${label}.symlinkCount`);
     const expectedBytes = assertNonnegativeInteger(record.bytes, `${label}.bytes`);
     const expectedSha256 = assertSha256(record.sha256, `${label}.sha256`);
     if (!Array.isArray(record.entries)) throw new Error(`${label}.entries must be an array`);
     const expectedEntries = record.entries.map((entry, index) => {
-        const row = assertExactKeys(entry, ["path", "bytes", "sha256"], `${label}.entries[${index}]`);
+        const row = assertExactKeys(entry, ["path", "kind", "bytes", "sha256", "target"], `${label}.entries[${index}]`);
         if (
             typeof row.path !== "string" ||
             row.path.length === 0 ||
@@ -340,10 +420,32 @@ export const verifyTreeDescriptor = (descriptor: TreeDescriptor, label: string):
         ) {
             throw new Error(`${label}.entries[${index}].path must be a safe relative POSIX path`);
         }
+        if (row.kind !== "regular_file" && row.kind !== "symbolic_link") {
+            throw new Error(`${label}.entries[${index}].kind is invalid`);
+        }
+        const bytes = assertNonnegativeInteger(row.bytes, `${label}.entries[${index}].bytes`);
+        const sha256 = assertSha256(row.sha256, `${label}.entries[${index}].sha256`);
+        if (
+            (row.kind === "regular_file" && row.target !== null) ||
+            (row.kind === "symbolic_link" && typeof row.target !== "string")
+        ) {
+            throw new Error(`${label}.entries[${index}].target is inconsistent with its kind`);
+        }
+        if (row.kind === "symbolic_link") {
+            const targetBytes = Buffer.from(row.target as string, "utf8");
+            if (
+                targetBytes.byteLength !== bytes ||
+                createHash("sha256").update(targetBytes).digest("hex") !== sha256
+            ) {
+                throw new Error(`${label}.entries[${index}] does not bind its symbolic-link target`);
+            }
+        }
         return {
             path: row.path,
-            bytes: assertNonnegativeInteger(row.bytes, `${label}.entries[${index}].bytes`),
-            sha256: assertSha256(row.sha256, `${label}.entries[${index}].sha256`),
+            kind: row.kind,
+            bytes,
+            sha256,
+            target: row.target,
         };
     });
     const sortedExpected = [...expectedEntries].sort((left, right) =>
@@ -356,10 +458,12 @@ export const verifyTreeDescriptor = (descriptor: TreeDescriptor, label: string):
         throw new Error(`${label}.entries contain duplicate paths`);
     }
     const actualEntries = collectTreeEntries(record.root);
+    const actualSymlinkCount = actualEntries.filter((entry) => entry.kind === "symbolic_link").length;
     const actualBytes = actualEntries.reduce((total, entry) => total + entry.bytes, 0);
     const actualSha256 = treeCompositeSha256(actualEntries);
     if (
         expectedCount !== actualEntries.length ||
+        expectedSymlinkCount !== actualSymlinkCount ||
         expectedBytes !== actualBytes ||
         expectedSha256 !== actualSha256 ||
         JSON.stringify(expectedEntries) !== JSON.stringify(actualEntries)
@@ -435,6 +539,8 @@ export const deriveProbeCoverage = (
             "familyCount",
             "representativeField",
             "preflightRule",
+            "preflightPlanSha256",
+            "preflightSelectedCommitmentSha256",
         ],
         "manifest.selection",
     );
@@ -457,14 +563,28 @@ export const deriveProbeCoverage = (
         throw new Error("Selection, requested, run, and population family counts are inconsistent");
     }
     const scope = record.scope as FidelityScope;
-    if (
-        (scope === "full" && (requested !== populationFamilyCount || record.preflightRule !== null)) ||
-        (scope === "preflight" &&
-            (requested >= populationFamilyCount ||
-                typeof record.preflightRule !== "string" ||
-                record.preflightRule.length === 0))
-    ) {
-        throw new Error("Selection scope, population coverage, and preflight rule are inconsistent");
+    if (scope === "full") {
+        if (
+            requested !== populationFamilyCount ||
+            record.preflightRule !== null ||
+            record.preflightPlanSha256 !== null ||
+            record.preflightSelectedCommitmentSha256 !== null
+        ) {
+            throw new Error("Full selection must not bind a preflight plan");
+        }
+    } else {
+        if (
+            requested !== EXPANDED_PREFLIGHT_FAMILY_COUNT ||
+            requested >= populationFamilyCount ||
+            record.preflightRule !== EXPANDED_PREFLIGHT_RULE
+        ) {
+            throw new Error("Preflight selection is not the frozen expanded plan");
+        }
+        assertSha256(record.preflightPlanSha256, "selection.preflightPlanSha256");
+        assertSha256(
+            record.preflightSelectedCommitmentSha256,
+            "selection.preflightSelectedCommitmentSha256",
+        );
     }
     return {
         artifactKind:
@@ -794,4 +914,467 @@ export const validateReciprocalStarts = (
         reciprocalPhysicalSlots,
         failures,
     };
+};
+
+export type FamilyWorkerProbeRun = {
+    order: ["alpha", "beta"] | ["beta", "alpha"];
+    loaded: boolean;
+    initialTick: number | null;
+    finalTick: number | null;
+    updates: number;
+    initialTickIsZero: boolean;
+    tickUpdateArithmeticConsistent: boolean;
+    progressedBeyondTickOne: boolean;
+    reachedTargetTick: boolean;
+    starts: ParticipantStarts;
+    wallTimeMs: number;
+    warningCaptureTruncated: boolean;
+    error: SerializedError | null;
+};
+
+export type FamilyWorkerInitialization = {
+    succeeded: boolean;
+    warnings: SerializedWarning[];
+    warningCaptureTruncated: boolean;
+    error: SerializedError | null;
+};
+
+export type FamilyWorkerResult = {
+    familyIndex: number;
+    familyId: string;
+    representativeMapPath: string;
+    mapName: string;
+    executedMapAlias: string;
+    mapBytes: number;
+    mapSha256: string;
+    slurmJobId: string;
+    requestedEngineSeed: number;
+    targetTick: number;
+    declaredStartLocations: Array<StartLocation & { waypoint: number; encoded: number }>;
+    forward: FamilyWorkerProbeRun;
+    reverse: FamilyWorkerProbeRun;
+    reciprocalStartCheck: ReciprocalStartCheck;
+    warnings: SerializedWarning[];
+    failureCategories: string[];
+    reviewCategories: string[];
+    fidelityStatus: "pass" | "review" | "fail";
+};
+
+export type FamilyBinding = {
+    manifestOrdinal: number;
+    familyIndex: number;
+    familyIdSha256: string;
+    familyEntrySha256: string;
+};
+
+export type FamilyWorkerScheduler = {
+    jobId: string;
+    account: "pi_jss233";
+    partition: string | null;
+    qos: string | null;
+    source: "scontrol";
+};
+
+export type FamilyWorkerShard = {
+    schemaVersion: 1;
+    gate: typeof MAP_FIDELITY_GATE;
+    artifactKind: "map_fidelity_family_worker_shard";
+    outcomeFree: true;
+    manifestSha256: string;
+    attestationSha256: string;
+    family: FamilyBinding;
+    attemptNumber: number;
+    intentSha256: string;
+    scheduler: FamilyWorkerScheduler;
+    payload: {
+        engineInitialization: FamilyWorkerInitialization;
+        familyResult: FamilyWorkerResult;
+        mapLoadAttestation: MapLoadAttestationEvidence;
+    };
+};
+
+const asciiJsonString = (value: string): string =>
+    JSON.stringify(value).replace(/[\u007f-\uffff]/g, (character) =>
+        `\\u${character.charCodeAt(0).toString(16).padStart(4, "0")}`,
+    );
+
+/**
+ * Python-json compatible canonicalization for the integer/string/bool/null
+ * evidence records used by the supervisor. Floats are rejected deliberately:
+ * Python and JavaScript spell some numerically equal floats differently.
+ */
+export const canonicalJson = (value: unknown): string => {
+    if (value === null) return "null";
+    if (typeof value === "string") return asciiJsonString(value);
+    if (typeof value === "boolean") return value ? "true" : "false";
+    if (typeof value === "number") {
+        if (!Number.isSafeInteger(value)) throw new Error("Canonical evidence numbers must be safe integers");
+        return String(value);
+    }
+    if (Array.isArray(value)) return `[${value.map(canonicalJson).join(",")}]`;
+    if (typeof value === "object") {
+        const record = value as Record<string, unknown>;
+        return `{${Object.keys(record)
+            .sort()
+            .map((key) => `${asciiJsonString(key)}:${canonicalJson(record[key])}`)
+            .join(",")}}`;
+    }
+    throw new Error(`Unsupported canonical evidence value: ${typeof value}`);
+};
+
+export const canonicalJsonSha256 = (value: unknown): string =>
+    createHash("sha256").update(canonicalJson(value), "utf8").digest("hex");
+
+const assertSortedUniqueStrings = (value: unknown, label: string): string[] => {
+    assertStringArray(value, label);
+    const entries = value as string[];
+    if (entries.some((entry) => entry.length === 0)) throw new Error(`${label} contains an empty string`);
+    const expected = [...new Set(entries)].sort();
+    if (JSON.stringify(entries) !== JSON.stringify(expected)) {
+        throw new Error(`${label} must be sorted and unique`);
+    }
+    return entries;
+};
+
+const assertStrictSerializedWarning = (value: unknown, label: string): SerializedWarning => {
+    assertWarning(value, label);
+    const warning = value as SerializedWarning;
+    const expectedSeverity =
+        warning.level === "error" ? "fail" : WARNING_CATEGORY_SEVERITY[warning.category];
+    if (warning.severity !== expectedSeverity) throw new Error(`${label}.severity is inconsistent`);
+    return warning;
+};
+
+const assertWorkerInitialization = (value: unknown, label: string): FamilyWorkerInitialization => {
+    const initialization = assertExactKeys(
+        value,
+        ["succeeded", "warnings", "warningCaptureTruncated", "error"],
+        label,
+    );
+    if (
+        typeof initialization.succeeded !== "boolean" ||
+        typeof initialization.warningCaptureTruncated !== "boolean" ||
+        !Array.isArray(initialization.warnings)
+    ) {
+        throw new Error(`${label} status or warning fields are invalid`);
+    }
+    initialization.warnings.forEach((warning, index) =>
+        assertStrictSerializedWarning(warning, `${label}.warnings[${index}]`),
+    );
+    assertErrorRecord(initialization.error, `${label}.error`);
+    if (initialization.succeeded !== (initialization.error === null)) {
+        throw new Error(`${label}.succeeded must be equivalent to a null error`);
+    }
+    return value as FamilyWorkerInitialization;
+};
+
+const assertWorkerProbeRun = (
+    value: unknown,
+    label: string,
+    expectedOrder: FamilyWorkerProbeRun["order"],
+    targetTick: number,
+): FamilyWorkerProbeRun => {
+    const run = assertExactKeys(
+        value,
+        [
+            "order",
+            "loaded",
+            "initialTick",
+            "finalTick",
+            "updates",
+            "initialTickIsZero",
+            "tickUpdateArithmeticConsistent",
+            "progressedBeyondTickOne",
+            "reachedTargetTick",
+            "starts",
+            "wallTimeMs",
+            "warningCaptureTruncated",
+            "error",
+        ],
+        label,
+    );
+    if (JSON.stringify(run.order) !== JSON.stringify(expectedOrder)) {
+        throw new Error(`${label}.order is not the committed reciprocal order`);
+    }
+    for (const key of [
+        "loaded",
+        "initialTickIsZero",
+        "tickUpdateArithmeticConsistent",
+        "progressedBeyondTickOne",
+        "reachedTargetTick",
+        "warningCaptureTruncated",
+    ]) {
+        if (typeof run[key] !== "boolean") throw new Error(`${label}.${key} must be boolean`);
+    }
+    const updates = assertNonnegativeInteger(run.updates, `${label}.updates`);
+    assertNonnegativeInteger(run.wallTimeMs, `${label}.wallTimeMs`);
+    const initialTick =
+        run.initialTick === null ? null : assertNonnegativeInteger(run.initialTick, `${label}.initialTick`);
+    const finalTick =
+        run.finalTick === null ? null : assertNonnegativeInteger(run.finalTick, `${label}.finalTick`);
+    const loaded = initialTick !== null && finalTick !== null;
+    if (run.loaded !== loaded) throw new Error(`${label}.loaded is inconsistent with its ticks`);
+    if (run.initialTickIsZero !== (initialTick === 0)) {
+        throw new Error(`${label}.initialTickIsZero is inconsistent`);
+    }
+    const arithmeticConsistent =
+        initialTick !== null && finalTick !== null && finalTick - initialTick === updates;
+    if (run.tickUpdateArithmeticConsistent !== arithmeticConsistent) {
+        throw new Error(`${label}.tickUpdateArithmeticConsistent is inconsistent`);
+    }
+    if (run.progressedBeyondTickOne !== (finalTick !== null && finalTick > 1)) {
+        throw new Error(`${label}.progressedBeyondTickOne is inconsistent`);
+    }
+    if (run.reachedTargetTick !== (finalTick !== null && finalTick >= targetTick)) {
+        throw new Error(`${label}.reachedTargetTick is inconsistent`);
+    }
+    const starts = assertExactKeys(run.starts, ["alpha", "beta"], `${label}.starts`);
+    assertPoint(starts.alpha, `${label}.starts.alpha`, false);
+    assertPoint(starts.beta, `${label}.starts.beta`, false);
+    assertErrorRecord(run.error, `${label}.error`);
+    return value as FamilyWorkerProbeRun;
+};
+
+const assertWorkerReciprocalCheck = (value: unknown, label: string): ReciprocalStartCheck => {
+    assertReciprocalCheck(value, label);
+    const check = value as ReciprocalStartCheck;
+    assertSortedUniqueStrings(check.failures, `${label}.failures`);
+    return check;
+};
+
+const assertWorkerFamilyResult = (
+    value: unknown,
+    label: string,
+    scheduler: FamilyWorkerScheduler,
+): FamilyWorkerResult => {
+    const family = assertExactKeys(
+        value,
+        [
+            "familyIndex",
+            "familyId",
+            "representativeMapPath",
+            "mapName",
+            "executedMapAlias",
+            "mapBytes",
+            "mapSha256",
+            "slurmJobId",
+            "requestedEngineSeed",
+            "targetTick",
+            "declaredStartLocations",
+            "forward",
+            "reverse",
+            "reciprocalStartCheck",
+            "warnings",
+            "failureCategories",
+            "reviewCategories",
+            "fidelityStatus",
+        ],
+        label,
+    );
+    for (const key of ["familyIndex", "mapBytes", "requestedEngineSeed", "targetTick"]) {
+        assertNonnegativeInteger(family[key], `${label}.${key}`);
+    }
+    if ((family.targetTick as number) <= 1) throw new Error(`${label}.targetTick must exceed one`);
+    for (const key of ["familyId", "representativeMapPath", "mapName", "executedMapAlias", "slurmJobId"]) {
+        if (typeof family[key] !== "string" || (family[key] as string).length === 0) {
+            throw new Error(`${label}.${key} must be nonempty`);
+        }
+    }
+    if (
+        path.isAbsolute(family.representativeMapPath as string) ||
+        (family.representativeMapPath as string).split("/").includes("..")
+    ) {
+        throw new Error(`${label}.representativeMapPath must be a safe relative path`);
+    }
+    assertSha256(family.mapSha256, `${label}.mapSha256`);
+    if (family.slurmJobId !== scheduler.jobId) throw new Error(`${label}.slurmJobId is inconsistent`);
+    if (!Array.isArray(family.declaredStartLocations) || family.declaredStartLocations.length < 2) {
+        throw new Error(`${label}.declaredStartLocations must contain at least two points`);
+    }
+    family.declaredStartLocations.forEach((point, index) =>
+        assertPoint(point, `${label}.declaredStartLocations[${index}]`, true),
+    );
+    assertWorkerProbeRun(
+        family.forward,
+        `${label}.forward`,
+        ["alpha", "beta"],
+        family.targetTick as number,
+    );
+    assertWorkerProbeRun(
+        family.reverse,
+        `${label}.reverse`,
+        ["beta", "alpha"],
+        family.targetTick as number,
+    );
+    assertWorkerReciprocalCheck(family.reciprocalStartCheck, `${label}.reciprocalStartCheck`);
+    if (!Array.isArray(family.warnings)) throw new Error(`${label}.warnings must be an array`);
+    family.warnings.forEach((warning, index) =>
+        assertStrictSerializedWarning(warning, `${label}.warnings[${index}]`),
+    );
+    const failures = assertSortedUniqueStrings(family.failureCategories, `${label}.failureCategories`);
+    const reviews = assertSortedUniqueStrings(family.reviewCategories, `${label}.reviewCategories`);
+    const expectedStatus = failures.length > 0 ? "fail" : reviews.length > 0 ? "review" : "pass";
+    if (family.fidelityStatus !== expectedStatus) throw new Error(`${label}.fidelityStatus is inconsistent`);
+    return value as FamilyWorkerResult;
+};
+
+const assertMapLoadAttestationEvidence = (
+    value: unknown,
+    label: string,
+): MapLoadAttestationEvidence => {
+    const evidence = assertExactKeys(
+        value,
+        ["protocol", "alias", "aliasPath", "expectedBytes", "expectedSha256", "phases", "reads", "complete"],
+        label,
+    );
+    if (
+        evidence.protocol !== MAP_LOAD_ATTESTATION_PROTOCOL ||
+        evidence.complete !== true ||
+        typeof evidence.alias !== "string" ||
+        !/^cdfid-[0-9]{6}-[0-9a-f]{64}\.map$/.test(evidence.alias) ||
+        typeof evidence.aliasPath !== "string" ||
+        !path.isAbsolute(evidence.aliasPath) ||
+        path.basename(evidence.aliasPath) !== evidence.alias
+    ) {
+        throw new Error(`${label} identity or alias fields are invalid`);
+    }
+    const expectedBytes = assertNonnegativeInteger(evidence.expectedBytes, `${label}.expectedBytes`);
+    const expectedSha256 = assertSha256(evidence.expectedSha256, `${label}.expectedSha256`);
+    const expectedSequence = (
+        Object.entries(MAP_LOAD_PHASE_READ_COUNTS) as Array<[keyof typeof MAP_LOAD_PHASE_READ_COUNTS, number]>
+    ).flatMap(([phase, count]) => Array.from({ length: count }, (_, index) => ({ phase, ordinal: index + 1 })));
+    if (!Array.isArray(evidence.phases) || evidence.phases.length !== 3) {
+        throw new Error(`${label}.phases must contain exactly three records`);
+    }
+    const phases = evidence.phases as unknown[];
+    Object.entries(MAP_LOAD_PHASE_READ_COUNTS).forEach(([phase, count], index) => {
+        const record = assertExactKeys(
+            phases[index],
+            ["phase", "expectedReads", "observedReads"],
+            `${label}.phases[${index}]`,
+        );
+        if (record.phase !== phase || record.expectedReads !== count || record.observedReads !== count) {
+            throw new Error(`${label}.phases[${index}] does not prove the prescribed read count`);
+        }
+    });
+    if (!Array.isArray(evidence.reads) || evidence.reads.length !== expectedSequence.length) {
+        throw new Error(`${label}.reads must contain exactly ${expectedSequence.length} records`);
+    }
+    evidence.reads.forEach((entry, index) => {
+        const read = assertExactKeys(
+            entry,
+            ["phase", "ordinal", "alias", "resolvedPath", "bytes", "sha256", "adapter", "inMemorySnapshot"],
+            `${label}.reads[${index}]`,
+        );
+        const expected = expectedSequence[index];
+        if (
+            read.phase !== expected.phase ||
+            read.ordinal !== expected.ordinal ||
+            read.alias !== evidence.alias ||
+            read.resolvedPath !== evidence.aliasPath ||
+            read.bytes !== expectedBytes ||
+            read.sha256 !== expectedSha256 ||
+            read.adapter !== "file-system-access/node.FileHandle.getFile" ||
+            read.inMemorySnapshot !== true
+        ) {
+            throw new Error(`${label}.reads[${index}] is inconsistent with the committed alias snapshot`);
+        }
+    });
+    return value as MapLoadAttestationEvidence;
+};
+
+const assertWorkerScheduler = (value: unknown, label: string): FamilyWorkerScheduler => {
+    const scheduler = assertExactKeys(value, ["jobId", "account", "partition", "qos", "source"], label);
+    if (
+        typeof scheduler.jobId !== "string" ||
+        scheduler.jobId.length === 0 ||
+        scheduler.account !== "pi_jss233" ||
+        scheduler.source !== "scontrol"
+    ) {
+        throw new Error(`${label} is not authoritative pi_jss233 provenance`);
+    }
+    for (const key of ["partition", "qos"]) {
+        if (scheduler[key] !== null && typeof scheduler[key] !== "string") {
+            throw new Error(`${label}.${key} must be string or null`);
+        }
+    }
+    return value as FamilyWorkerScheduler;
+};
+
+const assertFamilyBinding = (value: unknown, label: string): FamilyBinding => {
+    const binding = assertExactKeys(
+        value,
+        ["manifestOrdinal", "familyIndex", "familyIdSha256", "familyEntrySha256"],
+        label,
+    );
+    assertNonnegativeInteger(binding.manifestOrdinal, `${label}.manifestOrdinal`);
+    assertNonnegativeInteger(binding.familyIndex, `${label}.familyIndex`);
+    assertSha256(binding.familyIdSha256, `${label}.familyIdSha256`);
+    assertSha256(binding.familyEntrySha256, `${label}.familyEntrySha256`);
+    return value as FamilyBinding;
+};
+
+/** Strict, recursive allowlist for one technically complete family shard. */
+export const assertStrictFamilyWorkerShard = (value: unknown): FamilyWorkerShard => {
+    const shard = assertExactKeys(
+        value,
+        [
+            "schemaVersion",
+            "gate",
+            "artifactKind",
+            "outcomeFree",
+            "manifestSha256",
+            "attestationSha256",
+            "family",
+            "attemptNumber",
+            "intentSha256",
+            "scheduler",
+            "payload",
+        ],
+        "family worker shard",
+    );
+    if (
+        shard.schemaVersion !== 1 ||
+        shard.gate !== MAP_FIDELITY_GATE ||
+        shard.artifactKind !== "map_fidelity_family_worker_shard" ||
+        shard.outcomeFree !== true
+    ) {
+        throw new Error("Family worker shard identity markers are invalid");
+    }
+    assertSha256(shard.manifestSha256, "family worker shard.manifestSha256");
+    assertSha256(shard.attestationSha256, "family worker shard.attestationSha256");
+    assertSha256(shard.intentSha256, "family worker shard.intentSha256");
+    const attemptNumber = assertNonnegativeInteger(shard.attemptNumber, "family worker shard.attemptNumber");
+    if (attemptNumber !== 1 && attemptNumber !== 2) throw new Error("Family worker attempt number must be one or two");
+    const binding = assertFamilyBinding(shard.family, "family worker shard.family");
+    const scheduler = assertWorkerScheduler(shard.scheduler, "family worker shard.scheduler");
+    const payload = assertExactKeys(
+        shard.payload,
+        ["engineInitialization", "familyResult", "mapLoadAttestation"],
+        "family worker shard.payload",
+    );
+    assertWorkerInitialization(payload.engineInitialization, "family worker shard.payload.engineInitialization");
+    const family = assertWorkerFamilyResult(
+        payload.familyResult,
+        "family worker shard.payload.familyResult",
+        scheduler,
+    );
+    const mapEvidence = assertMapLoadAttestationEvidence(
+        payload.mapLoadAttestation,
+        "family worker shard.payload.mapLoadAttestation",
+    );
+    const expectedAlias =
+        `cdfid-${String(binding.familyIndex).padStart(6, "0")}-${family.mapSha256}.map`;
+    const expectedFamilyIdSha256 = createHash("sha256").update(family.familyId, "utf8").digest("hex");
+    if (
+        binding.familyIndex !== family.familyIndex ||
+        binding.familyIdSha256 !== expectedFamilyIdSha256 ||
+        mapEvidence.alias !== expectedAlias ||
+        mapEvidence.alias !== family.executedMapAlias ||
+        mapEvidence.expectedBytes !== family.mapBytes ||
+        mapEvidence.expectedSha256 !== family.mapSha256
+    ) {
+        throw new Error("Family worker payload does not cross-bind family and map-load evidence");
+    }
+    return value as FamilyWorkerShard;
 };

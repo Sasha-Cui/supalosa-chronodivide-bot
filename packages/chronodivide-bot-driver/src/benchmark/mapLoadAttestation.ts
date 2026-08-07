@@ -10,6 +10,14 @@ export const PINNED_GAME_API_VERSION = "0.75.0";
 export const PINNED_FILE_SYSTEM_ACCESS_VERSION = "1.0.4";
 export const PINNED_FETCH_BLOB_VERSION = "3.2.0";
 
+/** A provenance/read-proof failure that must never become a compatibility result. */
+export class MapLoadAttestationError extends Error {
+    constructor(message: string) {
+        super(message);
+        this.name = "MapLoadAttestationError";
+    }
+}
+
 const PINNED_SHA256 = Object.freeze({
     gameApiPackage: "79d1f8d5b976ef73b4267e0e423cd611f7b1251da8076ca4e9314afc67544297",
     gameApiRuntime: "dd398f5c8c2b4c3e3d6eb0f9ca6d7549bf70fee16c5950cd8902616ac922497d",
@@ -694,6 +702,52 @@ export const materializeMapAlias = (args: {
     }
 };
 
+/**
+ * Remove the private representative bytes once the in-memory attestation
+ * evidence has been obtained. The exact issued alias is authenticated before
+ * unlink, and both the unlink and sandbox removal are durably committed.
+ */
+export const removeMaterializedMapAlias = (materialized: MaterializedMapAlias): void => {
+    if (!issuedMaterializations.has(materialized)) {
+        throw new MapLoadAttestationError("Map alias cleanup requires an issued materialization");
+    }
+    const sandboxDirectory = requireRegularDirectory(materialized.sandboxDirectory, "alias sandbox");
+    const parentDirectory = requireRegularDirectory(path.dirname(sandboxDirectory), "alias sandbox parent");
+    if (
+        path.resolve(materialized.aliasPath) !== path.join(sandboxDirectory, materialized.alias) ||
+        path.resolve(materialized.sourcePath) === path.resolve(materialized.aliasPath)
+    ) {
+        throw new MapLoadAttestationError("Map alias cleanup path binding is inconsistent");
+    }
+    assertUniqueMaterializedAlias(
+        materialized.resolutionRoots,
+        materialized.alias,
+        materialized.aliasPath,
+    );
+    const aliasStat = fs.lstatSync(materialized.aliasPath);
+    if (
+        !aliasStat.isFile() ||
+        aliasStat.isSymbolicLink() ||
+        (aliasStat.mode & 0o777) !== 0o400 ||
+        aliasStat.size !== materialized.bytes ||
+        sha256AttestationFile(materialized.aliasPath) !== materialized.sha256
+    ) {
+        throw new MapLoadAttestationError("Map alias cleanup refused drifted private bytes");
+    }
+
+    fs.unlinkSync(materialized.aliasPath);
+    fsyncDirectory(sandboxDirectory);
+    if (fs.readdirSync(sandboxDirectory).length !== 0) {
+        throw new MapLoadAttestationError("Map alias sandbox is not empty after authenticated unlink");
+    }
+    fs.rmdirSync(sandboxDirectory);
+    fsyncDirectory(parentDirectory);
+    if (fs.existsSync(sandboxDirectory)) {
+        throw new MapLoadAttestationError("Map alias sandbox still exists after durable cleanup");
+    }
+    issuedMaterializations.delete(materialized);
+};
+
 type AdapterGetFile = typeof NodeAdapterFileHandle.prototype.getFile;
 type RuntimeFileHandle = { _path?: unknown };
 
@@ -709,9 +763,13 @@ export class MapLoadAttestationSession {
     constructor(private readonly materialized: MaterializedMapAlias) {}
 
     async runPhase<T>(phase: MapLoadPhase, operation: () => Promise<T>): Promise<T> {
-        if (this.activePhase !== null) throw new Error(`Map-load phase ${this.activePhase} is still active`);
+        if (this.activePhase !== null) {
+            throw new MapLoadAttestationError(`Map-load phase ${this.activePhase} is still active`);
+        }
         const expectedPhase = PHASE_ORDER[this.nextPhaseIndex];
-        if (phase !== expectedPhase) throw new Error(`Expected map-load phase ${String(expectedPhase)}, got ${phase}`);
+        if (phase !== expectedPhase) {
+            throw new MapLoadAttestationError(`Expected map-load phase ${String(expectedPhase)}, got ${phase}`);
+        }
         this.activePhase = phase;
         this.phaseStart = this.reads.length;
         try {
@@ -719,7 +777,9 @@ export class MapLoadAttestationSession {
             const observedReads = this.reads.length - this.phaseStart;
             const expectedReads = MAP_LOAD_PHASE_READ_COUNTS[phase];
             if (observedReads !== expectedReads) {
-                throw new Error(`Map-load phase ${phase} observed ${observedReads} reads; expected ${expectedReads}`);
+                throw new MapLoadAttestationError(
+                    `Map-load phase ${phase} observed ${observedReads} reads; expected ${expectedReads}`,
+                );
             }
             this.completedPhases.push({ phase, expectedReads, observedReads });
             this.nextPhaseIndex++;
@@ -734,14 +794,14 @@ export class MapLoadAttestationSession {
             return originalGetFile.call(handle);
         }
         if (this.activePhase === null)
-            throw new Error(`Map alias ${this.materialized.alias} was opened outside an attested phase`);
+            throw new MapLoadAttestationError(`Map alias ${this.materialized.alias} was opened outside an attested phase`);
         const expectedReads = MAP_LOAD_PHASE_READ_COUNTS[this.activePhase];
         const ordinal = this.reads.length - this.phaseStart + 1;
         if (ordinal > expectedReads)
-            throw new Error(`Map-load phase ${this.activePhase} exceeded ${expectedReads} alias reads`);
+            throw new MapLoadAttestationError(`Map-load phase ${this.activePhase} exceeded ${expectedReads} alias reads`);
 
         if (fs.realpathSync(process.cwd()) !== this.materialized.sandboxDirectory) {
-            throw new Error("Process cwd left the authenticated private map sandbox during attestation");
+            throw new MapLoadAttestationError("Process cwd left the authenticated private map sandbox during attestation");
         }
         assertUniqueMaterializedAlias(
             this.materialized.resolutionRoots,
@@ -751,22 +811,22 @@ export class MapLoadAttestationSession {
 
         const runtimePath = (handle as unknown as RuntimeFileHandle)._path;
         if (typeof runtimePath !== "string")
-            throw new Error("Pinned Node adapter FileHandle._path is unavailable at runtime");
+            throw new MapLoadAttestationError("Pinned Node adapter FileHandle._path is unavailable at runtime");
         const resolvedPath = path.resolve(runtimePath);
         if (handle.name !== this.materialized.alias || resolvedPath !== path.resolve(this.materialized.aliasPath)) {
-            throw new Error("Node adapter resolved the map alias to an unexpected name or path");
+            throw new MapLoadAttestationError("Node adapter resolved the map alias to an unexpected name or path");
         }
         const stat = fs.lstatSync(resolvedPath);
         if (!stat.isFile() || stat.isSymbolicLink())
-            throw new Error("Resolved map alias is not a regular non-symlink file");
+            throw new MapLoadAttestationError("Resolved map alias is not a regular non-symlink file");
 
         const diskFile = await originalGetFile.call(handle);
         if (diskFile.name !== this.materialized.alias)
-            throw new Error("Node adapter returned an unexpected map filename");
+            throw new MapLoadAttestationError("Node adapter returned an unexpected map filename");
         const bytes = Buffer.from(await diskFile.arrayBuffer());
         const digest = sha256Bytes(bytes);
         if (bytes.byteLength !== this.materialized.bytes || digest !== this.materialized.sha256) {
-            throw new Error("Node adapter returned map bytes that differ from the committed representative");
+            throw new MapLoadAttestationError("Node adapter returned map bytes that differ from the committed representative");
         }
         this.reads.push({
             phase: this.activePhase,
@@ -786,7 +846,7 @@ export class MapLoadAttestationSession {
 
     evidence(): MapLoadAttestationEvidence {
         if (this.activePhase !== null || this.nextPhaseIndex !== PHASE_ORDER.length || this.reads.length !== 5) {
-            throw new Error("Map-load attestation is incomplete");
+            throw new MapLoadAttestationError("Map-load attestation is incomplete");
         }
         return {
             protocol: MAP_LOAD_ATTESTATION_PROTOCOL,
