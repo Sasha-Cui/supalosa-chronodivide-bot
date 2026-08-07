@@ -493,7 +493,7 @@ const assertWorkerScheduler = (
     if (scheduler.account !== "pi_jss233" || scheduler.source !== "scontrol") {
         throw new Error(`${label} is not authoritative pi_jss233 provenance`);
     }
-    if (expected && JSON.stringify(scheduler) !== JSON.stringify(expected)) {
+    if (expected && canonicalJsonSha256(scheduler) !== canonicalJsonSha256(expected)) {
         throw new Error(`${label} does not match the authoritative running Slurm job`);
     }
     return scheduler;
@@ -1233,7 +1233,7 @@ export const assertWorkerManifest = (
     for (const key of RUNTIME_HASH_KEYS) {
         requireWorkerHash(runtimeHashes[key], `manifest.runtimeHashes.${key}`);
     }
-    if (JSON.stringify(runtimeHashes) !== JSON.stringify(expectedRuntimeHashes)) {
+    if (canonicalJsonSha256(runtimeHashes) !== canonicalJsonSha256(expectedRuntimeHashes)) {
         throw new Error("manifest.runtimeHashes does not match exact inputs");
     }
     return value as WorkerManifest;
