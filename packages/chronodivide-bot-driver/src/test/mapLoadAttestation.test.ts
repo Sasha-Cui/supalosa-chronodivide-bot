@@ -4,7 +4,11 @@ import os from "node:os";
 import path from "node:path";
 import { FileHandle as NodeAdapterFileHandle } from "file-system-access/lib/adapters/node.js";
 import { describe, expect, it } from "vitest";
-import { completeAttestedMapSettingsReadPair, removeEmptyWorkerSandbox } from "../benchmark/mapFidelityProbe.js";
+import {
+    buildWorkerTechnicalDiagnostic,
+    completeAttestedMapSettingsReadPair,
+    removeEmptyWorkerSandbox,
+} from "../benchmark/mapFidelityProbe.js";
 import { captureConsoleWarnings } from "../benchmark/mapFidelityProtocol.js";
 import {
     MAP_LOAD_ATTESTATION_PROTOCOL,
@@ -87,6 +91,24 @@ const readAlias = async (materialized: MaterializedMapAlias, count: number): Pro
 };
 
 describe("collision-free map-load attestation", () => {
+    it("emits only a fixed technical stage and hashes for worker failures", () => {
+        const diagnostic = buildWorkerTechnicalDiagnostic(
+            "manifest_validate",
+            new Error("winner beta at /private/path"),
+        );
+        expect(diagnostic).toMatchObject({
+            schemaVersion: 1,
+            artifactKind: "map_fidelity_worker_technical_diagnostic",
+            outcomeFree: true,
+            stage: "manifest_validate",
+            errorNameSha256: sha256(Buffer.from("Error", "utf8")),
+            errorMessageSha256: sha256(Buffer.from("winner beta at /private/path", "utf8")),
+        });
+        expect(diagnostic.errorStackSha256).toMatch(/^[0-9a-f]{64}$/);
+        expect(JSON.stringify(diagnostic)).not.toContain("winner beta");
+        expect(JSON.stringify(diagnostic)).not.toContain("/private/path");
+    });
+
     it("pins every private runtime and compatibility marker without importing or starting the engine", () => {
         const compatibility = validateMapLoadCompatibility();
         expect(compatibility).toMatchObject({

@@ -24,6 +24,7 @@ import {
     WARNING_CATEGORY_SEVERITY,
     assertPinnedLoggingMode,
     assertStrictFamilyWorkerShard,
+    canonicalJson,
     canonicalJsonSha256,
     captureConsoleWarnings,
     deriveProbeCoverage,
@@ -347,6 +348,66 @@ type WorkerOrderResult = {
 const HEX_SHA256 = /^[0-9a-f]{64}$/;
 const GIT_OBJECT_ID = /^(?:[0-9a-f]{40}|[0-9a-f]{64})$/;
 const EMPTY_SHA256 = createHash("sha256").update(Buffer.alloc(0)).digest("hex");
+
+export const WORKER_TECHNICAL_STAGES = [
+    "parse_arguments",
+    "scheduler_validate",
+    "manifest_read",
+    "manifest_validate",
+    "family_select",
+    "pre_attestation_read",
+    "pre_attestation_validate",
+    "intent_read",
+    "intent_validate",
+    "output_parent_validate",
+    "source_validate",
+    "sandbox_create",
+    "alias_materialize",
+    "engine_run",
+    "shard_validate",
+    "shard_write",
+] as const;
+
+export type WorkerTechnicalStage = (typeof WORKER_TECHNICAL_STAGES)[number];
+
+export type WorkerTechnicalDiagnostic = {
+    schemaVersion: 1;
+    gate: typeof MAP_FIDELITY_GATE;
+    artifactKind: "map_fidelity_worker_technical_diagnostic";
+    outcomeFree: true;
+    stage: WorkerTechnicalStage;
+    errorNameSha256: string;
+    errorMessageSha256: string;
+    errorStackSha256: string | null;
+};
+
+let currentWorkerTechnicalStage: WorkerTechnicalStage = "parse_arguments";
+
+const diagnosticComponentSha256 = (value: string): string =>
+    createHash("sha256").update(value, "utf8").digest("hex");
+
+export const buildWorkerTechnicalDiagnostic = (
+    stage: WorkerTechnicalStage,
+    error: unknown,
+): WorkerTechnicalDiagnostic => {
+    const errorName = error instanceof Error ? error.name : typeof error;
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error && typeof error.stack === "string" ? error.stack : null;
+    return {
+        schemaVersion: 1,
+        gate: MAP_FIDELITY_GATE,
+        artifactKind: "map_fidelity_worker_technical_diagnostic",
+        outcomeFree: true,
+        stage,
+        errorNameSha256: diagnosticComponentSha256(errorName),
+        errorMessageSha256: diagnosticComponentSha256(errorMessage),
+        errorStackSha256: errorStack === null ? null : diagnosticComponentSha256(errorStack),
+    };
+};
+
+const setWorkerTechnicalStage = (stage: WorkerTechnicalStage): void => {
+    currentWorkerTechnicalStage = stage;
+};
 
 const assertWorkerRecord = (value: unknown, label: string): Record<string, unknown> => {
     if (value === null || typeof value !== "object" || Array.isArray(value)) {
@@ -1784,19 +1845,26 @@ export const removeEmptyWorkerSandbox = (
 };
 
 const familyWorkerMain = async (): Promise<void> => {
+    setWorkerTechnicalStage("parse_arguments");
     const manifestPath = path.resolve(requireStringArg("--manifest"));
     const attestationPath = path.resolve(requireStringArg("--attestation"));
     const intentPath = path.resolve(requireStringArg("--intent"));
     const outputPath = path.resolve(requireStringArg("--output"));
     const familyOrdinal = requireFamilyOrdinalArg();
+    setWorkerTechnicalStage("scheduler_validate");
     const scheduler = getAuthoritativeScheduler();
 
+    setWorkerTechnicalStage("manifest_read");
     const manifestArtifact = readWorkerJson(manifestPath, "Manifest");
+    setWorkerTechnicalStage("manifest_validate");
     const manifest = assertWorkerManifest(manifestArtifact.value, scheduler);
+    setWorkerTechnicalStage("family_select");
     if (familyOrdinal >= manifest.families.length) throw new Error("--family-ordinal is outside the manifest");
     const family = manifest.families[familyOrdinal];
     const familyBinding = expectedWorkerFamilyBinding(family, familyOrdinal);
+    setWorkerTechnicalStage("pre_attestation_read");
     const attestationArtifact = readWorkerJson(attestationPath, "Pre-attestation");
+    setWorkerTechnicalStage("pre_attestation_validate");
     assertWorkerPreAttestation(
         attestationArtifact.value,
         manifest,
@@ -1805,7 +1873,9 @@ const familyWorkerMain = async (): Promise<void> => {
         manifestArtifact.sha256,
         scheduler,
     );
+    setWorkerTechnicalStage("intent_read");
     const intentArtifact = readWorkerJson(intentPath, "Attempt intent");
+    setWorkerTechnicalStage("intent_validate");
     const intent = assertWorkerIntent(
         intentArtifact.value,
         manifestPath,
@@ -1816,10 +1886,13 @@ const familyWorkerMain = async (): Promise<void> => {
         familyBinding,
         scheduler,
     );
+    setWorkerTechnicalStage("output_parent_validate");
     const outputParent = assertPrivateWorkerDirectory(path.dirname(outputPath), "Worker output parent");
     const sandboxDirectory = path.join(outputParent, "map-sandbox");
+    setWorkerTechnicalStage("source_validate");
     const sourcePath = assertCurrentFamilyInputs(manifest, family);
     let materialized: ReturnType<typeof materializeMapAlias>;
+    setWorkerTechnicalStage("sandbox_create");
     try {
         if (fs.existsSync(sandboxDirectory)) {
             throw new Error("Attempt-local map sandbox already exists");
@@ -1828,6 +1901,7 @@ const familyWorkerMain = async (): Promise<void> => {
         fs.chmodSync(sandboxDirectory, 0o700);
         fsyncWorkerDirectory(outputParent);
         assertPrivateWorkerDirectory(sandboxDirectory, "Attempt-local map sandbox");
+        setWorkerTechnicalStage("alias_materialize");
         materialized = materializeMapAlias({
             familyIndex: family.index,
             expectedSha256: family.sha256,
@@ -1844,6 +1918,7 @@ const familyWorkerMain = async (): Promise<void> => {
         }
         throw error;
     }
+    setWorkerTechnicalStage("engine_run");
     const payload = await (async () => {
         try {
             return await runAttestedWorkerFamily(family, manifest, materialized);
@@ -1875,14 +1950,22 @@ const familyWorkerMain = async (): Promise<void> => {
             mapLoadAttestation: payload.mapLoadAttestation,
         },
     };
+    setWorkerTechnicalStage("shard_validate");
     assertStrictFamilyWorkerShard(shard);
+    setWorkerTechnicalStage("shard_write");
     writeExclusiveWorkerJson(outputPath, shard);
 };
 
 if (process.argv[1] && import.meta.url === pathToFileURL(path.resolve(process.argv[1])).href) {
-    familyWorkerMain().catch(() => {
-        // The supervisor records the nonzero exit as technical incompletion.
-        // No raw error, stack, role, or outcome text may cross stdout/stderr.
+    familyWorkerMain().catch((error: unknown) => {
+        // Only canonical stage metadata and hashes cross stderr; raw diagnostic
+        // text, roles, paths, stacks, and outcomes are never emitted.
+        try {
+            const diagnostic = buildWorkerTechnicalDiagnostic(currentWorkerTechnicalStage, error);
+            process.stderr.write(`${canonicalJson(diagnostic)}\n`);
+        } catch {
+            // Exit status remains fail-closed even if diagnostic serialization fails.
+        }
         process.exitCode = 2;
     });
 }

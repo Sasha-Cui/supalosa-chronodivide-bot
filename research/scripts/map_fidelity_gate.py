@@ -2125,6 +2125,28 @@ ALLOWED_WORKER_ENV_KEYS = (
     "SLURM_JOB_QOS", "SLURM_CPUS_PER_TASK", "SLURM_MEM_PER_NODE",
     "SLURM_RESTART_COUNT", "SLURM_ARRAY_JOB_ID", "SLURM_ARRAY_TASK_ID", "SLURMD_NODENAME",
 )
+WORKER_TECHNICAL_STAGES = {
+    "parse_arguments",
+    "scheduler_validate",
+    "manifest_read",
+    "manifest_validate",
+    "family_select",
+    "pre_attestation_read",
+    "pre_attestation_validate",
+    "intent_read",
+    "intent_validate",
+    "output_parent_validate",
+    "source_validate",
+    "sandbox_create",
+    "alias_materialize",
+    "engine_run",
+    "shard_validate",
+    "shard_write",
+}
+WORKER_TECHNICAL_DIAGNOSTIC_KEYS = {
+    "schemaVersion", "gate", "artifactKind", "outcomeFree", "stage",
+    "errorNameSha256", "errorMessageSha256", "errorStackSha256",
+}
 
 
 def require_durable_path(path: Path, *, durable_root: Path = DURABLE_EVIDENCE_ROOT) -> Path:
@@ -2316,6 +2338,202 @@ def validate_checkpoint_ledger_entries(
     return entries
 
 
+
+def validate_worker_technical_diagnostic(
+    value: Any, label: str
+) -> dict[str, Any]:
+    diagnostic = strict_object(
+        value, WORKER_TECHNICAL_DIAGNOSTIC_KEYS, label
+    )
+    if (
+        diagnostic["schemaVersion"] != 1
+        or diagnostic["gate"] != GATE
+        or diagnostic["artifactKind"]
+        != "map_fidelity_worker_technical_diagnostic"
+        or diagnostic["outcomeFree"] is not True
+        or diagnostic["stage"] not in WORKER_TECHNICAL_STAGES
+    ):
+        raise RuntimeError(f"{label} identity or stage is invalid")
+    strict_sha256(diagnostic["errorNameSha256"], f"{label}.errorNameSha256")
+    strict_sha256(
+        diagnostic["errorMessageSha256"], f"{label}.errorMessageSha256"
+    )
+    if diagnostic["errorStackSha256"] is not None:
+        strict_sha256(
+            diagnostic["errorStackSha256"], f"{label}.errorStackSha256"
+        )
+    return diagnostic
+
+
+def canonical_diagnostic_stream(diagnostic: dict[str, Any]) -> bytes:
+    return (
+        json.dumps(
+            diagnostic,
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        )
+        + "\n"
+    ).encode("ascii")
+
+
+def validate_attempt_terminal_evidence(
+    terminal_path: Path,
+    *,
+    manifest: dict[str, Any],
+    ordinal: int,
+    attempt_number: int,
+    manifest_sha256: str,
+    attestation_sha256: str,
+    intent_sha256: str,
+    scheduler: dict[str, Any],
+    durable_root: Path,
+) -> dict[str, Any]:
+    terminal = strict_object(
+        load_json(terminal_path),
+        ATTEMPT_TERMINAL_KEYS,
+        f"terminal[{ordinal}].attempt[{attempt_number}]",
+    )
+    if (
+        terminal["schemaVersion"] != INTERNAL_EVIDENCE_SCHEMA_VERSION
+        or terminal["gate"] != GATE
+        or terminal["artifactKind"]
+        != "map_fidelity_family_attempt_terminal"
+        or terminal["outcomeFree"] is not True
+        or terminal["manifestSha256"] != manifest_sha256
+        or terminal["attestationSha256"] != attestation_sha256
+        or terminal["attemptNumber"] != attempt_number
+        or terminal["intentSha256"] != intent_sha256
+    ):
+        raise RuntimeError("Attempt terminal identity binding is invalid")
+    validate_family_binding(
+        terminal["family"],
+        manifest=manifest,
+        ordinal=ordinal,
+        label="attempt terminal.family",
+    )
+    validate_supervisor_scheduler(
+        terminal["scheduler"], scheduler, "attempt terminal.scheduler"
+    )
+    timing = strict_object(
+        terminal["timing"], {"wallTimeMs"}, "attempt terminal.timing"
+    )
+    strict_nonnegative_integer(
+        timing["wallTimeMs"], "attempt terminal.timing.wallTimeMs"
+    )
+    process = strict_object(
+        terminal["process"],
+        {"exitCode", "termSignal", "timedOut", "termSent", "killSent"},
+        "attempt terminal.process",
+    )
+    for key in ("exitCode", "termSignal"):
+        if process[key] is not None:
+            strict_nonnegative_integer(
+                process[key], f"attempt terminal.process.{key}"
+            )
+    for key in ("timedOut", "termSent", "killSent"):
+        if not isinstance(process[key], bool):
+            raise RuntimeError(f"attempt terminal.process.{key} must be boolean")
+
+    streams = strict_object(
+        terminal["streams"], {"stdout", "stderr"}, "attempt terminal.streams"
+    )
+    for stream_name in ("stdout", "stderr"):
+        stream = strict_object(
+            streams[stream_name],
+            {"bytes", "sha256", "truncated"},
+            f"attempt terminal.streams.{stream_name}",
+        )
+        strict_nonnegative_integer(
+            stream["bytes"], f"attempt terminal.streams.{stream_name}.bytes"
+        )
+        strict_sha256(
+            stream["sha256"], f"attempt terminal.streams.{stream_name}.sha256"
+        )
+        if not isinstance(stream["truncated"], bool):
+            raise RuntimeError(
+                f"attempt terminal.streams.{stream_name}.truncated "
+                "must be boolean"
+            )
+
+    shard = terminal["shard"]
+    if shard is not None:
+        shard_record = strict_exact_file_record(
+            shard, "attempt terminal.shard"
+        )
+        actual_shard = private_evidence_file(
+            Path(shard_record["path"]), durable_root=durable_root
+        )
+        if shard_record != actual_shard:
+            raise RuntimeError("Attempt terminal shard descriptor drifted")
+
+    disposition = strict_object(
+        terminal["technicalDisposition"],
+        {"status", "categories", "workerDiagnostic"},
+        "attempt terminal.technicalDisposition",
+    )
+    categories = disposition["categories"]
+    if (
+        not isinstance(categories, list)
+        or any(not isinstance(item, str) or not item for item in categories)
+        or categories != sorted(set(categories))
+    ):
+        raise RuntimeError(
+            "Attempt terminal technical categories are not sorted unique strings"
+        )
+    if disposition["status"] not in {"complete", "retryable_failure"}:
+        raise RuntimeError("Attempt terminal technical status is invalid")
+    diagnostic = disposition["workerDiagnostic"]
+    if diagnostic is not None:
+        diagnostic = validate_worker_technical_diagnostic(
+            diagnostic,
+            "attempt terminal.technicalDisposition.workerDiagnostic",
+        )
+        expected_stream = canonical_diagnostic_stream(diagnostic)
+        empty_sha = hashlib.sha256(b"").hexdigest()
+        if (
+            process["exitCode"] != 2
+            or streams["stdout"]
+            != {"bytes": 0, "sha256": empty_sha, "truncated": False}
+            or streams["stderr"]
+            != {
+                "bytes": len(expected_stream),
+                "sha256": hashlib.sha256(expected_stream).hexdigest(),
+                "truncated": False,
+            }
+            or "worker_exit_nonzero" not in categories
+        ):
+            raise RuntimeError(
+                "Worker diagnostic does not bind the exact failed process/stream"
+            )
+    if disposition["status"] == "complete":
+        empty_sha = hashlib.sha256(b"").hexdigest()
+        if (
+            categories
+            or diagnostic is not None
+            or process
+            != {
+                "exitCode": 0,
+                "termSignal": None,
+                "timedOut": False,
+                "termSent": False,
+                "killSent": False,
+            }
+            or streams["stdout"]
+            != {"bytes": 0, "sha256": empty_sha, "truncated": False}
+            or streams["stderr"]
+            != {"bytes": 0, "sha256": empty_sha, "truncated": False}
+            or shard is None
+        ):
+            raise RuntimeError(
+                "Technically complete attempt has failure evidence"
+            )
+    elif not categories:
+        raise RuntimeError("Retryable attempt has no technical category")
+    return terminal
+
+
 def collect_supervisor_evidence(
     manifest_path: Path,
     pre_attestation_path: Path,
@@ -2456,18 +2674,39 @@ def collect_supervisor_evidence(
         technical_attempt_count += len(attempt_names)
         for recorded_attempt in range(1, len(attempt_names) + 1):
             recorded_attempt_dir = attempts_root / f"{recorded_attempt:02d}"
+            recorded_intent_path = (
+                recorded_attempt_dir / "attempt-intent.json"
+            )
+            recorded_terminal_path = (
+                recorded_attempt_dir / "attempt-terminal.json"
+            )
             recorded_shard_path = recorded_attempt_dir / "family-shard.json"
+            recorded_intent = private_evidence_file(
+                recorded_intent_path, durable_root=durable_root
+            )
+            recorded_terminal = private_evidence_file(
+                recorded_terminal_path, durable_root=durable_root
+            )
+            validate_attempt_terminal_evidence(
+                recorded_terminal_path,
+                manifest=manifest,
+                ordinal=ordinal,
+                attempt_number=recorded_attempt,
+                manifest_sha256=manifest_sha,
+                attestation_sha256=pre_sha,
+                intent_sha256=recorded_intent["sha256"],
+                scheduler=scheduler,
+                durable_root=durable_root,
+            )
             campaign_attempt_records.append({
                 "family": expected_binding,
                 "attemptNumber": recorded_attempt,
-                "intent": private_evidence_file(
-                    recorded_attempt_dir / "attempt-intent.json", durable_root=durable_root
-                ),
-                "terminal": private_evidence_file(
-                    recorded_attempt_dir / "attempt-terminal.json", durable_root=durable_root
-                ),
+                "intent": recorded_intent,
+                "terminal": recorded_terminal,
                 "shard": (
-                    private_evidence_file(recorded_shard_path, durable_root=durable_root)
+                    private_evidence_file(
+                        recorded_shard_path, durable_root=durable_root
+                    )
                     if recorded_shard_path.exists() else None
                 ),
             })
@@ -2575,8 +2814,16 @@ def collect_supervisor_evidence(
                 raise RuntimeError("Accepted terminal contains worker stream output")
         if terminal["shard"] != accepted_shard:
             raise RuntimeError("Terminal shard descriptor differs from checkpoint")
-        disposition = strict_object(terminal["technicalDisposition"], {"status", "categories"}, "terminal.technicalDisposition")
-        if disposition != {"status": "complete", "categories": []}:
+        disposition = strict_object(
+            terminal["technicalDisposition"],
+            {"status", "categories", "workerDiagnostic"},
+            "terminal.technicalDisposition",
+        )
+        if disposition != {
+            "status": "complete",
+            "categories": [],
+            "workerDiagnostic": None,
+        }:
             raise RuntimeError("Checkpoint references a technically incomplete terminal")
 
         shard = strict_object(load_json(shard_path), SHARD_ENVELOPE_KEYS, f"shard[{ordinal}]")

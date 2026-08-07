@@ -36,6 +36,35 @@ MAX_TECHNICAL_ATTEMPTS = 2
 DEFAULT_TIMEOUT_SECONDS = 120.0
 DEFAULT_TERMINATION_GRACE_SECONDS = 5.0
 DEFAULT_MAX_STREAM_BYTES = 1024 * 1024
+WORKER_TECHNICAL_DIAGNOSTIC_MAX_BYTES = 4096
+WORKER_TECHNICAL_STAGES = {
+    "parse_arguments",
+    "scheduler_validate",
+    "manifest_read",
+    "manifest_validate",
+    "family_select",
+    "pre_attestation_read",
+    "pre_attestation_validate",
+    "intent_read",
+    "intent_validate",
+    "output_parent_validate",
+    "source_validate",
+    "sandbox_create",
+    "alias_materialize",
+    "engine_run",
+    "shard_validate",
+    "shard_write",
+}
+WORKER_TECHNICAL_DIAGNOSTIC_KEYS = {
+    "schemaVersion",
+    "gate",
+    "artifactKind",
+    "outcomeFree",
+    "stage",
+    "errorNameSha256",
+    "errorMessageSha256",
+    "errorStackSha256",
+}
 HEX_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
 MAX_SAFE_INTEGER = 2**53 - 1
@@ -207,7 +236,7 @@ PROCESS_KEYS = {
 STREAMS_KEYS = {"stdout", "stderr"}
 STREAM_KEYS = {"bytes", "sha256", "truncated"}
 SHARD_BINDING_KEYS = {"path", "bytes", "sha256"}
-DISPOSITION_KEYS = {"status", "categories"}
+DISPOSITION_KEYS = {"status", "categories", "workerDiagnostic"}
 CHECKPOINT_KEYS = {
     "schemaVersion",
     "gate",
@@ -738,6 +767,7 @@ class BoundedStreamCollector(threading.Thread):
         self.max_bytes = max_bytes
         self.total_bytes = 0
         self.digest = hashlib.sha256()
+        self.diagnostic_prefix = bytearray()
         self.error: BaseException | None = None
 
     def run(self) -> None:
@@ -748,6 +778,12 @@ class BoundedStreamCollector(threading.Thread):
                     break
                 self.total_bytes += len(block)
                 self.digest.update(block)
+                remaining = (
+                    WORKER_TECHNICAL_DIAGNOSTIC_MAX_BYTES
+                    - len(self.diagnostic_prefix)
+                )
+                if remaining > 0:
+                    self.diagnostic_prefix.extend(block[:remaining])
         except BaseException as error:  # captured and converted to evidence
             self.error = error
         finally:
@@ -760,6 +796,75 @@ class BoundedStreamCollector(threading.Thread):
             "truncated": self.total_bytes > self.max_bytes,
         }
 
+    def diagnostic_candidate(self) -> bytes | None:
+        if (
+            self.error is not None
+            or self.total_bytes == 0
+            or self.total_bytes > WORKER_TECHNICAL_DIAGNOSTIC_MAX_BYTES
+        ):
+            return None
+        return bytes(self.diagnostic_prefix)
+
+
+def validate_worker_technical_diagnostic(
+    value: Any, label: str = "worker technical diagnostic"
+) -> dict[str, Any]:
+    diagnostic = require_exact_keys(
+        value, WORKER_TECHNICAL_DIAGNOSTIC_KEYS, label
+    )
+    if (
+        diagnostic["schemaVersion"] != 1
+        or diagnostic["gate"] != GATE
+        or diagnostic["artifactKind"]
+        != "map_fidelity_worker_technical_diagnostic"
+        or diagnostic["outcomeFree"] is not True
+        or diagnostic["stage"] not in WORKER_TECHNICAL_STAGES
+    ):
+        raise ValidationError(f"{label} identity or stage is invalid")
+    require_sha256(diagnostic["errorNameSha256"], f"{label}.errorNameSha256")
+    require_sha256(
+        diagnostic["errorMessageSha256"], f"{label}.errorMessageSha256"
+    )
+    if diagnostic["errorStackSha256"] is not None:
+        require_sha256(
+            diagnostic["errorStackSha256"], f"{label}.errorStackSha256"
+        )
+    return diagnostic
+
+
+def parse_worker_technical_diagnostic(payload: bytes) -> dict[str, Any]:
+    if (
+        not payload.endswith(b"\n")
+        or len(payload) > WORKER_TECHNICAL_DIAGNOSTIC_MAX_BYTES
+        or b"\x00" in payload
+    ):
+        raise ValidationError("Worker technical diagnostic framing is invalid")
+
+    def reject_duplicate_keys(
+        pairs: list[tuple[str, Any]],
+    ) -> dict[str, Any]:
+        result: dict[str, Any] = {}
+        for key, value in pairs:
+            if key in result:
+                raise ValidationError(
+                    "Worker technical diagnostic contains a duplicate key"
+                )
+            result[key] = value
+        return result
+
+    try:
+        value = json.loads(
+            payload.decode("ascii"),
+            object_pairs_hook=reject_duplicate_keys,
+        )
+    except (UnicodeDecodeError, json.JSONDecodeError) as error:
+        raise ValidationError(
+            "Worker technical diagnostic is not strict ASCII JSON"
+        ) from error
+    diagnostic = validate_worker_technical_diagnostic(value)
+    if canonical_bytes(diagnostic) + b"\n" != payload:
+        raise ValidationError("Worker technical diagnostic is not canonical")
+    return diagnostic
 
 
 def validate_environment_binding(value: Any, label: str) -> dict[str, Any]:
@@ -1359,15 +1464,42 @@ def validate_terminal(
     disposition = require_exact_keys(
         terminal["technicalDisposition"], DISPOSITION_KEYS, "attempt terminal.technicalDisposition"
     )
+    worker_diagnostic = disposition["workerDiagnostic"]
+    if worker_diagnostic is not None:
+        validate_worker_technical_diagnostic(
+            worker_diagnostic,
+            "attempt terminal.technicalDisposition.workerDiagnostic",
+        )
+        expected_diagnostic_stream = canonical_bytes(worker_diagnostic) + b"\n"
+        if (
+            process["exitCode"] != 2
+            or streams["stdout"]["bytes"] != 0
+            or streams["stdout"]["sha256"] != hashlib.sha256(b"").hexdigest()
+            or streams["stdout"]["truncated"] is not False
+            or streams["stderr"]["bytes"] != len(expected_diagnostic_stream)
+            or streams["stderr"]["sha256"]
+            != hashlib.sha256(expected_diagnostic_stream).hexdigest()
+            or streams["stderr"]["truncated"] is not False
+        ):
+            raise ValidationError(
+                "Worker diagnostic does not bind the exact stderr stream"
+            )
     if disposition["status"] not in {"complete", "retryable_failure"}:
         raise ValidationError("Technical disposition status is invalid")
     if (
         not isinstance(disposition["categories"], list)
         or any(not isinstance(item, str) or not item for item in disposition["categories"])
+        or disposition["categories"] != sorted(set(disposition["categories"]))
     ):
-        raise ValidationError("Technical disposition categories must be strings")
-    if disposition["status"] == "complete" and disposition["categories"]:
-        raise ValidationError("Complete technical disposition cannot have failure categories")
+        raise ValidationError(
+            "Technical disposition categories must be sorted unique strings"
+        )
+    if disposition["status"] == "complete" and (
+        disposition["categories"] or worker_diagnostic is not None
+    ):
+        raise ValidationError(
+            "Complete technical disposition cannot have failures or diagnostics"
+        )
     if disposition["status"] == "retryable_failure" and not disposition["categories"]:
         raise ValidationError("Retryable disposition must have a category")
     return terminal
@@ -1783,6 +1915,7 @@ class MapFidelitySupervisor:
         stderr: dict[str, Any],
         shard: dict[str, Any] | None,
         categories: Iterable[str],
+        worker_diagnostic: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         category_list = sorted(set(categories))
         term_signal = -return_code if return_code is not None and return_code < 0 else None
@@ -1814,6 +1947,7 @@ class MapFidelitySupervisor:
             "technicalDisposition": {
                 "status": "retryable_failure" if category_list else "complete",
                 "categories": category_list,
+                "workerDiagnostic": worker_diagnostic,
             },
         }
 
@@ -1940,7 +2074,22 @@ class MapFidelitySupervisor:
             categories.append("stream_capture_error")
         stdout_record = stdout_collector.record()
         stderr_record = stderr_collector.record()
-        if stdout_record["bytes"] or stderr_record["bytes"]:
+        worker_diagnostic: dict[str, Any] | None = None
+        if (
+            process.returncode not in {None, 0}
+            and stdout_record["bytes"] == 0
+            and stderr_collector.diagnostic_candidate() is not None
+        ):
+            try:
+                worker_diagnostic = parse_worker_technical_diagnostic(
+                    stderr_collector.diagnostic_candidate() or b""
+                )
+            except ValidationError:
+                categories.append("worker_diagnostic_invalid")
+        if (
+            stdout_record["bytes"]
+            or (stderr_record["bytes"] and worker_diagnostic is None)
+        ):
             categories.append("unexpected_worker_output")
         if stdout_record["truncated"] or stderr_record["truncated"]:
             categories.append("stream_limit_exceeded")
@@ -1973,6 +2122,7 @@ class MapFidelitySupervisor:
             stderr=stderr_record,
             shard=shard_binding,
             categories=categories,
+            worker_diagnostic=worker_diagnostic,
         )
         validate_terminal(
             terminal,

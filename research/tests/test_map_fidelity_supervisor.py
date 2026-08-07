@@ -33,6 +33,7 @@ SCHEDULER = {
 
 MOCK_WORKER = r"""
 import argparse
+import hashlib
 import json
 import os
 import signal
@@ -57,6 +58,24 @@ args = parser.parse_args()
 if args.invocations:
     with args.invocations.open("a", encoding="utf-8") as handle:
         handle.write(f"{args.family_ordinal}\n")
+
+if args.mode == "diagnostic":
+    message = "winner beta at /private/path"
+    diagnostic = {
+        "schemaVersion": 1,
+        "gate": "map-fidelity-gate-v1",
+        "artifactKind": "map_fidelity_worker_technical_diagnostic",
+        "outcomeFree": True,
+        "stage": "manifest_validate",
+        "errorNameSha256": hashlib.sha256(b"Error").hexdigest(),
+        "errorMessageSha256": hashlib.sha256(message.encode("utf-8")).hexdigest(),
+        "errorStackSha256": None,
+    }
+    sys.stderr.write(json.dumps(
+        diagnostic, sort_keys=True, separators=(",", ":")
+    ) + "\n")
+    sys.stderr.flush()
+    raise SystemExit(2)
 
 if args.mode == "crash":
     raise SystemExit(7)
@@ -542,6 +561,46 @@ class SupervisorFixture(unittest.TestCase):
         while time.time() < deadline and not process_is_gone(pid):
             time.sleep(0.02)
         self.assertTrue(process_is_gone(pid), f"descendant {pid} survived group kill")
+
+    def test_hashed_worker_diagnostic_is_bound_without_raw_text(self) -> None:
+        self.manifest["families"] = self.manifest["families"][:1]
+        self._write_json(self.manifest_path, self.manifest)
+        self._refresh_attestation_manifest_binding()
+        supervisor = self.supervisor(
+            "diagnostic",
+            self.command("diagnostic"),
+            max_attempts=1,
+        )
+        summary = supervisor.run()
+        self.assertEqual(summary["pendingCount"], 1)
+        terminal_path = (
+            supervisor.family_directory(0)
+            / "attempts/01/attempt-terminal.json"
+        )
+        terminal = json.loads(terminal_path.read_text(encoding="utf-8"))
+        disposition = terminal["technicalDisposition"]
+        self.assertEqual(
+            disposition["workerDiagnostic"]["stage"], "manifest_validate"
+        )
+        self.assertNotIn("unexpected_worker_output", disposition["categories"])
+        self.assertNotIn("winner beta", json.dumps(terminal))
+        self.assertGreater(terminal["streams"]["stderr"]["bytes"], 0)
+        tampered = copy.deepcopy(terminal)
+        tampered["technicalDisposition"]["workerDiagnostic"][
+            "errorMessageSha256"
+        ] = "f" * 64
+        with self.assertRaisesRegex(
+            SUPERVISOR.ValidationError, "exact stderr stream"
+        ):
+            SUPERVISOR.validate_terminal(
+                tampered,
+                manifest_sha256=supervisor.manifest_sha256,
+                attestation_sha256=supervisor.attestation_sha256,
+                family_binding=supervisor.family_binding(0),
+                attempt_number=1,
+                intent_sha256=terminal["intentSha256"],
+                scheduler=SCHEDULER,
+            )
 
     def test_crash_retries_once_then_accepts_second_attempt(self) -> None:
         self.manifest["families"] = self.manifest["families"][:1]

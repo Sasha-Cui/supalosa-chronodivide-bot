@@ -20,6 +20,16 @@ assert SPEC is not None and SPEC.loader is not None
 GATE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(GATE)
 
+SUPERVISOR_MODULE_PATH = (
+    Path(__file__).resolve().parents[1] / "scripts/map_fidelity_supervisor.py"
+)
+SUPERVISOR_SPEC = importlib.util.spec_from_file_location(
+    "map_fidelity_supervisor_contract", SUPERVISOR_MODULE_PATH
+)
+assert SUPERVISOR_SPEC is not None and SUPERVISOR_SPEC.loader is not None
+SUPERVISOR = importlib.util.module_from_spec(SUPERVISOR_SPEC)
+SUPERVISOR_SPEC.loader.exec_module(SUPERVISOR)
+
 
 MAP_TEXT = """[Basic]
 GameMode=standard
@@ -191,6 +201,20 @@ class MapParseTests(unittest.TestCase):
         self.assertIsNotNone(rule_match)
         worker_rule = "".join(re.findall(r'"([^"]*)"', rule_match.group(1)))
         self.assertEqual(worker_rule, GATE.EXPANDED_PREFLIGHT_RULE)
+
+        stage_match = re.search(
+            r"export const WORKER_TECHNICAL_STAGES = \[(.*?)\] as const;",
+            probe_source,
+            flags=re.DOTALL,
+        )
+        self.assertIsNotNone(stage_match)
+        worker_stages = set(re.findall(r'"([^"]+)"', stage_match.group(1)))
+        self.assertEqual(worker_stages, GATE.WORKER_TECHNICAL_STAGES)
+        self.assertEqual(worker_stages, SUPERVISOR.WORKER_TECHNICAL_STAGES)
+        self.assertEqual(
+            GATE.WORKER_TECHNICAL_DIAGNOSTIC_KEYS,
+            SUPERVISOR.WORKER_TECHNICAL_DIAGNOSTIC_KEYS,
+        )
 
     def test_tracked_dirty_source_fails_closed(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -367,6 +391,32 @@ class GateFixture(unittest.TestCase):
             verify_runtime_inputs=True,
         )
         self.assertIs(validated, self.manifest)
+
+    def test_hashed_worker_diagnostic_stream_is_independently_bound(self) -> None:
+        diagnostic = {
+            "schemaVersion": 1,
+            "gate": GATE.GATE,
+            "artifactKind": "map_fidelity_worker_technical_diagnostic",
+            "outcomeFree": True,
+            "stage": "manifest_validate",
+            "errorNameSha256": "a" * 64,
+            "errorMessageSha256": "b" * 64,
+            "errorStackSha256": None,
+        }
+        stream = GATE.canonical_diagnostic_stream(diagnostic)
+        self.assertEqual(
+            GATE.validate_worker_technical_diagnostic(
+                diagnostic, "fixture diagnostic"
+            ),
+            diagnostic,
+        )
+        self.assertNotIn(b"winner", stream)
+        tampered = deepcopy(diagnostic)
+        tampered["stage"] = "unbounded_stage"
+        with self.assertRaisesRegex(RuntimeError, "identity or stage"):
+            GATE.validate_worker_technical_diagnostic(
+                tampered, "fixture diagnostic"
+            )
 
     def result(self) -> dict[str, object]:
         family = self.manifest["families"][0]
@@ -625,7 +675,11 @@ class GateFixture(unittest.TestCase):
             },
             "streams": {"stdout": empty_stream, "stderr": empty_stream},
             "shard": shard_record,
-            "technicalDisposition": {"status": "complete", "categories": []},
+            "technicalDisposition": {
+                "status": "complete",
+                "categories": [],
+                "workerDiagnostic": None,
+            },
         }
         GATE.write_exclusive(terminal_path, terminal)
         checkpoint_path = family_dir / "completion-checkpoint.json"
