@@ -12,6 +12,7 @@
         "benchmark": "node dist/benchmark/headToHead.js --es-module-specifier-resolution=node",
         "benchmark:suite": "node dist/benchmark/regressionSuite.js --es-module-specifier-resolution=node",
         "train:params": "node dist/training/parameterTrainer.js --es-module-specifier-resolution=node",
+        "research:run-plan": "node dist/training/researchPlanRunner.js --es-module-specifier-resolution=node",
         "analyze:training": "node dist/training/analyzeTrainingResults.js --es-module-specifier-resolution=node",
         "test": "vitest"
     },

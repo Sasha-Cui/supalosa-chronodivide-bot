@@ -326,6 +326,7 @@ export const createExperimentManifest = (args: {
     const sourceRuntimeTrees = [
         hashRuntimeTree(path.join(source.repoRoot, "packages", "chronodivide-bot", "dist")),
         hashRuntimeTree(path.join(source.repoRoot, "packages", "chronodivide-bot-driver", "dist", "benchmark")),
+        hashRuntimeTree(path.join(source.repoRoot, "packages", "chronodivide-bot-driver", "dist", "training")),
     ];
     const gameApiRuntimeTree = hashRuntimeTree(
         path.join(source.repoRoot, "node_modules", "@chronodivide", "game-api", "dist"),
