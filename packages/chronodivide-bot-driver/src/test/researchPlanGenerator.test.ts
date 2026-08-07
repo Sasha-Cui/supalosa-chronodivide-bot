@@ -4,6 +4,7 @@ import {
     RESEARCH_STAGE0_FAMILY_COUNT,
     RESEARCH_STAGE0_POLICY_COUNT,
     selectStage0Families,
+    selectTrainingFamilies,
 } from "../training/researchPlanGenerator.js";
 import { RoleTarget } from "../training/researchPlanRunner.js";
 import { DEFAULT_RESEARCH_POLICY, parseResearchPolicy, researchPolicySha256 } from "../training/researchPolicy.js";
@@ -50,10 +51,12 @@ describe("prospective research plan generation", () => {
         expect(selected).toHaveLength(RESEARCH_STAGE0_FAMILY_COUNT);
         expect(new Set(selected.map(({ descriptors }) => descriptors.startCount))).toEqual(new Set([2, 3, 4, 6, 8]));
         expect(new Set(selected.map(({ familyId }) => familyId)).size).toBe(RESEARCH_STAGE0_FAMILY_COUNT);
+        expect(selectTrainingFamilies(targets, 2, 6)).toEqual(selected);
+        expect(selectTrainingFamilies(targets, 2, 8).slice(0, 6)).toEqual(selected);
     });
 
     test("rejects invalid optimizer indexes and undersized family populations", () => {
         expect(() => generateStage0Policies(-1)).toThrow(/optimizerRunIndex/);
-        expect(() => selectStage0Families([target("mf_a", 2)], 0)).toThrow(/requires at least/);
+        expect(() => selectStage0Families([target("mf_a", 2)], 0)).toThrow(/Requested 6 families/);
     });
 });

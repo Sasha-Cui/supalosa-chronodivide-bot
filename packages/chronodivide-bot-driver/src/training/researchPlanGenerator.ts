@@ -29,11 +29,15 @@ export const RESEARCH_OPTIMIZER_SCHEMA_VERSION = 1 as const;
 export const RESEARCH_MAX_TICKS = 18_000 as const;
 export const RESEARCH_STAGE0_POLICY_COUNT = 32 as const;
 export const RESEARCH_STAGE0_FAMILY_COUNT = 6 as const;
+export const RESEARCH_STAGE1_POLICY_COUNT = 12 as const;
+export const RESEARCH_STAGE1_FAMILY_COUNT = 12 as const;
+export const RESEARCH_STAGE2_POLICY_COUNT = 6 as const;
+export const RESEARCH_STAGE2_FAMILY_COUNT = 22 as const;
 export const RESEARCH_SMOKE_SEED_BASE = 10_000_000 as const;
 export const RESEARCH_OPTIMIZER_SEED_BASE = 20_000_000 as const;
 export const RESEARCH_OPTIMIZER_RUN_STRIDE = 100_000 as const;
 
-type GeneratorMode = "train-smoke" | "optimizer-stage0";
+export type GeneratorMode = "train-smoke" | "optimizer-stage0" | "optimizer-stage1" | "optimizer-stage2";
 
 type GeneratorRoleData = {
     fileSha256: string;
@@ -46,6 +50,7 @@ type GeneratorRoleData = {
 export type ResearchCampaignManifest = {
     schemaVersion: typeof RESEARCH_OPTIMIZER_SCHEMA_VERSION;
     mode: GeneratorMode;
+    stage: "smoke" | 0 | 1 | 2;
     optimizerRunIndex: number;
     sourceGitCommit: string;
     generatedAt: string;
@@ -56,6 +61,8 @@ export type ResearchCampaignManifest = {
     policyCount: number;
     familyCount: number;
     launchedGameCount: number;
+    parentCampaignSha256: string | null;
+    survivorFileSha256: string | null;
     policies: ResearchPlanPolicy[];
     selectedFamilies: Array<{
         familyId: string;
@@ -70,6 +77,16 @@ export type ResearchCampaignManifest = {
         familyId: string;
         launchedGameCount: number;
     }>;
+};
+
+type SurvivorArtifact = {
+    schemaVersion: 1;
+    optimizerRunIndex: number;
+    completedStage: 0 | 1;
+    sourceCampaignPath: string;
+    sourceCampaignSha256: string;
+    selectedCount: number;
+    selectedPolicies: ResearchPlanPolicy[];
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -166,9 +183,13 @@ const targetStartCount = (target: RoleTarget): number => {
 };
 
 /** Select one family per available start-count stratum, then fill by the same hash rank. */
-export const selectStage0Families = (targets: RoleTarget[], optimizerRunIndex: number): RoleTarget[] => {
-    if (targets.length < RESEARCH_STAGE0_FAMILY_COUNT) {
-        throw new Error(`Stage 0 requires at least ${RESEARCH_STAGE0_FAMILY_COUNT} training families`);
+export const selectTrainingFamilies = (
+    targets: RoleTarget[],
+    optimizerRunIndex: number,
+    familyCount: number,
+): RoleTarget[] => {
+    if (!Number.isSafeInteger(familyCount) || familyCount <= 0 || targets.length < familyCount) {
+        throw new Error(`Requested ${familyCount} families from a population of ${targets.length}`);
     }
     const ranked = [...targets].sort((left, right) =>
         deterministicRank("stage0-family", optimizerRunIndex, left.familyId).localeCompare(
@@ -178,12 +199,12 @@ export const selectStage0Families = (targets: RoleTarget[], optimizerRunIndex: n
     const selected: RoleTarget[] = [];
     for (const startCount of [...new Set(ranked.map(targetStartCount))].sort((left, right) => left - right)) {
         const target = ranked.find((candidate) => targetStartCount(candidate) === startCount);
-        if (target && selected.length < RESEARCH_STAGE0_FAMILY_COUNT) {
+        if (target && selected.length < familyCount) {
             selected.push(target);
         }
     }
     for (const target of ranked) {
-        if (selected.length >= RESEARCH_STAGE0_FAMILY_COUNT) {
+        if (selected.length >= familyCount) {
             break;
         }
         if (!selected.includes(target)) {
@@ -191,6 +212,63 @@ export const selectStage0Families = (targets: RoleTarget[], optimizerRunIndex: n
         }
     }
     return selected;
+};
+
+export const selectStage0Families = (targets: RoleTarget[], optimizerRunIndex: number): RoleTarget[] =>
+    selectTrainingFamilies(targets, optimizerRunIndex, RESEARCH_STAGE0_FAMILY_COUNT);
+
+const readSurvivors = (
+    survivorPath: string,
+    parentCampaignPath: string,
+    optimizerRunIndex: number,
+    requestedStage: 1 | 2,
+): { policies: ResearchPlanPolicy[]; parentCampaignSha256: string; survivorFileSha256: string } => {
+    const parentCampaignSha256 = sha256File(parentCampaignPath);
+    const parentValue = JSON.parse(fs.readFileSync(parentCampaignPath, "utf8")) as Record<string, unknown>;
+    const survivorValue = JSON.parse(fs.readFileSync(survivorPath, "utf8")) as Partial<SurvivorArtifact>;
+    const expectedCompletedStage = requestedStage === 1 ? 0 : 1;
+    const expectedPolicyCount = requestedStage === 1 ? RESEARCH_STAGE1_POLICY_COUNT : RESEARCH_STAGE2_POLICY_COUNT;
+    const expectedParentMode = requestedStage === 1 ? "optimizer-stage0" : "optimizer-stage1";
+    if (
+        parentValue.schemaVersion !== RESEARCH_OPTIMIZER_SCHEMA_VERSION ||
+        parentValue.mode !== expectedParentMode ||
+        parentValue.optimizerRunIndex !== optimizerRunIndex ||
+        !Array.isArray(parentValue.policies)
+    ) {
+        throw new Error(`Parent campaign is not the expected run-${optimizerRunIndex} ${expectedParentMode} campaign`);
+    }
+    if (
+        survivorValue.schemaVersion !== 1 ||
+        survivorValue.optimizerRunIndex !== optimizerRunIndex ||
+        survivorValue.completedStage !== expectedCompletedStage ||
+        path.resolve(String(survivorValue.sourceCampaignPath)) !== path.resolve(parentCampaignPath) ||
+        survivorValue.sourceCampaignSha256 !== parentCampaignSha256 ||
+        survivorValue.selectedCount !== expectedPolicyCount ||
+        !Array.isArray(survivorValue.selectedPolicies) ||
+        survivorValue.selectedPolicies.length !== expectedPolicyCount
+    ) {
+        throw new Error(`Survivor artifact is not the expected stage-${expectedCompletedStage} selection`);
+    }
+    const parentPolicies = new Map(
+        (parentValue.policies as ResearchPlanPolicy[]).map((policy) => [policy.policyId, policy.policy]),
+    );
+    const policies = survivorValue.selectedPolicies.map((raw, index) => {
+        if (!isRecord(raw) || typeof raw.policyId !== "string") {
+            throw new Error(`Selected survivor ${index} has an invalid schema`);
+        }
+        const policy = parseResearchPolicy(raw.policy);
+        if (researchPolicySha256(policy) !== raw.policyId || !parentPolicies.has(raw.policyId)) {
+            throw new Error(`Selected survivor ${index} is not a hash-identical parent policy`);
+        }
+        if (researchPolicySha256(parentPolicies.get(raw.policyId)) !== raw.policyId) {
+            throw new Error(`Parent policy bytes differ for selected survivor ${index}`);
+        }
+        return { policyId: raw.policyId, policy };
+    });
+    if (new Set(policies.map(({ policyId }) => policyId)).size !== policies.length) {
+        throw new Error("Survivor artifact contains duplicate policies");
+    }
+    return { policies, parentCampaignSha256, survivorFileSha256: sha256File(survivorPath) };
 };
 
 const readGeneratorRole = (repoRoot: string, privateRoleRoot: string): GeneratorRoleData => {
@@ -266,8 +344,13 @@ const parseOptimizerRunIndex = (): number => {
 
 const modeFromEnvironment = (): GeneratorMode => {
     const value = process.env.RESEARCH_PLAN_MODE;
-    if (value !== "train-smoke" && value !== "optimizer-stage0") {
-        throw new Error("RESEARCH_PLAN_MODE must be train-smoke or optimizer-stage0");
+    if (
+        value !== "train-smoke" &&
+        value !== "optimizer-stage0" &&
+        value !== "optimizer-stage1" &&
+        value !== "optimizer-stage2"
+    ) {
+        throw new Error("RESEARCH_PLAN_MODE must be train-smoke or optimizer-stage0/1/2");
     }
     return value;
 };
@@ -289,12 +372,43 @@ const main = async (): Promise<void> => {
     const mode = modeFromEnvironment();
     const optimizerRunIndex = parseOptimizerRunIndex();
     const role = readGeneratorRole(repoRoot, privateRoleRoot);
-    const policies = mode === "train-smoke"
-        ? [{ policyId: researchPolicySha256(DEFAULT_RESEARCH_POLICY), policy: parseResearchPolicy(DEFAULT_RESEARCH_POLICY) }]
-        : generateStage0Policies(optimizerRunIndex);
-    const families = mode === "train-smoke"
-        ? [selectStage0Families(role.targets, optimizerRunIndex)[0]]
-        : selectStage0Families(role.targets, optimizerRunIndex);
+    if (role.targets.length !== RESEARCH_STAGE2_FAMILY_COUNT) {
+        throw new Error(`Research optimizer v1 requires exactly ${RESEARCH_STAGE2_FAMILY_COUNT} frozen train families`);
+    }
+    const stage: ResearchCampaignManifest["stage"] = mode === "train-smoke"
+        ? "smoke"
+        : mode === "optimizer-stage0"
+            ? 0
+            : mode === "optimizer-stage1"
+                ? 1
+                : 2;
+    let policies: ResearchPlanPolicy[];
+    let parentCampaignSha256: string | null = null;
+    let survivorFileSha256: string | null = null;
+    if (mode === "train-smoke") {
+        policies = [{ policyId: researchPolicySha256(DEFAULT_RESEARCH_POLICY), policy: parseResearchPolicy(DEFAULT_RESEARCH_POLICY) }];
+    } else if (mode === "optimizer-stage0") {
+        policies = generateStage0Policies(optimizerRunIndex);
+    } else {
+        const parent = readSurvivors(
+            requiredPath("SURVIVOR_FILE"),
+            requiredPath("PARENT_CAMPAIGN"),
+            optimizerRunIndex,
+            stage as 1 | 2,
+        );
+        policies = parent.policies;
+        parentCampaignSha256 = parent.parentCampaignSha256;
+        survivorFileSha256 = parent.survivorFileSha256;
+    }
+    const familyCount = stage === "smoke"
+        ? 1
+        : stage === 0
+            ? RESEARCH_STAGE0_FAMILY_COUNT
+            : stage === 1
+                ? RESEARCH_STAGE1_FAMILY_COUNT
+                : RESEARCH_STAGE2_FAMILY_COUNT;
+    const selectedTrainingFamilies = selectTrainingFamilies(role.targets, optimizerRunIndex, Math.max(1, familyCount));
+    const families = stage === "smoke" ? [selectedTrainingFamilies[0]] : selectedTrainingFamilies;
     const engineSeedBase = mode === "train-smoke"
         ? RESEARCH_SMOKE_SEED_BASE + optimizerRunIndex * 100
         : RESEARCH_OPTIMIZER_SEED_BASE + optimizerRunIndex * RESEARCH_OPTIMIZER_RUN_STRIDE;
@@ -332,11 +446,11 @@ const main = async (): Promise<void> => {
     const sourceShort = generationManifest.source.gitCommit.slice(0, 10);
     for (let shardIndex = 0; shardIndex < families.length; shardIndex++) {
         const target = families[shardIndex];
-        const seedBlockIndex = mode === "train-smoke" ? 900 : shardIndex;
+        const seedBlockIndex = stage === "smoke" ? 900 : (stage as number) * 100 + shardIndex;
         const requestedEngineSeed = derivePairedEngineSeed(engineSeedBase, seedBlockIndex);
         const runId = mode === "train-smoke"
             ? `train-smoke-r${optimizerRunIndex}-${sourceShort}`
-            : `optimizer-r${optimizerRunIndex}-stage0-shard${shardIndex}-${sourceShort}`;
+            : `optimizer-r${optimizerRunIndex}-stage${stage}-shard${shardIndex}-${sourceShort}`;
         const episodes = policies.flatMap((policy, candidateIndex) => ([0, 1] as const).map((candidateSlot) => ({
             episodeId: `c${candidateIndex}-b${seedBlockIndex}-s${candidateSlot}`,
             familyId: target.familyId,
@@ -381,6 +495,7 @@ const main = async (): Promise<void> => {
     const campaign: ResearchCampaignManifest = {
         schemaVersion: RESEARCH_OPTIMIZER_SCHEMA_VERSION,
         mode,
+        stage,
         optimizerRunIndex,
         sourceGitCommit: generationManifest.source.gitCommit,
         generatedAt: new Date().toISOString(),
@@ -394,6 +509,8 @@ const main = async (): Promise<void> => {
         policyCount: policies.length,
         familyCount: families.length,
         launchedGameCount: shards.reduce((total, shard) => total + shard.launchedGameCount, 0),
+        parentCampaignSha256,
+        survivorFileSha256,
         policies,
         selectedFamilies: families.map((target) => ({
             familyId: target.familyId,
