@@ -28,8 +28,22 @@ import {
     verifyBundleDescriptor,
     verifyTreeDescriptor,
 } from "../benchmark/mapFidelityProtocol.js";
+import { expectedWorkerCommittedInputPaths } from "../benchmark/mapFidelityProbe.js";
 
 describe("outcome-free map fidelity protocol", () => {
+    it("binds the frozen source population only for the canonical Temperate target", () => {
+        const sourceTarget = "research/artifacts/role_blind_fidelity_targets_v1.json";
+        const temperateTarget =
+            "research/artifacts/role_blind_temperate_fidelity_targets_v1.json";
+        const catalog = "research/artifacts/map_family_catalog.json";
+        const temperate = expectedWorkerCommittedInputPaths(temperateTarget, catalog, null);
+        const original = expectedWorkerCommittedInputPaths(sourceTarget, catalog, null);
+
+        expect(temperate.slice(-3)).toEqual([temperateTarget, catalog, sourceTarget]);
+        expect(original.slice(-2)).toEqual([sourceTarget, catalog]);
+        expect(original.filter((entry) => entry === sourceTarget)).toHaveLength(1);
+    });
+
     it("categorizes known parser and asset warnings", () => {
         expect(classifyConsoleMessage("warn", 'File "isourb.mix" not found')).toMatchObject({
             category: "missing_asset",

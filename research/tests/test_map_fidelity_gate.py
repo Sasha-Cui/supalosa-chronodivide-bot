@@ -64,6 +64,72 @@ SCHEDULER = {
 
 
 class MapParseTests(unittest.TestCase):
+    def test_temperate_population_rederives_exact_source_subset(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            repo = Path(temporary)
+            artifact_dir = repo / "research/artifacts"
+            map_dir = repo / "maps"
+            artifact_dir.mkdir(parents=True)
+            map_dir.mkdir()
+            temperate_map = map_dir / "temperate.map"
+            snow_map = map_dir / "snow.map"
+            temperate_map.write_text(MAP_TEXT, encoding="latin-1")
+            snow_map.write_text(
+                MAP_TEXT.replace("Theater=TEMPERATE", "Theater=SNOW"),
+                encoding="latin-1",
+            )
+            source_records = [
+                {
+                    "familyId": "mf_temperate",
+                    "representative": {
+                        "path": "maps/temperate.map",
+                        "sha256": GATE.sha256_file(temperate_map),
+                    },
+                },
+                {
+                    "familyId": "mf_snow",
+                    "representative": {
+                        "path": "maps/snow.map",
+                        "sha256": GATE.sha256_file(snow_map),
+                    },
+                },
+            ]
+            source_manifest = {
+                "targetCount": len(source_records),
+                "populationCommitmentSha256": GATE.canonical_sha256(source_records),
+                "catalogSha256": "c" * 64,
+                "targets": source_records,
+            }
+            source_path = artifact_dir / "role_blind_fidelity_targets_v1.json"
+            source_path.write_text(json.dumps(source_manifest), encoding="utf-8")
+            selected = [source_records[0]]
+            targets_path = artifact_dir / "role_blind_temperate_fidelity_targets_v1.json"
+            targets_manifest = {
+                "sourceTargetManifestSha256": GATE.sha256_file(source_path),
+                "sourceTargetPopulationCommitmentSha256": source_manifest[
+                    "populationCommitmentSha256"
+                ],
+                "selectionTheater": "TEMPERATE",
+                "selectionPolicy": GATE.TEMPERATE_SELECTION_POLICY,
+                "selectionPolicySha256": GATE.hashlib.sha256(
+                    GATE.TEMPERATE_SELECTION_POLICY.encode("utf-8")
+                ).hexdigest(),
+                "catalogSha256": source_manifest["catalogSha256"],
+                "targets": selected,
+            }
+            targets_path.write_text(json.dumps(targets_manifest), encoding="utf-8")
+
+            self.assertEqual(
+                GATE.validate_temperate_target_population(
+                    repo, targets_path, targets_manifest, selected
+                ),
+                source_path,
+            )
+            with self.assertRaisesRegex(RuntimeError, "exact ordered Theater subset"):
+                GATE.validate_temperate_target_population(
+                    repo, targets_path, targets_manifest, source_records
+                )
+
     def test_probe_validator_allows_null_starts_after_failed_load(self) -> None:
         probe = {
             "order": ["alpha", "beta"],

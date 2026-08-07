@@ -1823,12 +1823,22 @@ def validate_manifest_v2(
         *TOOL_SOURCE_PATHS,
         target_relative,
         catalog_relative,
+        *(
+            [SOURCE_TARGET_RELATIVE_PATH]
+            if target_relative == TEMPERATE_TARGET_RELATIVE_PATH
+            else []
+        ),
         *([preflight_relative] if preflight_relative is not None else []),
     ]
     if inputs["trackedCommittedInputs"] != expected_tracked:
         raise RuntimeError("manifest.inputs.trackedCommittedInputs is not the frozen order")
     expected_git_paths = list(dict.fromkeys([
         *TOOL_SOURCE_PATHS, target_relative, catalog_relative,
+        *(
+            [SOURCE_TARGET_RELATIVE_PATH]
+            if target_relative == TEMPERATE_TARGET_RELATIVE_PATH
+            else []
+        ),
         *([preflight_relative] if preflight_relative is not None else []),
     ]))
     git_blobs = inputs["gitBlobs"]
@@ -1903,6 +1913,12 @@ def validate_manifest_v2(
             str(record.get("familyId")): record for record in target_records
             if isinstance(record, dict)
         }
+        validate_temperate_target_population(
+            repo_root,
+            target_path,
+            targets,
+            target_records,
+        )
         for family in families:
             target = target_by_id.get(str(family["familyId"]))
             if not isinstance(target, dict) or target.get("representative") != {

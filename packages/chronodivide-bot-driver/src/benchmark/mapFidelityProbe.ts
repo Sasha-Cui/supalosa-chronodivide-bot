@@ -146,12 +146,29 @@ const WORKER_SOURCE_PATHS = [
 ] as const;
 
 const PREFLIGHT_PLAN_RELATIVE_PATH = "research/artifacts/map_fidelity_expanded_preflight_v2.json";
+const SOURCE_TARGET_RELATIVE_PATH = "research/artifacts/role_blind_fidelity_targets_v1.json";
+const TEMPERATE_TARGET_RELATIVE_PATH =
+    "research/artifacts/role_blind_temperate_fidelity_targets_v1.json";
 const COMPILED_RUNTIME_NAMES = [
     "mapFidelityProbe.js",
     "mapFidelityProtocol.js",
     "mapLoadAttestation.js",
     "seededOfflineGame.js",
 ] as const;
+
+export const expectedWorkerCommittedInputPaths = (
+    targetRelative: string,
+    catalogRelative: string,
+    preflightRelative: string | null,
+): string[] => [
+    ...WORKER_SOURCE_PATHS,
+    targetRelative,
+    catalogRelative,
+    ...(targetRelative === TEMPERATE_TARGET_RELATIVE_PATH
+        ? [SOURCE_TARGET_RELATIVE_PATH]
+        : []),
+    ...(preflightRelative === null ? [] : [preflightRelative]),
+];
 
 const RUNTIME_HASH_KEYS = [
     "packageLockSha256",
@@ -1155,8 +1172,11 @@ export const assertWorkerManifest = (
     const targetRelative = descriptorRelativePath(repoRoot, targetManifest, "manifest.inputs.targetManifest");
     const catalogRelative = descriptorRelativePath(repoRoot, catalog, "manifest.inputs.catalog");
     const preflightRelative = preflightPlan === null ? null : PREFLIGHT_PLAN_RELATIVE_PATH;
-    const expectedTracked = [...WORKER_SOURCE_PATHS, targetRelative, catalogRelative,
-        ...(preflightRelative === null ? [] : [preflightRelative])];
+    const expectedTracked = expectedWorkerCommittedInputPaths(
+        targetRelative,
+        catalogRelative,
+        preflightRelative,
+    );
     if (
         JSON.stringify(requireWorkerStringArray(inputs.trackedCommittedInputs, "manifest.inputs.trackedCommittedInputs")) !==
         JSON.stringify(expectedTracked)
@@ -1167,8 +1187,11 @@ export const assertWorkerManifest = (
     const gitBlobs = inputs.gitBlobs.map((record, index) =>
         assertWorkerGitBlob(record, `manifest.inputs.gitBlobs[${index}]`),
     );
-    const expectedBlobPaths = [...WORKER_SOURCE_PATHS, targetRelative, catalogRelative,
-        ...(preflightRelative === null ? [] : [preflightRelative])].filter(
+    const expectedBlobPaths = expectedWorkerCommittedInputPaths(
+        targetRelative,
+        catalogRelative,
+        preflightRelative,
+    ).filter(
         (entry, index, all) => all.indexOf(entry) === index,
     );
     if (JSON.stringify(gitBlobs.map((record) => record.gitPath)) !== JSON.stringify(expectedBlobPaths)) {
