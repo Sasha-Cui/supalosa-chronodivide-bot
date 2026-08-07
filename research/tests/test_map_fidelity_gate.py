@@ -93,6 +93,13 @@ class MapParseTests(unittest.TestCase):
         self.assertEqual(validated, probe)
         self.assertIn("forward_load_failed", failures)
         self.assertIn("forward_missing_asset", failures)
+        reciprocal = GATE.recompute_reciprocal_check(
+            validated,
+            {**validated, "order": ["beta", "alpha"]},
+            [{"x": 37, "y": 63}, {"x": 62, "y": 39}],
+        )
+        self.assertEqual(reciprocal["failures"], sorted(reciprocal["failures"]))
+        self.assertEqual(len(reciprocal["failures"]), 4)
 
     def test_engine_asset_directory_rejects_missing_files(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:

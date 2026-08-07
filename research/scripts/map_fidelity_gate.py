@@ -3291,7 +3291,7 @@ def recompute_reciprocal_check(
             for point in (fa, fb, ra, rb)
         ),
         "reciprocalPhysicalSlots": reciprocal_physical_slots,
-        "failures": failures,
+        "failures": sorted(set(failures)),
     }
 
 
