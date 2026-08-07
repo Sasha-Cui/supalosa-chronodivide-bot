@@ -3,13 +3,14 @@
 Status: **hard no-go for the 127-family screen** as of 2026-08-06.
 
 The legacy three-family job 21296316 passed a narrow, outcome-free smoke test.
-The replacement 11-family protocol is implemented and passes mock/no-engine
-tests, but it has not yet produced engine evidence. No StrongBot result or
-population clearance follows from either state.
+The replacement 11-family protocol has now produced two independently verified
+engine runs at the same committed source revision. Both reproducibly returned
+four `pass`, two `review`, and five `fail` family classifications. No StrongBot
+result or population clearance follows from this compatibility evidence.
 
 ## P0 implementation status
 
-### Exact map-load attestation: implemented, engine confirmation pending
+### Exact map-load attestation: implemented and confirmed
 
 The worker now creates a private content-addressed map alias, enumerates every
 real-filesystem lookup root, rejects case-fold collisions, intercepts the
@@ -17,9 +18,10 @@ pinned filesystem adapter, and hashes the exact bytes supplied to the engine.
 It requires one initialization plus two forward and two reverse map-settings
 reads. Adapter, marker, count, path, byte-size, or hash drift fails closed.
 Adversarial no-engine tests include same-basename/case-variant decoys and exact
-read-count checks.
+read-count checks. Jobs 21599648 and 21600745 each authenticated all five reads
+for every technically complete family attempt.
 
-### Per-family isolation and durability: implemented, engine confirmation pending
+### Per-family isolation and durability: implemented and confirmed
 
 A sequential supervisor launches one fresh process group per family, imposes a
 monotonic timeout, escalates termination after a fixed grace period, reaps the
@@ -28,18 +30,19 @@ Intent, terminal, shard, checkpoint, and campaign records are strict,
 role-free, atomically written, fsynced, and independently re-read by the gate.
 Only technical incompletion is retryable, with a prospective maximum of two
 attempts. A compatibility `review` or `fail` is complete and cannot trigger a
-retry.
+retry. The confirmation completed all 11 families on their first attempt,
+demonstrating that none of the negative classifications was retried away.
 
-### Durable evidence storage: implemented, external recheck pending
+### Durable evidence storage: implemented and independently rechecked
 
 Future artifacts are written directly to versioned private project storage at
 `research-evidence/map-compatibility-gate-v2`, rather than relying on unstable
 scratch retention. The job preserves its logs, scheduler-bound manifest,
 pre/post attestations, complete attempt ledger, aggregate, and gate summary.
-After the job exits, a separate session must verify scheduler accounting and
-rehash the durable bundle with
-`scripts/verify_map_fidelity_execution.py` before it is entered in
-`RESULT_REGISTRY.tsv`.
+After each job exited, a separate session verified scheduler accounting,
+runtime and source provenance, all schemas and cross-file bindings, and a fresh
+tree commitment with `scripts/verify_map_fidelity_execution.py`. The final
+calibration and confirmation are registered in `RESULT_REGISTRY.tsv`.
 
 ## Expanded preflight coverage
 
@@ -53,6 +56,30 @@ The expanded preflight is a technical stress test, not a random sample and not
 scientific evidence about policy quality. Compatibility status may be examined
 because it is the declared purpose of this infrastructure gate; gameplay
 outcomes are neither consumed nor emitted.
+
+## Executed evidence and decision
+
+Final calibration job 21599648 and confirmation job 21600745 both used commit
+`eab4925d420a28b5c04ae72c473d7d5bf74ac3e7`, completed 22/22 reciprocal
+passive sessions, and were independently verified. Their evidence-tree
+commitments are respectively
+`85b92025795aa842149d2d7f6c5ad3f89d299555c7b59124bf38b6d03dd6b4c0` and
+`f1528632f4026251b13ae0c7315ce937a3c483aba85394f3dbe49dab1e81d718`.
+
+The normalized family evidence is exactly reproducible: four `pass`, two
+`review`, and five `fail`. Three failures share one `missing_asset` diagnostic,
+one has a distinct `missing_asset` diagnostic, and one is
+`unsupported_theater`. Both review families reach tick 250 but emit stable
+non-outcome warnings. The aggregate has `technicalChecksPassed=true` while its
+compatibility verdict is `FAIL`, `screenComplete=false`, and
+`eligibleForFidelityClearance=false`.
+
+This combination means the infrastructure worked and exposed a real scope
+problem. It does not authorize the 127-family screen. The next admissible step
+is outcome-free diagnosis of these classifications, followed either by a
+source/asset repair and repeated preflight or by a prospectively justified,
+fully reported supported-map universe. Policy outcomes must remain sealed
+during that choice.
 
 ## P1 requirements before policy evaluation
 
@@ -82,19 +109,18 @@ no test-period hyperparameter selection.
   MIX archives, copied game assets, or other third-party material without
   permission.
 
-## Authorization sequence
+## Completed authorization steps and remaining gate
 
-1. Commit a clean source state and pass build, focused TypeScript tests, all
-   research Python tests, shell syntax checks, and `sbatch --test-only`.
-2. Run the 11-family calibration with one attempt per family on `pi_jss233`.
-3. Rehash the durable bundle from a separate session and diagnose every
-   technical failure; code or protocol changes invalidate that calibration
-   source commitment and require a new calibration.
-4. If technically complete, run the same committed plan with at most two
-   attempts and independently verify it again.
-5. Review family compatibility classifications and all P0 evidence. Only then
-   may this document change from hard no-go to a scoped authorization for the
-   127-family compatibility screen.
+1. **Complete:** clean source, build, focused TypeScript tests, all research
+   Python tests, shell syntax checks, and scheduler validation.
+2. **Complete:** one-attempt calibration on `pi_jss233`.
+3. **Complete:** independent rehash and validation of the calibration bundle.
+4. **Complete:** same-commit confirmation with at most two attempts, followed
+   by independent validation; no family needed a retry.
+5. **Failed compatibility gate:** review of the reproducible classifications
+   found five `fail` and two `review` families. Diagnose and repair them, or
+   freeze a defensible supported-map population without examining policy
+   outcomes, then repeat this gate before considering the 127-family screen.
 
 The later StrongBot diagnostic remains separately blocked until the
 method-interface runner and evaluation-seed/start gate pass. No compatibility

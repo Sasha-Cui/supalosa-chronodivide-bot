@@ -118,8 +118,29 @@ Eleven families with two capped attempts require about 46 minutes before
 overhead. A preflight pass always has `fullCoverage=false`, `passed=false`, and
 `eligibleForFidelityClearance=false`; it is infrastructure evidence only.
 
-The 127-family screen remains unauthorized until calibration and confirmation
-are technically complete, the evidence is reverified from a separate session,
-and `FULL_SCREEN_READINESS_REVIEW.md` is updated. If authorized, its worst-case
-two-attempt timeout budget is about 8.8 hours before overhead, so it requires a
-separate reviewed submission with an approximately ten-hour wall-time request.
+## Executed expanded preflight
+
+The final source-matched calibration and confirmation both used source commit
+`eab4925d420a28b5c04ae72c473d7d5bf74ac3e7` and completed under
+`pi_jss233`:
+
+- calibration job 21599648: 22/22 passive sessions, 11/11 technically complete
+  families, one attempt per family, independently verified tree commitment
+  `85b92025795aa842149d2d7f6c5ad3f89d299555c7b59124bf38b6d03dd6b4c0`;
+- confirmation job 21600745: 22/22 passive sessions, 11/11 technically complete
+  families, no retries despite a two-attempt cap, independently verified tree
+  commitment
+  `f1528632f4026251b13ae0c7315ce937a3c483aba85394f3dbe49dab1e81d718`.
+
+Both runs classified the same four families `pass`, two `review`, and five
+`fail`. After removing scheduler identity, paths, and wall-time fields, the
+family-level payloads were exactly identical, including seeds, starts, ticks,
+warnings, errors, and read attestations. This is a reproducible negative
+compatibility result, not a policy result.
+
+The 127-family screen therefore remains unauthorized. The five failure causes
+and two review classifications must first be resolved, or a prospectively
+defined supported-map universe must be justified and frozen without policy
+outcomes. If later authorized, the full screen's worst-case two-attempt timeout
+budget is about 8.8 hours before overhead, so it requires a separate reviewed
+submission with an approximately ten-hour wall-time request.
