@@ -65,6 +65,17 @@ class SelectTemperateFidelityTargetsTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "bytes do not match"):
                 MODULE.build_artifact(root, source_path, 1)
 
+    def test_verifies_only_an_exact_existing_artifact(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            artifact = MODULE.build_artifact(root, self.make_fixture(root), 1)
+            output = root / "temperate.json"
+            output.write_text(json.dumps(artifact), encoding="utf-8")
+            MODULE.verify_existing(output, artifact)
+            artifact["targetCount"] = 2
+            with self.assertRaisesRegex(ValueError, "does not reproduce exactly"):
+                MODULE.verify_existing(output, artifact)
+
 
 if __name__ == "__main__":
     unittest.main()

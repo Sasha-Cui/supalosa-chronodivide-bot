@@ -135,21 +135,32 @@ def write_exclusive(path: Path, value: dict[str, Any]) -> None:
         handle.write(payload)
 
 
+def verify_existing(path: Path, expected: dict[str, Any]) -> None:
+    actual = json.loads(path.read_text(encoding="utf-8"))
+    if actual != expected:
+        raise ValueError(f"Existing Temperate target artifact does not reproduce exactly: {path}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo-root", type=Path, required=True)
     parser.add_argument("--source-targets", type=Path, required=True)
     parser.add_argument("--expected-count", type=int, default=67)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--verify-existing", action="store_true")
     args = parser.parse_args()
     repo_root = args.repo_root.resolve()
     source_path = args.source_targets.resolve()
     artifact = build_artifact(repo_root, source_path, args.expected_count)
-    write_exclusive(args.output.resolve(), artifact)
+    if args.verify_existing:
+        verify_existing(args.output.resolve(), artifact)
+    else:
+        write_exclusive(args.output.resolve(), artifact)
     print(json.dumps({
         "artifact": str(args.output.resolve()),
         "populationCommitmentSha256": artifact["populationCommitmentSha256"],
         "targetCount": artifact["targetCount"],
+        "verifiedExisting": args.verify_existing,
     }, sort_keys=True, indent=2))
 
 

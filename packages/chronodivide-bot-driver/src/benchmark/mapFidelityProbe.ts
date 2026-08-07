@@ -141,6 +141,7 @@ const WORKER_SOURCE_PATHS = [
     "research/scripts/map_fidelity_gate.py",
     "research/scripts/map_fidelity_supervisor.py",
     "research/scripts/select_map_fidelity_preflight.py",
+    "research/scripts/select_temperate_fidelity_targets.py",
     "research/slurm/map_fidelity_gate_v1.sbatch",
 ] as const;
 

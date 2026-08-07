@@ -37,6 +37,7 @@ CATALOG="$REPO/research/artifacts/map_family_catalog.json"
 PREFLIGHT_PLAN="$REPO/research/artifacts/map_fidelity_expanded_preflight_v2.json"
 GATE_SCRIPT="$REPO/research/scripts/map_fidelity_gate.py"
 SUPERVISOR_SCRIPT="$REPO/research/scripts/map_fidelity_supervisor.py"
+TEMPERATE_SELECTOR="$REPO/research/scripts/select_temperate_fidelity_targets.py"
 WORKER="$REPO/packages/chronodivide-bot-driver/dist/benchmark/mapFidelityProbe.js"
 
 TARGET_TICK=250
@@ -123,6 +124,14 @@ cd "$REPO"
 "$NODE_BIN" --version
 "$NPM_BIN" --version
 "$NPM_BIN" run build --workspace=@supalosa/chronodivide-bot-driver
+if [[ "$MAP_FIDELITY_PROFILE" == "temperate" ]]; then
+    "$PYTHON_BIN" "$TEMPERATE_SELECTOR" \
+        --repo-root "$REPO" \
+        --source-targets "$REPO/research/artifacts/role_blind_fidelity_targets_v1.json" \
+        --expected-count "$EXPECTED_FAMILIES" \
+        --output "$TARGETS" \
+        --verify-existing
+fi
 
 "$PYTHON_BIN" "$GATE_SCRIPT" prepare \
     --repo-root "$REPO" \

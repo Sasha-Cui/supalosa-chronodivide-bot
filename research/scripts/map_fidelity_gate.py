@@ -46,10 +46,20 @@ TOOL_SOURCE_PATHS = (
     "research/scripts/map_fidelity_gate.py",
     "research/scripts/map_fidelity_supervisor.py",
     "research/scripts/select_map_fidelity_preflight.py",
+    "research/scripts/select_temperate_fidelity_targets.py",
     "research/slurm/map_fidelity_gate_v1.sbatch",
 )
 PREFLIGHT_PLAN_RELATIVE_PATH = (
     "research/artifacts/map_fidelity_expanded_preflight_v2.json"
+)
+SOURCE_TARGET_RELATIVE_PATH = "research/artifacts/role_blind_fidelity_targets_v1.json"
+TEMPERATE_TARGET_RELATIVE_PATH = (
+    "research/artifacts/role_blind_temperate_fidelity_targets_v1.json"
+)
+TEMPERATE_SELECTION_POLICY = (
+    "Retain every ordered source-target record whose exact representative map "
+    "declares Theater=TEMPERATE in its [Map] section; do not inspect simulator "
+    "compatibility, dataset role, policy identity, or gameplay outcome."
 )
 EXPANDED_PREFLIGHT_FAMILY_COUNT = 11
 EXPANDED_PREFLIGHT_RULE = (
@@ -529,6 +539,82 @@ def authoritative_scheduler() -> dict[str, Any]:
     return parse_scontrol_line(completed.stdout.strip(), job_id)
 
 
+def representative_theater(path: Path) -> str:
+    section = ""
+    values: list[str] = []
+    with path.open("r", encoding="latin-1", errors="replace", newline="") as handle:
+        for raw_line in handle:
+            line = raw_line.strip()
+            if not line or line.startswith((";", "#")):
+                continue
+            if line.startswith("[") and "]" in line:
+                section = line[1:line.index("]")].strip().lower()
+                continue
+            if section != "map" or "=" not in line:
+                continue
+            key, value = line.split("=", 1)
+            if key.strip().lower() == "theater":
+                values.append(value.split(";", 1)[0].strip().upper())
+    if len(values) != 1 or not values[0]:
+        raise RuntimeError(
+            f"Representative must declare exactly one nonempty [Map] Theater: {path}"
+        )
+    return values[0]
+
+
+def validate_temperate_target_population(
+    repo_root: Path,
+    targets_path: Path,
+    targets_manifest: dict[str, Any],
+    target_records: list[dict[str, Any]],
+) -> Path | None:
+    expected_target_path = (repo_root / TEMPERATE_TARGET_RELATIVE_PATH).resolve()
+    if targets_path != expected_target_path:
+        return None
+    source_path = (repo_root / SOURCE_TARGET_RELATIVE_PATH).resolve()
+    source = load_json(source_path)
+    source_records = source.get("targets")
+    if (
+        not isinstance(source_records, list)
+        or source.get("targetCount") != len(source_records)
+        or source.get("populationCommitmentSha256") != canonical_sha256(source_records)
+        or targets_manifest.get("sourceTargetManifestSha256") != sha256_file(source_path)
+        or targets_manifest.get("sourceTargetPopulationCommitmentSha256")
+        != source.get("populationCommitmentSha256")
+        or targets_manifest.get("selectionTheater") != "TEMPERATE"
+        or targets_manifest.get("selectionPolicy") != TEMPERATE_SELECTION_POLICY
+        or targets_manifest.get("selectionPolicySha256")
+        != hashlib.sha256(TEMPERATE_SELECTION_POLICY.encode("utf-8")).hexdigest()
+        or targets_manifest.get("catalogSha256") != source.get("catalogSha256")
+    ):
+        raise RuntimeError("Temperate target does not bind the frozen source and selection policy")
+
+    selected: list[dict[str, Any]] = []
+    for index, record in enumerate(source_records):
+        if not isinstance(record, dict) or set(record) != {"familyId", "representative"}:
+            raise RuntimeError(f"Source target {index} has an invalid schema")
+        representative = record.get("representative")
+        if not isinstance(representative, dict) or set(representative) != {"path", "sha256"}:
+            raise RuntimeError(f"Source target {index} representative schema is invalid")
+        relative = Path(str(representative.get("path")))
+        if relative.is_absolute() or ".." in relative.parts:
+            raise RuntimeError(f"Source representative path escapes the repository: {relative}")
+        map_path = (repo_root / relative).resolve()
+        try:
+            map_path.relative_to(repo_root)
+        except ValueError as error:
+            raise RuntimeError(
+                f"Source representative path escapes the repository: {relative}"
+            ) from error
+        if not map_path.is_file() or sha256_file(map_path) != representative.get("sha256"):
+            raise RuntimeError(f"Source representative bytes drifted: {relative}")
+        if representative_theater(map_path) == "TEMPERATE":
+            selected.append(record)
+    if selected != target_records:
+        raise RuntimeError("Temperate targets are not the exact ordered Theater subset")
+    return source_path
+
+
 def parse_map(path: Path) -> dict[str, Any]:
     sections: dict[str, dict[str, str]] = {}
     current = ""
@@ -931,6 +1017,9 @@ def build_manifest(
             "Outcome fields are forbidden in fidelity targets: "
             + ", ".join(leaked_outcomes[:20])
         )
+    source_target_path = validate_temperate_target_population(
+        repo_root, targets_path, targets_manifest, target_records
+    )
     if target_tick <= 1:
         raise RuntimeError("target_tick must exceed tick 1")
     if (
@@ -972,6 +1061,8 @@ def build_manifest(
         repo_root / relative_path for relative_path in TOOL_SOURCE_PATHS
     ] + [targets_path, catalog_path] + (
         [preflight_plan_path] if preflight_plan_path is not None else []
+    ) + (
+        [source_target_path] if source_target_path is not None else []
     )
     if require_clean_source:
         tracked_inputs = assert_clean_committed_source(
@@ -989,9 +1080,9 @@ def build_manifest(
         and isinstance(record.get("evidenceBasedDevelopmentEligibility"), dict)
         and record["evidenceBasedDevelopmentEligibility"].get("eligible") is True
     ]
-    if len(catalog_eligible) != expected_families:
+    if len(catalog_eligible) < expected_families:
         raise RuntimeError(
-            f"Expected {expected_families} evidence-based catalog families, "
+            f"Expected at least {expected_families} evidence-based catalog families, "
             f"found {len(catalog_eligible)}"
         )
     if len(target_records) != expected_families:
@@ -1000,9 +1091,13 @@ def build_manifest(
         )
     eligible_ids = {str(record.get("familyId")) for record in catalog_eligible}
     target_ids = [str(record.get("familyId")) for record in target_records]
-    if len(set(target_ids)) != len(target_ids) or set(target_ids) != eligible_ids:
+    if len(set(target_ids)) != len(target_ids) or not set(target_ids).issubset(eligible_ids):
         raise RuntimeError(
-            "Role-blind target families do not exactly equal the evidence-based catalog set"
+            "Role-blind target families must be unique evidence-based catalog members"
+        )
+    if source_target_path is None and set(target_ids) != eligible_ids:
+        raise RuntimeError(
+            "Only the canonical Temperate artifact may scope the evidence-based catalog set"
         )
     selected = target_records
     population = sorted(selected, key=lambda item: str(item.get("familyId")))
@@ -1119,6 +1214,11 @@ def build_manifest(
         *TOOL_SOURCE_PATHS,
         targets_path.relative_to(repo_root).as_posix(),
         catalog_path.relative_to(repo_root).as_posix(),
+        *(
+            [source_target_path.relative_to(repo_root).as_posix()]
+            if source_target_path is not None
+            else []
+        ),
         *(
             [preflight_plan_path.relative_to(repo_root).as_posix()]
             if preflight_plan_path is not None
