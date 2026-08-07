@@ -26,6 +26,7 @@ policies, and its positive policy hypothesis remains untested.
 | --- | --- |
 | Owner decisions and positive primary hypothesis | [`DECISIONS_2026-08-04.md`](DECISIONS_2026-08-04.md) |
 | Coordinate-free policy interface and equal-budget contract | [`METHOD_INTERFACE_GATE.md`](METHOD_INTERFACE_GATE.md) |
+| Prospective successive-halving training algorithm | [`OPTIMIZER_PROTOCOL.md`](OPTIMIZER_PROTOCOL.md) |
 | Outcome-free compatibility protocol | [`MAP_FIDELITY_GATE.md`](MAP_FIDELITY_GATE.md) |
 | Original 127-family no-go review | [`FULL_SCREEN_READINESS_REVIEW.md`](FULL_SCREEN_READINESS_REVIEW.md) |
 | Map-family construction and eligibility | [`MAP_FAMILY_ELIGIBILITY.md`](MAP_FAMILY_ELIGIBILITY.md) |

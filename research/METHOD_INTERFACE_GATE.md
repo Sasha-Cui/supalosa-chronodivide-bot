@@ -1,8 +1,10 @@
 # Confirmatory method-interface gate
 
-Status: **BLOCKED -- the historical parameter trainer is not an admissible
-runner for the proposed paper.** This is a source-code finding, not a gameplay
-result. No policy outcomes are needed to reach it.
+Status: **PASSED for private training and development execution; the separate
+sealed-test command remains intentionally unimplemented.** The historical
+parameter trainer remains inadmissible. The replacement plan generator, shared
+episode primitive, role-sealed runner, and strict stage reducer are committed on
+`main` and covered by mock-only failure tests.
 
 ## Scope
 
@@ -91,5 +93,26 @@ The replacement runner must fail closed unless all of the following are true:
 6. Run the prespecified at-most-1,000-launch diagnostic and continue only under
    its already documented technical and positive-signal rules.
 
-Until these conditions pass, historical trainer outputs can motivate search
-ranges but cannot support the proposed generalization claim.
+Historical trainer outputs may motivate search ranges but cannot support the
+proposed generalization claim; passing the replacement interface gate does not
+rehabilitate those old outcomes.
+
+## Replacement implementation
+
+The accepted training/development path is now:
+
+- `training/researchPolicy.ts` for the exact coordinate-free schema;
+- `training/researchEpisode.ts` for one seeded, no-retry game;
+- `training/researchPlanRunner.ts` for role, budget, runtime, baseline, map, and
+  allocation enforcement;
+- `training/researchPlanGenerator.ts` for prospective private campaign plans;
+- `training/researchStageReducer.ts` for complete-shard reconciliation and
+  fixed successive-halving selection; and
+- `research/slurm/research_plan_shard_v1.sbatch` for pinned `pi_jss233`
+  execution.
+
+Job `21655228` completed the two-launch end-to-end smoke with exact accounting
+and no technical failure. Its 0--2 gameplay result is training calibration only,
+not evidence for the proposed method comparison or a paper claim. See
+[`OPTIMIZER_PROTOCOL.md`](OPTIMIZER_PROTOCOL.md) for the prospectively frozen
+search and selection rules.
