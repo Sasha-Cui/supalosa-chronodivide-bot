@@ -77,6 +77,36 @@ class AccountingTests(unittest.TestCase):
 
 
 class InventoryTests(unittest.TestCase):
+    def test_live_nonsource_runtime_is_exactly_revalidated(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            runtime = root / "runtime.bin"
+            runtime.write_bytes(b"runtime")
+            descriptor = VERIFIER.GATE.exact_file(runtime)
+            tree = VERIFIER.GATE.tree_descriptor(root)
+            inputs = {
+                key: descriptor for key in VERIFIER.LIVE_RUNTIME_FILE_INPUT_KEYS
+            }
+            inputs.update({
+                "compiledRuntime": [descriptor],
+                "preflightPlan": None,
+                "repoRoot": str(root),
+                **{
+                    key: tree for key in VERIFIER.LIVE_RUNTIME_TREE_INPUT_KEYS
+                },
+            })
+            result = VERIFIER.validate_live_nonsource_runtime({
+                "inputs": inputs,
+                "families": [],
+            })
+            self.assertEqual(result["representativeMapCount"], 0)
+            runtime.write_bytes(b"drift")
+            with self.assertRaisesRegex(VERIFIER.VerificationError, "live runtime file drift"):
+                VERIFIER.validate_live_nonsource_runtime({
+                    "inputs": inputs,
+                    "families": [],
+                })
+
     def test_private_tree_inventory_is_sorted_and_hash_bound(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

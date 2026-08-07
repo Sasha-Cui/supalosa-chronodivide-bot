@@ -61,6 +61,21 @@ REQUIRED_COMPLETE_FILES = (
     "job.stdout.log",
     "job.stderr.log",
 )
+LIVE_RUNTIME_FILE_INPUT_KEYS = (
+    "packageLock",
+    "nodeRuntime",
+    "pythonRuntime",
+    "scontrolRuntime",
+    "gameApiPackage",
+    "gameApiRuntime",
+    "targetManifest",
+    "catalog",
+)
+LIVE_RUNTIME_TREE_INPUT_KEYS = (
+    "gameApiRuntimeTree",
+    "runtimeDependencyTree",
+    "mixTree",
+)
 
 
 class VerificationError(RuntimeError):
@@ -266,6 +281,64 @@ def run_sacct(sacct: Path, job_id: str) -> tuple[str, list[dict[str, str]]]:
     return completed.stdout, parse_sacct_output(completed.stdout, job_id)
 
 
+def validate_live_nonsource_runtime(manifest: dict[str, Any]) -> dict[str, Any]:
+    """Recheck mutable runtime/data inputs while source is verified from Git blobs."""
+
+    inputs = manifest.get("inputs")
+    families = manifest.get("families")
+    if not isinstance(inputs, dict) or not isinstance(families, list):
+        raise VerificationError("manifest runtime inputs are malformed")
+    file_records: list[tuple[str, dict[str, Any]]] = []
+    for key in LIVE_RUNTIME_FILE_INPUT_KEYS:
+        record = inputs.get(key)
+        if not isinstance(record, dict):
+            raise VerificationError(f"manifest runtime file descriptor is missing: {key}")
+        file_records.append((key, record))
+    compiled = inputs.get("compiledRuntime")
+    if not isinstance(compiled, list) or not compiled:
+        raise VerificationError("manifest compiled runtime descriptors are missing")
+    for index, record in enumerate(compiled):
+        if not isinstance(record, dict):
+            raise VerificationError("manifest compiled runtime descriptor is malformed")
+        file_records.append((f"compiledRuntime[{index}]", record))
+    preflight_plan = inputs.get("preflightPlan")
+    if preflight_plan is not None:
+        if not isinstance(preflight_plan, dict):
+            raise VerificationError("manifest preflight plan descriptor is malformed")
+        file_records.append(("preflightPlan", preflight_plan))
+    for label, record in file_records:
+        failure = GATE.verify_exact_file(record)
+        if failure:
+            raise VerificationError(f"live runtime file drift ({label}): {failure}")
+
+    for key in LIVE_RUNTIME_TREE_INPUT_KEYS:
+        record = inputs.get(key)
+        if not isinstance(record, dict) or not isinstance(record.get("root"), str):
+            raise VerificationError(f"manifest runtime tree descriptor is missing: {key}")
+        if GATE.tree_descriptor(Path(record["root"])) != record:
+            raise VerificationError(f"live runtime tree drift: {key}")
+
+    repo_root = inputs.get("repoRoot")
+    if not isinstance(repo_root, str):
+        raise VerificationError("manifest repository root is malformed")
+    for index, family in enumerate(families):
+        if not isinstance(family, dict):
+            raise VerificationError(f"manifest family {index} is malformed")
+        relative = family.get("representativeMapPath")
+        if not isinstance(relative, str):
+            raise VerificationError(f"manifest family {index} map path is malformed")
+        current = GATE.exact_file(Path(repo_root) / relative)
+        if current["bytes"] != family.get("bytes") or current["sha256"] != family.get("sha256"):
+            raise VerificationError(f"live representative map drift: family {index}")
+    return {
+        "fileDescriptorCount": len(file_records),
+        "treeDescriptorCount": len(LIVE_RUNTIME_TREE_INPUT_KEYS),
+        "representativeMapCount": len(families),
+        "historicalSourceValidatedFromCommittedGitBlobs": True,
+        "liveWorktreeSourceEqualityRequired": False,
+    }
+
+
 def independently_verify(
     *, job_id: str, scope: str, run_root: Path, output: Path, sacct: Path
 ) -> dict[str, Any]:
@@ -309,9 +382,13 @@ def independently_verify(
         result_path,
         scheduler,
         durable_root=GATE.DURABLE_EVIDENCE_ROOT,
-        verify_runtime_inputs=True,
+        # The verifier is intentionally a later committed revision. The gate
+        # validates job-time source from the manifest's committed Git blobs;
+        # mutable non-source runtime/data inputs are rechecked separately below.
+        verify_runtime_inputs=False,
         write_legacy_result=False,
     )
+    live_runtime = validate_live_nonsource_runtime(manifest)
     if GATE.canonical_sha256(stored_summary) != GATE.canonical_sha256(recomputed_summary):
         raise VerificationError("stored gate summary differs from independent recomputation")
     pipeline = stored_summary.get("evidencePipeline")
@@ -348,6 +425,7 @@ def independently_verify(
         },
         "evidence": {
             "completeBundleRevalidated": True,
+            "liveNonsourceRuntimeRevalidated": live_runtime,
             "manifest": GATE.exact_file(manifest_path),
             "storedGateSummary": GATE.exact_file(summary_path),
             "recomputedGateSummaryCanonicalSha256": GATE.canonical_sha256(
