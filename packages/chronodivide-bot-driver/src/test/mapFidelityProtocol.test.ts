@@ -43,6 +43,15 @@ describe("outcome-free map fidelity protocol", () => {
             category: "invalid_terrain",
             severity: "review",
         });
+        expect(
+            classifyConsoleMessage(
+                "warn",
+                "No valid location found for waypoint 65. Skipping action 0850116C[3] (@Sounds Shoreline 2)..",
+            ),
+        ).toMatchObject({
+            category: "invalid_waypoint",
+            severity: "fail",
+        });
         expect(classifyConsoleMessage("info", "Loaded map resources")).toBeNull();
         expect(classifyConsoleMessage("error", "Unknown object reference FOO")).toMatchObject({
             category: "invalid_object",

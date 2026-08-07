@@ -173,6 +173,8 @@ export const classifyConsoleMessage = (level: ConsoleLevel, rawText: string): Ca
         category = "invalid_object";
     } else if (/\b(?:rules?\.ini|art\.ini|rule|weapon|warhead|armor)\b/i.test(text) && WARNING_SIGNAL.test(text)) {
         category = "invalid_rules";
+    } else if (/\bno valid location found for (?:waypoint|starting point|spawn location)\b/i.test(text)) {
+        category = "invalid_waypoint";
     } else if (/\b(?:trigger|event|action|teamtype|taskforce|script)\b/i.test(text) && WARNING_SIGNAL.test(text)) {
         category = "invalid_trigger_event";
     } else if (/\b(?:waypoint|starting point|spawn location)\b/i.test(text) && WARNING_SIGNAL.test(text)) {
