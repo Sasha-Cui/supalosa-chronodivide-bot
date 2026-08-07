@@ -1667,9 +1667,6 @@ def validate_manifest_v2(
             ):
                 if family[key] != expected_static[key]:
                     raise RuntimeError(f"Manifest family static parsing drift: {representative}:{key}")
-            mix_copy = exact_file(Path(str(inputs["mixDir"])) / str(family["mapName"]))
-            if mix_copy["bytes"] != family["bytes"] or mix_copy["sha256"] != family["sha256"]:
-                raise RuntimeError(f"Runtime map copy drift: {family['mapName']}")
     if canonical_sha256(families) != inputs["familySequenceSha256"]:
         raise RuntimeError("Manifest family sequence commitment mismatch")
 

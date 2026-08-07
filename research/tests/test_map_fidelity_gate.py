@@ -359,6 +359,15 @@ class GateFixture(unittest.TestCase):
             self.manifest["families"][0]["mapName"], "cd_fixture.map"
         )
 
+    def test_full_runtime_validation_accepts_private_alias_source_only(self) -> None:
+        self.assertFalse((self.mix / "cd_fixture.map").exists())
+        validated = GATE.validate_manifest_v2(
+            self.manifest,
+            scheduler=SCHEDULER,
+            verify_runtime_inputs=True,
+        )
+        self.assertIs(validated, self.manifest)
+
     def result(self) -> dict[str, object]:
         family = self.manifest["families"][0]
         first = {"x": 37, "y": 63}
