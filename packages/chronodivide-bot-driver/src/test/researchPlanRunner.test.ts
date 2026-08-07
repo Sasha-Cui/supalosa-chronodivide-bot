@@ -41,6 +41,7 @@ const validPlan = (): Record<string, unknown> => ({
     role: "train",
     purpose: "optimizer-search",
     sourceGitCommit: ZERO_COMMIT,
+    sourceRuntimeSha256: ZERO_SHA,
     baselineGitCommit: ZERO_COMMIT,
     baselineRuntimeSha256: ZERO_SHA,
     gameApiRuntimeSha256: ZERO_SHA,

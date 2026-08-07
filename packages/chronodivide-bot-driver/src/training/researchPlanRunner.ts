@@ -45,6 +45,7 @@ export type ResearchRunPlan = {
     role: ResearchRole;
     purpose: ResearchPurpose;
     sourceGitCommit: string;
+    sourceRuntimeSha256: string;
     baselineGitCommit: string;
     baselineRuntimeSha256: string;
     gameApiRuntimeSha256: string;
@@ -139,6 +140,9 @@ export const sha256File = (filePath: string): string => {
     return digest.digest("hex");
 };
 
+export const sourceRuntimeCommitmentSha256 = (runtimeTrees: ExperimentManifest["source"]["runtimeTrees"]): string =>
+    crypto.createHash("sha256").update(JSON.stringify(runtimeTrees)).digest("hex");
+
 export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
     if (!isRecord(value)) {
         throw new Error("Research run plan must be an object");
@@ -149,6 +153,7 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
         "role",
         "purpose",
         "sourceGitCommit",
+        "sourceRuntimeSha256",
         "baselineGitCommit",
         "baselineRuntimeSha256",
         "gameApiRuntimeSha256",
@@ -274,6 +279,7 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
         role,
         purpose: value.purpose as ResearchPurpose,
         sourceGitCommit: expectCommit(value, "sourceGitCommit"),
+        sourceRuntimeSha256: expectSha256(value, "sourceRuntimeSha256"),
         baselineGitCommit: expectCommit(value, "baselineGitCommit"),
         baselineRuntimeSha256: expectSha256(value, "baselineRuntimeSha256"),
         gameApiRuntimeSha256: expectSha256(value, "gameApiRuntimeSha256"),
@@ -419,6 +425,9 @@ const appendJsonLine = (filePath: string, value: unknown): void => {
 const assertRuntimeProvenance = (plan: ResearchRunPlan, manifest: ExperimentManifest): void => {
     if (manifest.source.gitCommit !== plan.sourceGitCommit || manifest.source.gitBranch !== "main") {
         throw new Error("Research plan source commit must equal a clean main-branch checkout");
+    }
+    if (sourceRuntimeCommitmentSha256(manifest.source.runtimeTrees) !== plan.sourceRuntimeSha256) {
+        throw new Error("Research source runtime trees do not match the plan commitment");
     }
     if (manifest.source.trackedDirty !== false) {
         throw new Error("Research execution refuses a tracked-dirty source tree");
