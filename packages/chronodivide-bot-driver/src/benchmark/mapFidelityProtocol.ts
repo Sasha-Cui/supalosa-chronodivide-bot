@@ -39,6 +39,7 @@ export type CapturedWarning = {
 
 export type PhaseWarning = CapturedWarning & { phase: string };
 export type SerializedWarning = Omit<PhaseWarning, "text"> & { diagnosticSha256: string };
+export type PrivateDiagnosticSink = (warning: PhaseWarning) => void;
 export type SerializedError = {
     category: WarningCategory;
     name: "captured_error";
@@ -132,6 +133,26 @@ const OUTCOME_DIAGNOSTIC = /\b(?:winner|loser|victor(?:y|ious)?|defeat(?:ed)?|cr
 export const sanitizeDiagnosticText = (rawText: string): string =>
     rawText.replace(/\s+/g, " ").trim().replace(OUTCOME_DIAGNOSTIC, "[outcome-redacted]").slice(0, 4096);
 
+let privateDiagnosticSink: PrivateDiagnosticSink | null = null;
+
+/**
+ * Installs a process-local sink for private, outcome-redacted infrastructure
+ * diagnosis. The admissible worker never installs one; the separate private
+ * diagnostic wrapper does so before invoking the same worker entry point.
+ */
+export const installPrivateDiagnosticSinkForProcess = (sink: PrivateDiagnosticSink): (() => void) => {
+    if (privateDiagnosticSink !== null) throw new Error("A private diagnostic sink is already installed");
+    privateDiagnosticSink = sink;
+    let installed = true;
+    return () => {
+        if (!installed || privateDiagnosticSink !== sink) {
+            throw new Error("Private diagnostic sink removal is not balanced");
+        }
+        privateDiagnosticSink = null;
+        installed = false;
+    };
+};
+
 export const classifyConsoleMessage = (level: ConsoleLevel, rawText: string): CapturedWarning | null => {
     const text = sanitizeDiagnosticText(rawText);
     if (text.length === 0 || (level !== "warn" && level !== "error" && !WARNING_SIGNAL.test(text))) {
@@ -202,8 +223,11 @@ export const captureConsoleWarnings = async <T>(
                   }
                 : null);
         if (!classified || classified.text.length === 0) return;
-        if (warnings.length < MAX_CAPTURED_WARNINGS_PER_SESSION) warnings.push({ phase, ...classified });
-        else truncated = true;
+        if (warnings.length < MAX_CAPTURED_WARNINGS_PER_SESSION) {
+            const warning = { phase, ...classified };
+            privateDiagnosticSink?.(warning);
+            warnings.push(warning);
+        } else truncated = true;
     };
 
     const writeCapture = (level: "info" | "error") =>

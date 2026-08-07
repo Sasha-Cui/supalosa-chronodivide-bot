@@ -390,6 +390,8 @@ export type WorkerTechnicalDiagnostic = {
 
 let currentWorkerTechnicalStage: WorkerTechnicalStage = "parse_arguments";
 
+export const getCurrentWorkerTechnicalStage = (): WorkerTechnicalStage => currentWorkerTechnicalStage;
+
 const diagnosticComponentSha256 = (value: string): string =>
     createHash("sha256").update(value, "utf8").digest("hex");
 
@@ -1875,7 +1877,7 @@ export const removeEmptyWorkerSandbox = (
     return !fs.existsSync(resolvedSandbox);
 };
 
-const manifestValidationOnlyMain = async (): Promise<void> => {
+export const manifestValidationOnlyMain = async (): Promise<void> => {
     setWorkerTechnicalStage("parse_arguments");
     const argumentsAfterEntry = process.argv.slice(2);
     if (
@@ -1896,7 +1898,7 @@ const manifestValidationOnlyMain = async (): Promise<void> => {
     assertWorkerManifest(manifestArtifact.value, scheduler);
 };
 
-const familyWorkerMain = async (): Promise<void> => {
+export const familyWorkerMain = async (): Promise<void> => {
     setWorkerTechnicalStage("parse_arguments");
     const manifestPath = path.resolve(requireStringArg("--manifest"));
     const attestationPath = path.resolve(requireStringArg("--attestation"));

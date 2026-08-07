@@ -18,6 +18,7 @@ import {
     deriveProbeCoverage,
     diagnosticSha256,
     fatalDiagnosticLine,
+    installPrivateDiagnosticSinkForProcess,
     sanitizeDiagnosticText,
     serializeCapturedError,
     serializeCapturedWarning,
@@ -79,6 +80,27 @@ describe("outcome-free map fidelity protocol", () => {
             diagnosticSha256: diagnosticSha256("Invalid terrain tile 511"),
         });
         expect(console.warn).toBe(originalWarn);
+    });
+
+    it("exposes redacted warning text only to an explicitly installed private sink", async () => {
+        const privateDiagnostics: Array<{ phase: string; text: string }> = [];
+        const removeSink = installPrivateDiagnosticSinkForProcess((warning) => {
+            privateDiagnostics.push({ phase: warning.phase, text: warning.text });
+        });
+        try {
+            await captureConsoleWarnings("private-diagnostic-test", async () => {
+                console.warn("Winner beta; missing file %s", "isourb.mix");
+            });
+        } finally {
+            removeSink();
+        }
+
+        expect(privateDiagnostics).toEqual([
+            {
+                phase: "private-diagnostic-test",
+                text: "[outcome-redacted] beta; missing file isourb.mix",
+            },
+        ]);
     });
 
     it("suppresses and hashes emitWarning plus direct process stream writes", async () => {
