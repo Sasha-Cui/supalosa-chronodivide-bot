@@ -143,23 +143,24 @@ const requiredPath = (name: string): string => {
     return path.resolve(value);
 };
 
-const loadCampaign = (campaignPath: string): ResearchCampaignManifest => {
+export const loadOptimizerCampaign = (campaignPath: string): ResearchCampaignManifest => {
     const value = readJson(campaignPath);
     if (
         !isRecord(value) ||
         value.schemaVersion !== RESEARCH_OPTIMIZER_SCHEMA_VERSION ||
-        (value.mode !== "optimizer-stage0" && value.mode !== "optimizer-stage1") ||
-        (value.stage !== 0 && value.stage !== 1) ||
+        (value.mode !== "optimizer-stage0" && value.mode !== "optimizer-stage1" && value.mode !== "optimizer-stage2") ||
+        (value.stage !== 0 && value.stage !== 1 && value.stage !== 2) ||
         !Number.isSafeInteger(value.optimizerRunIndex) ||
         !Array.isArray(value.policies) ||
         !Array.isArray(value.selectedFamilies) ||
         !Array.isArray(value.shards)
     ) {
-        throw new Error("Reducer requires a valid optimizer stage-0 or stage-1 campaign");
+        throw new Error("Expected a valid optimizer stage-0, stage-1, or stage-2 campaign");
     }
     if (
         (value.stage === 0 && value.mode !== "optimizer-stage0") ||
-        (value.stage === 1 && value.mode !== "optimizer-stage1")
+        (value.stage === 1 && value.mode !== "optimizer-stage1") ||
+        (value.stage === 2 && value.mode !== "optimizer-stage2")
     ) {
         throw new Error("Campaign stage and mode disagree");
     }
@@ -171,7 +172,7 @@ const resultDirectories = (resultsRoot: string): string[] => fs
     .filter((entry) => entry.isDirectory())
     .map((entry) => path.join(resultsRoot, entry.name));
 
-const loadCompleteResults = (
+export const loadCompleteCampaignResults = (
     campaign: ResearchCampaignManifest,
     resultsRoot: string,
 ): ResearchEpisodeResult[] => {
@@ -257,7 +258,10 @@ const main = (): void => {
     if (fs.existsSync(outputPath)) {
         throw new Error(`Refusing to overwrite reducer output ${outputPath}`);
     }
-    const campaign = loadCampaign(campaignPath);
+    const campaign = loadOptimizerCampaign(campaignPath);
+    if (campaign.stage === 2) {
+        throw new Error("Stage 2 is finalized into method artifacts rather than reduced to another survivor stage");
+    }
     const policies = campaign.policies.map((raw, index) => {
         const policy = parseResearchPolicy(raw.policy);
         if (researchPolicySha256(policy) !== raw.policyId) {
@@ -266,7 +270,7 @@ const main = (): void => {
         return { policyId: raw.policyId, policy };
     });
     const familyIds = campaign.selectedFamilies.map(({ familyId }) => familyId);
-    const results = loadCompleteResults(campaign, resultsRoot);
+    const results = loadCompleteCampaignResults(campaign, resultsRoot);
     const ranking = rankStagePolicies(policies, familyIds, results);
     const selectedCount = campaign.stage === 0 ? RESEARCH_STAGE1_POLICY_COUNT : RESEARCH_STAGE2_POLICY_COUNT;
     const policiesById = new Map(policies.map((policy) => [policy.policyId, policy]));
