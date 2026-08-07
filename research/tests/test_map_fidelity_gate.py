@@ -64,6 +64,18 @@ SCHEDULER = {
 
 
 class MapParseTests(unittest.TestCase):
+    def test_engine_asset_directory_rejects_missing_files(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            with self.assertRaisesRegex(RuntimeError, "Engine asset directory is incomplete"):
+                GATE.validate_engine_asset_directory(Path(temporary))
+
+    def test_engine_asset_directory_accepts_exact_nonempty_files(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for name in GATE.REQUIRED_ENGINE_ASSET_FILES:
+                (root / name).write_bytes(b"fixture")
+            GATE.validate_engine_asset_directory(root)
+
     def test_required_sections_and_waypoints_are_parsed(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             path = Path(temporary) / "fixture.map"
@@ -258,7 +270,8 @@ class GateFixture(unittest.TestCase):
         )
         representative.parent.mkdir(parents=True)
         representative.write_text(MAP_TEXT, encoding="latin-1")
-        (self.mix / "ra2.mix").write_bytes(b"fixture-assets")
+        for name in GATE.REQUIRED_ENGINE_ASSET_FILES:
+            (self.mix / name).write_bytes(b"fixture-assets")
         (self.repo / "package-lock.json").write_text("{}\n", encoding="utf-8")
         game_api = self.repo / "node_modules/@chronodivide/game-api"
         (game_api / "dist").mkdir(parents=True)

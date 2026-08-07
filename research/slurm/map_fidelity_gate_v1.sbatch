@@ -32,7 +32,7 @@ readonly DEBUG_LOGGING
 export DEBUG_LOGGING
 
 REPO=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot
-MIX_DIR=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-assets/headless-data-full-ra2
+MIX_DIR="$REPO/packages/chronodivide-bot-driver/data"
 EVIDENCE_BASE=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/map-compatibility-gate-v2
 CATALOG="$REPO/research/artifacts/map_family_catalog.json"
 TARGETS="$REPO/research/artifacts/role_blind_fidelity_targets_v1.json"
@@ -93,6 +93,12 @@ if [[ ! -d "$MIX_DIR" ]]; then
     echo "Required full RA2 asset directory is missing: $MIX_DIR" >&2
     exit 2
 fi
+for asset in language.mix ra2.mix cache.mix load.mix local.mix neutral.mix conquer.mix generic.mix isogen.mix temperat.mix audio.bag audio.idx rules.ini art.ini ai.ini; do
+    if [[ ! -s "$MIX_DIR/$asset" || -L "$MIX_DIR/$asset" ]]; then
+        echo "Required regular nonempty engine asset is unavailable: $MIX_DIR/$asset" >&2
+        exit 2
+    fi
+done
 
 cd "$REPO"
 "$NODE_BIN" --version

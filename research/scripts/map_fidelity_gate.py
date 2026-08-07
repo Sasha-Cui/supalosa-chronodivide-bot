@@ -63,6 +63,23 @@ COMPILED_RUNTIME_NAMES = (
     "mapLoadAttestation.js",
     "seededOfflineGame.js",
 )
+REQUIRED_ENGINE_ASSET_FILES = (
+    "language.mix",
+    "ra2.mix",
+    "cache.mix",
+    "load.mix",
+    "local.mix",
+    "neutral.mix",
+    "conquer.mix",
+    "generic.mix",
+    "isogen.mix",
+    "temperat.mix",
+    "audio.bag",
+    "audio.idx",
+    "rules.ini",
+    "art.ini",
+    "ai.ini",
+)
 RUNTIME_HASH_BINDINGS = (
     ("packageLockSha256", "file", "packageLock"),
     ("nodeRuntimeSha256", "file", "nodeRuntime"),
@@ -202,6 +219,25 @@ def exact_file(path: Path) -> dict[str, Any]:
         "bytes": descriptor.st_size,
         "sha256": sha256_file(resolved),
     }
+
+
+def validate_engine_asset_directory(mix_dir: Path) -> None:
+    """Fail before manifest publication when the pinned engine assets are absent."""
+
+    missing_or_empty: list[str] = []
+    for relative_path in REQUIRED_ENGINE_ASSET_FILES:
+        try:
+            descriptor = exact_file(mix_dir / relative_path)
+        except RuntimeError:
+            missing_or_empty.append(relative_path)
+            continue
+        if descriptor["bytes"] <= 0:
+            missing_or_empty.append(relative_path)
+    if missing_or_empty:
+        raise RuntimeError(
+            "Engine asset directory is incomplete; missing or empty exact files: "
+            + ", ".join(missing_or_empty)
+        )
 
 
 def resolved_executable(path: Path, label: str) -> Path:
@@ -832,6 +868,7 @@ def build_manifest(
     targets_path = targets_path.resolve()
     catalog_path = catalog_path.resolve()
     mix_dir = mix_dir.resolve()
+    validate_engine_asset_directory(mix_dir)
     targets_manifest = load_json(targets_path)
     catalog = load_json(catalog_path)
     if (
