@@ -6,9 +6,32 @@ This repository is a fork of [Supalosa's Chrono Divide bot](https://github.com/S
 
 The original upstream documentation is still useful for basic setup and online play. This README describes the current fork state: what has been implemented, what is validated, and what still needs work before this should be treated as a polished upstream replacement.
 
+## Start Here
+
+| Goal | Entry point |
+| --- | --- |
+| Understand the bot and run local matches | This README, then `packages/chronodivide-bot` |
+| Run benchmarks, training, or driver tests | `packages/chronodivide-bot-driver` |
+| See the current paper-readiness status | [`research/STATUS.md`](research/STATUS.md) |
+| Navigate the audit, protocols, and paper plan | [`research/README.md`](research/README.md) |
+| Trace a result to its configuration and Slurm job | [`research/RESULT_REGISTRY.tsv`](research/RESULT_REGISTRY.tsv) |
+| Understand old generated outputs | [`benchmark-results/README.md`](benchmark-results/README.md) |
+
+The engineering benchmark archive and the scientific result ledger serve
+different purposes. Historical folders under `benchmark-results/` are retained
+for provenance, but they are not automatically admissible paper evidence.
+
 ## Current Status
 
 This branch has moved beyond the stock Supalosa baseline in several controlled head-to-head scenarios, especially on tuned map starts. It is not yet a complete ladder-ready AI. Some maps still draw, some water/naval games do not close, and several map profiles are tuned for specific starts rather than broadly generalized.
+
+Those are engineering observations, not yet a confirmatory paper result. The
+research pipeline has passed its deterministic replay gate and completed two
+reproducible, outcome-free compatibility screens of the 67-family Temperate
+source population. It has **not** yet produced an admissible
+StrongBot-versus-Supalosa policy estimate. See
+[`research/STATUS.md`](research/STATUS.md) before
+using any result in a claim.
 
 Recent validation highlights:
 
@@ -84,6 +107,10 @@ Current caveat: naval support is present, but water-map play is still not strong
 
 - `packages/chronodivide-bot`: Main bot package. This contains the runtime bot logic, strategies, missions, map awareness, building rules, and exported bot classes.
 - `packages/chronodivide-bot-driver`: Driver package for offline matches, replay generation, benchmarks, parameter training, analysis, and tests.
+- `research`: Paper audit, current status, experimental protocols, manifests,
+  reproducibility tooling, and the canonical result registry.
+- `benchmark-results`: Preserved local engineering outputs. Start with its
+  README; do not treat the directory as the scientific result ledger.
 - `TODO.md`: Historical roadmap. It is useful context, but the current status section above is more up to date for this fork.
 
 ## Setup
@@ -178,9 +205,10 @@ participant streams. Matches and traces record `requestedEngineSeed`, the root
 `engineSeedEpochMs`; global shims and callback wrappers are restored in
 `finally`, and concurrent seeded sessions fail closed. Reciprocal `0,1` slot
 runs reuse one explicit seed block and reject outcome-dependent start filtering.
-Same-process same-seed/different-seed trace tests pass, but the prespecified
-10/10 fresh-process trace check remains required before confirmatory
-experiments. Schema-3 manifests query `scontrol` for authoritative Slurm
+Same-process same-seed/different-seed trace tests pass. The prespecified 10/10
+fresh-process trace gate also passed under Slurm job 21291720; this validates
+the deterministic endpoint, not policy strength. Schema-3 manifests query
+`scontrol` for authoritative Slurm
 accounting instead of trusting mutable environment labels. See `research/` for
 the clean-baseline preparation and Slurm protocol. Large generated result
 folders and copied map data should not be committed.
