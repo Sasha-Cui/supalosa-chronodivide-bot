@@ -363,7 +363,14 @@ export const WORKER_TECHNICAL_STAGES = [
     "source_validate",
     "sandbox_create",
     "alias_materialize",
-    "engine_run",
+    "engine_initialize",
+    "engine_attestation_enter",
+    "engine_map_initialize",
+    "engine_forward",
+    "engine_reverse",
+    "engine_attestation_finalize",
+    "engine_result_finalize",
+    "alias_cleanup",
     "shard_validate",
     "shard_write",
 ] as const;
@@ -1633,20 +1640,22 @@ const runAttestedWorkerFamily = async (
     family: WorkerManifestFamily,
     manifest: WorkerManifest,
     materialized: ReturnType<typeof materializeMapAlias>,
+    engineInitialization: WorkerPhaseResult<boolean>,
 ): Promise<{
     initialization: FamilyWorkerInitialization;
     familyResult: FamilyWorkerResult;
     mapLoadAttestation: Awaited<ReturnType<typeof withMapLoadAttestation>>["evidence"];
 }> => {
     const seed = deriveEngineSeed(manifest.protocol.engineSeedBase, family.index);
+    setWorkerTechnicalStage("engine_attestation_enter");
     const attested = await withMapLoadAttestation({
         materialized,
         operation: async (session) => {
+            setWorkerTechnicalStage("engine_map_initialize");
             const initialization: WorkerPhaseResult<boolean> = await session.runPhase(
                 "initialization",
                 async () => {
                     const captured = await captureConsoleWarnings(`${family.familyId}:initialization`, async () => {
-                        await cdapi.init(manifest.inputs.mixDir);
                         const alpha = new PassiveFidelityProbe(`FidelityInitAlpha_${family.index}`, manifest.protocol.participantCountry);
                         const beta = new PassiveFidelityProbe(`FidelityInitBeta_${family.index}`, manifest.protocol.participantCountry);
                         buildSettings(materialized.alias, [alpha, beta]);
@@ -1658,6 +1667,7 @@ const runAttestedWorkerFamily = async (
                     return captured;
                 },
             );
+            setWorkerTechnicalStage("engine_forward");
             const forward = await session.runPhase("forward_create", async () =>
                 runWorkerOrder(
                     family,
@@ -1668,6 +1678,7 @@ const runAttestedWorkerFamily = async (
                     ["alpha", "beta"],
                 ),
             );
+            setWorkerTechnicalStage("engine_reverse");
             const reverse = await session.runPhase("reverse_create", async () =>
                 runWorkerOrder(
                     family,
@@ -1678,15 +1689,19 @@ const runAttestedWorkerFamily = async (
                     ["beta", "alpha"],
                 ),
             );
+            setWorkerTechnicalStage("engine_attestation_finalize");
             return { initialization, forward, reverse };
         },
     });
 
+    setWorkerTechnicalStage("engine_result_finalize");
     const { initialization: initializationCapture, forward, reverse } = attested.value;
     const initialization: FamilyWorkerInitialization = {
         succeeded: initializationCapture.error === null,
-        warnings: initializationCapture.warnings.map(serializeCapturedWarning),
-        warningCaptureTruncated: initializationCapture.truncated,
+        warnings: [...engineInitialization.warnings, ...initializationCapture.warnings].map(
+            serializeCapturedWarning,
+        ),
+        warningCaptureTruncated: engineInitialization.truncated || initializationCapture.truncated,
         error:
             initializationCapture.error === null
                 ? null
@@ -1702,6 +1717,7 @@ const runAttestedWorkerFamily = async (
         failures: [...new Set(reciprocal.failures)].sort(),
     };
     const allWarnings = [
+        ...engineInitialization.warnings,
         ...initializationCapture.warnings,
         ...forward.warnings,
         ...reverse.warnings,
@@ -1944,12 +1960,35 @@ const familyWorkerMain = async (): Promise<void> => {
         }
         throw error;
     }
-    setWorkerTechnicalStage("engine_run");
     const payload = await (async () => {
+        let engineFailure: unknown | null = null;
         try {
-            return await runAttestedWorkerFamily(family, manifest, materialized);
+            setWorkerTechnicalStage("engine_initialize");
+            const engineInitialization = await captureConsoleWarnings(
+                `${family.familyId}:engine-initialize`,
+                async () => {
+                    await cdapi.init(manifest.inputs.mixDir);
+                    return true;
+                },
+            );
+            if (engineInitialization.error !== null) throw engineInitialization.error;
+            return await runAttestedWorkerFamily(
+                family,
+                manifest,
+                materialized,
+                engineInitialization,
+            );
+        } catch (error) {
+            engineFailure = error;
+            throw error;
         } finally {
-            removeMaterializedMapAlias(materialized);
+            if (engineFailure === null) setWorkerTechnicalStage("alias_cleanup");
+            try {
+                removeMaterializedMapAlias(materialized);
+            } catch (cleanupError) {
+                setWorkerTechnicalStage("alias_cleanup");
+                throw cleanupError;
+            }
         }
     })();
     const workerScheduler: FamilyWorkerScheduler = {
