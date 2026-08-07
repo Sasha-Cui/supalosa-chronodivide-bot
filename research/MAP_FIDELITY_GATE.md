@@ -138,9 +138,28 @@ family-level payloads were exactly identical, including seeds, starts, ticks,
 warnings, errors, and read attestations. This is a reproducible negative
 compatibility result, not a policy result.
 
-The 127-family screen therefore remains unauthorized. The five failure causes
-and two review classifications must first be resolved, or a prospectively
-defined supported-map universe must be justified and frozen without policy
-outcomes. If later authorized, the full screen's worst-case two-attempt timeout
-budget is about 8.8 hours before overhead, so it requires a separate reviewed
-submission with an approximately ten-hour wall-time request.
+Private, outcome-redacted diagnostic job 21605386 then established that both
+`review` families were skipping actions because referenced waypoints did not
+exist. That wording had escaped the `invalid_waypoint` classifier. After a
+prospective classifier repair, source-matched calibration job 21606315 and
+confirmation job 21606800 independently verified and exactly reproduced four
+`pass`, zero `review`, and seven `fail` classifications at commit
+`a8a6c57843022b30eaa13f0261ff435343651b7c`. Both used 11 first attempts;
+the confirmation's two-attempt allowance was never exercised. Their evidence
+tree commitments are respectively
+`584a9fdf7cad0af4beaa17bd65981b6e2c398edc724a9ebe0ac99fc37a929fd2`
+and
+`1a16147842b4d69776a5e639937b2be5f2c756ca38ce93b4d7e9c109266bb90e`.
+The seven failures comprise one missing Snow archive, three missing Urban
+archive failures, one unsupported Desert theater, and two invalid-waypoint
+maps. No policy outcome was produced or inspected.
+
+The 127-family screen therefore remains unauthorized. The seven failure causes
+must first be resolved, or a prospectively defined supported-map universe must
+be justified and frozen without policy outcomes. The exact representative
+population contains 67 Temperate, 41 Snow, 18 Urban, and one Desert map. With
+the currently authorized asset tree, only a separately preregistered
+Temperate-only compatibility screen is feasible. If the original full screen
+is later authorized, its worst-case two-attempt timeout budget is about 8.8
+hours before overhead, so it requires a separate reviewed submission with an
+approximately ten-hour wall-time request.

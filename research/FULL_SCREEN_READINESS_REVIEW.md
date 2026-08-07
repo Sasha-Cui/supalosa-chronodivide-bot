@@ -1,12 +1,13 @@
 # Full-screen readiness review
 
-Status: **hard no-go for the 127-family screen** as of 2026-08-06.
+Status: **hard no-go for the 127-family screen** as of 2026-08-07.
 
 The legacy three-family job 21296316 passed a narrow, outcome-free smoke test.
-The replacement 11-family protocol has now produced two independently verified
-engine runs at the same committed source revision. Both reproducibly returned
-four `pass`, two `review`, and five `fail` family classifications. No StrongBot
-result or population clearance follows from this compatibility evidence.
+The replacement 11-family protocol has now produced independently verified,
+same-commit calibration and confirmation runs after warning adjudication and a
+classifier repair. Both reproducibly returned four `pass`, zero `review`, and
+seven `fail` family classifications. No StrongBot result or population
+clearance follows from this compatibility evidence.
 
 ## P0 implementation status
 
@@ -59,20 +60,20 @@ outcomes are neither consumed nor emitted.
 
 ## Executed evidence and decision
 
-Final calibration job 21599648 and confirmation job 21600745 both used commit
-`eab4925d420a28b5c04ae72c473d7d5bf74ac3e7`, completed 22/22 reciprocal
-passive sessions, and were independently verified. Their evidence-tree
-commitments are respectively
-`85b92025795aa842149d2d7f6c5ad3f89d299555c7b59124bf38b6d03dd6b4c0` and
-`f1528632f4026251b13ae0c7315ce937a3c483aba85394f3dbe49dab1e81d718`.
+Corrected calibration job 21606315 and confirmation job 21606800 both used
+commit `a8a6c57843022b30eaa13f0261ff435343651b7c`, completed 22/22
+reciprocal passive sessions, and were independently verified. Their
+evidence-tree commitments are respectively
+`584a9fdf7cad0af4beaa17bd65981b6e2c398edc724a9ebe0ac99fc37a929fd2`
+and
+`1a16147842b4d69776a5e639937b2be5f2c756ca38ce93b4d7e9c109266bb90e`.
 
-The normalized family evidence is exactly reproducible: four `pass`, two
-`review`, and five `fail`. Three failures share one `missing_asset` diagnostic,
-one has a distinct `missing_asset` diagnostic, and one is
-`unsupported_theater`. Both review families reach tick 250 but emit stable
-non-outcome warnings. The aggregate has `technicalChecksPassed=true` while its
-compatibility verdict is `FAIL`, `screenComplete=false`, and
-`eligibleForFidelityClearance=false`.
+The normalized family evidence is exactly reproducible: four `pass`, zero
+`review`, and seven `fail`. The failures are one missing `isosnow.mix`, three
+missing `isourb.mix`, one unsupported Desert theater, and two maps with actions
+that reference nonexistent waypoints. The aggregate has
+`technicalChecksPassed=true` while its compatibility verdict is `FAIL`,
+`screenComplete=false`, and `eligibleForFidelityClearance=false`.
 
 This combination means the infrastructure worked and exposed a real scope
 problem. It does not authorize the 127-family screen. The next admissible step
@@ -117,10 +118,10 @@ no test-period hyperparameter selection.
 3. **Complete:** independent rehash and validation of the calibration bundle.
 4. **Complete:** same-commit confirmation with at most two attempts, followed
    by independent validation; no family needed a retry.
-5. **Failed compatibility gate:** review of the reproducible classifications
-   found five `fail` and two `review` families. Diagnose and repair them, or
-   freeze a defensible supported-map population without examining policy
-   outcomes, then repeat this gate before considering the 127-family screen.
+5. **Failed compatibility gate:** adjudication found seven reproducible `fail`
+   families. Supply the missing legally obtained theater assets and repair or
+   exclude invalid maps, or freeze a defensible supported-map population
+   without examining policy outcomes, then repeat the appropriate scoped gate.
 
 The later StrongBot diagnostic remains separately blocked until the
 method-interface runner and evaluation-seed/start gate pass. No compatibility
