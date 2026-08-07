@@ -27,8 +27,13 @@ It remains useful provenance, but it does not authorize the new full screen.
 
 ## Per-family execution contract
 
-Each family runs in a fresh child process under one authoritative Slurm job.
-The worker creates a private content-addressed map alias, rejects case-folded
+After Python prepares the manifest, the compiled worker first executes a
+manifest-only cross-language validator. That mode accepts only the manifest
+argument, cannot initialize the simulator, and must pass before pre-worker
+attestation or family launch.
+
+Each family then runs in a fresh child process under one authoritative Slurm
+job. The worker creates a private content-addressed map alias, rejects case-folded
 filesystem collisions, intercepts the pinned Node filesystem adapter, and
 attests the exact bytes returned to the engine. A complete family attempt
 requires five attested map-settings reads: one initialization read, two forward
