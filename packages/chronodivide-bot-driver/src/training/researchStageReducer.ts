@@ -2,7 +2,11 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { ResearchEpisodeResult } from "./researchEpisode.js";
+import {
+    RESEARCH_EPISODE_SCHEMA_VERSION,
+    RESEARCH_OUTCOME_ENDPOINT,
+    ResearchEpisodeResult,
+} from "./researchEpisode.js";
 import {
     RESEARCH_OPTIMIZER_SCHEMA_VERSION,
     RESEARCH_STAGE1_POLICY_COUNT,
@@ -173,7 +177,7 @@ const resultDirectories = (resultsRoot: string): string[] => fs
     .map((entry) => path.join(resultsRoot, entry.name));
 
 export const loadCompleteCampaignResults = (
-    campaign: ResearchCampaignManifest,
+    campaign: Pick<ResearchCampaignManifest, "shards">,
     resultsRoot: string,
 ): ResearchEpisodeResult[] => {
     const byRunId = new Map<string, string>();
@@ -239,12 +243,35 @@ export const loadCompleteCampaignResults = (
             throw new Error(`Shard ${shard.runId} event accounting does not reconcile`);
         }
         const shardResults = completeEvents.map((event) => event.result as ResearchEpisodeResult);
-        const expectedEpisodeIds = new Set(parsedPlan.episodes.map(({ episodeId }) => episodeId));
+        const expectedEpisodes = new Map(parsedPlan.episodes.map((episode) => [episode.episodeId, episode]));
         if (
-            shardResults.some((result) => !isRecord(result) || !expectedEpisodeIds.has(result.episodeId)) ||
-            new Set(shardResults.map(({ episodeId }) => episodeId)).size !== expectedEpisodeIds.size
+            shardResults.some((result) => {
+                if (!isRecord(result) || typeof result.episodeId !== "string") {
+                    return true;
+                }
+                const expected = expectedEpisodes.get(result.episodeId);
+                return !expected ||
+                    result.schemaVersion !== RESEARCH_EPISODE_SCHEMA_VERSION ||
+                    result.familyId !== expected.familyId ||
+                    result.methodId !== expected.methodId ||
+                    result.policyId !== expected.policyId ||
+                    result.policySha256 !== expected.policyId ||
+                    result.seedBlockIndex !== expected.seedBlockIndex ||
+                    result.requestedEngineSeed !== expected.requestedEngineSeed ||
+                    result.candidateSlot !== expected.candidateSlot ||
+                    result.candidateCountry !== parsedPlan.candidateCountry ||
+                    result.baselineCountry !== parsedPlan.baselineCountry ||
+                    result.maxTicks !== parsedPlan.maxTicks ||
+                    result.outcomeEndpoint !== RESEARCH_OUTCOME_ENDPOINT ||
+                    (result.candidateScore !== 0 && result.candidateScore !== 0.5 && result.candidateScore !== 1) ||
+                    (result.winner === "candidate" ? result.candidateScore !== 1
+                        : result.winner === "baseline" ? result.candidateScore !== 0
+                            : result.winner === "draw" ? result.candidateScore !== 0.5
+                                : true);
+            }) ||
+            new Set(shardResults.map(({ episodeId }) => episodeId)).size !== expectedEpisodes.size
         ) {
-            throw new Error(`Shard ${shard.runId} result identities do not match its plan`);
+            throw new Error(`Shard ${shard.runId} result identities or schedule fields do not match its plan`);
         }
         results.push(...shardResults);
     }
