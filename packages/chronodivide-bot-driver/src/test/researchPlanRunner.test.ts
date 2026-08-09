@@ -10,6 +10,7 @@ import {
     materializeEpisodeSpecs,
     parseResearchRunPlan,
     ResearchRunPlan,
+    serializeResearchRunPlan,
     sha256File,
 } from "../training/researchPlanRunner.js";
 import {
@@ -96,6 +97,18 @@ describe("strict research run plan", () => {
         expect(plan.role).toBe("train");
         expect(plan.episodes).toHaveLength(4);
         expect(new Set(plan.episodes.map(({ requestedEngineSeed }) => requestedEngineSeed))).toEqual(new Set([1007]));
+    });
+
+    test("round-trips normalized train and development plans through their strict wire schemas", () => {
+        const train = parseResearchRunPlan(validPlan());
+        const trainWire = JSON.parse(serializeResearchRunPlan(train)) as Record<string, unknown>;
+        expect((trainWire.episodes as Array<Record<string, unknown>>)[0]).not.toHaveProperty("methodId");
+        expect(parseResearchRunPlan(trainWire)).toEqual(train);
+
+        const development = parseResearchRunPlan(validDevelopmentPlan());
+        const developmentWire = JSON.parse(serializeResearchRunPlan(development)) as Record<string, unknown>;
+        expect((developmentWire.episodes as Array<Record<string, unknown>>)[0]).toHaveProperty("methodId");
+        expect(parseResearchRunPlan(developmentWire)).toEqual(development);
     });
 
     test("balances development by method identity even when both methods select the same policy", () => {

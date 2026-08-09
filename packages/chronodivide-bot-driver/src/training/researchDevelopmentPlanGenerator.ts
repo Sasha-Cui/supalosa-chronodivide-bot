@@ -12,6 +12,7 @@ import {
     parseResearchRunPlan,
     ResearchPlanPolicy,
     ResearchRunPlan,
+    serializeResearchRunPlan,
     sha256File,
     sourceRuntimeCommitmentSha256,
 } from "./researchPlanRunner.js";
@@ -627,7 +628,7 @@ const main = async (): Promise<void> => {
             episodes,
         });
         const planFile = path.join(plansRoot, `shard-${String(shardDesign.shardIndex).padStart(3, "0")}.json`);
-        fs.writeFileSync(planFile, JSON.stringify(plan, null, 2), { flag: "wx", mode: 0o600 });
+        fs.writeFileSync(planFile, serializeResearchRunPlan(plan), { flag: "wx", mode: 0o600 });
         shards.push({
             ...shardDesign,
             planFile,

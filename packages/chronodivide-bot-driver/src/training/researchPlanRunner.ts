@@ -328,6 +328,23 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
     };
 };
 
+/**
+ * Serialize the strict wire schema rather than the parser's normalized model.
+ * Training method IDs are derived from policy IDs and are deliberately absent
+ * on disk; development method IDs are explicit design inputs and are retained.
+ */
+export const serializeResearchRunPlan = (plan: ResearchRunPlan): string => JSON.stringify({
+    ...plan,
+    episodes: plan.role === "train" ? plan.episodes.map((episode) => ({
+        episodeId: episode.episodeId,
+        familyId: episode.familyId,
+        policyId: episode.policyId,
+        seedBlockIndex: episode.seedBlockIndex,
+        requestedEngineSeed: episode.requestedEngineSeed,
+        candidateSlot: episode.candidateSlot,
+    })) : plan.episodes,
+}, null, 2);
+
 const parseJsonFile = (filePath: string): unknown => JSON.parse(fs.readFileSync(filePath, "utf8"));
 
 export const loadResearchRole = (plan: ResearchRunPlan, context: StrictPlanContext): LoadedResearchRole => {
