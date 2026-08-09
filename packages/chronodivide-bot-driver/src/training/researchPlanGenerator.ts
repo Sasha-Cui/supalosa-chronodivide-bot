@@ -39,7 +39,7 @@ export const RESEARCH_OPTIMIZER_RUN_STRIDE = 100_000 as const;
 
 export type GeneratorMode = "train-smoke" | "optimizer-stage0" | "optimizer-stage1" | "optimizer-stage2";
 
-type GeneratorRoleData = {
+export type GeneratorRoleData = {
     fileSha256: string;
     roleCommitmentSha256: string;
     splitCommitmentSha256: string;
@@ -271,7 +271,7 @@ const readSurvivors = (
     return { policies, parentCampaignSha256, survivorFileSha256: sha256File(survivorPath) };
 };
 
-const readGeneratorRole = (repoRoot: string, privateRoleRoot: string): GeneratorRoleData => {
+export const readGeneratorRole = (repoRoot: string, privateRoleRoot: string): GeneratorRoleData => {
     const publicPath = path.join(repoRoot, "research", "artifacts", "family_role_commitments_v1.json");
     const publicValue = JSON.parse(fs.readFileSync(publicPath, "utf8")) as Record<string, unknown>;
     if (publicValue.status !== "FROZEN_FAMILY_ROLE_COMMITMENTS_IDENTITIES_PRIVATE") {

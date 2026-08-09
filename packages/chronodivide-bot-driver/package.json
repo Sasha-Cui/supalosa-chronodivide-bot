@@ -12,6 +12,8 @@
         "benchmark": "node dist/benchmark/headToHead.js --es-module-specifier-resolution=node",
         "benchmark:suite": "node dist/benchmark/regressionSuite.js --es-module-specifier-resolution=node",
         "train:params": "node dist/training/parameterTrainer.js --es-module-specifier-resolution=node",
+        "research:generate-championship-plan": "node dist/training/researchChampionshipPlanGenerator.js --es-module-specifier-resolution=node",
+        "research:reduce-championship": "node dist/training/researchChampionshipReducer.js --es-module-specifier-resolution=node",
         "research:generate-development-plan": "node dist/training/researchDevelopmentPlanGenerator.js --es-module-specifier-resolution=node",
         "research:gate-development-technical": "node dist/training/researchDevelopmentTechnicalGate.js --es-module-specifier-resolution=node",
         "research:unblind-development": "node dist/training/researchDevelopmentUnblinder.js --es-module-specifier-resolution=node",
