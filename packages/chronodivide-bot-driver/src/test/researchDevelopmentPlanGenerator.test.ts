@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
     buildDevelopmentShardDesign,
     DevelopmentTarget,
+    validatePriorTechnicalGate,
 } from "../training/researchDevelopmentPlanGenerator.js";
 
 const target = (
@@ -88,5 +89,47 @@ describe("frozen development diagnostic design", () => {
             targets(),
             [0, 1, 2, 3, 5],
         )).toThrow(/runs 0,1,2,3,4/);
+    });
+    test("requires the exact prior technical gate before later phases", () => {
+        const gate = {
+            schemaVersion: 1,
+            status: "PASSED_TECHNICAL_ONLY_NO_OUTCOMES_INSPECTED",
+            phase: "development-phase1",
+            authorizedNextPhase: "development-phase2",
+            schedulerAccount: "pi_jss233",
+            requestedLaunches: 64,
+            accountedLaunches: 64,
+            technicalFailures: 0,
+            sealedSummaryViolations: 0,
+            repeatIdentityPassed: true,
+            outcomeFieldsEmitted: [],
+        };
+        expect(validatePriorTechnicalGate(
+            "development-phase2",
+            gate,
+            "/private/phase1-technical-gate.json",
+            "0".repeat(64),
+        )).toMatchObject({
+            phase: "development-phase1",
+            authorizedNextPhase: "development-phase2",
+        });
+        expect(() => validatePriorTechnicalGate(
+            "development-phase2",
+            { ...gate, outcomeFieldsEmitted: ["candidateWins"] },
+            "/private/phase1-technical-gate.json",
+            "0".repeat(64),
+        )).toThrow(/does not authorize/);
+        expect(() => validatePriorTechnicalGate(
+            "development-phase3",
+            gate,
+            "/private/phase1-technical-gate.json",
+            "0".repeat(64),
+        )).toThrow(/does not authorize/);
+        expect(() => validatePriorTechnicalGate(
+            "development-phase1",
+            gate,
+            "",
+            "",
+        )).toThrow(/must not inherit/);
     });
 });

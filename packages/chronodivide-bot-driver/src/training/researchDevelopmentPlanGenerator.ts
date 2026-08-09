@@ -75,6 +75,13 @@ export type ResearchDevelopmentCampaign = {
     optimizerSourceGitCommit: string;
     generatedAt: string;
     selectionRule: string;
+    priorTechnicalGate: {
+        gatePath: string;
+        gateSha256: string;
+        status: "PASSED_TECHNICAL_ONLY_NO_OUTCOMES_INSPECTED";
+        phase: "development-phase1" | "development-phase2";
+        authorizedNextPhase: "development-phase2" | "development-phase3";
+    } | null;
     maxTicks: typeof RESEARCH_DEVELOPMENT_MAX_TICKS;
     engineSeedBase: typeof RESEARCH_DEVELOPMENT_SEED_BASE;
     outcomeAccess: "sealed-private-events";
@@ -416,6 +423,72 @@ const requiredPath = (name: string): string => {
     return path.resolve(value);
 };
 
+export const validatePriorTechnicalGate = (
+    requestedPhase: DevelopmentPhase,
+    value: unknown,
+    gatePath: string,
+    gateSha256: string,
+): ResearchDevelopmentCampaign["priorTechnicalGate"] => {
+    if (requestedPhase === "development-phase1") {
+        if (value !== null) {
+            throw new Error("Phase 1 must not inherit a prior technical gate");
+        }
+        return null;
+    }
+    if (!isRecord(value)) {
+        throw new Error(`${requestedPhase} requires a prior technical gate artifact`);
+    }
+    const expectedPriorPhase = requestedPhase === "development-phase2"
+        ? "development-phase1"
+        : "development-phase2";
+    const expectedLaunches = expectedPriorPhase === "development-phase1" ? 64 : 96;
+    if (
+        !path.isAbsolute(gatePath) ||
+        !SHA256_PATTERN.test(gateSha256) ||
+        value.schemaVersion !== 1 ||
+        value.status !== "PASSED_TECHNICAL_ONLY_NO_OUTCOMES_INSPECTED" ||
+        value.phase !== expectedPriorPhase ||
+        value.authorizedNextPhase !== requestedPhase ||
+        value.schedulerAccount !== "pi_jss233" ||
+        value.technicalFailures !== 0 ||
+        value.sealedSummaryViolations !== 0 ||
+        value.requestedLaunches !== expectedLaunches ||
+        value.accountedLaunches !== expectedLaunches ||
+        !Array.isArray(value.outcomeFieldsEmitted) ||
+        value.outcomeFieldsEmitted.length !== 0
+    ) {
+        throw new Error(`Prior technical gate does not authorize ${requestedPhase}`);
+    }
+    if (expectedPriorPhase === "development-phase1" && value.repeatIdentityPassed !== true) {
+        throw new Error("Phase-1 prior gate lacks the required fresh-process identity pass");
+    }
+    return {
+        gatePath,
+        gateSha256,
+        status: "PASSED_TECHNICAL_ONLY_NO_OUTCOMES_INSPECTED",
+        phase: expectedPriorPhase,
+        authorizedNextPhase: requestedPhase,
+    };
+};
+
+const loadPriorTechnicalGate = (
+    phase: DevelopmentPhase,
+): ResearchDevelopmentCampaign["priorTechnicalGate"] => {
+    if (phase === "development-phase1") {
+        if (process.env.PRIOR_TECHNICAL_GATE) {
+            throw new Error("Phase 1 refuses an unexpected PRIOR_TECHNICAL_GATE");
+        }
+        return validatePriorTechnicalGate(phase, null, "", "");
+    }
+    const gatePath = requiredPath("PRIOR_TECHNICAL_GATE");
+    return validatePriorTechnicalGate(
+        phase,
+        JSON.parse(fs.readFileSync(gatePath, "utf8")) as unknown,
+        gatePath,
+        sha256File(gatePath),
+    );
+};
+
 const phaseFromEnvironment = (): DevelopmentPhase => {
     const phase = process.env.RESEARCH_DEVELOPMENT_PHASE;
     if (
@@ -424,12 +497,6 @@ const phaseFromEnvironment = (): DevelopmentPhase => {
         phase !== "development-phase3"
     ) {
         throw new Error("RESEARCH_DEVELOPMENT_PHASE must be development-phase1/2/3");
-    }
-    if (
-        phase === "development-phase3" &&
-        process.env.DEVELOPMENT_PHASE3_AUTHORIZATION !== "phase2-technical-gate-passed"
-    ) {
-        throw new Error("Phase 3 generation requires the frozen phase-2 technical-gate authorization");
     }
     return phase;
 };
@@ -450,6 +517,7 @@ const main = async (): Promise<void> => {
         throw new Error(`Refusing to reuse existing OUT_ROOT ${outRoot}`);
     }
     const phase = phaseFromEnvironment();
+    const priorTechnicalGate = loadPriorTechnicalGate(phase);
     const role = readDevelopmentRole(repoRoot, privateRoleRoot);
     const artifacts = loadOptimizerArtifacts(artifactRoot);
     const artifactByRun = new Map(artifacts.map((artifact) => [artifact.optimizerRunIndex, artifact]));
@@ -584,6 +652,7 @@ const main = async (): Promise<void> => {
         generatedAt: new Date().toISOString(),
         selectionRule:
             "Frozen SHA-256 ranks select phase-1 families/runs and the phase-2 run; phase 3 uses all ten primary families and all five optimizer runs.",
+        priorTechnicalGate,
         maxTicks: RESEARCH_DEVELOPMENT_MAX_TICKS,
         engineSeedBase: RESEARCH_DEVELOPMENT_SEED_BASE,
         outcomeAccess: "sealed-private-events",
