@@ -34,6 +34,7 @@ export type ResearchPlanEpisode = {
     episodeId: string;
     familyId: string;
     policyId: string;
+    methodId: string;
     seedBlockIndex: number;
     requestedEngineSeed: number;
     candidateSlot: 0 | 1;
@@ -214,19 +215,30 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
         if (!isRecord(raw)) {
             throw new Error(`Episode ${index} must be an object`);
         }
-        assertExactKeys(`Episode ${index}`, raw, [
+        const expectedKeys = [
             "episodeId",
             "familyId",
             "policyId",
             "seedBlockIndex",
             "requestedEngineSeed",
             "candidateSlot",
-        ]);
+        ];
+        if (role === "development") {
+            expectedKeys.push("methodId");
+        }
+        assertExactKeys(`Episode ${index}`, raw, expectedKeys);
         const episodeId = expectString(raw, "episodeId");
         const familyId = expectString(raw, "familyId");
         const policyId = expectSha256(raw, "policyId");
         if (!IDENTIFIER_PATTERN.test(episodeId) || !IDENTIFIER_PATTERN.test(familyId)) {
             throw new Error(`Episode ${index} identifiers contain forbidden characters`);
+        }
+        const methodId = role === "development" ? expectString(raw, "methodId") : policyId;
+        if (!IDENTIFIER_PATTERN.test(methodId)) {
+            throw new Error(`Episode ${index} methodId contains forbidden characters`);
+        }
+        if (role === "development" && methodId !== "global" && methodId !== "conditioned") {
+            throw new Error(`Episode ${index} development methodId must be global or conditioned`);
         }
         if (!policyIds.has(policyId)) {
             throw new Error(`Episode ${index} references undeclared policy ${policyId}`);
@@ -239,31 +251,50 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
         if (raw.candidateSlot !== 0 && raw.candidateSlot !== 1) {
             throw new Error(`Episode ${index} candidateSlot must be 0 or 1`);
         }
-        return { episodeId, familyId, policyId, seedBlockIndex, requestedEngineSeed, candidateSlot: raw.candidateSlot };
+        return {
+            episodeId,
+            familyId,
+            policyId,
+            methodId,
+            seedBlockIndex,
+            requestedEngineSeed,
+            candidateSlot: raw.candidateSlot,
+        };
     });
     if (new Set(episodes.map(({ episodeId }) => episodeId)).size !== episodes.length) {
         throw new Error("Research plan episodeId values must be unique");
     }
     const schedules = new Map<string, Set<string>>();
+    const methodFamilyPolicies = new Map<string, string>();
     for (const episode of episodes) {
-        const schedule = schedules.get(episode.policyId) ?? new Set<string>();
+        const schedule = schedules.get(episode.methodId) ?? new Set<string>();
         const key = `${episode.familyId}|${episode.seedBlockIndex}|${episode.candidateSlot}`;
         if (schedule.has(key)) {
-            throw new Error(`Duplicate policy schedule row ${episode.policyId}|${key}`);
+            throw new Error(`Duplicate method schedule row ${episode.methodId}|${key}`);
         }
         schedule.add(key);
-        schedules.set(episode.policyId, schedule);
+        schedules.set(episode.methodId, schedule);
+        const methodFamilyKey = `${episode.methodId}|${episode.familyId}`;
+        const priorPolicyId = methodFamilyPolicies.get(methodFamilyKey);
+        if (priorPolicyId && priorPolicyId !== episode.policyId) {
+            throw new Error(`Method ${episode.methodId} changes policy within family ${episode.familyId}`);
+        }
+        methodFamilyPolicies.set(methodFamilyKey, episode.policyId);
     }
-    const reference = [...(schedules.get(policies[0].policyId) ?? [])].sort();
-    for (const policy of policies) {
-        const actual = [...(schedules.get(policy.policyId) ?? [])].sort();
+    const methodIds = [...schedules.keys()].sort();
+    if (role === "development" && methodIds.join(",") !== "conditioned,global") {
+        throw new Error("Development plans must contain exactly global and conditioned methods");
+    }
+    const reference = [...(schedules.get(methodIds[0]) ?? [])].sort();
+    for (const methodId of methodIds) {
+        const actual = [...(schedules.get(methodId) ?? [])].sort();
         if (actual.length !== reference.length || actual.some((entry, index) => entry !== reference[index])) {
-            throw new Error("Every policy in a research plan must receive the identical launched-game schedule");
+            throw new Error("Every method in a research plan must receive the identical launched-game schedule");
         }
     }
     const reciprocalGroups = new Map<string, number[]>();
     for (const episode of episodes) {
-        const key = `${episode.policyId}|${episode.familyId}|${episode.seedBlockIndex}`;
+        const key = `${episode.methodId}|${episode.familyId}|${episode.seedBlockIndex}`;
         const slots = reciprocalGroups.get(key) ?? [];
         slots.push(episode.candidateSlot);
         reciprocalGroups.set(key, slots);
@@ -407,6 +438,7 @@ export const materializeEpisodeSpecs = (
             mapName: path.basename(target.representative.path),
             mapSha256: target.representative.sha256,
             policyId: episode.policyId,
+            methodId: episode.methodId,
             policy,
             seedBlockIndex: episode.seedBlockIndex,
             requestedEngineSeed: episode.requestedEngineSeed,
@@ -420,6 +452,52 @@ export const materializeEpisodeSpecs = (
 
 const appendJsonLine = (filePath: string, value: unknown): void => {
     fs.appendFileSync(filePath, `${JSON.stringify(value)}\n`);
+};
+
+export type ResearchRunAccounting = {
+    generatedAt: string;
+    runId: string;
+    planBytesSha256: string;
+    requestedLaunches: number;
+    completed: number;
+    technicalFailures: number;
+    candidateWins: number;
+    baselineWins: number;
+    draws: number;
+};
+
+export const buildResearchRunSummary = (
+    role: ResearchRole,
+    accounting: ResearchRunAccounting,
+): Record<string, unknown> => {
+    const technicalSummary = {
+        schemaVersion: 1,
+        generatedAt: accounting.generatedAt,
+        runId: accounting.runId,
+        planBytesSha256: accounting.planBytesSha256,
+        requestedLaunches: accounting.requestedLaunches,
+        accountedLaunches: accounting.completed + accounting.technicalFailures,
+        completed: accounting.completed,
+        technicalFailures: accounting.technicalFailures,
+        complete: accounting.completed + accounting.technicalFailures === accounting.requestedLaunches,
+        technicallyClean: accounting.technicalFailures === 0,
+    };
+    if (role === "development") {
+        return {
+            ...technicalSummary,
+            outcomeAccess: "sealed-private-events",
+        };
+    }
+    return {
+        ...technicalSummary,
+        outcomeAccess: "open-training",
+        candidateWins: accounting.candidateWins,
+        baselineWins: accounting.baselineWins,
+        draws: accounting.draws,
+        candidateScoreRate: accounting.completed > 0
+            ? (accounting.candidateWins + 0.5 * accounting.draws) / accounting.completed
+            : null,
+    };
 };
 
 const assertRuntimeProvenance = (plan: ResearchRunPlan, manifest: ExperimentManifest): void => {
@@ -507,6 +585,7 @@ const main = async (): Promise<void> => {
             candidateCountry: plan.candidateCountry,
             baselineCountry: plan.baselineCountry,
             maxTicks: plan.maxTicks,
+            outcomeAccess: plan.role === "development" ? "sealed-private-events" : "open-training",
         },
         baseline: baselineFactory.descriptor,
         gameSeedBase: plan.engineSeedBase,
@@ -541,6 +620,7 @@ const main = async (): Promise<void> => {
             episodeId: spec.episodeId,
             familyId: spec.familyId,
             policyId: spec.policyId,
+            methodId: spec.methodId,
             seedBlockIndex: spec.seedBlockIndex,
             requestedEngineSeed: spec.requestedEngineSeed,
             candidateSlot: spec.candidateSlot,
@@ -566,22 +646,17 @@ const main = async (): Promise<void> => {
             });
         }
     }
-    const summary = {
-        schemaVersion: 1,
+    const summary = buildResearchRunSummary(plan.role, {
         generatedAt: new Date().toISOString(),
         runId: plan.runId,
         planBytesSha256,
         requestedLaunches: specs.length,
-        accountedLaunches: completed + technicalFailures,
         completed,
         technicalFailures,
         candidateWins,
         baselineWins,
         draws,
-        candidateScoreRate: completed > 0 ? (candidateWins + 0.5 * draws) / completed : null,
-        complete: completed + technicalFailures === specs.length,
-        technicallyClean: technicalFailures === 0,
-    };
+    });
     fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 2), { flag: "wx" });
     appendJsonLine(eventsPath, { event: "run_complete", summary });
     console.log(JSON.stringify(summary));

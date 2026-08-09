@@ -4,6 +4,7 @@ import path from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import {
+    buildResearchRunSummary,
     LoadedResearchRole,
     loadResearchRole,
     materializeEpisodeSpecs,
@@ -61,6 +62,26 @@ const validPlan = (): Record<string, unknown> => ({
     episodes: [...episodesFor(firstPolicyId), ...episodesFor(secondPolicyId)],
 });
 
+const validDevelopmentPlan = (): Record<string, unknown> => {
+    const plan = validPlan();
+    const methodEpisodes = (methodId: "global" | "conditioned") => [0, 1].map((candidateSlot) => ({
+        episodeId: `${methodId}-slot-${candidateSlot}`,
+        familyId: "mf_alpha",
+        methodId,
+        policyId: firstPolicyId,
+        seedBlockIndex: 7,
+        requestedEngineSeed: ENGINE_SEED_BASE + 7,
+        candidateSlot,
+    }));
+    return {
+        ...plan,
+        role: "development",
+        purpose: "development-qc",
+        policies: [{ policyId: firstPolicyId, policy: firstPolicy }],
+        episodes: [...methodEpisodes("global"), ...methodEpisodes("conditioned")],
+    };
+};
+
 const temporaryDirectories: string[] = [];
 
 afterEach(() => {
@@ -75,6 +96,41 @@ describe("strict research run plan", () => {
         expect(plan.role).toBe("train");
         expect(plan.episodes).toHaveLength(4);
         expect(new Set(plan.episodes.map(({ requestedEngineSeed }) => requestedEngineSeed))).toEqual(new Set([1007]));
+    });
+
+    test("balances development by method identity even when both methods select the same policy", () => {
+        const plan = parseResearchRunPlan(validDevelopmentPlan());
+        expect(plan.policies).toHaveLength(1);
+        expect(new Set(plan.episodes.map(({ methodId }) => methodId))).toEqual(new Set(["global", "conditioned"]));
+
+        const asymmetric = validDevelopmentPlan();
+        asymmetric.episodes = (asymmetric.episodes as Array<Record<string, unknown>>).slice(1);
+        expect(() => parseResearchRunPlan(asymmetric)).toThrow(
+            /identical launched-game schedule|reciprocal slots/,
+        );
+    });
+
+    test("seals development outcomes from summaries and scheduler output", () => {
+        const accounting = {
+            generatedAt: "2026-08-09T00:00:00.000Z",
+            runId: "summary-test",
+            planBytesSha256: ZERO_SHA,
+            requestedLaunches: 4,
+            completed: 4,
+            technicalFailures: 0,
+            candidateWins: 3,
+            baselineWins: 1,
+            draws: 0,
+        };
+        const sealed = buildResearchRunSummary("development", accounting);
+        expect(sealed.outcomeAccess).toBe("sealed-private-events");
+        expect(sealed).not.toHaveProperty("candidateWins");
+        expect(sealed).not.toHaveProperty("baselineWins");
+        expect(sealed).not.toHaveProperty("draws");
+        expect(sealed).not.toHaveProperty("candidateScoreRate");
+
+        const open = buildResearchRunSummary("train", accounting);
+        expect(open).toMatchObject({ outcomeAccess: "open-training", candidateWins: 3, baselineWins: 1 });
     });
 
     test("rejects sealed roles, map overrides, country changes, and seed drift", () => {
@@ -158,6 +214,15 @@ describe("strict research run plan", () => {
         const specs = materializeEpisodeSpecs(plan, role);
         expect(specs.map(({ mapName }) => mapName)).toEqual(["alpha.map", "alpha.map"]);
         expect(specs.every(({ mapSha256: digest }) => digest === mapSha256)).toBe(true);
+
+        const developmentPlan = parseResearchRunPlan({
+            ...validDevelopmentPlan(),
+            roleManifestSha256,
+            roleCommitmentSha256,
+            splitCommitmentSha256,
+            sourcePopulationCommitmentSha256,
+        });
+        expect(materializeEpisodeSpecs(developmentPlan, { ...role, role: "development" })[0].methodId).toBe("global");
 
         const forgedRole: LoadedResearchRole = { ...role, targets: [] };
         expect(() => materializeEpisodeSpecs(plan, forgedRole)).toThrow(/not in the private train manifest/);

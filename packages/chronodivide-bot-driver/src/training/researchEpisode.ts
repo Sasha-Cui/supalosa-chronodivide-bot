@@ -26,6 +26,7 @@ export type ResearchEpisodeSpec = {
     familyId: string;
     mapName: string;
     mapSha256: string;
+    methodId: string;
     policyId: string;
     policy: ResearchPolicyConfig;
     seedBlockIndex: number;
@@ -54,6 +55,7 @@ export type ResearchEpisodeResult = {
     familyId: string;
     mapName: string;
     mapSha256: string;
+    methodId: string;
     policyId: string;
     policySha256: string;
     seedBlockIndex: number;
@@ -95,6 +97,7 @@ export const validateResearchEpisodeSpec = (spec: ResearchEpisodeSpec): Research
     }
     assertIdentifier("episodeId", spec.episodeId);
     assertIdentifier("familyId", spec.familyId);
+    assertIdentifier("methodId", spec.methodId);
     assertIdentifier("policyId", spec.policyId);
     if (spec.mapName !== spec.mapName.split(/[\\/]/).pop() || !spec.mapName.toLowerCase().endsWith(".map")) {
         throw new Error(`Research episode mapName must be a basename ending in .map; got ${spec.mapName}`);
@@ -257,6 +260,7 @@ export const runResearchEpisode = async (
                 familyId: spec.familyId,
                 mapName: spec.mapName,
                 mapSha256: spec.mapSha256,
+                methodId: spec.methodId,
                 policyId: spec.policyId,
                 policySha256: researchPolicySha256(spec.policy),
                 seedBlockIndex: spec.seedBlockIndex,

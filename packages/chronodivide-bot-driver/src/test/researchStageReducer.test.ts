@@ -30,6 +30,7 @@ const result = (args: {
     familyId: args.familyId,
     mapName: "alpha.map",
     mapSha256: "0".repeat(64),
+    methodId: args.policyId,
     policyId: args.policyId,
     policySha256: args.policyId,
     seedBlockIndex: 0,
