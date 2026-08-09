@@ -49,7 +49,12 @@ if [[ -z "$RESEARCH_PLAN" || ! -f "$RESEARCH_PLAN" ]]; then
 fi
 
 JOB_LINE=$("$SCONTROL" show job -o "$SLURM_JOB_ID")
-JOB_ACCOUNT=$(tr ' ' '\n' <<< "$JOB_LINE" | awk -F= '$1 == "Account" {print $2; exit}')
+if [[ "$JOB_LINE" =~ (^|[[:space:]])Account=([^[:space:]]+) ]]; then
+    JOB_ACCOUNT=${BASH_REMATCH[2]}
+else
+    echo "Authoritative Slurm account is absent from scontrol output" >&2
+    exit 2
+fi
 if [[ "$JOB_ACCOUNT" != "pi_jss233" ]]; then
     echo "Refusing development plan: authoritative Slurm account is $JOB_ACCOUNT, expected pi_jss233" >&2
     exit 2
