@@ -13,6 +13,14 @@ import {
 } from "./researchPlanRunner.js";
 
 export const RESEARCH_DEVELOPMENT_TECHNICAL_GATE_SCHEMA_VERSION = 1 as const;
+export const developmentPhaseTechnicalAllocation = (
+    phase: DevelopmentPhase,
+): { shards: number; launches: number } => phase === "development-phase1"
+    ? { shards: 16, launches: 64 }
+    : phase === "development-phase2"
+        ? { shards: 24, launches: 96 }
+        : { shards: 200, launches: 800 };
+
 
 type SealedDevelopmentSummary = {
     schemaVersion: 1;
@@ -149,9 +157,6 @@ const parseCampaign = (campaignPath: string): ResearchDevelopmentCampaign => {
         !Array.isArray(value.selectedOptimizerRuns)
     ) {
         throw new Error("Development campaign manifest has an invalid schema");
-    }
-    if (value.phase === "development-phase3") {
-        throw new Error("Technical compatibility gate refuses phase-3 outcome-bearing analysis");
     }
     return value as unknown as ResearchDevelopmentCampaign;
 };
@@ -300,8 +305,8 @@ const main = (): void => {
     }
     const campaignSha256 = sha256File(campaignPath);
     const campaign = parseCampaign(campaignPath);
-    const expectedShards = campaign.phase === "development-phase1" ? 16 : 24;
-    const expectedLaunches = campaign.phase === "development-phase1" ? 64 : 96;
+    const { shards: expectedShards, launches: expectedLaunches } =
+        developmentPhaseTechnicalAllocation(campaign.phase);
     if (
         campaign.shards.length !== expectedShards ||
         campaign.launchedGameCount !== expectedLaunches ||
@@ -352,7 +357,7 @@ const main = (): void => {
     const output = {
         schemaVersion: RESEARCH_DEVELOPMENT_TECHNICAL_GATE_SCHEMA_VERSION,
         status: "PASSED_TECHNICAL_ONLY_NO_OUTCOMES_INSPECTED",
-        phase: campaign.phase as Exclude<DevelopmentPhase, "development-phase3">,
+        phase: campaign.phase,
         generatedAt: new Date().toISOString(),
         gateSourceGitCommit: gitCommit,
         campaignPath,
@@ -372,7 +377,11 @@ const main = (): void => {
         repeatIdentityPassed: campaign.phase === "development-phase1" ? true : null,
         outcomeFieldsEmitted: [],
         authorizedNextPhase:
-            campaign.phase === "development-phase1" ? "development-phase2" : "development-phase3",
+            campaign.phase === "development-phase1"
+                ? "development-phase2"
+                : campaign.phase === "development-phase2"
+                    ? "development-phase3"
+                    : "development-unblinding",
     };
     fs.mkdirSync(path.dirname(outputPath), { recursive: true, mode: 0o700 });
     fs.writeFileSync(outputPath, JSON.stringify(output, null, 2), { flag: "wx", mode: 0o600 });

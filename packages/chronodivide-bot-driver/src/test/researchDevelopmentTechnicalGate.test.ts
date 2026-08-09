@@ -1,5 +1,6 @@
 import { describe, expect, test } from "vitest";
 import {
+    developmentPhaseTechnicalAllocation,
     normalizedRepeatResultSha256,
     validateSealedDevelopmentSummary,
 } from "../training/researchDevelopmentTechnicalGate.js";
@@ -68,5 +69,10 @@ describe("development technical gate", () => {
             outcomeAccess: "open-training",
         })).toThrow(/invalid sealed metadata/);
         expect(() => normalizedRepeatResultSha256(null)).toThrow(/must be an object/);
+    });
+    test("preserves the frozen technical allocations through phase 3", () => {
+        expect(developmentPhaseTechnicalAllocation("development-phase1")).toEqual({ shards: 16, launches: 64 });
+        expect(developmentPhaseTechnicalAllocation("development-phase2")).toEqual({ shards: 24, launches: 96 });
+        expect(developmentPhaseTechnicalAllocation("development-phase3")).toEqual({ shards: 200, launches: 800 });
     });
 });
