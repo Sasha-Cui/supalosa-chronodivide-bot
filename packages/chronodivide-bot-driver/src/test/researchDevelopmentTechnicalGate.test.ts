@@ -1,5 +1,9 @@
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 import { describe, expect, test } from "vitest";
 import {
+    developmentResultArtifactCommitmentSha256,
     developmentPhaseTechnicalAllocation,
     normalizedRepeatResultSha256,
     validateSealedDevelopmentSummary,
@@ -74,5 +78,26 @@ describe("development technical gate", () => {
         expect(developmentPhaseTechnicalAllocation("development-phase1")).toEqual({ shards: 16, launches: 64 });
         expect(developmentPhaseTechnicalAllocation("development-phase2")).toEqual({ shards: 24, launches: 96 });
         expect(developmentPhaseTechnicalAllocation("development-phase3")).toEqual({ shards: 200, launches: 800 });
+    });
+
+    test("binds every result manifest, summary, and private event stream", () => {
+        const root = fs.mkdtempSync(path.join(os.tmpdir(), "development-gate-"));
+        try {
+            for (const shardIndex of [0, 1]) {
+                const directory = path.join(root, `17_${shardIndex}`);
+                fs.mkdirSync(directory);
+                fs.writeFileSync(path.join(directory, "manifest.json"), `manifest-${shardIndex}`);
+                fs.writeFileSync(path.join(directory, "summary.json"), `summary-${shardIndex}`);
+                fs.writeFileSync(path.join(directory, "events.jsonl"), `events-${shardIndex}`);
+            }
+            const campaign = { shards: [{ shardIndex: 0 }, { shardIndex: 1 }] } as never;
+            const before = developmentResultArtifactCommitmentSha256(campaign, root, "17");
+            fs.writeFileSync(path.join(root, "17_1", "events.jsonl"), "changed-events");
+            const after = developmentResultArtifactCommitmentSha256(campaign, root, "17");
+            expect(before).toMatch(/^[0-9a-f]{64}$/);
+            expect(after).not.toBe(before);
+        } finally {
+            fs.rmSync(root, { recursive: true });
+        }
     });
 });

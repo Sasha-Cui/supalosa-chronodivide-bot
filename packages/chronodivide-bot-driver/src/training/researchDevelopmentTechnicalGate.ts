@@ -12,7 +12,7 @@ import {
     sha256File,
 } from "./researchPlanRunner.js";
 
-export const RESEARCH_DEVELOPMENT_TECHNICAL_GATE_SCHEMA_VERSION = 1 as const;
+export const RESEARCH_DEVELOPMENT_TECHNICAL_GATE_SCHEMA_VERSION = 2 as const;
 export const developmentPhaseTechnicalAllocation = (
     phase: DevelopmentPhase,
 ): { shards: number; launches: number } => phase === "development-phase1"
@@ -159,6 +159,23 @@ const parseCampaign = (campaignPath: string): ResearchDevelopmentCampaign => {
         throw new Error("Development campaign manifest has an invalid schema");
     }
     return value as unknown as ResearchDevelopmentCampaign;
+};
+
+export const developmentResultArtifactCommitmentSha256 = (
+    campaign: ResearchDevelopmentCampaign,
+    resultsRoot: string,
+    arrayJobId: string,
+): string => {
+    const artifacts = campaign.shards.map(({ shardIndex }) => {
+        const resultDir = path.join(resultsRoot, `${arrayJobId}_${shardIndex}`);
+        return {
+            shardIndex,
+            manifestSha256: sha256File(path.join(resultDir, "manifest.json")),
+            summarySha256: sha256File(path.join(resultDir, "summary.json")),
+            eventsSha256: sha256File(path.join(resultDir, "events.jsonl")),
+        };
+    });
+    return crypto.createHash("sha256").update(JSON.stringify(artifacts)).digest("hex");
 };
 
 const parseEvents = (eventsPath: string): Record<string, unknown>[] => {
@@ -364,6 +381,12 @@ const main = (): void => {
         campaignSha256,
         campaignSourceGitCommit: campaign.sourceGitCommit,
         optimizerSourceGitCommit: campaign.optimizerSourceGitCommit,
+        resultsRoot,
+        resultArtifactCommitmentSha256: developmentResultArtifactCommitmentSha256(
+            campaign,
+            resultsRoot,
+            arrayJobId,
+        ),
         arrayJobId,
         schedulerAccount: "pi_jss233",
         schedulerJobIds: [...new Set(schedulerJobIds)].sort((left, right) => Number(left) - Number(right)),

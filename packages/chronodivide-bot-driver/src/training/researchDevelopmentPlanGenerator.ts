@@ -445,7 +445,7 @@ export const validatePriorTechnicalGate = (
     if (
         !path.isAbsolute(gatePath) ||
         !SHA256_PATTERN.test(gateSha256) ||
-        value.schemaVersion !== 1 ||
+        (value.schemaVersion !== 1 && value.schemaVersion !== 2) ||
         value.status !== "PASSED_TECHNICAL_ONLY_NO_OUTCOMES_INSPECTED" ||
         value.phase !== expectedPriorPhase ||
         value.authorizedNextPhase !== requestedPhase ||

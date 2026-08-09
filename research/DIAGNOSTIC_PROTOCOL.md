@@ -1,6 +1,6 @@
 # Pre-confirmatory diagnostic protocol
 
-Status: **draft, outcome-blind, not yet authorized for execution**.
+Status: **frozen diagnostic v1, outcome-blind through the phase-3 technical gate**.
 
 This protocol limits the first gameplay diagnostic to 1,000 launched component-
 game attempts under Slurm account `pi_jss233`. Every game creation, failed
@@ -67,6 +67,31 @@ The phase-3 dataset is analyzed once with the frozen two-way map-family and
 optimizer-run clustered procedure. Absolute score, individual starts, family
 signs, structural strata, error categories, and timing are diagnostics only;
 none may replace or redefine the primary development estimand.
+
+For the intercept-only block-level analysis, let \(e_{frb}=D_{frb}-
+\Delta_{\mathrm{dev}}\), \(N=200\), \(G_f=10\), \(G_r=5\), and \(G_{fr}=50\).
+The finite-cluster sandwich variance is frozen as
+
+$$
+\widehat V =
+\frac{G_f}{G_f-1}\frac{\sum_f(\sum_{rb}e_{frb})^2}{N^2}
++\frac{G_r}{G_r-1}\frac{\sum_r(\sum_{fb}e_{frb})^2}{N^2}
+-\frac{G_{fr}}{G_{fr}-1}\frac{\sum_{fr}(\sum_b e_{frb})^2}{N^2}.
+$$
+
+A non-finite or non-positive \(\widehat V\) fails closed. Otherwise, the
+one-sided 80% lower bound is
+
+$$
+\Delta_{\mathrm{dev}}-
+0.9409645772351825\sqrt{\widehat V},
+$$
+
+where the critical value is the 0.80 quantile of Student's \(t\) distribution
+with \(\min(G_f,G_r)-1=4\) degrees of freedom. The committed unblinding program
+must validate the exact 800-launch technical-gate artifact, refuses a second or
+overwriting run, and writes the signal decision and prespecified diagnostics in
+one invocation. No alternative variance estimator can replace this signal gate.
 
 ## Technical stop and retry rules
 

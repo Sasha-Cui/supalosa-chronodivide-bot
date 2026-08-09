@@ -14,6 +14,7 @@
         "train:params": "node dist/training/parameterTrainer.js --es-module-specifier-resolution=node",
         "research:generate-development-plan": "node dist/training/researchDevelopmentPlanGenerator.js --es-module-specifier-resolution=node",
         "research:gate-development-technical": "node dist/training/researchDevelopmentTechnicalGate.js --es-module-specifier-resolution=node",
+        "research:unblind-development": "node dist/training/researchDevelopmentUnblinder.js --es-module-specifier-resolution=node",
         "research:generate-plan": "node dist/training/researchPlanGenerator.js --es-module-specifier-resolution=node",
         "research:finalize-optimizer": "node dist/training/researchOptimizerFinalizer.js --es-module-specifier-resolution=node",
         "research:reduce-stage": "node dist/training/researchStageReducer.js --es-module-specifier-resolution=node",
