@@ -96,6 +96,14 @@ class BuildAnonymousArtifactTest(unittest.TestCase):
                 "eight sanitized aggregate JSON records",
                 " ".join((package / "THIRD_PARTY.md").read_text().split()),
             )
+            package_text = "\n".join(
+                path.read_text(encoding="utf-8")
+                for path in sorted(package.rglob("*"))
+                if path.is_file()
+                and path.name != "MANIFEST.json"
+                and path.suffix not in {".pyc"}
+            )
+            self.assertNotIn("Bouchet", package_text)
 
             manifest = json.loads((package / "MANIFEST.json").read_text())
             for relative, expected in manifest["files"].items():

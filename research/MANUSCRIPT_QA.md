@@ -142,16 +142,16 @@ The claim audit confirmed that the paper:
 A committed submission revision at `77d93359242756f07afba30d88fb2db8fd97e7b2`
 and the portable-artifact repair at
 `d53f822144bd0b3fffe3b4d778770091f77900b8` passed ten paper-generator and
-manuscript-invariant tests, nine SCITEPRESS tests, two artifact-builder tests,
+manuscript-invariant tests, eleven SCITEPRESS tests, two artifact-builder tests,
 the three frozen family-exporter tests, one author-verification-packet test,
 one venue-ruling-template test, and one external-review-response-template test
-(27 tests total). They regenerated all paper
+(29 tests total). They regenerated all paper
 fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
-`7d385367857dd0486fb66696783331296c1eb59099f541f89a4cbcfd81f99eb3`
-and size 95,193 bytes. Two independent builds produced that same hash. The
-archive contains 59 manifested immutable files, normalized `0/0` ownership and
+`2ad44d30c0fa05d31896f6afaf94ffe2060f9f48d662309a20762cfbaea56fd2`
+and size 99,618 bytes. Two independent builds produced that same hash. The
+archive contains 60 manifested immutable files, normalized `0/0` ownership and
 epoch timestamps, no Git tree, no bot packages, and no direct author,
 scheduler-account, institution, or private-path token. It now contains both the
 LNCS/SCAG sources and the exact SCITEPRESS/ICAART candidate, including the four
@@ -160,9 +160,14 @@ boundary report the exact eight sanitized JSON inputs, and regression tests
 enforce that count. A package-local verifier checks every manifested file and
 rejects missing, changed, or unexpected immutable files.
 
+The archive denylist now also treats the institutional cluster name as an
+identity token. The two copied build READMEs use toolchain-neutral language,
+and a regression test scans the full package rather than only manuscript TeX.
+This closes a source-artifact anonymity leak without changing either PDF.
+
 A fresh extraction on an independent macOS machine used Python 3.12.13, GNU
 Make 3.81, and TeX Live 2022 rather than Bouchet's Python 3.9 and TeX Live 2024.
-The manifest verified both before and after deterministic regeneration, all 19
+The manifest verified both before and after deterministic regeneration, all 21
 packaged manuscript tests passed, and the Git-free build produced the expected
 16-page Letter LNCS paper, five-page Letter supplement, and 10-page A4
 SCITEPRESS candidate. The local-toolchain PDF identities were respectively
@@ -174,6 +179,15 @@ sources and generated fragments remain manifest-bound. All fonts were embedded;
 the final logs contained no overfull box, unresolved reference/citation, rerun,
 or multiply-defined-label warning. Contact-sheet inspection covered all 31
 pages, and every SCITEPRESS page was additionally inspected at full resolution.
+
+The production candidate additionally passed the new Poppler-backed
+`submission-check`: exactly 10 A4 pages, 36,355 non-whitespace characters under
+the documented default reading order, 195 abstract words, empty review
+identity metadata, no forms/JavaScript/encryption/rotation, nine embedded fonts
+with Unicode maps, exact PDF-to-portal title/abstract/keyword agreement, and
+SHA-256 agreement between the metadata JSON and its three source files. The
+same deep check passed the independent macOS build. A fresh 31-page render
+confirmed that the unchanged PDF hashes still correspond to clean layouts.
 
 The inspected PDFs have empty Author, Title, Subject, and Keywords metadata;
 contain no identifying binary strings, JavaScript, forms, or encryption; and

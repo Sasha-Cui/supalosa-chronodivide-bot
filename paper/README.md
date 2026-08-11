@@ -7,10 +7,9 @@ program is frozen; no manuscript edit authorizes new outcome-bearing games.
 
 ## Build
 
-On Bouchet:
+With TeX Live 2024 available on `PATH`:
 
 ```bash
-module load texlive/20240312-GCC-13.3.0
 cd paper
 make check
 make all

@@ -48,8 +48,8 @@ the anonymous branch during review.
 - Supplement PDF SHA-256:
   `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98`
 - Deterministic anonymous artifact SHA-256:
-  `7d385367857dd0486fb66696783331296c1eb59099f541f89a4cbcfd81f99eb3`
-- Anonymous artifact size: 95,193 bytes; 59 immutable manifested files.
+  `2ad44d30c0fa05d31896f6afaf94ffe2060f9f48d662309a20762cfbaea56fd2`
+- Anonymous artifact size: 99,618 bytes; 60 immutable manifested files.
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
@@ -119,10 +119,10 @@ commit and all three hashes together; never mix files from different freezes.
 ## Reproducibility and anonymity
 
 - [x] `make -C paper check main supplement` passes in a clean committed export.
-- [x] Anonymous artifact self-verifier checks all 59 immutable files and rejects
+- [x] Anonymous artifact self-verifier checks all 60 immutable files and rejects
       missing, changed, or unexpected entries.
 - [x] A fresh Git-free extraction on an independent macOS toolchain passes all
-      19 packaged tests and rebuilds the 16-page paper, 5-page supplement, and
+      21 packaged tests and rebuilds the 16-page paper, 5-page supplement, and
       exact 10-page SCITEPRESS candidate without actionable warnings.
 - [x] Main, supplement, and SCITEPRESS PDFs have been rendered after the last
       edit; no clipping, overlap, invisible text, or illegible plot label.

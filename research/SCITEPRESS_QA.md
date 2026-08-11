@@ -42,9 +42,11 @@ Under `texlive/20240312-GCC-13.3.0` on Bouchet:
 ```text
 make -C paper_scitepress clean
 make -C paper_scitepress check
+module load poppler/25.07.0-GCC-13.3.0
+make -C paper_scitepress submission-check
 ```
 
-completed successfully. Nine candidate-specific tests passed, the shared paper
+completed successfully. Eleven candidate-specific tests passed, the shared paper
 generator produced no Git drift, BibTeX emitted no warning, LaTeX emitted no
 overfull box or undefined citation/reference, and the build checker enforced a
 maximum of 12 pages. Commit `297d5b8` adds the fourth post-BibTeX LaTeX pass
@@ -59,12 +61,21 @@ The extracted PDF contains 36,355 non-whitespace characters, within ICAART's
 official 70--200-word interval. The page is A4 and the current 10-page build is
 below the 12-page full-paper proceedings limit.
 
+The separate submission check now enforces those values against the built PDF
+and portal JSON rather than treating them as prose-only QA. It also fails on
+non-A4 geometry, nonempty identity metadata, encryption, forms, JavaScript,
+page rotation, missing Unicode maps or embedded fonts, PDF-to-portal
+title/abstract/keyword drift, and metadata source-hash drift. Poppler's default
+reading order is the frozen character-count method; layout mode has a different
+count and is deliberately not mixed with the submitted 36,355-character
+identity.
+
 ## Independent artifact reproduction
 
 The repaired anonymous archive packages this exact SCITEPRESS source rather
 than only the LNCS secondary format. A fresh Git-free extraction on macOS using
-Python 3.12.13, GNU Make 3.81, and TeX Live 2022 verified all 59 immutable files
-before and after regeneration, passed the ten shared and nine
+Python 3.12.13, GNU Make 3.81, and TeX Live 2022 verified all 60 immutable files
+before and after regeneration, passed the ten shared and eleven
 SCITEPRESS-specific tests, and completed `make -C paper_scitepress check`.
 The result is a 10-page A4 PDF of 164,267 bytes with SHA-256
 `9531e3fe2266487e173855ef119162b5c8e4b2ecca25c0d49e3b6be6ddd8e8bd`.
@@ -75,6 +86,13 @@ log had no overfull box, unresolved reference/citation, rerun, or
 multiply-defined-label warning, all fonts were embedded, and all ten pages were
 inspected at full resolution. The package-local exporter produced the same
 195-word portal metadata JSON and SHA-256 recorded above.
+
+The rebuilt archive is 99,618 bytes with 60 immutable files and SHA-256
+`2ad44d30c0fa05d31896f6afaf94ffe2060f9f48d662309a20762cfbaea56fd2`.
+Its two copied build READMEs no longer name the institutional compute cluster,
+the archive denylist rejects that token, and a whole-package regression check
+prevents recurrence. The independent build also passed the Poppler-backed deep
+submission check with the same 10-page, 36,355-character, nine-font result.
 
 ## Reviewer-assignment metadata
 
@@ -122,6 +140,13 @@ The PDF has empty Author, Title, Subject, and Keywords metadata; no JavaScript,
 form, encryption, identifying repository URL, private path, author name,
 institution, NetID, or scheduler-account token; and all fonts are embedded with
 Unicode maps.
+
+The final submission-verifier and source-artifact anonymity changes do not
+touch manuscript TeX, generated empirical fragments, bibliography, or PDF
+metadata. The Bouchet PDF remains byte-identical at the frozen SHA-256. All 31
+pages across ICAART, LNCS, and supplement were re-rendered; contact-sheet review
+covered the complete set and every ICAART page was inspected at full
+resolution with no defect.
 
 ## Unresolved submission gates
 

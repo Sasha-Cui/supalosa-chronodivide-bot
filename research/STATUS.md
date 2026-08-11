@@ -141,11 +141,11 @@ Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 commit `7cdbe0d` hardens its direct-identity denylist, and the current builder
 tests enforce the exact eight-input reviewer description. Commit `d53f822`
 adds the exact SCITEPRESS candidate, a package-local manifest verifier, and
-Git-free build checks. The current 95,193-byte review archive is
+Git-free build checks. The current 99,618-byte review archive is
 byte-deterministic at SHA-256
-`7d385367857dd0486fb66696783331296c1eb59099f541f89a4cbcfd81f99eb3`.
+`2ad44d30c0fa05d31896f6afaf94ffe2060f9f48d662309a20762cfbaea56fd2`.
 Its 59-file immutable manifest verifies, all artifact tests pass, and an
-independent macOS extraction passes 19 packaged tests and rebuilds the 16-page
+independent macOS extraction passes 21 packaged tests and rebuilds the 16-page
 LNCS paper, five-page supplement, and 10-page A4 SCITEPRESS candidate without
 undefined references, overflow, or BibTeX warnings. All fonts are embedded and
 all 31 pages received a rendered layout check.

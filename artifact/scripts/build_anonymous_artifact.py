@@ -27,6 +27,7 @@ DENIED_TEXT = (
     "/nfs/roberts",
     "github.com/Sasha-Cui",
     "Yale University",
+    "Bouchet",
 )
 REDACTED_KEYS = {"sourceGitCommit"}
 
@@ -143,8 +144,9 @@ def anonymity_scan(package_root: Path) -> None:
     violations: list[str] = []
     for path in sorted(package_root.rglob("*")):
         relative = path.relative_to(package_root).as_posix()
+        folded_relative = relative.casefold()
         for token in DENIED_TEXT:
-            if token in relative:
+            if token.casefold() in folded_relative:
                 violations.append(f"filename contains {token!r}: {relative}")
         if not path.is_file():
             continue
@@ -152,8 +154,9 @@ def anonymity_scan(package_root: Path) -> None:
             text = path.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             continue
+        folded_text = text.casefold()
         for token in DENIED_TEXT:
-            if token in text:
+            if token.casefold() in folded_text:
                 violations.append(f"file contains {token!r}: {relative}")
     if violations:
         raise ValueError("anonymous artifact scan failed:\n" + "\n".join(violations))

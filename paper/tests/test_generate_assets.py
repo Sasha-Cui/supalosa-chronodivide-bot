@@ -19,6 +19,15 @@ MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
 
+def contains_sha256_window(text: str, length: int, digest: str) -> bool:
+    folded = text.casefold()
+    return any(
+        hashlib.sha256(folded[index : index + length].encode()).hexdigest()
+        == digest
+        for index in range(max(0, len(folded) - length + 1))
+    )
+
+
 class GeneratePaperAssetsTest(unittest.TestCase):
     def test_generates_expected_outputs_from_frozen_artifacts(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -193,23 +202,28 @@ class GeneratePaperAssetsTest(unittest.TestCase):
         for text in (main, supplement):
             self.assertIn(r"\author{Anonymous Author(s)}", text)
             self.assertIn(r"\institute{Anonymous institution}", text)
-        sources = [main, supplement]
+        sources = [
+            main,
+            supplement,
+            (REPO / "paper" / "README.md").read_text(encoding="utf-8"),
+        ]
         sources.extend(
             path.read_text(encoding="utf-8")
             for path in sorted((REPO / "paper" / "sections").glob("*.tex"))
         )
         manuscript = "\n".join(sources)
-        for denied in (
-            "Sasha" + " Cui",
-            "sasha.z.cui" + "@gmail.com",
-            "zc" + "362",
-            "pi_" + "jss233",
-            "/nfs/" + "roberts",
-            "github.com/" + "Sasha" + "-" + "Cui",
-            "Yale" + " University",
+        for length, digest in (
+            (9, "e6875845a691b5464cf487f7f682f0599b50f5315f826a9c89f4441359a57eaa"),
+            (21, "ef2c57ce5560278e397c51027d153dd0836a22705e0c864c9344a33b7b67b295"),
+            (5, "308d8ecab5e130335dbf084e25a599c16416ef921c6392a078c6f3c5f19a94c2"),
+            (9, "25fa2524993e224aa7924a65faeff7b96f166601879957cf43f785d7c87c0642"),
+            (12, "119786061ff9379adb1749f811057b8aaadc52e691fb2e2a907c674b320db98d"),
+            (20, "65c747204c8cba071ae66fa55aa2799e7d76d987b4ff7bbce81d8e1ac720a125"),
+            (15, "0d3d34a24da6435314d9b61f6c0129e1a80a044aac348da045e3879b4cff4aa1"),
+            (7, "c72778ae004e950e51ed73084f7a31a50bd246a12498fdf894ea7c974c7d104f"),
         ):
-            with self.subTest(denied=denied):
-                self.assertNotIn(denied, manuscript)
+            with self.subTest(digest=digest):
+                self.assertFalse(contains_sha256_window(manuscript, length, digest))
 
 
 if __name__ == "__main__":
