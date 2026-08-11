@@ -333,7 +333,42 @@ const parseStrongStrategyOptions = (): StrongStrategyOptions => ({
         priority: parseOptionalIntEnv("STATIC_DEFENSE_PRIORITY"),
     },
     strategicPlan: parseStrategicPlan(),
+    buildingElimination: parseBuildingEliminationOptions(),
 });
+
+const parseBuildingEliminationOptions = (): StrongStrategyOptions["buildingElimination"] => {
+    if (!Object.keys(process.env).some((name) => name.startsWith("BUILDING_ELIMINATION_"))) {
+        return undefined;
+    }
+    const targetPriority = process.env.BUILDING_ELIMINATION_TARGET_PRIORITY;
+    if (targetPriority && !new Set(["production", "defense", "nearest"]).has(targetPriority)) {
+        throw new Error(
+            `BUILDING_ELIMINATION_TARGET_PRIORITY must be production, defense, or nearest, got ${targetPriority}`,
+        );
+    }
+    const observationMode = process.env.BUILDING_ELIMINATION_OBSERVATION_MODE;
+    if (observationMode && !new Set(["publicApi", "visibleOnly"]).has(observationMode)) {
+        throw new Error(
+            `BUILDING_ELIMINATION_OBSERVATION_MODE must be publicApi or visibleOnly, got ${observationMode}`,
+        );
+    }
+    return {
+        enabled: parseBoolEnv("BUILDING_ELIMINATION_ENABLED", false),
+        minTick: parseOptionalIntEnv("BUILDING_ELIMINATION_MIN_TICK"),
+        minCombatants: parseOptionalIntEnv("BUILDING_ELIMINATION_MIN_COMBATANTS"),
+        combatantAdvantage: parseOptionalIntEnv("BUILDING_ELIMINATION_COMBATANT_ADVANTAGE"),
+        maxEnemyCombatants: parseOptionalIntEnv("BUILDING_ELIMINATION_MAX_ENEMY_COMBATANTS"),
+        reserveCombatants: parseOptionalIntEnv("BUILDING_ELIMINATION_RESERVE_COMBATANTS"),
+        orderIntervalTicks: parseOptionalIntEnv("BUILDING_ELIMINATION_ORDER_INTERVAL_TICKS"),
+        maxTargetGroups: parseOptionalIntEnv("BUILDING_ELIMINATION_MAX_TARGET_GROUPS"),
+        targetPriority: targetPriority as any,
+        observationMode: observationMode as any,
+        directVisibleAttack: parseOptionalBoolEnv("BUILDING_ELIMINATION_DIRECT_VISIBLE_ATTACK"),
+        preemptExistingAttacks: parseOptionalBoolEnv("BUILDING_ELIMINATION_PREEMPT_ATTACKS"),
+        sweepWhenNoTargets: parseOptionalBoolEnv("BUILDING_ELIMINATION_SWEEP_ENABLED"),
+        sweepRevisitTicks: parseOptionalIntEnv("BUILDING_ELIMINATION_SWEEP_REVISIT_TICKS"),
+    };
+};
 
 const parseAllInOptions = (): StrongStrategyOptions["allIn"] => {
     if (!Object.keys(process.env).some((name) => name.startsWith("ALL_IN_"))) {

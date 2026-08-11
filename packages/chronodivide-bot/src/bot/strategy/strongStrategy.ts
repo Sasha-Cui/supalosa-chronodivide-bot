@@ -4,6 +4,10 @@ import { MacroBoostMissionFactory } from "../logic/mission/missions/macroBoostMi
 import { StaticDefenseBoostMissionFactory, StaticDefenseBoostOptions } from "../logic/mission/missions/staticDefenseBoostMission.js";
 import { StrategicPlanMissionFactory, StrategicPlanOptions } from "../logic/mission/missions/strategicPlanMission.js";
 import { NavalAssaultMissionFactory } from "../logic/mission/missions/navalAssaultMission.js";
+import {
+    BuildingEliminationMissionFactory,
+    BuildingEliminationOptions,
+} from "../logic/mission/missions/buildingEliminationMission.js";
 import { SupabotContext } from "../logic/common/context.js";
 import { MissionController } from "../logic/mission/missionController.js";
 import { Countries, DebugLogger } from "../logic/common/utils.js";
@@ -18,6 +22,7 @@ export type StrongStrategyOptions = {
     };
     staticDefenseBoost?: StaticDefenseBoostOptions;
     strategicPlan?: StrategicPlanOptions;
+    buildingElimination?: BuildingEliminationOptions;
 };
 
 const DEFAULT_HFO_WEST_ALL_IN_OPTIONS: AllInAttackMissionFactoryOptions = {
@@ -726,7 +731,8 @@ const hasExplicitProfileOptions = (options: StrongStrategyOptions): boolean =>
     options.base?.attackCompositionPolicy !== undefined ||
     options.base?.attackGate?.enabled !== undefined ||
     options.staticDefenseBoost?.enabled !== undefined ||
-    options.allIn?.enabled !== undefined;
+    options.allIn?.enabled !== undefined ||
+    options.buildingElimination?.enabled !== undefined;
 
 /**
  * A deterministic ladder-oriented strategy tuned to beat the stock Supalosa bot.
@@ -740,6 +746,7 @@ export class StrongStrategy implements Strategy {
     private staticDefenseBoostFactory: StaticDefenseBoostMissionFactory;
     private strategicPlanFactory: StrategicPlanMissionFactory;
     private allInAttackFactory: AllInAttackMissionFactory;
+    private buildingEliminationFactory: BuildingEliminationMissionFactory;
     private navalAssaultFactory = new NavalAssaultMissionFactory();
 
     constructor(private options: StrongStrategyOptions = {}) {
@@ -811,6 +818,7 @@ export class StrongStrategy implements Strategy {
         this.allInAttackFactory = new AllInAttackMissionFactory(
             hasDefinedOption(options.allIn) ? options.allIn : DEFAULT_HFO_WEST_ALL_IN_OPTIONS,
         );
+        this.buildingEliminationFactory = new BuildingEliminationMissionFactory(options.buildingElimination);
     }
 
     onAiUpdate(context: SupabotContext, missionController: MissionController, logger: DebugLogger): Strategy {
@@ -864,6 +872,7 @@ export class StrongStrategy implements Strategy {
         this.navalAssaultFactory.maybeCreateMissions(context, missionController, logger);
         this.baseStrategy = this.baseStrategy.onAiUpdate(context, missionController, logger);
         this.allInAttackFactory.maybeCreateMissions(context, missionController, logger);
+        this.buildingEliminationFactory.maybeCreateMissions(context, missionController, logger);
         return this;
     }
 
