@@ -7,9 +7,9 @@ Verified: **2026-08-11**
 This is a resolution and metadata precheck for the bibliography used by:
 
 - reviewed submission source:
-  `bc0e6096ed89c7640bcbab5f3a4e7444e82f3b89`;
+  `853e2ffb3693287ee0572b7b8c659befa5f9763d`;
 - ICAART PDF SHA-256:
-  `271363cdad2e6128588b34e5a64f7ddb38487cf3669067406516118b80797c71`.
+  `d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413`.
 
 It verifies structural citation coverage, DOI registration, endpoint
 availability, and agreement of titles and publication years. It does **not**

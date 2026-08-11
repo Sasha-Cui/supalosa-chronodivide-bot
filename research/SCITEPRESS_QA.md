@@ -5,21 +5,23 @@ Prepared: **2026-08-11**
 ## Frozen candidate identity
 
 - Candidate introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
-- Current reviewed source: `bc0e6096ed89c7640bcbab5f3a4e7444e82f3b89`
+- Current reviewed source: `853e2ffb3693287ee0572b7b8c659befa5f9763d`
 - Scientific-claim freeze: `419a0f72188f957ae144262f62c62bcc11a66ac3`
 - Claim-preserving terminology refreeze: `77d93359242756f07afba30d88fb2db8fd97e7b2`
 - Citation-source refreeze: `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`
 - Submission-length contract refreeze: `abf5e9460a99ace48aa3a48c33076b8108c4d1df`
 - Acceptance-oriented framing refreeze: `bc0e6096ed89c7640bcbab5f3a4e7444e82f3b89`
+- Portable-contribution refreeze: `504cc2a7f1844183e2d87d0af09e1f697d3acfca`
+- Reviewer-artifact page-contract fix: `853e2ffb3693287ee0572b7b8c659befa5f9763d`
 - Portable artifact/build QA: `d53f822144bd0b3fffe3b4d778770091f77900b8`
 - Submission metadata exporter: `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0`
 - Build entry point: `paper_scitepress/main.tex`
 - Target: ICAART 2027 regular paper, anonymous SCITEPRESS review format
-- PDF: 11 A4 pages, 168,002 bytes
-- PDF SHA-256: `271363cdad2e6128588b34e5a64f7ddb38487cf3669067406516118b80797c71`
-- Expanded plain-text abstract: 196 words
-- Extracted submission length: 37,970 non-whitespace characters
-- Portal metadata JSON SHA-256: `8935329266d8b20e53a718371eb74e86ba15a645d6469106f3cc86b74c6c8e4a`
+- PDF: 11 A4 pages, 168,176 bytes
+- PDF SHA-256: `d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413`
+- Expanded plain-text abstract: 193 words
+- Extracted submission length: 38,261 non-whitespace characters
+- Portal metadata JSON SHA-256: `2581e6ae5e00454919c9ddf6b6cea7721935117234bc675b7d19162a799db834`
 
 The PDF is a build product and is not committed. The hash identifies the exact
 file rendered and inspected in this QA pass.
@@ -59,8 +61,8 @@ PDF hash above. The fixed `SOURCE_DATE_EPOCH` is a stable reproducibility
 constant established at the earlier comparator-justified freeze; the current
 reviewed source identity is recorded above.
 
-The extracted PDF contains 37,970 non-whitespace characters, within ICAART's
-10,000--50,000 review-submission interval. Its 196-word expanded abstract is within the
+The extracted PDF contains 38,261 non-whitespace characters, within ICAART's
+10,000--50,000 review-submission interval. Its 193-word expanded abstract is within the
 official 70--200-word interval. The page is A4 and the current 11-page build is
 below the 12-page full-paper proceedings limit.
 
@@ -70,7 +72,7 @@ non-A4 geometry, nonempty identity metadata, encryption, forms, JavaScript,
 page rotation, missing Unicode maps or embedded fonts, PDF-to-portal
 title/abstract/keyword drift, and metadata source-hash drift. Poppler's default
 reading order is the frozen character-count method; layout mode has a different
-count and is deliberately not mixed with the submitted 37,970-character
+count and is deliberately not mixed with the submitted 38,261-character
 identity.
 
 ## Independent artifact reproduction
@@ -81,7 +83,7 @@ Python 3.12.13, GNU Make 3.81, and TeX Live 2022 verified all 60 immutable files
 before and after regeneration, passed the ten shared and twelve
 SCITEPRESS-specific tests, and completed `make -C paper_scitepress check`.
 The result is an 11-page A4 PDF with SHA-256
-`0a504938b2c6021fecf7bcec0e9db6e2354af971e72c7555b84f33a0cc647e3c`.
+`2037e3ed5626360dfd09cda2790547cfdf4fe27c7d8d2052e23c51e881f7e2a4`.
 That byte identity is intentionally recorded separately from the Bouchet TeX
 Live 2024 identity above; the package manifest and generated-fragment hashes,
 not cross-version PDF bytes, are the portable invariant. The independent final
@@ -89,15 +91,15 @@ log had no overfull box, unresolved reference/citation, rerun, or
 multiply-defined-label warning, all fonts were embedded, and all 11 pages were
 inspected. The changed title, threat-to-control table, reflowed transitions,
 and final reference page were additionally inspected at full resolution. The
-package-local exporter produced the same 196-word portal metadata JSON and
+package-local exporter produced the same 193-word portal metadata JSON and
 SHA-256 recorded above.
 
-The rebuilt archive is 101,342 bytes with 60 immutable files and SHA-256
-`022b5dfdb9c6e58c6c42e4ee13e0e661e1210d5c6b5620b7314d22f31a732bf4`.
+The rebuilt archive is 101,528 bytes with 60 immutable files and SHA-256
+`3e4cc0fab8d6d0b6b378ceb0cf9cccda2c884a64699a65ca97e008d60704d798`.
 Its two copied build READMEs no longer name the institutional compute cluster,
 the archive denylist rejects that token, and a whole-package regression check
 prevents recurrence. The independent build also passed the Poppler-backed deep
-submission check with the same 11-page, 37,970-character, nine-font result.
+submission check with the same 11-page, 38,261-character, nine-font result.
 
 ## Reviewer-assignment metadata
 
@@ -167,7 +169,7 @@ five-page supplement remained byte-identical to its previously inspected
 freeze. The fresh TeX Live 2022 artifact build also retained the 10-page fit;
 its related-work and reference pages were inspected at full resolution.
 
-The acceptance-oriented refreeze at `bc0e609` changes the title and both
+The acceptance-oriented refreeze at `bc0e609` changed the title and both
 abstracts to foreground the paper's actual leakage-resistant evaluation
 contribution, and adds a full-width threat-to-control map tying each validity
 risk to its prespecified safeguard. It changes no empirical input, result,
@@ -177,6 +179,17 @@ inspection covered the complete 34-page production set across the LNCS paper,
 supplement, and ICAART candidate; all changed and final reference pages were
 also checked at full resolution. The independent TeX Live 2022 build passed
 the same deep submission check and reproduced all immutable generated assets.
+
+The portable-contribution refreeze at `504cc2a` adds a concise, bounded
+statement of the reusable evidence contract to the abstract and conclusion,
+uses ragged-right columns in the threat-to-control table, and balances the
+two-column reference ending. It does not claim a new optimizer, environment,
+or reliable opponent superiority. The SCITEPRESS candidate is now 11 pages,
+38,261 non-whitespace characters, and 193 abstract words. Two clean TeX Live
+2024 builds reproduced the PDF and metadata hashes above; the TeX Live 2022
+artifact build reproduced its separately recorded cross-toolchain identity.
+All 11 production pages and the changed pages at full resolution passed the
+visual, anonymity, font, metadata, and overflow checks.
 
 ## Unresolved submission gates
 

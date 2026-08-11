@@ -4,13 +4,15 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `bc0e6096ed89c7640bcbab5f3a4e7444e82f3b89`
+- Source commit: `853e2ffb3693287ee0572b7b8c659befa5f9763d`
+- Manuscript-content refreeze: `504cc2a7f1844183e2d87d0af09e1f697d3acfca`
+- Reviewer-artifact page-contract fix: `853e2ffb3693287ee0572b7b8c659befa5f9763d`
 - Main source: `paper/main.tex`
 - Supplement source: `paper/supplement.tex`
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 18 pages total; non-reference content ends on page 15
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `666695c812fe504507aae7f3e7d813698ec64df3f74ad973a19ec73f2ee98d64`
+- Main PDF SHA-256: `3b6ce71b2c569aecd8f18ccc40370f5c7ec9dc3bc2f5b1f88ca24ede37dfccd4`
 - Supplement PDF SHA-256: `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`
 
 The PDFs are build products and are not committed. Their hashes identify the
@@ -88,7 +90,7 @@ bibliography links, and section transitions. The final source contains no
 author NetID, institution name, literal Slurm account, personal repository URL,
 or private absolute path.
 
-The final ICAART game-testbed citation and bibliography compaction received a
+At that historical freeze, the final ICAART game-testbed citation and bibliography compaction received a
 fresh complete 31-page pass over the 16-page LNCS paper, five-page supplement,
 and 10-page SCITEPRESS candidate. The conclusion remains on LNCS page 14,
 references begin on page 15, and no orphan bibliography page remains.
@@ -127,9 +129,9 @@ remain clean.
 
 Commit `0f3e690` adds a deterministic plain-text ICAART metadata exporter and
 does not change manuscript content or PDF bytes. Its output expands every
-result macro, contains no residual LaTeX, records the exact 196-word abstract,
+result macro, contains no residual LaTeX, records the exact 193-word abstract,
 and has SHA-256
-`8935329266d8b20e53a718371eb74e86ba15a645d6469106f3cc86b74c6c8e4a`.
+`2581e6ae5e00454919c9ddf6b6cea7721935117234bc675b7d19162a799db834`.
 
 The claim audit confirmed that the paper:
 
@@ -148,18 +150,22 @@ The claim audit confirmed that the paper:
 
 ## Clean export and reviewer artifact
 
-A committed submission revision at `bc0e6096ed89c7640bcbab5f3a4e7444e82f3b89`
-and the portable-artifact repair at
-`d53f822144bd0b3fffe3b4d778770091f77900b8` passed ten paper-generator and
+A committed submission revision at `504cc2a7f1844183e2d87d0af09e1f697d3acfca`,
+the portable-artifact repair at
+`d53f822144bd0b3fffe3b4d778770091f77900b8`, and the package-contract fix at
+`853e2ffb3693287ee0572b7b8c659befa5f9763d` passed ten paper-generator and
 manuscript-invariant tests, twelve SCITEPRESS tests, two artifact-builder tests,
 the three frozen family-exporter tests, one author-verification-packet test,
 one venue-ruling-template test, one external-review-response-template test,
 and one substantive-citation-audit test (31 tests total). They regenerated all paper
 fragments without byte drift.
 
+The final repository-wide verification runs all 135 tests: 111 research tests,
+10 paper tests, 12 SCITEPRESS tests, and two artifact tests.
+
 The deterministic anonymous review archive has SHA-256
-`022b5dfdb9c6e58c6c42e4ee13e0e661e1210d5c6b5620b7314d22f31a732bf4`
-and size 101,342 bytes. Two independent builds produced that same hash. The
+`3e4cc0fab8d6d0b6b378ceb0cf9cccda2c884a64699a65ca97e008d60704d798`
+and size 101,528 bytes. Two independent builds produced that same hash. The
 archive contains 60 manifested immutable files, normalized `0/0` ownership and
 epoch timestamps, no Git tree, no bot packages, and no direct author,
 scheduler-account, institution, or private-path token. It now contains both the
@@ -180,9 +186,9 @@ The manifest verified both before and after deterministic regeneration, all 22
 packaged manuscript tests passed, and the Git-free build produced the expected
 18-page Letter LNCS paper, five-page Letter supplement, and 11-page A4
 SCITEPRESS candidate. The local-toolchain PDF identities were respectively
-`458899355c925f68c69f3f8950c8dda9ed39dbdc5a681a637500aec71a5c8935`,
+`47c379cd3687ac0540fca88029cfe05e6b5fe20f5a73ec08aa91eaf2c3b9a8e4`,
 `f78a88d16e217aef0a18f0948d3148055ccb2514ae6935cc00832935ffa75f2e`,
-and `0a504938b2c6021fecf7bcec0e9db6e2354af971e72c7555b84f33a0cc647e3c`.
+and `2037e3ed5626360dfd09cda2790547cfdf4fe27c7d8d2052e23c51e881f7e2a4`.
 PDF bytes legitimately differ across TeX distributions, while all immutable
 sources and generated fragments remain manifest-bound. All fonts were embedded;
 the final logs contained no overfull box, unresolved reference/citation, rerun,
@@ -191,8 +197,8 @@ pages; the changed title, threat-to-control table, reflowed transitions, and
 complete final reference pages were additionally inspected at full resolution.
 
 The production candidate additionally passed the new Poppler-backed
-`submission-check`: exactly 11 A4 pages, 37,970 non-whitespace characters under
-the documented default reading order, 196 abstract words, empty review
+`submission-check`: exactly 11 A4 pages, 38,261 non-whitespace characters under
+the documented default reading order, 193 abstract words, empty review
 identity metadata, no forms/JavaScript/encryption/rotation, nine embedded fonts
 with Unicode maps, exact PDF-to-portal title/abstract/keyword agreement, and
 SHA-256 agreement between the metadata JSON and its three source files. The
@@ -214,7 +220,7 @@ related-work and reference pages. No clipping, overlap, broken link label,
 margin violation, or unreadable text was found. The five-page supplement is
 byte-identical to the previously inspected freeze.
 
-The acceptance-oriented refreeze at `bc0e609` retitles the paper around its
+The acceptance-oriented refreeze at `bc0e609` retitled the paper around its
 actual leakage-resistant evaluation contribution, aligns both abstracts with
 that framing, and adds a full-width threat-to-control map that makes the
 prespecified safeguards auditable at reviewer reading speed. It changes no
@@ -226,6 +232,29 @@ Contact sheets covered all 34 pages, and the retitled first pages, both
 threat-to-control tables, reflowed transitions, and complete final reference
 pages were inspected at full resolution. No clipping, overlap, unreadable
 label, contrast defect, broken link, or margin violation was found.
+
+The portable-contribution refreeze at
+`504cc2a7f1844183e2d87d0af09e1f697d3acfca` makes the transferable result
+explicit in both abstracts and the conclusion: the reusable object is an
+evidence contract covering instance lineage, random-stream ownership, start
+balance, comparator isolation, and retry semantics. It also changes the
+threat-to-control table to ragged-right columns and balances the final
+SCITEPRESS reference page. The follow-up package-only fix at
+`853e2ffb3693287ee0572b7b8c659befa5f9763d` corrects the reviewer README's
+LNCS content-page contract from 14 to 15 and adds a regression assertion. No
+frozen input, estimate, interval, gate, diagnostic, citation, or scope boundary
+changed.
+
+Two clean TeX Live 2024 production builds were byte-identical at the hashes
+above. A Git-free TeX Live 2022 extraction produced local PDF identities
+`47c379cd3687ac0540fca88029cfe05e6b5fe20f5a73ec08aa91eaf2c3b9a8e4`,
+`f78a88d16e217aef0a18f0948d3148055ccb2514ae6935cc00832935ffa75f2e`,
+and `2037e3ed5626360dfd09cda2790547cfdf4fe27c7d8d2052e23c51e881f7e2a4`
+for the LNCS paper, supplement, and SCITEPRESS paper respectively. Both
+toolchains pass the 11-page, 38,261-character, nine-font anonymous-submission
+check. All 34 production pages were rendered; every changed page and both
+complete reference endings were inspected at full resolution with no clipping,
+overlap, contrast defect, missing glyph, or margin violation.
 
 The inspected PDFs have empty Author, Title, Subject, and Keywords metadata;
 contain no identifying binary strings, JavaScript, forms, or encryption; and

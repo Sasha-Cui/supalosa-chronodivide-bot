@@ -17,17 +17,17 @@ Verify these files before beginning. Stop if any value differs.
 
 | Item | Frozen identity |
 | --- | --- |
-| Reviewed source | `bc0e6096ed89c7640bcbab5f3a4e7444e82f3b89` |
-| ICAART PDF | `271363cdad2e6128588b34e5a64f7ddb38487cf3669067406516118b80797c71` |
-| LNCS PDF | `666695c812fe504507aae7f3e7d813698ec64df3f74ad973a19ec73f2ee98d64` |
+| Reviewed source | `853e2ffb3693287ee0572b7b8c659befa5f9763d` |
+| ICAART PDF | `d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413` |
+| LNCS PDF | `3b6ce71b2c569aecd8f18ccc40370f5c7ec9dc3bc2f5b1f88ca24ede37dfccd4` |
 | LNCS supplement | `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56` |
-| Anonymous artifact | `022b5dfdb9c6e58c6c42e4ee13e0e661e1210d5c6b5620b7314d22f31a732bf4` |
-| ICAART portal metadata | `8935329266d8b20e53a718371eb74e86ba15a645d6469106f3cc86b74c6c8e4a` |
+| Anonymous artifact | `3e4cc0fab8d6d0b6b378ceb0cf9cccda2c884a64699a65ca97e008d60704d798` |
+| ICAART portal metadata | `2581e6ae5e00454919c9ddf6b6cea7721935117234bc675b7d19162a799db834` |
 
 Run from the repository root:
 
 ```text
-git rev-parse bc0e609
+git rev-parse 853e2ff
 sha256sum paper/build/main.pdf paper/build/supplement.pdf
 sha256sum paper_scitepress/build/main.pdf
 sha256sum artifact/dist/chrono-divide-review-artifact.tar.gz

@@ -40,16 +40,16 @@ the anonymous branch during review.
 - Title: **Leakage-Resistant Evaluation of Scripted RTS Agent Configuration in
   Chrono Divide**
 - Anonymous manuscript source commit:
-  `bc0e6096ed89c7640bcbab5f3a4e7444e82f3b89`
+  `853e2ffb3693287ee0572b7b8c659befa5f9763d`
 - Main PDF: 18 pages total; non-reference material ends on page 15.
 - Main PDF SHA-256:
-  `666695c812fe504507aae7f3e7d813698ec64df3f74ad973a19ec73f2ee98d64`
+  `3b6ce71b2c569aecd8f18ccc40370f5c7ec9dc3bc2f5b1f88ca24ede37dfccd4`
 - Supplement: 5 pages.
 - Supplement PDF SHA-256:
   `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`
 - Deterministic anonymous artifact SHA-256:
-  `022b5dfdb9c6e58c6c42e4ee13e0e661e1210d5c6b5620b7314d22f31a732bf4`
-- Anonymous artifact size: 101,342 bytes; 60 immutable manifested files.
+  `3e4cc0fab8d6d0b6b378ceb0cf9cccda2c884a64699a65ca97e008d60704d798`
+- Anonymous artifact size: 101,528 bytes; 60 immutable manifested files.
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
@@ -59,12 +59,12 @@ commit and all three hashes together; never mix files from different freezes.
 
 - [x] Separate SCITEPRESS source committed at
       `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`; the current reviewed source is
-      `bc0e6096ed89c7640bcbab5f3a4e7444e82f3b89` and changes no frozen empirical
+      `853e2ffb3693287ee0572b7b8c659befa5f9763d` and changes no frozen empirical
       artifact.
-- [x] PDF is 11 A4 pages, with a 196-word expanded abstract and 37,970 extracted
+- [x] PDF is 11 A4 pages, with a 193-word expanded abstract and 38,261 extracted
       non-whitespace characters.
 - [x] PDF SHA-256 is
-      `271363cdad2e6128588b34e5a64f7ddb38487cf3669067406516118b80797c71`.
+      `d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413`.
 - [x] Two pinned Bouchet builds are byte-identical; all 11 pages, metadata, fonts,
       anonymity tokens, tables, plots, equations, and references were checked.
 - [x] ICAART reviewer assignment is frozen to **Agents** with the call topics
@@ -74,10 +74,10 @@ commit and all three hashes together; never mix files from different freezes.
       **Real-time Strategy Games**, **Scripted Agents**, **Algorithm
       Configuration**, and **Reproducible Evaluation**.
 - [x] `make -C paper_scitepress metadata` deterministically exports the exact
-      plain-text portal title, expanded 196-word abstract, keywords, area, and
+      plain-text portal title, expanded 193-word abstract, keywords, area, and
       ordered topics with source hashes; no LaTeX macro needs manual expansion.
 - [x] Portal metadata JSON SHA-256 is
-      `8935329266d8b20e53a718371eb74e86ba15a645d6469106f3cc86b74c6c8e4a`.
+      `2581e6ae5e00454919c9ddf6b6cea7721935117234bc675b7d19162a799db834`.
 - [ ] ICAART confirms author eligibility, request procedure, and fee class for
       the documented exceptional live-online route.
 - [ ] ICAART specifies whether the named code repository must be private during
