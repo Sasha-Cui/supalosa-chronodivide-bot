@@ -75,6 +75,7 @@ separately versioned prospective experiment.
 | Simulator compatibility | [`MAP_FIDELITY_GATE.md`](MAP_FIDELITY_GATE.md) |
 | Deterministic policy interface | [`METHOD_INTERFACE_GATE.md`](METHOD_INTERFACE_GATE.md) |
 | Literature and novelty boundary | [`RELATED_WORK.md`](RELATED_WORK.md) |
+| Citation resolution and metadata audit | [`CITATION_INTEGRITY_AUDIT.md`](CITATION_INTEGRITY_AUDIT.md) |
 | Environment contract | [`ENVIRONMENT.md`](ENVIRONMENT.md) |
 | Venue fit and deadlines | [`VENUE_STRATEGY.md`](VENUE_STRATEGY.md) |
 | Venue decision handoff | [`VENUE_DECISION_PACKET.md`](VENUE_DECISION_PACKET.md) |

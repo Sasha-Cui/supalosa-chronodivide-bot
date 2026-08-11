@@ -133,6 +133,10 @@ read enough of the primary source to verify the proposition below. Record the
 pages or sections consulted. A correct title or abstract alone is insufficient
 when the manuscript makes a detailed methodological claim.
 
+`research/CITATION_INTEGRITY_AUDIT.md` records an automated resolution and
+title/year metadata precheck. It is useful for detecting broken identifiers,
+but it does not verify any proposition and does not satisfy a row below.
+
 | BibTeX key | Proposition to verify | Manuscript location | Human status |
 | --- | --- | --- | --- |
 | `elimam2026maco` | MACO is a recent game-AI environment/testbed | introduction | `[ ]` |
