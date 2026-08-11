@@ -171,6 +171,28 @@ environment or optimizer. The resulting internal assessment is **weak accept
 with meaningful reviewer variance**, not guaranteed acceptance. See
 [`ICAART_ACCEPTED_PAPER_CALIBRATION.md`](ICAART_ACCEPTED_PAPER_CALIBRATION.md).
 
+### ICAART SPIKE special-session fallback -- scope unresolved
+
+ICAART now lists **eSports Performance, Artificial Intelligence and Knowledge
+in Esports -- Trends & Applications (SPIKE 2027)** as a special session. Its
+scope explicitly mentions AI methods and agent-based systems in competitive
+gaming, multi-agent strategy, AI-based esports technologies, and tactical
+prediction. The paper deadline is **2026-12-03**, after the first regular-round
+notification on **2026-11-13**, and accepted papers enter a special section of
+the ICAART proceedings.
+
+The Chrono Divide study is plausibly adjacent but not clearly in scope: it
+evaluates an autonomous RTS agent, not human player performance, audience
+engagement, or esports operations. The public pages also do not say whether a
+paper rejected from ICAART's regular round may be substantially revised and
+submitted sequentially to a same-year special session. SPIKE is therefore a
+**conditional sequential fallback**, not a current co-submission or replacement
+for the regular track. Use the separate inquiry in
+`CONTACT_TEMPLATES.md`; activate it only after written confirmation of both
+scope and non-simultaneous resubmission eligibility.
+
+Official page: [SPIKE 2027](https://icaart.scitevents.org/SPIKE.aspx?y=2027).
+
 Use the dated rule in `VENUE_DECISION_PACKET.md` because ICAART's first regular
 round arrives before the EvoStar deadline. Send both venue inquiries
 immediately, but prepare ICAART as the default route. Select ICAART by

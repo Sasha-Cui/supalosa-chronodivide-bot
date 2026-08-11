@@ -117,4 +117,9 @@ methodology:
    delayed answers resolve all four questions; or
 3. use *Entertainment Computing* as the no-travel archival fallback.
 
+After a negative ICAART first-round decision, the SPIKE 2027 special session is
+an additional **conditional** December 3 route only if its chairs have
+confirmed both scope and same-year sequential-resubmission eligibility in
+writing. Never submit to SPIKE while the regular paper remains under review.
+
 Do not submit simultaneously to incompatible archival venues.

@@ -67,6 +67,8 @@ Retain the original sent message and full response privately with:
 
 An informal statement on a website is not a substitute for a response to the
 project's exact circumstances.
+Use a private copy of `ICAART_RULING_RESPONSE_TEMPLATE.md` to extract the four
+ICAART answers and apply the fail-closed decision rules.
 
 ## Decision rule
 
@@ -89,6 +91,12 @@ project's exact circumstances.
   or move to the no-travel journal fallback in `VENUE_STRATEGY.md`.
 
 Never submit simultaneously to both archival venues.
+
+If the ICAART first-round paper is rejected, SPIKE 2027 may be considered
+before its 2026-12-03 deadline only if the secretariat or special-session
+chairs have already confirmed both topical scope and the permissibility of a
+substantially revised, non-simultaneous same-year submission. The public dates
+alone do not establish either condition.
 
 ## Work after venue selection
 

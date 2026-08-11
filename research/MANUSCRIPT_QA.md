@@ -134,8 +134,9 @@ A committed submission revision at `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0`
 and the portable-artifact repair at
 `d53f822144bd0b3fffe3b4d778770091f77900b8` passed ten paper-generator and
 manuscript-invariant tests, nine SCITEPRESS tests, two artifact-builder tests,
-the three frozen family-exporter tests, and one author-verification packet test
-(25 tests total). They regenerated all paper fragments without byte drift.
+the three frozen family-exporter tests, one author-verification-packet test,
+and one venue-ruling-template test (26 tests total). They regenerated all paper
+fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
 `8620c456bbbbde78ce7092d335ff5e6f407eace3ddd3d56d71a020181f69ecf6`

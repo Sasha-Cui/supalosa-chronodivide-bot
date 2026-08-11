@@ -132,7 +132,45 @@ establishes exceptional remote support for speakers unable to travel and allows
 disclosed AI assistance in principle. The unresolved items are the remote
 procedure/registration class, named-repository handling, and blind-review
 disclosure implementation, plus the reviewer-artifact delivery route; see
-`ICAART_POLICY_RECONCILIATION.md`.
+`ICAART_POLICY_RECONCILIATION.md`. Extract the reply into a private copy of
+`ICAART_RULING_RESPONSE_TEMPLATE.md`; do not treat a generic link to the
+public pages as a decision-complete answer.
+
+### Optional ICAART SPIKE fallback inquiry
+
+Send this separately only if evaluating the SPIKE special session as a
+sequential fallback. Do not submit or promise the same paper to two tracks at
+once.
+
+**Subject:** ICAART 2027 SPIKE: scope and sequential-submission question
+
+> Dear ICAART Secretariat and SPIKE Chairs,
+>
+> I am evaluating whether a completed paper could be appropriate for the
+> SPIKE 2027 special session if it is not accepted in ICAART's first regular-
+> paper round. The paper studies reproducible configuration and leakage-
+> controlled held-out evaluation of an autonomous scripted agent in a
+> competitive real-time-strategy game. It does not study human player
+> performance, audience engagement, or esports management.
+>
+> Could you please clarify two points?
+>
+> 1. Is this autonomous-agent configuration and evaluation contribution within
+>    SPIKE's intended scope?
+> 2. Because the first regular-paper notification is November 13 and the SPIKE
+>    deadline is December 3, may a substantially revised paper be submitted to
+>    SPIKE only after a negative regular-round decision, with no simultaneous
+>    submission? Or does ICAART prohibit same-work sequential resubmission to a
+>    special session in the same year?
+>
+> I would appreciate a written answer before treating SPIKE as a fallback. I am
+> happy to provide the anonymous abstract or manuscript if useful.
+>
+> Best regards,
+> [author name]
+
+Do not infer scope merely because the work concerns a competitive game, and do
+not infer sequential-resubmission permission from the non-overlapping dates.
 
 ## Supalosa
 

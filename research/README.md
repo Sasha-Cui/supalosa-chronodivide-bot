@@ -80,6 +80,7 @@ separately versioned prospective experiment.
 | Venue fit and deadlines | [`VENUE_STRATEGY.md`](VENUE_STRATEGY.md) |
 | Venue decision handoff | [`VENUE_DECISION_PACKET.md`](VENUE_DECISION_PACKET.md) |
 | ICAART public-policy reconciliation | [`ICAART_POLICY_RECONCILIATION.md`](ICAART_POLICY_RECONCILIATION.md) |
+| ICAART private response template | [`ICAART_RULING_RESPONSE_TEMPLATE.md`](ICAART_RULING_RESPONSE_TEMPLATE.md) |
 | Accepted-paper venue calibration | [`SCAG_ACCEPTED_PAPER_CALIBRATION.md`](SCAG_ACCEPTED_PAPER_CALIBRATION.md) |
 | ICAART reviewer-criteria audit | [`ICAART_REVIEW_SCORECARD.md`](ICAART_REVIEW_SCORECARD.md) |
 | ICAART short-paper contingency | [`ICAART_SHORT_PAPER_REDUCTION_PLAN.md`](ICAART_SHORT_PAPER_REDUCTION_PLAN.md) |
