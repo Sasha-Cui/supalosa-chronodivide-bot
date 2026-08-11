@@ -1,0 +1,144 @@
+{
+  "aggregateChecks": {
+    "championMinusDefault": 0.3359375,
+    "championScore": 0.53515625,
+    "defaultScore": 0.19921875,
+    "familySigns": {
+      "negative": 0,
+      "positive": 14,
+      "zero": 2
+    }
+  },
+  "artifactType": "confirmatory-family-diagnostics",
+  "design": {
+    "blocksPerFamily": 8,
+    "familyCount": 16,
+    "methods": [
+      "default",
+      "champion"
+    ],
+    "reciprocalSlotsPerMethod": 2
+  },
+  "families": [
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.0,
+      "championScore": 0.5,
+      "defaultScore": 0.5,
+      "familyId": "mf_69962e7efc29cb5b"
+    },
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.0,
+      "championScore": 0.5,
+      "defaultScore": 0.5,
+      "familyId": "mf_mp09du"
+    },
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.125,
+      "championScore": 0.46875,
+      "defaultScore": 0.34375,
+      "familyId": "mf_death"
+    },
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.1875,
+      "championScore": 0.34375,
+      "defaultScore": 0.15625,
+      "familyId": "mf_doradodescent"
+    },
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.21875,
+      "championScore": 0.5625,
+      "defaultScore": 0.34375,
+      "familyId": "mf_536b69726d6973682047616d65"
+    },
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.21875,
+      "championScore": 0.46875,
+      "defaultScore": 0.25,
+      "familyId": "mf_mp27t8"
+    },
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.25,
+      "championScore": 0.53125,
+      "defaultScore": 0.28125,
+      "familyId": "mf_mp17du"
+    },
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.28125,
+      "championScore": 0.5,
+      "defaultScore": 0.21875,
+      "familyId": "mf_mp11t2"
+    },
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.3125,
+      "championScore": 0.625,
+      "defaultScore": 0.3125,
+      "familyId": "mf_mp14t2"
+    },
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.375,
+      "championScore": 0.5,
+      "defaultScore": 0.125,
+      "familyId": "mf_seaofiso"
+    },
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.4375,
+      "championScore": 0.4375,
+      "defaultScore": 0.0,
+      "familyId": "mf_tanyas"
+    },
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.4375,
+      "championScore": 0.5,
+      "defaultScore": 0.0625,
+      "familyId": "mf_unrepent"
+    },
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.46875,
+      "championScore": 0.46875,
+      "defaultScore": 0.0,
+      "familyId": "mf_dc29052d730e0060"
+    },
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.59375,
+      "championScore": 0.59375,
+      "defaultScore": 0.0,
+      "familyId": "mf_newhghts"
+    },
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.625,
+      "championScore": 0.625,
+      "defaultScore": 0.0,
+      "familyId": "mf_riverram"
+    },
+    {
+      "blockCount": 8,
+      "championMinusDefault": 0.84375,
+      "championScore": 0.9375,
+      "defaultScore": 0.09375,
+      "familyId": "mf_tn04t2"
+    }
+  ],
+  "schemaVersion": 1,
+  "source": {
+    "arrayJobId": "21925439",
+    "launchedGameCount": 512,
+    "schedulerAccount": "pi_jss233",
+    "sourceGitCommit": "698dc7601b61a80e091ce7b8ac2b9e681685bc69",
+    "unblindingSha256": "2f55de50b4cb4a110b3d8d48a3734866e23fac954f2254ef47556bd041fc0cfb"
+  }
+}

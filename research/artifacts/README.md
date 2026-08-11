@@ -20,6 +20,10 @@ Artifact groups:
   confirmatory split.
 - `audit_pilot_*` and `determinism_screen_v1.json` describe diagnostics, not
   final policy evidence.
+- `method_v2_*_result_v1.json` records the frozen confirmatory and diagnostic
+  aggregates. `method_v2_confirmatory_family_diagnostics_v1.json` is the
+  deterministic, release-safe family-level export used by paper figures; its
+  source unblinding commitment is embedded in the artifact.
 
 Do not hand-edit generated JSON or JSONL values. Change the producing script or
 frozen input, regenerate deterministically, review the diff, and record the
