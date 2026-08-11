@@ -7,9 +7,9 @@ Verified: **2026-08-11**
 This is a resolution and metadata precheck for the bibliography used by:
 
 - reviewed submission source:
-  `5ed5dad47e9b2902385f4ee873da5c3fb9683bbd`;
+  `92a4c870b6e697682b51fa41fd0f785c97c6b121`;
 - ICAART PDF SHA-256:
-  `4bd0048eedb7c8ddeeb1d42b0552d402ea18ec9cfe702e9bd82c01fb0c673463`.
+  `7d4c26640a5f4da34783d1a533c8cfeb807d2d7b37a1e52acdc37b8cf6386c07`.
 
 It verifies structural citation coverage, DOI registration, endpoint
 availability, and agreement of titles and publication years. It does **not**
@@ -24,8 +24,8 @@ the current candidate. Neither audit replaces the author's source reading.
 
 ## Structural checks
 
-- `paper/references.bib` contains exactly 32 entries with distinct keys.
-- The shared manuscript sources cite all 32 keys.
+- `paper/references.bib` contains exactly 33 entries with distinct keys.
+- The shared manuscript sources cite all 33 keys.
 - No cited key is missing from the bibliography.
 - No bibliography entry is uncited.
 - The generated ICAART paper has a settled reference list and no unresolved
@@ -33,7 +33,7 @@ the current candidate. Neither audit replaces the author's source reading.
 
 ## DOI-backed sources
 
-Twenty-five entries have registered DOIs. Title and publication year returned by
+Twenty-six entries have registered DOIs. Title and publication year returned by
 DOI content negotiation, the Crossref metadata API, or the official publisher
 record agree with the BibTeX entry.
 
@@ -44,6 +44,7 @@ record agree with the BibTeX entry.
 | `young2012goal` | [10.1609/aiide.v8i1.12503](https://doi.org/10.1609/aiide.v8i1.12503) | registered; title/year match |
 | `othman2012starcraft` | [10.1109/CIG.2012.6374182](https://doi.org/10.1109/CIG.2012.6374182) | registered; title/year match |
 | `liu2016microbehaviors` | [10.1109/TCIAIG.2016.2544844](https://doi.org/10.1109/TCIAIG.2016.2544844) | registered; title/year match |
+| `ouessai2022evolving` | [10.1016/j.entcom.2022.100493](https://doi.org/10.1016/j.entcom.2022.100493) | official publisher record; title/authors/year/volume/article number match |
 | `fernandezAres2012map` | [10.1109/CIG.2012.6374185](https://doi.org/10.1109/CIG.2012.6374185) | registered; title/year match |
 | `marino2021programmatic` | [10.1609/aaai.v35i1.16114](https://doi.org/10.1609/aaai.v35i1.16114) | registered; title/year match |
 | `medeiros2022sketches` | [10.1609/aaai.v36i7.20744](https://doi.org/10.1609/aaai.v36i7.20744) | registered; title/year match |
@@ -88,8 +89,8 @@ All seven non-DOI endpoints returned HTTP 200 at the pinned path.
 
 No broken key, missing citation, uncited entry, unregistered DOI, dead URL, or
 title/year mismatch was found. The 2026-08-11 closest-work refresh added the
-two IJCAI records above; no further bibliography or manuscript edit is
-justified by this metadata audit.
+two IJCAI records and the Entertainment Computing record above; no further
+bibliography or manuscript edit is justified by this metadata audit.
 
 Before submission, the human author must still:
 

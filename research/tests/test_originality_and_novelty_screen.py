@@ -12,9 +12,9 @@ class OriginalityAndNoveltyScreenTest(unittest.TestCase):
     def test_screen_is_bound_to_current_candidate_and_honest_limits(self) -> None:
         screen = SCREEN.read_text(encoding="utf-8")
         for identity in (
-            "5ed5dad47e9b2902385f4ee873da5c3fb9683bbd",
-            "617f5e3e8b0b7c209e4c7c92aaa4db432e72b1f407d8e09aea08b4cd8834a82d",
-            "4bd0048eedb7c8ddeeb1d42b0552d402ea18ec9cfe702e9bd82c01fb0c673463",
+            "92a4c870b6e697682b51fa41fd0f785c97c6b121",
+            "c44c0d5739a33ae4155c18f0eba8c480785f4e3e1b9e2250dc03a43733a6d0a1",
+            "7d4c26640a5f4da34783d1a533c8cfeb807d2d7b37a1e52acdc37b8cf6386c07",
         ):
             self.assertIn(identity, screen)
 
@@ -35,7 +35,11 @@ class OriginalityAndNoveltyScreenTest(unittest.TestCase):
             encoding="utf-8"
         )
 
-        for key in ("moraes2023opponents", "moraes2024semantic"):
+        for key in (
+            "moraes2023opponents",
+            "moraes2024semantic",
+            "ouessai2022evolving",
+        ):
             self.assertIn(f"{{{key},", bibliography)
             self.assertIn(key, related)
 

@@ -5,7 +5,7 @@ Prepared: **2026-08-11**
 ## Frozen candidate identity
 
 - Candidate introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
-- Current reviewed source: `5ed5dad47e9b2902385f4ee873da5c3fb9683bbd`
+- Current reviewed source: `92a4c870b6e697682b51fa41fd0f785c97c6b121`
 - Scientific-claim freeze: `419a0f72188f957ae144262f62c62bcc11a66ac3`
 - Claim-preserving terminology refreeze: `77d93359242756f07afba30d88fb2db8fd97e7b2`
 - Citation-source refreeze: `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`
@@ -17,10 +17,10 @@ Prepared: **2026-08-11**
 - Submission metadata exporter: `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0`
 - Build entry point: `paper_scitepress/main.tex`
 - Target: ICAART 2027 regular paper, anonymous SCITEPRESS review format
-- PDF: 11 A4 pages, 168,176 bytes
-- PDF SHA-256: `4bd0048eedb7c8ddeeb1d42b0552d402ea18ec9cfe702e9bd82c01fb0c673463`
+- PDF: 11 A4 pages, 169,302 bytes
+- PDF SHA-256: `7d4c26640a5f4da34783d1a533c8cfeb807d2d7b37a1e52acdc37b8cf6386c07`
 - Expanded plain-text abstract: 193 words
-- Extracted submission length: 38,760 non-whitespace characters
+- Extracted submission length: 39,102 non-whitespace characters
 - Portal metadata JSON SHA-256: `2581e6ae5e00454919c9ddf6b6cea7721935117234bc675b7d19162a799db834`
 
 The PDF is a build product and is not committed. The hash identifies the exact
@@ -61,7 +61,7 @@ PDF hash above. The fixed `SOURCE_DATE_EPOCH` is a stable reproducibility
 constant established at the earlier comparator-justified freeze; the current
 reviewed source identity is recorded above.
 
-The extracted PDF contains 38,760 non-whitespace characters, within ICAART's
+The extracted PDF contains 39,102 non-whitespace characters, within ICAART's
 10,000--50,000 review-submission interval. Its 193-word expanded abstract is within the
 official 70--200-word interval. The page is A4 and the current 11-page build is
 below the 12-page full-paper proceedings limit.
@@ -72,13 +72,14 @@ non-A4 geometry, nonempty identity metadata, encryption, forms, JavaScript,
 page rotation, missing Unicode maps or embedded fonts, PDF-to-portal
 title/abstract/keyword drift, and metadata source-hash drift. Poppler's default
 reading order is the frozen character-count method; layout mode has a different
-count and is deliberately not mixed with the submitted 38,760-character
+count and is deliberately not mixed with the submitted 39,102-character
 identity.
 
 ## Independent artifact reproduction
 
-The repaired anonymous archive packages this exact SCITEPRESS source rather
-than only the LNCS secondary format. A fresh Git-free extraction on macOS using
+Before the current citation-only refreeze, the repaired anonymous archive
+established cross-toolchain portability rather than only the LNCS secondary
+format. A fresh Git-free extraction on macOS using
 Python 3.12.13, GNU Make 3.81, and TeX Live 2022 verified all 60 immutable files
 before and after regeneration, passed the ten shared and twelve
 SCITEPRESS-specific tests, and completed `make -C paper_scitepress check`.
@@ -94,12 +95,13 @@ and final reference page were additionally inspected at full resolution. The
 package-local exporter produced the same 193-word portal metadata JSON and
 SHA-256 recorded above.
 
-The rebuilt archive is 101,884 bytes with 60 immutable files and SHA-256
-`8ede1a73f07bd06dcd8fa5a9c647984a55ecc9101cd715f6bf71171a2fb5b9d1`.
+The current rebuilt archive is 102,179 bytes with 60 immutable files and SHA-256
+`10f270f49d38d2a3d2175f598795fca8d8e7ca57c5736f0971e2462d2ee42d0c`.
 Its two copied build READMEs no longer name the institutional compute cluster,
 the archive denylist rejects that token, and a whole-package regression check
-prevents recurrence. The independent build also passed the Poppler-backed deep
-submission check with the same 11-page, 38,760-character, nine-font result.
+prevents recurrence. That earlier independent build also passed the
+Poppler-backed deep submission check with its then-current 11-page,
+38,760-character, nine-font result.
 
 A separate same-toolchain clean-room run extracted this exact archive into a
 fresh Git-free directory on Bouchet with Python 3.12.3 and TeX Live 2024. It
@@ -211,6 +213,20 @@ pass and full-resolution inspection of pages 2--3 and 10--11 found no clipping,
 overlap, unreadable text, broken reference flow, contrast defect, or margin
 violation. The scientific result, abstract, conclusion, and 193-word portal
 abstract are unchanged.
+
+The automatic-configuration closest-work refreeze at `92a4c87` adds Ouessai
+et al.'s 2022 action-preselection configuration study and explicitly preserves
+the distinction between its map--opponent-specific setup and this paper's
+family-disjoint held-out estimand. The current candidate remains 11 A4 pages
+and now contains 39,102 non-whitespace characters. Two deterministic archive
+builds match at 102,179 bytes and SHA-256
+`10f270f49d38d2a3d2175f598795fca8d8e7ca57c5736f0971e2462d2ee42d0c`;
+a fresh TeX Live 2024 Git-free extraction passed all 22 packaged tests, both
+manifest checks, and the deep submission check, and reproduced the production
+PDF byte for byte. Complete 34-page contact-sheet inspection and full-resolution
+inspection of the reflowed related-work and reference pages found no clipping,
+overlap, unreadable text, broken reference flow, contrast defect, or margin
+violation.
 
 ## Unresolved submission gates
 

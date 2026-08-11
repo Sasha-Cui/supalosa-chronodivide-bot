@@ -4,16 +4,16 @@ Verified: **2026-08-11**
 
 ## Scope, identity, and boundary
 
-This is a machine-assisted proposition-level precheck of the 32 bibliography
-keys used at 40 key-by-citation placements in the shared manuscript sources.
+This is a machine-assisted proposition-level precheck of the 33 bibliography
+keys used at 41 key-by-citation placements in the shared manuscript sources.
 It is bound to:
 
 - reviewed submission source:
-  `5ed5dad47e9b2902385f4ee873da5c3fb9683bbd`;
+  `92a4c870b6e697682b51fa41fd0f785c97c6b121`;
 - LNCS PDF SHA-256:
-  `617f5e3e8b0b7c209e4c7c92aaa4db432e72b1f407d8e09aea08b4cd8834a82d`;
+  `c44c0d5739a33ae4155c18f0eba8c480785f4e3e1b9e2250dc03a43733a6d0a1`;
 - ICAART PDF SHA-256:
-  `4bd0048eedb7c8ddeeb1d42b0552d402ea18ec9cfe702e9bd82c01fb0c673463`.
+  `7d4c26640a5f4da34783d1a533c8cfeb807d2d7b37a1e52acdc37b8cf6386c07`.
 
 The check compared every cited proposition with the primary paper,
 publisher record, project page, package record, or pinned repository named
@@ -47,6 +47,7 @@ Classifications mean:
 | `young2012goal` | Goal priorities in a real-time strategy bot were evolved; [AIIDE paper abstract and method](https://doi.org/10.1609/aiide.v8i1.12503). | supported |
 | `othman2012starcraft` | XML-configured StarCraft tactical behavior was optimized through evolutionary computation; [IEEE paper abstract and method](https://doi.org/10.1109/CIG.2012.6374182). | supported |
 | `liu2016microbehaviors` | Microbehavior parameters were evolved and evaluated beyond their training combat scenarios; [IEEE article abstract and experiments](https://doi.org/10.1109/TCIAIG.2016.2544844). | supported |
+| `ouessai2022evolving` | A genetic algorithm configures parametric action-preselection heuristics for particular $\mu$RTS map--opponent settings, and EvoPMCTS is compared with several agents on those maps; [Entertainment Computing article abstract and method](https://doi.org/10.1016/j.entcom.2022.100493). | supported with wording boundary |
 | `mora2012noisy` | Noisy RTS fitness motivates repeated games, multiple maps, and incumbent reevaluation; [journal paper, methods and Sections 4--5](https://doi.org/10.1007/s11390-012-1281-5). | supported |
 | `castejon2026tales` | The work compares coevolution, fixed, and hybrid training modes for a bot governed by weighted behavioral rules; [Springer chapter](https://doi.org/10.1007/978-3-032-23607-4_33). | supported |
 | `marino2021programmatic` | Map-specific programmatic $\mu$RTS strategies were synthesized from a domain-specific language; [AAAI paper, introduction and method](https://doi.org/10.1609/aaai.v35i1.16114). | supported |
@@ -78,10 +79,13 @@ offline interface and pinned bot revision are supported by the package and
 repository records. Commit `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`
 therefore cites all three sources at the two environment-description
 placements and positions the evaluation contribution against the closest
-map-specific and later program-synthesis work. No empirical result, method
-description, scope boundary, or conclusion changed.
+map-specific and later program-synthesis work. Commit
+`92a4c870b6e697682b51fa41fd0f785c97c6b121` additionally records the close
+automatic action-preselection configuration precedent while distinguishing
+its map--opponent-specific setup. No empirical result, method description,
+scope boundary, or conclusion changed.
 
-All 32 keys have a source-support classification above. This precheck found
+All 33 keys have a source-support classification above. This precheck found
 no citation use that required claim removal or a bibliographic replacement.
 Human source reading and the blank statuses in
 `research/HUMAN_AUTHOR_VERIFICATION_PACKET.md` remain mandatory before

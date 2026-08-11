@@ -16,7 +16,7 @@ class HumanAuthorVerificationPacketTest(unittest.TestCase):
             encoding="utf-8"
         )
         keys = re.findall(r"^@[A-Za-z]+\{([^,]+),", bibliography, re.MULTILINE)
-        self.assertEqual(len(keys), 32)
+        self.assertEqual(len(keys), 33)
         for key in keys:
             self.assertIn(f"`{key}`", packet, key)
 
@@ -57,7 +57,7 @@ class HumanAuthorVerificationPacketTest(unittest.TestCase):
             self.assertIn(heading, packet)
 
         self.assertNotIn("[x]", packet.lower())
-        self.assertIn("git rev-parse 5ed5dad", packet)
+        self.assertIn("git rev-parse 92a4c87", packet)
         self.assertNotIn("git rev-parse 853e2ff", packet)
         self.assertIn("template only; human verification not yet complete", packet)
 

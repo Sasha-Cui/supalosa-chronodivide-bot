@@ -4,7 +4,7 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `5ed5dad47e9b2902385f4ee873da5c3fb9683bbd`
+- Source commit: `92a4c870b6e697682b51fa41fd0f785c97c6b121`
 - Manuscript-content refreeze: `504cc2a7f1844183e2d87d0af09e1f697d3acfca`
 - Reviewer-artifact page-contract fix: `853e2ffb3693287ee0572b7b8c659befa5f9763d`
 - Main source: `paper/main.tex`
@@ -12,7 +12,7 @@ Last updated: **2026-08-11**
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 18 pages total; non-reference content ends on page 15
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `617f5e3e8b0b7c209e4c7c92aaa4db432e72b1f407d8e09aea08b4cd8834a82d`
+- Main PDF SHA-256: `c44c0d5739a33ae4155c18f0eba8c480785f4e3e1b9e2250dc03a43733a6d0a1`
 - Supplement PDF SHA-256: `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`
 
 The PDFs are build products and are not committed. Their hashes identify the
@@ -37,7 +37,7 @@ The final LNCS logs contain:
 - zero overfull boxes;
 - zero undefined or multiply defined references;
 - zero BibTeX warnings;
-- 32 citation keys, 32 bibliography entries, no missing keys, and no unused
+- 33 citation keys, 33 bibliography entries, no missing keys, and no unused
   entries; and
 - deterministic regenerated paper fragments whose input and output hashes are
   recorded in `paper/generated/asset_manifest.json` for all eight frozen
@@ -57,13 +57,15 @@ MACO paper and DOI `10.5220/0014358500004052`; the 25-author StarCraft II
 reference uses standard `et al.` formatting while retaining its identifier and
 DOI.
 
-A proposition-level precheck mapped all 32 bibliography keys across 40
+A proposition-level precheck mapped all 33 bibliography keys across 41
 key-by-citation placements to primary-source locators. It found one attribution
 boundary: the Chrono Divide homepage supports the reconstruction claim but not
 the exact offline API or pinned opponent. The refreeze added the package and
 repository citations to both environment-description groups and, after a fresh
 close-work search, added Mariño et al.'s map-specific program-synthesis
-precedent. Empirical claims and the supplement did not change; see
+precedent, then added the closest located automatic RTS action-preselection
+configuration precedent and its map--opponent-specific boundary. Empirical
+claims and the supplement did not change; see
 `SUBSTANTIVE_CITATION_AUDIT.md`.
 
 ## Visual and content checks
@@ -164,8 +166,8 @@ The final repository-wide verification runs all 140 tests: 115 research tests,
 10 paper tests, 12 SCITEPRESS tests, and three artifact tests.
 
 The deterministic anonymous review archive has SHA-256
-`8ede1a73f07bd06dcd8fa5a9c647984a55ecc9101cd715f6bf71171a2fb5b9d1`
-and size 101,884 bytes. Two independent builds produced that same hash. The
+`10f270f49d38d2a3d2175f598795fca8d8e7ca57c5736f0971e2462d2ee42d0c`
+and size 102,179 bytes. Two independent builds produced that same hash. The
 archive contains 60 manifested immutable files, normalized `0/0` ownership and
 epoch timestamps, no Git tree, no bot packages, and no direct author,
 scheduler-account, institution, or private-path token. It now contains both the
@@ -197,7 +199,7 @@ pages; the changed title, threat-to-control table, reflowed transitions, and
 complete final reference pages were additionally inspected at full resolution.
 
 The production candidate additionally passed the new Poppler-backed
-`submission-check`: exactly 11 A4 pages, 38,760 non-whitespace characters under
+`submission-check`: exactly 11 A4 pages, 39,102 non-whitespace characters under
 the documented default reading order, 193 abstract words, empty review
 identity metadata, no forms/JavaScript/encryption/rotation, nine embedded fonts
 with Unicode maps, exact PDF-to-portal title/abstract/keyword agreement, and
@@ -211,7 +213,7 @@ A second Git-free extraction reproduced the exact current archive on Bouchet
 using Python 3.12.3 and TeX Live 2024. The manifest verified all 60 immutable
 files before and after regeneration, all 22 packaged tests passed, and the
 three rebuilt PDFs were byte-identical to the production hashes above. The
-11-page submission check again passed at 38,760 characters and nine embedded
+11-page submission check again passed at 39,102 characters and nine embedded
 fonts. All 34 rebuilt pages were rendered and inspected without a layout or
 readability defect. The command transcript, environment, identities, and
 scope boundary are frozen in `ARTIFACT_CLEANROOM_REPRODUCTION.md`.
@@ -267,9 +269,9 @@ above. A Git-free TeX Live 2022 extraction produced local PDF identities
 `47c379cd3687ac0540fca88029cfe05e6b5fe20f5a73ec08aa91eaf2c3b9a8e4`,
 `f78a88d16e217aef0a18f0948d3148055ccb2514ae6935cc00832935ffa75f2e`,
 and `2037e3ed5626360dfd09cda2790547cfdf4fe27c7d8d2052e23c51e881f7e2a4`
-for the LNCS paper, supplement, and SCITEPRESS paper respectively. Both
-toolchains pass the 11-page, 38,760-character, nine-font anonymous-submission
-check. All 34 production pages were rendered; every changed page and both
+for the LNCS paper, supplement, and SCITEPRESS paper respectively. At that
+portable-contribution freeze, both toolchains passed the 11-page,
+38,760-character, nine-font anonymous-submission check. All 34 production pages were rendered; every changed page and both
 complete reference endings were inspected at full resolution with no clipping,
 overlap, contrast defect, missing glyph, or margin violation.
 
@@ -294,6 +296,22 @@ were rendered at 120 DPI and inspected as contact sheets. LNCS pages 3--4 and
 16--18 and ICAART pages 2--3 and 10--11 were additionally inspected at full
 resolution. No clipping, overlap, contrast defect, missing glyph, broken link
 label, margin violation, or malformed section transition was found.
+
+The automatic-configuration closest-work refreeze at
+`92a4c870b6e697682b51fa41fd0f785c97c6b121` adds Ouessai et al.'s 2022
+map--opponent-specific action-preselection configuration study and narrows the
+positioning without changing the empirical claim, abstract, results, or
+conclusion. The current TeX Live 2024 production and Git-free clean-room builds
+are byte-identical at the LNCS and ICAART hashes above; the five-page supplement
+and portal metadata remain byte-identical. The exact 102,179-byte, 60-file
+archive has SHA-256
+`10f270f49d38d2a3d2175f598795fca8d8e7ca57c5736f0971e2462d2ee42d0c`.
+All 34 pages were rendered at 120 DPI and inspected as complete contact sheets;
+LNCS pages 3--4 and 16--18 and ICAART pages 2--3 and 10--11 were also inspected
+at full resolution. No clipping, overlap, contrast defect, missing glyph,
+broken link, margin violation, or malformed reference flow was found. The
+current ICAART deep check passes at 11 A4 pages, 39,102 non-whitespace
+characters, nine embedded fonts, and anonymous metadata.
 
 ## Remaining submission gates
 

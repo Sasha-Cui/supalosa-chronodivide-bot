@@ -44,16 +44,16 @@ the anonymous branch during review.
 - Title: **Leakage-Resistant Evaluation of Scripted RTS Agent Configuration in
   Chrono Divide**
 - Anonymous manuscript source commit:
-  `5ed5dad47e9b2902385f4ee873da5c3fb9683bbd`
+  `92a4c870b6e697682b51fa41fd0f785c97c6b121`
 - Main PDF: 18 pages total; non-reference material ends on page 15.
 - Main PDF SHA-256:
-  `617f5e3e8b0b7c209e4c7c92aaa4db432e72b1f407d8e09aea08b4cd8834a82d`
+  `c44c0d5739a33ae4155c18f0eba8c480785f4e3e1b9e2250dc03a43733a6d0a1`
 - Supplement: 5 pages.
 - Supplement PDF SHA-256:
   `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`
 - Deterministic anonymous artifact SHA-256:
-  `8ede1a73f07bd06dcd8fa5a9c647984a55ecc9101cd715f6bf71171a2fb5b9d1`
-- Anonymous artifact size: 101,884 bytes; 60 immutable manifested files.
+  `10f270f49d38d2a3d2175f598795fca8d8e7ca57c5736f0971e2462d2ee42d0c`
+- Anonymous artifact size: 102,179 bytes; 60 immutable manifested files.
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
@@ -63,12 +63,12 @@ commit and all three hashes together; never mix files from different freezes.
 
 - [x] Separate SCITEPRESS source committed at
       `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`; the current reviewed source is
-      `5ed5dad47e9b2902385f4ee873da5c3fb9683bbd` and changes no frozen empirical
+      `92a4c870b6e697682b51fa41fd0f785c97c6b121` and changes no frozen empirical
       artifact.
-- [x] PDF is 11 A4 pages, with a 193-word expanded abstract and 38,760 extracted
+- [x] PDF is 11 A4 pages, with a 193-word expanded abstract and 39,102 extracted
       non-whitespace characters.
 - [x] PDF SHA-256 is
-      `4bd0048eedb7c8ddeeb1d42b0552d402ea18ec9cfe702e9bd82c01fb0c673463`.
+      `7d4c26640a5f4da34783d1a533c8cfeb807d2d7b37a1e52acdc37b8cf6386c07`.
 - [x] Two pinned Bouchet builds are byte-identical; all 11 pages, metadata, fonts,
       anonymity tokens, tables, plots, equations, and references were checked.
 - [x] ICAART reviewer assignment is frozen to **Agents** with the call topics

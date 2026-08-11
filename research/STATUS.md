@@ -92,8 +92,10 @@ and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.m
 
 ## Manuscript status and remaining work
 
-Commit `5ed5dad` is the current reviewed manuscript source; commit `fb1a594`
-binds its originality screen, PDF identities, portal metadata, and anonymous
+Commit `92a4c87` is the current reviewed manuscript source. It extends the
+earlier `5ed5dad` closest-work freeze with the closest located automatic RTS
+action-preselection configuration precedent; the current QA records bind its
+originality screen, PDF identities, portal metadata, and anonymous
 reviewer-artifact identity.
 The manuscript-content refreeze at `504cc2a` builds on the claim-preserving
 scientific and citation freeze at `e91674f` and retains the title centered on
@@ -140,11 +142,13 @@ statistic, and expanding the outcome labels. The edit is claim-preserving: all
 frozen inputs, estimates, uncertainty, citations, abstract fields, and portal
 metadata remain unchanged.
 
-Commit `5ed5dad` completes the current proposition-level citation precheck over
-all 32 bibliography keys and 40 key-by-citation placements. The source changes cite
+Commit `92a4c87` completes the current proposition-level citation precheck over
+all 33 bibliography keys and 41 key-by-citation placements. The source changes cite
 the exact game-API package and pinned Supalosa repository alongside the Chrono
 Divide project page and add the closest map-specific and later
-programmatic-strategy-synthesis precedents. No empirical result, method, scope boundary, conclusion, or portal
+programmatic-strategy-synthesis precedents, plus the closest located automatic
+RTS action-preselection configuration precedent. No empirical result, method,
+scope boundary, conclusion, or portal
 field changed. Both main-paper formats were re-rendered and
 inspected; the supplement remains byte-identical. Human source reading remains
 an explicit pre-submission gate.
@@ -159,9 +163,9 @@ Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 commit `7cdbe0d` hardens its direct-identity denylist, and the current builder
 tests enforce the exact eight-input reviewer description. Commit `d53f822`
 adds the exact SCITEPRESS candidate, a package-local manifest verifier, and
-Git-free build checks. The current 101,884-byte review archive is
+Git-free build checks. The current 102,179-byte review archive is
 byte-deterministic at SHA-256
-`8ede1a73f07bd06dcd8fa5a9c647984a55ecc9101cd715f6bf71171a2fb5b9d1`.
+`10f270f49d38d2a3d2175f598795fca8d8e7ca57c5736f0971e2462d2ee42d0c`.
 Its 60-file immutable manifest verifies, all artifact tests pass, and an
 independent macOS extraction passes 22 packaged tests and rebuilds the 18-page
 LNCS paper, five-page supplement, and 11-page A4 SCITEPRESS candidate without
@@ -206,9 +210,9 @@ eligibility still needs a written ruling; its presenter page documents live
 online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS submission format that reuses the frozen main-paper sections and result
-macros. The current candidate is 11 A4 pages with a 193-word expanded abstract and 38,760 extracted
+macros. The current candidate is 11 A4 pages with a 193-word expanded abstract and 39,102 extracted
 non-whitespace characters; two clean builds match at SHA-256
-`4bd0048eedb7c8ddeeb1d42b0552d402ea18ec9cfe702e9bd82c01fb0c673463`,
+`7d4c26640a5f4da34783d1a533c8cfeb807d2d7b37a1e52acdc37b8cf6386c07`,
 and every page passed visual and anonymity QA. It is not authorized for upload
 until ICAART confirms exceptional remote eligibility/procedure and double-blind
 AI-disclosure placement. The home page now establishes remote support for

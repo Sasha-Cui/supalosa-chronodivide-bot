@@ -17,17 +17,17 @@ Verify these files before beginning. Stop if any value differs.
 
 | Item | Frozen identity |
 | --- | --- |
-| Reviewed source | `5ed5dad47e9b2902385f4ee873da5c3fb9683bbd` |
-| ICAART PDF | `4bd0048eedb7c8ddeeb1d42b0552d402ea18ec9cfe702e9bd82c01fb0c673463` |
-| LNCS PDF | `617f5e3e8b0b7c209e4c7c92aaa4db432e72b1f407d8e09aea08b4cd8834a82d` |
+| Reviewed source | `92a4c870b6e697682b51fa41fd0f785c97c6b121` |
+| ICAART PDF | `7d4c26640a5f4da34783d1a533c8cfeb807d2d7b37a1e52acdc37b8cf6386c07` |
+| LNCS PDF | `c44c0d5739a33ae4155c18f0eba8c480785f4e3e1b9e2250dc03a43733a6d0a1` |
 | LNCS supplement | `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56` |
-| Anonymous artifact | `8ede1a73f07bd06dcd8fa5a9c647984a55ecc9101cd715f6bf71171a2fb5b9d1` |
+| Anonymous artifact | `10f270f49d38d2a3d2175f598795fca8d8e7ca57c5736f0971e2462d2ee42d0c` |
 | ICAART portal metadata | `2581e6ae5e00454919c9ddf6b6cea7721935117234bc675b7d19162a799db834` |
 
 Run from the repository root:
 
 ```text
-git rev-parse 5ed5dad
+git rev-parse 92a4c87
 sha256sum paper/build/main.pdf paper/build/supplement.pdf
 sha256sum paper_scitepress/build/main.pdf
 python3 artifact/scripts/verify_frozen_archive.py
@@ -159,6 +159,7 @@ replace primary-source reading or review of a venue-generated similarity report.
 | `young2012goal` | StarCraft goal priorities were evolved | related work | `[ ]` |
 | `othman2012starcraft` | XML-configured StarCraft tactical behavior was optimized | related work | `[ ]` |
 | `liu2016microbehaviors` | Microbehavior parameters and transfer to unseen combat scenarios were studied | related work | `[ ]` |
+| `ouessai2022evolving` | A genetic algorithm configured action-preselection heuristics for particular $\mu$RTS map--opponent settings | related work | `[ ]` |
 | `mora2012noisy` | Noisy RTS fitness motivates repeated combats, maps, and reevaluation | related work; supplement | `[ ]` |
 | `castejon2026tales` | Recent work compares evolutionary training modes for a weighted game bot | related work | `[ ]` |
 | `marino2021programmatic` | Map-specific programmatic $\mu$RTS strategies were synthesized from a domain-specific language | related work | `[ ]` |
