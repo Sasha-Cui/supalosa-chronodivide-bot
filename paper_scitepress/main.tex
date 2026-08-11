@@ -1,0 +1,92 @@
+\documentclass[a4paper,twoside]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage{epsfig}
+\usepackage{calc}
+\usepackage{amssymb}
+\usepackage{amstext}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{multicol}
+\usepackage{pslatex}
+\usepackage{apalike}
+\usepackage{algorithm2e}
+\usepackage[bottom]{footmisc}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{SCITEPRESS}
+
+\setlength{\emergencystretch}{1em}
+\usetikzlibrary{arrows.meta,positioning,matrix}
+\pgfplotsset{compat=1.18}
+
+\definecolor{ChronoInk}{HTML}{1F2937}
+\definecolor{ChronoMuted}{HTML}{5B6573}
+\definecolor{ChronoBlue}{HTML}{1769AA}
+\definecolor{ChronoBlueLight}{HTML}{9CC9E8}
+\definecolor{ChronoOrange}{HTML}{C65D00}
+\definecolor{ChronoPale}{HTML}{E8F2F8}
+\definecolor{ChronoGrid}{HTML}{AEB8C2}
+\AtBeginDocument{\color{ChronoInk}}
+\hypersetup{colorlinks=true,linkcolor=ChronoBlue,citecolor=ChronoBlue,urlcolor=ChronoBlue}
+
+\input{generated/metrics}
+
+\title{Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono Divide}
+\author{\authorname{Anonymous Author(s)}}
+\keywords{Real-time Strategy Games, Algorithm Configuration, Simulation-based
+Optimization, Reproducible Evaluation, Distribution Shift.}
+\abstract{\input{abstract}}
+
+% The official style asks for uppercase section headings. Preserve star and
+% optional-title forms so the bibliography heading remains compatible.
+\let\scitepresssection\section
+\RenewDocumentCommand{\section}{s o m}{%
+  \IfBooleanTF{#1}{%
+    \IfNoValueTF{#2}{\scitepresssection*{\MakeUppercase{#3}}}{\scitepresssection*[{#2}]{\MakeUppercase{#3}}}%
+  }{%
+    \IfNoValueTF{#2}{\scitepresssection{\MakeUppercase{#3}}}{\scitepresssection[{#2}]{\MakeUppercase{#3}}}%
+  }%
+}
+
+% The three result/protocol tables were designed for a one-column LNCS page.
+% Give them the full two-column width without changing their scientific source.
+\expandafter\let\expandafter\scitepresstable\csname table*\endcsname
+\expandafter\let\expandafter\endscitepresstable\csname endtable*\endcsname
+\renewenvironment{table}[1][t]{\scitepresstable[#1]}{\endscitepresstable}
+
+% Narrow SCITEPRESS columns otherwise overrun on the two multi-term estimand
+% equations. A uniform 9-point display size preserves the shared equations.
+\AtBeginEnvironment{equation}{\small}
+
+\begin{document}
+\onecolumn
+\maketitle
+\normalsize
+\setcounter{footnote}{0}
+\vfill
+
+\input{../paper/sections/introduction}
+\input{../paper/sections/related_work}
+\begingroup
+\expandafter\let\expandafter\scitepressfigure\csname figure*\endcsname
+\expandafter\let\expandafter\endscitepressfigure\csname endfigure*\endcsname
+\renewenvironment{figure}[1][t]{\scitepressfigure[#1]}{\endscitepressfigure}
+\input{../paper/sections/environment}
+\endgroup
+\input{../paper/sections/protocol}
+\input{../paper/sections/results}
+\input{../paper/sections/diagnostics}
+\input{../paper/sections/reproducibility}
+\input{../paper/sections/conclusion}
+
+\bibliographystyle{apalike}
+\bibliography{references}
+\end{document}

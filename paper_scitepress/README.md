@@ -1,0 +1,31 @@
+# SCITEPRESS fallback manuscript
+
+This directory is a separate, anonymous SCITEPRESS-format fallback for the
+frozen Chrono Divide study. It reuses the authoritative section sources,
+generated result macros, and bibliography under `../paper/`; it does not fork
+the empirical record or authorize new outcome-bearing analysis.
+
+Build from the repository root with:
+
+```bash
+make -C paper_scitepress check
+```
+
+The build uses a fixed `SOURCE_DATE_EPOCH` tied to manuscript source commit
+`cb891b47c9bb5ad3ac75c2d67b59865d56a7e1d1`. A clean build should therefore
+produce the same PDF bytes under the pinned Bouchet TeX toolchain.
+
+## Official template provenance
+
+The four unmodified files in `vendor/` came from the official conference
+LaTeX archive at
+<https://www.scitepress.org/documents/SCITEPRESS_Conference_Latex.zip>,
+downloaded on 2026-08-11. The archive SHA-256 was
+`ec6cfaa11962e08d5c6a402124f21c3bca3591397521406ab6d1889398a3807a`.
+`VENDOR_SHA256SUMS` records the individual file hashes.
+
+The review PDF deliberately contains `Anonymous Author(s)` and no affiliation,
+email, acknowledgment, repository URL, or AI-use disclosure. ICAART's current
+guidelines require AI disclosure while also requiring acknowledgments to be
+removed for double-blind review. Do not submit this fallback until the
+secretariat gives written instructions for the disclosure location.

@@ -1,0 +1,78 @@
+from __future__ import annotations
+
+import hashlib
+import re
+import unittest
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[2]
+FALLBACK = ROOT / "paper_scitepress"
+
+
+class FallbackManuscriptTest(unittest.TestCase):
+    def test_reuses_every_authoritative_main_section(self) -> None:
+        source = (FALLBACK / "main.tex").read_text()
+        expected = [
+            "introduction",
+            "related_work",
+            "environment",
+            "protocol",
+            "results",
+            "diagnostics",
+            "reproducibility",
+            "conclusion",
+        ]
+        for stem in expected:
+            self.assertIn(rf"\input{{../paper/sections/{stem}}}", source)
+        self.assertNotIn(r"\input{../paper/sections/abstract}", source)
+
+    def test_abstract_is_within_official_word_bounds(self) -> None:
+        source = (FALLBACK / "abstract.tex").read_text()
+        visible = re.sub(r"\\[A-Za-z]+\*?(?:\{\})?", " VALUE ", source)
+        visible = re.sub(r"[{}~\\]", " ", visible)
+        words = re.findall(r"[A-Za-z0-9][A-Za-z0-9'&.-]*", visible)
+        self.assertGreaterEqual(len(words), 70)
+        self.assertLessEqual(len(words), 200)
+
+    def test_review_sources_are_anonymous(self) -> None:
+        paths = [
+            FALLBACK / "main.tex",
+            FALLBACK / "abstract.tex",
+            FALLBACK / "README.md",
+        ]
+        text = "\n".join(path.read_text() for path in paths).lower()
+        forbidden = (
+            "sasha",
+            "cui",
+            "yale",
+            "zc362",
+            "pi_jss233",
+            "/nfs/",
+            "github.com/sasha-cui",
+        )
+        for token in forbidden:
+            self.assertNotIn(token, text)
+
+    def test_headline_values_are_generated_not_duplicated(self) -> None:
+        text = (FALLBACK / "main.tex").read_text() + (FALLBACK / "abstract.tex").read_text()
+        for literal in ("0.535", "0.199", "0.336", "0.215", "0.457", "8,704"):
+            self.assertNotIn(literal, text)
+        self.assertIn(r"\ImprovementEstimate{}", text)
+        self.assertIn(r"\ChampionAbsoluteLower{}", text)
+
+    def test_vendor_files_match_the_official_archive(self) -> None:
+        manifest = [
+            line
+            for line in (FALLBACK / "VENDOR_SHA256SUMS").read_text().splitlines()
+            if line.strip()
+        ]
+        self.assertEqual(len(manifest), 4)
+        for line in manifest:
+            expected, name = line.split(None, 1)
+            data = (FALLBACK / "vendor" / name).read_bytes()
+            self.assertEqual(hashlib.sha256(data).hexdigest(), expected)
+
+
+if __name__ == "__main__":
+    unittest.main()
