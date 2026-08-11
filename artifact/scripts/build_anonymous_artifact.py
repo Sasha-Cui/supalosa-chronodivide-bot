@@ -20,6 +20,8 @@ from typing import Any
 PACKAGE_NAME = "chrono-divide-review-artifact"
 REDACTED = "REDACTED_FOR_DOUBLE_BLIND"
 DENIED_TEXT = (
+    "Sasha Cui",
+    "sasha.z.cui@gmail.com",
     "zc362",
     "pi_jss233",
     "/nfs/roberts",
