@@ -99,7 +99,9 @@ interpretation of the EvoStar code.
 - Workshop and special-session paper deadline: **2026-12-03**.
 - Conference: **2027-02-23 through 2027-02-25**.
 - Format: SCITEPRESS two-column A4 template. A regular paper may be accepted as
-  a 12-page full paper or an 8-page short paper.
+  a 12-page full paper or an 8-page short paper. Review submissions must contain
+  10,000--50,000 non-whitespace characters, and the template requires a
+  70--200-word abstract.
 - Early speaker registration: **EUR 620** for members or **EUR 680** for
   nonmembers at the currently posted rates.
 - Remote status: the official presenter page gives complete live Zoom
@@ -107,6 +109,10 @@ interpretation of the EvoStar code.
   presenter to attend synchronously even when a backup video is uploaded. Ask
   the secretariat to confirm that this route is available to the paper before
   paying.
+- AI-disclosure ambiguity: the guidelines require disclosure in the
+  acknowledgments and a citation to the AI system in affected sections, while
+  the same double-blind instructions require acknowledgments to be omitted.
+  Obtain the secretariat's exact review-version placement instruction.
 - Official pages: [call and dates](https://icaart.scitevents.org/CallForPapers.aspx?y=2027),
   [paper-length definitions](https://icaart.scitevents.org/Glossary.aspx),
   [online presentation instructions](https://icaart.scitevents.org/presentationdetails.aspx),
@@ -114,14 +120,20 @@ interpretation of the EvoStar code.
   [templates](https://icaart.scitevents.org/Templates.aspx), and
   [registration fees](https://icaart.scitevents.org/RegistrationFees.aspx?y=2027).
 
-Use a dated decision rule because the first regular round arrives before the
-EvoStar deadline. Send both venue inquiries immediately. If EvoStar has not
-confirmed scope, remote presentation, repository handling, and AI eligibility
-by **2026-08-20**, begin a SCITEPRESS conversion without changing the frozen
-science. By **2026-09-01**, either commit to ICAART's September 15 regular-paper
-round or retain SCAG based on written answers. The October 22 regular round is
-the final practical fallback. Submit the completed study as a regular paper,
-not as a position paper. Do not submit to both archival venues simultaneously.
+The SCITEPRESS conversion was completed prospectively on 2026-08-11 without
+changing the frozen science. It is 10 A4 pages, has a 196-word abstract and
+36,325 extracted non-whitespace characters, and reproduces byte-for-byte across
+clean builds at SHA-256
+`38758d72d1a517ad0c41134c2e649c20e661fe4a54c3eb48f903910064d38c51`.
+All pages passed rendered inspection; see `SCITEPRESS_QA.md`.
+
+Use the dated rule in `VENUE_DECISION_PACKET.md` because the first regular
+round arrives before the EvoStar deadline. Send both venue inquiries
+immediately. By **2026-09-01**, either commit to ICAART's September 15
+regular-paper round or retain SCAG based on written answers. The October 22
+regular round is the final practical fallback. Submit the completed study as a
+regular paper, not as a position paper. Do not submit to both archival venues
+simultaneously.
 
 ### Entertainment Computing — no-travel archival fallback
 

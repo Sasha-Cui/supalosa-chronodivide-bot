@@ -8,13 +8,15 @@ the anonymous branch during review.
 
 ## Target and policy rulings
 
-- [ ] Target confirmed: EvoApplications 2027, SCAG special session.
-- [ ] Chair confirms the application/evaluation contribution is in scope.
-- [ ] Chair confirms fully remote presentation is permitted.
-- [ ] Chair rules on the previously public named repository under double-blind
+- [ ] Exactly one archival target is selected by 2026-09-01.
+- [ ] If SCAG is selected, its chairs confirm the application/evaluation
+      contribution is in scope.
+- [ ] The selected venue confirms fully remote presentation is permitted.
+- [ ] If SCAG is selected, its chairs rule on the previously public named
+      repository under double-blind
       review.
-- [ ] Chair rules on the recorded beyond-copy-editing use of OpenAI Codex and
-      specifies any required disclosure.
+- [ ] The selected venue rules on the recorded beyond-copy-editing use of
+      OpenAI Codex and specifies any required disclosure and citation.
 - [x] Anonymous supplement and reviewer artifact together fit the official
       10 MB supplementary-material field; every essential detail remains in
       the main paper.
@@ -43,6 +45,24 @@ the anonymous branch during review.
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
 commit and all three hashes together; never mix files from different freezes.
+
+## ICAART fallback identity
+
+- [x] Separate SCITEPRESS source committed at
+      `e1b10b5e5648a3c4e7c032bbffcf01f098da682f` without changing the LNCS source
+      or frozen empirical artifacts.
+- [x] PDF is 10 A4 pages, with a 196-word abstract and 36,325 extracted
+      non-whitespace characters.
+- [x] PDF SHA-256 is
+      `38758d72d1a517ad0c41134c2e649c20e661fe4a54c3eb48f903910064d38c51`.
+- [x] Two clean builds are byte-identical; all ten pages, metadata, fonts,
+      anonymity tokens, tables, plots, equations, and references were checked.
+- [ ] ICAART confirms that the presenting author may elect the documented live
+      online route without physical attendance.
+- [ ] ICAART specifies where the required AI acknowledgment and affected-
+      section system citation belong in the double-blind review version.
+- [ ] If ICAART is selected, apply only the approved disclosure and
+      claim-preserving edits, then repeat `SCITEPRESS_QA.md` before upload.
 
 ## Scientific consistency
 

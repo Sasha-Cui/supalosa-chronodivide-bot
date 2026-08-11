@@ -143,9 +143,15 @@ training:
 ICAART 2027 is now the verified policy-compatible fallback: its official
 guidance permits disclosed AI-assisted writing, revision, and code; its
 presenter page documents live online talks; and its first regular-paper
-deadline is 2026-09-15. If EvoStar has not supplied affirmative written rulings
-by 2026-08-20, begin the 12-page SCITEPRESS conversion and decide the venue by
-2026-09-01. Do not submit to both archival venues simultaneously.
+deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
+SCITEPRESS fallback that reuses the frozen main-paper sections and result
+macros. It is 10 A4 pages with a 196-word abstract and 36,325 extracted
+non-whitespace characters; two clean builds match at SHA-256
+`38758d72d1a517ad0c41134c2e649c20e661fe4a54c3eb48f903910064d38c51`,
+and every page passed visual and anonymity QA. It is not authorized for upload
+until ICAART confirms online-route election and double-blind AI-disclosure
+placement. Decide one venue by 2026-09-01 and do not submit to both archival
+venues simultaneously.
 
 The candid submission decision is **go** for a scoped lower-tier game-AI or
 algorithm-configuration workshop/special session, and **no-go** for a broad or

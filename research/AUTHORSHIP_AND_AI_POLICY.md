@@ -29,9 +29,10 @@ ICAART 2027 is the verified policy-compatible fallback. Its official
 [AI-tools guidance](https://icaart.scitevents.org/AiTools.aspx) permits
 responsible AI assistance with manuscript writing, revision, and code, requires
 disclosure of the tool and affected content, and keeps human authors fully
-accountable. Its double-blind call separately asks authors to omit
-acknowledgments, so the secretariat must still specify where the disclosure
-belongs in the review version. The factual inquiry is in
+accountable. The 2027 guidelines also say that affected sections should cite
+the AI system. The same double-blind call asks authors to omit acknowledgments,
+so the secretariat must specify where both the disclosure and system citation
+belong in the review version. The factual inquiry is in
 [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md).
 
 ## Required author verification

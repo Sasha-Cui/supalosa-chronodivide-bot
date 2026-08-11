@@ -79,8 +79,9 @@ Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 >
 > I am considering a 2027 regular-paper submission on reproducible
 > configuration and held-out evaluation of a scripted real-time-strategy
-> agent. Before adapting the paper to the SCITEPRESS template, could you please
-> clarify two points?
+> agent. I have prepared an anonymous 10-page version in the official
+> SCITEPRESS template. Before submitting it, could you please clarify two
+> points?
 >
 > 1. The presenter instructions describe live online oral and poster
 >    presentations over Zoom. May an author elect this online route for an
@@ -90,10 +91,12 @@ Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 >    software implementation, experiment orchestration, research auditing,
 >    statistical cross-checks, literature triage, and manuscript drafting and
 >    revision. The human author will personally verify the evidence, citations,
->    code, and final manuscript and remain fully accountable. Because the
->    submission call asks authors to omit acknowledgments for double-blind
->    review, where should the required AI-use disclosure appear in the review
->    version?
+>    code, and final manuscript and remain fully accountable. The 2027
+>    guidelines require AI-generated text to be disclosed in acknowledgments
+>    and say that affected sections should cite the AI system, but the same
+>    double-blind instructions require authors to omit acknowledgments. Where
+>    should the disclosure and any system citation appear in the review
+>    version, and what exact wording or citation form do you require?
 >
 > The paper reports a completed 8,704-game study with family-disjoint training
 > and evaluation. Its configured policy improves a prospectively frozen generic

@@ -29,11 +29,12 @@ family-disjoint evaluation and configuration of a generic scripted RTS policy.
 10. [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md) — factual
    generative-AI use boundary, author-verification requirements, and venue
    eligibility gate.
-11. [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md),
+11. [`VENUE_DECISION_PACKET.md`](VENUE_DECISION_PACKET.md),
+   [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md),
    [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md), and
    [`SUBMISSION_ROADMAP.md`](SUBMISSION_ROADMAP.md) — send-ready external
-   questions, a neutral cold-read protocol, and the dated path to the
-   2026-11-01 deadline.
+   questions, a neutral cold-read protocol, and the dated path to one selected
+   venue deadline.
 12. [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md) — the final claim,
    anonymity, rights, artifact, and upload freeze record.
 13. [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) — append-only mapping from every
@@ -75,8 +76,10 @@ separately versioned prospective experiment.
 | Literature and novelty boundary | [`RELATED_WORK.md`](RELATED_WORK.md) |
 | Environment contract | [`ENVIRONMENT.md`](ENVIRONMENT.md) |
 | Venue fit and deadlines | [`VENUE_STRATEGY.md`](VENUE_STRATEGY.md) |
+| Venue decision handoff | [`VENUE_DECISION_PACKET.md`](VENUE_DECISION_PACKET.md) |
 | Accepted-paper venue calibration | [`SCAG_ACCEPTED_PAPER_CALIBRATION.md`](SCAG_ACCEPTED_PAPER_CALIBRATION.md) |
 | Manuscript QA | [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md) |
+| SCITEPRESS fallback QA | [`SCITEPRESS_QA.md`](SCITEPRESS_QA.md) |
 | Reviewer-style decision | [`REVIEWER_AUDIT.md`](REVIEWER_AUDIT.md) |
 | Reviewer-response evidence index | [`REVIEW_RESPONSE_GUIDE.md`](REVIEW_RESPONSE_GUIDE.md) |
 | Anonymity and release risk | [`ANONYMITY_RELEASE_RISK.md`](ANONYMITY_RELEASE_RISK.md) |
@@ -86,6 +89,7 @@ separately versioned prospective experiment.
 | Dated submission roadmap | [`SUBMISSION_ROADMAP.md`](SUBMISSION_ROADMAP.md) |
 | Submission freeze checklist | [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md) |
 | Anonymous artifact builder | [`../artifact/README.md`](../artifact/README.md) |
+| SCITEPRESS fallback source | [`../paper_scitepress/README.md`](../paper_scitepress/README.md) |
 
 ## Reproducibility layout
 
