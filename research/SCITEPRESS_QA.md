@@ -5,16 +5,17 @@ Prepared: **2026-08-11**
 ## Frozen candidate identity
 
 - Candidate introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
-- Current reviewed source: `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0`
-- Authoritative shared manuscript source: `419a0f72188f957ae144262f62c62bcc11a66ac3`
+- Current reviewed source: `77d93359242756f07afba30d88fb2db8fd97e7b2`
+- Scientific-claim freeze: `419a0f72188f957ae144262f62c62bcc11a66ac3`
+- Claim-preserving terminology refreeze: `77d93359242756f07afba30d88fb2db8fd97e7b2`
 - Portable artifact/build QA: `d53f822144bd0b3fffe3b4d778770091f77900b8`
 - Submission metadata exporter: `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0`
 - Build entry point: `paper_scitepress/main.tex`
 - Target: ICAART 2027 regular paper, anonymous SCITEPRESS review format
-- PDF: 10 A4 pages, 164,295 bytes
-- PDF SHA-256: `1a92466bc627a3edc3d757542289df03121bdbe4ebccdc8947508cf7b084747c`
+- PDF: 10 A4 pages, 164,420 bytes
+- PDF SHA-256: `3ec1a157b4b09ccbf398f68dd254da8f0abd9f90a7520550bead46246e1b9ff4`
 - Expanded plain-text abstract: 195 words
-- Extracted submission length: 36,231 non-whitespace characters
+- Extracted submission length: 36,355 non-whitespace characters
 - Portal metadata JSON SHA-256: `b6c79cacfc78289ccface7d0793d46c6c6317451e3f9cdc0b0984731fba2ea47`
 
 The PDF is a build product and is not committed. The hash identifies the exact
@@ -53,7 +54,7 @@ PDF hash above. The fixed `SOURCE_DATE_EPOCH` is a stable reproducibility
 constant established at the earlier comparator-justified freeze; the current
 reviewed source identity is recorded above.
 
-The extracted PDF contains 36,231 non-whitespace characters, within ICAART's
+The extracted PDF contains 36,355 non-whitespace characters, within ICAART's
 10,000--50,000 review-submission interval. Its 195-word expanded abstract is within the
 official 70--200-word interval. The page is A4 and the current 10-page build is
 below the 12-page full-paper proceedings limit.
@@ -62,11 +63,11 @@ below the 12-page full-paper proceedings limit.
 
 The repaired anonymous archive packages this exact SCITEPRESS source rather
 than only the LNCS secondary format. A fresh Git-free extraction on macOS using
-Python 3.14.2, GNU Make 3.81, and TeX Live 2022 verified all 59 immutable files
+Python 3.12.13, GNU Make 3.81, and TeX Live 2022 verified all 59 immutable files
 before and after regeneration, passed the ten shared and nine
 SCITEPRESS-specific tests, and completed `make -C paper_scitepress check`.
-The result is a 10-page A4 PDF of 164,132 bytes with SHA-256
-`5681311606accf025bc6261037523582578825f10a4544572b6032e49059e01d`.
+The result is a 10-page A4 PDF of 164,267 bytes with SHA-256
+`9531e3fe2266487e173855ef119162b5c8e4b2ecca25c0d49e3b6be6ddd8e8bd`.
 That byte identity is intentionally recorded separately from the Bouchet TeX
 Live 2024 identity above; the package manifest and generated-fragment hashes,
 not cross-version PDF bytes, are the portable invariant. The independent final
@@ -106,6 +107,10 @@ The acceptance-criteria edit then tightened the contribution framing and made
 the family-effect caption self-contained. A fresh 10-page render found the
 revised contribution and caption legible and found no change to the paper's
 claim boundary or conclusion.
+The terminology refreeze at `77d9335` then replaced one-off acronyms with
+descriptive names, stated the exact five-family lower-tail statistic, and
+expanded the confirmatory outcome labels. A fresh complete render and a second
+macOS artifact build found all ten pages legible with no page-count change.
 The study-flow diagram was widened to two columns after the first pass; the
 final pass found no clipped or overlapping text, invisible content, broken
 glyph, unreadable plot label, margin violation, misleading caption, or malformed

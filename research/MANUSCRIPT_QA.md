@@ -4,13 +4,13 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0`
+- Source commit: `77d93359242756f07afba30d88fb2db8fd97e7b2`
 - Main source: `paper/main.tex`
 - Supplement source: `paper/supplement.tex`
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 16 pages total; non-reference content ends on page 14
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `a93b9a759d52848bd0fb39c39d6edcd6d2e554573beb58c6f0ce214cb303a2aa`
+- Main PDF SHA-256: `2434b9a2684025afd2eca8cfb505d1890b6bbeebf97e87ce738538eda5e6401a`
 - Supplement PDF SHA-256: `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98`
 
 The PDFs are build products and are not committed. Their hashes identify the
@@ -107,6 +107,15 @@ above. Fresh Poppler renders covered all 16 main-paper pages, all five
 supplement pages, and all 10 SCITEPRESS pages; the changed contribution and
 family-effect pages were also inspected at full resolution.
 
+The claim-preserving terminology refreeze at `77d9335` removes undefined
+one-off acronyms, names the championship lower-tail rank as the exact mean of
+the five lowest family scores, and expands the confirmatory outcome labels.
+It changes no frozen input, result, estimator, citation, abstract, or portal
+field. Two clean Bouchet builds were byte-identical. Contact-sheet inspection
+covered all 31 pages, and every page affected by reflow was inspected at full
+resolution; the 10-page ICAART, 16-page LNCS, and five-page supplement layouts
+remain clean.
+
 Commit `0f3e690` adds a deterministic plain-text ICAART metadata exporter and
 does not change manuscript content or PDF bytes. Its output expands every
 result macro, contains no residual LaTeX, records the exact 195-word abstract,
@@ -130,7 +139,7 @@ The claim audit confirmed that the paper:
 
 ## Clean export and reviewer artifact
 
-A committed submission revision at `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0`
+A committed submission revision at `77d93359242756f07afba30d88fb2db8fd97e7b2`
 and the portable-artifact repair at
 `d53f822144bd0b3fffe3b4d778770091f77900b8` passed ten paper-generator and
 manuscript-invariant tests, nine SCITEPRESS tests, two artifact-builder tests,
@@ -139,8 +148,8 @@ and one venue-ruling-template test (26 tests total). They regenerated all paper
 fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
-`8620c456bbbbde78ce7092d335ff5e6f407eace3ddd3d56d71a020181f69ecf6`
-and size 95,169 bytes. Two independent builds produced that same hash. The
+`7d385367857dd0486fb66696783331296c1eb59099f541f89a4cbcfd81f99eb3`
+and size 95,193 bytes. Two independent builds produced that same hash. The
 archive contains 59 manifested immutable files, normalized `0/0` ownership and
 epoch timestamps, no Git tree, no bot packages, and no direct author,
 scheduler-account, institution, or private-path token. It now contains both the
@@ -150,15 +159,15 @@ boundary report the exact eight sanitized JSON inputs, and regression tests
 enforce that count. A package-local verifier checks every manifested file and
 rejects missing, changed, or unexpected immutable files.
 
-A fresh extraction on an independent macOS machine used Python 3.14.2, GNU
+A fresh extraction on an independent macOS machine used Python 3.12.13, GNU
 Make 3.81, and TeX Live 2022 rather than Bouchet's Python 3.9 and TeX Live 2024.
 The manifest verified both before and after deterministic regeneration, all 19
 packaged manuscript tests passed, and the Git-free build produced the expected
 16-page Letter LNCS paper, five-page Letter supplement, and 10-page A4
 SCITEPRESS candidate. The local-toolchain PDF identities were respectively
-`20a17d2304ca5e6761c2b6696fc4a8581c1835b09fe4bc889c098abcca560030`,
+`777b1d05447ac00a63633e3be1e8ff12be5b80d632bd4befd5262ce8469def9c`,
 `82e54a6266bdc211530d6cde92443c6707f78e975dbdd77cc1a4c6b2db8cc20b`,
-and `5681311606accf025bc6261037523582578825f10a4544572b6032e49059e01d`.
+and `9531e3fe2266487e173855ef119162b5c8e4b2ecca25c0d49e3b6be6ddd8e8bd`.
 PDF bytes legitimately differ across TeX distributions, while all immutable
 sources and generated fragments remain manifest-bound. All fonts were embedded;
 the final logs contained no overfull box, unresolved reference/citation, rerun,

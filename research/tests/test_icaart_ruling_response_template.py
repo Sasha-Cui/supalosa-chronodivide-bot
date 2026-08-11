@@ -37,8 +37,9 @@ class IcaartRulingResponseTemplateTest(unittest.TestCase):
             self.assertIn(status, template)
 
         for digest in (
-            "1a92466bc627a3edc3d757542289df03121bdbe4ebccdc8947508cf7b084747c",
-            "8620c456bbbbde78ce7092d335ff5e6f407eace3ddd3d56d71a020181f69ecf6",
+            "77d93359242756f07afba30d88fb2db8fd97e7b2",
+            "3ec1a157b4b09ccbf398f68dd254da8f0abd9f90a7520550bead46246e1b9ff4",
+            "7d385367857dd0486fb66696783331296c1eb59099f541f89a4cbcfd81f99eb3",
             "b6c79cacfc78289ccface7d0793d46c6c6317451e3f9cdc0b0984731fba2ea47",
         ):
             self.assertIn(digest, template)

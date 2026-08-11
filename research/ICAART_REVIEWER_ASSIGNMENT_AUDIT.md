@@ -88,7 +88,7 @@ candidate addresses each without adding post-hoc evidence:
 | Are figures adequate? | Study flow, complete family effects, paired outcome transitions, and multiplicity-aware component effects were rendered and checked at reading scale. | Repeat visual QA after any disclosure or availability edit. |
 | Are conclusions and future work convincing? | The conclusion leads with the passed relative result, failed joint criterion, avoided-loss pattern, and non-claims; limitations specify prospective extensions. | Do not convert future work into evidence already obtained. |
 | Are references current and appropriate? | The 27-entry bibliography includes primary RTS configuration, algorithm-configuration, benchmark, inference, Chrono Divide, Supalosa, and 2026 venue-local work; DOI metadata was audited. | Human author must read and approve every cited source. |
-| Does formatting need adjustment? | The candidate is 10 A4 pages, 36,231 non-whitespace characters, uses the official template, has embedded fonts, and has no unresolved reference or overflow warning. | Recheck the PRIMORIS-rendered/downloaded copy. |
+| Does formatting need adjustment? | The candidate is 10 A4 pages, 36,355 non-whitespace characters, uses the official template, has embedded fonts, and has no unresolved reference or overflow warning. | Recheck the PRIMORIS-rendered/downloaded copy. |
 | Does English need improvement? | The paper has completed multiple full-text and rendered-page passes; automated TeX lint produced no actionable prose defect. | Use the unprimed cold read for the final language decision. |
 
 The correct reviewer-facing claim remains: configuration robustly improves the

@@ -126,6 +126,12 @@ references, missing citations, or BibTeX warnings. All 21 LNCS/supplement pages
 and all 10 SCITEPRESS pages have received rendered visual checks. The current PDF SHA-256 values are recorded in
 [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md).
 
+Commit `77d9335` completes the final machine-assisted prose screen by replacing
+undefined one-off acronyms, naming the exact five-family lower-tail ranking
+statistic, and expanding the outcome labels. The edit is claim-preserving: all
+frozen inputs, estimates, uncertainty, citations, abstract fields, and portal
+metadata remain unchanged.
+
 Commit `0f3e690` adds a deterministic plain-text ICAART portal-metadata export
 and tests the same exporter inside the anonymous artifact. It leaves all
 manuscript PDF bytes unchanged while replacing the earlier approximate abstract
@@ -135,9 +141,9 @@ Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 commit `7cdbe0d` hardens its direct-identity denylist, and the current builder
 tests enforce the exact eight-input reviewer description. Commit `d53f822`
 adds the exact SCITEPRESS candidate, a package-local manifest verifier, and
-Git-free build checks. The current 95,169-byte review archive is
+Git-free build checks. The current 95,193-byte review archive is
 byte-deterministic at SHA-256
-`8620c456bbbbde78ce7092d335ff5e6f407eace3ddd3d56d71a020181f69ecf6`.
+`7d385367857dd0486fb66696783331296c1eb59099f541f89a4cbcfd81f99eb3`.
 Its 59-file immutable manifest verifies, all artifact tests pass, and an
 independent macOS extraction passes 19 packaged tests and rebuilds the 16-page
 LNCS paper, five-page supplement, and 10-page A4 SCITEPRESS candidate without
@@ -168,9 +174,9 @@ guidance permits disclosed AI-assisted writing, revision, and code; its
 presenter page documents live online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS submission format that reuses the frozen main-paper sections and result
-macros. It is 10 A4 pages with a 195-word expanded abstract and 36,231 extracted
+macros. It is 10 A4 pages with a 195-word expanded abstract and 36,355 extracted
 non-whitespace characters; two clean builds match at SHA-256
-`1a92466bc627a3edc3d757542289df03121bdbe4ebccdc8947508cf7b084747c`,
+`3ec1a157b4b09ccbf398f68dd254da8f0abd9f90a7520550bead46246e1b9ff4`,
 and every page passed visual and anonymity QA. It is not authorized for upload
 until ICAART confirms exceptional remote eligibility/procedure and double-blind
 AI-disclosure placement. The home page now establishes remote support for
