@@ -46,6 +46,19 @@ evidence and a disjoint fresh development pool, while test identities and
 outcomes remained sealed. We report this adaptation history rather than
 presenting method v2 as if it had been the only idea tried.
 
+This design separates two confirmatory questions from one post-confirmatory
+diagnostic question:
+
+\begin{enumerate}
+  \item[RQ1.] Does the configured policy improve the shipped StrongBot default
+  against pinned Supalosa on unseen map families?
+  \item[RQ2.] Does the configured policy itself score reliably above 0.5
+  against that opponent under the same family-level analysis?
+  \item[RQ3.] Which paired outcome transitions and terminal-state patterns
+  accompany any improvement, and do one-group policy reverts isolate a
+  component? RQ3 is descriptive and cannot rescue either confirmatory gate.
+\end{enumerate}
+
 The principal result is positive but narrower than a claim of a winning bot.
 Across 16 test families, the champion scores \ChampionScore{} and the shipped
 StrongBot default scores \DefaultScore{} against the same Supalosa revision.
