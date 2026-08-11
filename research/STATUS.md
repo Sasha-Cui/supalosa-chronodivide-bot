@@ -132,6 +132,15 @@ statistic, and expanding the outcome labels. The edit is claim-preserving: all
 frozen inputs, estimates, uncertainty, citations, abstract fields, and portal
 metadata remain unchanged.
 
+Commit `91f9978` completes a proposition-level citation precheck over all 27
+bibliography keys and 35 key-by-citation placements. The only source change is
+to cite the exact game-API package and pinned Supalosa repository alongside the
+Chrono Divide project page at both environment-description placements. No
+wording, empirical result, method, scope boundary, conclusion, bibliography
+entry, or portal field changed. Both main-paper formats were re-rendered and
+inspected; the supplement remains byte-identical. Human source reading remains
+an explicit pre-submission gate.
+
 Commit `0f3e690` adds a deterministic plain-text ICAART portal-metadata export
 and tests the same exporter inside the anonymous artifact. It leaves all
 manuscript PDF bytes unchanged while replacing the earlier approximate abstract
@@ -141,10 +150,10 @@ Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 commit `7cdbe0d` hardens its direct-identity denylist, and the current builder
 tests enforce the exact eight-input reviewer description. Commit `d53f822`
 adds the exact SCITEPRESS candidate, a package-local manifest verifier, and
-Git-free build checks. The current 99,618-byte review archive is
+Git-free build checks. The current 99,619-byte review archive is
 byte-deterministic at SHA-256
-`2ad44d30c0fa05d31896f6afaf94ffe2060f9f48d662309a20762cfbaea56fd2`.
-Its 59-file immutable manifest verifies, all artifact tests pass, and an
+`57307d0ace24191719b8ccaf3a5ddc463e0c43f4e581d835890c1397dc516f03`.
+Its 60-file immutable manifest verifies, all artifact tests pass, and an
 independent macOS extraction passes 21 packaged tests and rebuilds the 16-page
 LNCS paper, five-page supplement, and 10-page A4 SCITEPRESS candidate without
 undefined references, overflow, or BibTeX warnings. All fonts are embedded and
@@ -180,9 +189,9 @@ guidance permits disclosed AI-assisted writing, revision, and code; its
 presenter page documents live online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS submission format that reuses the frozen main-paper sections and result
-macros. It is 10 A4 pages with a 195-word expanded abstract and 36,355 extracted
+macros. It is 10 A4 pages with a 195-word expanded abstract and 36,409 extracted
 non-whitespace characters; two clean builds match at SHA-256
-`3ec1a157b4b09ccbf398f68dd254da8f0abd9f90a7520550bead46246e1b9ff4`,
+`6f605941b8a0bee2b14d875bc973166f2710981746ffb245f563a74618926093`,
 and every page passed visual and anonymity QA. It is not authorized for upload
 until ICAART confirms exceptional remote eligibility/procedure and double-blind
 AI-disclosure placement. The home page now establishes remote support for

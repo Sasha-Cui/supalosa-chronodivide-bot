@@ -77,6 +77,7 @@ separately versioned prospective experiment.
 | Deterministic policy interface | [`METHOD_INTERFACE_GATE.md`](METHOD_INTERFACE_GATE.md) |
 | Literature and novelty boundary | [`RELATED_WORK.md`](RELATED_WORK.md) |
 | Citation resolution and metadata audit | [`CITATION_INTEGRITY_AUDIT.md`](CITATION_INTEGRITY_AUDIT.md) |
+| Proposition-level citation precheck | [`SUBSTANTIVE_CITATION_AUDIT.md`](SUBSTANTIVE_CITATION_AUDIT.md) |
 | Environment contract | [`ENVIRONMENT.md`](ENVIRONMENT.md) |
 | Venue fit and deadlines | [`VENUE_STRATEGY.md`](VENUE_STRATEGY.md) |
 | Venue decision handoff | [`VENUE_DECISION_PACKET.md`](VENUE_DECISION_PACKET.md) |

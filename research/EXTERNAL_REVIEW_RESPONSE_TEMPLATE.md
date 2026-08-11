@@ -15,8 +15,8 @@ Use exactly one row. Do not ask one reader to compare formats.
 
 | Candidate | Source commit | PDF SHA-256 |
 | --- | --- | --- |
-| LNCS / SCAG | `77d93359242756f07afba30d88fb2db8fd97e7b2` | `2434b9a2684025afd2eca8cfb505d1890b6bbeebf97e87ce738538eda5e6401a` |
-| SCITEPRESS / ICAART | `77d93359242756f07afba30d88fb2db8fd97e7b2` | `3ec1a157b4b09ccbf398f68dd254da8f0abd9f90a7520550bead46246e1b9ff4` |
+| LNCS / SCAG | `91f9978ae6df7d400e751712c07a8e8816fc9c07` | `d5ea2c2893f4452b3889489101b74c9151f1d41a5f51b316acd3e25fbe29755e` |
+| SCITEPRESS / ICAART | `91f9978ae6df7d400e751712c07a8e8816fc9c07` | `6f605941b8a0bee2b14d875bc973166f2710981746ffb245f563a74618926093` |
 
 Private selection record:
 

@@ -7,9 +7,9 @@ Verified: **2026-08-11**
 This is a resolution and metadata precheck for the bibliography used by:
 
 - reviewed submission source:
-  `77d93359242756f07afba30d88fb2db8fd97e7b2`;
+  `91f9978ae6df7d400e751712c07a8e8816fc9c07`;
 - ICAART PDF SHA-256:
-  `3ec1a157b4b09ccbf398f68dd254da8f0abd9f90a7520550bead46246e1b9ff4`.
+  `6f605941b8a0bee2b14d875bc973166f2710981746ffb245f563a74618926093`.
 
 It verifies structural citation coverage, DOI registration, endpoint
 availability, and agreement of titles and publication years. It does **not**
@@ -17,6 +17,10 @@ verify that the manuscript's propositions follow from the papers, that every
 author/page/venue field is perfect, or that a source has been read. Those
 remain human-author responsibilities under
 `HUMAN_AUTHOR_VERIFICATION_PACKET.md`.
+
+The separate `SUBSTANTIVE_CITATION_AUDIT.md` records the later
+proposition-level precheck and the source-placement correction that produced
+the current candidate. Neither audit replaces the author's source reading.
 
 ## Structural checks
 

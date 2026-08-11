@@ -5,17 +5,18 @@ Prepared: **2026-08-11**
 ## Frozen candidate identity
 
 - Candidate introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
-- Current reviewed source: `77d93359242756f07afba30d88fb2db8fd97e7b2`
+- Current reviewed source: `91f9978ae6df7d400e751712c07a8e8816fc9c07`
 - Scientific-claim freeze: `419a0f72188f957ae144262f62c62bcc11a66ac3`
 - Claim-preserving terminology refreeze: `77d93359242756f07afba30d88fb2db8fd97e7b2`
+- Citation-source refreeze: `91f9978ae6df7d400e751712c07a8e8816fc9c07`
 - Portable artifact/build QA: `d53f822144bd0b3fffe3b4d778770091f77900b8`
 - Submission metadata exporter: `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0`
 - Build entry point: `paper_scitepress/main.tex`
 - Target: ICAART 2027 regular paper, anonymous SCITEPRESS review format
-- PDF: 10 A4 pages, 164,420 bytes
-- PDF SHA-256: `3ec1a157b4b09ccbf398f68dd254da8f0abd9f90a7520550bead46246e1b9ff4`
+- PDF: 10 A4 pages, 164,473 bytes
+- PDF SHA-256: `6f605941b8a0bee2b14d875bc973166f2710981746ffb245f563a74618926093`
 - Expanded plain-text abstract: 195 words
-- Extracted submission length: 36,355 non-whitespace characters
+- Extracted submission length: 36,409 non-whitespace characters
 - Portal metadata JSON SHA-256: `b6c79cacfc78289ccface7d0793d46c6c6317451e3f9cdc0b0984731fba2ea47`
 
 The PDF is a build product and is not committed. The hash identifies the exact
@@ -56,7 +57,7 @@ PDF hash above. The fixed `SOURCE_DATE_EPOCH` is a stable reproducibility
 constant established at the earlier comparator-justified freeze; the current
 reviewed source identity is recorded above.
 
-The extracted PDF contains 36,355 non-whitespace characters, within ICAART's
+The extracted PDF contains 36,409 non-whitespace characters, within ICAART's
 10,000--50,000 review-submission interval. Its 195-word expanded abstract is within the
 official 70--200-word interval. The page is A4 and the current 10-page build is
 below the 12-page full-paper proceedings limit.
@@ -67,7 +68,7 @@ non-A4 geometry, nonempty identity metadata, encryption, forms, JavaScript,
 page rotation, missing Unicode maps or embedded fonts, PDF-to-portal
 title/abstract/keyword drift, and metadata source-hash drift. Poppler's default
 reading order is the frozen character-count method; layout mode has a different
-count and is deliberately not mixed with the submitted 36,355-character
+count and is deliberately not mixed with the submitted 36,409-character
 identity.
 
 ## Independent artifact reproduction
@@ -77,8 +78,8 @@ than only the LNCS secondary format. A fresh Git-free extraction on macOS using
 Python 3.12.13, GNU Make 3.81, and TeX Live 2022 verified all 60 immutable files
 before and after regeneration, passed the ten shared and eleven
 SCITEPRESS-specific tests, and completed `make -C paper_scitepress check`.
-The result is a 10-page A4 PDF of 164,267 bytes with SHA-256
-`9531e3fe2266487e173855ef119162b5c8e4b2ecca25c0d49e3b6be6ddd8e8bd`.
+The result is a 10-page A4 PDF of 164,299 bytes with SHA-256
+`f6da3cf524e853c8687acd63c43df86e31111c4438dafced2514dbb9ce551079`.
 That byte identity is intentionally recorded separately from the Bouchet TeX
 Live 2024 identity above; the package manifest and generated-fragment hashes,
 not cross-version PDF bytes, are the portable invariant. The independent final
@@ -87,12 +88,12 @@ multiply-defined-label warning, all fonts were embedded, and all ten pages were
 inspected at full resolution. The package-local exporter produced the same
 195-word portal metadata JSON and SHA-256 recorded above.
 
-The rebuilt archive is 99,618 bytes with 60 immutable files and SHA-256
-`2ad44d30c0fa05d31896f6afaf94ffe2060f9f48d662309a20762cfbaea56fd2`.
+The rebuilt archive is 99,619 bytes with 60 immutable files and SHA-256
+`57307d0ace24191719b8ccaf3a5ddc463e0c43f4e581d835890c1397dc516f03`.
 Its two copied build READMEs no longer name the institutional compute cluster,
 the archive denylist rejects that token, and a whole-package regression check
 prevents recurrence. The independent build also passed the Poppler-backed deep
-submission check with the same 10-page, 36,355-character, nine-font result.
+submission check with the same 10-page, 36,409-character, nine-font result.
 
 ## Reviewer-assignment metadata
 
@@ -129,6 +130,12 @@ The terminology refreeze at `77d9335` then replaced one-off acronyms with
 descriptive names, stated the exact five-family lower-tail statistic, and
 expanded the confirmatory outcome labels. A fresh complete render and a second
 macOS artifact build found all ten pages legible with no page-count change.
+The substantive citation audit then found one source-attribution boundary:
+the project homepage supports the reconstruction claim but not the precise
+offline API and pinned-bot statements. Commit `91f9978` added the package and
+repository sources at both environment-description placements without changing
+the wording or any empirical claim. All ten pages were re-rendered and
+inspected, including the changed first page and the complete reference list.
 The study-flow diagram was widened to two columns after the first pass; the
 final pass found no clipped or overlapping text, invisible content, broken
 glyph, unreadable plot label, margin violation, misleading caption, or malformed
@@ -141,12 +148,14 @@ form, encryption, identifying repository URL, private path, author name,
 institution, NetID, or scheduler-account token; and all fonts are embedded with
 Unicode maps.
 
-The final submission-verifier and source-artifact anonymity changes do not
+The final submission-verifier and source-artifact anonymity changes did not
 touch manuscript TeX, generated empirical fragments, bibliography, or PDF
-metadata. The Bouchet PDF remains byte-identical at the frozen SHA-256. All 31
-pages across ICAART, LNCS, and supplement were re-rendered; contact-sheet review
-covered the complete set and every ICAART page was inspected at full
-resolution with no defect.
+metadata. The later citation-source correction changed only two citation
+groups. All 26 current main-paper pages across ICAART and LNCS were re-rendered;
+contact-sheet review covered the complete set and the changed pages and both
+reference lists were inspected at full resolution with no defect. The
+five-page supplement remained byte-identical to its previously inspected
+freeze.
 
 ## Unresolved submission gates
 

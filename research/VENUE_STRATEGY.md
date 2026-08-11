@@ -131,7 +131,7 @@ interpretation of the EvoStar code.
   Obtain a written ruling before changing its visibility.
 - Reviewer-artifact ambiguity: the public complete-paper instructions describe
   a PDF submission but do not specify a supplementary-file field or an
-  anonymous external-link route. Ask whether the 99,618-byte identity-neutral
+  anonymous external-link route. Ask whether the 99,619-byte identity-neutral
   aggregate artifact can accompany the review submission and, if so, by which
   mechanism. If not, keep all essential evidence in the paper and describe the
   artifact as release material rather than implying reviewer access.
@@ -147,9 +147,9 @@ The public-policy evidence and exact remaining questions are frozen in
 
 The SCITEPRESS conversion was completed prospectively on 2026-08-11 without
 changing the frozen science. It is 10 A4 pages, has a 195-word expanded abstract and
-36,355 extracted non-whitespace characters, and reproduces byte-for-byte across
+36,409 extracted non-whitespace characters, and reproduces byte-for-byte across
 clean builds at SHA-256
-`3ec1a157b4b09ccbf398f68dd254da8f0abd9f90a7520550bead46246e1b9ff4`.
+`6f605941b8a0bee2b14d875bc973166f2710981746ffb245f563a74618926093`.
 All pages passed rendered inspection; see `SCITEPRESS_QA.md`.
 
 For reviewer assignment, use the main **Agents** area and the exact call topics

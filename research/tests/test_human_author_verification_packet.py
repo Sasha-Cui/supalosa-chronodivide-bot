@@ -35,6 +35,7 @@ class HumanAuthorVerificationPacketTest(unittest.TestCase):
             "research/ANONYMITY_RELEASE_RISK.md",
             "research/AUTHORSHIP_AND_AI_POLICY.md",
             "research/CITATION_INTEGRITY_AUDIT.md",
+            "research/SUBSTANTIVE_CITATION_AUDIT.md",
             "research/CONTACT_TEMPLATES.md",
             "artifact/THIRD_PARTY.md",
         )

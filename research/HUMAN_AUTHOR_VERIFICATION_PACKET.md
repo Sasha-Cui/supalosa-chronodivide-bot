@@ -17,17 +17,17 @@ Verify these files before beginning. Stop if any value differs.
 
 | Item | Frozen identity |
 | --- | --- |
-| Reviewed source | `77d93359242756f07afba30d88fb2db8fd97e7b2` |
-| ICAART PDF | `3ec1a157b4b09ccbf398f68dd254da8f0abd9f90a7520550bead46246e1b9ff4` |
-| LNCS PDF | `2434b9a2684025afd2eca8cfb505d1890b6bbeebf97e87ce738538eda5e6401a` |
+| Reviewed source | `91f9978ae6df7d400e751712c07a8e8816fc9c07` |
+| ICAART PDF | `6f605941b8a0bee2b14d875bc973166f2710981746ffb245f563a74618926093` |
+| LNCS PDF | `d5ea2c2893f4452b3889489101b74c9151f1d41a5f51b316acd3e25fbe29755e` |
 | LNCS supplement | `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98` |
-| Anonymous artifact | `2ad44d30c0fa05d31896f6afaf94ffe2060f9f48d662309a20762cfbaea56fd2` |
+| Anonymous artifact | `57307d0ace24191719b8ccaf3a5ddc463e0c43f4e581d835890c1397dc516f03` |
 | ICAART portal metadata | `b6c79cacfc78289ccface7d0793d46c6c6317451e3f9cdc0b0984731fba2ea47` |
 
 Run from the repository root:
 
 ```text
-git rev-parse 77d9335
+git rev-parse 91f9978
 sha256sum paper/build/main.pdf paper/build/supplement.pdf
 sha256sum paper_scitepress/build/main.pdf
 sha256sum artifact/dist/chrono-divide-review-artifact.tar.gz
@@ -134,8 +134,11 @@ pages or sections consulted. A correct title or abstract alone is insufficient
 when the manuscript makes a detailed methodological claim.
 
 `research/CITATION_INTEGRITY_AUDIT.md` records an automated resolution and
-title/year metadata precheck. It is useful for detecting broken identifiers,
-but it does not verify any proposition and does not satisfy a row below.
+title/year metadata precheck. `research/SUBSTANTIVE_CITATION_AUDIT.md` records
+a machine-assisted proposition-level precheck, including the one source-
+placement correction made before this candidate was frozen. Both are useful
+review aids, but neither replaces reading the primary source, checking the
+recorded locator, or completing a row below.
 
 | BibTeX key | Proposition to verify | Manuscript location | Human status |
 | --- | --- | --- | --- |

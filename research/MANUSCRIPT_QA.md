@@ -4,13 +4,13 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `77d93359242756f07afba30d88fb2db8fd97e7b2`
+- Source commit: `91f9978ae6df7d400e751712c07a8e8816fc9c07`
 - Main source: `paper/main.tex`
 - Supplement source: `paper/supplement.tex`
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 16 pages total; non-reference content ends on page 14
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `2434b9a2684025afd2eca8cfb505d1890b6bbeebf97e87ce738538eda5e6401a`
+- Main PDF SHA-256: `d5ea2c2893f4452b3889489101b74c9151f1d41a5f51b316acd3e25fbe29755e`
 - Supplement PDF SHA-256: `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98`
 
 The PDFs are build products and are not committed. Their hashes identify the
@@ -54,6 +54,14 @@ The final venue-local addition was checked against the official ICAART 2026
 MACO paper and DOI `10.5220/0014358500004052`; the 25-author StarCraft II
 reference uses standard `et al.` formatting while retaining its identifier and
 DOI.
+
+A later proposition-level precheck mapped all 27 bibliography keys across 35
+key-by-citation placements to primary-source locators. It found one attribution
+boundary: the Chrono Divide homepage supports the reconstruction claim but not
+the exact offline API or pinned opponent. Commit `91f9978` added the package
+and repository citations to both environment-description groups. The wording,
+bibliography, empirical claims, and supplement did not change; see
+`SUBSTANTIVE_CITATION_AUDIT.md`.
 
 ## Visual and content checks
 
@@ -139,18 +147,18 @@ The claim audit confirmed that the paper:
 
 ## Clean export and reviewer artifact
 
-A committed submission revision at `77d93359242756f07afba30d88fb2db8fd97e7b2`
+A committed submission revision at `91f9978ae6df7d400e751712c07a8e8816fc9c07`
 and the portable-artifact repair at
 `d53f822144bd0b3fffe3b4d778770091f77900b8` passed ten paper-generator and
 manuscript-invariant tests, eleven SCITEPRESS tests, two artifact-builder tests,
 the three frozen family-exporter tests, one author-verification-packet test,
-one venue-ruling-template test, and one external-review-response-template test
-(29 tests total). They regenerated all paper
+one venue-ruling-template test, one external-review-response-template test,
+and one substantive-citation-audit test (30 tests total). They regenerated all paper
 fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
-`2ad44d30c0fa05d31896f6afaf94ffe2060f9f48d662309a20762cfbaea56fd2`
-and size 99,618 bytes. Two independent builds produced that same hash. The
+`57307d0ace24191719b8ccaf3a5ddc463e0c43f4e581d835890c1397dc516f03`
+and size 99,619 bytes. Two independent builds produced that same hash. The
 archive contains 60 manifested immutable files, normalized `0/0` ownership and
 epoch timestamps, no Git tree, no bot packages, and no direct author,
 scheduler-account, institution, or private-path token. It now contains both the
@@ -171,9 +179,9 @@ The manifest verified both before and after deterministic regeneration, all 21
 packaged manuscript tests passed, and the Git-free build produced the expected
 16-page Letter LNCS paper, five-page Letter supplement, and 10-page A4
 SCITEPRESS candidate. The local-toolchain PDF identities were respectively
-`777b1d05447ac00a63633e3be1e8ff12be5b80d632bd4befd5262ce8469def9c`,
+`12c5c30e4e2af515845a6d242fb2e2913439296359904ae740d694215c181d5a`,
 `82e54a6266bdc211530d6cde92443c6707f78e975dbdd77cc1a4c6b2db8cc20b`,
-and `9531e3fe2266487e173855ef119162b5c8e4b2ecca25c0d49e3b6be6ddd8e8bd`.
+and `f6da3cf524e853c8687acd63c43df86e31111c4438dafced2514dbb9ce551079`.
 PDF bytes legitimately differ across TeX distributions, while all immutable
 sources and generated fragments remain manifest-bound. All fonts were embedded;
 the final logs contained no overfull box, unresolved reference/citation, rerun,
@@ -181,13 +189,15 @@ or multiply-defined-label warning. Contact-sheet inspection covered all 31
 pages, and every SCITEPRESS page was additionally inspected at full resolution.
 
 The production candidate additionally passed the new Poppler-backed
-`submission-check`: exactly 10 A4 pages, 36,355 non-whitespace characters under
+`submission-check`: exactly 10 A4 pages, 36,409 non-whitespace characters under
 the documented default reading order, 195 abstract words, empty review
 identity metadata, no forms/JavaScript/encryption/rotation, nine embedded fonts
 with Unicode maps, exact PDF-to-portal title/abstract/keyword agreement, and
 SHA-256 agreement between the metadata JSON and its three source files. The
-same deep check passed the independent macOS build. A fresh 31-page render
-confirmed that the unchanged PDF hashes still correspond to clean layouts.
+same deep check passed the independent macOS build. After the citation-source
+correction, a fresh 26-page render confirmed clean current ICAART and LNCS
+layouts; the five-page supplement retained its byte-identical previously
+inspected hash.
 
 The inspected PDFs have empty Author, Title, Subject, and Keywords metadata;
 contain no identifying binary strings, JavaScript, forms, or encryption; and
