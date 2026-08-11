@@ -27,7 +27,7 @@ export type StrategicPlanName =
 
 type ConcreteStrategicPlanName = Exclude<StrategicPlanName, "off" | "adaptive" | "hfo">;
 
-type StructurePlanItem = {
+export type StructurePlanItem = {
     name: string;
     targetCount: number;
     priority: number;
@@ -35,7 +35,7 @@ type StructurePlanItem = {
     requireCredits?: number;
 };
 
-type UnitPlanItem = {
+export type UnitPlanItem = {
     name: string;
     targetCount: number;
     priority: number;
@@ -61,9 +61,97 @@ export type StrategicPlanOptions = {
     plan?: StrategicPlanName;
     rushSellTick?: number;
     rushSellMinCombatants?: number;
+    rushSellEnabled?: boolean;
+    finisherArtilleryTargetCount?: number;
+    finisherArtilleryStartTick?: number;
+    finisherArtilleryPriority?: number;
+    finisherArtilleryTechLeadTicks?: number;
+    finisherArtilleryTechPriority?: number;
     dogTargetCount?: number;
     hfoBottomDogTargetCount?: number;
     antiInfantryDogTargetCount?: number;
+};
+
+export type StrategicFinisherOptions = {
+    rushSellEnabled: boolean;
+    artilleryTargetCount: number;
+    artilleryStartTick: number;
+    artilleryPriority: number;
+    artilleryTechLeadTicks: number;
+    artilleryTechPriority: number;
+};
+
+const requireFinisherInteger = (name: string, value: number, minimum: number, maximum: number): void => {
+    if (!Number.isInteger(value) || value < minimum || value > maximum) {
+        throw new Error(`${name} must be an integer in [${minimum}, ${maximum}], got ${value}`);
+    }
+};
+
+export const resolveStrategicFinisherOptions = (options: StrategicPlanOptions = {}): StrategicFinisherOptions => {
+    const resolved: StrategicFinisherOptions = {
+        rushSellEnabled: options.rushSellEnabled ?? true,
+        artilleryTargetCount: options.finisherArtilleryTargetCount ?? 0,
+        artilleryStartTick: options.finisherArtilleryStartTick ?? 12_600,
+        artilleryPriority: options.finisherArtilleryPriority ?? 120,
+        artilleryTechLeadTicks: options.finisherArtilleryTechLeadTicks ?? 3_600,
+        artilleryTechPriority: options.finisherArtilleryTechPriority ?? 112,
+    };
+    requireFinisherInteger("finisherArtilleryTargetCount", resolved.artilleryTargetCount, 0, 100);
+    requireFinisherInteger("finisherArtilleryStartTick", resolved.artilleryStartTick, 0, 100_000);
+    requireFinisherInteger("finisherArtilleryPriority", resolved.artilleryPriority, 1, 1_000);
+    requireFinisherInteger("finisherArtilleryTechLeadTicks", resolved.artilleryTechLeadTicks, 0, 100_000);
+    requireFinisherInteger("finisherArtilleryTechPriority", resolved.artilleryTechPriority, 1, 1_000);
+    return resolved;
+};
+
+export const getFinisherArtilleryPlanItem = (
+    side: SideType.Nod | SideType.GDI,
+    options: StrategicFinisherOptions,
+): UnitPlanItem | null =>
+    options.artilleryTargetCount > 0
+        ? {
+              name: side === SideType.Nod ? "V3" : "SREF",
+              targetCount: options.artilleryTargetCount,
+              priority: options.artilleryPriority,
+              startTick: options.artilleryStartTick,
+          }
+        : null;
+
+export const getFinisherArtilleryStructurePlanItems = (
+    side: SideType.Nod | SideType.GDI,
+    options: StrategicFinisherOptions,
+): StructurePlanItem[] => {
+    if (options.artilleryTargetCount <= 0) {
+        return [];
+    }
+    const startTick = Math.max(0, options.artilleryStartTick - options.artilleryTechLeadTicks);
+    if (side === SideType.Nod) {
+        return [
+            {
+                name: "NARADR",
+                targetCount: 1,
+                priority: options.artilleryTechPriority,
+                startTick,
+                requireCredits: 800,
+            },
+        ];
+    }
+    return [
+        {
+            name: "GAAIRC",
+            targetCount: 1,
+            priority: options.artilleryTechPriority,
+            startTick,
+            requireCredits: 800,
+        },
+        {
+            name: "GATECH",
+            targetCount: 1,
+            priority: options.artilleryTechPriority,
+            startTick,
+            requireCredits: 1_800,
+        },
+    ];
 };
 
 const STRATEGIC_BUILD_MISSION_NAME = "strategicPlanBuild";
@@ -956,6 +1044,7 @@ const getPlanSide = (context: MissionContext): SideType.Nod | SideType.GDI | nul
 class StrategicBuildMission extends Mission {
     constructor(
         private plan: ConcreteStrategicPlan,
+        private finisherOptions: StrategicFinisherOptions,
         logger: DebugLogger,
     ) {
         super(`${STRATEGIC_BUILD_MISSION_NAME}.${plan.name}`, logger);
@@ -973,7 +1062,11 @@ class StrategicBuildMission extends Mission {
         ];
         const availableByName = new Map(availableObjects.map((rules) => [rules.name, rules]));
 
-        for (const item of this.plan.structures[side]) {
+        const planItems = [
+            ...getFinisherArtilleryStructurePlanItems(side, this.finisherOptions),
+            ...this.plan.structures[side],
+        ];
+        for (const item of planItems) {
             if (context.game.getCurrentTick() < (item.startTick ?? 0)) {
                 continue;
             }
@@ -1018,6 +1111,7 @@ class StrategicUnitMission extends Mission {
     constructor(
         private plan: ConcreteStrategicPlan,
         private options: StrategicPlanOptions,
+        private finisherOptions: StrategicFinisherOptions,
         logger: DebugLogger,
     ) {
         super(`${STRATEGIC_UNIT_MISSION_NAME}.${plan.name}`, logger);
@@ -1029,7 +1123,9 @@ class StrategicUnitMission extends Mission {
             return noop();
         }
         const requests: Record<string, number> = {};
-        for (const item of this.plan.units[side]) {
+        const finisherArtillery = getFinisherArtilleryPlanItem(side, this.finisherOptions);
+        const planItems = finisherArtillery ? [...this.plan.units[side], finisherArtillery] : this.plan.units[side];
+        for (const item of planItems) {
             if (context.game.getCurrentTick() < (item.startTick ?? 0)) {
                 continue;
             }
@@ -1080,7 +1176,7 @@ class StrategicSellMission extends Mission {
 
     _onAiUpdate(context: MissionContext): MissionAction {
         const sellPlan = this.plan.sellYard;
-        if (this.sold || !sellPlan?.enabled) {
+        if (this.sold || !sellPlan?.enabled || this.options.rushSellEnabled === false) {
             return disbandMission("done");
         }
         const tick = this.options.rushSellTick ?? sellPlan.tick;
@@ -1121,8 +1217,11 @@ class StrategicSellMission extends Mission {
 
 export class StrategicPlanMissionFactory {
     private resolvedPlan: ConcreteStrategicPlan | null | undefined;
+    private finisherOptions: StrategicFinisherOptions;
 
-    constructor(private options: StrategicPlanOptions = {}) {}
+    constructor(private options: StrategicPlanOptions = {}) {
+        this.finisherOptions = resolveStrategicFinisherOptions(options);
+    }
 
     maybeCreateMissions(context: SupabotContext, missionController: MissionController, logger: DebugLogger): void {
         if (!enabled(this.options)) {
@@ -1138,8 +1237,10 @@ export class StrategicPlanMissionFactory {
         if (!this.resolvedPlan) {
             return;
         }
-        missionController.addMission(new StrategicBuildMission(this.resolvedPlan, logger));
-        missionController.addMission(new StrategicUnitMission(this.resolvedPlan, this.options, logger));
+        missionController.addMission(new StrategicBuildMission(this.resolvedPlan, this.finisherOptions, logger));
+        missionController.addMission(
+            new StrategicUnitMission(this.resolvedPlan, this.options, this.finisherOptions, logger),
+        );
         if (this.resolvedPlan.sellYard?.enabled) {
             missionController.addMission(new StrategicSellMission(this.resolvedPlan, this.options, logger));
         }

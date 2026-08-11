@@ -7,6 +7,7 @@ import {
     BuildingEliminationTelemetryEvent,
     resolveBuildingEliminationOptions,
 } from "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
+import { resolveStrategicFinisherOptions } from "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/strategicPlanMission.js";
 import { StrongBot, StrongBotOptions } from "@supalosa/chronodivide-bot/dist/bot/strongBot.js";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { BaselineFactory, loadBaselineFactory } from "./baselineLoader.js";
@@ -316,6 +317,12 @@ const parseStrategicPlan = (): StrongStrategyOptions["strategicPlan"] => {
         plan: raw as any,
         rushSellTick: parseOptionalIntEnv("RUSH_SELL_TICK"),
         rushSellMinCombatants: parseOptionalIntEnv("RUSH_SELL_MIN_COMBATANTS"),
+        rushSellEnabled: parseOptionalBoolEnv("RUSH_SELL_ENABLED"),
+        finisherArtilleryTargetCount: parseOptionalIntEnv("FINISHER_ARTILLERY_TARGET_COUNT"),
+        finisherArtilleryStartTick: parseOptionalIntEnv("FINISHER_ARTILLERY_START_TICK"),
+        finisherArtilleryPriority: parseOptionalIntEnv("FINISHER_ARTILLERY_PRIORITY"),
+        finisherArtilleryTechLeadTicks: parseOptionalIntEnv("FINISHER_ARTILLERY_TECH_LEAD_TICKS"),
+        finisherArtilleryTechPriority: parseOptionalIntEnv("FINISHER_ARTILLERY_TECH_PRIORITY"),
         dogTargetCount: parseOptionalIntEnv("STRATEGIC_DOG_TARGET_COUNT"),
         hfoBottomDogTargetCount: parseOptionalIntEnv("HFO_BOTTOM_DOG_TARGET_COUNT"),
         antiInfantryDogTargetCount: parseOptionalIntEnv("ANTI_INFANTRY_DOG_TARGET_COUNT"),
@@ -885,6 +892,18 @@ const main = async () => {
         strongStrategyOptions.buildingElimination = resolveBuildingEliminationOptions(
             strongStrategyOptions.buildingElimination,
         );
+    }
+    if (strongStrategyOptions.strategicPlan) {
+        const finisherOptions = resolveStrategicFinisherOptions(strongStrategyOptions.strategicPlan);
+        strongStrategyOptions.strategicPlan = {
+            ...strongStrategyOptions.strategicPlan,
+            rushSellEnabled: finisherOptions.rushSellEnabled,
+            finisherArtilleryTargetCount: finisherOptions.artilleryTargetCount,
+            finisherArtilleryStartTick: finisherOptions.artilleryStartTick,
+            finisherArtilleryPriority: finisherOptions.artilleryPriority,
+            finisherArtilleryTechLeadTicks: finisherOptions.artilleryTechLeadTicks,
+            finisherArtilleryTechPriority: finisherOptions.artilleryTechPriority,
+        };
     }
     const strongBotOptions = parseStrongBotOptions();
     const runId =
