@@ -25,15 +25,15 @@ the anonymous branch during review.
 - Title: **Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono
   Divide**
 - Anonymous manuscript source commit:
-  `64957e5dce9680a509c1d9101094cca20f795a04`
+  `c02a28c3cc9da676f242ecc18e876575e284c066`
 - Main PDF: 16 pages total; non-reference material ends on page 14.
 - Main PDF SHA-256:
-  `2fe30264c2cba4772bae6bbc231721c0c8d4cd13302f7d6314a2d756ee600b68`
+  `eed87d34eab33ffe9045f1a7c41efd269ca2fabb4eacadb7929e5c1655bc6cfd`
 - Supplement: 5 pages.
 - Supplement PDF SHA-256:
-  `8e14a20bf05fc0d24b9ece5a00dbc365de0a249c75d64daef24c20274efeebb0`
+  `10f6062eadabc1b7c71ff7c37a09b67e24d3c87a3fd7bae08e81c5dd97ece48a`
 - Deterministic anonymous artifact SHA-256:
-  `ac31dd4c3553c3e6af30e308984912348ec2ea89241759518faa76e4b2377548`
+  `a34227d89ffa128017037d4db359c5e0b003ae80f820f747df7c96fd3a96809c`
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the

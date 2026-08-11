@@ -78,13 +78,14 @@ and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.m
 
 ## Manuscript status and remaining work
 
-Commit `64957e5` is the current anonymous LNCS manuscript revision. It sharpens
+Commit `c02a28c` is the current anonymous LNCS manuscript revision. It sharpens
 the held-out-evaluation title, states two confirmatory research questions and
 one explicitly descriptive diagnostic question, removes causal-sounding
 mechanism language, and adds primary prior art on hidden-level evaluation and
-protocol sensitivity and classifies the search as deterministic mutation-based
-finite configuration rather than iterative population-based evolution, without
-changing any result. The main PDF is 16 pages with
+protocol sensitivity, classifies the search as deterministic mutation-based
+finite configuration rather than iterative population-based evolution, and
+cites the closest recent SCAG training-mode comparison without changing any
+result. The main PDF is 16 pages with
 main text ending on page 14 and references continuing afterward; the supplement
 is five pages. All reported tables and figures are generated from hash-pinned
 aggregate artifacts. The final build has no overfull boxes, undefined
@@ -94,10 +95,10 @@ received rendered visual checks. The current PDF SHA-256 values are recorded in
 
 Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder.
 The current 60 KB review archive is byte-deterministic at SHA-256
-`ac31dd4c3553c3e6af30e308984912348ec2ea89241759518faa76e4b2377548`.
+`a34227d89ffa128017037d4db359c5e0b003ae80f820f747df7c96fd3a96809c`.
 Its 35-file manifest verifies, all artifact tests pass, and an extracted
 reviewer copy rebuilds the 16-page paper and five-page supplement without
-warnings.
+undefined references, overflow, or BibTeX warnings.
 
 The remaining blockers are release- and submission-oriented, not additional
 training:
