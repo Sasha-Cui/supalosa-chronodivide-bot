@@ -18,7 +18,7 @@ Verified on **2026-08-11**.
 ## Included
 
 The artifact contains the anonymous paper source, author-written paper asset
-generator and tests, generated TeX fragments, and seven sanitized aggregate
+generator and tests, generated TeX fragments, and eight sanitized aggregate
 JSON records needed to regenerate every reported table and figure. Sanitization
 redacts the literal scheduler account and project source commit fields while
 preserving job IDs, design counts, estimates, intervals, result commitments,

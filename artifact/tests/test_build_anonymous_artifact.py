@@ -40,6 +40,19 @@ class BuildAnonymousArtifactTest(unittest.TestCase):
             self.assertIn(r"\newcommand{\ChampionAbsoluteLower}{-0.021}", metrics)
             self.assertIn(r"\newcommand{\AcceptedCoreHours}{288.72}", metrics)
 
+            aggregate_inputs = sorted(
+                (package / "research" / "artifacts").glob("*.json")
+            )
+            self.assertEqual(len(aggregate_inputs), 8)
+            self.assertIn(
+                "eight sanitized frozen JSON inputs",
+                (package / "README.md").read_text(),
+            )
+            self.assertIn(
+                "eight sanitized aggregate JSON records",
+                " ".join((package / "THIRD_PARTY.md").read_text().split()),
+            )
+
             manifest = json.loads((package / "MANIFEST.json").read_text())
             for relative, expected in manifest["files"].items():
                 actual = hashlib.sha256((package / relative).read_bytes()).hexdigest()

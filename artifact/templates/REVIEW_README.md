@@ -8,7 +8,7 @@ it cannot launch Chrono Divide games or retrain the bot.
 
 - `paper/`: anonymous LNCS paper and supplement source, bibliography,
   deterministic generator, generated fragments, and unit tests.
-- `research/artifacts/`: seven sanitized frozen JSON inputs used by the paper.
+- `research/artifacts/`: eight sanitized frozen JSON inputs used by the paper.
 - `artifact_hashes.json`: SHA-256 allowlist for those sanitized inputs.
 - `MANIFEST.json`: SHA-256 inventory of every other file in this package.
 - `THIRD_PARTY.md`: precise inclusion, exclusion, and licensing boundary.
