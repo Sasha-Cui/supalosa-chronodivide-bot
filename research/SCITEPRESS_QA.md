@@ -5,14 +5,14 @@ Prepared: **2026-08-11**
 ## Frozen fallback identity
 
 - Fallback introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
-- Current reviewed source: `a1bf46b9ef758938e458bd6782bf8518c44fa205`
-- Authoritative shared manuscript source: `297d8b3f02acb76f2335869ebd2bfb4bf5f06f5a`
+- Current reviewed source: `ba7a3b6ce19a650b19978e4d7fb0ffa952e23cd0`
+- Authoritative shared manuscript source: `ba7a3b6ce19a650b19978e4d7fb0ffa952e23cd0`
 - Build entry point: `paper_scitepress/main.tex`
 - Target: ICAART 2027 regular paper, anonymous SCITEPRESS review format
-- PDF: 10 A4 pages, 164,387 bytes
-- PDF SHA-256: `8012e45816c75f4d6dd4c8da18839f6afcb4e69ab53b355796b7afe8c9c1b39a`
+- PDF: 10 A4 pages, 164,386 bytes
+- PDF SHA-256: `724b2e29e2392b529ea24204d902722622b13de25cdba96c6ec9677abf997bca`
 - Abstract: 197 words
-- Extracted submission length: 36,604 non-whitespace characters
+- Extracted submission length: 36,611 non-whitespace characters
 
 The PDF is a build product and is not committed. The hash identifies the exact
 file rendered and inspected in this QA pass.
@@ -48,7 +48,7 @@ PDF hash above. The fixed `SOURCE_DATE_EPOCH` is a stable reproducibility
 constant established at the earlier comparator-justified freeze; the current
 reviewed source identity is recorded above.
 
-The extracted PDF contains 36,604 non-whitespace characters, within ICAART's
+The extracted PDF contains 36,611 non-whitespace characters, within ICAART's
 10,000--50,000 review-submission interval. Its 197-word abstract is within the
 official 70--200-word interval. The page is A4 and the current 10-page build is
 below the 12-page full-paper proceedings limit.
@@ -76,6 +76,10 @@ inspection.
 The final keyword-only edit received a fresh ten-page rendered inspection. The
 new first-page keyword line is legible and remains inside its minipage; pages
 2--10 are pixel-identical to the previously inspected freeze.
+The final conclusion edit changed only page 9. That page was rendered at full
+resolution and inspected; the conclusion remains adjacent to the limitations,
+references begin cleanly below it, and pages 1--8 and 10 are pixel-identical to
+the preceding inspected freeze.
 The study-flow diagram was widened to two columns after the first pass; the
 final pass found no clipped or overlapping text, invisible content, broken
 glyph, unreadable plot label, margin violation, misleading caption, or malformed

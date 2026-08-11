@@ -121,9 +121,9 @@ and all 10 fallback pages have received rendered visual checks. The current PDF 
 
 Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 commit `7cdbe0d` hardens its direct-identity denylist, and the current builder
-tests enforce the exact eight-input reviewer description. The current 65,475-byte
+tests enforce the exact eight-input reviewer description. The current 65,474-byte
 review archive is byte-deterministic at SHA-256
-`fc1960a02216be892e2d9aca7f1b041571a7bef5c5cd6a8fe809f43875c52c0d`.
+`e72db5f1dc2b6e5984a9d0c01850a4a535d0d5be03155d3745e25dc5a9d9b545`.
 Its 36-file manifest verifies, all artifact tests pass, and an extracted
 reviewer copy rebuilds the 16-page paper and five-page supplement without
 undefined references, overflow, or BibTeX warnings.
@@ -152,9 +152,9 @@ guidance permits disclosed AI-assisted writing, revision, and code; its
 presenter page documents live online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS fallback that reuses the frozen main-paper sections and result
-macros. It is 10 A4 pages with a 197-word abstract and 36,604 extracted
+macros. It is 10 A4 pages with a 197-word abstract and 36,611 extracted
 non-whitespace characters; two clean builds match at SHA-256
-`8012e45816c75f4d6dd4c8da18839f6afcb4e69ab53b355796b7afe8c9c1b39a`,
+`724b2e29e2392b529ea24204d902722622b13de25cdba96c6ec9677abf997bca`,
 and every page passed visual and anonymity QA. It is not authorized for upload
 until ICAART confirms online-route election and double-blind AI-disclosure
 placement. A full-text comparison with three nearby accepted ICAART 2025--2026
@@ -165,6 +165,9 @@ and contribution positioning remain the scientific risks. See
 The ICAART metadata now targets the Agents reviewer pool rather than generic
 distribution-shift ML; exact area, topic, and keyword choices are recorded in
 [`ICAART_REVIEWER_ASSIGNMENT_AUDIT.md`](ICAART_REVIEWER_ASSIGNMENT_AUDIT.md).
+The final conclusion now states the methodological contribution as control of
+evaluation threats while retaining the explicit non-claims about environment,
+optimizer, and broad dominance novelty.
 Decide one venue by 2026-09-01 and do not submit to both archival venues
 simultaneously.
 

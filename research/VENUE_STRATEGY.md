@@ -122,9 +122,9 @@ interpretation of the EvoStar code.
 
 The SCITEPRESS conversion was completed prospectively on 2026-08-11 without
 changing the frozen science. It is 10 A4 pages, has a 197-word abstract and
-36,604 extracted non-whitespace characters, and reproduces byte-for-byte across
+36,611 extracted non-whitespace characters, and reproduces byte-for-byte across
 clean builds at SHA-256
-`8012e45816c75f4d6dd4c8da18839f6afcb4e69ab53b355796b7afe8c9c1b39a`.
+`724b2e29e2392b529ea24204d902722622b13de25cdba96c6ec9677abf997bca`.
 All pages passed rendered inspection; see `SCITEPRESS_QA.md`.
 
 For reviewer assignment, use the main **Agents** area and the exact call topics

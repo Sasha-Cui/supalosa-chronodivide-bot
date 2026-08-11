@@ -4,13 +4,13 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `297d8b3f02acb76f2335869ebd2bfb4bf5f06f5a`
+- Source commit: `ba7a3b6ce19a650b19978e4d7fb0ffa952e23cd0`
 - Main source: `paper/main.tex`
 - Supplement source: `paper/supplement.tex`
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 16 pages total; non-reference content ends on page 14
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `e37b536750b337533273425a67c8d1a0a330dfef6d992d17a0a2556a30b3984c`
+- Main PDF SHA-256: `7dac69efb0410517a2131cc300e5bedf3e536c771e2de940f959dc0380ebc095`
 - Supplement PDF SHA-256: `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98`
 
 The PDFs are build products and are not committed. Their hashes identify the
@@ -81,6 +81,11 @@ The final ICAART game-testbed citation and bibliography compaction received a
 fresh complete 31-page pass over the 16-page LNCS paper, five-page supplement,
 and 10-page SCITEPRESS fallback. The conclusion remains on LNCS page 14,
 references begin on page 15, and no orphan bibliography page remains.
+The final significance edit changed only LNCS page 14 and SCITEPRESS page 9;
+both were rendered at full resolution and inspected for line wrapping, margins,
+section transitions, and reference flow. Every other main-paper page is
+pixel-identical to the preceding inspected freeze, and the supplement remains
+byte-identical.
 
 The claim audit confirmed that the paper:
 
@@ -99,14 +104,14 @@ The claim audit confirmed that the paper:
 
 ## Clean export and reviewer artifact
 
-A committed main revision at `297d8b3` passed nine paper-generator and
-manuscript-invariant tests, two
-artifact-builder tests, and the three frozen family-exporter tests. It
-regenerated all paper fragments without byte drift.
+A committed main revision at `ba7a3b6` passed nine paper-generator and
+manuscript-invariant tests, six SCITEPRESS tests, two artifact-builder tests,
+and the three frozen family-exporter tests (20 tests total). It regenerated all
+paper fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
-`fc1960a02216be892e2d9aca7f1b041571a7bef5c5cd6a8fe809f43875c52c0d`
-and size 65,475 bytes.
+`e72db5f1dc2b6e5984a9d0c01850a4a535d0d5be03155d3745e25dc5a9d9b545`
+and size 65,474 bytes.
 Two independent builds produced that same hash. The archive contains 36
 manifested files, normalized `0/0` ownership and epoch timestamps, no Git tree,
 no bot packages, and no direct author, scheduler-account, institution, or
