@@ -4,13 +4,13 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `ba7a3b6ce19a650b19978e4d7fb0ffa952e23cd0`
+- Source commit: `8242720bd603a8ac72ef5f28496b412f573b294e`
 - Main source: `paper/main.tex`
 - Supplement source: `paper/supplement.tex`
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 16 pages total; non-reference content ends on page 14
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `7dac69efb0410517a2131cc300e5bedf3e536c771e2de940f959dc0380ebc095`
+- Main PDF SHA-256: `c7e0dd7afcaeda08a54eb16848b52481b15bcc44efa2f826f1b336177dd0874b`
 - Supplement PDF SHA-256: `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98`
 
 The PDFs are build products and are not committed. Their hashes identify the
@@ -23,12 +23,14 @@ The following completed successfully under
 
 ```text
 make check main supplement
+make -C paper_scitepress clean
+make -C paper_scitepress check
 python3 -m unittest paper.tests.test_generate_assets -v
 python3 -m unittest research.tests.test_export_confirmatory_family_diagnostics -v
 python3 -m unittest artifact.tests.test_build_anonymous_artifact -v
 ```
 
-The final logs contain:
+The final LNCS logs contain:
 
 - zero overfull boxes;
 - zero undefined or multiply defined references;
@@ -39,7 +41,7 @@ The final logs contain:
   recorded in `paper/generated/asset_manifest.json` for all eight frozen
   aggregate inputs.
 
-The only final-log warning is the template/toolchain-level `amsmath` notice
+The only final LNCS-log warning is the template/toolchain-level `amsmath` notice
 that it cannot redefine the `\\vec` accent; it does not affect output.
 
 A bibliographic metadata audit rechecked every Crossref-registered DOI against
@@ -87,6 +89,16 @@ section transitions, and reference flow. Every other main-paper page is
 pixel-identical to the preceding inspected freeze, and the supplement remains
 byte-identical.
 
+The reviewer-entry-point refreeze at `8242720` aligned the LNCS keywords with
+the game-agent reviewer pool, made the deployed-default exclusion explicit in
+the abstract, and stated the large family-consistent avoided-loss result more
+directly in the conclusion. LNCS pages 1, 2, and 14 and SCITEPRESS page 9 were
+rendered at full resolution and inspected; every other page is pixel-identical
+to the preceding inspected freeze. The conclusion remains wholly on page 14,
+references begin on page 15, and the supplement is byte-identical. Commit
+`297d5b8` also added a fourth SCITEPRESS LaTeX pass and a fail-closed regression
+test for unsettled cross-references.
+
 The claim audit confirmed that the paper:
 
 - leads with champion-versus-frozen-reference improvement, not absolute
@@ -104,14 +116,14 @@ The claim audit confirmed that the paper:
 
 ## Clean export and reviewer artifact
 
-A committed main revision at `ba7a3b6` passed nine paper-generator and
-manuscript-invariant tests, six SCITEPRESS tests, two artifact-builder tests,
-and the three frozen family-exporter tests (20 tests total). It regenerated all
+A committed main revision at `8242720` passed ten paper-generator and
+manuscript-invariant tests, seven SCITEPRESS tests, two artifact-builder tests,
+and the three frozen family-exporter tests (22 tests total). It regenerated all
 paper fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
-`e72db5f1dc2b6e5984a9d0c01850a4a535d0d5be03155d3745e25dc5a9d9b545`
-and size 65,474 bytes.
+`1436fa69e7e88a317a3bafcf5ef640335c47eadf7123e470760cf8d338fa6af7`
+and size 65,702 bytes.
 Two independent builds produced that same hash. The archive contains 36
 manifested files, normalized `0/0` ownership and epoch timestamps, no Git tree,
 no bot packages, and no direct author, scheduler-account, institution, or

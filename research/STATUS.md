@@ -92,7 +92,7 @@ and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.m
 
 ## Manuscript status and remaining work
 
-Commit `297d8b3` is the current anonymous manuscript source revision. It
+Commit `8242720` is the current anonymous manuscript source revision. It
 sharpens the held-out-evaluation title, states two confirmatory research
 questions and one explicitly descriptive diagnostic question, removes causal-sounding
 mechanism language, and adds primary prior art on hidden-level evaluation and
@@ -110,9 +110,13 @@ It also reports explicitly that the failed absolute gate fails the joint
 two-gate criterion, cites the exact pinned game-API package and opponent
 revision, cites the recent ICAART MACO game-testbed paper, and uses standard
 compact author formatting to avoid an orphan bibliography page. Both LNCS PDFs
-remain byte-reproducible.
-The main
-PDF is 16 pages with main text ending on page 14 and references continuing
+remain byte-reproducible. The latest reviewer-entry-point pass also aligns the
+LNCS keywords with the game-agent reviewer pool, states the deployed-default
+exclusion in the abstract, and makes the large family-consistent avoided-loss
+takeaway explicit in the conclusion. Commit `297d5b8` adds the fourth
+SCITEPRESS LaTeX pass required for settled cross-references and rejects rerun
+warnings prospectively. The main PDF is 16 pages with main text ending on page
+14 and references continuing
 afterward; the supplement is five pages. All reported tables and figures are
 generated from hash-pinned aggregate artifacts. The final build has no overfull boxes, undefined
 references, missing citations, or BibTeX warnings. All 21 LNCS/supplement pages
@@ -121,9 +125,9 @@ and all 10 fallback pages have received rendered visual checks. The current PDF 
 
 Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 commit `7cdbe0d` hardens its direct-identity denylist, and the current builder
-tests enforce the exact eight-input reviewer description. The current 65,474-byte
+tests enforce the exact eight-input reviewer description. The current 65,702-byte
 review archive is byte-deterministic at SHA-256
-`e72db5f1dc2b6e5984a9d0c01850a4a535d0d5be03155d3745e25dc5a9d9b545`.
+`1436fa69e7e88a317a3bafcf5ef640335c47eadf7123e470760cf8d338fa6af7`.
 Its 36-file manifest verifies, all artifact tests pass, and an extracted
 reviewer copy rebuilds the 16-page paper and five-page supplement without
 undefined references, overflow, or BibTeX warnings.
@@ -152,9 +156,9 @@ guidance permits disclosed AI-assisted writing, revision, and code; its
 presenter page documents live online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS fallback that reuses the frozen main-paper sections and result
-macros. It is 10 A4 pages with a 197-word abstract and 36,611 extracted
+macros. It is 10 A4 pages with a 197-word abstract and 36,435 extracted
 non-whitespace characters; two clean builds match at SHA-256
-`724b2e29e2392b529ea24204d902722622b13de25cdba96c6ec9677abf997bca`,
+`56fdc8e6b1c29f6c29b54cef205bdb75772034a8924bbbebeabf8bd9f6f29408`,
 and every page passed visual and anonymity QA. It is not authorized for upload
 until ICAART confirms exceptional remote eligibility/procedure and double-blind
 AI-disclosure placement. The home page now establishes remote support for
@@ -169,9 +173,9 @@ and contribution positioning remain the scientific risks. See
 The ICAART metadata now targets the Agents reviewer pool rather than generic
 distribution-shift ML; exact area, topic, and keyword choices are recorded in
 [`ICAART_REVIEWER_ASSIGNMENT_AUDIT.md`](ICAART_REVIEWER_ASSIGNMENT_AUDIT.md).
-The final conclusion now states the methodological contribution as control of
-evaluation threats while retaining the explicit non-claims about environment,
-optimizer, and broad dominance novelty.
+The final conclusion now states the contribution as a provenance-bound,
+family-disjoint evaluation workflow while retaining the explicit non-claims
+about environment, optimizer, and dominance novelty.
 Decide one venue by 2026-09-01 and do not submit to both archival venues
 simultaneously.
 

@@ -38,15 +38,15 @@ the anonymous branch during review.
 - Title: **Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono
   Divide**
 - Anonymous manuscript source commit:
-  `ba7a3b6ce19a650b19978e4d7fb0ffa952e23cd0`
+  `8242720bd603a8ac72ef5f28496b412f573b294e`
 - Main PDF: 16 pages total; non-reference material ends on page 14.
 - Main PDF SHA-256:
-  `7dac69efb0410517a2131cc300e5bedf3e536c771e2de940f959dc0380ebc095`
+  `c7e0dd7afcaeda08a54eb16848b52481b15bcc44efa2f826f1b336177dd0874b`
 - Supplement: 5 pages.
 - Supplement PDF SHA-256:
   `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98`
 - Deterministic anonymous artifact SHA-256:
-  `e72db5f1dc2b6e5984a9d0c01850a4a535d0d5be03155d3745e25dc5a9d9b545`
+  `1436fa69e7e88a317a3bafcf5ef640335c47eadf7123e470760cf8d338fa6af7`
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
@@ -56,12 +56,12 @@ commit and all three hashes together; never mix files from different freezes.
 
 - [x] Separate SCITEPRESS source committed at
       `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`; the current reviewed source is
-      `ba7a3b6ce19a650b19978e4d7fb0ffa952e23cd0` and changes no frozen empirical
+      `8242720bd603a8ac72ef5f28496b412f573b294e` and changes no frozen empirical
       artifact.
-- [x] PDF is 10 A4 pages, with a 197-word abstract and 36,611 extracted
+- [x] PDF is 10 A4 pages, with a 197-word abstract and 36,435 extracted
       non-whitespace characters.
 - [x] PDF SHA-256 is
-      `724b2e29e2392b529ea24204d902722622b13de25cdba96c6ec9677abf997bca`.
+      `56fdc8e6b1c29f6c29b54cef205bdb75772034a8924bbbebeabf8bd9f6f29408`.
 - [x] Two clean builds are byte-identical; all ten pages, metadata, fonts,
       anonymity tokens, tables, plots, equations, and references were checked.
 - [x] ICAART reviewer assignment is frozen to **Agents** with the call topics

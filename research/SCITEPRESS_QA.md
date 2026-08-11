@@ -5,14 +5,14 @@ Prepared: **2026-08-11**
 ## Frozen fallback identity
 
 - Fallback introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
-- Current reviewed source: `ba7a3b6ce19a650b19978e4d7fb0ffa952e23cd0`
-- Authoritative shared manuscript source: `ba7a3b6ce19a650b19978e4d7fb0ffa952e23cd0`
+- Current reviewed source: `8242720bd603a8ac72ef5f28496b412f573b294e`
+- Authoritative shared manuscript source: `8242720bd603a8ac72ef5f28496b412f573b294e`
 - Build entry point: `paper_scitepress/main.tex`
 - Target: ICAART 2027 regular paper, anonymous SCITEPRESS review format
-- PDF: 10 A4 pages, 164,386 bytes
-- PDF SHA-256: `724b2e29e2392b529ea24204d902722622b13de25cdba96c6ec9677abf997bca`
+- PDF: 10 A4 pages, 164,393 bytes
+- PDF SHA-256: `56fdc8e6b1c29f6c29b54cef205bdb75772034a8924bbbebeabf8bd9f6f29408`
 - Abstract: 197 words
-- Extracted submission length: 36,611 non-whitespace characters
+- Extracted submission length: 36,435 non-whitespace characters
 
 The PDF is a build product and is not committed. The hash identifies the exact
 file rendered and inspected in this QA pass.
@@ -40,15 +40,17 @@ make -C paper_scitepress clean
 make -C paper_scitepress check
 ```
 
-completed successfully. Six fallback-specific tests passed, the shared paper
+completed successfully. Seven fallback-specific tests passed, the shared paper
 generator produced no Git drift, BibTeX emitted no warning, LaTeX emitted no
 overfull box or undefined citation/reference, and the build checker enforced a
-maximum of 12 pages. Two independent clean builds were byte-identical at the
+maximum of 12 pages. Commit `297d5b8` adds the fourth post-BibTeX LaTeX pass
+needed for clean cross-reference convergence and makes any remaining rerun
+warning fail closed. Two independent clean builds were byte-identical at the
 PDF hash above. The fixed `SOURCE_DATE_EPOCH` is a stable reproducibility
 constant established at the earlier comparator-justified freeze; the current
 reviewed source identity is recorded above.
 
-The extracted PDF contains 36,611 non-whitespace characters, within ICAART's
+The extracted PDF contains 36,435 non-whitespace characters, within ICAART's
 10,000--50,000 review-submission interval. Its 197-word abstract is within the
 official 70--200-word interval. The page is A4 and the current 10-page build is
 below the 12-page full-paper proceedings limit.
@@ -97,9 +99,11 @@ Unicode maps.
 This validated PDF is not yet authorized for upload. Written ICAART guidance is
 still required on:
 
-1. whether an accepted regular-paper author may elect the documented live Zoom
-   route without physical attendance; and
-2. where the required AI-use acknowledgment and affected-section citation
+1. whether the author's no-travel requirement qualifies for the documented
+   exceptional remote route and, if so, its procedure, timing, and fee class;
+2. how the previously public named implementation repository must be handled
+   during double-blind review; and
+3. where the required AI-use acknowledgment and affected-section citation
    belong in a double-blind review submission that must omit acknowledgments.
 
 After that ruling, add exactly the required disclosure, complete the human

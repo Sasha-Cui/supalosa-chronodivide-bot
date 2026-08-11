@@ -1,7 +1,7 @@
 # Results-driven paper plan
 
 Status: **empirical program complete; submission-candidate manuscript at
-`297d8b3`; deterministic anonymous artifact and internal QA complete**.
+`8242720`; deterministic anonymous artifact and internal QA complete**.
 
 ## Recommended paper
 
