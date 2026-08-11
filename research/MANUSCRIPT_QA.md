@@ -4,14 +4,14 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `b08b75e1b07ff6e6e4cec88a4038d31dfa39bc61`
+- Source commit: `d545418104b2fb4953e25a5f2654cdc5fe2985e8`
 - Main source: `paper/main.tex`
 - Supplement source: `paper/supplement.tex`
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 16 pages total; non-reference content ends on page 14
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `200aa4c5514f20a0588293fec54f943f54ce70a35edd96ee5822f95ad2202871`
-- Supplement PDF SHA-256: `f2d85c1bee116af0f49187c6aeeab0e0084eb0d7661746a3781001d41d749a9f`
+- Main PDF SHA-256: `789aa1cede3e3c9eb41dbb64bf1ddb0010a64f64621c1e0d6920eabb2d0479ee`
+- Supplement PDF SHA-256: `49753e464cbd11e422fbd067886be316ef72a874a814f53d825dd6a3ef3ac13c`
 
 The PDFs are build products and are not committed. Their hashes identify the
 exact artifacts inspected during this QA pass.
@@ -52,7 +52,9 @@ method-classification edit received another complete 21-page pass. The final
 closest-work citation and page-fit edit received a further complete 21-page
 pass. The final resource-accounting addition received another complete
 21-page pass. The artifact-derived claim refactor received a final complete
-21-page pass. The checks covered title-page anonymity, text and background
+21-page pass. The comparator-identity correction received another complete
+layout pass, including fresh renders of every changed supplement page. The
+checks covered title-page anonymity, text and background
 contrast, margins, line wrapping, tables, plot labels, captions, page numbers,
 bibliography links, and section transitions. The final source contains no
 author NetID, institution name, literal Slurm account, personal repository URL,
@@ -60,7 +62,8 @@ or private absolute path.
 
 The claim audit confirmed that the paper:
 
-- leads with champion-versus-default improvement, not absolute superiority;
+- leads with champion-versus-frozen-reference improvement, not absolute
+  superiority or a comparison with the deployed StrongBot default;
 - reports the failed one-sided absolute-strength gate in the abstract,
   introduction, results, and conclusion;
 - labels optimizer, component, and terminal analyses post-confirmatory;
@@ -71,14 +74,14 @@ The claim audit confirmed that the paper:
 
 ## Clean export and reviewer artifact
 
-A committed main revision at `b08b75e` passed eight paper-generator and
+A committed main revision at `d545418` passed nine paper-generator and
 manuscript-invariant tests, two
 artifact-builder tests, and the three frozen family-exporter tests. It
 regenerated all paper fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
-`7feb00236f8f7f6d944399b395b9b94160802aa0cea29f360805c0fd225ea7f6`
-and size 64,852 bytes.
+`f2e8b44e8eba0ffc96c2854307c037b17631a0cf4e2036bd15a3a026b9831d86`
+and size 64,986 bytes.
 Two independent builds produced that same hash. The archive contains 36
 manifested files, normalized `0/0` ownership and epoch timestamps, no Git tree,
 no bot packages, and no direct author, scheduler-account, institution, or

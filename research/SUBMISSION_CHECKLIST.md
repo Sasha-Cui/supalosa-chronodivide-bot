@@ -30,15 +30,15 @@ the anonymous branch during review.
 - Title: **Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono
   Divide**
 - Anonymous manuscript source commit:
-  `b08b75e1b07ff6e6e4cec88a4038d31dfa39bc61`
+  `d545418104b2fb4953e25a5f2654cdc5fe2985e8`
 - Main PDF: 16 pages total; non-reference material ends on page 14.
 - Main PDF SHA-256:
-  `200aa4c5514f20a0588293fec54f943f54ce70a35edd96ee5822f95ad2202871`
+  `789aa1cede3e3c9eb41dbb64bf1ddb0010a64f64621c1e0d6920eabb2d0479ee`
 - Supplement: 5 pages.
 - Supplement PDF SHA-256:
-  `f2d85c1bee116af0f49187c6aeeab0e0084eb0d7661746a3781001d41d749a9f`
+  `49753e464cbd11e422fbd067886be316ef72a874a814f53d825dd6a3ef3ac13c`
 - Deterministic anonymous artifact SHA-256:
-  `7feb00236f8f7f6d944399b395b9b94160802aa0cea29f360805c0fd225ea7f6`
+  `f2e8b44e8eba0ffc96c2854307c037b17631a0cf4e2036bd15a3a026b9831d86`
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
@@ -46,19 +46,21 @@ commit and all three hashes together; never mix files from different freezes.
 
 ## Scientific consistency
 
-- [x] Abstract, RQ1, results, and conclusion report champion-minus-default as
+- [x] Abstract, RQ1, results, and conclusion report champion-minus-reference as
       the positive confirmatory claim.
 - [x] Abstract, RQ2, results, and conclusion report the failed absolute gate.
 - [x] Exactly 512 confirmatory games, 16 sealed families, and 256 games per
       method are reported consistently.
 - [x] Improvement is 0.33594; family-clustered 95% CI is [0.21456, 0.45732].
 - [x] Champion score is 0.53516; one-sided lower margin above 0.5 is -0.02117.
-- [x] W/D/L counts are default 1/100/155 and champion 47/180/29.
+- [x] W/D/L counts are reference 1/100/155 and champion 47/180/29.
 - [x] Fourteen family effects are positive, two zero, and none negative.
 - [x] Component and terminal-state evidence is labeled post-confirmatory and
       non-causal.
 - [x] No claim introduces Chrono Divide, a novel optimizer, reliable Supalosa
       superiority, broad game-AI dominance, or a paradigm shift.
+- [x] The frozen generic reference is not described as StrongBot's shipped or
+      deployed map-profile-enabled default.
 - [x] No new outcome-bearing evidence from the opened family population has
       been added.
 

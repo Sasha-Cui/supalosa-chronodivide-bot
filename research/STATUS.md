@@ -91,7 +91,7 @@ and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.m
 
 ## Manuscript status and remaining work
 
-Commit `b08b75e` is the current anonymous LNCS manuscript source revision. It
+Commit `d545418` is the current anonymous LNCS manuscript source revision. It
 sharpens the held-out-evaluation title, states two confirmatory research
 questions and one explicitly descriptive diagnostic question, removes causal-sounding
 mechanism language, and adds primary prior art on hidden-level evaluation and
@@ -99,7 +99,9 @@ protocol sensitivity, classifies the search as deterministic mutation-based
 finite configuration rather than iterative population-based evolution, and
 cites the closest recent SCAG training-mode comparison, reports exact
 accepted-path resource use, and derives secondary reported values from frozen
-aggregate artifacts without changing any scientific result. The main
+aggregate artifacts without changing any scientific result. It also corrects
+the comparator identity from an inaccurate shipped-default description to the
+prospectively frozen generic research reference. The main
 PDF is 16 pages with main text ending on page 14 and references continuing
 afterward; the supplement is five pages. All reported tables and figures are
 generated from hash-pinned aggregate artifacts. The final build has no overfull boxes, undefined
@@ -110,7 +112,7 @@ received rendered visual checks. The current PDF SHA-256 values are recorded in
 Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 and commit `7cdbe0d` hardens its direct-identity denylist. The current 65 KB
 review archive is byte-deterministic at SHA-256
-`7feb00236f8f7f6d944399b395b9b94160802aa0cea29f360805c0fd225ea7f6`.
+`f2e8b44e8eba0ffc96c2854307c037b17631a0cf4e2036bd15a3a026b9831d86`.
 Its 36-file manifest verifies, all artifact tests pass, and an extracted
 reviewer copy rebuilds the 16-page paper and five-page supplement without
 undefined references, overflow, or BibTeX warnings.
