@@ -5,9 +5,15 @@ Reviewed: **2026-08-11**
 ## Purpose and evidence boundary
 
 This is an internal acceptance-risk audit of the anonymous SCITEPRESS regular
-paper at repository commit `419a0f72188f957ae144262f62c62bcc11a66ac3`.
-It is not an independent review, an acceptance-probability estimate, or a
-substitute for the unprimed human cold read in `EXTERNAL_REVIEW_PACKET.md`.
+paper whose manuscript content was frozen at
+`419a0f72188f957ae144262f62c62bcc11a66ac3`, whose current reviewed
+submission source is `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0`, and
+whose PDF SHA-256 is
+`1a92466bc627a3edc3d757542289df03121bdbe4ebccdc8947508cf7b084747c`.
+The surrounding governance tree was rechecked at
+`0178203382836043baf27e1053ee3e55bf8c4a52`. This is not an independent
+review, an acceptance-probability estimate, or a substitute for the unprimed
+human cold read in `EXTERNAL_REVIEW_PACKET.md`.
 
 ICAART's current reviewer guidance asks reviewers to consider **Relevance**,
 **Originality**, **Technical Quality**, **Significance**, and **Presentation**.
@@ -21,6 +27,7 @@ Official sources checked on 2026-08-11:
 
 - [ICAART ethics of review](https://icaart.scitevents.org/EthicsOfReview.aspx)
 - [ICAART 2027 call for papers](https://icaart.scitevents.org/CallForPapers.aspx?y=2027)
+- [ICAART 2027 submission guidelines](https://icaart.scitevents.org/Guidelines.aspx?y=2027)
 - [ICAART submission-type glossary](https://icaart.scitevents.org/Glossary.aspx)
 
 ## Criterion-level assessment
@@ -31,7 +38,7 @@ Official sources checked on 2026-08-11:
 | Originality | 3/5 | The original contribution is the integrated leakage-resistant Chrono Divide evaluation protocol: revision-aware families, sealed role access, participant-isolated common randomness, reciprocal starts, clustered inference, and fail-closed provenance. | Successive halving and the individual controls are established; the paper must not be read as claiming optimizer or environment novelty. |
 | Technical quality | 5/5 | The study has family-disjoint roles, a transparently retired method, fresh development, one-time sealed evaluation, paired design, family-clustered uncertainty, negative-gate reporting, exact accounting, and deterministic aggregate reproduction. | Family construction is heuristic, the endpoint has many tick-cap draws, and full replay depends on third-party content. |
 | Significance | 3/5 | The held-out effect is large and family-consistent, and the study shows how strong execution controls narrow an initially diffuse bot-strength story into one positive relative result and one failed absolute result. | One independent opponent, one faction mirror, a low-scoring generic reference, and no deployed-default comparison limit practical generality. |
-| Presentation | 4/5 | The 10-page paper is visually clean, RQ-led, explicit about the failed joint gate, and supported by four interpretable figures and three compact tables. | The method is dense, and defensive caveats can obscure the positive evaluation contribution on a fast read. |
+| Presentation | 4/5 | All ten A4 pages were re-rendered and inspected at the frozen hash. The paper is visually clean, RQ-led, explicit about the failed joint gate, and supported by four interpretable figures and three compact tables. Its 36,231 extracted non-whitespace characters satisfy the official 10,000--50,000 submission band. | The method is dense, and defensive caveats can obscure the positive evaluation contribution on a fast read. |
 
 Overall internal recommendation: **weak accept, with meaningful reviewer
 variance**. Technical quality is well above the likely rejection threshold;
@@ -49,8 +56,31 @@ evaluation protocol despite narrow opponent breadth.
 | Figures adequate? | Yes after repair. Figures show study flow, all family effects, paired transitions, and component intervals. | Figure 2 no longer depends on an unavailable supplement; its family labels are defined in place. |
 | Conclusions/future work convincing? | Yes. The conclusion answers both confirmatory gates and states the non-causal diagnostic boundary; the immediately preceding limitations identify the next prospective extension. | Cold-read whether the final paragraph remains appropriately bounded rather than merely defensive. |
 | References current and appropriate? | Yes. The bibliography includes the closest game-agent configuration work, generalization/evaluation foundations, exact pinned software sources, and a 2026 ICAART game paper. | Human author still verifies every primary source and citation use. |
-| Formatting adjustment? | None currently. The candidate is 10 A4 pages under the 12-page full-paper limit, with embedded fonts and settled references. | Full post-edit render completed; repeat only after a later source change. |
+| Formatting adjustment? | None currently. The candidate is 10 A4 pages and 36,231 non-whitespace characters, with embedded fonts and settled references. A later full-paper acceptance permits 12 proceedings pages; a short-paper acceptance permits 8. | Full post-edit render completed; repeat only after a later source change. Retain an 8-page camera-ready reduction plan rather than compressing the review version preemptively. |
 | Improve English? | No systemic issue found. | Human line edit remains mandatory under the authorship policy. |
+
+## Adversarial no-edit decision
+
+The complete ten-page PDF was extracted and rendered again after the
+author-verification packet landed on `main`. Every page was inspected at
+normal reading scale and at full rendered resolution. No clipping, overlap,
+missing glyph, broken cross-reference, illegible plot label, malformed
+reference, or anonymity disclosure was found.
+
+The content was then read against each current ICAART reviewer prompt. The
+principal rejection risk is unchanged: a reviewer may judge one opponent, one
+Iraq mirror, and a generic coordinate-free reference insufficiently
+significant. That is a real external-validity limitation, not a missing
+sentence or an analysis that can be repaired after test unblinding. The paper
+already states it in the abstract, introduction, limitations, and conclusion.
+Adding post-hoc games, a simulated deployed baseline, stronger mechanism
+language, or an optimizer-novelty claim would weaken the evidence.
+
+Decision: **make no manuscript change from this audit**. Preserve the frozen
+PDF until either the unprimed human cold read identifies a concrete
+misunderstanding or the venue supplies required disclosure instructions. Any
+later edit must remain claim-preserving and trigger a complete rebuild,
+character count, anonymity scan, and rendered-page inspection.
 
 ## Decision-critical objections
 
