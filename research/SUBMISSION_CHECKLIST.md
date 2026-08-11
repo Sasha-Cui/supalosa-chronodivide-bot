@@ -63,7 +63,7 @@ commit and all three hashes together; never mix files from different freezes.
 
 - [x] Separate SCITEPRESS source committed at
       `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`; the current reviewed source is
-      `853e2ffb3693287ee0572b7b8c659befa5f9763d` and changes no frozen empirical
+      `5ed5dad47e9b2902385f4ee873da5c3fb9683bbd` and changes no frozen empirical
       artifact.
 - [x] PDF is 11 A4 pages, with a 193-word expanded abstract and 38,760 extracted
       non-whitespace characters.
@@ -128,6 +128,10 @@ commit and all three hashes together; never mix files from different freezes.
 - [x] A fresh Git-free extraction on an independent macOS toolchain passes all
       22 packaged tests and rebuilds the 18-page paper, 5-page supplement, and
       exact 11-page SCITEPRESS candidate without actionable warnings.
+- [x] A second fresh Git-free extraction using the production Python and TeX
+      toolchain verifies the manifest before and after regeneration and
+      reproduces all three production PDF hashes exactly; see
+      `ARTIFACT_CLEANROOM_REPRODUCTION.md`.
 - [x] Main, supplement, and SCITEPRESS PDFs have been rendered after the last
       edit; no clipping, overlap, invisible text, or illegible plot label.
 - [x] No author name, NetID, institution, scheduler account, private path,

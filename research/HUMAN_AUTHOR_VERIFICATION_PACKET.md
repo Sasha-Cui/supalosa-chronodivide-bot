@@ -27,7 +27,7 @@ Verify these files before beginning. Stop if any value differs.
 Run from the repository root:
 
 ```text
-git rev-parse 853e2ff
+git rev-parse 5ed5dad
 sha256sum paper/build/main.pdf paper/build/supplement.pdf
 sha256sum paper_scitepress/build/main.pdf
 sha256sum artifact/dist/chrono-divide-review-artifact.tar.gz
@@ -59,6 +59,7 @@ exact page or sentence reviewed and whether the wording is supported.
 | Component and terminal analyses are post-confirmatory and non-causal | `research/METHOD_V2_COMPONENT_ABLATION_RESULT.md`; `research/METHOD_V2_TERMINAL_STATE_ANALYSIS.md` | `[ ]` |
 | Scope is one pinned opponent, Iraq mirror, simulator revision, and Temperate family population | `paper/sections/reproducibility.tex`; `research/SUPPORTED_SCOPE_DECISION.md` | `[ ]` |
 | Release statements exclude unauthorized third-party content | `artifact/THIRD_PARTY.md`; `research/ANONYMITY_RELEASE_RISK.md` | `[ ]` |
+| Anonymous archive reconstructs outside the repository | `research/ARTIFACT_CLEANROOM_REPRODUCTION.md` | `[ ]` |
 
 Reject or rewrite any sentence that implies a new environment, novel general
 optimizer, deployed-default improvement, causal component, broad agent

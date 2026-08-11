@@ -92,7 +92,9 @@ and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.m
 
 ## Manuscript status and remaining work
 
-Commit `853e2ff` is the current reviewed source and reviewer-artifact revision.
+Commit `5ed5dad` is the current reviewed manuscript source; commit `fb1a594`
+binds its originality screen, PDF identities, portal metadata, and anonymous
+reviewer-artifact identity.
 The manuscript-content refreeze at `504cc2a` builds on the claim-preserving
 scientific and citation freeze at `e91674f` and retains the title centered on
 leakage-resistant evaluation rather than optimizer novelty,
@@ -138,8 +140,8 @@ statistic, and expanding the outcome labels. The edit is claim-preserving: all
 frozen inputs, estimates, uncertainty, citations, abstract fields, and portal
 metadata remain unchanged.
 
-Commit `e91674f` completes a proposition-level citation precheck over all 30
-bibliography keys and 38 key-by-citation placements. The source changes cite
+Commit `5ed5dad` completes the current proposition-level citation precheck over
+all 32 bibliography keys and 40 key-by-citation placements. The source changes cite
 the exact game-API package and pinned Supalosa repository alongside the Chrono
 Divide project page and add the closest map-specific and later
 programmatic-strategy-synthesis precedents. No empirical result, method, scope boundary, conclusion, or portal
@@ -165,6 +167,12 @@ independent macOS extraction passes 22 packaged tests and rebuilds the 18-page
 LNCS paper, five-page supplement, and 11-page A4 SCITEPRESS candidate without
 undefined references, overflow, or BibTeX warnings. All fonts are embedded and
 all 34 pages received a rendered layout check.
+
+A second fresh, Git-free reconstruction with Python 3.12.3 and TeX Live 2024
+verified the same 60 files before and after regeneration, passed the same 22
+packaged tests and deep submission check, and reproduced all three production
+PDF hashes byte for byte. Its full command and identity record is
+[`ARTIFACT_CLEANROOM_REPRODUCTION.md`](ARTIFACT_CLEANROOM_REPRODUCTION.md).
 
 Commit `bda13e4` adds an evidence-indexed reviewer-response guide covering the
 weak-reference boundary, ordinary-tuning objection, one-opponent scope, high

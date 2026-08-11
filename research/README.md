@@ -21,15 +21,18 @@ family-disjoint evaluation and configuration of a generic scripted RTS policy.
    [`REVIEWER_AUDIT.md`](REVIEWER_AUDIT.md), and
    [`REVIEW_RESPONSE_GUIDE.md`](REVIEW_RESPONSE_GUIDE.md) — build/visual checks,
    the candid acceptance audit, and evidence-indexed bounded responses.
-8. [`SCAG_ACCEPTED_PAPER_CALIBRATION.md`](SCAG_ACCEPTED_PAPER_CALIBRATION.md)
+8. [`ORIGINALITY_AND_NOVELTY_SCREEN.md`](ORIGINALITY_AND_NOVELTY_SCREEN.md) and
+   [`ARTIFACT_CLEANROOM_REPRODUCTION.md`](ARTIFACT_CLEANROOM_REPRODUCTION.md) —
+   the bounded originality screen and Git-free reconstruction record.
+9. [`SCAG_ACCEPTED_PAPER_CALIBRATION.md`](SCAG_ACCEPTED_PAPER_CALIBRATION.md)
    — comparison with the 2024--2026 SCAG proceedings and the resulting venue
    fit boundary.
-9. [`ANONYMITY_RELEASE_RISK.md`](ANONYMITY_RELEASE_RISK.md) — double-blind and
+10. [`ANONYMITY_RELEASE_RISK.md`](ANONYMITY_RELEASE_RISK.md) — double-blind and
    upstream-license actions required before submission or public bot release.
-10. [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md) — factual
+11. [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md) — factual
    generative-AI use boundary, author-verification requirements, and venue
    eligibility gate.
-11. [`VENUE_DECISION_PACKET.md`](VENUE_DECISION_PACKET.md),
+12. [`VENUE_DECISION_PACKET.md`](VENUE_DECISION_PACKET.md),
    [`ICAART_POLICY_RECONCILIATION.md`](ICAART_POLICY_RECONCILIATION.md),
    [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md),
    [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md),
@@ -37,11 +40,11 @@ family-disjoint evaluation and configuration of a generic scripted RTS policy.
    [`SUBMISSION_ROADMAP.md`](SUBMISSION_ROADMAP.md) — send-ready external
    questions, a neutral cold-read protocol, and the dated path to one selected
    venue deadline.
-12. [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md) — the final claim,
+13. [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md) — the final claim,
    anonymity, rights, artifact, and upload freeze record.
-13. [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) — append-only mapping from every
+14. [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) — append-only mapping from every
    interpreted result to its configuration, artifact, revision, and job ID.
-14. [`FORENSIC_AUDIT.md`](FORENSIC_AUDIT.md) — original inventory, leakage audit,
+15. [`FORENSIC_AUDIT.md`](FORENSIC_AUDIT.md) — original inventory, leakage audit,
    and reconstruction of the pre-research project.
 
 ## Frozen result boundary
@@ -78,6 +81,7 @@ separately versioned prospective experiment.
 | Literature and novelty boundary | [`RELATED_WORK.md`](RELATED_WORK.md) |
 | Citation resolution and metadata audit | [`CITATION_INTEGRITY_AUDIT.md`](CITATION_INTEGRITY_AUDIT.md) |
 | Proposition-level citation precheck | [`SUBSTANTIVE_CITATION_AUDIT.md`](SUBSTANTIVE_CITATION_AUDIT.md) |
+| Originality and novelty screen | [`ORIGINALITY_AND_NOVELTY_SCREEN.md`](ORIGINALITY_AND_NOVELTY_SCREEN.md) |
 | Environment contract | [`ENVIRONMENT.md`](ENVIRONMENT.md) |
 | Venue fit and deadlines | [`VENUE_STRATEGY.md`](VENUE_STRATEGY.md) |
 | Venue decision handoff | [`VENUE_DECISION_PACKET.md`](VENUE_DECISION_PACKET.md) |
@@ -93,6 +97,7 @@ separately versioned prospective experiment.
 | Anonymity and release risk | [`ANONYMITY_RELEASE_RISK.md`](ANONYMITY_RELEASE_RISK.md) |
 | Authorship and generative-AI policy | [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md) |
 | Human author verification packet | [`HUMAN_AUTHOR_VERIFICATION_PACKET.md`](HUMAN_AUTHOR_VERIFICATION_PACKET.md) |
+| Git-free artifact reconstruction | [`ARTIFACT_CLEANROOM_REPRODUCTION.md`](ARTIFACT_CLEANROOM_REPRODUCTION.md) |
 | External contact drafts | [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md) |
 | Independent cold-read protocol | [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md) |
 | Blank private cold-read response record | [`EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md`](EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md) |

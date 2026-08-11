@@ -37,6 +37,7 @@ class HumanAuthorVerificationPacketTest(unittest.TestCase):
             "research/CITATION_INTEGRITY_AUDIT.md",
             "research/SUBSTANTIVE_CITATION_AUDIT.md",
             "research/ORIGINALITY_AND_NOVELTY_SCREEN.md",
+            "research/ARTIFACT_CLEANROOM_REPRODUCTION.md",
             "research/CONTACT_TEMPLATES.md",
             "artifact/THIRD_PARTY.md",
         )
@@ -56,6 +57,8 @@ class HumanAuthorVerificationPacketTest(unittest.TestCase):
             self.assertIn(heading, packet)
 
         self.assertNotIn("[x]", packet.lower())
+        self.assertIn("git rev-parse 5ed5dad", packet)
+        self.assertNotIn("git rev-parse 853e2ff", packet)
         self.assertIn("template only; human verification not yet complete", packet)
 
 

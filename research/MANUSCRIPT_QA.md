@@ -160,7 +160,7 @@ one venue-ruling-template test, one external-review-response-template test,
 and one substantive-citation-audit test (31 tests total). They regenerated all paper
 fragments without byte drift.
 
-The final repository-wide verification runs all 138 tests: 114 research tests,
+The final repository-wide verification runs all 139 tests: 115 research tests,
 10 paper tests, 12 SCITEPRESS tests, and two artifact tests.
 
 The deterministic anonymous review archive has SHA-256
@@ -206,6 +206,15 @@ same deep check passed the independent macOS build. After the citation-source
 correction and close-work addition, a fresh 27-page render confirmed clean current ICAART and LNCS
 layouts; the five-page supplement retained its byte-identical previously
 inspected hash.
+
+A second Git-free extraction reproduced the exact current archive on Bouchet
+using Python 3.12.3 and TeX Live 2024. The manifest verified all 60 immutable
+files before and after regeneration, all 22 packaged tests passed, and the
+three rebuilt PDFs were byte-identical to the production hashes above. The
+11-page submission check again passed at 38,760 characters and nine embedded
+fonts. All 34 rebuilt pages were rendered and inspected without a layout or
+readability defect. The command transcript, environment, identities, and
+scope boundary are frozen in `ARTIFACT_CLEANROOM_REPRODUCTION.md`.
 
 The final close-work refreeze at `e91674f` adds the AAAI 2022 learned-sketch
 and AAAI 2023 bilevel-synthesis successors, explicitly disclaims synthesis and

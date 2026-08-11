@@ -22,3 +22,18 @@ python3 artifact/scripts/build_anonymous_artifact.py
 The archive is written under `artifact/dist/` and is intentionally ignored by
 Git. Inspect `artifact/THIRD_PARTY.md` before distributing it. The archive is a
 review artifact, not a license grant for upstream bot or game content.
+
+The output is a gzip-compressed POSIX tar archive, not a ZIP file. Review it in
+a new directory so that no repository file can satisfy an omitted package
+dependency:
+
+```bash
+mkdir reviewer-cleanroom
+tar -xzf artifact/dist/chrono-divide-review-artifact.tar.gz \
+  -C reviewer-cleanroom
+cd reviewer-cleanroom/chrono-divide-review-artifact
+python3 verify_manifest.py
+```
+
+The complete clean-room reconstruction record is
+[`research/ARTIFACT_CLEANROOM_REPRODUCTION.md`](../research/ARTIFACT_CLEANROOM_REPRODUCTION.md).

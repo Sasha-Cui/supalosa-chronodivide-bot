@@ -101,6 +101,14 @@ the archive denylist rejects that token, and a whole-package regression check
 prevents recurrence. The independent build also passed the Poppler-backed deep
 submission check with the same 11-page, 38,760-character, nine-font result.
 
+A separate same-toolchain clean-room run extracted this exact archive into a
+fresh Git-free directory on Bouchet with Python 3.12.3 and TeX Live 2024. It
+verified all 60 files before and after regeneration, passed all 22 packaged
+tests, and reproduced the production SCITEPRESS PDF byte for byte at the hash
+above. Its deep submission check and complete 11-page rendered inspection also
+passed. See `ARTIFACT_CLEANROOM_REPRODUCTION.md` for the auditable transcript
+and the explicit boundary that this package does not rerun simulations.
+
 ## Reviewer-assignment metadata
 
 The title and abstract already identify a scripted RTS agent, the Chrono Divide
