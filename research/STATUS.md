@@ -4,8 +4,8 @@ Last reconciled: **2026-08-11**
 
 ## Bottom line
 
-The core empirical program is complete and the first full paper draft is built,
-visually checked, committed, and pushed. The frozen
+The core empirical program is complete and the submission-candidate paper is
+built, visually checked, committed, and ready for external review. The frozen
 method-v2 champion substantially improves the shipped StrongBot default across
 16 sealed Chrono Divide map families against one pinned, independently loaded
 Supalosa bot. The relative effect passes its prespecified confirmatory gate; the
@@ -78,20 +78,23 @@ and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.m
 
 ## Manuscript status and remaining work
 
-Commit `81e87e2` adds the complete anonymous LNCS manuscript, supplement,
-21-entry bibliography, and deterministic paper build. The main PDF is 16 pages
-with main text ending on page 14 and references continuing afterward; the
-supplement is five pages. All reported tables and figures are generated from
-hash-pinned aggregate artifacts. The final build has no overfull boxes,
-undefined references, missing citations, or BibTeX warnings, and all 21 pages
-have received a rendered visual check.
+Commit `cdf85e0` is the current anonymous LNCS manuscript revision. It sharpens
+the held-out-evaluation title, states two confirmatory research questions and
+one explicitly descriptive diagnostic question, and removes causal-sounding
+mechanism language without changing any result. The main PDF is 16 pages with
+main text ending on page 14 and references continuing afterward; the supplement
+is five pages. All reported tables and figures are generated from hash-pinned
+aggregate artifacts. The final build has no overfull boxes, undefined
+references, missing citations, or BibTeX warnings, and all 21 pages have
+received rendered visual checks. The current PDF SHA-256 values are recorded in
+[`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md).
 
-Commit `3c5af39` adds a deterministic anonymous aggregate-artifact builder. A
-clean `git archive` of that commit passed all paper and artifact tests and
-reproduced the 58 KB review archive byte-for-byte at SHA-256
-`0c8fff25c274abbddbd4ed92ecd04979bfc1c323b346173168bc3116e1bf16c3`.
-An extracted reviewer copy also rebuilt the 16-page paper and five-page
-supplement without warnings.
+Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder.
+The current 59 KB review archive is byte-deterministic at SHA-256
+`5e160fb9766a17cace0f63815fcbb9b271f19d6eafb5fa0ad68912b6b9bdffa1`.
+Its 35-file manifest verifies, all artifact tests pass, and an extracted
+reviewer copy rebuilds the 16-page paper and five-page supplement without
+warnings.
 
 The remaining blockers are release- and submission-oriented, not additional
 training:
@@ -100,9 +103,11 @@ training:
    redistributing the combined bot, whose upstream package is `UNLICENSED`;
 2. resolve the double-blind risk created by the named public GitHub repository
    containing the paper and unique result text;
-3. obtain written confirmation that EvoStar permits remote presentation; and
-4. complete final reviewer edits, accessibility checks, submission metadata,
-   and a post-edit PDF QA pass.
+3. obtain written confirmation that EvoStar accepts the paper's application and
+   evaluation emphasis, permits remote presentation, and allows the intended
+   supplement/artifact route; and
+4. obtain a cold read from an independent technical reader, incorporate only
+   claim-preserving clarity corrections, and repeat final PDF QA.
 
 The candid submission decision is **go** for a scoped lower-tier game-AI or
 evolutionary-computation workshop/special session, and **no-go** for a broad or

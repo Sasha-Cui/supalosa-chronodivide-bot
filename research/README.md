@@ -20,12 +20,16 @@ family-disjoint evaluation and configuration of a generic scripted RTS policy.
    reviewer-style acceptance audit.
 7. [`ANONYMITY_RELEASE_RISK.md`](ANONYMITY_RELEASE_RISK.md) — double-blind and
    upstream-license actions required before submission or public bot release.
-8. [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md) and
+8. [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md),
+   [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md), and
    [`SUBMISSION_ROADMAP.md`](SUBMISSION_ROADMAP.md) — send-ready external
-   questions and the dated path to the 2026-11-01 deadline.
-9. [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) — append-only mapping from every
+   questions, a neutral cold-read protocol, and the dated path to the
+   2026-11-01 deadline.
+9. [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md) — the final claim,
+   anonymity, rights, artifact, and upload freeze record.
+10. [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) — append-only mapping from every
    interpreted result to its configuration, artifact, revision, and job ID.
-10. [`FORENSIC_AUDIT.md`](FORENSIC_AUDIT.md) — original inventory, leakage audit,
+11. [`FORENSIC_AUDIT.md`](FORENSIC_AUDIT.md) — original inventory, leakage audit,
    and reconstruction of the pre-research project.
 
 ## Frozen result boundary
@@ -63,7 +67,9 @@ separately versioned prospective experiment.
 | Reviewer-style decision | [`REVIEWER_AUDIT.md`](REVIEWER_AUDIT.md) |
 | Anonymity and release risk | [`ANONYMITY_RELEASE_RISK.md`](ANONYMITY_RELEASE_RISK.md) |
 | External contact drafts | [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md) |
+| Independent cold-read protocol | [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md) |
 | Dated submission roadmap | [`SUBMISSION_ROADMAP.md`](SUBMISSION_ROADMAP.md) |
+| Submission freeze checklist | [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md) |
 | Anonymous artifact builder | [`../artifact/README.md`](../artifact/README.md) |
 
 ## Reproducibility layout

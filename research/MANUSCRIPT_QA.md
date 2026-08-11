@@ -4,14 +4,14 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `81e87e2291a6a8d2179cbda9c811e0993f758d9e`
+- Source commit: `cdf85e0c549f17f136efe105a5a66da00134a74c`
 - Main source: `paper/main.tex`
 - Supplement source: `paper/supplement.tex`
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 16 pages total; non-reference content ends on page 14
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `c4368889093e4bf173d59963cce43c0bb8e23bbb148530c972f4ef3232e44038`
-- Supplement PDF SHA-256: `09a5cc77cc905e8df192c3d5468c7b5bfb71b2cbcd650070574793cca3946b2c`
+- Main PDF SHA-256: `c59a921c828bbbec568d26954e4d6d97f1a1904c7278e9aabf2aa445db9a364e`
+- Supplement PDF SHA-256: `5b38896312a50295da112711d2a4f9f8683299fc155b39fafc754e107474c791`
 
 The PDFs are build products and are not committed. Their hashes identify the
 exact artifacts inspected during this QA pass.
@@ -40,11 +40,13 @@ The final logs contain:
 ## Visual and content checks
 
 All 16 main-paper pages and all five supplement pages were rendered with
-Poppler and visually inspected. The pass checked title-page anonymity, text and
-background contrast, margins, line wrapping, tables, plot labels, captions,
-page numbers, bibliography links, and section transitions. The final source
-contains no author NetID, institution name, literal Slurm account, personal
-repository URL, or private absolute path.
+Poppler and visually inspected. After the final title, research-question, and
+diagnostic-wording edit, all 16 main-paper pages were rendered and inspected
+again. The pass checked title-page anonymity, text and background contrast,
+margins, line wrapping, tables, plot labels, captions, page numbers,
+bibliography links, and section transitions. The final source contains no
+author NetID, institution name, literal Slurm account, personal repository URL,
+or private absolute path.
 
 The claim audit confirmed that the paper:
 
@@ -59,12 +61,12 @@ The claim audit confirmed that the paper:
 
 ## Clean export and reviewer artifact
 
-A `git archive` export of committed main revision `3c5af39` passed five paper
-generator tests, two artifact-builder tests, and the three frozen
-family-exporter tests. It regenerated all paper fragments without byte drift.
+A committed main revision at `cdf85e0` passed five paper-generator tests, two
+artifact-builder tests, and the three frozen family-exporter tests. It
+regenerated all paper fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
-`0c8fff25c274abbddbd4ed92ecd04979bfc1c323b346173168bc3116e1bf16c3`.
+`5e160fb9766a17cace0f63815fcbb9b271f19d6eafb5fa0ad68912b6b9bdffa1`.
 Two independent builds produced that same hash. The archive contains 35
 manifested files, normalized `0/0` ownership and epoch timestamps, no Git tree,
 no bot packages, and no direct author, scheduler-account, institution, or

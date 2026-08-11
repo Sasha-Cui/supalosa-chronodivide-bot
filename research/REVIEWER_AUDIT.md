@@ -76,14 +76,18 @@ post hoc to this submission.
 
 ## Remaining acceptance work
 
-1. Ask the EvoStar/SCAG chair two questions in writing: whether remote
-   presentation is allowed and whether a named public implementation repository
-   posted before submission conflicts with the double-blind policy.
+1. Ask the EvoStar/SCAG chair in writing whether the paper's application and
+   evaluation emphasis is in scope, whether remote presentation is allowed,
+   whether a named public implementation repository posted before submission
+   conflicts with double-blind review, and whether the supplement/artifact may
+   accompany the main PDF.
 2. Ask Supalosa for explicit permission and preferred attribution/license for
    public redistribution of the derived bot. Until then, release only the
    aggregate reviewer artifact.
-3. Conduct one external human proofread focused on whether the study-flow and
-   adaptation sequence are understandable without repository context.
+3. Conduct the neutral external cold read in
+   [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md), focused on whether
+   the claim boundary, study flow, and adaptation sequence are understandable
+   without repository context.
 4. Repeat the citation, page-limit, anonymity, manifest, and rendered-PDF checks
    after the last editorial change.
 

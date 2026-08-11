@@ -35,13 +35,15 @@ successive-halving method itself is not novel.
   [submission instructions](https://www.evostar.org/2027/submit-paper/), and
   [hybrid conference statement](https://www.evostar.org/2027/).
 
-The project is now **near the expected SCAG standard**: its empirical program
-is complete, the relative confirmatory endpoint passed, the failed absolute
-endpoint is reported, every result is tied to frozen manifests and job records,
-and a complete anonymous LNCS manuscript and supplement are committed at
-`81e87e2`. It is not yet submission-ready because the anonymous artifact,
-license boundary, clean-clone reproduction, reviewer audit, and written remote
-presentation confirmation remain unfinished.
+The project is now **near the expected SCAG standard and internally
+submission-ready**: its empirical program is complete, the relative
+confirmatory endpoint passed, the failed absolute endpoint is reported, every
+result is tied to frozen manifests and job records, the anonymous LNCS paper
+and supplement have received full rendered QA, and the deterministic aggregate
+artifact passes a clean extraction and rebuild. Submission still depends on
+written rulings about topical scope, remote presentation, prior public-repository
+exposure, and supplementary material. Public redistribution of the combined
+bot separately depends on upstream permission.
 
 Likely reviewer concerns and the required answers are:
 

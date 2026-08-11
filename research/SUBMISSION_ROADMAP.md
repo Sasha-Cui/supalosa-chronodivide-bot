@@ -9,8 +9,8 @@ on the opened family population.
 ## 11--17 August 2026: external policy decisions
 
 - Send the three drafts in [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md).
-- Obtain a written remote-presentation ruling and double-blind repository ruling
-  from EvoStar/SCAG.
+- Obtain written scope, remote-presentation, double-blind repository, and
+  supplement/artifact rulings from EvoStar/SCAG.
 - Request explicit redistribution/license terms from Supalosa.
 - Request Chrono Divide citation, version-pinning, and acquisition guidance.
 - If the chair requires a non-public repository, change visibility without
@@ -22,7 +22,8 @@ review and does not depend on bot redistribution.
 
 ## 18--31 August 2026: independent reading pass
 
-- Give the PDF, not the repository, to one technically literate reader.
+- Give the PDF, not the repository, to one technically literate reader using
+  the neutral prompts in [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md).
 - Ask the reader to summarize the claim, method-v1/method-v2 sequence, and why
   0.535 does not establish reliable superiority.
 - Repair any point the reader cannot explain correctly after one reading.
@@ -63,7 +64,8 @@ Exit condition: upload-ready package by the internal **2026-10-15** deadline.
 - Upload early enough to download and inspect the venue-generated submission
   copy.
 - Store the submission ID, uploaded hashes, confirmation email, and exact PDF
-  in the private submission record.
+  in the private submission record. Use
+  [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md) as the freeze record.
 
 ## Fallback trigger
 

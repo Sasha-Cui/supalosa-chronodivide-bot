@@ -1,20 +1,12 @@
 # Results-driven paper plan
 
-Status: **empirical program complete; full evidence-bound manuscript and
-supplement committed at `81e87e2`; release QA in progress**.
+Status: **empirical program complete; submission-candidate manuscript at
+`cdf85e0`; deterministic anonymous artifact and internal QA complete**.
 
 ## Recommended paper
 
-**Working title:** *Reproducible Policy Configuration for a Scripted RTS Agent
-in Chrono Divide*
-
-Alternative titles:
-
-1. *Family-Disjoint Evaluation of a Configured Chrono Divide Agent*
-2. *From Default Script to Robust Generalist: Reproducible Agent Configuration
-   in Chrono Divide*
-3. *Common-Seed Configuration and Held-Out Map Evaluation for a Scripted RTS
-   Agent*
+**Title:** *Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono
+Divide*
 
 The primary target is a lower-tier game-AI/evolutionary-computation workshop or
 special session. The paper is an empirical evaluation and reproducibility
@@ -32,16 +24,7 @@ reliably beats Supalosa.
 
 ## Research questions
 
-**RQ1 — Can Chrono Divide support reproducible, leakage-controlled scripted-agent
-evaluation?**
-
-Yes within the documented scope. The harness provides explicit engine and
-participant seeds, reciprocal physical starts, source/runtime/baseline/map
-commitments, family-disjoint roles, fail-closed job accounting, sealed outcome
-access, and family-level inference. Of 67 Temperate map families screened twice,
-54 passed the outcome-free compatibility criteria.
-
-**RQ2 — Does training-only configuration improve a generic StrongBot policy on
+**RQ1 — Does training-only configuration improve a generic StrongBot policy on
 held-out map families?**
 
 Yes. On 16 sealed families, the frozen champion scores 0.53516 versus 0.19922
@@ -49,20 +32,22 @@ for the shipped default. The equally family-weighted improvement is 0.33594,
 with two-sided 95% interval [0.21456, 0.45732]. Fourteen family effects are
 positive and two are zero.
 
-**RQ3 — Does the configured StrongBot reliably beat Supalosa?**
+**RQ2 — Does the configured StrongBot reliably beat Supalosa?**
 
 Not established. The champion's score margin above 0.5 is 0.03516, but its
 prespecified one-sided 95% lower margin is -0.02117. This failed gate is a main
 result, not a footnote.
 
-**RQ4 — What observed behavior accounts for the improvement?**
+**RQ3 — What paired outcome and terminal-state patterns accompany the
+improvement, and do one-group reverts isolate a component?**
 
 Descriptively, the champion converts many default losses into tick-cap draws or
 wins and ends matched draw-to-draw games with substantially more relative
 combatants and fewer banked credits. The joint infantry+rush strategy group is
 the dominant component signal, but its multiplicity-controlled interval
 includes zero. These results support a mechanism hypothesis, not a proven
-single-component cause.
+single-component cause. This is a post-confirmatory descriptive question and
+cannot rescue either confirmatory gate.
 
 ## Contribution statement
 

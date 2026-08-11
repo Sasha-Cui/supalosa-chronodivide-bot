@@ -7,7 +7,7 @@ any third party.
 
 ## EvoStar / EvoApplications / SCAG chairs
 
-**Subject:** EvoApplications 2027 SCAG: remote presentation and double-blind repository question
+**Subject:** EvoApplications 2027 SCAG: scope, remote presentation, and review-policy questions
 
 > Dear EvoApplications/SCAG Chairs,
 >
@@ -24,6 +24,14 @@ any third party.
 >    repository. Does this conflict with the double-blind policy? If so, would
 >    making that repository non-public for the review period satisfy the policy,
 >    or is the prior public posting itself disqualifying?
+> 3. The study applies established configuration techniques rather than proposing
+>    a new evolutionary algorithm. Its contribution is a leakage-controlled,
+>    reproducible evaluation protocol plus held-out evidence for a scripted game
+>    agent. Is that application/evaluation emphasis within the intended SCAG
+>    scope?
+> 4. May authors upload a separate anonymous supplement and a small reviewer
+>    artifact in addition to the 14-page paper? If so, are reviewers expected to
+>    consult them, or must every essential detail remain in the main PDF?
 >
 > I would appreciate a written ruling before registration or submission. I am
 > happy to provide a short anonymous summary if useful.
