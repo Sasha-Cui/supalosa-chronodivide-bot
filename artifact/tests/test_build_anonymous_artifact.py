@@ -81,7 +81,7 @@ class BuildAnonymousArtifactTest(unittest.TestCase):
                 (package / "README.md").read_text(),
             )
             self.assertIn(
-                "Expected output is a 16-page",
+                "Expected output is a 17-page",
                 (package / "README.md").read_text(),
             )
             self.assertIn(

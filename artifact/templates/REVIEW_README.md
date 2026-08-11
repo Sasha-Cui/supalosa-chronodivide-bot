@@ -46,7 +46,7 @@ make -C paper main supplement
 make -C paper_scitepress check
 ```
 
-Expected output is a 16-page `paper/build/main.pdf`, a five-page
+Expected output is a 17-page `paper/build/main.pdf`, a five-page
 `paper/build/supplement.pdf`, and a 10-page A4
 `paper_scitepress/build/main.pdf`. The LNCS non-reference main-paper content
 ends on page 14. PDF byte hashes may vary across TeX distributions; the package
