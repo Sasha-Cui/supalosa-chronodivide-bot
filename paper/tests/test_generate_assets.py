@@ -5,6 +5,7 @@ import importlib.util
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import tempfile
 import unittest
@@ -162,6 +163,29 @@ class GeneratePaperAssetsTest(unittest.TestCase):
             "does not estimate improvement over the deployed policy",
             sections["reproducibility"],
         )
+        self.assertIn(
+            "deployed map-profile-enabled default",
+            sections["abstract"].lower(),
+        )
+
+    def test_keywords_target_game_agent_reviewers(self) -> None:
+        source = (REPO / "paper" / "sections" / "abstract.tex").read_text(
+            encoding="utf-8"
+        )
+        match = re.search(r"\\keywords\{([^}]*)\}", source, re.DOTALL)
+        self.assertIsNotNone(match)
+        assert match is not None
+        keywords = " ".join(match.group(1).split()).lower()
+        for required in (
+            "game artificial intelligence",
+            "real-time strategy games",
+            "scripted agents",
+            "algorithm configuration",
+            "reproducible evaluation",
+        ):
+            self.assertIn(required, keywords)
+        self.assertNotIn("distribution shift", keywords)
+        self.assertNotIn("simulation-based optimization", keywords)
 
     def test_review_sources_remain_anonymous(self) -> None:
         main = (REPO / "paper" / "main.tex").read_text(encoding="utf-8")
