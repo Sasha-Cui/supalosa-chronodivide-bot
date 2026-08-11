@@ -4,16 +4,40 @@ Last reconciled: **2026-08-11**
 
 ## Bottom line
 
-The core empirical program is complete and the submission-candidate paper is
-built, visually checked, committed, and ready for external review. The frozen
+The method-v2 empirical program is complete, but its manuscript is **not a
+submission candidate under the current project objective**. The frozen
 method-v2 champion substantially improves a prospectively frozen generic
 StrongBot reference across 16 sealed Chrono Divide map families against one
-pinned, independently loaded Supalosa bot. The relative effect passes its prespecified confirmatory gate; the
-separate claim that the champion reliably beats Supalosa does not, and the
-frozen joint two-gate criterion therefore fails.
+pinned, independently loaded Supalosa bot. The relative effect passes its
+prespecified confirmatory gate; the separate claim that the champion reliably
+beats Supalosa does not, and the frozen joint two-gate criterion therefore
+fails.
 
 No Chrono Divide simulation job is active. Do not launch more outcome-bearing
 games on the opened family population for this paper.
+
+The active program is the prospectively separated, multi-country method v3 in
+[`METHOD_V3_PROSPECTIVE_PROGRAM.md`](METHOD_V3_PROSPECTIVE_PROGRAM.md). Its
+primary endpoint is actual win probability, not draw-adjusted score, and its
+engineering target is destroying every enemy building before the tick cap.
+The existing PDFs, submission hashes, and readiness statements are historical
+method-v2 artifacts and must not be submitted or represented as current.
+
+## Active method-v3 program
+
+Method v3 begins from opened method-v2 pilot evidence but requires a genuinely
+new map-family population and a new one-time sealed confirmatory campaign. It
+will cover all nine supported country mirrors with one shared coordinate-free
+policy. The first mechanism screen tests attack-mission preemption, earlier
+building closeout, production/power/defense target priorities, systematic map
+sweeps, late anti-structure production, and construction-yard sale timing.
+
+No method-v3 outcome-bearing job has launched. The cluster queue is empty. Code
+interfaces, role commitments, compatibility gates, training utility, and exact
+launch manifests remain to be implemented and tested before simulation.
+
+Everything below records the immutable method-v2 program and remains valid as
+pilot history, not as the current submission state.
 
 ## Main result
 
