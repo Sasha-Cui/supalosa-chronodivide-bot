@@ -1,10 +1,10 @@
-# SCITEPRESS fallback QA record
+# SCITEPRESS submission-candidate QA record
 
 Prepared: **2026-08-11**
 
-## Frozen fallback identity
+## Frozen candidate identity
 
-- Fallback introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
+- Candidate introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
 - Current reviewed source: `8242720bd603a8ac72ef5f28496b412f573b294e`
 - Authoritative shared manuscript source: `8242720bd603a8ac72ef5f28496b412f573b294e`
 - Build entry point: `paper_scitepress/main.tex`
@@ -19,10 +19,10 @@ file rendered and inspected in this QA pass.
 
 ## Source and template controls
 
-The fallback imports all eight authoritative main-paper sections and regenerates
+The candidate imports all eight authoritative main-paper sections and regenerates
 the result macros from the same eight hash-pinned aggregate inputs as the LNCS
 paper. Its separate abstract contains no literal headline result values; those
-also come from generated macros. The fallback does not include the supplement
+also come from generated macros. The candidate does not include the supplement
 and does not create a second empirical record.
 
 The four unmodified vendor files came from the official SCITEPRESS conference
@@ -40,7 +40,7 @@ make -C paper_scitepress clean
 make -C paper_scitepress check
 ```
 
-completed successfully. Seven fallback-specific tests passed, the shared paper
+completed successfully. Seven candidate-specific tests passed, the shared paper
 generator produced no Git drift, BibTeX emitted no warning, LaTeX emitted no
 overfull box or undefined citation/reference, and the build checker enforced a
 maximum of 12 pages. Commit `297d5b8` adds the fourth post-BibTeX LaTeX pass
@@ -104,8 +104,13 @@ still required on:
 2. how the previously public named implementation repository must be handled
    during double-blind review; and
 3. where the required AI-use acknowledgment and affected-section citation
-   belong in a double-blind review submission that must omit acknowledgments.
+   belong in a double-blind review submission that must omit acknowledgments;
+   and
+4. whether the identity-neutral aggregate artifact may accompany review as a
+   PRIMORIS attachment or anonymous link, including the accepted archive type
+   and size limit.
 
-After that ruling, add exactly the required disclosure, complete the human
-verification in `AUTHORSHIP_AND_AI_POLICY.md`, and repeat this full QA. Do not
-silently upload the current no-disclosure PDF.
+After those rulings, add exactly the required disclosure, align availability
+language with the permitted artifact route, complete the human verification in
+`AUTHORSHIP_AND_AI_POLICY.md`, and repeat this full QA. Do not silently upload
+the current no-disclosure PDF.

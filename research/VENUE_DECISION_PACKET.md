@@ -20,6 +20,12 @@ send email, authorize submission, or replace a written venue ruling.
 Neither venue is currently cleared for upload. The remaining uncertainty is
 governance, not manuscript or experiment completion.
 
+ICAART is the operational primary candidate because its public AI policy
+matches the recorded assistance and it publishes a live-online presentation
+route. SCAG remains the stronger topical fit, but it should displace ICAART
+only if its chairs give workable written answers to all four project-specific
+questions.
+
 ICAART reviewer assignment is already frozen: submit under **Agents**, choose
 **Agent Models and Architectures**, **Simulation**, and **Task Planning and
 Execution** when the exact call taxonomy is available, and copy the title,
@@ -34,9 +40,10 @@ Send the two factual inquiries in `CONTACT_TEMPLATES.md` now:
    covering scope, fully remote presentation, prior public repository exposure,
    and eligibility/disclosure for the recorded Codex assistance.
 2. ICAART secretariat: request the exceptional remote-route procedure and fee
-   class, a ruling on the named public code repository, and exact instructions
-   for AI disclosure in the double-blind version. The public evidence and
-   remaining ambiguities are in `ICAART_POLICY_RECONCILIATION.md`.
+   class, a ruling on the named public code repository, exact instructions for
+   AI disclosure in the double-blind version, and the permitted review-artifact
+   attachment or anonymous-link route. The public evidence and remaining
+   ambiguities are in `ICAART_POLICY_RECONCILIATION.md`.
 
 Do not describe the AI work as copy editing. Do not send both manuscripts as
 submissions, and do not make either PDF public during review. An anonymous PDF
@@ -55,6 +62,7 @@ Retain the original sent message and full response privately with:
 | Remote ruling | Yes / no / conditions and registration class |
 | Repository ruling | Yes / no / required action |
 | AI ruling | Eligibility, wording, placement, and citation instruction |
+| Artifact ruling | Attachment/link mechanism, size limit, or not permitted |
 | Evidence identity | Manuscript source commit and PDF SHA-256 |
 
 An informal statement on a website is not a substitute for a response to the
@@ -62,13 +70,18 @@ project's exact circumstances.
 
 ## Decision rule
 
-- **Choose SCAG** only if all four SCAG questions receive affirmative or
-  workable written rulings by **2026-08-20**. It remains the stronger topical
+- **Choose ICAART's September 15 regular round** if it confirms remote
+  eligibility/procedure, repository handling, disclosure placement, and a
+  definite reviewer-artifact instruction by **2026-08-25**. Artifact attachment
+  is desirable rather than an eligibility condition: a ruling that no artifact
+  is permitted is workable if the manuscript is revised not to imply reviewer
+  access. This is the default route because it best matches the no-travel and
+  transparent-AI constraints.
+- **Choose SCAG instead** only if ICAART cannot provide a workable ruling and
+  all four SCAG questions receive affirmative or workable written answers by
+  **2026-08-25**. SCAG remains the stronger topical fit but the riskier policy
   fit.
-- **Choose ICAART's September 15 regular round** if SCAG remains unresolved and
-  ICAART confirms remote eligibility/procedure, repository handling, and
-  disclosure placement by **2026-08-25**.
-- Make the one-venue decision by **2026-09-01**. If ICAART is chosen, insert the
+- Make the one-venue decision by **2026-08-25**. If ICAART is chosen, insert the
   approved disclosure, perform the human verification and cold read, and
   refreeze by **2026-09-08**, leaving one week for PRIMORIS upload checks.
 - If neither venue gives a workable remote/policy ruling, do not gamble on

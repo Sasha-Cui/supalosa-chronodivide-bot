@@ -3,8 +3,8 @@
 Prepared: **2026-08-11**
 
 This record freezes the claim-preserving metadata for an ICAART 2027 regular
-paper. It does not authorize submission or resolve the remote-presentation and
-AI-disclosure gates.
+paper. It does not authorize submission or resolve the remote-presentation,
+repository, AI-disclosure, or reviewer-artifact gates.
 
 ## Decision
 
@@ -73,6 +73,23 @@ without changing the evidence:
 | Significance | Large family-consistent relative gain and a reusable audit pattern | Absolute superiority failed; generality is bounded |
 | Presentation | Title, abstract, RQs, tables, figures, and conclusion expose the positive and negative endpoints | High draw rate requires careful reading |
 
+## Official reviewer-question coverage
+
+The public review description also lists nine concrete questions. The current
+candidate addresses each without adding post-hoc evidence:
+
+| Reviewer question | Current evidence | Residual action |
+| --- | --- | --- |
+| Are the abstract and introduction adequate? | The 197-word abstract names the existing environment, method, estimand, passed relative gate, failed absolute/joint gate, and scope; the introduction states three RQs and contributions. | Independent cold reader must recover the same boundaries unprompted. |
+| Are more experimental results needed? | The completed design has 8,704 games and one sealed 512-game family-clustered confirmation; more games on opened families would not add generalization units. | Acknowledge that a second opponent or matchup is prospective future work. |
+| Is more comparative evaluation needed? | The paper compares champion and frozen in-class reference, five run-local selections, and five component reverts. | One independent opponent remains the largest scientific weakness; do not imply broad baseline coverage. |
+| Should critical discussion improve? | Six explicit limitations cover opponent/matchup, supported maps, comparator, draws/cap, configurator baselines, and adaptation/diagnostic power. | Preserve this space during any page-limited edit. |
+| Are figures adequate? | Study flow, complete family effects, paired outcome transitions, and multiplicity-aware component effects were rendered and checked at reading scale. | Repeat visual QA after any disclosure or availability edit. |
+| Are conclusions and future work convincing? | The conclusion leads with the passed relative result, failed joint criterion, avoided-loss pattern, and non-claims; limitations specify prospective extensions. | Do not convert future work into evidence already obtained. |
+| Are references current and appropriate? | The 27-entry bibliography includes primary RTS configuration, algorithm-configuration, benchmark, inference, Chrono Divide, Supalosa, and 2026 venue-local work; DOI metadata was audited. | Human author must read and approve every cited source. |
+| Does formatting need adjustment? | The candidate is 10 A4 pages, 36,435 non-whitespace characters, uses the official template, has embedded fonts, and has no unresolved reference or overflow warning. | Recheck the PRIMORIS-rendered/downloaded copy. |
+| Does English need improvement? | The paper has completed multiple full-text and rendered-page passes; automated TeX lint produced no actionable prose defect. | Use the unprimed cold read for the final language decision. |
+
 The correct reviewer-facing claim remains: configuration robustly improves the
 frozen generic coordinate-free reference against pinned Supalosa on the tested
 map-family population. It is not a claim that StrongBot reliably beats
@@ -88,6 +105,9 @@ or contributes a new optimizer.
 4. Recheck the downloaded venue-rendered PDF against the retained SHA-256.
 5. Apply only the written venue-approved AI disclosure; do not silently add an
    acknowledgment that breaks double-blind review.
+6. Attach or link the anonymous aggregate artifact only through the route the
+   secretariat approves; if none is permitted, remove any implication of
+   reviewer access while retaining the future release statement.
 
 ## Official sources
 

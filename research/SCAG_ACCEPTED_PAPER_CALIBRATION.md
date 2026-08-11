@@ -60,5 +60,5 @@ the closest full-text comparison:
    study would need a separately registered prospective experiment.
 5. Submission to SCAG remains conditional on written confirmation that the
    application/evaluation emphasis is in scope and that remote presentation is
-   permitted. If scope is rejected, use the broader ICAART fallback rather
+   permitted. If scope is rejected, use the broader ICAART route rather
    than changing the scientific story.

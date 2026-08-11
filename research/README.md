@@ -81,7 +81,7 @@ separately versioned prospective experiment.
 | ICAART public-policy reconciliation | [`ICAART_POLICY_RECONCILIATION.md`](ICAART_POLICY_RECONCILIATION.md) |
 | Accepted-paper venue calibration | [`SCAG_ACCEPTED_PAPER_CALIBRATION.md`](SCAG_ACCEPTED_PAPER_CALIBRATION.md) |
 | Manuscript QA | [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md) |
-| SCITEPRESS fallback QA | [`SCITEPRESS_QA.md`](SCITEPRESS_QA.md) |
+| SCITEPRESS submission-candidate QA | [`SCITEPRESS_QA.md`](SCITEPRESS_QA.md) |
 | Reviewer-style decision | [`REVIEWER_AUDIT.md`](REVIEWER_AUDIT.md) |
 | Reviewer-response evidence index | [`REVIEW_RESPONSE_GUIDE.md`](REVIEW_RESPONSE_GUIDE.md) |
 | Anonymity and release risk | [`ANONYMITY_RELEASE_RISK.md`](ANONYMITY_RELEASE_RISK.md) |
@@ -91,7 +91,7 @@ separately versioned prospective experiment.
 | Dated submission roadmap | [`SUBMISSION_ROADMAP.md`](SUBMISSION_ROADMAP.md) |
 | Submission freeze checklist | [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md) |
 | Anonymous artifact builder | [`../artifact/README.md`](../artifact/README.md) |
-| SCITEPRESS fallback source | [`../paper_scitepress/README.md`](../paper_scitepress/README.md) |
+| SCITEPRESS submission-candidate source | [`../paper_scitepress/README.md`](../paper_scitepress/README.md) |
 
 ## Reproducibility layout
 

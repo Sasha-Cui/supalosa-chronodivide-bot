@@ -71,7 +71,7 @@ copy editing.
 
 ## ICAART secretariat
 
-**Subject:** ICAART 2027: remote procedure, repository anonymity, and AI disclosure
+**Subject:** ICAART 2027: remote, anonymity, AI disclosure, and reviewer artifact
 
 Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 
@@ -80,7 +80,7 @@ Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 > I am considering a 2027 regular-paper submission on reproducible
 > configuration and held-out evaluation of a scripted real-time-strategy
 > agent. I have prepared an anonymous 10-page version in the official
-> SCITEPRESS template. Before submitting it, could you please clarify three
+> SCITEPRESS template. Before submitting it, could you please clarify four
 > points?
 >
 > 1. The ICAART home page says speakers who are unable to travel may
@@ -108,6 +108,13 @@ Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 >    the references be acceptable in the review version? Please specify the
 >    required placement, wording, and citation form, including whether a single
 >    disclosure may identify all affected sections.
+> 4. I have a small identity-neutral aggregate artifact that regenerates every
+>    reported table and figure but contains no author identity, bot packages,
+>    maps, game assets, or private raw logs. The public complete-paper
+>    instructions describe the review PDF but do not specify supplementary
+>    files or anonymous external links. May this artifact accompany the review
+>    submission, and if so, should it be attached in PRIMORIS or supplied by an
+>    anonymous link? Please also indicate any file-type or size restriction.
 >
 > The paper reports a completed 8,704-game study with family-disjoint training
 > and evaluation. Its configured policy improves a prospectively frozen generic
@@ -124,7 +131,8 @@ Retain the answer with the submission record. Public guidance already
 establishes exceptional remote support for speakers unable to travel and allows
 disclosed AI assistance in principle. The unresolved items are the remote
 procedure/registration class, named-repository handling, and blind-review
-disclosure implementation; see `ICAART_POLICY_RECONCILIATION.md`.
+disclosure implementation, plus the reviewer-artifact delivery route; see
+`ICAART_POLICY_RECONCILIATION.md`.
 
 ## Supalosa
 

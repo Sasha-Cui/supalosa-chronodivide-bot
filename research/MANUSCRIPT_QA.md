@@ -72,7 +72,7 @@ limitation received a further complete 16-page main-paper pass. The explicit
 failed-joint-criterion language and pinned-source citation correction then
 received a fresh complete 21-page LNCS and supplement pass. Two clean builds of
 each PDF were byte-identical after the LNCS build adopted the fixed source
-epoch already used by the fallback. The checks covered title-page anonymity,
+epoch already used by the SCITEPRESS build. The checks covered title-page anonymity,
 text and background
 contrast, margins, line wrapping, tables, plot labels, captions, page numbers,
 bibliography links, and section transitions. The final source contains no
@@ -81,7 +81,7 @@ or private absolute path.
 
 The final ICAART game-testbed citation and bibliography compaction received a
 fresh complete 31-page pass over the 16-page LNCS paper, five-page supplement,
-and 10-page SCITEPRESS fallback. The conclusion remains on LNCS page 14,
+and 10-page SCITEPRESS candidate. The conclusion remains on LNCS page 14,
 references begin on page 15, and no orphan bibliography page remains.
 The final significance edit changed only LNCS page 14 and SCITEPRESS page 9;
 both were rendered at full resolution and inspected for line wrapping, margins,
@@ -153,5 +153,8 @@ modes.
 4. Obtain a written venue ruling on the documented beyond-copy-editing AI use,
    and complete the human evidence, citation, code, and line-by-line manuscript
    verification recorded in `AUTHORSHIP_AND_AI_POLICY.md`.
-5. Repeat this QA after the final reviewer edits and before uploading the
+5. If ICAART is selected, obtain its exact review-artifact attachment or
+   anonymous-link instruction; do not assume SCAG's 10 MB supplementary field
+   exists in PRIMORIS.
+6. Repeat this QA after the final reviewer edits and before uploading the
    submission PDF.

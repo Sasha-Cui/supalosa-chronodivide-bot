@@ -120,7 +120,7 @@ warnings prospectively. The main PDF is 16 pages with main text ending on page
 afterward; the supplement is five pages. All reported tables and figures are
 generated from hash-pinned aggregate artifacts. The final build has no overfull boxes, undefined
 references, missing citations, or BibTeX warnings. All 21 LNCS/supplement pages
-and all 10 fallback pages have received rendered visual checks. The current PDF SHA-256 values are recorded in
+and all 10 SCITEPRESS pages have received rendered visual checks. The current PDF SHA-256 values are recorded in
 [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md).
 
 Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
@@ -142,20 +142,20 @@ training:
 
 1. obtain permission or a licensing decision from Supalosa before publicly
    redistributing the combined bot, whose upstream package is `UNLICENSED`;
-2. obtain written confirmation that EvoStar accepts the paper's application and
-   evaluation emphasis, permits remote presentation, and permits the proposed
-   handling of the prior named public repository;
-3. obtain a written EvoStar ruling on the recorded beyond-copy-editing use of
-   OpenAI Codex, complete the human evidence/citation/code/manuscript verification,
-   and make any required disclosure; and
+2. obtain ICAART's four written rulings on the exceptional remote procedure,
+   prior named repository, blind-review AI disclosure, and reviewer-artifact
+   route; retain SCAG only as a topical secondary if its chairs affirm scope,
+   remote presentation, repository handling, and AI eligibility;
+3. complete the human evidence/citation/code/manuscript verification and apply
+   only the selected venue's required disclosure; and
 4. obtain a cold read from an independent technical reader, incorporate only
    claim-preserving clarity corrections, and repeat final PDF QA.
 
-ICAART 2027 is now the verified policy-compatible fallback: its official
+ICAART 2027 is now the operational primary candidate: its official
 guidance permits disclosed AI-assisted writing, revision, and code; its
 presenter page documents live online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
-SCITEPRESS fallback that reuses the frozen main-paper sections and result
+SCITEPRESS submission format that reuses the frozen main-paper sections and result
 macros. It is 10 A4 pages with a 197-word abstract and 36,435 extracted
 non-whitespace characters; two clean builds match at SHA-256
 `56fdc8e6b1c29f6c29b54cef205bdb75772034a8924bbbebeabf8bd9f6f29408`,
@@ -176,12 +176,12 @@ distribution-shift ML; exact area, topic, and keyword choices are recorded in
 The final conclusion now states the contribution as a provenance-bound,
 family-disjoint evaluation workflow while retaining the explicit non-claims
 about environment, optimizer, and dominance novelty.
-Decide one venue by 2026-09-01 and do not submit to both archival venues
+Decide one venue by 2026-08-25 and do not submit to both archival venues
 simultaneously.
 
-The candid submission decision is **go** for a scoped lower-tier game-AI or
-algorithm-configuration workshop/special session, and **no-go** for a broad or
-methodological flagship claim.
+The candid submission decision is **go** for a scoped lower-tier agent,
+game-AI, or algorithm-configuration conference/workshop, and **no-go** for a
+broad or methodological flagship claim.
 
 Use [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) for job-level provenance and
 [`PAPER_PLAN.md`](PAPER_PLAN.md) for the manuscript formulation.

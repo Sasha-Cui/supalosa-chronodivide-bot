@@ -8,7 +8,8 @@ the anonymous branch during review.
 
 ## Target and policy rulings
 
-- [ ] Exactly one archival target is selected by 2026-09-01.
+- [ ] Exactly one archival target is selected by 2026-08-25; ICAART is the
+      operational primary candidate pending its four written rulings.
 - [ ] If SCAG is selected, its chairs confirm the application/evaluation
       contribution is in scope.
 - [ ] If ICAART is selected, the secretariat confirms the author qualifies and
@@ -23,7 +24,7 @@ the anonymous branch during review.
       named implementation repository and any required visibility change.
 - [ ] The selected venue rules on the recorded beyond-copy-editing use of
       OpenAI Codex and specifies any required disclosure and citation.
-- [x] Anonymous supplement and reviewer artifact together fit the official
+- [x] Anonymous supplement and reviewer artifact together fit SCAG's official
       10 MB supplementary-material field; every essential detail remains in
       the main paper.
 - [ ] Deadline, timezone, page limit, review model, and registration requirement
@@ -52,7 +53,7 @@ These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
 commit and all three hashes together; never mix files from different freezes.
 
-## ICAART fallback identity
+## ICAART primary-candidate identity
 
 - [x] Separate SCITEPRESS source committed at
       `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`; the current reviewed source is
@@ -76,6 +77,9 @@ commit and all three hashes together; never mix files from different freezes.
       review and whether prior public visibility affects eligibility.
 - [ ] ICAART specifies where the required AI acknowledgment and affected-
       section system citation belong in the double-blind review version.
+- [ ] ICAART specifies whether PRIMORIS accepts the identity-neutral aggregate
+      artifact as a supplementary file or anonymous link, including any size
+      limit; if it does not, reviewer-facing prose does not imply access.
 - [ ] If ICAART is selected, apply only the approved disclosure and
       claim-preserving edits, then repeat `SCITEPRESS_QA.md` before upload.
 

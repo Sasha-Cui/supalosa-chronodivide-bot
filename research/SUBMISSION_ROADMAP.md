@@ -2,42 +2,47 @@
 
 Prepared: **2026-08-11**
 
-Primary target: EvoApplications 2027, SCAG special session. Official paper
-deadline: **2026-11-01**. The plan assumes no additional outcome-bearing games
-on the opened family population.
+Operational primary target: ICAART 2027 first-round regular paper. Official
+paper deadline: **2026-09-15 AoE**. SCAG remains the topical secondary if
+ICAART cannot satisfy the project-governance gates and its own chairs give
+affirmative rulings. The plan assumes no additional outcome-bearing games on
+the opened family population.
 
 ## 11--17 August 2026: external policy decisions
 
 - Send the four drafts in [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md).
+- Send the ICAART inquiry in `CONTACT_TEMPLATES.md` so that the
+  exceptional remote-route procedure and fee class, named-repository handling,
+  and double-blind disclosure location are known before the validated candidate
+  is selected for submission. The public-policy boundary is in
+  `ICAART_POLICY_RECONCILIATION.md`.
 - Obtain written scope, remote-presentation, and double-blind repository
-  rulings from EvoStar/SCAG.
+  rulings from EvoStar/SCAG as the topical secondary.
 - Obtain a written eligibility and disclosure ruling for the recorded
   beyond-copy-editing use of OpenAI Codex. Do not submit under a grammar-only
-  description.
-- Send the ICAART inquiry in `CONTACT_TEMPLATES.md` in parallel so that the
-  exceptional remote-route procedure and fee class, named-repository handling,
-  and double-blind disclosure location are known before the validated fallback
-  is activated for submission. The public-policy boundary is in
-  `ICAART_POLICY_RECONCILIATION.md`.
+  description at either venue.
 - Begin the human verification checklist in
   [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md), including
   primary evidence, all citations, experiment-affecting code, and the complete
-  manuscript. The official 10 MB supplementary-material field is already
-  documented; keep every essential claim and method in the main paper.
+  manuscript. SCAG's official 10 MB supplementary-material field is already
+  documented; ICAART must confirm whether it accepts the aggregate artifact as
+  an attachment or anonymous link. Keep every essential claim and method in
+  the main paper at either venue.
 - Request explicit redistribution/license terms from Supalosa.
 - Request Chrono Divide citation, version-pinning, and acquisition guidance.
 - If the chair requires a non-public repository, change visibility without
   deleting or rewriting evidence history.
 
-Exit condition: venue, anonymity, remote-presentation, and generative-AI
-eligibility routes are known, even if upstream code permission is still
-pending. The aggregate-only artifact is sufficient for review and does not
-depend on bot redistribution.
+Exit condition: venue, anonymity, remote-presentation, generative-AI, and
+review-artifact routes are known, even if upstream code permission is still
+pending. The aggregate-only artifact is sufficient if the venue permits it and
+does not depend on bot redistribution; the paper remains self-contained if the
+venue does not accept review artifacts.
 
 The SCITEPRESS conversion is already complete and visually validated at ten
-pages. If EvoStar has not supplied affirmative written rulings by
-**2026-08-20**, use `VENUE_DECISION_PACKET.md` to select the route; this
-preparation is not simultaneous submission.
+pages. Use `VENUE_DECISION_PACKET.md` to select exactly one route by
+**2026-08-25**; this parallel policy inquiry and format preparation is not
+simultaneous submission.
 
 ## 18--31 August 2026: independent reading pass
 
@@ -54,39 +59,43 @@ preparation is not simultaneous submission.
 Exit condition: an outside reader reproduces the intended takeaway without
 being coached by the authors.
 
-## 1--20 September 2026: venue-shaped revision
+## 1--8 September 2026: venue-shaped revision
 
-- Adjust title, keywords, and related-work emphasis to the chair's SCAG scope
-  guidance without changing the frozen claims.
-- Keep the evaluation contribution primary; do not manufacture evolutionary
+- If ICAART is selected, apply only the secretariat-approved AI disclosure to
+  the validated two-column A4 version. Preserve every failed-gate and scope
+  limitation, then repeat full SCITEPRESS QA.
+- If SCAG is selected instead, adjust only title, keywords, or related-work
+  emphasis explicitly requested by the chairs without changing frozen claims.
+  Keep the evaluation contribution primary; do not manufacture evolutionary
   algorithm novelty.
 - Add author names, acknowledgements, funding, and non-anonymous URLs only to a
   camera-ready source revision after double-blind review.
 - Test the review archive on a machine other than Bouchet if possible.
-- If ICAART is activated, apply only the secretariat-approved AI disclosure to
-  the validated two-column A4 version, preserve every failed-gate and scope
-  limitation, repeat full QA, and submit the regular paper by **2026-09-15
-  AoE**. Keep an 8-page short-paper reduction plan available in case the venue
-  changes the acceptance type.
 
 Exit condition: content-complete submission candidate and independently tested
 review artifact.
 
-## 21 September--15 October 2026: submission package
+## 9--15 September 2026: ICAART submission window
 
-- Reverify the official call, 14-page rule, deadline timezone, remote policy,
-  registration requirement, and submission fields.
+- Reverify the official call, 10,000--50,000-character rule, deadline timezone,
+  remote policy, registration requirement, and PRIMORIS fields.
 - Freeze the PDF, supplement, anonymous archive, archive SHA-256, abstract,
   keywords, conflicts, and author metadata in a submission checklist.
 - Run the final claim/statistics audit against committed JSON artifacts and the
   result registry.
 - Render every PDF page one last time and inspect at normal reading scale.
+- Upload early enough to download and inspect the venue-generated submission
+  copy. Keep an 8-page short-paper reduction plan available in case the venue
+  changes the acceptance type after review.
 
-Exit condition: upload-ready package by the internal **2026-10-15** deadline.
+Exit condition: verified ICAART submission by **2026-09-15 AoE**.
 
-## 16 October--1 November 2026: buffer and submit
+## 16 September--1 November 2026: SCAG route, only if selected
 
-- Make only error corrections; do not add analyses or outcome-bearing evidence.
+- Reverify the official 14-page rule, deadline timezone, remote policy,
+  registration requirement, and EasyChair fields.
+- Make only error corrections and chair-requested claim-preserving changes; do
+  not add analyses or outcome-bearing evidence.
 - Upload early enough to download and inspect the venue-generated submission
   copy.
 - Store the submission ID, uploaded hashes, confirmation email, and exact PDF
@@ -95,16 +104,15 @@ Exit condition: upload-ready package by the internal **2026-10-15** deadline.
 
 ## Fallback trigger
 
-If EvoStar rejects remote presentation, says the prior public repository is
-incompatible with double-blind review, considers the paper out of SCAG scope,
-or disallows the recorded generative-AI assistance, activate a policy-compatible
-venue fallback rather than conceal the project history or weaken the
+If ICAART rejects remote presentation, cannot give a compatible repository or
+AI-disclosure instruction, or does not answer in time, activate a
+policy-compatible route rather than conceal the project history or weaken the
 methodology:
 
-1. activate ICAART's **2026-09-15** regular-paper round if the conversion is
-   ready, or reverify its **2026-10-22** regular-paper round;
-2. otherwise use the **2026-12-03** ICAART workshop/special-session round if a
-   suitable track exists; or
+1. select SCAG only if its chairs affirm scope, remote presentation,
+   repository handling, and eligibility/disclosure for the recorded AI use;
+2. otherwise use ICAART's **2026-10-22** second regular-paper round if the
+   delayed answers resolve all four questions; or
 3. use *Entertainment Computing* as the no-travel archival fallback.
 
 Do not submit simultaneously to incompatible archival venues.

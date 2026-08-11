@@ -4,14 +4,17 @@ Reviewed: **2026-08-11**
 
 ## Overall assessment
 
-**Current recommendation: weak accept / borderline accept for EvoApplications
-SCAG, conditional on topical fit and artifact/anonymity resolution.** The paper
-is much stronger as a reproducibility and empirical configuration study than as
-an algorithm paper. Its central relative result is large, held out, consistent
-across families, and reported with an unusually complete provenance chain. The
-frozen joint criterion nevertheless fails because absolute superiority is not
-established. The main weakness is breadth: one independently authored opponent, one faction
-mirror, one simulator version, and a high-draw endpoint.
+**Current recommendation: weak accept for an ICAART regular paper, with
+meaningful reviewer variance and conditional on the four venue-governance
+rulings.** The separate SCAG assessment remains weak/borderline accept if its
+chairs affirm topical fit, remote presentation, repository handling, and AI
+eligibility. The paper is much stronger as a reproducibility and empirical
+configuration study than as an algorithm paper. Its central relative result is
+large, held out, consistent across families, and reported with an unusually
+complete provenance chain. The frozen joint criterion nevertheless fails
+because absolute superiority is not established. The main weakness is breadth:
+one independently authored opponent, one faction mirror, one simulator version,
+and a high-draw endpoint.
 
 Indicative reviewer dimensions:
 
@@ -143,25 +146,27 @@ disclosure. See
 
 ## Remaining acceptance work
 
-1. Ask the EvoStar/SCAG organizers in writing whether the paper's application
-   and evaluation emphasis is in scope, whether remote presentation is
-   allowed, whether a named public implementation repository posted before
-   submission conflicts with double-blind review, and whether the recorded
-   beyond-copy-editing use of Codex is eligible and requires disclosure. The
+1. Ask the ICAART secretariat for the exceptional remote procedure and fee
+   class, the required handling of the named public implementation repository,
+   the exact double-blind placement and citation form for the factual Codex
+   disclosure, and the permitted supplementary-file or anonymous-link route
+   for the identity-neutral reviewer artifact.
+2. Ask the EvoStar/SCAG organizers the four corresponding scope, remote,
+   repository, and AI-eligibility questions as the topical secondary. Its
    official submission page already provides a 10 MB supplementary-material
    field.
-2. Ask Supalosa for explicit permission and preferred attribution/license for
+3. Ask Supalosa for explicit permission and preferred attribution/license for
    public redistribution of the derived bot. Until then, release only the
    aggregate reviewer artifact.
-3. Conduct the neutral external cold read in
+4. Conduct the neutral external cold read in
    [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md), focused on whether
    the claim boundary, study flow, and adaptation sequence are understandable
    without repository context.
    Use [`REVIEW_RESPONSE_GUIDE.md`](REVIEW_RESPONSE_GUIDE.md) only after the
    reader has answered independently; it is an evidence index, not coaching.
-4. Repeat the citation, page-limit, anonymity, manifest, and rendered-PDF checks
+5. Repeat the citation, page-limit, anonymity, manifest, and rendered-PDF checks
    after the last editorial change.
-5. Require the human author to complete the primary-evidence, citation, code,
+6. Require the human author to complete the primary-evidence, citation, code,
    and line-by-line verification in
    [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md). This internal
    review cannot substitute for author accountability.

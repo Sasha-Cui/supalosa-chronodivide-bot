@@ -47,6 +47,19 @@ review or whether its prior exposure affects double-blind eligibility. Do not
 change repository visibility without an explicit author decision; request the
 secretariat's ruling first.
 
+## Reviewer artifact delivery
+
+The complete-paper guidelines require a PDF submission through PRIMORIS but do
+not identify a supplementary-file field, anonymous external-link mechanism,
+accepted archive type, or size limit for reviewer artifacts. The documented
+10 MB upload on the presenter page is for a conference poster, not a paper
+review artifact. The existing 65,702-byte identity-neutral aggregate archive
+is ready, but its existence does not prove that ICAART reviewers can receive
+it. All essential claims and methods therefore remain in the main paper. Ask
+the secretariat whether the artifact may accompany review and by which exact
+route; if it may not, revise reviewer-facing availability language rather than
+implying access.
+
 ## Exact remaining inquiry
 
 One message to the ICAART secretariat should ask only:
@@ -57,11 +70,15 @@ One message to the ICAART secretariat should ask only:
 2. the required action, if any, for the previously public named code repository
    while the anonymous paper is under review; and
 3. the exact blind-review placement, wording, and citation form for the factual
-   Codex assistance disclosure.
+   Codex assistance disclosure; and
+4. whether the identity-neutral aggregate artifact may accompany review as a
+   PRIMORIS attachment or anonymous link and any file-type or size restriction.
 
-The revised message is in `CONTACT_TEMPLATES.md`. A reply resolving all three
-items is sufficient for the venue-governance gate; a generic link back to the
-same pages is not.
+The revised message is in `CONTACT_TEMPLATES.md`. A reply resolving all four
+items is sufficient for the venue-governance gate. A ruling that no reviewer
+artifact is permitted is workable because the paper is self-contained, but it
+must trigger claim-preserving availability wording before upload. A generic
+link back to the same pages is not a resolution.
 
 ## Official pages
 

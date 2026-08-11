@@ -1,6 +1,6 @@
-# SCITEPRESS fallback manuscript
+# SCITEPRESS submission-candidate manuscript
 
-This directory is a separate, anonymous SCITEPRESS-format fallback for the
+This directory is the separate, anonymous SCITEPRESS-format candidate for the
 frozen Chrono Divide study. It reuses the authoritative section sources,
 generated result macros, and bibliography under `../paper/`; it does not fork
 the empirical record or authorize new outcome-bearing analysis.
@@ -30,5 +30,6 @@ downloaded on 2026-08-11. The archive SHA-256 was
 The review PDF deliberately contains `Anonymous Author(s)` and no affiliation,
 email, acknowledgment, repository URL, or AI-use disclosure. ICAART's current
 guidelines require AI disclosure while also requiring acknowledgments to be
-removed for double-blind review. Do not submit this fallback until the
-secretariat gives written instructions for the disclosure location.
+removed for double-blind review. Do not submit this candidate until the
+secretariat gives written instructions for the disclosure location and the
+reviewer-artifact delivery route.

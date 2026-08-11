@@ -5,17 +5,28 @@ registration price, and presenter instructions immediately before submission.
 
 ## Decision
 
-**Primary target: EvoApplications 2027, Soft Computing Applied to Games (SCAG)
-special session.** This is the best topical and ambition-level fit for the
-completed study. EvoApplications explicitly welcomes applications of
-evolutionary computation, including significant work in progress, while SCAG's
-current call lists empirical analysis of computational-intelligence techniques
-for games and game-based benchmarking and says bio-inspired approaches are
-especially encouraged rather than required. The study uses five run-distinct,
-deterministically mutation-generated policy pools and successive halving. This
-is finite algorithm configuration, not a conventional iterative evolutionary
-algorithm; the venue fit rests on the applied game-agent configuration and
-evaluation contribution and should be confirmed in writing.
+**Operational primary target: ICAART 2027, first-round regular paper, subject
+to the four written rulings below.** Its public policy permits the recorded
+AI-assisted writing and code work with disclosure, and its site explicitly
+documents an exceptional live-online presentation route. Those two facts make
+it the safest current match to the author's no-travel requirement and the
+project's actual provenance. Its broader Agents area is a weaker topical fit
+than SCAG, but calibration against recent accepted ICAART papers supports a
+weak-accept assessment with meaningful reviewer variance.
+
+**Topical secondary: EvoApplications 2027, Soft Computing Applied to Games
+(SCAG) special session.** SCAG is the best topical and ambition-level fit for
+the completed study, but it remains ineligible as an operational primary until
+the chairs resolve remote presentation and the venue's apparently stricter
+generative-AI rule in writing. EvoApplications explicitly welcomes applications
+of evolutionary computation, including significant work in progress, while
+SCAG's current call lists empirical analysis of computational-intelligence
+techniques for games and game-based benchmarking and says bio-inspired
+approaches are especially encouraged rather than required. The study uses five
+run-distinct, deterministically mutation-generated policy pools and successive
+halving. This is finite algorithm configuration, not a conventional iterative
+evolutionary algorithm; the venue fit rests on the applied game-agent
+configuration and evaluation contribution and should be confirmed in writing.
 
 - Paper deadline: **2026-11-01**.
 - Internal full-draft deadline: **2026-09-20**.
@@ -82,9 +93,9 @@ Likely reviewer concerns and the required answers are:
 | The mechanism is overstated | Lead with the passed relative endpoint; label component and terminal analyses post-confirmatory and acknowledge multiplicity and endpoint-only limitations. |
 | The commercial game prevents reproduction | Release author-owned code, plans, hashes, metadata, aggregates, and asset-acquisition instructions; do not redistribute third-party maps or game assets without permission. |
 
-## Fallbacks
+## Operational route and fallbacks
 
-### ICAART 2027 — policy-compatible, online-capable fallback
+### ICAART 2027 — operational primary candidate
 
 ICAART covers agents, simulation, evolutionary computing, planning, and
 learning. It is a broader and weaker topical fit than SCAG, but its official
@@ -97,7 +108,7 @@ interpretation of the EvoStar code.
 - First regular-paper deadline: **2026-09-15**.
 - Second position/regular-paper deadline: **2026-10-22**.
 - Workshop and special-session paper deadline: **2026-12-03**.
-- Conference: **2027-02-23 through 2027-02-25**.
+- Conference: **2027-02-23 through 2027-02-26**.
 - Format: SCITEPRESS two-column A4 template. A regular paper may be accepted as
   a 12-page full paper or an 8-page short paper. Review submissions must contain
   10,000--50,000 non-whitespace characters, and the template requires a
@@ -118,6 +129,12 @@ interpretation of the EvoStar code.
   public rules do not say how a previously public named implementation
   repository affects anonymity or whether it must be private during review.
   Obtain a written ruling before changing its visibility.
+- Reviewer-artifact ambiguity: the public complete-paper instructions describe
+  a PDF submission but do not specify a supplementary-file field or an
+  anonymous external-link route. Ask whether the 65,702-byte identity-neutral
+  aggregate artifact can accompany the review submission and, if so, by which
+  mechanism. If not, keep all essential evidence in the paper and describe the
+  artifact as release material rather than implying reviewer access.
 - Official pages: [call and dates](https://icaart.scitevents.org/CallForPapers.aspx?y=2027),
   [paper-length definitions](https://icaart.scitevents.org/Glossary.aspx),
   [online presentation instructions](https://icaart.scitevents.org/presentationdetails.aspx),
@@ -143,7 +160,7 @@ Configuration**, and **Reproducible Evaluation**. Do not classify the paper as
 generic distribution-shift ML or multi-agent learning; see
 `ICAART_REVIEWER_ASSIGNMENT_AUDIT.md`.
 
-The fallback is also calibrated against three nearby accepted ICAART 2025--2026
+The ICAART route is also calibrated against three nearby accepted 2025--2026
 papers read in full: a new one-game environment with a 2,100-game tournament,
 a 360-instance controlled architecture comparison, and an eight-page
 simulation-analysis position paper. The Chrono Divide manuscript is stronger
@@ -154,13 +171,15 @@ environment or optimizer. The resulting internal assessment is **weak accept
 with meaningful reviewer variance**, not guaranteed acceptance. See
 [`ICAART_ACCEPTED_PAPER_CALIBRATION.md`](ICAART_ACCEPTED_PAPER_CALIBRATION.md).
 
-Use the dated rule in `VENUE_DECISION_PACKET.md` because the first regular
+Use the dated rule in `VENUE_DECISION_PACKET.md` because ICAART's first regular
 round arrives before the EvoStar deadline. Send both venue inquiries
-immediately. By **2026-09-01**, either commit to ICAART's September 15
-regular-paper round or retain SCAG based on written answers. The October 22
-regular round is the final practical fallback. Submit the completed study as a
-regular paper, not as a position paper. Do not submit to both archival venues
-simultaneously.
+immediately, but prepare ICAART as the default route. Select ICAART by
+**2026-08-25** if its four written answers are workable; use SCAG instead only
+if ICAART cannot satisfy the project-governance requirements and SCAG has
+affirmatively resolved all four of its questions. The October 22 ICAART regular
+round is the final practical conference fallback. Submit the completed study as
+a regular paper, not as a position paper, and never submit to both archival
+venues simultaneously.
 
 ### Entertainment Computing — no-travel archival fallback
 
