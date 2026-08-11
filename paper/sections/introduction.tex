@@ -15,13 +15,14 @@ families, randomness, and adaptation decisions are not the units of the design.
 
 This paper studies that problem in Chrono Divide, a ground-up browser
 reconstruction of \emph{Command \& Conquer: Red Alert 2} with an offline bot
-API~\cite{chronodivide2026}. We configure StrongBot, an author-developed fork of
-the public Supalosa scripted bot, and evaluate it against a clean pinned
-Supalosa revision~\cite{supalosa2026bot}. Chrono Divide is an existing project,
-not an environment introduced here. Our contribution is an auditable way to
-use it for scripted-agent research and a bounded empirical case study of what
-that process finds. The comparator is a frozen generic StrongBot reference
-under this interface, not the deployed map-profile-enabled default.
+API~\cite{chronodivide2026,chronodivideGameApi2026,supalosa2026bot}. We
+configure StrongBot, an author-developed fork of the public Supalosa scripted
+bot, and evaluate it against a clean pinned Supalosa
+revision~\cite{supalosa2026bot}. Chrono Divide is an existing project, not an
+environment introduced here. Our contribution is an auditable way to use it
+for scripted-agent research and a bounded empirical case study of what that
+process finds. The comparator is a frozen generic StrongBot reference under
+this interface, not the deployed map-profile-enabled default.
 
 Initial exploratory runs were not paper evidence: some used wall-clock-derived
 engine randomness, permitted exact-map behavior, reused maps adaptively, lacked
