@@ -163,16 +163,16 @@ Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 commit `7cdbe0d` hardens its direct-identity denylist, and the current builder
 tests enforce the exact eight-input reviewer description. Commit `d53f822`
 adds the exact SCITEPRESS candidate, a package-local manifest verifier, and
-Git-free build checks. The current 102,198-byte review archive is
+Git-free build checks. The current 102,706-byte review archive is
 byte-deterministic at SHA-256
-`53e0aed782f6a1c42329c33bac849bc2cad3225982184dc6db7f8ea7d0ca9e3e`.
+`39356f3a38ac3ffbb789a7298e23a77f51c949d16d207acd74530133882d4117`.
 Its 60-file immutable manifest verifies, all artifact tests pass, and an
 earlier independent macOS extraction established package portability by passing
 22 packaged tests and rebuilding the three manuscript formats without undefined
 references, overflow, or BibTeX warnings.
 
 The current artifact received a fresh Git-free reconstruction with Python
-3.12.3 and TeX Live 2024. It verified all 60 files before and after regeneration, passed all 22
+3.12.3 and TeX Live 2024. It verified all 60 files before and after regeneration, passed all 23
 packaged tests and deep submission check, and reproduced all three production
 PDF hashes byte for byte. Its full command and identity record is
 [`ARTIFACT_CLEANROOM_REPRODUCTION.md`](ARTIFACT_CLEANROOM_REPRODUCTION.md).
@@ -210,9 +210,9 @@ eligibility still needs a written ruling; its presenter page documents live
 online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS submission format that reuses the frozen main-paper sections and result
-macros. The current candidate is 11 A4 pages with a 197-word expanded abstract and 39,123 extracted
+macros. The current candidate is 11 A4 pages with a 197-word expanded abstract and 39,611 extracted
 non-whitespace characters; two clean builds match at SHA-256
-`42f5cdb1b08ea8fff04fdefc4898dd336c8556c6cafb57f07e1d2139ed0daf28`,
+`5a7450582b7452a9c568a08247e39cc9e9f0f5e0e1afcc9e9986ec9ef8ca5f21`,
 and every page passed visual and anonymity QA. It is not authorized for upload
 until ICAART confirms exceptional remote eligibility/procedure and double-blind
 AI-disclosure placement. The home page now establishes remote support for
@@ -247,6 +247,23 @@ after regeneration, passed all 22 packaged tests and the deep submission
 check, and reproduced the production LNCS, supplement, and ICAART PDFs byte for
 byte. Complete 34-page contact-sheet inspection and full-resolution inspection
 of both reflowed first pages found no visual defect.
+
+Commit `4c2d011` closes the remaining ordinary-tuning ambiguity by defining the
+evidence contract as a joint, executable campaign-admission rule while
+explicitly denying novelty for its individual controls and proof against
+unknown dependencies. It changes no empirical input, estimate, interval,
+gate, diagnostic, citation, abstract field, or scope boundary. The current
+LNCS, supplement, and ICAART PDF SHA-256 identities are respectively
+`0b0a5c55a9cbbc123693524597e520922ce927fcc21001cb5dd79b9004914bf6`,
+`7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`,
+and `5a7450582b7452a9c568a08247e39cc9e9f0f5e0e1afcc9e9986ec9ef8ca5f21`.
+Two deterministic 102,706-byte, 60-file artifact builds match at SHA-256
+`39356f3a38ac3ffbb789a7298e23a77f51c949d16d207acd74530133882d4117`.
+A fresh Git-free reconstruction verified the manifest before and after
+regeneration, passed all 23 packaged tests and the 11-page, 39,611-character,
+nine-font deep check, and reproduced all three production PDFs byte for byte.
+All 34 pages passed rendered contact-sheet QA, and each reflowed page passed
+full-resolution inspection.
 Decide one venue by 2026-08-25 and do not submit to both archival venues
 simultaneously.
 

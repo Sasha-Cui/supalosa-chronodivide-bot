@@ -44,16 +44,16 @@ the anonymous branch during review.
 - Title: **Leakage-Resistant Evaluation of Scripted RTS Agent Configuration in
   Chrono Divide**
 - Anonymous manuscript source commit:
-  `e365e37b52dfcea24c3c26f5130b7ac37a9366ac`
+  `4c2d011cacb4a3c98bf203153dd300e2075f142c`
 - Main PDF: 18 pages total; non-reference material ends on page 15.
 - Main PDF SHA-256:
-  `7303ab1c2c1f8ea0abfb2abe4d4c56b3111d4b3ccd7e55e714836d6c0ce33f92`
+  `0b0a5c55a9cbbc123693524597e520922ce927fcc21001cb5dd79b9004914bf6`
 - Supplement: 5 pages.
 - Supplement PDF SHA-256:
   `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`
 - Deterministic anonymous artifact SHA-256:
-  `53e0aed782f6a1c42329c33bac849bc2cad3225982184dc6db7f8ea7d0ca9e3e`
-- Anonymous artifact size: 102,198 bytes; 60 immutable manifested files.
+  `39356f3a38ac3ffbb789a7298e23a77f51c949d16d207acd74530133882d4117`
+- Anonymous artifact size: 102,706 bytes; 60 immutable manifested files.
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
@@ -63,12 +63,12 @@ commit and all three hashes together; never mix files from different freezes.
 
 - [x] Separate SCITEPRESS source committed at
       `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`; the current reviewed source is
-      `e365e37b52dfcea24c3c26f5130b7ac37a9366ac` and changes no frozen empirical
+      `4c2d011cacb4a3c98bf203153dd300e2075f142c` and changes no frozen empirical
       artifact.
-- [x] PDF is 11 A4 pages, with a 197-word expanded abstract and 39,123 extracted
+- [x] PDF is 11 A4 pages, with a 197-word expanded abstract and 39,611 extracted
       non-whitespace characters.
 - [x] PDF SHA-256 is
-      `42f5cdb1b08ea8fff04fdefc4898dd336c8556c6cafb57f07e1d2139ed0daf28`.
+      `5a7450582b7452a9c568a08247e39cc9e9f0f5e0e1afcc9e9986ec9ef8ca5f21`.
 - [x] Two pinned Bouchet builds are byte-identical; all 11 pages, metadata, fonts,
       anonymity tokens, tables, plots, equations, and references were checked.
 - [x] ICAART reviewer assignment is frozen to **Agents** with the call topics
@@ -128,8 +128,8 @@ commit and all three hashes together; never mix files from different freezes.
 - [x] `python3 artifact/scripts/verify_frozen_archive.py` rebuilds the archive
       from current source and rejects both source drift and a stale ignored
       distribution file against `artifact/FROZEN_IDENTITY.json`.
-- [x] A fresh Git-free extraction on an independent macOS toolchain passes all
-      22 packaged tests and rebuilds the 18-page paper, 5-page supplement, and
+- [x] A fresh Git-free extraction on an independent macOS toolchain passed all
+      22 then-packaged tests and rebuilt the 18-page paper, 5-page supplement, and
       exact 11-page SCITEPRESS candidate without actionable warnings.
 - [x] A second fresh Git-free extraction using the production Python and TeX
       toolchain verifies the manifest before and after regeneration and

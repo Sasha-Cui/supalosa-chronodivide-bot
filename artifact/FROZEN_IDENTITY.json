@@ -2,9 +2,9 @@
   "archive": {
     "filename": "chrono-divide-review-artifact.tar.gz",
     "immutableFileCount": 60,
-    "sha256": "53e0aed782f6a1c42329c33bac849bc2cad3225982184dc6db7f8ea7d0ca9e3e",
-    "sizeBytes": 102198
+    "sha256": "39356f3a38ac3ffbb789a7298e23a77f51c949d16d207acd74530133882d4117",
+    "sizeBytes": 102706
   },
-  "reviewedManuscriptSourceGitCommit": "e365e37b52dfcea24c3c26f5130b7ac37a9366ac",
+  "reviewedManuscriptSourceGitCommit": "4c2d011cacb4a3c98bf203153dd300e2075f142c",
   "schemaVersion": 1
 }

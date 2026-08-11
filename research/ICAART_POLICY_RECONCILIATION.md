@@ -74,7 +74,7 @@ The complete-paper guidelines require a PDF submission through PRIMORIS but do
 not identify a supplementary-file field, anonymous external-link mechanism,
 accepted archive type, or size limit for reviewer artifacts. The documented
 10 MB upload on the presenter page is for a conference poster, not a paper
-review artifact. The existing 102,198-byte identity-neutral aggregate archive
+review artifact. The existing 102,706-byte identity-neutral aggregate archive
 is ready, but its existence does not prove that ICAART reviewers can receive
 it. All essential claims and methods therefore remain in the main paper. Ask
 the secretariat whether the artifact may accompany review and by which exact

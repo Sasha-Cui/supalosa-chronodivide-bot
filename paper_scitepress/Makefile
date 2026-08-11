@@ -52,7 +52,7 @@ check: test check-generated main metadata
 submission-check: check
 	$(PYTHON) scripts/check_submission.py \
 		--expected-pages 11 \
-		--expected-characters 39123 \
+		--expected-characters 39611 \
 		build/main.pdf build/submission_metadata.json
 
 clean:

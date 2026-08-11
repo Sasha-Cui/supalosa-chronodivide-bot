@@ -4,7 +4,7 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `e365e37b52dfcea24c3c26f5130b7ac37a9366ac`
+- Source commit: `4c2d011cacb4a3c98bf203153dd300e2075f142c`
 - Manuscript-content refreeze: `504cc2a7f1844183e2d87d0af09e1f697d3acfca`
 - Reviewer-artifact page-contract fix: `853e2ffb3693287ee0572b7b8c659befa5f9763d`
 - Main source: `paper/main.tex`
@@ -12,7 +12,7 @@ Last updated: **2026-08-11**
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 18 pages total; non-reference content ends on page 15
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `7303ab1c2c1f8ea0abfb2abe4d4c56b3111d4b3ccd7e55e714836d6c0ce33f92`
+- Main PDF SHA-256: `0b0a5c55a9cbbc123693524597e520922ce927fcc21001cb5dd79b9004914bf6`
 - Supplement PDF SHA-256: `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`
 
 The PDFs are build products and are not committed. Their hashes identify the
@@ -162,12 +162,12 @@ one venue-ruling-template test, one external-review-response-template test,
 and one substantive-citation-audit test (31 tests total). They regenerated all paper
 fragments without byte drift.
 
-The final repository-wide verification runs all 140 tests: 115 research tests,
-10 paper tests, 12 SCITEPRESS tests, and three artifact tests.
+The final repository-wide verification runs all 141 tests: 115 research tests,
+11 paper tests, 12 SCITEPRESS tests, and three artifact tests.
 
 The deterministic anonymous review archive has SHA-256
-`53e0aed782f6a1c42329c33bac849bc2cad3225982184dc6db7f8ea7d0ca9e3e`
-and size 102,198 bytes. Two independent builds produced that same hash. The
+`39356f3a38ac3ffbb789a7298e23a77f51c949d16d207acd74530133882d4117`
+and size 102,706 bytes. Two independent builds produced that same hash. The
 archive contains 60 manifested immutable files, normalized `0/0` ownership and
 epoch timestamps, no Git tree, no bot packages, and no direct author,
 scheduler-account, institution, or private-path token. It now contains both the
@@ -199,7 +199,7 @@ pages; the changed title, threat-to-control table, reflowed transitions, and
 complete final reference pages were additionally inspected at full resolution.
 
 The production candidate additionally passed the new Poppler-backed
-`submission-check`: exactly 11 A4 pages, 39,123 non-whitespace characters under
+`submission-check`: exactly 11 A4 pages, 39,611 non-whitespace characters under
 the documented default reading order, 197 abstract words, empty review
 identity metadata, no forms/JavaScript/encryption/rotation, nine embedded fonts
 with Unicode maps, exact PDF-to-portal title/abstract/keyword agreement, and
@@ -211,9 +211,9 @@ inspected hash.
 
 A second Git-free extraction reproduced the exact current archive on Bouchet
 using Python 3.12.3 and TeX Live 2024. The manifest verified all 60 immutable
-files before and after regeneration, all 22 packaged tests passed, and the
+files before and after regeneration, all 23 packaged tests passed, and the
 three rebuilt PDFs were byte-identical to the production hashes above. The
-11-page submission check again passed at 39,123 characters and nine embedded
+11-page submission check again passed at 39,611 characters and nine embedded
 fonts. All 34 rebuilt pages were rendered and inspected without a layout or
 readability defect. The command transcript, environment, identities, and
 scope boundary are frozen in `ARTIFACT_CLEANROOM_REPRODUCTION.md`.
@@ -333,6 +333,30 @@ passed all 22 packaged tests, rebuilt all three PDFs, and passed the 11-page,
 39,123-character deep check. Contact-sheet inspection covered all 34 pages;
 both reflowed first-page transitions were inspected at full resolution with no
 clipping, overlap, contrast, glyph, or margin defect.
+
+The joint-admission-rule refreeze at
+`4c2d011cacb4a3c98bf203153dd300e2075f142c` defines the evidence contract as
+the executable conjunction of the already established controls and states
+that a contract violation invalidates a campaign rather than licensing
+post-hoc exclusion. It claims neither that any component is new nor that the
+contract proves the absence of unknown dependencies. No empirical input,
+estimate, interval, gate, diagnostic, citation, abstract field, or scope
+boundary changed. The current TeX Live 2024 production and fresh Git-free
+clean-room builds are byte-identical at LNCS SHA-256
+`0b0a5c55a9cbbc123693524597e520922ce927fcc21001cb5dd79b9004914bf6`,
+supplement SHA-256
+`7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`,
+and ICAART SHA-256
+`5a7450582b7452a9c568a08247e39cc9e9f0f5e0e1afcc9e9986ec9ef8ca5f21`.
+The unchanged 197-word portal metadata has SHA-256
+`6eb561c409fad9bb24b362ec9634d8fb00cc4a9ad7a6983ddb82a0cd7033e498`.
+Two deterministic 102,706-byte artifact builds match at SHA-256
+`39356f3a38ac3ffbb789a7298e23a77f51c949d16d207acd74530133882d4117`.
+The fresh extraction verified all 60 files before and after regeneration,
+passed all 23 packaged tests, rebuilt all three PDFs, and passed the 11-page,
+39,611-character deep check. Contact-sheet inspection covered all 34 pages,
+with full-resolution inspection of every reflowed page; no clipping, overlap,
+contrast, glyph, table, margin, or reference-flow defect was found.
 
 ## Remaining submission gates
 

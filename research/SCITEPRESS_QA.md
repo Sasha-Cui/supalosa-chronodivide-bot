@@ -5,7 +5,7 @@ Prepared: **2026-08-11**
 ## Frozen candidate identity
 
 - Candidate introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
-- Current reviewed source: `e365e37b52dfcea24c3c26f5130b7ac37a9366ac`
+- Current reviewed source: `4c2d011cacb4a3c98bf203153dd300e2075f142c`
 - Scientific-claim freeze: `419a0f72188f957ae144262f62c62bcc11a66ac3`
 - Claim-preserving terminology refreeze: `77d93359242756f07afba30d88fb2db8fd97e7b2`
 - Citation-source refreeze: `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`
@@ -17,10 +17,10 @@ Prepared: **2026-08-11**
 - Submission metadata exporter: `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0`
 - Build entry point: `paper_scitepress/main.tex`
 - Target: ICAART 2027 regular paper, anonymous SCITEPRESS review format
-- PDF: 11 A4 pages, 169,331 bytes
-- PDF SHA-256: `42f5cdb1b08ea8fff04fdefc4898dd336c8556c6cafb57f07e1d2139ed0daf28`
+- PDF: 11 A4 pages, 169,925 bytes
+- PDF SHA-256: `5a7450582b7452a9c568a08247e39cc9e9f0f5e0e1afcc9e9986ec9ef8ca5f21`
 - Expanded plain-text abstract: 197 words
-- Extracted submission length: 39,123 non-whitespace characters
+- Extracted submission length: 39,611 non-whitespace characters
 - Portal metadata JSON SHA-256: `6eb561c409fad9bb24b362ec9634d8fb00cc4a9ad7a6983ddb82a0cd7033e498`
 
 The PDF is a build product and is not committed. The hash identifies the exact
@@ -61,7 +61,7 @@ PDF hash above. The fixed `SOURCE_DATE_EPOCH` is a stable reproducibility
 constant established at the earlier comparator-justified freeze; the current
 reviewed source identity is recorded above.
 
-The extracted PDF contains 39,123 non-whitespace characters, within ICAART's
+The extracted PDF contains 39,611 non-whitespace characters, within ICAART's
 10,000--50,000 review-submission interval. Its 197-word expanded abstract is within the
 official 70--200-word interval. The page is A4 and the current 11-page build is
 below the 12-page full-paper proceedings limit.
@@ -72,7 +72,7 @@ non-A4 geometry, nonempty identity metadata, encryption, forms, JavaScript,
 page rotation, missing Unicode maps or embedded fonts, PDF-to-portal
 title/abstract/keyword drift, and metadata source-hash drift. Poppler's default
 reading order is the frozen character-count method; layout mode has a different
-count and is deliberately not mixed with the submitted 39,123-character
+count and is deliberately not mixed with the submitted 39,611-character
 identity.
 
 ## Independent artifact reproduction
@@ -95,8 +95,8 @@ and final reference page were additionally inspected at full resolution. The
 package-local exporter produced the same 197-word portal metadata JSON and
 SHA-256 recorded above.
 
-The current rebuilt archive is 102,198 bytes with 60 immutable files and SHA-256
-`53e0aed782f6a1c42329c33bac849bc2cad3225982184dc6db7f8ea7d0ca9e3e`.
+The current rebuilt archive is 102,706 bytes with 60 immutable files and SHA-256
+`39356f3a38ac3ffbb789a7298e23a77f51c949d16d207acd74530133882d4117`.
 Its two copied build READMEs no longer name the institutional compute cluster,
 the archive denylist rejects that token, and a whole-package regression check
 prevents recurrence. That earlier independent build also passed the
@@ -105,7 +105,7 @@ Poppler-backed deep submission check with its then-current 11-page,
 
 A separate same-toolchain clean-room run extracted this exact archive into a
 fresh Git-free directory on Bouchet with Python 3.12.3 and TeX Live 2024. It
-verified all 60 files before and after regeneration, passed all 22 packaged
+verified all 60 files before and after regeneration, passed all 23 packaged
 tests, and reproduced the production SCITEPRESS PDF byte for byte at the hash
 above. Its deep submission check and complete 11-page rendered inspection also
 passed. See `ARTIFACT_CLEANROOM_REPRODUCTION.md` for the auditable transcript
@@ -243,6 +243,25 @@ and after regeneration, passed all 22 packaged tests and the deep submission
 check, and reproduced all three production PDFs byte for byte. All 34 pages
 were inspected as contact sheets, and both abstract-driven first-page reflows
 were checked at full resolution without a visual defect.
+
+The joint-admission-rule refreeze at `4c2d011` defines the evidence contract as
+the executable conjunction of its already established controls and states
+that a violation invalidates the campaign rather than licensing post-hoc
+exclusion. It does not claim novelty for the individual controls or proof
+against unknown dependencies. No frozen empirical quantity, gate, diagnostic,
+citation, abstract field, or scope boundary changed. The current candidate is
+11 A4 pages, has a 197-word abstract and 39,611 non-whitespace characters, and
+has SHA-256
+`5a7450582b7452a9c568a08247e39cc9e9f0f5e0e1afcc9e9986ec9ef8ca5f21`.
+The unchanged portal metadata has SHA-256
+`6eb561c409fad9bb24b362ec9634d8fb00cc4a9ad7a6983ddb82a0cd7033e498`.
+Two deterministic 102,706-byte artifact builds match at SHA-256
+`39356f3a38ac3ffbb789a7298e23a77f51c949d16d207acd74530133882d4117`;
+a fresh Git-free TeX Live 2024 extraction verified the 60-file manifest before
+and after regeneration, passed all 23 packaged tests and the deep submission
+check, and reproduced all three production PDFs byte for byte. All 34 pages
+were inspected as contact sheets and every reflowed page was inspected at full
+resolution without a visual defect.
 
 ## Unresolved submission gates
 

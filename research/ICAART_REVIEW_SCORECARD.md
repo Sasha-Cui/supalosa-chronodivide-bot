@@ -10,9 +10,9 @@ paper whose scientific claims were frozen at
 refreeze is `77d93359242756f07afba30d88fb2db8fd97e7b2`, whose citation-source
 refreeze is `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`, whose portable-contribution
 presentation refreeze is `504cc2a7f1844183e2d87d0af09e1f697d3acfca`, whose
-current reviewed source is `e365e37b52dfcea24c3c26f5130b7ac37a9366ac`, and
+current reviewed source is `4c2d011cacb4a3c98bf203153dd300e2075f142c`, and
 whose PDF SHA-256 is
-`42f5cdb1b08ea8fff04fdefc4898dd336c8556c6cafb57f07e1d2139ed0daf28`.
+`5a7450582b7452a9c568a08247e39cc9e9f0f5e0e1afcc9e9986ec9ef8ca5f21`.
 The surrounding governance tree was rechecked at
 `0178203382836043baf27e1053ee3e55bf8c4a52`. This is not an independent
 review, an acceptance-probability estimate, or a substitute for the unprimed
@@ -41,7 +41,7 @@ Official sources checked on 2026-08-11:
 | Originality | 3/5 | The original contribution is the integrated leakage-resistant Chrono Divide evaluation protocol: revision-aware families, sealed role access, participant-isolated common randomness, reciprocal starts, clustered inference, and fail-closed provenance. | Successive halving and the individual controls are established; the paper must not be read as claiming optimizer or environment novelty. |
 | Technical quality | 5/5 | The study has family-disjoint roles, a transparently retired method, fresh development, one-time sealed evaluation, paired design, family-clustered uncertainty, negative-gate reporting, exact accounting, and deterministic aggregate reproduction. | Family construction is heuristic, the endpoint has many tick-cap draws, and full replay depends on third-party content. |
 | Significance | 3/5 | The held-out effect is large and family-consistent, and the study shows how strong execution controls narrow an initially diffuse bot-strength story into one positive relative result and one failed absolute result. | One independent opponent, one faction mirror, a low-scoring generic reference, and no deployed-default comparison limit practical generality. |
-| Presentation | 4/5 | All 11 A4 pages were re-rendered and inspected at the frozen hash. The title and abstract foreground leakage-resistant evaluation rather than optimizer novelty, the evidence contract is explicit at the reader entry points, and the threat-to-control table makes the reusable design visible before the dense implementation detail. Four figures and four tables remain legible; 39,123 extracted non-whitespace characters satisfy the official 10,000--50,000 submission band. | The method remains dense, and the bounded positive claim still demands attentive reading. |
+| Presentation | 4/5 | All 11 A4 pages were re-rendered and inspected at the frozen hash. The title and abstract foreground leakage-resistant evaluation rather than optimizer novelty, the evidence contract is explicit at the reader entry points, and the threat-to-control table makes the reusable design visible before the dense implementation detail. Four figures and four tables remain legible; 39,611 extracted non-whitespace characters satisfy the official 10,000--50,000 submission band. | The method remains dense, and the bounded positive claim still demands attentive reading. |
 
 Overall internal recommendation: **weak accept, with meaningful reviewer
 variance**. Technical quality is well above the likely rejection threshold;
@@ -59,7 +59,7 @@ evaluation protocol despite narrow opponent breadth.
 | Figures adequate? | Yes after repair. Figures show study flow, all family effects, paired transitions, and component intervals. | Figure 2 no longer depends on an unavailable supplement; its family labels are defined in place. |
 | Conclusions/future work convincing? | Yes. The conclusion answers both confirmatory gates and states the non-causal diagnostic boundary; the immediately preceding limitations identify the next prospective extension. | Cold-read whether the final paragraph remains appropriately bounded rather than merely defensive. |
 | References current and appropriate? | Yes. The bibliography includes the closest game-agent configuration work, map-specific program synthesis, generalization/evaluation foundations, exact pinned software sources, and a 2026 ICAART game paper. | Human author still verifies every primary source and citation use. |
-| Formatting adjustment? | None currently. The candidate is 11 A4 pages and 39,123 non-whitespace characters, with embedded fonts and settled references. A later full-paper acceptance permits 12 proceedings pages; a short-paper acceptance permits 8. | Full post-edit render completed; repeat only after a later source change. Retain an 8-page camera-ready reduction plan rather than compressing the review version preemptively. |
+| Formatting adjustment? | None currently. The candidate is 11 A4 pages and 39,611 non-whitespace characters, with embedded fonts and settled references. A later full-paper acceptance permits 12 proceedings pages; a short-paper acceptance permits 8. | Full post-edit render completed; repeat only after a later source change. Retain an 8-page camera-ready reduction plan rather than compressing the review version preemptively. |
 | Improve English? | No systemic issue found. | Human line edit remains mandatory under the authorship policy. |
 
 ## Acceptance-oriented revision decision

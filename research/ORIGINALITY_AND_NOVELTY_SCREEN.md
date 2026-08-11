@@ -7,11 +7,11 @@ Verified: **2026-08-11**
 This is a limited, machine-assisted screen of the submission candidate at:
 
 - reviewed source commit:
-  `e365e37b52dfcea24c3c26f5130b7ac37a9366ac`;
+  `4c2d011cacb4a3c98bf203153dd300e2075f142c`;
 - LNCS PDF SHA-256:
-  `7303ab1c2c1f8ea0abfb2abe4d4c56b3111d4b3ccd7e55e714836d6c0ce33f92`;
+  `0b0a5c55a9cbbc123693524597e520922ce927fcc21001cb5dd79b9004914bf6`;
 - ICAART PDF SHA-256:
-  `42f5cdb1b08ea8fff04fdefc4898dd336c8556c6cafb57f07e1d2139ed0daf28`.
+  `5a7450582b7452a9c568a08247e39cc9e9f0f5e0e1afcc9e9986ec9ef8ca5f21`.
 
 It asks two bounded questions:
 
