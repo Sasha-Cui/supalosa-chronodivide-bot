@@ -233,8 +233,28 @@ presentation.
 
 - NeurIPS, ICLR, ICML, and similarly broad flagships: the one-game,
   one-opponent empirical contribution does not support that ambition or scope.
-- IEEE Conference on Games 2026: its deadline has passed, and no official 2027
-  call with a remote-presenter route is available yet.
+- [EXAG 2026](https://www.exag.org/call_for_papers) is the closest currently
+  open game-AI workshop: it accepts validated test-bed research, failed
+  experiments, and 10--15-page full papers through **2026-08-28**. Its call,
+  however, explicitly assigns both paper tracks to **in-person oral
+  presentation** on 9--10 November. It is therefore incompatible with the
+  no-travel requirement despite strong topical fit.
+- The non-archival NeurIPS 2026 workshop
+  [Who Verifies the Agents?](https://verify-agents-workshop.github.io/) is a
+  close methodological fit: its call includes environment-grounded
+  evaluation, simulators, and evolutionary or search-based agent
+  optimization, with a **2026-08-29** deadline. It is held in Sydney, requires
+  accepted papers to be presented, and publishes no remote-presenter route.
+  It also offers only OpenReview dissemination rather than proceedings. Do not
+  spend the short submission window on a format conversion unless the
+  organizers first provide written remote-presentation permission and the
+  author explicitly prefers a non-archival workshop over ICAART.
+- [IEEE Conference on Games 2027](https://rt247a.u-aizu.ac.jp/) now advertises
+  a **2027-03-01** full-paper deadline and a **2027-05-15** auxiliary-paper
+  deadline. It is a strong topical venue, but its current call does not verify
+  a remote-presenter route and its broader independent-comparison expectations
+  make it a riskier target for the frozen one-opponent study. Keep it as a
+  future-study venue, not a reason to delay the current submission.
 - Any event that requires an in-person talk: incompatible with the author's
   stated attendance constraint.
 
