@@ -5,7 +5,7 @@ Prepared: **2026-08-11**
 ## Frozen candidate identity
 
 - Candidate introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
-- Current reviewed source: `853e2ffb3693287ee0572b7b8c659befa5f9763d`
+- Current reviewed source: `5ed5dad47e9b2902385f4ee873da5c3fb9683bbd`
 - Scientific-claim freeze: `419a0f72188f957ae144262f62c62bcc11a66ac3`
 - Claim-preserving terminology refreeze: `77d93359242756f07afba30d88fb2db8fd97e7b2`
 - Citation-source refreeze: `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`
@@ -18,7 +18,7 @@ Prepared: **2026-08-11**
 - Build entry point: `paper_scitepress/main.tex`
 - Target: ICAART 2027 regular paper, anonymous SCITEPRESS review format
 - PDF: 11 A4 pages, 168,176 bytes
-- PDF SHA-256: `d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413`
+- PDF SHA-256: `4bd0048eedb7c8ddeeb1d42b0552d402ea18ec9cfe702e9bd82c01fb0c673463`
 - Expanded plain-text abstract: 193 words
 - Extracted submission length: 38,760 non-whitespace characters
 - Portal metadata JSON SHA-256: `2581e6ae5e00454919c9ddf6b6cea7721935117234bc675b7d19162a799db834`
@@ -94,8 +94,8 @@ and final reference page were additionally inspected at full resolution. The
 package-local exporter produced the same 193-word portal metadata JSON and
 SHA-256 recorded above.
 
-The rebuilt archive is 101,528 bytes with 60 immutable files and SHA-256
-`3e4cc0fab8d6d0b6b378ceb0cf9cccda2c884a64699a65ca97e008d60704d798`.
+The rebuilt archive is 101,884 bytes with 60 immutable files and SHA-256
+`8ede1a73f07bd06dcd8fa5a9c647984a55ecc9101cd715f6bf71171a2fb5b9d1`.
 Its two copied build READMEs no longer name the institutional compute cluster,
 the archive denylist rejects that token, and a whole-package regression check
 prevents recurrence. The independent build also passed the Poppler-backed deep
@@ -190,6 +190,14 @@ or reliable opponent superiority. The SCITEPRESS candidate is now 11 pages,
 artifact build reproduced its separately recorded cross-toolchain identity.
 All 11 production pages and the changed pages at full resolution passed the
 visual, anonymity, font, metadata, and overflow checks.
+
+The closest-work refreeze at `5ed5dad` adds two recent IJCAI synthesis
+precedents and freezes the submission check at 38,760 extracted non-whitespace
+characters. The candidate remains 11 A4 pages. A complete 11-page contact-sheet
+pass and full-resolution inspection of pages 2--3 and 10--11 found no clipping,
+overlap, unreadable text, broken reference flow, contrast defect, or margin
+violation. The scientific result, abstract, conclusion, and 193-word portal
+abstract are unchanged.
 
 ## Unresolved submission gates
 

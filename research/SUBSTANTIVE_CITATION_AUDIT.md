@@ -9,11 +9,11 @@ keys used at 40 key-by-citation placements in the shared manuscript sources.
 It is bound to:
 
 - reviewed submission source:
-  `853e2ffb3693287ee0572b7b8c659befa5f9763d`;
+  `5ed5dad47e9b2902385f4ee873da5c3fb9683bbd`;
 - LNCS PDF SHA-256:
-  `3b6ce71b2c569aecd8f18ccc40370f5c7ec9dc3bc2f5b1f88ca24ede37dfccd4`;
+  `617f5e3e8b0b7c209e4c7c92aaa4db432e72b1f407d8e09aea08b4cd8834a82d`;
 - ICAART PDF SHA-256:
-  `d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413`.
+  `4bd0048eedb7c8ddeeb1d42b0552d402ea18ec9cfe702e9bd82c01fb0c673463`.
 
 The check compared every cited proposition with the primary paper,
 publisher record, project page, package record, or pinned repository named

@@ -4,7 +4,7 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `853e2ffb3693287ee0572b7b8c659befa5f9763d`
+- Source commit: `5ed5dad47e9b2902385f4ee873da5c3fb9683bbd`
 - Manuscript-content refreeze: `504cc2a7f1844183e2d87d0af09e1f697d3acfca`
 - Reviewer-artifact page-contract fix: `853e2ffb3693287ee0572b7b8c659befa5f9763d`
 - Main source: `paper/main.tex`
@@ -12,7 +12,7 @@ Last updated: **2026-08-11**
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 18 pages total; non-reference content ends on page 15
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `3b6ce71b2c569aecd8f18ccc40370f5c7ec9dc3bc2f5b1f88ca24ede37dfccd4`
+- Main PDF SHA-256: `617f5e3e8b0b7c209e4c7c92aaa4db432e72b1f407d8e09aea08b4cd8834a82d`
 - Supplement PDF SHA-256: `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`
 
 The PDFs are build products and are not committed. Their hashes identify the
@@ -160,12 +160,12 @@ one venue-ruling-template test, one external-review-response-template test,
 and one substantive-citation-audit test (31 tests total). They regenerated all paper
 fragments without byte drift.
 
-The final repository-wide verification runs all 136 tests: 112 research tests,
+The final repository-wide verification runs all 138 tests: 114 research tests,
 10 paper tests, 12 SCITEPRESS tests, and two artifact tests.
 
 The deterministic anonymous review archive has SHA-256
-`3e4cc0fab8d6d0b6b378ceb0cf9cccda2c884a64699a65ca97e008d60704d798`
-and size 101,528 bytes. Two independent builds produced that same hash. The
+`8ede1a73f07bd06dcd8fa5a9c647984a55ecc9101cd715f6bf71171a2fb5b9d1`
+and size 101,884 bytes. Two independent builds produced that same hash. The
 archive contains 60 manifested immutable files, normalized `0/0` ownership and
 epoch timestamps, no Git tree, no bot packages, and no direct author,
 scheduler-account, institution, or private-path token. It now contains both the
@@ -263,6 +263,20 @@ matches the documentation PDF shipped in Springer's current official LNCS
 LaTeX package, so it is not a local geometry override. Archive members use
 numeric owner/group `0/0`, blank owner names, epoch timestamps, and fixed file
 modes.
+
+The closest-work refreeze at
+`5ed5dad47e9b2902385f4ee873da5c3fb9683bbd` adds the IJCAI 2023
+opponent-set guidance and IJCAI 2024 semantic-space search papers as explicit
+programmatic-synthesis prior art. It preserves the paper's no-synthesis and
+no-optimizer-novelty boundary and changes no empirical claim. The associated
+`ORIGINALITY_AND_NOVELTY_SCREEN.md` records the searched literature and eight
+distinctive exact-phrase queries while explicitly declining to treat a public
+web search as a similarity certificate. The current LNCS and ICAART hashes are
+bound above; the supplement remains byte-identical. All 34 production pages
+were rendered at 120 DPI and inspected as contact sheets. LNCS pages 3--4 and
+16--18 and ICAART pages 2--3 and 10--11 were additionally inspected at full
+resolution. No clipping, overlap, contrast defect, missing glyph, broken link
+label, margin violation, or malformed section transition was found.
 
 ## Remaining submission gates
 

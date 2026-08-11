@@ -13,9 +13,9 @@ record before use.
 
 | Item | Frozen identity |
 | --- | --- |
-| Reviewed submission source | `853e2ffb3693287ee0572b7b8c659befa5f9763d` |
-| ICAART PDF SHA-256 | `d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413` |
-| Aggregate artifact SHA-256 | `3e4cc0fab8d6d0b6b378ceb0cf9cccda2c884a64699a65ca97e008d60704d798` |
+| Reviewed submission source | `5ed5dad47e9b2902385f4ee873da5c3fb9683bbd` |
+| ICAART PDF SHA-256 | `4bd0048eedb7c8ddeeb1d42b0552d402ea18ec9cfe702e9bd82c01fb0c673463` |
+| Aggregate artifact SHA-256 | `8ede1a73f07bd06dcd8fa5a9c647984a55ecc9101cd715f6bf71171a2fb5b9d1` |
 | Portal metadata SHA-256 | `2581e6ae5e00454919c9ddf6b6cea7721935117234bc675b7d19162a799db834` |
 
 ## Outbound record

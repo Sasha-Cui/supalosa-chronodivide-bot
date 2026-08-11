@@ -44,16 +44,16 @@ the anonymous branch during review.
 - Title: **Leakage-Resistant Evaluation of Scripted RTS Agent Configuration in
   Chrono Divide**
 - Anonymous manuscript source commit:
-  `853e2ffb3693287ee0572b7b8c659befa5f9763d`
+  `5ed5dad47e9b2902385f4ee873da5c3fb9683bbd`
 - Main PDF: 18 pages total; non-reference material ends on page 15.
 - Main PDF SHA-256:
-  `3b6ce71b2c569aecd8f18ccc40370f5c7ec9dc3bc2f5b1f88ca24ede37dfccd4`
+  `617f5e3e8b0b7c209e4c7c92aaa4db432e72b1f407d8e09aea08b4cd8834a82d`
 - Supplement: 5 pages.
 - Supplement PDF SHA-256:
   `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`
 - Deterministic anonymous artifact SHA-256:
-  `3e4cc0fab8d6d0b6b378ceb0cf9cccda2c884a64699a65ca97e008d60704d798`
-- Anonymous artifact size: 101,528 bytes; 60 immutable manifested files.
+  `8ede1a73f07bd06dcd8fa5a9c647984a55ecc9101cd715f6bf71171a2fb5b9d1`
+- Anonymous artifact size: 101,884 bytes; 60 immutable manifested files.
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
@@ -68,7 +68,7 @@ commit and all three hashes together; never mix files from different freezes.
 - [x] PDF is 11 A4 pages, with a 193-word expanded abstract and 38,760 extracted
       non-whitespace characters.
 - [x] PDF SHA-256 is
-      `d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413`.
+      `4bd0048eedb7c8ddeeb1d42b0552d402ea18ec9cfe702e9bd82c01fb0c673463`.
 - [x] Two pinned Bouchet builds are byte-identical; all 11 pages, metadata, fonts,
       anonymity tokens, tables, plots, equations, and references were checked.
 - [x] ICAART reviewer assignment is frozen to **Agents** with the call topics

@@ -157,9 +157,9 @@ Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 commit `7cdbe0d` hardens its direct-identity denylist, and the current builder
 tests enforce the exact eight-input reviewer description. Commit `d53f822`
 adds the exact SCITEPRESS candidate, a package-local manifest verifier, and
-Git-free build checks. The current 101,528-byte review archive is
+Git-free build checks. The current 101,884-byte review archive is
 byte-deterministic at SHA-256
-`3e4cc0fab8d6d0b6b378ceb0cf9cccda2c884a64699a65ca97e008d60704d798`.
+`8ede1a73f07bd06dcd8fa5a9c647984a55ecc9101cd715f6bf71171a2fb5b9d1`.
 Its 60-file immutable manifest verifies, all artifact tests pass, and an
 independent macOS extraction passes 22 packaged tests and rebuilds the 18-page
 LNCS paper, five-page supplement, and 11-page A4 SCITEPRESS candidate without
@@ -200,7 +200,7 @@ deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS submission format that reuses the frozen main-paper sections and result
 macros. The current candidate is 11 A4 pages with a 193-word expanded abstract and 38,760 extracted
 non-whitespace characters; two clean builds match at SHA-256
-`d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413`,
+`4bd0048eedb7c8ddeeb1d42b0552d402ea18ec9cfe702e9bd82c01fb0c673463`,
 and every page passed visual and anonymity QA. It is not authorized for upload
 until ICAART confirms exceptional remote eligibility/procedure and double-blind
 AI-disclosure placement. The home page now establishes remote support for

@@ -17,11 +17,11 @@ Verify these files before beginning. Stop if any value differs.
 
 | Item | Frozen identity |
 | --- | --- |
-| Reviewed source | `853e2ffb3693287ee0572b7b8c659befa5f9763d` |
-| ICAART PDF | `d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413` |
-| LNCS PDF | `3b6ce71b2c569aecd8f18ccc40370f5c7ec9dc3bc2f5b1f88ca24ede37dfccd4` |
+| Reviewed source | `5ed5dad47e9b2902385f4ee873da5c3fb9683bbd` |
+| ICAART PDF | `4bd0048eedb7c8ddeeb1d42b0552d402ea18ec9cfe702e9bd82c01fb0c673463` |
+| LNCS PDF | `617f5e3e8b0b7c209e4c7c92aaa4db432e72b1f407d8e09aea08b4cd8834a82d` |
 | LNCS supplement | `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56` |
-| Anonymous artifact | `3e4cc0fab8d6d0b6b378ceb0cf9cccda2c884a64699a65ca97e008d60704d798` |
+| Anonymous artifact | `8ede1a73f07bd06dcd8fa5a9c647984a55ecc9101cd715f6bf71171a2fb5b9d1` |
 | ICAART portal metadata | `2581e6ae5e00454919c9ddf6b6cea7721935117234bc675b7d19162a799db834` |
 
 Run from the repository root:
@@ -139,6 +139,10 @@ a machine-assisted proposition-level precheck, including the one source-
 placement and closest-work corrections made before this candidate was frozen. Both are useful
 review aids, but neither replaces reading the primary source, checking the
 recorded locator, or completing a row below.
+
+`research/ORIGINALITY_AND_NOVELTY_SCREEN.md` records a limited current-literature
+and exact-phrase web screen. It is not a similarity certificate and does not
+replace primary-source reading or review of a venue-generated similarity report.
 
 | BibTeX key | Proposition to verify | Manuscript location | Human status |
 | --- | --- | --- | --- |

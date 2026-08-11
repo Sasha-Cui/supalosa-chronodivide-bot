@@ -109,7 +109,7 @@ Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 >    the references be acceptable in the review version? Please specify the
 >    required placement, wording, and citation form, including whether a single
 >    disclosure may identify all affected sections.
-> 4. I have a 101,528-byte identity-neutral aggregate artifact that regenerates
+> 4. I have a 101,884-byte identity-neutral aggregate artifact that regenerates
 >    every reported table and figure but contains no author identity, bot packages,
 >    maps, game assets, or private raw logs. The public complete-paper
 >    instructions describe the review PDF but do not specify supplementary

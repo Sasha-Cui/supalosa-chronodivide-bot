@@ -10,9 +10,9 @@ paper whose scientific claims were frozen at
 refreeze is `77d93359242756f07afba30d88fb2db8fd97e7b2`, whose citation-source
 refreeze is `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`, whose portable-contribution
 presentation refreeze is `504cc2a7f1844183e2d87d0af09e1f697d3acfca`, whose
-current reviewed source is `853e2ffb3693287ee0572b7b8c659befa5f9763d`, and
+current reviewed source is `5ed5dad47e9b2902385f4ee873da5c3fb9683bbd`, and
 whose PDF SHA-256 is
-`d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413`.
+`4bd0048eedb7c8ddeeb1d42b0552d402ea18ec9cfe702e9bd82c01fb0c673463`.
 The surrounding governance tree was rechecked at
 `0178203382836043baf27e1053ee3e55bf8c4a52`. This is not an independent
 review, an acceptance-probability estimate, or a substitute for the unprimed
