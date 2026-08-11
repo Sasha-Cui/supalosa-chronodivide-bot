@@ -50,6 +50,10 @@ simultaneous submission.
 - Give the PDF, not the repository, to one technically literate reader using
   Phase A of [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md); do not
   reveal the targeted comprehension questions.
+- Run `research/scripts/build_external_review_handoff.py --candidate icaart`,
+  retain its JSON identity record privately, inspect that the deterministic
+  archive contains only the anonymous PDF and neutral prompt, and send exactly
+  those two files for Phase A.
 - Before sending, copy
   [`EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md`](EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md)
   to the private submission record and bind it to the selected PDF hash.

@@ -1,0 +1,11 @@
+Independent anonymous regular-paper review
+
+Please review the enclosed anonymous regular paper for relevance,
+originality, technical quality, significance, and presentation. Summarize its
+main claim, assign a 1--5 score with a one-sentence justification for each
+criterion, identify the strongest acceptance and rejection arguments, list
+required versus optional revisions, and vote accept, borderline, or reject
+with confidence.
+
+Please use only the two files in this handoff and return the review before
+requesting supplementary material or discussing the paper with an author.

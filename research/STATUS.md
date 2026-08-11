@@ -202,6 +202,16 @@ defines the unprimed/targeted sequence, and
 `EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md` is a blank, hash-bound private-copy form
 for locking the response, scoring comprehension, and separating feasible
 presentation repairs from requests for post-hoc evidence.
+`research/scripts/build_external_review_handoff.py` now makes the Phase-A
+boundary fail closed: it verifies the selected frozen PDF identity and creates
+a deterministic archive containing only the anonymous paper and a separately
+tracked neutral prompt. Targeted questions, intended answers, repository
+context, and the response form are excluded. The archive's identity record is
+for the author's private log; no review has been requested or received.
+Two fresh ICAART handoff builds from the current PDF are byte-identical at
+170,377 bytes and SHA-256
+`b96091a7970d2292604d7269cd1a18d84d79f02ca0fb25436ba420a5c91c4477`;
+each contains exactly `anonymous-paper.pdf` and `review-prompt.txt`.
 
 ICAART 2027 is now the operational primary candidate: its official guidance
 permits disclosed writing and revision assistance and expressly covers

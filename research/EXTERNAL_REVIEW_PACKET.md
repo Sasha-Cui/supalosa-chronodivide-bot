@@ -18,6 +18,22 @@ compare formats.
 
 Record the selected hash before sending. If it does not match, stop and locate
 the drift rather than asking the reader to review an unidentified build.
+Build the unprimed handoff with:
+
+```bash
+python3 research/scripts/build_external_review_handoff.py \
+  --candidate icaart \
+  --output tmp/external-review/icaart-phase-a.zip
+```
+
+The builder refuses PDF-hash drift and emits a deterministic archive containing
+only `anonymous-paper.pdf` and the neutral
+`EXTERNAL_REVIEW_PHASE_A_PROMPT.txt`. Its JSON output records the candidate,
+source identity, PDF hash, archive hash, and member list for the author's
+private log. Inspect the two archive members before sending. Do not add this
+packet, the targeted Phase-B questions, or a response template to the Phase-A
+archive.
+
 Before sending, copy `EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md` into the private
 submission record. Use that copy to lock Phase A, hash the returned responses,
 score the four claim boundaries, and classify every requested change.
