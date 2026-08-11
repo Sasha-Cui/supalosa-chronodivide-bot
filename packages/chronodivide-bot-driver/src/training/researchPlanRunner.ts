@@ -23,7 +23,9 @@ export type ResearchPurpose =
     | "train-smoke"
     | "optimizer-search"
     | "development-qc"
-    | "development-evaluation";
+    | "development-evaluation"
+    | "development-v2-qc"
+    | "development-v2-evaluation";
 
 export type ResearchPlanPolicy = {
     policyId: string;
@@ -88,7 +90,17 @@ const SHA256_PATTERN = /^[0-9a-f]{64}$/;
 const GIT_COMMIT_PATTERN = /^[0-9a-f]{40}$/;
 const IDENTIFIER_PATTERN = /^[A-Za-z0-9._-]+$/;
 const TRAIN_PURPOSES: ResearchPurpose[] = ["train-smoke", "optimizer-search"];
-const DEVELOPMENT_PURPOSES: ResearchPurpose[] = ["development-qc", "development-evaluation"];
+const DEVELOPMENT_PURPOSES: ResearchPurpose[] = [
+    "development-qc",
+    "development-evaluation",
+    "development-v2-qc",
+    "development-v2-evaluation",
+];
+
+const developmentMethodIds = (purpose: ResearchPurpose): readonly string[] =>
+    purpose === "development-v2-qc" || purpose === "development-v2-evaluation"
+        ? ["champion", "default"]
+        : ["conditioned", "global"];
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null && !Array.isArray(value);
@@ -185,6 +197,7 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
     if (typeof value.purpose !== "string" || !allowedPurposes.includes(value.purpose as ResearchPurpose)) {
         throw new Error(`Research purpose ${String(value.purpose)} is not allowed for role ${role}`);
     }
+    const purpose = value.purpose as ResearchPurpose;
     if (value.candidateCountry !== Countries.IRAQ || value.baselineCountry !== Countries.IRAQ) {
         throw new Error("Research plan v1 requires the prospectively fixed Arabs mirror matchup");
     }
@@ -237,8 +250,10 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
         if (!IDENTIFIER_PATTERN.test(methodId)) {
             throw new Error(`Episode ${index} methodId contains forbidden characters`);
         }
-        if (role === "development" && methodId !== "global" && methodId !== "conditioned") {
-            throw new Error(`Episode ${index} development methodId must be global or conditioned`);
+        if (role === "development" && !developmentMethodIds(purpose).includes(methodId)) {
+            throw new Error(
+                `Episode ${index} development methodId must be one of ${developmentMethodIds(purpose).join(", ")}`,
+            );
         }
         if (!policyIds.has(policyId)) {
             throw new Error(`Episode ${index} references undeclared policy ${policyId}`);
@@ -282,8 +297,9 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
         methodFamilyPolicies.set(methodFamilyKey, episode.policyId);
     }
     const methodIds = [...schedules.keys()].sort();
-    if (role === "development" && methodIds.join(",") !== "conditioned,global") {
-        throw new Error("Development plans must contain exactly global and conditioned methods");
+    const expectedDevelopmentMethodIds = developmentMethodIds(purpose);
+    if (role === "development" && methodIds.join(",") !== expectedDevelopmentMethodIds.join(",")) {
+        throw new Error(`Development plans must contain exactly ${expectedDevelopmentMethodIds.join(" and ")} methods`);
     }
     const reference = [...(schedules.get(methodIds[0]) ?? [])].sort();
     for (const methodId of methodIds) {
@@ -308,7 +324,7 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
         schemaVersion: RESEARCH_PLAN_SCHEMA_VERSION,
         runId,
         role,
-        purpose: value.purpose as ResearchPurpose,
+        purpose,
         sourceGitCommit: expectCommit(value, "sourceGitCommit"),
         sourceRuntimeSha256: expectSha256(value, "sourceRuntimeSha256"),
         baselineGitCommit: expectCommit(value, "baselineGitCommit"),
@@ -599,7 +615,14 @@ const main = async (): Promise<void> => {
     }
     const planBytesSha256 = sha256File(planPath);
     const plan = parseResearchRunPlan(parseJsonFile(planPath));
-    const publicCommitmentsPath = path.join(repoRoot, "research", "artifacts", "family_role_commitments_v1.json");
+    const publicCommitmentsPath = path.join(
+        repoRoot,
+        "research",
+        "artifacts",
+        plan.purpose === "development-v2-qc" || plan.purpose === "development-v2-evaluation"
+            ? "method_v2_development_role_commitment.json"
+            : "family_role_commitments_v1.json",
+    );
     const role = loadResearchRole(plan, { publicCommitmentsPath, privateRoleRoot, repoRoot });
     const specs = materializeEpisodeSpecs(plan, role);
     const baselineFactory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));

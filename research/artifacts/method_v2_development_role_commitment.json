@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "status": "FROZEN_FAMILY_ROLE_COMMITMENTS_IDENTITIES_PRIVATE",
+  "methodVersion": 2,
+  "identitiesPrivate": true,
+  "outcomeBlind": true,
+  "interpretation": "Fresh method-v2 development role; identities remain in a separate private manifest and sealed-test identities are not emitted.",
+  "privateArtifacts": {
+    "development": {
+      "file": "development-families.json",
+      "sha256": "80a7f04739b06480cf2c7c9aa5ac6466c47bd69952c6ccc6207a238b94a4c59b"
+    }
+  },
+  "roleCommitments": {
+    "development": "9bdc1ec8370002daa584d6c7964ef0856161233f00f09b65be7aa6d4988beba4"
+  },
+  "splitCommitmentSha256": "24ece1e78ad9ef39fc3b672c61ad1bf9fe9b43fb00a1fdd86f7c014baf3b675f",
+  "sourcePopulationCommitmentSha256": "20e8b14d11fc191a5ff59c620894871eb0c91749588357fe8ff0bdda3af88974",
+  "poolCommitmentSha256": "5fa4304eace347df794dcd8c3e3d978d2bf235491b3a14e939fc04ab6c5076d4",
+  "adjudicationCommitmentSha256": "d7fefd43f68556036caf58fd026dade08432f0b03313409a994c34ca6a5c5d3c",
+  "roleCounts": {
+    "development": 11
+  },
+  "developmentDiagnosticCounts": {
+    "primary": 10,
+    "substitute": 1
+  },
+  "poolSourceCounts": {
+    "originalReserve": 4,
+    "fidelityReview": 7
+  },
+  "fidelityDispositionCounts": {
+    "pass": 54,
+    "review": 7,
+    "fail": 6
+  },
+  "allowedReviewWarningCategories": [
+    "invalid_object",
+    "invalid_terrain",
+    "other_warning"
+  ],
+  "fidelityScheduler": {
+    "jobId": "21608882",
+    "account": "pi_jss233"
+  },
+  "rankDomain": "chrono-divide-method-v2-development-v1",
+  "inputArtifacts": {
+    "catalog": {
+      "sha256": "8f378ee52a2d8a6d45e5d23a1e521aa6b2e08e9ab174adc8066cce8a1824bd54"
+    },
+    "gate_summary": {
+      "sha256": "cff2659efbab44c757f9e41ad985c126c4db9053c24698cbfd4ab0078355f668"
+    },
+    "original_public_roles": {
+      "sha256": "e7a4f4df4325c75107eb3708d5b105f43dd1436c78cbd210b0695076fc47d65d"
+    },
+    "probe_results": {
+      "sha256": "7679cd5c87a8925693b937c0c12056a83a68ccfdcdbc689b90f312e6f1d133c2"
+    },
+    "role_blind_targets": {
+      "sha256": "8780e809aef0554e2d90474a97caa7b4efdef54f3433722890de902d1fa7d6d2"
+    }
+  }
+}

@@ -84,6 +84,20 @@ const validDevelopmentPlan = (): Record<string, unknown> => {
     };
 };
 
+const validDevelopmentV2Plan = (): Record<string, unknown> => {
+    const plan = validDevelopmentPlan();
+    const episodes = plan.episodes as Array<Record<string, unknown>>;
+    return {
+        ...plan,
+        purpose: "development-v2-qc",
+        episodes: episodes.map((episode) => ({
+            ...episode,
+            episodeId: String(episode.episodeId).replace("global", "default").replace("conditioned", "champion"),
+            methodId: episode.methodId === "global" ? "default" : "champion",
+        })),
+    };
+};
+
 const temporaryDirectories: string[] = [];
 
 afterEach(() => {
@@ -130,6 +144,14 @@ describe("strict research run plan", () => {
         expect(() => parseResearchRunPlan(asymmetric)).toThrow(
             /identical launched-game schedule|reciprocal slots/,
         );
+    });
+
+    test("supports the sealed method-v2 champion and default method pair", () => {
+        const plan = parseResearchRunPlan(validDevelopmentV2Plan());
+        expect(new Set(plan.episodes.map(({ methodId }) => methodId))).toEqual(new Set(["champion", "default"]));
+        const wrong = validDevelopmentV2Plan();
+        (wrong.episodes as Array<Record<string, unknown>>)[0].methodId = "global";
+        expect(() => parseResearchRunPlan(wrong)).toThrow(/champion, default/);
     });
 
     test("seals development outcomes from summaries and scheduler output", () => {
