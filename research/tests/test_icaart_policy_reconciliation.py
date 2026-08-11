@@ -30,6 +30,8 @@ class IcaartPolicyReconciliationTest(unittest.TestCase):
         self.assertNotIn("2027-02-23 through 2027-02-26", strategy)
         self.assertIn("103,324-byte", reconciliation)
         self.assertNotIn("100,837-byte", reconciliation)
+        self.assertIn("EUR 620", reconciliation)
+        self.assertIn("no updates are accepted after that", reconciliation)
         self.assertIn("visually validated at 11\npages", roadmap)
 
         for document in (reconciliation, strategy, checklist, authorship):

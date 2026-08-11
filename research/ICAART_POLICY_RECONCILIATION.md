@@ -12,11 +12,12 @@ message, register a paper, or authorize upload.
 | --- | --- | --- |
 | First-round deadline | 2026-09-15 Anywhere on Earth | Resolved |
 | Conference | 2027-02-23 through 2027-02-25, Valletta | Resolved |
-| Remote presentation | Speakers unable to travel may exceptionally present remotely; live online oral and poster procedures are published | Procedure, approval timing, and fee class unresolved |
+| Remote presentation | Speakers unable to travel may exceptionally present remotely; live online oral and poster procedures are published; registering a paper uses the standard `Speaker` class, currently EUR 620 for members or EUR 680 for nonmembers at the early rate | Exception procedure and approval timing remain unresolved; confirm that the standard speaker fee also applies remotely |
 | Generative-AI eligibility | Writing, revision, literature-overview, and language assistance are explicitly allowed; AI-generated code is expressly covered by the disclosure rule, while fabrication or manipulation is prohibited | Project-specific implementation/orchestration eligibility, blind-review disclosure placement, and system-citation form unresolved |
 | Under-review AI confidentiality | A manuscript under review must not be processed through a public AI platform | Resolved; activate the conservative embargo at initial upload |
 | Double-blind repository handling | Public posting of the submitted paper is prohibited during review | Previously public named code repository remains unresolved |
 | Reviewer artifact | Complete-paper instructions specify the PDF submission only | Attachment or anonymous-link route unresolved |
+| Submission replacement cutoff | PRIMORIS permits any number of replacements before the paper deadline and no updates after it | Resolved; upload and inspect the final candidate before 2026-09-15 AoE |
 
 ## Remote presentation
 
@@ -26,12 +27,14 @@ complete live Zoom procedures for both oral and poster papers and says that the
 speaker must attend synchronously even when a backup video is uploaded.
 
 This resolves the existence and conditional eligibility of a no-travel route
-for speakers who cannot travel. It
-does **not** explain how an author requests the exception, when it is approved,
-or which registration class applies. The fee table lists only speaker and
-non-speaker categories, includes onsite benefits such as lunches, and has no
-online-speaker row. The remaining remote question is therefore procedural, not
-whether ICAART has remote presentation at all.
+for speakers who cannot travel. The registration policy says that registering
+a paper requires the `Speaker` class, and the current early fee table lists EUR
+620 for members and EUR 680 for nonmembers. It has no online-speaker row or
+remote discount. The public default is therefore the standard early speaker
+fee. The pages still do **not** explain how an author requests the exception or
+when it is approved, and the secretariat should confirm that the standard fee
+also governs an approved remote speaker. The remaining eligibility question is
+procedural, not whether ICAART has remote presentation at all.
 
 ## Generative-AI assistance
 
@@ -81,13 +84,23 @@ the secretariat whether the artifact may accompany review and by which exact
 route; if it may not, revise reviewer-facing availability language rather than
 implying access.
 
+## Submission replacement cutoff
+
+The official FAQ permits authors to replace a paper any number of times before
+the Paper Submission deadline, but says no updates are accepted after that
+deadline. This makes the September 15 AoE cutoff an immutable review boundary,
+not a soft target. Complete the source, policy, human-review, and anonymity
+freeze first; upload early enough to download and inspect the venue copy; and
+retain the automatic confirmation email. Do not plan to repair a disclosure,
+metadata, or PDF problem after the deadline.
+
 ## Exact remaining inquiry
 
 One message to the ICAART secretariat should ask only:
 
-1. whether the author's need to present without travel qualifies for the
-   exceptional remote route and, if so, its procedure, confirmation timing, and
-   speaker-registration class;
+1. whether the author's inability to travel qualifies for the exceptional
+   remote route, its request procedure and confirmation timing, and whether the
+   published standard speaker fee applies to an approved remote presentation;
 2. the required action, if any, for the previously public named code repository
    while the anonymous paper is under review; and
 3. the exact blind-review placement, wording, and citation form for the factual
@@ -110,3 +123,4 @@ link back to the same pages is not a resolution.
 - [Submission, anonymity, and review rules](https://icaart.scitevents.org/Guidelines.aspx?y=2027)
 - [Submission deadlines in Anywhere-on-Earth time](https://icaart.scitevents.org/ImportantDates.aspx?y=2027)
 - [Registration deadlines and speaker-registration rule](https://icaart.scitevents.org/ImportantInformation.aspx?y=2027)
+- [PRIMORIS replacement and no-late-update rules](https://icaart.scitevents.org/FAQ.aspx?y=2027)

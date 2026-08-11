@@ -85,10 +85,11 @@ Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 >
 > 1. The ICAART home page says speakers who are unable to travel may
 >    exceptionally present remotely, and the presenter page documents live
->    Zoom oral and poster sessions. I need to present without traveling. Would
->    this qualify for the exceptional remote route? If so, what procedure should
->    I follow, when is it confirmed, and which speaker registration category and
->    fee apply?
+>    Zoom oral and poster sessions. I will be unable to travel. What procedure
+>    should I follow to request the exception, and when will it be confirmed?
+>    The public registration rules say a paper uses the standard Speaker class,
+>    currently EUR 620 for members or EUR 680 for nonmembers at the early rate;
+>    please confirm whether that same fee applies to an approved remote speaker.
 > 2. The anonymous paper has not been posted publicly, but the author-developed
 >    implementation and research records have previously been visible in a
 >    named public GitHub repository. Does that code repository conflict with
@@ -106,11 +107,17 @@ Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 >    and say that affected sections should cite the AI system, but the same
 >    double-blind instructions require authors to omit acknowledgments. Would
 >    an identity-neutral “Generative-AI Assistance Disclosure” section before
->    the references be acceptable in the review version? Please specify the
->    required placement, wording, and citation form, including whether a single
->    disclosure may identify all affected sections.
+>    the references be acceptable in the review version? Proposed review-version
+>    wording is: “OpenAI Codex assisted with software implementation, experiment
+>    orchestration, research auditing, statistical verification, literature
+>    triage, and manuscript drafting and editing. The human author reviewed the
+>    primary evidence and cited sources, verified the analyses, approved the
+>    final text, and takes full responsibility for the work.” Please approve or
+>    amend this wording and specify its required placement and citation form,
+>    including whether a single disclosure may identify all affected sections.
 > 4. I have a 103,324-byte identity-neutral aggregate artifact that regenerates
->    every reported table and figure but contains no author identity, bot packages,
+>    every reported table and figure, maps each claim to its frozen aggregate,
+>    and contains no author identity, bot packages,
 >    maps, game assets, or private raw logs. The public complete-paper
 >    instructions describe the review PDF but do not specify supplementary
 >    files or anonymous external links. May this artifact accompany the review
@@ -131,8 +138,8 @@ Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 Retain the answer with the submission record. Public guidance already
 establishes exceptional remote support for speakers unable to travel and allows
 disclosed AI assistance in principle. The unresolved items are the remote
-procedure/registration class, named-repository handling, and blind-review
-disclosure implementation, plus the reviewer-artifact delivery route; see
+exception procedure and fee confirmation, named-repository handling, and
+blind-review disclosure implementation, plus the reviewer-artifact delivery route; see
 `ICAART_POLICY_RECONCILIATION.md`. Extract the reply into a private copy of
 `ICAART_RULING_RESPONSE_TEMPLATE.md`; do not treat a generic link to the
 public pages as a decision-complete answer.

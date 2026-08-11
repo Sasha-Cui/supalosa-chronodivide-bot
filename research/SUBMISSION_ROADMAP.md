@@ -12,7 +12,8 @@ the opened family population.
 
 - Send the four drafts in [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md).
 - Send the ICAART inquiry in `CONTACT_TEMPLATES.md` so that the
-  exceptional remote-route procedure and fee class, named-repository handling,
+  exceptional remote-route procedure and standard-fee confirmation,
+  named-repository handling,
   and double-blind disclosure location are known before the validated candidate
   is selected for submission. The public-policy boundary is in
   `ICAART_POLICY_RECONCILIATION.md`.
@@ -93,8 +94,10 @@ review artifact.
   confidential reviews, and rebuttal drafts out of public generative-AI
   services until the official selection result.
 - Upload early enough to download and inspect the venue-generated submission
-  copy. If the venue classifies the accepted regular submission as a short
-  paper, apply
+  copy. The official FAQ allows replacements before the paper deadline but no
+  updates afterward, so retain the automatic confirmation and do not rely on a
+  post-deadline correction. If the venue classifies the accepted regular
+  submission as a short paper, apply
   [`ICAART_SHORT_PAPER_REDUCTION_PLAN.md`](ICAART_SHORT_PAPER_REDUCTION_PLAN.md)
   rather than deleting evidence ad hoc.
 

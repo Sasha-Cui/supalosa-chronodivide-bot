@@ -48,8 +48,9 @@ strengthening ambiguous language.
 | This author may use the exceptional remote route | yes / no / conditional / unresolved |
 | Request procedure | |
 | Approval timing | before submission / after acceptance / other / unresolved |
-| Required speaker registration class | |
-| Fee and deadline | |
+| Public default | `Speaker`; early fee EUR 620 member / EUR 680 nonmember |
+| Approved remote presentation uses that default | yes / no / other / unresolved |
+| Fee and registration deadline | |
 | Synchronous attendance requirements | |
 
 Decision:
@@ -87,6 +88,7 @@ Decision:
 | Recorded beyond-copy-editing assistance is eligible | yes / no / conditional / unresolved |
 | Review-version disclosure location | |
 | Required wording | |
+| Proposed review-version wording approved | yes / no / changes required / unresolved |
 | Required AI-system citation form | |
 | Sections that must carry a citation | |
 | Camera-ready change, if different | |

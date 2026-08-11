@@ -291,6 +291,15 @@ mistaken for confirmatory support. Two deterministic builds of the updated
 A fresh Git-free reconstruction verified both manifests, passed all 23
 packaged tests and the 11-page deep check, and reproduced all PDF and portal
 metadata hashes exactly. No manuscript source or empirical claim changed.
+
+The 2026-08-11 official-policy recheck also closes two operational details.
+ICAART requires the `Speaker` registration class for a paper and currently
+posts early fees of EUR 620 for members and EUR 680 for nonmembers; the
+secretariat still needs to confirm the exception procedure, timing, and that
+the same fee applies remotely. The FAQ permits replacements before the paper
+deadline but none afterward, so the upload plan now treats September 15 AoE as
+an immutable review boundary. The inquiry supplies exact proposed AI-disclosure
+wording for approval instead of asking the venue to invent it from scratch.
 Decide one venue by 2026-08-25 and do not submit to both archival venues
 simultaneously.
 

@@ -13,8 +13,9 @@ the anonymous branch during review.
 - [ ] If SCAG is selected, its chairs confirm the application/evaluation
       contribution is in scope.
 - [ ] If ICAART is selected, the secretariat confirms the author qualifies and
-      provides the procedure, confirmation timing, and speaker fee class for
-      its publicly documented exceptional remote route.
+      provides the procedure and confirmation timing for its publicly
+      documented exceptional remote route, and confirms that the standard
+      early Speaker fee (EUR 620 member / EUR 680 nonmember) applies.
 - [ ] If SCAG is selected, its chairs confirm fully remote presentation is
       permitted.
 - [ ] If SCAG is selected, its chairs rule on the previously public named
@@ -29,6 +30,8 @@ the anonymous branch during review.
       the main paper.
 - [ ] Deadline, timezone, page limit, review model, and registration requirement
       reverified from the official call on the upload date.
+- [ ] Final PDF and portal fields are uploaded and downloaded for inspection
+      before the paper deadline; no post-deadline correction is assumed.
 - [ ] No simultaneous submission to an incompatible archival venue.
 - [ ] At the initial upload, archive the submitted identity and activate the
       under-review confidentiality embargo: do not provide the manuscript,
@@ -82,8 +85,9 @@ commit and all three hashes together; never mix files from different freezes.
       ordered topics with source hashes; no LaTeX macro needs manual expansion.
 - [x] Portal metadata JSON SHA-256 is
       `285af4e101ea36d6e5190a3c0ceb5d4a52ded5e56f96210b1295360bb077e4ca`.
-- [ ] ICAART confirms author eligibility, request procedure, and fee class for
-      the documented exceptional live-online route.
+- [ ] ICAART confirms author eligibility, request procedure, confirmation
+      timing, and use of the published standard Speaker fee for the documented
+      exceptional live-online route.
 - [ ] ICAART specifies whether the named code repository must be private during
       review and whether prior public visibility affects eligibility.
 - [ ] ICAART specifies where the required AI acknowledgment and affected-

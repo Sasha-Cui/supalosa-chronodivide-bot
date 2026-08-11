@@ -13,7 +13,7 @@ send email, authorize submission, or replace a written venue ruling.
 | First deadline | 2026-11-01 | 2026-09-15 AoE |
 | Current paper | 15-page LNCS body plus references | 11-page SCITEPRESS A4 paper |
 | Current PDF hash | `efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3` | `98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07` |
-| Remote presentation | Conference says hybrid; remote-presenter election is not explicit | Home page permits exceptional remote presentation when travel is impossible; procedure and fee class need confirmation |
+| Remote presentation | Conference says hybrid; remote-presenter election is not explicit | Home page permits exceptional remote presentation when travel is impossible; paper registration uses the standard Speaker class at EUR 620/680 early, while exception procedure, timing, and confirmation that the standard fee applies remotely remain open |
 | AI policy | Eligibility unresolved because assistance exceeded copy editing | Writing/revision are permitted and AI-generated code is disclosure-covered; project-specific implementation eligibility and blind-review placement remain unresolved |
 | Under-review AI confidentiality | Resolve with chairs if selected | Public-platform embargo is explicit; activate it at initial upload |
 | Double-blind risk | Prior named public repository requires a ruling | Submitted-paper posting is prohibited; named code-repository handling is unspecified and requires a ruling |
@@ -41,10 +41,11 @@ Send the two factual inquiries in `CONTACT_TEMPLATES.md` now:
    covering scope, fully remote presentation, prior public repository exposure,
    and eligibility/disclosure for the recorded Codex assistance.
 2. ICAART secretariat: request the exceptional remote-route procedure and fee
-   class, a ruling on the named public code repository, exact instructions for
-   AI disclosure in the double-blind version, and the permitted review-artifact
-   attachment or anonymous-link route. The public evidence and remaining
-   ambiguities are in `ICAART_POLICY_RECONCILIATION.md`.
+   confirmation, a ruling on the named public code repository, exact
+   instructions for AI disclosure in the double-blind version, and the
+   permitted review-artifact attachment or anonymous-link route. The public
+   evidence and remaining ambiguities are in
+   `ICAART_POLICY_RECONCILIATION.md`.
 
 Do not describe the AI work as copy editing. Do not send both manuscripts as
 submissions, and do not make either PDF public during review. An anonymous PDF
@@ -55,6 +56,11 @@ public-AI confidentiality embargo. Archive the exact submitted identity first,
 then do not provide the manuscript, confidential reviews, or rebuttal drafts to
 Codex, ChatGPT, or another public generative-AI service until the official
 selection result.
+
+The official FAQ permits repeated replacements only before the paper deadline
+and no updates afterward. Treat the September 15 AoE cutoff as immutable:
+upload early, download the venue copy, inspect it, and retain the automatic
+confirmation rather than planning a post-deadline correction.
 
 ## Required response record
 

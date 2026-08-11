@@ -120,9 +120,10 @@ interpretation of the EvoStar code, but it is not blanket clearance.
 - Remote status: the home page explicitly permits exceptional remote
   presentation for speakers unable to travel. The presenter page gives complete
   live Zoom instructions and requires synchronous attendance even with a backup
-  video. The registration table has no online-speaker row, so ask only for the
-  author's eligibility, exception procedure, confirmation timing, and
-  applicable fee class before paying.
+  video. The registration policy requires the `Speaker` class for a paper and
+  the current early fee is EUR 620/680; there is no online-speaker row. Ask for
+  the exception procedure and confirmation timing, and confirm that an approved
+  remote speaker pays the published standard fee before registering.
 - AI-disclosure ambiguity: the guidelines require disclosure in the
   acknowledgments and a citation to the AI system in affected sections, while
   the same double-blind instructions require acknowledgments to be omitted.
@@ -147,7 +148,8 @@ interpretation of the EvoStar code, but it is not blanket clearance.
   [online presentation instructions](https://icaart.scitevents.org/presentationdetails.aspx?y=2027),
   [generative-AI policy](https://icaart.scitevents.org/AiTools.aspx?y=2027),
   [templates](https://icaart.scitevents.org/Templates.aspx), and
-  [registration fees](https://icaart.scitevents.org/RegistrationFees.aspx?y=2027).
+  [registration fees](https://icaart.scitevents.org/RegistrationFees.aspx?y=2027),
+  plus the [submission replacement cutoff](https://icaart.scitevents.org/FAQ.aspx?y=2027).
 
 The public-policy evidence and exact remaining questions are frozen in
 `ICAART_POLICY_RECONCILIATION.md`.

@@ -47,6 +47,9 @@ class IcaartRulingResponseTemplateTest(unittest.TestCase):
         contacts = (ROOT / "research" / "CONTACT_TEMPLATES.md").read_text(
             encoding="utf-8"
         )
+        self.assertIn("Proposed review-version", contacts)
+        self.assertIn("EUR 620", contacts)
+        self.assertIn("Proposed review-version wording approved", template)
         self.assertIn("Optional ICAART SPIKE fallback inquiry", contacts)
         self.assertIn("no simultaneous", contacts)
 
