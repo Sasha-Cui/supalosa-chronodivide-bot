@@ -74,8 +74,9 @@ used by the searches. Stage A evaluates all 30 policies on all 22 families
 with one common seed block and reciprocal starts (1,320 games), retaining six.
 Stage B evaluates those six with three additional common seed blocks per
 family (792 games). The final ranking pools both stages and is lexicographic by
-equally family-weighted score, lower-20\% family CVaR, worst-family score, and
-policy hash. Terminal material cannot select the champion. All policies within
+equally family-weighted score, mean of the five lowest family scores,
+worst-family score, and policy hash. Terminal material cannot select the
+champion. All policies within
 a family--stage cell share the engine seed and opponent stream, so differences
 are paired rather than confounded by run-specific randomness.
 
