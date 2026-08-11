@@ -110,9 +110,10 @@ class FallbackManuscriptTest(unittest.TestCase):
         )
         self.assertEqual(
             metadata["title"],
-            "Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono Divide",
+            "Leakage-Resistant Evaluation of Scripted RTS Agent Configuration in "
+            "Chrono Divide",
         )
-        self.assertEqual(metadata["abstractWordCount"], 195)
+        self.assertEqual(metadata["abstractWordCount"], 196)
         self.assertIn("0.336", metadata["abstract"])
         self.assertIn("-0.021", metadata["abstract"])
         self.assertNotRegex(metadata["abstract"], r"[\\{}]")

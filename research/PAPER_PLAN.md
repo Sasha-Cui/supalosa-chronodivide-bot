@@ -1,12 +1,12 @@
 # Results-driven paper plan
 
-Status: **empirical program complete; submission-candidate manuscript at
-`91f9978`; deterministic anonymous artifact and internal QA complete**.
+Status: **empirical program complete; acceptance-oriented submission candidate
+and deterministic anonymous artifact under final QA**.
 
 ## Recommended paper
 
-**Title:** *Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono
-Divide*
+**Title:** *Leakage-Resistant Evaluation of Scripted RTS Agent Configuration in
+Chrono Divide*
 
 The primary target is a lower-tier game-AI/algorithm-configuration workshop or
 special session. The paper is an empirical evaluation and reproducibility

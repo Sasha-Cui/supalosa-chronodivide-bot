@@ -69,7 +69,7 @@ class BuildAnonymousArtifactTest(unittest.TestCase):
             )
             self.assertEqual(metadata_run.returncode, 0, metadata_run.stderr)
             submission_metadata = json.loads(metadata_run.stdout)
-            self.assertEqual(submission_metadata["abstractWordCount"], 195)
+            self.assertEqual(submission_metadata["abstractWordCount"], 196)
             self.assertNotIn("\\", submission_metadata["abstract"])
 
             aggregate_inputs = sorted(
@@ -81,11 +81,11 @@ class BuildAnonymousArtifactTest(unittest.TestCase):
                 (package / "README.md").read_text(),
             )
             self.assertIn(
-                "Expected output is a 17-page",
+                "Expected output is an 18-page",
                 (package / "README.md").read_text(),
             )
             self.assertIn(
-                "10-page A4",
+                "11-page A4",
                 (package / "README.md").read_text(),
             )
             self.assertIn(

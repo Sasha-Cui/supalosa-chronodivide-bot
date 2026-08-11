@@ -1,6 +1,38 @@
 \section{Environment and Validity Controls}
 \label{sec:environment}
 
+Table~\ref{tab:threat-controls} maps the principal evaluation threats to the
+controls that determine what evidence is admissible. These biases are not
+repaired by simply repeating more games.
+
+\begin{table}[t]
+\centering
+\caption{Threat-to-control map. Each control changes the admissible evidence
+or analysis unit rather than merely increasing the repeat count.}
+\label{tab:threat-controls}
+\small
+\begin{tabular}{@{}p{0.18\linewidth}@{\hspace{0.025\linewidth}}
+                    p{0.40\linewidth}@{\hspace{0.025\linewidth}}
+                    p{0.32\linewidth}@{}}
+\toprule
+Threat & Design control & Consequence for evidence \\
+\midrule
+Map-copy or revision leakage & Outcome-free family construction before role
+assignment & Training and test are family-disjoint; family is the inferential
+cluster \\
+Favorable physical start & Reciprocal candidate slots within every
+family--seed block & Effects average over slot within each matched block \\
+Uncontrolled or coupled randomness & Logged engine stream plus identity-keyed
+participant streams & Method contrasts are paired under matched random inputs \\
+Opponent or comparator contamination & Clean pinned Supalosa tree and frozen
+generic StrongBot reference & Source and policy hashes fix both comparators \\
+Outcome-adaptive retry or test tuning & Hidden test identities and outcomes;
+indivisible attempts and launch ledger & One frozen campaign; partial or
+selectively repaired evidence is inadmissible \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 \subsection{Game, agents, and endpoint}
 
 Chrono Divide is an independent browser reconstruction of Red Alert 2 with a
