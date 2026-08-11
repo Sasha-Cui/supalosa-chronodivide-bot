@@ -40,6 +40,23 @@ Indicative reviewer dimensions:
 5. The aggregate artifact is small, deterministic, anonymous at the file level,
    and sufficient to reproduce every paper number and visual.
 
+## Comparator-identity audit
+
+A source trace found and corrected a material wording error before this freeze.
+The accepted comparator is `DEFAULT_RESEARCH_POLICY`, a prospectively frozen
+coordinate-free research policy compiled with built-in map profiles and
+exact-map tactics disabled. The StrongBot constructors enable those deployed
+features when no override is supplied. The comparator therefore must be called
+the **frozen generic StrongBot reference**, not the shipped or deployed
+StrongBot default. Frozen JSON fields retain their historical `default` label;
+that implementation label does not change the comparator's identity.
+
+This correction changes no game, score, family, interval, gate, or policy hash.
+It narrows the product-performance interpretation: the study does not estimate
+whether the champion improves over the fork's map-profile-enabled deployed
+default. The manuscript, supplement, generated labels, review packet, venue
+calibration, and current status must all preserve this distinction.
+
 ## Likely rejection arguments
 
 1. **“This is ordinary tuning.”** The paper cannot answer with optimizer
@@ -67,6 +84,11 @@ Indicative reviewer dimensions:
    aggregates, not matches. The response is the explicit third-party boundary,
    exact hashes and acquisition instructions, and a future permission-dependent
    implementation release.
+7. **“The baseline is artificially weak.”** The paper cannot answer that the
+   reference is the deployed product baseline. It can answer that the
+   coordinate-free reference was frozen prospectively as candidate 0 and
+   evaluated under the identical generic-policy boundary. Lack of a deployed
+   map-profile baseline remains an explicit limitation.
 
 ## Empirical decision
 

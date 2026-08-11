@@ -25,7 +25,7 @@ then ran once and refuses overwrite.
 
 ## Prespecified results
 
-The champion-minus-default score improvement is 0.33594. Its two-sided
+The champion-minus-reference score improvement is 0.33594. Its two-sided
 family-clustered 95% confidence interval is [0.21456, 0.45732], entirely above
 zero. Improvement is positive on 14 families, zero on two, and negative on
 none. This component of the frozen confirmatory gate passes.
@@ -36,9 +36,9 @@ estimated margin over 0.5 is 0.03516 with family-clustered standard error
 so the absolute-strength component fails. Six family scores exceed 0.5, five
 equal 0.5, and five fall below 0.5.
 
-Across 256 games per method, the default policy records 1 win, 100 draws, and
-155 losses for score 0.19922. The champion records 47 wins, 180 draws, and 29
-losses for score 0.53516. These records are descriptive; they do not override
+Across 256 games per method, the frozen generic reference policy records 1 win,
+100 draws, and 155 losses for score 0.19922. The champion records 47 wins, 180
+draws, and 29 losses for score 0.53516. These records are descriptive; they do not override
 the family-clustered inference.
 
 ## Independent sensitivity audit
@@ -56,8 +56,11 @@ gate.
 ## Claim boundary
 
 The evidence supports the claim that the frozen training-and-selection pipeline
-substantially improves this agent over its default policy when both are tested
-against the same pinned Supalosa opponent and committed map-family population.
+substantially improves this agent over its frozen generic reference policy when
+both are tested against the same pinned Supalosa opponent and committed
+map-family population.
 It does not support the stronger claim that the method-v2 champion reliably
 beats Supalosa across map families. The paper must report both the passed
-improvement component and the failed joint gate.
+improvement component and the failed joint gate. The reference is
+`DEFAULT_RESEARCH_POLICY`, not the fork's map-profile-enabled deployed
+constructor default; frozen result fields retain the label `default`.

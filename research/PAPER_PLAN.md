@@ -28,8 +28,8 @@ reliably beats Supalosa.
 held-out map families?**
 
 Yes. On 16 sealed families, the frozen champion scores 0.53516 versus 0.19922
-for the shipped default. The equally family-weighted improvement is 0.33594,
-with two-sided 95% interval [0.21456, 0.45732]. Fourteen family effects are
+for the frozen generic StrongBot reference. The equally family-weighted
+improvement is 0.33594, with two-sided 95% interval [0.21456, 0.45732]. Fourteen family effects are
 positive and two are zero.
 
 **RQ2 — Does the configured StrongBot reliably beat Supalosa?**
@@ -41,7 +41,7 @@ result, not a footnote.
 **RQ3 — What paired outcome and terminal-state patterns accompany the
 improvement, and do one-group reverts isolate a component?**
 
-Descriptively, the champion converts many default losses into tick-cap draws or
+Descriptively, the champion converts many reference losses into tick-cap draws or
 wins and ends matched draw-to-draw games with substantially more relative
 combatants and fewer banked credits. The joint infantry+rush strategy group is
 the dominant component signal, but its multiplicity-controlled interval
@@ -63,8 +63,8 @@ The paper should claim exactly three contributions:
    followed by a common-seed championship that selects one generic policy from
    30 finalists without test access.
 3. **Held-out empirical evidence.** We show a large, family-consistent
-   improvement over the shipped StrongBot default on 16 sealed families, report
-   the failed absolute-strength gate, and decompose the result with paired
+   improvement over the frozen generic StrongBot reference on 16 sealed
+   families, report the failed absolute-strength gate, and decompose the result with paired
    outcome transitions, terminal states, optimizer-selection comparisons, and
    component reverts.
 
@@ -95,8 +95,12 @@ hand-authored policy space in isolation.
 - Matchup: Iraq (`Arabs`) versus Iraq, 10,000 starting credits, superweapons
   disabled, short-game defeat, 18,000-tick cap.
 - Endpoint: win = 1, draw = 0.5, loss = 0.
-- Generic-policy boundary: default map profiles, exact-map tactics, coordinate
+- Generic-policy boundary: built-in map profiles, exact-map tactics, coordinate
   routes, placement anchors, and orientation gates disabled.
+- Comparator identity: candidate 0 is `DEFAULT_RESEARCH_POLICY`, a
+  prospectively frozen coordinate-free research reference. It is not the
+  fork's map-profile-enabled deployed constructor default; machine artifacts
+  retain the historical method label `default`.
 
 ### Map population and leakage control
 
@@ -113,7 +117,8 @@ hand-authored policy space in isolation.
 ### Configuration and selection
 
 Each of five deterministic search runs generates 32 distinct policies from a
-fixed coordinate-free policy space. Candidate 0 is default; other candidates
+fixed coordinate-free policy space. Candidate 0 is the frozen generic
+reference; other candidates
 anchor attack-composition and strategic-plan choices and receive additional
 hash-ranked mutations. Successive halving evaluates:
 
@@ -130,9 +135,9 @@ those six on three new seed blocks per family (792 games). Ranking is
 lexicographic by family-macro score, lower-20% family CVaR, worst-family score,
 and policy hash. Terminal material cannot determine the champion.
 
-The champion differs from default in seven stored fields:
+The champion differs from the reference in seven stored fields:
 
-| Field | Default | Champion |
+| Field | Reference | Champion |
 | --- | --- | --- |
 | Attack composition | assault | infantry |
 | Strategic plan | macro | rush |
@@ -146,13 +151,13 @@ The champion differs from default in seven stored fields:
 
 The confirmatory design contains 16 families, eight new seed blocks/family, two
 reciprocal candidate slots, and two methods: 512 games total. The primary
-estimand is the equally-family-weighted champion-minus-default score difference
-after reciprocal-slot averaging. The primary interval uses the frozen
+estimand is the equally-family-weighted champion-minus-reference score
+difference after reciprocal-slot averaging. The primary interval uses the frozen
 finite-family cluster sandwich and Student-$t_{15}$ critical value.
 
 The confirmatory gate had two components:
 
-1. two-sided 95% interval for champion-minus-default entirely above zero; and
+1. two-sided 95% interval for champion-minus-reference entirely above zero; and
 2. one-sided 95% lower bound for champion score minus 0.5 above zero.
 
 Both results are reported. The first passed; the second failed.
@@ -163,9 +168,9 @@ Both results are reported. The first passed; the second failed.
 
 | Quantity | Estimate | Uncertainty/status |
 | --- | ---: | --- |
-| Default score | 0.19922 | 1 W / 100 D / 155 L |
+| Reference score | 0.19922 | 1 W / 100 D / 155 L |
 | Champion score | 0.53516 | 47 W / 180 D / 29 L |
-| Champion - default | 0.33594 | SE 0.05695; 95% CI [0.21456, 0.45732]; pass |
+| Champion - reference | 0.33594 | SE 0.05695; 95% CI [0.21456, 0.45732]; pass |
 | Champion - 0.5 | 0.03516 | SE 0.03213; one-sided 95% lower -0.02117; fail |
 | Family signs | 14 positive / 2 zero / 0 negative | descriptive support |
 | Improvement family bootstrap |  | diagnostic 95% [0.23047, 0.44727] |
@@ -175,10 +180,10 @@ Both results are reported. The first passed; the second failed.
 
 Of 256 common family-seed-slot pairs:
 
-- 28 default losses become champion wins;
-- 104 default losses become champion draws;
-- 18 default draws become champion wins;
-- 6 default draws become champion losses;
+- 28 reference losses become champion wins;
+- 104 reference losses become champion draws;
+- 18 reference draws become champion wins;
+- 6 reference draws become champion losses;
 - 100 pairs have equal frozen score.
 
 Thus 150 pairs improve, six regress, and 100 are unchanged. This transition
@@ -217,7 +222,7 @@ binds every result to source, runtime, map, plan, and scheduler commitments.
 Five 32-policy successive-halving searches followed by a common-seed
 championship select one coordinate-free generic policy using training families
 only. In a frozen 512-game evaluation over 16 sealed families, the selected
-policy scores 0.535 versus 0.199 for the shipped StrongBot default. The
+policy scores 0.535 versus 0.199 for the frozen generic StrongBot reference. The
 equally-family-weighted improvement is 0.336 (family-clustered 95% CI
 [0.215, 0.457]); 14 family effects are positive and two are zero. The
 prespecified absolute-strength gate does not pass: the one-sided 95% lower bound
@@ -304,12 +309,12 @@ Committed main-paper items:
    searches, championship, fresh development, and sealed test.
 2. **Table 1 — Search allocation:** exact successive-halving policy, family,
    slot, and launched-game counts.
-3. **Table 2 — Policy differences:** every stored default/champion difference.
+3. **Table 2 — Policy differences:** every stored reference/champion difference.
 4. **Table 3 — Main confirmatory result:** scores, records, clustered interval,
    and both gate decisions.
-5. **Figure 2 — Per-family confirmatory effects:** 16 champion-minus-default
+5. **Figure 2 — Per-family confirmatory effects:** 16 champion-minus-reference
    points with zero line; do not show unearned game-level intervals.
-6. **Figure 3 — Paired outcome transitions:** default loss/draw/win to champion
+6. **Figure 3 — Paired outcome transitions:** reference loss/draw/win to champion
    loss/draw/win counts.
 7. **Figure 4 — Component contrasts:** five champion-minus-revert estimates
    with ordinary and familywise intervals.

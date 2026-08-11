@@ -42,8 +42,10 @@ family-disjoint evaluation and configuration of a generic scripted RTS policy.
 
 ## Frozen result boundary
 
-The method-v2 champion scores 0.53516 and the shipped StrongBot default scores
-0.19922 over 256 paired games per method on 16 sealed families. The
+The method-v2 champion scores 0.53516 and the frozen generic StrongBot reference
+scores 0.19922 over 256 paired games per method on 16 sealed families. This
+reference is the coordinate-free `DEFAULT_RESEARCH_POLICY`, not the fork's
+map-profile-enabled deployed constructor default. The
 equally-family-weighted improvement is 0.33594 with a family-clustered 95%
 interval [0.21456, 0.45732]. The champion's one-sided lower score margin versus
 0.5 is negative, so the repository does not support “reliably beats Supalosa.”

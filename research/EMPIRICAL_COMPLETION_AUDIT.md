@@ -45,7 +45,8 @@ The championship artifact is
 `40a53c142fa30725ea5d22032d4b6dfcda4f358e15e1b8d36ac6a102b76e9ee1`.
 It freezes policy
 `ab0071009cbd5f1fc9e2f1a76a562455a0ebeacf77dac1cd9c13b9fc6374203f`;
-the default comparator is
+the frozen generic reference comparator (historically labeled `default` in
+machine artifacts) is
 `8fc9e46aba10fb84d7283e16a4ccde12d3e3e429c29d5caca5b42dd5a25cef4a`.
 
 Two prospective zero-launch failures remain preserved but contribute no game:
@@ -61,16 +62,17 @@ Two prospective zero-launch failures remain preserved but contribute no game:
 ### Confirmatory result
 
 On 16 sealed test families and 256 paired games per method, the champion scores
-0.53516 (47 wins, 180 draws, 29 losses) and default scores 0.19922 (1 win, 100
-draws, 155 losses). The equally family-weighted improvement is 0.33594 with
+0.53516 (47 wins, 180 draws, 29 losses) and the frozen generic reference scores
+0.19922 (1 win, 100 draws, 155 losses). The equally family-weighted improvement
+is 0.33594 with
 family-clustered standard error 0.05695 and two-sided 95% interval
 [0.21456, 0.45732]. Fourteen family effects are positive and two are zero.
 
 The relative-improvement gate passes. The separate absolute-strength gate
 fails: the champion's margin above 0.5 is 0.03516, but its prespecified
 one-sided 95% lower margin is -0.02117. The paper may say that optimization
-substantially and robustly improves the shipped StrongBot default against the
-pinned Supalosa opponent. It may not say that the champion reliably beats
+substantially and robustly improves the frozen generic StrongBot reference
+against the pinned Supalosa opponent. It may not say that the champion reliably beats
 Supalosa.
 
 ### Mechanism and component evidence
@@ -94,7 +96,7 @@ reportable evidence.
 
 The 1,472-game post-outcome analysis is committed at
 `61d84614a5f8088bb38f263a772ec1c34a1334283d51098e96af3d85839dc6b4`.
-The champion primarily converts default losses into tick-cap survival or wins.
+The champion primarily converts reference losses into tick-cap survival or wins.
 Even within 76 pairs that remain draw-to-draw, it ends with 22.71 more relative
 combatants and 683.82 fewer relative credits. This is consistent with converting
 banked resources into combat power. It is descriptive terminal evidence, not a
@@ -143,8 +145,12 @@ special-session paper whose contributions are:
 2. a training-only configuration pipeline that selects one generic StrongBot
    policy; and
 3. held-out evidence that the selected policy substantially improves the
-   shipped StrongBot default across diverse supported map families, plus candid
-   post-confirmatory mechanism diagnostics.
+   frozen generic StrongBot reference across diverse supported map families,
+   plus candid post-confirmatory mechanism diagnostics.
+
+The reference disables built-in map profiles and exact-map tactics. It is not
+the fork's map-profile-enabled deployed constructor default; no result in this
+study estimates champion performance relative to that deployed policy.
 
 **No-go** for a paper centered on a new general-purpose learning algorithm, a
 new game environment authored by this project, a broad game-AI paradigm shift,

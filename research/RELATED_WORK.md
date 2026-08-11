@@ -85,8 +85,9 @@ Supported contribution in the frozen study:
 - a low-cost Chrono Divide evaluation protocol with reciprocal starts,
   participant-isolated random streams, family-disjoint roles, repeated searches,
   sealed outcomes, and family-clustered uncertainty;
-- a held-out case study showing a 0.336 family-weighted improvement over the
-  shipped default while preserving a negative absolute-strength conclusion;
+- a held-out case study showing a 0.336 family-weighted improvement over a
+  prospectively frozen generic reference while preserving a negative
+  absolute-strength conclusion;
 - an author-owned manifest/hash artifact layer whose aggregate results can be
   regenerated without redistributing third-party game assets.
 
@@ -94,8 +95,9 @@ The strongest novelty sentence supported by the completed evidence is:
 
 > This study contributes an integrated, leakage-resistant configuration and
 > evaluation workflow for a scripted Chrono Divide agent, together with held-out
-> evidence that the workflow substantially improves a weak shipped default
-> against one pinned opponent without establishing absolute superiority.
+> evidence that the workflow substantially improves a frozen generic StrongBot
+> reference against one pinned opponent without establishing absolute
+> superiority. The comparator is not the deployed map-profile-enabled default.
 
 The manuscript bibliography now covers the primary sources used by the paper.
 It remains a scoped review rather than evidence of a universal literature gap;

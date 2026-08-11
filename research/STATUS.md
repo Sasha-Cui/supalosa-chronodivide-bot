@@ -6,9 +6,9 @@ Last reconciled: **2026-08-11**
 
 The core empirical program is complete and the submission-candidate paper is
 built, visually checked, committed, and ready for external review. The frozen
-method-v2 champion substantially improves the shipped StrongBot default across
-16 sealed Chrono Divide map families against one pinned, independently loaded
-Supalosa bot. The relative effect passes its prespecified confirmatory gate; the
+method-v2 champion substantially improves a prospectively frozen generic
+StrongBot reference across 16 sealed Chrono Divide map families against one
+pinned, independently loaded Supalosa bot. The relative effect passes its prespecified confirmatory gate; the
 separate claim that the champion reliably beats Supalosa does not.
 
 No Chrono Divide simulation job is active. Do not launch more outcome-bearing
@@ -18,20 +18,26 @@ games on the opened family population for this paper.
 
 | Method | Games | W/D/L | Score |
 | --- | ---: | ---: | ---: |
-| Shipped StrongBot default | 256 | 1 / 100 / 155 | 0.19922 |
+| Frozen generic StrongBot reference | 256 | 1 / 100 / 155 | 0.19922 |
 | Frozen method-v2 champion | 256 | 47 / 180 / 29 | 0.53516 |
 
-The equally family-weighted champion-minus-default estimate is **0.33594** with
+The equally family-weighted champion-minus-reference estimate is **0.33594** with
 family-clustered standard error **0.05695** and two-sided 95% confidence interval
 **[0.21456, 0.45732]**. Fourteen family effects are positive and two are zero.
 
 The champion's absolute score margin above 0.5 is 0.03516, but its prespecified
 one-sided 95% lower margin is **-0.02117**. Therefore:
 
-- supported: optimization robustly improves the StrongBot default against the
-  pinned Supalosa version on the supported test-family population;
+- supported: optimization robustly improves the frozen generic StrongBot
+  reference against the pinned Supalosa version on the supported test-family
+  population;
 - unsupported: the champion reliably beats Supalosa, a new general learning
   algorithm, broad game-AI superiority, or a paradigm shift.
+
+The reference is `DEFAULT_RESEARCH_POLICY`, compiled with built-in map profiles
+and exact-map tactics disabled. It is not the fork's map-profile-enabled
+deployed constructor default. Frozen machine artifacts retain the historical
+method label `default`; current prose calls that method `reference`.
 
 See [`METHOD_V2_CONFIRMATORY_RESULT.md`](METHOD_V2_CONFIRMATORY_RESULT.md) for
 the immutable confirmatory ledger.

@@ -48,7 +48,8 @@ the private message: `alberto.tonda(at)inra.fr`, `amorag(at)ugr.es`,
 > mutation-generated 32-policy pools, successive halving, and a training-only
 > common-seed championship. Evaluation groups map revisions into disjoint
 > families and opens 16 sealed families once. The configured policy improves
-> its shipped default by 0.336 (family-clustered 95% CI [0.215, 0.457]) against
+> a prospectively frozen generic StrongBot reference by 0.336
+> (family-clustered 95% CI [0.215, 0.457]) against
 > one pinned external opponent, but a separate prespecified gate does not
 > establish that it reliably beats that opponent. The paper claims an applied
 > configuration-and-evaluation workflow, not optimizer novelty or broad game-AI
@@ -95,7 +96,8 @@ Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 >    version?
 >
 > The paper reports a completed 8,704-game study with family-disjoint training
-> and evaluation. Its configured policy improves the shipped default on 16
+> and evaluation. Its configured policy improves a prospectively frozen generic
+> StrongBot reference on 16
 > sealed map families, while a separate absolute-strength gate fails; the paper
 > does not claim a new optimizer or broad agent superiority.
 >
@@ -117,7 +119,8 @@ and availability of the online route still require confirmation.
 > I am the author of StrongBot, a research fork of your
 > `supalosa-chronodivide-bot`. I now have a paper draft and a completed held-out
 > study. The result is deliberately scoped: the configured StrongBot policy
-> substantially improves StrongBot's shipped default against a pinned copy of
+> substantially improves a prospectively frozen generic StrongBot reference
+> against a pinned copy of
 > your bot, but the experiment does not establish that StrongBot reliably beats
 > Supalosa.
 >

@@ -34,17 +34,18 @@ equivalence check.
 
 ## Confirmatory outcome decomposition
 
-The champion's 0.53516 score versus the default policy's 0.19922 is an
+The champion's 0.53516 score versus the frozen generic reference policy's
+0.19922 is an
 improvement of 0.33594 on 256 paired games per method. In paired outcome terms:
 
-- 28 default losses became champion wins and 104 became tick-cap draws.
-- 18 default draws became champion wins.
-- Six default draws regressed to champion losses.
-- One default win and 99 other outcomes were unchanged at the score level.
+- 28 reference losses became champion wins and 104 became tick-cap draws.
+- 18 reference draws became champion wins.
+- Six reference draws regressed to champion losses.
+- One reference win and 99 other outcomes were unchanged at the score level.
 
 Equivalently, 150 pairs improved, six regressed, and 100 had the same frozen
 score. The champion gained 46 wins, 80 draws, and avoided 126 losses relative
-to default. This makes the practical effect clearer: the policy primarily
+to the reference. This makes the practical effect clearer: the policy primarily
 turns rapid or eventual losses into survival and, less often, outright wins.
 The absolute result still does **not** pass the frozen reliable-win gate against
 Supalosa.
@@ -96,12 +97,15 @@ not logged.
 ## Paper claim boundary
 
 The defensible interpretation is that method-v2 optimization found a policy
-that robustly improves the shipped StrongBot default, largely by replacing
-losses with survival or wins and by ending matched games with substantially
+that robustly improves the frozen generic StrongBot reference, largely by
+replacing losses with survival or wins and by ending matched games with substantially
 more combat power and fewer banked credits. The strategy group is the principal
 observed component signal. The evidence does not establish a novel learning
 algorithm, a multiplicity-controlled single-component cause, or a reliable
 absolute win rate above 0.5 against Supalosa.
+
+The reference is `DEFAULT_RESEARCH_POLICY`, not the fork's map-profile-enabled
+deployed constructor default; frozen result fields retain the label `default`.
 
 No further outcome-bearing game is authorized by this analysis. New
 instrumented games could study trajectories in future work, but they would be

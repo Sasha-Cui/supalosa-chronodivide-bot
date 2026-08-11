@@ -44,7 +44,7 @@ A second reader, or the same reader on a later pass, should inspect only the
 title, abstract, figures, tables, captions, and conclusion. Ask whether those
 elements alone communicate all of the following:
 
-- configured champion versus shipped-default improvement: 0.336 with a
+- configured champion versus frozen-generic-reference improvement: 0.336 with a
   family-clustered 95% interval [0.215, 0.457];
 - absolute superiority over Supalosa not established;
 - 16 sealed map families and family-level inference;
@@ -57,8 +57,8 @@ elements alone communicate all of the following:
 The manuscript passes the cold read only if the reader independently reports
 all four core boundaries:
 
-1. the positive claim is champion versus StrongBot default, not champion versus
-   Supalosa;
+1. the positive claim is champion versus the frozen generic StrongBot reference,
+   not champion versus Supalosa or the deployed StrongBot default;
 2. Chrono Divide is an existing environment, not introduced by the paper;
 3. the configuration routine uses established techniques and is not claimed as
    a novel optimizer; and
