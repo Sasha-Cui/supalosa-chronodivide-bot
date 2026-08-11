@@ -4,7 +4,7 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `419a0f72188f957ae144262f62c62bcc11a66ac3`
+- Source commit: `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0`
 - Main source: `paper/main.tex`
 - Supplement source: `paper/supplement.tex`
 - Target format: Springer LNCS, anonymous submission
@@ -107,6 +107,12 @@ above. Fresh Poppler renders covered all 16 main-paper pages, all five
 supplement pages, and all 10 SCITEPRESS pages; the changed contribution and
 family-effect pages were also inspected at full resolution.
 
+Commit `0f3e690` adds a deterministic plain-text ICAART metadata exporter and
+does not change manuscript content or PDF bytes. Its output expands every
+result macro, contains no residual LaTeX, records the exact 195-word abstract,
+and has SHA-256
+`b6c79cacfc78289ccface7d0793d46c6c6317451e3f9cdc0b0984731fba2ea47`.
+
 The claim audit confirmed that the paper:
 
 - leads with champion-versus-frozen-reference improvement, not absolute
@@ -124,16 +130,16 @@ The claim audit confirmed that the paper:
 
 ## Clean export and reviewer artifact
 
-A committed manuscript revision at `419a0f72188f957ae144262f62c62bcc11a66ac3` and the portable-artifact repair
+A committed submission revision at `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0` and the portable-artifact repair
 at `d53f822144bd0b3fffe3b4d778770091f77900b8` passed ten paper-generator and
-manuscript-invariant tests, eight SCITEPRESS tests, two artifact-builder tests,
-and the three frozen family-exporter tests (23 tests total). They regenerated
+manuscript-invariant tests, nine SCITEPRESS tests, two artifact-builder tests,
+and the three frozen family-exporter tests (24 tests total). They regenerated
 all paper fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
-`47a9e56aeb0d67c01703bf16f9f7ab48b842273d7595d289d6fad67817fc9c0a`
-and size 93,381 bytes. Two independent builds produced that same hash. The
-archive contains 58 manifested immutable files, normalized `0/0` ownership and
+`8620c456bbbbde78ce7092d335ff5e6f407eace3ddd3d56d71a020181f69ecf6`
+and size 95,169 bytes. Two independent builds produced that same hash. The
+archive contains 59 manifested immutable files, normalized `0/0` ownership and
 epoch timestamps, no Git tree, no bot packages, and no direct author,
 scheduler-account, institution, or private-path token. It now contains both the
 LNCS/SCAG sources and the exact SCITEPRESS/ICAART candidate, including the four
@@ -144,7 +150,7 @@ rejects missing, changed, or unexpected immutable files.
 
 A fresh extraction on an independent macOS machine used Python 3.14.2, GNU
 Make 3.81, and TeX Live 2022 rather than Bouchet's Python 3.9 and TeX Live 2024.
-The manifest verified both before and after deterministic regeneration, all 18
+The manifest verified both before and after deterministic regeneration, all 19
 packaged manuscript tests passed, and the Git-free build produced the expected
 16-page Letter LNCS paper, five-page Letter supplement, and 10-page A4
 SCITEPRESS candidate. The local-toolchain PDF identities were respectively

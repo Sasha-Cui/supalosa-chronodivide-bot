@@ -39,7 +39,7 @@ the anonymous branch during review.
 - Title: **Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono
   Divide**
 - Anonymous manuscript source commit:
-  `419a0f72188f957ae144262f62c62bcc11a66ac3`
+  `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0`
 - Main PDF: 16 pages total; non-reference material ends on page 14.
 - Main PDF SHA-256:
   `a93b9a759d52848bd0fb39c39d6edcd6d2e554573beb58c6f0ce214cb303a2aa`
@@ -47,8 +47,8 @@ the anonymous branch during review.
 - Supplement PDF SHA-256:
   `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98`
 - Deterministic anonymous artifact SHA-256:
-  `47a9e56aeb0d67c01703bf16f9f7ab48b842273d7595d289d6fad67817fc9c0a`
-- Anonymous artifact size: 93,381 bytes; 58 immutable manifested files.
+  `8620c456bbbbde78ce7092d335ff5e6f407eace3ddd3d56d71a020181f69ecf6`
+- Anonymous artifact size: 95,169 bytes; 59 immutable manifested files.
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
@@ -58,7 +58,7 @@ commit and all three hashes together; never mix files from different freezes.
 
 - [x] Separate SCITEPRESS source committed at
       `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`; the current reviewed source is
-      `419a0f72188f957ae144262f62c62bcc11a66ac3` and changes no frozen empirical
+      `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0` and changes no frozen empirical
       artifact.
 - [x] PDF is 10 A4 pages, with a 195-word expanded abstract and 36,231 extracted
       non-whitespace characters.
@@ -75,6 +75,8 @@ commit and all three hashes together; never mix files from different freezes.
 - [x] `make -C paper_scitepress metadata` deterministically exports the exact
       plain-text portal title, expanded 195-word abstract, keywords, area, and
       ordered topics with source hashes; no LaTeX macro needs manual expansion.
+- [x] Portal metadata JSON SHA-256 is
+      `b6c79cacfc78289ccface7d0793d46c6c6317451e3f9cdc0b0984731fba2ea47`.
 - [ ] ICAART confirms author eligibility, request procedure, and fee class for
       the documented exceptional live-online route.
 - [ ] ICAART specifies whether the named code repository must be private during
@@ -116,10 +118,10 @@ commit and all three hashes together; never mix files from different freezes.
 ## Reproducibility and anonymity
 
 - [x] `make -C paper check main supplement` passes in a clean committed export.
-- [x] Anonymous artifact self-verifier checks all 58 immutable files and rejects
+- [x] Anonymous artifact self-verifier checks all 59 immutable files and rejects
       missing, changed, or unexpected entries.
 - [x] A fresh Git-free extraction on an independent macOS toolchain passes all
-      18 packaged tests and rebuilds the 16-page paper, 5-page supplement, and
+      19 packaged tests and rebuilds the 16-page paper, 5-page supplement, and
       exact 10-page SCITEPRESS candidate without actionable warnings.
 - [x] Main, supplement, and SCITEPRESS PDFs have been rendered after the last
       edit; no clipping, overlap, invisible text, or illegible plot label.

@@ -126,15 +126,20 @@ references, missing citations, or BibTeX warnings. All 21 LNCS/supplement pages
 and all 10 SCITEPRESS pages have received rendered visual checks. The current PDF SHA-256 values are recorded in
 [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md).
 
+Commit `0f3e690` adds a deterministic plain-text ICAART portal-metadata export
+and tests the same exporter inside the anonymous artifact. It leaves all
+manuscript PDF bytes unchanged while replacing the earlier approximate abstract
+count with the exact 195-word expanded text.
+
 Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 commit `7cdbe0d` hardens its direct-identity denylist, and the current builder
 tests enforce the exact eight-input reviewer description. Commit `d53f822`
 adds the exact SCITEPRESS candidate, a package-local manifest verifier, and
-Git-free build checks. The current 93,381-byte review archive is
+Git-free build checks. The current 95,169-byte review archive is
 byte-deterministic at SHA-256
-`47a9e56aeb0d67c01703bf16f9f7ab48b842273d7595d289d6fad67817fc9c0a`.
-Its 58-file immutable manifest verifies, all artifact tests pass, and an
-independent macOS extraction passes 18 packaged tests and rebuilds the 16-page
+`8620c456bbbbde78ce7092d335ff5e6f407eace3ddd3d56d71a020181f69ecf6`.
+Its 59-file immutable manifest verifies, all artifact tests pass, and an
+independent macOS extraction passes 19 packaged tests and rebuilds the 16-page
 LNCS paper, five-page supplement, and 10-page A4 SCITEPRESS candidate without
 undefined references, overflow, or BibTeX warnings. All fonts are embedded and
 all 31 pages received a rendered layout check.

@@ -13,8 +13,8 @@ compare formats.
 
 | Candidate | Source commit | PDF SHA-256 |
 | --- | --- | --- |
-| LNCS / SCAG | `419a0f72188f957ae144262f62c62bcc11a66ac3` | `a93b9a759d52848bd0fb39c39d6edcd6d2e554573beb58c6f0ce214cb303a2aa` |
-| SCITEPRESS / ICAART | `419a0f72188f957ae144262f62c62bcc11a66ac3` | `1a92466bc627a3edc3d757542289df03121bdbe4ebccdc8947508cf7b084747c` |
+| LNCS / SCAG | `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0` | `a93b9a759d52848bd0fb39c39d6edcd6d2e554573beb58c6f0ce214cb303a2aa` |
+| SCITEPRESS / ICAART | `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0` | `1a92466bc627a3edc3d757542289df03121bdbe4ebccdc8947508cf7b084747c` |
 
 Record the selected hash before sending. If it does not match, stop and locate
 the drift rather than asking the reader to review an unidentified build.
