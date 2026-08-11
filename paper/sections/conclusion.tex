@@ -1,17 +1,12 @@
 \section{Conclusion}
 
-We converted an exploratory Chrono Divide bot project into a deterministic,
-family-disjoint, provenance-bound scripted-policy configuration study. Five
-successive-halving searches and a common-seed championship selected one policy
-from training families. Across \TestFamilyCount{} sealed test families, its score improves on
-the shipped default by \ImprovementEstimate{} (family-clustered 95\% CI
+Across \TestFamilyCount{} sealed families, the configured policy improves the
+frozen generic reference by \ImprovementEstimate{} (family-clustered 95\% CI
 [\ImprovementCILower{},~\ImprovementCIUpper{}]); \PositiveFamilyCount{} effects
-are positive and \ZeroFamilyCount{} are zero, and the gain mainly converts
-losses to tick-cap draws.
-
-Yet its one-sided lower score margin against Supalosa is
-\ChampionAbsoluteLower{}, so absolute superiority is not established. Endpoint
-and component diagnostics suggest an infantry-rush policy that fields more units
-but establish no mechanism after familywise correction. The contribution is a
-reproducible configuration/evaluation workflow and bounded relative result---not
-a new environment, optimizer, or broad game-AI dominance claim.
+are positive and \ZeroFamilyCount{} are zero, mainly replacing losses with
+tick-cap draws. Yet its one-sided lower score margin against Supalosa is
+\ChampionAbsoluteLower{}, so absolute superiority is not established.
+Endpoint and component diagnostics are consistent with an infantry-rush policy
+that fields more units but do not establish a mechanism. The contribution is a
+provenance-bound, family-disjoint configuration/evaluation workflow and bounded
+relative result---not a new environment, optimizer, or broad dominance claim.

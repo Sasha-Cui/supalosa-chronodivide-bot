@@ -316,7 +316,7 @@ def generate_family_plot(family_data: dict[str, Any]) -> str:
   xtick={{0,0.2,0.4,0.6,0.8}},
   ytick={{{ticks}}},
   yticklabels={{{labels}}},
-  xlabel={{Champion $-$ default score}},
+  xlabel={{Champion $-$ reference score}},
   axis line style={{draw=ChronoInk}},
   tick label style={{text=ChronoInk,font=\scriptsize}},
   label style={{text=ChronoInk,font=\small}},
@@ -336,7 +336,7 @@ def generate_family_table(family_data: dict[str, Any]) -> str:
     lines = [
         r"\begin{tabular}{@{}llrrr@{}}",
         r"\toprule",
-        r"Label & Family ID & Default & Champion & Difference \\",
+        r"Label & Family ID & Reference & Champion & Difference \\",
         r"\midrule",
     ]
     for index, row in enumerate(family_data["families"], start=1):
@@ -387,7 +387,7 @@ def generate_transition_figure(terminal: dict[str, Any]) -> str:
 {row_labels}
 {column_labels}
 {' '.join(cells)}
-\node[rotate=90,text=ChronoInk,font=\small\bfseries] at (-1.85,-1.05) {{Default outcome}};
+\node[rotate=90,text=ChronoInk,font=\small\bfseries] at (-1.85,-1.05) {{Reference outcome}};
 \node[text=ChronoInk,font=\small\bfseries] at (1.55,1.05) {{Champion outcome}};
 \end{{tikzpicture}}
 """
@@ -424,7 +424,7 @@ def generate_component_plot(component: dict[str, Any]) -> str:
 \begin{{tikzpicture}}
 \begin{{axis}}[
   width=0.90\linewidth,
-  height=5.2cm,
+  height=4.6cm,
   xmin=-0.15, xmax=0.72,
   ymin=0.4, ymax=5.6,
   xtick={{-0.1,0,0.1,0.3,0.5,0.7}},

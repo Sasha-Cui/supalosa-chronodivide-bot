@@ -57,10 +57,9 @@ was varied after results.
 
 \paragraph{Algorithmic comparison.}
 Successive halving, common random numbers, and deterministic selection are
-known methods. We do not compare against SMAC, irace, NTBEA, or a hand-tuning
-budget and therefore make no claim of search efficiency or optimizer novelty.
-The tie term also influences training rankings, although held-out evaluation
-uses game score alone.
+known. Without a SMAC, irace, NTBEA, or hand-tuning comparator, we claim
+neither search efficiency nor optimizer novelty. The tie term affects training
+rankings only; held-out evaluation uses game score.
 
 \paragraph{Adaptation and diagnostic power.}
 Method v2 followed a negative development result for method v1. Test data
@@ -70,8 +69,6 @@ single-shot preregistration. Component and championship diagnostics use only
 ten open families; their intervals include zero, and terminal snapshots lack
 trajectories.
 
-These limitations are structural. Adding more seeds on the opened test
-families would create post-selection evidence without adding opponents,
-factions, or an untouched map population. A future study should prospectively
-screen new maps, acquire additional independent bots, cross faction matchups,
-and log trajectories before any outcome is inspected.
+More seeds on the opened test families would create post-selection evidence
+without new generalization units. Future work requires prospectively screened
+maps, independent bots, cross-faction matchups, and logged trajectories.

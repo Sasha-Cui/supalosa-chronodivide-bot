@@ -12,7 +12,7 @@ instance-aware tuning~\cite{mora2012noisy,fernandezAres2012map,eggensperger2019p
 Table~\ref{tab:supp-families} gives the public mapping for the labels in the
 main-paper family-effect figure. Each score averages eight engine-seed blocks
 and two reciprocal physical candidate slots, for 16 games per method and
-family. The effect is champion minus default. The table contains no
+family. The effect is champion minus the frozen generic reference. The table contains no
 per-family post-selection exclusion.
 
 \begin{table}[ht]
@@ -77,7 +77,8 @@ The championship artifact is
 \nolinkurl{40a53c142fa30725ea5d22032d4b6dfcda4f358e15e1b8d36ac6a102b76e9ee1}.
 It fixes champion policy
 \nolinkurl{ab0071009cbd5f1fc9e2f1a76a562455a0ebeacf77dac1cd9c13b9fc6374203f};
-the default policy is
+the frozen generic reference policy (stored under the historical artifact
+label \texttt{default}) is
 \nolinkurl{8fc9e46aba10fb84d7283e16a4ccde12d3e3e429c29d5caca5b42dd5a25cef4a}.
 
 \section{Policy Search Space}

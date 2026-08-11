@@ -13,7 +13,9 @@ whose SHA-256 is its identity. Thus deployment receives game state but no
 family ID or map-specific configuration.
 
 Each of five run indices deterministically creates 32 distinct policies.
-Candidate 0 is the shipped generic default. Candidates 1--8 anchor each
+Candidate 0 is a frozen generic reference (labeled \texttt{default} in the
+immutable artifacts), not the fork's map-profile-enabled deployed default.
+Candidates 1--8 anchor each
 non-default attack composition; candidates 9--17 anchor each non-default
 strategic plan. Every non-default candidate receives 6--14 additional
 hash-ranked mutations over the declared fields. Generation reads no gameplay
@@ -75,19 +77,19 @@ policy hash. Terminal material cannot select the champion. All policies within
 a family--stage cell share the engine seed and opponent stream, so differences
 are paired rather than confounded by run-specific randomness.
 
-The selected policy differs from the default in only seven stored fields
+The selected policy differs from the reference in only seven stored fields
 (Table~\ref{tab:policy}). The forced-attack combatant threshold is inactive
 because forced attack is disabled, leaving six operational setting changes.
 
 \begin{table}[t]
 \centering
-\caption{Stored differences between the shipped default and the frozen
+\caption{Stored differences between the frozen generic reference and the
 champion. All other research-policy fields are identical.}
 \label{tab:policy}
 \small
 \begin{tabular}{@{}lll@{}}
 \toprule
-Field & Default & Champion \\
+Field & Reference & Champion \\
 \midrule
 Attack composition & assault & infantry \\
 Strategic plan & macro & rush \\
@@ -118,10 +120,10 @@ predeclared nonfatal set. A hash rank fixed ten primaries and one substitute.
 The three-phase gate comprised 32 repeated fresh-process games, 88 full-pool
 compatibility games, and 320 outcome-bearing signal games. Its single
 unblinding required positive one-sided 80\% lower bounds for both
-champion-minus-default and champion-minus-0.5. Both passed; this was a
+champion-minus-reference and champion-minus-0.5. Both passed; this was a
 permissive futility screen, not confirmatory evidence.
 
-Only then were the champion, default, source/runtime commitments, test analysis,
+Only then were the champion, reference, source/runtime commitments, test analysis,
 and attempt budget frozen. The confirmatory schedule crossed all 16 test
 families, eight new seed blocks, two methods, and two reciprocal slots, for
 \ConfirmatoryGameCount{} games in 128 indivisible shards.
@@ -131,7 +133,7 @@ families, eight new seed blocks, two methods, and two reciprocal slots, for
 For family $f$, seed block $b$, and slot $s$, let
 
 \begin{equation}
-d_{fbs}=Y_{\mathrm{champion},fbs}-Y_{\mathrm{default},fbs},
+d_{fbs}=Y_{\mathrm{champion},fbs}-Y_{\mathrm{reference},fbs},
 \qquad D_{fb}=\frac{d_{fb0}+d_{fb1}}{2}.
 \end{equation}
 

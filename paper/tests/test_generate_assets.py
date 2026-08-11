@@ -47,6 +47,11 @@ class GeneratePaperAssetsTest(unittest.TestCase):
             family_plot = (Path(directory) / "family_effects_plot.tex").read_text(encoding="utf-8")
             self.assertEqual(family_plot.count("mark=*"), 1)
             self.assertIn("(0.84375000,16)", family_plot)
+            self.assertIn("Champion $-$ reference score", family_plot)
+            family_table = (Path(directory) / "family_effects_table.tex").read_text(encoding="utf-8")
+            self.assertIn("Family ID & Reference & Champion", family_table)
+            transitions = (Path(directory) / "outcome_transitions.tex").read_text(encoding="utf-8")
+            self.assertIn("Reference outcome", transitions)
 
     def test_close_check_rejects_drift(self) -> None:
         with self.assertRaisesRegex(ValueError, "synthetic mismatch"):
@@ -129,6 +134,23 @@ class GeneratePaperAssetsTest(unittest.TestCase):
         for name, phrase in required_failure_language.items():
             with self.subTest(section=name):
                 self.assertIn(phrase, " ".join(entry_points[name].split()))
+
+    def test_generic_reference_is_not_described_as_shipped_default(self) -> None:
+        section_dir = REPO / "paper" / "sections"
+        sections = {
+            path.stem: " ".join(path.read_text(encoding="utf-8").split())
+            for path in sorted(section_dir.glob("*.tex"))
+        }
+        manuscript = "\n".join(sections.values()).lower()
+        self.assertNotIn("shipped default", manuscript)
+        self.assertNotIn("shipped strongbot default", manuscript)
+        for name in ("abstract", "introduction", "results", "conclusion"):
+            with self.subTest(section=name):
+                self.assertIn("reference", sections[name].lower())
+        self.assertIn(
+            "not the fork's map-profile-enabled deployed default",
+            sections["protocol"],
+        )
 
     def test_review_sources_remain_anonymous(self) -> None:
         main = (REPO / "paper" / "main.tex").read_text(encoding="utf-8")

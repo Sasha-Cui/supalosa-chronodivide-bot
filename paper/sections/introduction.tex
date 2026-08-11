@@ -19,7 +19,8 @@ the public Supalosa scripted bot, and evaluate it against a clean pinned
 Supalosa revision~\cite{supalosa2026bot}. Chrono Divide is an existing project,
 not an environment introduced here. Our contribution is an auditable way to
 use it for scripted-agent research and a bounded empirical case study of what
-that process finds.
+that process finds. The comparator is a frozen generic StrongBot reference
+under this interface, not the deployed map-profile-enabled default.
 
 The repository initially contained many exploratory head-to-head runs and
 parameter searches. A forensic reconstruction found that these artifacts were
@@ -51,7 +52,7 @@ This design separates two confirmatory questions from one post-confirmatory
 diagnostic question:
 
 \begin{enumerate}
-  \item[RQ1.] Does the configured policy improve the shipped StrongBot default
+  \item[RQ1.] Does the configured policy improve the frozen generic reference
   against pinned Supalosa on unseen map families?
   \item[RQ2.] Does the configured policy itself score reliably above 0.5
   against that opponent under the same family-level analysis?
@@ -61,8 +62,8 @@ diagnostic question:
 \end{enumerate}
 
 The principal result is positive but narrower than a claim of a winning bot.
-Across \TestFamilyCount{} test families, the champion scores \ChampionScore{} and the shipped
-StrongBot default scores \DefaultScore{} against the same Supalosa revision.
+Across \TestFamilyCount{} test families, the champion scores \ChampionScore{} and the frozen
+generic reference scores \DefaultScore{} against the same Supalosa revision.
 Their equally family-weighted difference is \ImprovementEstimate{} with a
 family-clustered 95\% confidence interval
 [\ImprovementCILower{},~\ImprovementCIUpper{}]. \PositiveFamilyCount{} family
@@ -72,7 +73,7 @@ many matches reach the tick cap. Its
 prespecified one-sided lower confidence bound for score above 0.5 is
 \ChampionAbsoluteLower{}, so the experiment does \emph{not} establish that
 StrongBot reliably beats Supalosa. The most faithful takeaway is that
-configuration robustly improves a weak shipped default against this opponent,
+configuration robustly improves a weak generic reference against this opponent,
 mainly by turning losses into survival or wins.
 
 Our contributions are threefold:
@@ -88,7 +89,7 @@ Our contributions are threefold:
   optimizer components are established techniques; their use is an engineering
   contribution, not a new general algorithm.
   \item We provide held-out evidence of a large, family-consistent improvement
-  over StrongBot's default, report the failed absolute-strength endpoint, and
+  over the frozen reference, report the failed absolute-strength endpoint, and
   triangulate the effect with paired transitions, terminal states,
   optimizer-selection diagnostics, and component reverts.
 \end{enumerate}
