@@ -1,0 +1,83 @@
+\section{Introduction}
+\label{sec:introduction}
+
+Real-time strategy (RTS) games combine long horizons, partial observability,
+large action spaces, adversarial interaction, and maps that change both
+economic and tactical opportunities. These properties have motivated learning
+environments and competitions ranging from microRTS to StarCraft
+II~\cite{ontanon2018microrts,vinyals2017sc2le,samvelyan2019smac}. They also make
+evaluation deceptively difficult. A bot can look stronger because it was tuned
+on the reported maps, starts in the favorable physical slot, consumes a lucky
+random stream, or is compared with a baseline loaded from the candidate's
+modified dependency tree. Repeated matches do not repair such problems if map
+families, randomness, and adaptation decisions are not the units of the design.
+
+This paper studies that problem in Chrono Divide, a ground-up browser
+reconstruction of \emph{Command \& Conquer: Red Alert 2} with an offline bot
+API~\cite{chronodivide2026}. We configure StrongBot, an author-developed fork of
+the public Supalosa scripted bot, and evaluate it against a clean pinned
+Supalosa revision~\cite{supalosa2026bot}. Chrono Divide is an existing project,
+not an environment introduced here. Our contribution is an auditable way to
+use it for scripted-agent research and a bounded empirical case study of what
+that process finds.
+
+The repository initially contained many exploratory head-to-head runs and
+parameter searches. A forensic reconstruction found that these artifacts were
+not paper evidence: some used wall-clock-derived engine randomness, several
+permitted exact-map behavior, maps were reused adaptively, source snapshots
+were incomplete, and historical wins could not be tied to one clean baseline
+and runtime. We therefore treated the existing bot as a starting point rather
+than treating old performance as a result. The replacement design freezes
+revision-aware map families, uses outcome-free compatibility screening,
+creates family-disjoint roles before training, controls engine and
+participant-specific randomness, evaluates reciprocal physical starts, and
+fails closed on partial or selectively retried campaigns.
+
+The final training pipeline performs five independent deterministic 32-policy
+searches over a 28-field coordinate-free policy space. Successive halving uses
+only training families. A common-seed championship then compares all 30
+run-finalist policies under shared family--seed blocks and selects one champion
+without development or test access. A permissive signal gate on a fresh
+development pool authorizes one frozen evaluation over 16 sealed test
+families. Importantly, this pipeline was not the first development attempt: a
+map-conditioned selector failed on an earlier development set and was retired.
+The fixed generic-policy championship was specified afterward using training
+evidence and a disjoint fresh development pool, while test identities and
+outcomes remained sealed. We report this adaptation history rather than
+presenting method v2 as if it had been the only idea tried.
+
+The principal result is positive but narrower than a claim of a winning bot.
+Across 16 test families, the champion scores \ChampionScore{} and the shipped
+StrongBot default scores \DefaultScore{} against the same Supalosa revision.
+Their equally family-weighted difference is \ImprovementEstimate{} with a
+family-clustered 95\% confidence interval
+[\ImprovementCILower{},~\ImprovementCIUpper{}]. Fourteen family effects are
+positive and two are zero. However, the champion records only
+\ChampionWins{} wins in 256 games and many matches reach the tick cap. Its
+prespecified one-sided lower confidence bound for score above 0.5 is
+\ChampionAbsoluteLower{}, so the experiment does \emph{not} establish that
+StrongBot reliably beats Supalosa. The most faithful takeaway is that
+configuration robustly improves a weak shipped default against this opponent,
+mainly by turning losses into survival or wins.
+
+Our contributions are threefold:
+
+\begin{enumerate}
+  \item We operationalize Chrono Divide as a deterministic, provenance-bound
+  scripted-agent evaluation substrate, with revision-aware family roles,
+  outcome-free compatibility checks, reciprocal starts, identity-keyed random
+  streams, sealed outcomes, and fail-closed job accounting.
+  \item We implement a reproducible training-only configuration pipeline:
+  five successive-halving searches followed by a common-seed championship
+  over their finalists. The optimizer components are established techniques;
+  their use is an engineering contribution, not a new general algorithm.
+  \item We provide held-out evidence of a large, family-consistent improvement
+  over StrongBot's default, report the failed absolute-strength endpoint, and
+  triangulate the effect with paired transitions, terminal states,
+  optimizer-selection diagnostics, and component reverts.
+\end{enumerate}
+
+The scope is deliberately finite: one independently authored opponent, an
+Iraq mirror matchup, a pinned simulator, and a supported Temperate map-family
+population. We make no claim about other opponents, factions, game versions,
+RTS titles, ladder play, or human competition.

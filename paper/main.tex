@@ -1,0 +1,52 @@
+\documentclass[runningheads]{llncs}
+
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage{booktabs}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{siunitx}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usepackage{pgfplots}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\setlength{\emergencystretch}{1em}
+\usetikzlibrary{arrows.meta,positioning,matrix}
+\pgfplotsset{compat=1.18}
+
+\definecolor{ChronoInk}{HTML}{1F2937}
+\definecolor{ChronoMuted}{HTML}{5B6573}
+\definecolor{ChronoBlue}{HTML}{1769AA}
+\definecolor{ChronoBlueLight}{HTML}{9CC9E8}
+\definecolor{ChronoOrange}{HTML}{C65D00}
+\definecolor{ChronoPale}{HTML}{E8F2F8}
+\definecolor{ChronoGrid}{HTML}{AEB8C2}
+\AtBeginDocument{\color{ChronoInk}}
+\hypersetup{colorlinks=true,linkcolor=ChronoBlue,citecolor=ChronoBlue,urlcolor=ChronoBlue}
+
+\input{generated/metrics}
+
+\title{Reproducible Policy Configuration for a Scripted RTS Agent in Chrono Divide}
+\titlerunning{Reproducible Policy Configuration in Chrono Divide}
+\author{Anonymous Author(s)}
+\authorrunning{Anonymous Author(s)}
+\institute{Anonymous institution}
+
+\begin{document}
+\maketitle
+
+\input{sections/abstract}
+\input{sections/introduction}
+\input{sections/related_work}
+\input{sections/environment}
+\input{sections/protocol}
+\input{sections/results}
+\input{sections/diagnostics}
+\input{sections/reproducibility}
+\input{sections/conclusion}
+
+\bibliographystyle{splncs04}
+\bibliography{references}
+\end{document}

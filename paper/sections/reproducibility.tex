@@ -1,0 +1,75 @@
+\section{Reproducibility, Limitations, and Release}
+\label{sec:limitations}
+
+\subsection{Execution and artifact chain}
+
+The finalized accepted path contains \TotalGameCount{} policy games: 4,680 in
+the five searches, 2,112 in the championship, 440 in fresh development, 512 in
+confirmatory evaluation, and 480 in each diagnostic panel. All accepted shards
+ran under the single prespecified Slurm project account; plan, event, summary,
+scheduler,
+and raw-completion counts agree, and no accepted campaign contains a technical
+failure or extra attempt. Two zero-launch campaigns and one sealed development
+campaign with a deterministic post-launch map-extension interface failure are
+retained separately. The latter was retired as an indivisible campaign; after
+a prospective interface repair, the full development protocol restarted from
+phase 1 without inspecting or pooling its outcomes.
+
+Every interpreted result maps to an exact configuration, source revision,
+opponent revision, artifact hash, and Slurm job ID in an append-only registry.
+Paper macros and TikZ/PGFPlots fragments are generated from committed JSON
+artifacts. The generator pins input hashes, cross-checks overlapping
+aggregates, and emits an output manifest; tests fail on numerical drift. A
+clean artifact can therefore reproduce every table and figure without the
+private cluster paths or raw third-party assets.
+
+The intended release includes author-owned bot changes, orchestration,
+protocols, tests, manifests, hashes, family metadata, aggregate results, and
+paper-generation code. Chrono Divide code, Supalosa code, Red Alert 2 archives,
+and downloaded map files remain under their respective rights. We will provide
+acquisition and hash-verification instructions rather than redistributing
+third-party content without permission. For double-blind review, the artifact
+will use an identity-neutral archive and contain no author-identifying URL or
+metadata.
+
+\subsection{Limitations}
+
+\paragraph{One opponent and matchup.}
+Supalosa is the only independently authored bot available to the project. All
+games are Iraq mirrors. The test therefore estimates performance against one
+pinned opponent in one faction matchup, not general agent strength. The failed
+absolute gate emphasizes this boundary.
+
+\paragraph{Supported map population.}
+Only Temperate families with two matching compatibility passes are included.
+Snow, Urban, and Desert are outside scope because the authorized asset/runtime
+combination was incomplete. Family grouping is conservative but heuristic,
+and compatibility to tick 250 is not proof of full behavioral fidelity to
+commercial Red Alert 2.
+
+\paragraph{High draw rate and endpoint.}
+The 18,000-tick cap produces many draws, all scored 0.5 regardless of terminal
+advantage. The primary gain is often survival rather than elimination. A
+different cap or outcome definition could answer a different question; neither
+was varied after results.
+
+\paragraph{Algorithmic comparison.}
+Successive halving, common random numbers, and deterministic selection are
+known methods. We do not compare against SMAC, irace, NTBEA, or a hand-tuning
+budget and therefore make no claim of search efficiency or optimizer novelty.
+The tie term also influences training rankings, although held-out evaluation
+uses game score alone.
+
+\paragraph{Adaptation and diagnostic power.}
+Method v2 followed a negative development result for method v1. Test data
+remained sealed and the new development pool was disjoint, but the final method
+should be understood as a transparently adapted research program rather than a
+single-shot preregistration. Component and championship diagnostics use only
+ten open families; their intervals include zero, and terminal snapshots lack
+trajectories.
+
+These limitations are structural. Adding more seeds on the opened test
+families would create post-selection evidence without adding opponents,
+factions, or an untouched map population. A future study should prospectively
+screen new maps, acquire additional independent bots, cross faction matchups,
+and log trajectories before any outcome is inspected.

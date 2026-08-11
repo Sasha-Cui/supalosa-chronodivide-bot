@@ -1,0 +1,29 @@
+\begin{abstract}
+Scripted game agents are often tuned on a small set of maps, so reported gains
+can conflate policy quality with map memorization, start position, simulator
+randomness, or a contaminated opponent implementation. We present a
+reproducible evaluation and configuration pipeline for StrongBot in Chrono
+Divide, a browser reconstruction of \emph{Command \& Conquer: Red Alert 2}.
+The pipeline groups map revisions into families, screens simulator
+compatibility without policy outcomes, isolates a pinned Supalosa opponent,
+controls engine and participant randomness, swaps physical starts, seals
+held-out outcomes, and binds every result to source, runtime, map, plan, and
+scheduler commitments. Five 32-policy successive-halving searches followed by
+a common-seed championship select one coordinate-free generic policy using
+training families only. In a frozen 512-game evaluation over 16 sealed
+families, the selected policy scores \ChampionScore{} versus \DefaultScore{}
+for the shipped StrongBot default. The equally family-weighted improvement is
+\ImprovementEstimate{} (family-clustered 95\% CI
+[\ImprovementCILower{},~\ImprovementCIUpper{}]); 14 family effects are positive
+and two are zero. A separate prespecified gate does not establish absolute
+superiority: the one-sided 95\% lower bound for the selected policy's score
+margin above 0.5 is \ChampionAbsoluteLower{}. Paired outcomes show that the
+configured policy primarily replaces losses with survival or wins. Component
+and terminal-state analyses suggest an infantry-rush, army-production
+mechanism, but remain post-confirmatory and unresolved after multiplicity
+control. We delimit the result to one opponent, matchup, and supported map
+population and release the author-owned reproducibility layer.
+
+\keywords{real-time strategy games \and evolutionary computation \and
+algorithm configuration \and reproducible evaluation \and distribution shift}
+\end{abstract}

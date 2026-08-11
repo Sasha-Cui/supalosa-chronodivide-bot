@@ -289,7 +289,7 @@ def generate_component_plot(component: dict[str, Any]) -> str:
     return rf"""
 \begin{{tikzpicture}}
 \begin{{axis}}[
-  width=\linewidth,
+  width=0.90\linewidth,
   height=5.2cm,
   xmin=-0.15, xmax=0.72,
   ymin=0.4, ymax=5.6,
@@ -314,28 +314,26 @@ def generate_component_plot(component: dict[str, Any]) -> str:
 def generate_study_flow(supported: dict[str, Any], roles: dict[str, Any]) -> str:
     return rf"""
 \begin{{tikzpicture}}[
-  node distance=4mm and 7mm,
-  box/.style={{draw=ChronoGrid,rounded corners=1.5pt,fill=white,text=ChronoInk,align=center,font=\scriptsize,inner sep=4pt}},
+  node distance=7mm and 3mm,
+  box/.style={{draw=ChronoGrid,rounded corners=1.5pt,fill=white,text=ChronoInk,align=center,font=\scriptsize,text width=2.65cm,minimum height=9mm,inner sep=3pt}},
   arrow/.style={{-{{Latex[length=2mm]}},draw=ChronoBlue,line width=0.8pt}},
-  note/.style={{text=ChronoMuted,font=\scriptsize,align=center}}
+  branch/.style={{-{{Latex[length=2mm]}},draw=ChronoMuted,line width=0.7pt}}
 ]
-\node[box] (screen) {{67 Temperate\\families screened twice}};
-\node[box,right=of screen] (pass) {{{supported['targetCount']} pass}};
-\node[box,above right=1mm and 7mm of pass] (exclude) {{7 review; 6 fail\\(outcome-free)}};
+\node[box] (screen) {{67 Temperate map\\families screened twice}};
+\node[box,right=of screen] (pass) {{{supported['targetCount']}-family supported\\population}};
 \node[box,right=of pass] (roles) {{22 train; 12 development\\16 test; 4 reserve}};
-\node[box,below right=5mm and 7mm of roles] (search) {{Five $\times$ 32-policy searches\\4,680 games}};
-\node[box,right=of search] (championship) {{30 finalists $\rightarrow$ one champion\\2,112 common-seed games}};
-\node[box,above right=5mm and 7mm of championship] (dev) {{Fresh v2 gate: 10 families\\440 games; passed}};
-\node[box,right=of dev] (test) {{Sealed test: 16 families\\512 games; opened once}};
+\node[box,right=of roles] (search) {{Five $\times$ 32 policies\\successive halving\\4,680 games}};
+\node[box,below=of search] (championship) {{30 finalists $\rightarrow$ champion\\2,112 games\\with common seeds}};
+\node[box,left=of championship] (dev) {{Fresh v2 gate: 10 families\\440 games; passed}};
+\node[box,left=of dev] (test) {{Sealed test: 16 families\\512 games; opened once}};
+\node[box,below=of screen] (exclude) {{13 reviewed or failed\\outcome-free checks}};
 \draw[arrow] (screen) -- (pass);
-\draw[arrow] (screen) -- (exclude);
+\draw[branch] (screen) -- (exclude);
 \draw[arrow] (pass) -- (roles);
 \draw[arrow] (roles) -- (search);
 \draw[arrow] (search) -- (championship);
 \draw[arrow] (championship) -- (dev);
 \draw[arrow] (dev) -- (test);
-\node[note,below=2mm of pass] {{54-family supported population}};
-\node[note,below=2mm of test] {{Relative gate passed; absolute gate failed}};
 \end{{tikzpicture}}
 """
 

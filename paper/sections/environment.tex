@@ -1,0 +1,109 @@
+\section{Environment and Validity Controls}
+\label{sec:environment}
+
+\subsection{Game, agents, and endpoint}
+
+Chrono Divide is an independent browser reconstruction of Red Alert 2 with a
+JavaScript bot API and headless offline matches~\cite{chronodivide2026}. We pin
+game API version 0.75.0 and Node.js 20.13.1 for the complete empirical path.
+The candidate code is StrongBot, an author-developed fork of Supalosa's public
+scripted agent. The opponent is built from an independent clean checkout of
+Supalosa commit \texttt{165b77a}; candidate imports cannot silently modify the
+opponent. Chrono Divide uses a JavaScript \texttt{instanceof} identity check, so
+the harness shares only the exact API runtime object required for compatibility
+while retaining separate bot source and compiled trees. Every campaign records
+both trees and their hashes.
+
+All reported matches are Iraq (the API label is \texttt{Arabs}) versus Iraq,
+with \num{10000} starting credits, superweapons disabled, short-game defeat
+enabled, and a cap of \num{18000} simulation ticks. The candidate score is
+
+\begin{equation}
+Y = \begin{cases}
+1 & \text{candidate win},\\
+0.5 & \text{completed or tick-cap draw},\\
+0 & \text{Supalosa win}.
+\end{cases}
+\label{eq:score}
+\end{equation}
+
+This endpoint intentionally does not convert terminal material into a win.
+Material counts are diagnostics only. Consequently, ``score above 0.5'' and
+``wins most games'' are not interchangeable when tick-cap draws are common.
+
+\subsection{Controlling randomness and physical starts}
+
+The pinned API exposes no public offline-game seed. Inspection showed that it
+initializes its internal Mersenne Twister using game identity and
+\texttt{Date.now()}, while bot callbacks can consume the process-global
+\texttt{Math.random}. Old fresh-process runs with otherwise identical settings
+therefore produced different terminal signatures and were inadmissible as
+seeded replicates.
+
+The replacement wrapper validates exact runtime markers and maps a requested
+32-bit engine seed to the clock value only while the offline game is created.
+It then installs distinct identity-keyed Mulberry32 streams for candidate and
+opponent callbacks. An extra random draw by one participant cannot advance the
+other's stream; reversing array order does not exchange participant streams;
+and all globals and callbacks are restored in a \texttt{finally} block. The
+requested engine seed, derived participant seeds, and seed-to-clock mapping are
+logged. Unit tests cover propagation, participant isolation, order invariance,
+and failure restoration. A Slurm gate ran ten fresh processes at seed 424242
+and one at 424243: the ten same-seed normalized 73-record traces were
+byte-identical, while the different seed produced a different trace.
+
+Every comparison uses both reciprocal physical candidate slots under the same
+family--seed block. There is no rejected-start loop. A launch counts even if
+initialization later fails, preventing a policy or start from resampling until
+it receives a favorable realization.
+
+\subsection{Map population and family construction}
+
+The initial inventory found 333 map files, 313 distinct content hashes, and 145
+conservative connected families. Families group exact copies and likely
+revisions using content identity, normalized map names, and explicit provenance
+links; ambiguity favors keeping maps together. This heuristic reduces obvious
+revision leakage but does not prove semantic independence.
+
+Only 67 exact Temperate representatives were supportable with the authorized
+asset tree. Snow and Urban maps required absent proprietary theater archives,
+and the pinned engine contract did not support Desert. Before any StrongBot or
+Supalosa outcome was evaluated, two independent screens ran all 67 Temperate
+families. Passive bots were used, and the verifier rejected outcome-bearing
+fields. A pass required exact-byte loading, valid distinct reciprocal starts,
+and progress to tick 250 in both directions. Both screens reproduced exactly
+54 pass, 7 review, and 6 fail classifications on their first attempts.
+Compatibility means parse/load/early-progress compatibility, not behavioral
+fidelity to the original commercial game.
+
+The 54-family pass population was split before training with a private
+HMAC-SHA256 permutation. The selected assignment balanced log area and absolute
+log aspect ratio within declared-start-count strata and fixed 22 training, 12
+initial-development, 16 test, and 4 reserve families. Exact copies and revisions
+could not cross roles. Role commitments were public while identities remained
+in separate command-specific manifests, so training and development commands
+could not enumerate test families.
+
+\begin{figure}[t]
+  \centering
+  \resizebox{\linewidth}{!}{\input{generated/study_flow}}
+  \caption{Outcome-access and family flow. The 12-family initial development
+  role was used by a retired method-v1 selector. Method v2 used the 22 training
+  families and a fresh pool formed from four original reserves plus seven
+  technically admissible review families; it opened the 16 test families only
+  after the frozen development gate passed. Counts refer to the finalized
+  accepted path.}
+  \label{fig:flow}
+\end{figure}
+
+\subsection{Fail-closed provenance}
+
+Each plan binds the Git source, compiled JavaScript, lockfile, Node executable,
+game API, external opponent tree, map bytes, policy, family role, seeds, slot,
+environment allowlist, and intended Slurm account. Every shard emits atomic
+intent, launch, completion, summary, and terminal records. Reducers require the
+exact planned set and query Slurm for authoritative account and job IDs. An
+in-run retry is forbidden. A scheduler attempt may be repeated only if it is
+proven to have stopped before its first counted launch; a post-launch technical
+failure invalidates the indivisible campaign rather than permitting selective
+repair. Superseded and failed attempts remain in the ledger.

@@ -1,0 +1,194 @@
+\section{Purpose and Evidence Boundary}
+
+This supplement records the details needed to audit the frozen study. It does
+not introduce an alternative endpoint, subgroup, policy, or additional game.
+All values are generated from committed aggregate artifacts, and the complete
+private execution bundles remain hash-bound outside Git. The main paper's
+algorithmic context follows established work on RTS bot configuration and
+instance-aware tuning~\cite{mora2012noisy,fernandezAres2012map,eggensperger2019pitfalls}.
+
+\section{Per-Family Confirmatory Scores}
+
+Table~\ref{tab:supp-families} gives the public mapping for the labels in the
+main-paper family-effect figure. Each score averages eight engine-seed blocks
+and two reciprocal physical candidate slots, for 16 games per method and
+family. The effect is champion minus default. The table contains no
+per-family post-selection exclusion.
+
+\begin{table}[ht]
+\centering
+\caption{Complete sealed-family result, ordered by effect.}
+\label{tab:supp-families}
+\scriptsize
+\resizebox{\textwidth}{!}{\input{generated/family_effects_table}}
+\end{table}
+
+\section{Finalized Execution Ledger}
+
+Table~\ref{tab:supp-ledger} lists every accepted outcome-bearing stage in the
+final method-v2 path. The controller job launched the five stage-2 arrays only
+after all stage-1 arrays reconciled; it contributed no game itself. All rows
+used the single prespecified Slurm project account. Its literal name is withheld
+for double-blind review but remains bound in the private scheduler records.
+
+\begin{table}[ht]
+\centering
+\caption{Accepted simulation stages and exact Slurm IDs.}
+\label{tab:supp-ledger}
+\scriptsize
+\begin{tabular}{@{}p{4.1cm}p{6.8cm}r@{}}
+\toprule
+Stage & Job IDs & Games \\
+\midrule
+Optimizer stage 0, runs 0--4 & 21655584--21655588 & 1,920 \\
+Optimizer stage 1, runs 0--4 & 21749720, 21749724--21749727 & 1,440 \\
+Fail-closed stage-2 controller & 21749797 & 0 \\
+Optimizer stage 2, runs 0--4 & 21759850--21759854 & 1,320 \\
+Common-seed championship A/B & 21788958, 21799790 & 2,112 \\
+Fresh development phases 1/2/3 & 21920172, 21920905, 21922464 & 440 \\
+Sealed confirmatory evaluation & 21925439 & 512 \\
+Optimizer-selection diagnostic & 21928633 & 480 \\
+Policy-component diagnostic & 21938403 & 480 \\
+\midrule
+Final accepted path & & \TotalGameCount{} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Each optimizer run finalized exactly 936 games. The finalist artifact SHA-256
+values for runs 0--4 are, respectively:
+{\small
+\begin{itemize}
+  \item \nolinkurl{4981febcb99503564a6850f47c161fecd1f9a6159defae881f13e0744f1dae28};
+  \item \nolinkurl{4d7fd4baba96cf579ae3193baa83f08f87b39d8e8d6fddb82e38c253ed9533f4};
+  \item \nolinkurl{1e24851265f30cf5df05da821d99203a4b41434468a76e590a59f16d58163908};
+  \item \nolinkurl{666570957161e4382d31fe617996bf2fdf675b13ddeab62a2089b11d9b5a4f41}; and
+  \item \nolinkurl{b82d6c3423ed99b94c1fb2be2514ad98624f916463c49f3d8d5ae01f0d79b896}.
+\end{itemize}
+}
+The championship artifact is
+\nolinkurl{40a53c142fa30725ea5d22032d4b6dfcda4f358e15e1b8d36ac6a102b76e9ee1}.
+It fixes champion policy
+\nolinkurl{ab0071009cbd5f1fc9e2f1a76a562455a0ebeacf77dac1cd9c13b9fc6374203f};
+the default policy is
+\nolinkurl{8fc9e46aba10fb84d7283e16a4ccde12d3e3e429c29d5caca5b42dd5a25cef4a}.
+
+\section{Policy Search Space}
+
+The canonical policy has 28 tunable fields. Table~\ref{tab:supp-space}
+summarizes the finite coordinate-free groups; all exact values are serialized
+in the released source. The largest categorical fields are attack composition
+(9 values) and strategic plan (10 values). Numeric choices are small grids,
+not continuous optimization.
+
+\begin{table}[ht]
+\centering
+\caption{Research-policy field groups.}
+\label{tab:supp-space}
+\small
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Group & Fields & Examples \\
+\midrule
+Attack composition & 1 & random, infantry, assault, tanks, artillery, naval \\
+Strategic plan & 1 & off, macro, rush, eco boom, tech, siege, adaptive \\
+Attack gate & 5 & enable, timing, force size, advantage, enemy cap \\
+Defense radius & 3 & check interval, initial radius, growth rate \\
+Scouting & 2 & cooldown, concurrent missions \\
+Engineer targeting & 2 & target count, distance \\
+Static defense & 3 & enable, start tick, target count \\
+All-in behavior & 4 & enable, timing, force size, advantage \\
+Forced attack & 5 & enable, timing, force size, advantage, enemy cap \\
+Emergency defense & 2 & radius, maximum defenders \\
+\midrule
+Total & 28 & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Candidate generation is deterministic from run index. One candidate is the
+default; eight anchor non-default attack compositions; nine anchor non-default
+strategic plans; and all non-default candidates receive 6--14 additional
+SHA-256-ranked mutations. A duplicate canonical policy hash invalidates plan
+generation. This is randomized-style finite configuration, not gradient
+learning or reinforcement learning.
+
+\section{Statistical Details}
+
+The confirmatory effect first averages reciprocal starts within each
+family--seed block. With 16 families and eight blocks per family, the primary
+estimate is balanced across families regardless of their file count or map
+revision count. The finite-cluster sandwich applies the $G/(G-1)$ correction
+and a Student-$t$ critical value with 15 degrees of freedom. The two-sided
+relative interval uses 2.131449545559323; the one-sided absolute lower bound
+uses 1.7530503556925547.
+
+The diagnostic family bootstrap resampled the 16 family means with replacement
+100,000 times using seed 20260811. Its improvement interval is
+[\ImprovementBootstrapLower{},~\ImprovementBootstrapUpper{}]. The exact
+sign-flip test enumerated all $2^{16}$ sign assignments and produced
+$p=\ImprovementSignFlipP{}$. Both analyses were post-confirmatory and are
+sensitivity checks only, consistent with recommendations to report uncertainty
+across tasks rather than treating correlated runs as independent
+\cite{agarwal2021precipice}.
+
+For the five component contrasts, ordinary intervals use the same ten-family
+cluster estimator on the open development panel. Familywise intervals use a
+Bonferroni two-sided critical probability of $1-0.05/(2\times5)$. The scouting
+contrast is exactly zero on every paired endpoint and therefore has zero
+observed variance; the paper reports that degeneracy rather than assigning it
+a conventional interval.
+
+\section{Transparent Adaptation and Failure Ledger}
+
+\paragraph{Retired method v1.}
+The first planned method compared a three-feature map-conditioned finalist
+selector with a global finalist. Its scheduled development effect was
+$-0.025$, and training-only leave-one-family checks showed no positive selector
+gain. The method was retired. Method v2 removed conditioning and introduced a
+common-seed finalist championship. It used the same training-only candidate
+pool but a fresh development family pool; sealed test identities and outcomes
+remained inaccessible throughout adaptation.
+
+\paragraph{Development interface failure.}
+An early source-bound development phase-2 campaign (array 21919472) counted 88
+launches. A basename validator rejected four committed \texttt{.mpr} map
+shards after launch, producing 72 technically clean completions and 16
+technical failures. No winner or score was inspected. Because a post-launch
+failure invalidated the stage, none of its 72 completions entered the analysis.
+After a committed extension-validation repair, the entire three-phase protocol
+restarted from phase 1 under new arrays; no successful shard was reused.
+
+\paragraph{Zero-launch failures.}
+Optimizer arrays 21655409--21655413 were cancelled after a runtime-tree change
+before any counted launch. Component array 21938264 failed uniformly during
+private-role loading before creating a results directory or counted launch.
+Its failure record has SHA-256
+\nolinkurl{9481d3055d0f79c7b3bc021dbc95647cca52363d13ad3be346125881c3954b89}.
+A prospective routing repair preceded the complete component array 21938403.
+Neither zero-launch failure contributed a game.
+
+\section{Artifact Reproduction}
+
+The anonymous artifact contains the paper inputs and author-owned code but not
+third-party game assets. After acquiring the pinned dependencies and map bytes
+whose hashes appear in the manifests, the paper-only checks require no game
+launch:
+
+\begin{verbatim}
+python3 research/scripts/\
+export_confirmatory_family_diagnostics.py \
+  --unblinding <frozen-unblinding.json> \
+  --out research/artifacts/\
+method_v2_confirmatory_family_diagnostics_v1.json
+python3 paper/scripts/generate_assets.py
+python3 -m unittest paper.tests.test_generate_assets -v
+git diff --exit-code -- paper/generated
+\end{verbatim}
+
+The paper generator refuses input if any frozen artifact byte hash changes. It
+also checks that the family export and confirmatory unblinding commitments
+match; the family means reproduce the primary estimate; the terminal reduction
+reproduces both method scores and their contrast; and supported-population and
+role counts retain their frozen values. The generated manifest records the
+SHA-256 of each TeX fragment.

@@ -1,0 +1,78 @@
+\section{Post-Confirmatory Diagnostics}
+\label{sec:diagnostics}
+
+The analyses in this section were specified or conducted after the held-out
+result. They explain and stress-test the frozen policy; they do not alter its
+selection or rescue the failed absolute gate.
+
+\subsection{Does the common-seed championship help?}
+
+The championship addressed a training-only concern: each optimizer run had
+selected its six finalists under different seeds. We therefore compared the
+champion with the five policies that each run would have selected on its own,
+using four new common seed blocks on the ten open method-v2 development
+families. The complete design contains \MechanismGameCount{} games (six
+methods, ten families, four seed blocks, and reciprocal slots).
+
+The champion scores 0.581, compared with 0.499 for the equal average of the
+five run-local policies. The difference is \MechanismEstimate{}, but its
+family-clustered 95\% interval
+[\MechanismCILower{},~\MechanismCIUpper{}] includes zero. All five pairwise
+point differences favor the champion (0.019 to 0.131), while every pairwise
+interval crosses zero. This evidence is consistent with common-seed selection
+being useful, but ten families do not statistically resolve the mechanism.
+
+\subsection{Which policy group matters?}
+
+We formed five policies that each revert one group of champion settings to the
+default: defense-radius growth, emergency defense, forced attack, scouting, or
+the joint attack-composition/strategic-plan group. A second 480-game
+common-seed panel compared all reverts with the champion on the same ten open
+families. The primary champion-minus-equal-revert-average estimate is
+\ComponentAverageEstimate{} with 95\% interval
+[\ComponentAverageCILower{},~\ComponentAverageCIUpper{}].
+
+Figure~\ref{fig:components} reports every individual contrast. Reverting
+infantry+rush to assault/macro gives by far the largest decline:
+\StrategyEstimate{}, with ordinary 95\% interval
+[\StrategyOrdinaryLower{},~\StrategyOrdinaryUpper{}]. However, its
+prespecified five-comparison Bonferroni familywise interval is
+[\StrategyFamilywiseLower{},~\StrategyFamilywiseUpper{}], narrowly including
+zero. The defense-growth and forced-attack reverts have slightly higher point
+scores than the champion, emergency defense is near zero, and the scouting
+revert is endpoint-identical in all 80 paired games. Thus the joint strategy
+group is the dominant observed signal, but no individual component clears the
+multiplicity-controlled criterion.
+
+\begin{figure}[t]
+  \centering
+  \input{generated/component_effects_plot}
+  \caption{Champion-minus-one-group-revert effects. Blue circles/lines are
+  ordinary family-clustered 95\% intervals; orange squares/lines are
+  Bonferroni familywise-95\% intervals. The scouting contrast (gray diamond)
+  has zero endpoint difference and zero observed variance, so no artificial
+  interval is drawn.}
+  \label{fig:components}
+\end{figure}
+
+\subsection{Terminal army and economy pattern}
+
+A deterministic analyzer validated and reduced all 1,472 raw completion
+records from the confirmatory and two diagnostic panels. Across confirmatory
+pairs, the champion improves its candidate-minus-opponent terminal balance by
+30.58 combatants and 31.19 total units while holding 1,217.93 fewer credits.
+Outcome changes mechanically alter terminal snapshots, so we also examine the
+\StableDrawPairCount{} pairs that remain tick-cap draws under both methods.
+They have identical score and duration, yet the champion ends with
+\StableDrawCombatantDifference{} more relative combatants,
+\StableDrawUnitDifference{} more relative units, and
+\StableDrawCreditDifference{} relative credits.
+
+The strategy-revert panel has the same qualitative pattern: the champion has
+19.89 more relative combatants, 15.70 more relative units, and 857.68 fewer
+credits overall. These endpoints are consistent with converting banked
+resources into fielded combat power. They do not establish when or how that
+conversion occurred, because the preserved games contain no action trace,
+production timeline, combat log, or intermediate state trajectory. Likewise,
+endpoint identity for the scouting revert does not prove identical internal
+actions.
