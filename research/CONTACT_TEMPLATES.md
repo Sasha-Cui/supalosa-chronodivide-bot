@@ -68,6 +68,46 @@ Retain the response with the submission records. Do not infer permission from
 the word “hybrid” alone, and do not describe the recorded AI assistance as
 copy editing.
 
+## ICAART secretariat
+
+**Subject:** ICAART 2027: online presentation and double-blind AI disclosure
+
+Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
+
+> Dear ICAART Secretariat,
+>
+> I am considering a 2027 regular-paper submission on reproducible
+> configuration and held-out evaluation of a scripted real-time-strategy
+> agent. Before adapting the paper to the SCITEPRESS template, could you please
+> clarify two points?
+>
+> 1. The presenter instructions describe live online oral and poster
+>    presentations over Zoom. May an author elect this online route for an
+>    accepted regular paper without traveling to the physical venue?
+> 2. The ICAART AI-tools policy permits disclosed assistance with manuscript
+>    writing, revision, and code. OpenAI Codex assisted this project with
+>    software implementation, experiment orchestration, research auditing,
+>    statistical cross-checks, literature triage, and manuscript drafting and
+>    revision. The human author will personally verify the evidence, citations,
+>    code, and final manuscript and remain fully accountable. Because the
+>    submission call asks authors to omit acknowledgments for double-blind
+>    review, where should the required AI-use disclosure appear in the review
+>    version?
+>
+> The paper reports a completed 8,704-game study with family-disjoint training
+> and evaluation. Its configured policy improves the shipped default on 16
+> sealed map families, while a separate absolute-strength gate fails; the paper
+> does not claim a new optimizer or broad agent superiority.
+>
+> I would appreciate written confirmation before submission or registration.
+>
+> Best regards,
+> [author name]
+
+Retain the answer with the submission record. The public AI policy establishes
+that disclosed assistance is allowed in principle, but the disclosure location
+and availability of the online route still require confirmation.
+
 ## Supalosa
 
 **Subject:** Permission and licensing for a research fork of your Chrono Divide bot

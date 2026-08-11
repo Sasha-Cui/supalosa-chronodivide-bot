@@ -14,6 +14,9 @@ on the opened family population.
 - Obtain a written eligibility and disclosure ruling for the recorded
   beyond-copy-editing use of OpenAI Codex. Do not submit under a grammar-only
   description.
+- Send the ICAART inquiry in `CONTACT_TEMPLATES.md` in parallel so that the
+  online-presentation route and double-blind disclosure location are known
+  before a fallback conversion begins.
 - Begin the human verification checklist in
   [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md), including
   primary evidence, all citations, experiment-affecting code, and the complete
@@ -28,6 +31,10 @@ Exit condition: venue, anonymity, remote-presentation, and generative-AI
 eligibility routes are known, even if upstream code permission is still
 pending. The aggregate-only artifact is sufficient for review and does not
 depend on bot redistribution.
+
+If EvoStar has not supplied affirmative written rulings by **2026-08-20**,
+begin a 12-page SCITEPRESS conversion for ICAART without changing the frozen
+science. This is preparation, not simultaneous submission.
 
 ## 18--31 August 2026: independent reading pass
 
@@ -51,6 +58,10 @@ being coached by the authors.
 - Add author names, acknowledgements, funding, and non-anonymous URLs only to a
   camera-ready source revision after double-blind review.
 - Test the review archive on a machine other than Bouchet if possible.
+- If ICAART is activated, finish the two-column A4 conversion, preserve every
+  failed-gate and scope limitation, and submit the regular paper by
+  **2026-09-15 AoE**. Keep an 8-page short-paper reduction plan available in
+  case the venue changes the acceptance type.
 
 Exit condition: content-complete submission candidate and independently tested
 review artifact.
@@ -84,7 +95,8 @@ or disallows the recorded generative-AI assistance, activate a policy-compatible
 venue fallback rather than conceal the project history or weaken the
 methodology:
 
-1. reverify ICAART's **2026-10-22** regular-paper round and remote exception;
+1. activate ICAART's **2026-09-15** regular-paper round if the conversion is
+   ready, or reverify its **2026-10-22** regular-paper round;
 2. otherwise use the **2026-12-03** ICAART workshop/special-session round if a
    suitable track exists; or
 3. use *Entertainment Computing* as the no-travel archival fallback.

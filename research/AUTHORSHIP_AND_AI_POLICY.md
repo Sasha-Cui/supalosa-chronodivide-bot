@@ -25,6 +25,15 @@ Do not infer permission from the publisher policy, and do not characterize the
 project history as copy editing. Obtain a written ruling from EvoApplications
 before submission.
 
+ICAART 2027 is the verified policy-compatible fallback. Its official
+[AI-tools guidance](https://icaart.scitevents.org/AiTools.aspx) permits
+responsible AI assistance with manuscript writing, revision, and code, requires
+disclosure of the tool and affected content, and keeps human authors fully
+accountable. Its double-blind call separately asks authors to omit
+acknowledgments, so the secretariat must still specify where the disclosure
+belongs in the review version. The factual inquiry is in
+[`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md).
+
 ## Required author verification
 
 Regardless of venue policy, the author must personally complete all of the
@@ -63,6 +72,9 @@ required.
   allows transparent declared assistance.
 - If no ruling arrives, treat eligibility as unresolved and use a verified
   fallback rather than gambling on silent noncompliance.
+- For ICAART, obtain a written instruction for the disclosure location and
+  retain it with the final manuscript hash. The permission is not a reason to
+  reduce the human verification requirement.
 
 ## Draft disclosure, if permitted
 

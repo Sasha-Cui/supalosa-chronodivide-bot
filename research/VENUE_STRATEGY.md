@@ -26,7 +26,7 @@ evaluation contribution and should be confirmed in writing.
 - Review: at least three program-committee reviewers.
 - Supplementary material: the official submission page provides a 10 MB
   EasyChair supplementary-material field and permits identity-neutral external
-  links. The current supplement and 60 KB aggregate artifact fit this route;
+  links. The current supplement and aggregate artifact fit this route;
   every essential claim and method detail must nevertheless remain in the main
   paper.
 - Conference: **2027-03-31 through 2027-04-02**, Mainz, Germany, in **hybrid
@@ -83,33 +83,44 @@ Likely reviewer concerns and the required answers are:
 
 ## Fallbacks
 
-### ICAART 2027 — earlier, broader, and more expensive fallback
+### ICAART 2027 — policy-compatible, online-capable fallback
 
 ICAART covers agents, simulation, evolutionary computing, planning, and
-learning. It is a broader and weaker topical fit than SCAG, but its site gives
-specific online oral and poster instructions and says speakers may present
-remotely when unable to travel.
+learning. It is a broader and weaker topical fit than SCAG, but its official
+site gives specific live-online oral and poster instructions. Its generative-AI
+policy explicitly permits responsible assistance with writing, revision, and
+code when the tool and affected content are disclosed and the human authors
+remain accountable. This is materially safer than relying on an unresolved
+interpretation of the EvoStar code.
 
 - First regular-paper deadline: **2026-09-15**.
 - Second position/regular-paper deadline: **2026-10-22**.
 - Workshop and special-session paper deadline: **2026-12-03**.
-- Conference: **2027-02-23 through 2027-02-26**.
+- Conference: **2027-02-23 through 2027-02-25**.
+- Format: SCITEPRESS two-column A4 template. A regular paper may be accepted as
+  a 12-page full paper or an 8-page short paper.
 - Early speaker registration: **EUR 620** for members or **EUR 680** for
   nonmembers at the currently posted rates.
-- Remote status: supported exceptionally for speakers unable to travel; online
-  presentations are live over Zoom and require presence even when a backup
-  video is uploaded. Ask the secretariat to confirm eligibility before paying.
+- Remote status: the official presenter page gives complete live Zoom
+  instructions for online oral and poster presentations and requires the
+  presenter to attend synchronously even when a backup video is uploaded. Ask
+  the secretariat to confirm that this route is available to the paper before
+  paying.
 - Official pages: [call and dates](https://icaart.scitevents.org/CallForPapers.aspx?y=2027),
-  [conference and hybrid statement](https://icaart.scitevents.org/home.aspx),
+  [paper-length definitions](https://icaart.scitevents.org/Glossary.aspx),
   [online presentation instructions](https://icaart.scitevents.org/presentationdetails.aspx),
-  and [registration fees](https://icaart.scitevents.org/RegistrationFees.aspx?y=2027).
+  [generative-AI policy](https://icaart.scitevents.org/AiTools.aspx),
+  [templates](https://icaart.scitevents.org/Templates.aspx), and
+  [registration fees](https://icaart.scitevents.org/RegistrationFees.aspx?y=2027).
 
-If the manuscript is unusually strong by early September, ICAART's first
-regular round is possible but unnecessarily rushed. The October round is the
-practical fallback if EvoStar does not confirm remote presentation. Submit the
-completed study as a regular paper, not as a position paper. The SPIKE eSports
-special session is available in December but emphasizes player and team
-performance more than agent configuration.
+Use a dated decision rule because the first regular round arrives before the
+EvoStar deadline. Send both venue inquiries immediately. If EvoStar has not
+confirmed scope, remote presentation, repository handling, and AI eligibility
+by **2026-08-20**, begin a SCITEPRESS conversion without changing the frozen
+science. By **2026-09-01**, either commit to ICAART's September 15 regular-paper
+round or retain SCAG based on written answers. The October 22 regular round is
+the final practical fallback. Submit the completed study as a regular paper,
+not as a position paper. Do not submit to both archival venues simultaneously.
 
 ### Entertainment Computing — no-travel archival fallback
 
