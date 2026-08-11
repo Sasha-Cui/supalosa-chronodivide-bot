@@ -33,9 +33,10 @@ creates family-disjoint roles before training, controls engine and
 participant-specific randomness, evaluates reciprocal physical starts, and
 fails closed on partial or selectively retried campaigns.
 
-The final training pipeline performs five independent deterministic 32-policy
-searches over a 28-field coordinate-free policy space. Successive halving uses
-only training families. A common-seed championship then compares all 30
+The final training pipeline performs five run-distinct deterministic searches
+over 32 mutation-generated policies and a 28-field coordinate-free policy
+space. Successive halving uses only training families. A common-seed
+championship then compares all 30
 run-finalist policies under shared family--seed blocks and selects one champion
 without development or test access. A permissive signal gate on a fresh
 development pool authorizes one frozen evaluation over 16 sealed test
@@ -81,9 +82,10 @@ Our contributions are threefold:
   outcome-free compatibility checks, reciprocal starts, identity-keyed random
   streams, sealed outcomes, and fail-closed job accounting.
   \item We implement a reproducible training-only configuration pipeline:
-  five successive-halving searches followed by a common-seed championship
-  over their finalists. The optimizer components are established techniques;
-  their use is an engineering contribution, not a new general algorithm.
+  five run-distinct mutation-generated candidate pools screened by successive
+  halving, followed by a common-seed championship over their finalists. The
+  optimizer components are established techniques; their use is an engineering
+  contribution, not a new general algorithm.
   \item We provide held-out evidence of a large, family-consistent improvement
   over StrongBot's default, report the failed absolute-strength endpoint, and
   triangulate the effect with paired transitions, terminal states,
