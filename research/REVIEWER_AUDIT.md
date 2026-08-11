@@ -9,7 +9,8 @@ SCAG, conditional on topical fit and artifact/anonymity resolution.** The paper
 is much stronger as a reproducibility and empirical configuration study than as
 an algorithm paper. Its central relative result is large, held out, consistent
 across families, and reported with an unusually complete provenance chain. The
-main weakness is breadth: one independently authored opponent, one faction
+frozen joint criterion nevertheless fails because absolute superiority is not
+established. The main weakness is breadth: one independently authored opponent, one faction
 mirror, one simulator version, and a high-draw endpoint.
 
 Indicative reviewer dimensions:
@@ -30,7 +31,8 @@ Indicative reviewer dimensions:
    family-level inference.
 2. The paper reports the result reviewers usually discover only after probing:
    score exceeds 0.5, but the prespecified one-sided lower bound does not. This
-   makes the positive claim precise and credible.
+   makes the bounded relative claim precise and credible, while explicitly
+   recording failure of the joint two-gate criterion.
 3. The evaluation controls distinct sources of bias that are often conflated in
    game-agent work: revisions, physical starts, engine randomness, participant
    randomness, opponent loading, adaptive outcome access, and scheduler retries.

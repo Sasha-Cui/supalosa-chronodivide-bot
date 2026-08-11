@@ -9,7 +9,8 @@ built, visually checked, committed, and ready for external review. The frozen
 method-v2 champion substantially improves a prospectively frozen generic
 StrongBot reference across 16 sealed Chrono Divide map families against one
 pinned, independently loaded Supalosa bot. The relative effect passes its prespecified confirmatory gate; the
-separate claim that the champion reliably beats Supalosa does not.
+separate claim that the champion reliably beats Supalosa does not, and the
+frozen joint two-gate criterion therefore fails.
 
 No Chrono Divide simulation job is active. Do not launch more outcome-bearing
 games on the opened family population for this paper.
@@ -91,7 +92,7 @@ and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.m
 
 ## Manuscript status and remaining work
 
-Commit `cb891b4` is the current anonymous LNCS manuscript source revision. It
+Commit `3f09836` is the current anonymous manuscript source revision. It
 sharpens the held-out-evaluation title, states two confirmatory research
 questions and one explicitly descriptive diagnostic question, removes causal-sounding
 mechanism language, and adds primary prior art on hidden-level evaluation and
@@ -105,6 +106,9 @@ prospectively frozen generic research reference. It now explains that every
 candidate shares a coordinate-free policy interface, identifies the deployed
 map-profile-enabled constructor as outside that estimand, and states explicitly
 that the experiment does not estimate improvement over the deployed default.
+It also reports explicitly that the failed absolute gate fails the joint
+two-gate criterion, cites the exact pinned game-API package and opponent
+revision, and makes both LNCS PDFs byte-reproducible.
 The main
 PDF is 16 pages with main text ending on page 14 and references continuing
 afterward; the supplement is five pages. All reported tables and figures are
@@ -114,9 +118,9 @@ received rendered visual checks. The current PDF SHA-256 values are recorded in
 [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md).
 
 Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
-and commit `7cdbe0d` hardens its direct-identity denylist. The current 65 KB
+and commit `7cdbe0d` hardens its direct-identity denylist. The current 65,548-byte
 review archive is byte-deterministic at SHA-256
-`b6edfce7c4fb70b37df7014dc828af416c4f3e42811027efe59a0ad0f50e1d37`.
+`f7b43e42826a6c6d2760f1ef87bedb3003bb61a484b424ea6f54c10b48a27b4b`.
 Its 36-file manifest verifies, all artifact tests pass, and an extracted
 reviewer copy rebuilds the 16-page paper and five-page supplement without
 undefined references, overflow, or BibTeX warnings.
@@ -145,9 +149,9 @@ guidance permits disclosed AI-assisted writing, revision, and code; its
 presenter page documents live online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS fallback that reuses the frozen main-paper sections and result
-macros. It is 10 A4 pages with a 196-word abstract and 36,325 extracted
+macros. It is 10 A4 pages with a 197-word abstract and 36,469 extracted
 non-whitespace characters; two clean builds match at SHA-256
-`38758d72d1a517ad0c41134c2e649c20e661fe4a54c3eb48f903910064d38c51`,
+`9c606c4c5bc92ce762422aa79be79f14ab34e7b4bbe2616ae5f3cef3ff3c3082`,
 and every page passed visual and anonymity QA. It is not authorized for upload
 until ICAART confirms online-route election and double-blind AI-disclosure
 placement. Decide one venue by 2026-09-01 and do not submit to both archival

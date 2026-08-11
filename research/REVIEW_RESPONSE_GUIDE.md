@@ -74,6 +74,7 @@ the one-sided 95% lower score margin over 0.5 is -0.02117.
 
 **Response.** Agree. The absolute-strength gate fails and appears in the
 abstract, introduction, Table 3, results, limitations, and conclusion. The
+joint two-gate criterion therefore also fails. The
 positive claim is champion-minus-reference improvement: 0.33594 with
 family-clustered 95% CI [0.21456, 0.45732].
 

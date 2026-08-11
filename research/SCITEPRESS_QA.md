@@ -4,14 +4,15 @@ Prepared: **2026-08-11**
 
 ## Frozen fallback identity
 
-- Fallback source commit: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
-- Authoritative shared manuscript source: `cb891b47c9bb5ad3ac75c2d67b59865d56a7e1d1`
+- Fallback introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
+- Current reviewed source: `3f09836947c9c9fd1c0b26bfc1091eac18580957`
+- Authoritative shared manuscript source: `3f09836947c9c9fd1c0b26bfc1091eac18580957`
 - Build entry point: `paper_scitepress/main.tex`
 - Target: ICAART 2027 regular paper, anonymous SCITEPRESS review format
-- PDF: 10 A4 pages, 163,436 bytes
-- PDF SHA-256: `38758d72d1a517ad0c41134c2e649c20e661fe4a54c3eb48f903910064d38c51`
-- Abstract: 196 words
-- Extracted submission length: 36,325 non-whitespace characters
+- PDF: 10 A4 pages, 164,424 bytes
+- PDF SHA-256: `9c606c4c5bc92ce762422aa79be79f14ab34e7b4bbe2616ae5f3cef3ff3c3082`
+- Abstract: 197 words
+- Extracted submission length: 36,469 non-whitespace characters
 
 The PDF is a build product and is not committed. The hash identifies the exact
 file rendered and inspected in this QA pass.
@@ -43,17 +44,20 @@ completed successfully. Five fallback-specific tests passed, the shared paper
 generator produced no Git drift, BibTeX emitted no warning, LaTeX emitted no
 overfull box or undefined citation/reference, and the build checker enforced a
 maximum of 12 pages. Two independent clean builds were byte-identical at the
-PDF hash above. The fixed `SOURCE_DATE_EPOCH` is the authoritative manuscript
-source commit time.
+PDF hash above. The fixed `SOURCE_DATE_EPOCH` is a stable reproducibility
+constant established at the earlier comparator-justified freeze; the current
+reviewed source identity is recorded above.
 
-The extracted PDF contains 36,325 non-whitespace characters, within ICAART's
-10,000--50,000 review-submission interval. Its 196-word abstract is within the
+The extracted PDF contains 36,469 non-whitespace characters, within ICAART's
+10,000--50,000 review-submission interval. Its 197-word abstract is within the
 official 70--200-word interval. The page is A4 and the current 10-page build is
 below the 12-page full-paper proceedings limit.
 
 ## Visual, metadata, and anonymity checks
 
 All ten pages were rendered with Poppler and inspected at full resolution.
+The explicit joint-gate wording and pinned-source citation revision received a
+further complete ten-page pass.
 The study-flow diagram was widened to two columns after the first pass; the
 final pass found no clipped or overlapping text, invisible content, broken
 glyph, unreadable plot label, margin violation, misleading caption, or malformed

@@ -1,7 +1,7 @@
 # Results-driven paper plan
 
 Status: **empirical program complete; submission-candidate manuscript at
-`cb891b4`; deterministic anonymous artifact and internal QA complete**.
+`3f09836`; deterministic anonymous artifact and internal QA complete**.
 
 ## Recommended paper
 
@@ -20,7 +20,7 @@ training-only configuration pipeline increases StrongBot's held-out score
 against a pinned Supalosa opponent by 0.336 (family-clustered 95% CI
 [0.215, 0.457]), mainly by replacing losses with survival or wins, although the
 optimized agent's absolute score is not precise enough to claim that it
-reliably beats Supalosa.
+reliably beats Supalosa, so the frozen joint two-gate criterion fails.
 
 ## Research questions
 

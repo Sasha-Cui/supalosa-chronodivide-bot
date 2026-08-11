@@ -121,10 +121,10 @@ interpretation of the EvoStar code.
   [registration fees](https://icaart.scitevents.org/RegistrationFees.aspx?y=2027).
 
 The SCITEPRESS conversion was completed prospectively on 2026-08-11 without
-changing the frozen science. It is 10 A4 pages, has a 196-word abstract and
-36,325 extracted non-whitespace characters, and reproduces byte-for-byte across
+changing the frozen science. It is 10 A4 pages, has a 197-word abstract and
+36,469 extracted non-whitespace characters, and reproduces byte-for-byte across
 clean builds at SHA-256
-`38758d72d1a517ad0c41134c2e649c20e661fe4a54c3eb48f903910064d38c51`.
+`9c606c4c5bc92ce762422aa79be79f14ab34e7b4bbe2616ae5f3cef3ff3c3082`.
 All pages passed rendered inspection; see `SCITEPRESS_QA.md`.
 
 Use the dated rule in `VENUE_DECISION_PACKET.md` because the first regular

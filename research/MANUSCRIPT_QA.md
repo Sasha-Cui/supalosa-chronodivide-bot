@@ -4,14 +4,14 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `cb891b47c9bb5ad3ac75c2d67b59865d56a7e1d1`
+- Source commit: `3f09836947c9c9fd1c0b26bfc1091eac18580957`
 - Main source: `paper/main.tex`
 - Supplement source: `paper/supplement.tex`
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 16 pages total; non-reference content ends on page 14
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `f9ff3b79f46a896b8c4d5b5e98d73c83fa640e45ec18b8a245d29effe5460f47`
-- Supplement PDF SHA-256: `ab8624eb934b903d802501c1e2426352b8438d25a0fb3eb97d8e807047a18266`
+- Main PDF SHA-256: `e14f8265fb8b386fc2434927737eca15e5989be56cf141fba9f551b790e1aa05`
+- Supplement PDF SHA-256: `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98`
 
 The PDFs are build products and are not committed. Their hashes identify the
 exact artifacts inspected during this QA pass.
@@ -33,7 +33,7 @@ The final logs contain:
 - zero overfull boxes;
 - zero undefined or multiply defined references;
 - zero BibTeX warnings;
-- 25 citation keys, 25 bibliography entries, no missing keys, and no unused
+- 26 citation keys, 26 bibliography entries, no missing keys, and no unused
   entries; and
 - deterministic regenerated paper fragments whose input and output hashes are
   recorded in `paper/generated/asset_manifest.json` for all eight frozen
@@ -41,6 +41,13 @@ The final logs contain:
 
 The only final-log warning is the template/toolchain-level `amsmath` notice
 that it cannot redefine the `\\vec` accent; it does not affect output.
+
+A bibliographic metadata audit rechecked every Crossref-registered DOI against
+its returned title and year, confirmed the closest 2026 paper on its Springer
+chapter page, verified game API 0.75.0 against the committed npm lock and
+installed package metadata, and resolved the full Supalosa opponent hash from
+the public upstream remote. The API and opponent citations now point to those
+exact pinned versions rather than only to moving project landing pages.
 
 ## Visual and content checks
 
@@ -55,8 +62,12 @@ pass. The final resource-accounting addition received another complete
 21-page pass. The comparator-identity correction received another complete
 layout pass, including fresh renders of every changed supplement page. The
 final coordinate-free comparator rationale and explicit deployed-default
-limitation received a further complete 16-page main-paper pass. The checks
-covered title-page anonymity, text and background
+limitation received a further complete 16-page main-paper pass. The explicit
+failed-joint-criterion language and pinned-source citation correction then
+received a fresh complete 21-page LNCS and supplement pass. Two clean builds of
+each PDF were byte-identical after the LNCS build adopted the fixed source
+epoch already used by the fallback. The checks covered title-page anonymity,
+text and background
 contrast, margins, line wrapping, tables, plot labels, captions, page numbers,
 bibliography links, and section transitions. The final source contains no
 author NetID, institution name, literal Slurm account, personal repository URL,
@@ -69,7 +80,8 @@ The claim audit confirmed that the paper:
   explains why the map-profile-enabled default is outside the prespecified
   coordinate-free comparison;
 - reports the failed one-sided absolute-strength gate in the abstract,
-  introduction, results, and conclusion;
+  introduction, results, and conclusion, and explicitly reports failure of the
+  joint two-gate criterion at each reader entry point;
 - labels optimizer, component, and terminal analyses post-confirmatory;
 - states the one-opponent, one-matchup, Temperate-only, high-draw,
   endpoint-only, and no-standard-configurator limitations; and
@@ -78,14 +90,14 @@ The claim audit confirmed that the paper:
 
 ## Clean export and reviewer artifact
 
-A committed main revision at `cb891b4` passed nine paper-generator and
+A committed main revision at `3f09836` passed nine paper-generator and
 manuscript-invariant tests, two
 artifact-builder tests, and the three frozen family-exporter tests. It
 regenerated all paper fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
-`b6edfce7c4fb70b37df7014dc828af416c4f3e42811027efe59a0ad0f50e1d37`
-and size 65,116 bytes.
+`f7b43e42826a6c6d2760f1ef87bedb3003bb61a484b424ea6f54c10b48a27b4b`
+and size 65,548 bytes.
 Two independent builds produced that same hash. The archive contains 36
 manifested files, normalized `0/0` ownership and epoch timestamps, no Git tree,
 no bot packages, and no direct author, scheduler-account, institution, or

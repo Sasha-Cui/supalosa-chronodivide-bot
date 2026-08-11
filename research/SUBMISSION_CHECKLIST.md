@@ -32,15 +32,15 @@ the anonymous branch during review.
 - Title: **Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono
   Divide**
 - Anonymous manuscript source commit:
-  `cb891b47c9bb5ad3ac75c2d67b59865d56a7e1d1`
+  `3f09836947c9c9fd1c0b26bfc1091eac18580957`
 - Main PDF: 16 pages total; non-reference material ends on page 14.
 - Main PDF SHA-256:
-  `f9ff3b79f46a896b8c4d5b5e98d73c83fa640e45ec18b8a245d29effe5460f47`
+  `e14f8265fb8b386fc2434927737eca15e5989be56cf141fba9f551b790e1aa05`
 - Supplement: 5 pages.
 - Supplement PDF SHA-256:
-  `ab8624eb934b903d802501c1e2426352b8438d25a0fb3eb97d8e807047a18266`
+  `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98`
 - Deterministic anonymous artifact SHA-256:
-  `b6edfce7c4fb70b37df7014dc828af416c4f3e42811027efe59a0ad0f50e1d37`
+  `f7b43e42826a6c6d2760f1ef87bedb3003bb61a484b424ea6f54c10b48a27b4b`
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
@@ -49,12 +49,13 @@ commit and all three hashes together; never mix files from different freezes.
 ## ICAART fallback identity
 
 - [x] Separate SCITEPRESS source committed at
-      `e1b10b5e5648a3c4e7c032bbffcf01f098da682f` without changing the LNCS source
-      or frozen empirical artifacts.
-- [x] PDF is 10 A4 pages, with a 196-word abstract and 36,325 extracted
+      `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`; the current reviewed source is
+      `3f09836947c9c9fd1c0b26bfc1091eac18580957` and changes no frozen empirical
+      artifact.
+- [x] PDF is 10 A4 pages, with a 197-word abstract and 36,469 extracted
       non-whitespace characters.
 - [x] PDF SHA-256 is
-      `38758d72d1a517ad0c41134c2e649c20e661fe4a54c3eb48f903910064d38c51`.
+      `9c606c4c5bc92ce762422aa79be79f14ab34e7b4bbe2616ae5f3cef3ff3c3082`.
 - [x] Two clean builds are byte-identical; all ten pages, metadata, fonts,
       anonymity tokens, tables, plots, equations, and references were checked.
 - [ ] ICAART confirms that the presenting author may elect the documented live
@@ -69,6 +70,9 @@ commit and all three hashes together; never mix files from different freezes.
 - [x] Abstract, RQ1, results, and conclusion report champion-minus-reference as
       the positive confirmatory claim.
 - [x] Abstract, RQ2, results, and conclusion report the failed absolute gate.
+- [x] Abstract, introduction, protocol, results, and conclusion explicitly
+      report that failure of the absolute gate also fails the frozen joint
+      two-gate criterion.
 - [x] Exactly 512 confirmatory games, 16 sealed families, and 256 games per
       method are reported consistently.
 - [x] Improvement is 0.33594; family-clustered 95% CI is [0.21456, 0.45732].

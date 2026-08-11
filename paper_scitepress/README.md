@@ -11,9 +11,12 @@ Build from the repository root with:
 make -C paper_scitepress check
 ```
 
-The build uses a fixed `SOURCE_DATE_EPOCH` tied to manuscript source commit
-`cb891b47c9bb5ad3ac75c2d67b59865d56a7e1d1`. A clean build should therefore
-produce the same PDF bytes under the pinned Bouchet TeX toolchain.
+The build uses a fixed `SOURCE_DATE_EPOCH` established at the comparator-
+justified manuscript freeze `cb891b47c9bb5ad3ac75c2d67b59865d56a7e1d1`.
+That value is a reproducibility constant, not the current source identity;
+`research/SCITEPRESS_QA.md` records the inspected source commit and PDF hash.
+A clean build should produce the same PDF bytes under the pinned Bouchet TeX
+toolchain.
 
 ## Official template provenance
 
