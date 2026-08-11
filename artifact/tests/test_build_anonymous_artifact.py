@@ -76,26 +76,39 @@ class BuildAnonymousArtifactTest(unittest.TestCase):
                 (package / "research" / "artifacts").glob("*.json")
             )
             self.assertEqual(len(aggregate_inputs), 8)
+            review_readme = (package / "README.md").read_text()
             self.assertIn(
                 "eight sanitized frozen JSON inputs",
-                (package / "README.md").read_text(),
+                review_readme,
             )
             self.assertIn(
                 "Expected output is an 18-page",
-                (package / "README.md").read_text(),
+                review_readme,
             )
             self.assertIn(
                 "11-page A4",
-                (package / "README.md").read_text(),
+                review_readme,
             )
             self.assertIn(
                 "ends on page 15",
-                (package / "README.md").read_text(),
+                review_readme,
             )
             self.assertIn(
                 "python3 verify_manifest.py",
-                (package / "README.md").read_text(),
+                review_readme,
             )
+            self.assertIn("## Claim-to-evidence map", review_readme)
+            self.assertIn(
+                "cannot rescue the failed absolute-strength gate",
+                " ".join(review_readme.split()),
+            )
+            for aggregate_input in aggregate_inputs:
+                reference = f"`research/artifacts/{aggregate_input.name}`"
+                self.assertEqual(
+                    review_readme.count(reference),
+                    1,
+                    f"claim map must link {aggregate_input.name} exactly once",
+                )
             self.assertIn(
                 "eight sanitized aggregate JSON records",
                 " ".join((package / "THIRD_PARTY.md").read_text().split()),
