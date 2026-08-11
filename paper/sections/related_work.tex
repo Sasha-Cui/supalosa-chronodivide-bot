@@ -15,14 +15,15 @@ compares evolutionary training modes for a 20-weight bot
 \cite{castejon2026tales}. These studies establish scripted-bot tuning and
 mutation search; our distinction is family-disjoint held-out evaluation.
 
-The closest conceptual precedent is adaptive selection by map type.
-Fern{\'a}ndez-Ares et al. evolved specialized policies and selected among them
-from online map characterization~\cite{fernandezAres2012map}. Our initial
-map-conditioned method followed this broad idea and failed its development
-gate. The final paper instead studies one generic policy, with exact-map
-profiles, coordinates, orientation branches, and map signatures disabled. Its
-distinctive evidence is family-disjoint and provenance-bound evaluation, not
-map-conditioned policy selection.
+The closest conceptual precedents specialize by map: Mari{\~n}o et al.
+synthesized map-specific programmatic $\mu$RTS strategies from a
+domain-specific language~\cite{marino2021programmatic}, while
+Fern{\'a}ndez-Ares et al. selected evolved policies from online map
+characterization~\cite{fernandezAres2012map}. Our initial method followed this
+idea and failed its development gate. The final paper instead studies one
+generic policy, disabling exact-map profiles, coordinates, orientation
+branches, and map signatures. Its distinction is family-disjoint,
+provenance-bound evaluation, not map-conditioned policy selection.
 
 \paragraph{Algorithm configuration.}
 Sequential model-based algorithm configuration and irace formalize tuning
