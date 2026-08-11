@@ -7,6 +7,7 @@ import {
     rankBuildingTargets,
     rankSweepPoints,
     reconcileRememberedBuildingTargets,
+    resolveBuildingEliminationOptions,
 } from "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
 
 const target = (overrides: Partial<BuildingTargetDescriptor>): BuildingTargetDescriptor => ({
@@ -98,5 +99,43 @@ describe("building elimination policy", () => {
         expect(isPreemptibleBuildingEliminationMission("allInAttack")).toBe(true);
         expect(isPreemptibleBuildingEliminationMission("defence_12")).toBe(false);
         expect(isPreemptibleBuildingEliminationMission("buildingElimination")).toBe(false);
+    });
+
+    test("configuration resolves to a canonical complete object without undefined overrides", () => {
+        const resolved = resolveBuildingEliminationOptions({
+            enabled: true,
+            minTick: 8400,
+            reserveCombatants: undefined,
+            observationMode: "visibleOnly",
+        });
+        expect(resolved.enabled).toBe(true);
+        expect(resolved.minTick).toBe(8400);
+        expect(resolved.reserveCombatants).toBe(4);
+        expect(resolved.observationMode).toBe("visibleOnly");
+        expect(Object.values(resolved)).not.toContain(undefined);
+        expect(Object.keys(resolved)).toEqual([
+            "enabled",
+            "minTick",
+            "minCombatants",
+            "combatantAdvantage",
+            "maxEnemyCombatants",
+            "reserveCombatants",
+            "orderIntervalTicks",
+            "maxTargetGroups",
+            "targetPriority",
+            "observationMode",
+            "directVisibleAttack",
+            "preemptExistingAttacks",
+            "sweepWhenNoTargets",
+            "sweepRevisitTicks",
+        ]);
+    });
+
+    test("configuration rejects impossible or non-integral search values", () => {
+        expect(() => resolveBuildingEliminationOptions({ orderIntervalTicks: 0 })).toThrow(
+            "orderIntervalTicks",
+        );
+        expect(() => resolveBuildingEliminationOptions({ maxTargetGroups: 1.5 })).toThrow("maxTargetGroups");
+        expect(() => resolveBuildingEliminationOptions({ minTick: -1 })).toThrow("minTick");
     });
 });

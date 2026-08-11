@@ -99,6 +99,36 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     sweepRevisitTicks: 900,
 };
 
+const requireIntegerInRange = (name: string, value: number, minimum: number, maximum: number): void => {
+    if (!Number.isInteger(value) || value < minimum || value > maximum) {
+        throw new Error(`${name} must be an integer in [${minimum}, ${maximum}], got ${value}`);
+    }
+};
+
+export const resolveBuildingEliminationOptions = (
+    options: BuildingEliminationOptions = {},
+): Required<BuildingEliminationOptions> => {
+    const definedOptions = Object.fromEntries(
+        Object.entries(options).filter(([, value]) => value !== undefined),
+    ) as BuildingEliminationOptions;
+    const resolved = { ...DEFAULT_OPTIONS, ...definedOptions };
+    requireIntegerInRange("minTick", resolved.minTick, 0, 100_000);
+    requireIntegerInRange("minCombatants", resolved.minCombatants, 0, 1_000);
+    requireIntegerInRange("combatantAdvantage", resolved.combatantAdvantage, -1_000, 1_000);
+    requireIntegerInRange("maxEnemyCombatants", resolved.maxEnemyCombatants, 0, 1_000);
+    requireIntegerInRange("reserveCombatants", resolved.reserveCombatants, 0, 1_000);
+    requireIntegerInRange("orderIntervalTicks", resolved.orderIntervalTicks, 1, 10_000);
+    requireIntegerInRange("maxTargetGroups", resolved.maxTargetGroups, 1, 64);
+    requireIntegerInRange("sweepRevisitTicks", resolved.sweepRevisitTicks, 0, 100_000);
+    if (!new Set<BuildingEliminationTargetPriority>(["production", "defense", "nearest"]).has(resolved.targetPriority)) {
+        throw new Error(`Invalid building-elimination target priority: ${resolved.targetPriority}`);
+    }
+    if (!new Set<BuildingEliminationObservationMode>(["publicApi", "visibleOnly"]).has(resolved.observationMode)) {
+        throw new Error(`Invalid building-elimination observation mode: ${resolved.observationMode}`);
+    }
+    return resolved;
+};
+
 const BUILDING_ELIMINATION_MISSION_NAME = "buildingElimination";
 const BUILDING_ELIMINATION_PRIORITY = 300;
 const POWER_BUILDINGS = new Set(["NAPOWR", "NANRCT", "GAPOWR"]);
@@ -494,10 +524,7 @@ export class BuildingEliminationMissionFactory {
         options: BuildingEliminationOptions = {},
         private telemetrySink: BuildingEliminationTelemetrySink = () => undefined,
     ) {
-        const definedOptions = Object.fromEntries(
-            Object.entries(options).filter(([, value]) => value !== undefined),
-        ) as BuildingEliminationOptions;
-        this.options = { ...DEFAULT_OPTIONS, ...definedOptions };
+        this.options = resolveBuildingEliminationOptions(options);
     }
 
     maybeCreateMissions(
