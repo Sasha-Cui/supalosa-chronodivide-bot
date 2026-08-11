@@ -78,10 +78,11 @@ and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.m
 
 ## Manuscript status and remaining work
 
-Commit `cdf85e0` is the current anonymous LNCS manuscript revision. It sharpens
+Commit `82bae41` is the current anonymous LNCS manuscript revision. It sharpens
 the held-out-evaluation title, states two confirmatory research questions and
-one explicitly descriptive diagnostic question, and removes causal-sounding
-mechanism language without changing any result. The main PDF is 16 pages with
+one explicitly descriptive diagnostic question, removes causal-sounding
+mechanism language, and adds primary prior art on hidden-level evaluation and
+protocol sensitivity without changing any result. The main PDF is 16 pages with
 main text ending on page 14 and references continuing afterward; the supplement
 is five pages. All reported tables and figures are generated from hash-pinned
 aggregate artifacts. The final build has no overfull boxes, undefined
@@ -90,8 +91,8 @@ received rendered visual checks. The current PDF SHA-256 values are recorded in
 [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md).
 
 Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder.
-The current 59 KB review archive is byte-deterministic at SHA-256
-`5e160fb9766a17cace0f63815fcbb9b271f19d6eafb5fa0ad68912b6b9bdffa1`.
+The current 60 KB review archive is byte-deterministic at SHA-256
+`1dd829195a08bdc6f6fe5226027aa49941e5e86eb8a60769b5c1ca5987b69c11`.
 Its 35-file manifest verifies, all artifact tests pass, and an extracted
 reviewer copy rebuilds the 16-page paper and five-page supplement without
 warnings.
