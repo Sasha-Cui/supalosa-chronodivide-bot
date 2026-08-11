@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import hashlib
 import re
+import subprocess
+import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -89,6 +92,35 @@ class FallbackManuscriptTest(unittest.TestCase):
             expected, name = line.split(None, 1)
             data = (FALLBACK / "vendor" / name).read_bytes()
             self.assertEqual(hashlib.sha256(data).hexdigest(), expected)
+
+    def test_build_checker_rejects_unsettled_cross_references(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            log = root / "main.log"
+            blg = root / "main.blg"
+            pdf = root / "main.pdf"
+            log.write_text(
+                "Output written on build/main.pdf (10 pages, 100 bytes).\n"
+                "LaTeX Warning: Label(s) may have changed. Rerun to get "
+                "cross-references right.\n",
+                encoding="utf-8",
+            )
+            blg.write_text("", encoding="utf-8")
+            pdf.write_bytes(b"%PDF-1.5\n")
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    str(FALLBACK / "scripts" / "check_build.py"),
+                    str(log),
+                    str(blg),
+                    str(pdf),
+                ],
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertNotEqual(completed.returncode, 0)
+            self.assertIn("Label", completed.stderr)
 
 
 if __name__ == "__main__":

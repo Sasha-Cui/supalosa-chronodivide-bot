@@ -27,6 +27,7 @@ def main() -> int:
         r"Overfull \\hbox",
         r"LaTeX Warning: (?:Reference|Citation).*undefined",
         r"There were undefined references",
+        r"LaTeX Warning: Label\(s\) may have changed",
         r"multiply defined",
         r"Undefined control sequence",
     )

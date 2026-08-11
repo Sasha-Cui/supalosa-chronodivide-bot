@@ -32,6 +32,7 @@ main: assets build
 	$(BIB_ENV) bibtex build/main
 	$(TEX_ENV) pdflatex $(TEX_FLAGS) main.tex
 	$(TEX_ENV) pdflatex $(TEX_FLAGS) main.tex
+	$(TEX_ENV) pdflatex $(TEX_FLAGS) main.tex
 
 check: test check-generated main
 	$(PYTHON) scripts/check_build.py build/main.log build/main.blg build/main.pdf
