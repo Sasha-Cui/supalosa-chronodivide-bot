@@ -30,9 +30,15 @@ class BuildAnonymousArtifactTest(unittest.TestCase):
             )
             self.assertEqual(confirmatory["scheduler"]["account"], MODULE.REDACTED)
             self.assertEqual(confirmatory["sourceGitCommit"], MODULE.REDACTED)
+            compute = json.loads(
+                (package / "research" / "artifacts" / "accepted_compute_accounting_v1.json").read_text()
+            )
+            self.assertEqual(compute["evidence"]["account"], MODULE.REDACTED)
+            self.assertEqual(compute["accounting"]["allocationCount"], 562)
             metrics = (package / "paper" / "generated" / "metrics.tex").read_text()
             self.assertIn(r"\newcommand{\ImprovementEstimate}{0.336}", metrics)
             self.assertIn(r"\newcommand{\ChampionAbsoluteLower}{-0.021}", metrics)
+            self.assertIn(r"\newcommand{\AcceptedCoreHours}{288.72}", metrics)
 
             manifest = json.loads((package / "MANIFEST.json").read_text())
             for relative, expected in manifest["files"].items():

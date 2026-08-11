@@ -12,30 +12,32 @@ family-disjoint evaluation and configuration of a generic scripted RTS policy.
    execution reconciliation, empirical sufficiency decision, and claim freeze.
 3. [`METHOD_V2_CONFIRMATORY_RESULT.md`](METHOD_V2_CONFIRMATORY_RESULT.md) —
    immutable held-out result and its failed absolute-strength gate.
-4. [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.md)
+4. [`COMPUTE_ACCOUNTING.md`](COMPUTE_ACCOUNTING.md) — frozen accepted-path
+   CPU, memory, and allocation accounting.
+5. [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.md)
    — descriptive outcome and terminal-state decomposition.
-5. [`PAPER_PLAN.md`](PAPER_PLAN.md) — manuscript framing, outline, and abstract.
-6. [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md) and
+6. [`PAPER_PLAN.md`](PAPER_PLAN.md) — manuscript framing, outline, and abstract.
+7. [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md) and
    [`REVIEWER_AUDIT.md`](REVIEWER_AUDIT.md) — build/visual checks and the candid
    reviewer-style acceptance audit.
-7. [`SCAG_ACCEPTED_PAPER_CALIBRATION.md`](SCAG_ACCEPTED_PAPER_CALIBRATION.md)
+8. [`SCAG_ACCEPTED_PAPER_CALIBRATION.md`](SCAG_ACCEPTED_PAPER_CALIBRATION.md)
    — comparison with the 2024--2026 SCAG proceedings and the resulting venue
    fit boundary.
-8. [`ANONYMITY_RELEASE_RISK.md`](ANONYMITY_RELEASE_RISK.md) — double-blind and
+9. [`ANONYMITY_RELEASE_RISK.md`](ANONYMITY_RELEASE_RISK.md) — double-blind and
    upstream-license actions required before submission or public bot release.
-9. [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md) — factual
+10. [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md) — factual
    generative-AI use boundary, author-verification requirements, and venue
    eligibility gate.
-10. [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md),
+11. [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md),
    [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md), and
    [`SUBMISSION_ROADMAP.md`](SUBMISSION_ROADMAP.md) — send-ready external
    questions, a neutral cold-read protocol, and the dated path to the
    2026-11-01 deadline.
-11. [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md) — the final claim,
+12. [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md) — the final claim,
    anonymity, rights, artifact, and upload freeze record.
-12. [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) — append-only mapping from every
+13. [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) — append-only mapping from every
    interpreted result to its configuration, artifact, revision, and job ID.
-13. [`FORENSIC_AUDIT.md`](FORENSIC_AUDIT.md) — original inventory, leakage audit,
+14. [`FORENSIC_AUDIT.md`](FORENSIC_AUDIT.md) — original inventory, leakage audit,
    and reconstruction of the pre-research project.
 
 ## Frozen result boundary
@@ -56,6 +58,7 @@ separately versioned prospective experiment.
 | Topic | Document |
 | --- | --- |
 | Final execution and go/no-go audit | [`EMPIRICAL_COMPLETION_AUDIT.md`](EMPIRICAL_COMPLETION_AUDIT.md) |
+| Accepted-path compute accounting | [`COMPUTE_ACCOUNTING.md`](COMPUTE_ACCOUNTING.md) |
 | Method-v2 training and selection | [`METHOD_V2_PROTOCOL.md`](METHOD_V2_PROTOCOL.md) |
 | Fresh development gate | [`METHOD_V2_DEVELOPMENT_PROTOCOL.md`](METHOD_V2_DEVELOPMENT_PROTOCOL.md) |
 | Confirmatory result | [`METHOD_V2_CONFIRMATORY_RESULT.md`](METHOD_V2_CONFIRMATORY_RESULT.md) |

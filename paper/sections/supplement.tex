@@ -55,6 +55,13 @@ Final accepted path & & \TotalGameCount{} \\
 \end{tabular}
 \end{table}
 
+The \AcceptedAllocationCount{} accepted simulation-shard allocations each used
+one CPU core and requested \AcceptedRequestedMemoryGiB{}~GiB, consuming
+\AcceptedCoreHours{} core-hours by Slurm
+\texttt{ElapsedRaw} $\times$ \texttt{AllocCPUS}.
+No allocation requested a GPU; peak recorded batch-step RSS was
+\AcceptedPeakRSSGiB{}~GiB. Controller and finalizer overhead is excluded.
+
 Each optimizer run finalized exactly 936 games. The finalist artifact SHA-256
 values for runs 0--4 are, respectively:
 {\small

@@ -27,6 +27,8 @@ EXPECTED_ARTIFACT_HASHES = {
         "d280138b124e0d1665151189a1dd9ad74b92f646a8c523d25cef4c634b2e90c1",
     "family_role_commitments_v1.json":
         "e7a4f4df4325c75107eb3708d5b105f43dd1436c78cbd210b0695076fc47d65d",
+    "accepted_compute_accounting_v1.json":
+        "eaf504b447ba6cbe0953cc91de0540a913e6c3b6bffd724017040bcfaa6e7674",
 }
 
 
@@ -106,6 +108,7 @@ def generate_metrics(
     terminal: dict[str, Any],
     supported: dict[str, Any],
     roles: dict[str, Any],
+    compute: dict[str, Any],
 ) -> str:
     improvement = confirmatory["prespecifiedImprovement"]
     absolute = confirmatory["prespecifiedChampionAbsolute"]
@@ -128,6 +131,23 @@ def generate_metrics(
         raise ValueError("supported family population drift")
     if roles["roleCounts"] != {"development": 12, "reserve": 4, "test": 16, "train": 22}:
         raise ValueError("family role counts drift")
+    accounting = compute["accounting"]
+    stages = compute["stageBreakdown"]
+    if accounting["allocationCount"] != 562:
+        raise ValueError("accepted allocation count drift")
+    if sum(row["allocationCount"] for row in stages) != accounting["allocationCount"]:
+        raise ValueError("compute stage allocation count mismatch")
+    if sum(row["coreSeconds"] for row in stages) != accounting["elapsedRawSeconds"]:
+        raise ValueError("compute stage core-seconds mismatch")
+    if sum(row["games"] for row in stages) != 8704:
+        raise ValueError("compute stage game count mismatch")
+    expect_close(
+        accounting["coreHours"],
+        accounting["elapsedRawSeconds"] / 3600,
+        "compute core-hours",
+    )
+    if accounting["allocCpusPerAllocation"] != 1 or accounting["gpuAllocationCount"] != 0:
+        raise ValueError("compute allocation shape drift")
 
     macros = {
         "ScreenedFamilyCount": "67",
@@ -147,6 +167,10 @@ def generate_metrics(
         "MechanismGameCount": "480",
         "ComponentGameCount": "480",
         "TotalGameCount": "8,704",
+        "AcceptedAllocationCount": str(accounting["allocationCount"]),
+        "AcceptedCoreHours": fmt(accounting["coreHours"], 2),
+        "AcceptedRequestedMemoryGiB": "6",
+        "AcceptedPeakRSSGiB": fmt(accounting["maxRssGiB"], 2),
         "DefaultScore": fmt(records["default"]["score"]),
         "ChampionScore": fmt(records["champion"]["score"]),
         "ImprovementEstimate": fmt(improvement["estimate"]),
@@ -389,6 +413,7 @@ def generate_all(
     terminal = inputs["method_v2_terminal_state_analysis_v1.json"]
     supported = inputs["supported_temperate_families_v1.json"]
     roles = inputs["family_role_commitments_v1.json"]
+    compute = inputs["accepted_compute_accounting_v1.json"]
 
     if families["source"]["unblindingSha256"] != confirmatory["evidence"]["unblindingSha256"]:
         raise ValueError("family export and confirmatory source commitments differ")
@@ -400,7 +425,15 @@ def generate_all(
 
     output_dir.mkdir(parents=True, exist_ok=True)
     outputs = {
-        "metrics.tex": generate_metrics(confirmatory, mechanism, component, terminal, supported, roles),
+        "metrics.tex": generate_metrics(
+            confirmatory,
+            mechanism,
+            component,
+            terminal,
+            supported,
+            roles,
+            compute,
+        ),
         "family_effects_plot.tex": generate_family_plot(families),
         "family_effects_table.tex": generate_family_table(families),
         "outcome_transitions.tex": generate_transition_figure(terminal),

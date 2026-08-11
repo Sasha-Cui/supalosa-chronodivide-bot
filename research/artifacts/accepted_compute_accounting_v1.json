@@ -1,0 +1,130 @@
+{
+  "accounting": {
+    "allocationCount": 562,
+    "allocCpusPerAllocation": 1,
+    "coreHours": 288.7225,
+    "elapsedRawSeconds": 1039401,
+    "firstStartSchedulerLocal": "2026-08-07T11:23:42",
+    "gamesPerCoreHour": 30.146594,
+    "gpuAllocationCount": 0,
+    "lastEndSchedulerLocal": "2026-08-11T06:05:28",
+    "maxRssGiB": 1.6319770813,
+    "maxRssKiB": 1711252,
+    "requestedMemoryPerAllocation": "6G"
+  },
+  "checks": {
+    "allAllocationsCompleted": true,
+    "allAllocationsUseOneCpu": true,
+    "allAllocationsUsePrespecifiedAccount": true,
+    "stageAllocationCountSum": 562,
+    "stageCoreSecondsSum": 1039401,
+    "stageGameCountSum": 8704
+  },
+  "evidence": {
+    "account": "pi_jss233",
+    "allocationRows": {
+      "relativePath": "research-evidence/compute-accounting-v1/accepted-job-allocations.tsv",
+      "rows": 562,
+      "sha256": "afc0cf1576fc0ff37073eaf572459a94bc7607673f6fbc3e09d694011eb9f2fe"
+    },
+    "jobRoots": [
+      21655584,
+      21655585,
+      21655586,
+      21655587,
+      21655588,
+      21749720,
+      21749724,
+      21749725,
+      21749726,
+      21749727,
+      21759850,
+      21759851,
+      21759852,
+      21759853,
+      21759854,
+      21788958,
+      21799790,
+      21920172,
+      21920905,
+      21922464,
+      21925439,
+      21928633,
+      21938403
+    ],
+    "scheduler": "Slurm",
+    "schedulerVersion": "25.11.6",
+    "stepRows": {
+      "relativePath": "research-evidence/compute-accounting-v1/accepted-job-steps.tsv",
+      "rows": 1686,
+      "sha256": "e1ffe10917c62a19fe94cf21462496ff7783ca2f5fd98c1a4ca993c757ae4988"
+    }
+  },
+  "exclusions": [
+    "controller and finalizer overhead",
+    "failed or zero-launch allocations",
+    "compatibility and infrastructure-only gates",
+    "terminal analysis that reused existing completion records"
+  ],
+  "interpretation": "Resource accounting for accepted outcome-bearing simulation shards only. Core-hours equal the sum of Slurm ElapsedRaw times AllocCPUS and include allocation setup and teardown; they are not a CPU-utilization or energy estimate.",
+  "schemaVersion": 1,
+  "stageBreakdown": [
+    {
+      "allocationCount": 30,
+      "coreHours": 52.782778,
+      "coreSeconds": 190018,
+      "games": 1920,
+      "stage": "optimizer_stage0"
+    },
+    {
+      "allocationCount": 60,
+      "coreHours": 41.597222,
+      "coreSeconds": 149750,
+      "games": 1440,
+      "stage": "optimizer_stage1"
+    },
+    {
+      "allocationCount": 110,
+      "coreHours": 42.186389,
+      "coreSeconds": 151871,
+      "games": 1320,
+      "stage": "optimizer_stage2"
+    },
+    {
+      "allocationCount": 44,
+      "coreHours": 70.391389,
+      "coreSeconds": 253409,
+      "games": 2112,
+      "stage": "common_seed_championship"
+    },
+    {
+      "allocationCount": 110,
+      "coreHours": 19.279444,
+      "coreSeconds": 69406,
+      "games": 440,
+      "stage": "fresh_development"
+    },
+    {
+      "allocationCount": 128,
+      "coreHours": 16.298889,
+      "coreSeconds": 58676,
+      "games": 512,
+      "stage": "sealed_confirmatory"
+    },
+    {
+      "allocationCount": 40,
+      "coreHours": 26.015,
+      "coreSeconds": 93654,
+      "games": 480,
+      "stage": "optimizer_selection_diagnostic"
+    },
+    {
+      "allocationCount": 40,
+      "coreHours": 20.171389,
+      "coreSeconds": 72617,
+      "games": 480,
+      "stage": "policy_component_diagnostic"
+    }
+  ],
+  "studyPath": "finalized accepted outcome-bearing path"
+}

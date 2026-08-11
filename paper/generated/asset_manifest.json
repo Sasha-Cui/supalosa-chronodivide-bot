@@ -1,6 +1,7 @@
 {
   "generator": "paper/scripts/generate_assets.py",
   "inputs": {
+    "research/artifacts/accepted_compute_accounting_v1.json": "eaf504b447ba6cbe0953cc91de0540a913e6c3b6bffd724017040bcfaa6e7674",
     "research/artifacts/family_role_commitments_v1.json": "e7a4f4df4325c75107eb3708d5b105f43dd1436c78cbd210b0695076fc47d65d",
     "research/artifacts/method_v2_component_ablation_result_v1.json": "dbc227e620a23d12bc54a51c1ec1ab89decddcfe454319ea112f822a4a82b012",
     "research/artifacts/method_v2_confirmatory_family_diagnostics_v1.json": "99a389d112d9c8241ca54a9b93a6f20d67979ae4808903a627e94a679bfeed65",
@@ -13,7 +14,7 @@
     "component_effects_plot.tex": "db02a4c9e44d2988a3a5857ff50aaac7479a0ef60b33872f98b6eb24ff15aa19",
     "family_effects_plot.tex": "918cfc70aa4452208d1b50700268dbbba47fb855f92efa264e26a12d974c3e68",
     "family_effects_table.tex": "eb042ea478b75f1a1b8207be2c4b936ede4ab7a93753b232995491ba3f38a789",
-    "metrics.tex": "d958916d7b5fad2e13e72fc2e24f73c14258311531df1f560de7420645af41ab",
+    "metrics.tex": "ffcb08054fc6d72642fc91d9f2b7b7e48c7502386335c36c7ffb63a79b309f96",
     "outcome_transitions.tex": "31d19cd49121d969278ad5f088ceca733b3d45fe7ff2a50bd83c82c5f4ce37e2",
     "study_flow.tex": "e82418b05d207996a0d6612e492bba92b59cda313d3ce09a8347f466d13e9b37"
   },
