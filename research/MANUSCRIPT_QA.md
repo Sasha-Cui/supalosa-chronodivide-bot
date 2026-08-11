@@ -4,7 +4,7 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `4c2d011cacb4a3c98bf203153dd300e2075f142c`
+- Source commit: `ccc0c101de207a7100fd553e15efc4fa18108a35`
 - Manuscript-content refreeze: `504cc2a7f1844183e2d87d0af09e1f697d3acfca`
 - Reviewer-artifact page-contract fix: `853e2ffb3693287ee0572b7b8c659befa5f9763d`
 - Main source: `paper/main.tex`
@@ -12,7 +12,7 @@ Last updated: **2026-08-11**
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 18 pages total; non-reference content ends on page 15
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `0b0a5c55a9cbbc123693524597e520922ce927fcc21001cb5dd79b9004914bf6`
+- Main PDF SHA-256: `efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3`
 - Supplement PDF SHA-256: `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`
 
 The PDFs are build products and are not committed. Their hashes identify the
@@ -166,8 +166,8 @@ The final repository-wide verification runs all 141 tests: 115 research tests,
 11 paper tests, 12 SCITEPRESS tests, and three artifact tests.
 
 The deterministic anonymous review archive has SHA-256
-`39356f3a38ac3ffbb789a7298e23a77f51c949d16d207acd74530133882d4117`
-and size 102,706 bytes. Two independent builds produced that same hash. The
+`74c038f20daf4cae2c95c1fc930ebc862304eda52442afda724a2f83f1fa7fb0`
+and size 102,615 bytes. Two independent builds produced that same hash. The
 archive contains 60 manifested immutable files, normalized `0/0` ownership and
 epoch timestamps, no Git tree, no bot packages, and no direct author,
 scheduler-account, institution, or private-path token. It now contains both the
@@ -199,8 +199,8 @@ pages; the changed title, threat-to-control table, reflowed transitions, and
 complete final reference pages were additionally inspected at full resolution.
 
 The production candidate additionally passed the new Poppler-backed
-`submission-check`: exactly 11 A4 pages, 39,611 non-whitespace characters under
-the documented default reading order, 197 abstract words, empty review
+`submission-check`: exactly 11 A4 pages, 39,210 non-whitespace characters under
+the documented default reading order, 193 abstract words, empty review
 identity metadata, no forms/JavaScript/encryption/rotation, nine embedded fonts
 with Unicode maps, exact PDF-to-portal title/abstract/keyword agreement, and
 SHA-256 agreement between the metadata JSON and its three source files. The
@@ -213,7 +213,7 @@ A second Git-free extraction reproduced the exact current archive on Bouchet
 using Python 3.12.3 and TeX Live 2024. The manifest verified all 60 immutable
 files before and after regeneration, all 23 packaged tests passed, and the
 three rebuilt PDFs were byte-identical to the production hashes above. The
-11-page submission check again passed at 39,611 characters and nine embedded
+11-page submission check again passed at 39,210 characters and nine embedded
 fonts. All 34 rebuilt pages were rendered and inspected without a layout or
 readability defect. The command transcript, environment, identities, and
 scope boundary are frozen in `ARTIFACT_CLEANROOM_REPRODUCTION.md`.
@@ -357,6 +357,30 @@ passed all 23 packaged tests, rebuilt all three PDFs, and passed the 11-page,
 39,611-character deep check. Contact-sheet inspection covered all 34 pages,
 with full-resolution inspection of every reflowed page; no clipping, overlap,
 contrast, glyph, table, margin, or reference-flow defect was found.
+
+The acceptance-oriented source pass at `24a612e` states the joint admission
+rule directly in the ICAART abstract, leaves seven words of margin below its
+200-word ceiling, and sharpens the final relative-gain/non-dominance takeaway.
+The page-contract repair at
+`ccc0c101de207a7100fd553e15efc4fa18108a35` removes duplicated future-work
+prose and makes the documented LNCS boundary true: non-reference content ends
+on page 15 and references begin on page 16. Neither commit changes an empirical
+input, estimate, interval, gate, diagnostic, citation, or supported population.
+The current TeX Live 2024 production and fresh Git-free clean-room builds are
+byte-identical at LNCS SHA-256
+`efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3`,
+supplement SHA-256
+`7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`,
+and ICAART SHA-256
+`98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07`.
+The 193-word portal metadata has SHA-256
+`285af4e101ea36d6e5190a3c0ceb5d4a52ded5e56f96210b1295360bb077e4ca`.
+Two deterministic 102,615-byte artifact builds match at SHA-256
+`74c038f20daf4cae2c95c1fc930ebc862304eda52442afda724a2f83f1fa7fb0`.
+The fresh extraction verified all 60 files before and after regeneration,
+passed all 23 packaged tests, reproduced all three production PDFs, and passed
+the 11-page, 39,210-character, nine-font deep check. Contact-sheet inspection
+covered all 34 pages, and all changed pages passed full-resolution inspection.
 
 ## Remaining submission gates
 

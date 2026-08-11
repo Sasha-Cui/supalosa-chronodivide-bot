@@ -12,9 +12,9 @@ class OriginalityAndNoveltyScreenTest(unittest.TestCase):
     def test_screen_is_bound_to_current_candidate_and_honest_limits(self) -> None:
         screen = SCREEN.read_text(encoding="utf-8")
         for identity in (
-            "4c2d011cacb4a3c98bf203153dd300e2075f142c",
-            "0b0a5c55a9cbbc123693524597e520922ce927fcc21001cb5dd79b9004914bf6",
-            "5a7450582b7452a9c568a08247e39cc9e9f0f5e0e1afcc9e9986ec9ef8ca5f21",
+            "ccc0c101de207a7100fd553e15efc4fa18108a35",
+            "efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3",
+            "98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07",
         ):
             self.assertIn(identity, screen)
 

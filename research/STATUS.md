@@ -163,9 +163,9 @@ Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 commit `7cdbe0d` hardens its direct-identity denylist, and the current builder
 tests enforce the exact eight-input reviewer description. Commit `d53f822`
 adds the exact SCITEPRESS candidate, a package-local manifest verifier, and
-Git-free build checks. The current 102,706-byte review archive is
+Git-free build checks. The current 102,615-byte review archive is
 byte-deterministic at SHA-256
-`39356f3a38ac3ffbb789a7298e23a77f51c949d16d207acd74530133882d4117`.
+`74c038f20daf4cae2c95c1fc930ebc862304eda52442afda724a2f83f1fa7fb0`.
 Its 60-file immutable manifest verifies, all artifact tests pass, and an
 earlier independent macOS extraction established package portability by passing
 22 packaged tests and rebuilding the three manuscript formats without undefined
@@ -210,9 +210,9 @@ eligibility still needs a written ruling; its presenter page documents live
 online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS submission format that reuses the frozen main-paper sections and result
-macros. The current candidate is 11 A4 pages with a 197-word expanded abstract and 39,611 extracted
+macros. The current candidate is 11 A4 pages with a 193-word expanded abstract and 39,210 extracted
 non-whitespace characters; two clean builds match at SHA-256
-`5a7450582b7452a9c568a08247e39cc9e9f0f5e0e1afcc9e9986ec9ef8ca5f21`,
+`98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07`,
 and every page passed visual and anonymity QA. It is not authorized for upload
 until ICAART confirms exceptional remote eligibility/procedure and double-blind
 AI-disclosure placement. The home page now establishes remote support for
@@ -263,6 +263,23 @@ A fresh Git-free reconstruction verified the manifest before and after
 regeneration, passed all 23 packaged tests and the 11-page, 39,611-character,
 nine-font deep check, and reproduced all three production PDFs byte for byte.
 All 34 pages passed rendered contact-sheet QA, and each reflowed page passed
+full-resolution inspection.
+
+Commit `24a612e` gives the ICAART abstract a seven-word safety margin below its
+portal ceiling and states the joint campaign-admission rule at the first reader
+entry point. Commit `ccc0c10` corrects the latent LNCS page-contract mismatch:
+the conclusion now ends on page 15 and references start on page 16. Both edits
+are claim-preserving. The current LNCS, supplement, and ICAART PDF identities
+are respectively
+`efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3`,
+`7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`,
+and `98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07`.
+Two deterministic 102,615-byte, 60-file artifact builds match at SHA-256
+`74c038f20daf4cae2c95c1fc930ebc862304eda52442afda724a2f83f1fa7fb0`.
+A fresh Git-free reconstruction verified the manifest before and after
+regeneration, passed all 23 packaged tests and the 11-page, 39,210-character,
+nine-font deep check, and reproduced all three production PDFs byte for byte.
+All 34 pages passed rendered contact-sheet QA, and each changed page passed
 full-resolution inspection.
 Decide one venue by 2026-08-25 and do not submit to both archival venues
 simultaneously.

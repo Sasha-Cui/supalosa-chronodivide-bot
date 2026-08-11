@@ -17,12 +17,12 @@ Verify these files before beginning. Stop if any value differs.
 
 | Item | Frozen identity |
 | --- | --- |
-| Reviewed source | `4c2d011cacb4a3c98bf203153dd300e2075f142c` |
-| ICAART PDF | `5a7450582b7452a9c568a08247e39cc9e9f0f5e0e1afcc9e9986ec9ef8ca5f21` |
-| LNCS PDF | `0b0a5c55a9cbbc123693524597e520922ce927fcc21001cb5dd79b9004914bf6` |
+| Reviewed source | `ccc0c101de207a7100fd553e15efc4fa18108a35` |
+| ICAART PDF | `98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07` |
+| LNCS PDF | `efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3` |
 | LNCS supplement | `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56` |
-| Anonymous artifact | `39356f3a38ac3ffbb789a7298e23a77f51c949d16d207acd74530133882d4117` |
-| ICAART portal metadata | `6eb561c409fad9bb24b362ec9634d8fb00cc4a9ad7a6983ddb82a0cd7033e498` |
+| Anonymous artifact | `74c038f20daf4cae2c95c1fc930ebc862304eda52442afda724a2f83f1fa7fb0` |
+| ICAART portal metadata | `285af4e101ea36d6e5190a3c0ceb5d4a52ded5e56f96210b1295360bb077e4ca` |
 
 Run from the repository root:
 
