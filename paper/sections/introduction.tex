@@ -39,7 +39,7 @@ space. Successive halving uses only training families. A common-seed
 championship then compares all 30
 run-finalist policies under shared family--seed blocks and selects one champion
 without development or test access. A permissive signal gate on a fresh
-development pool authorizes one frozen evaluation over 16 sealed test
+development pool authorizes one frozen evaluation over \TestFamilyCount{} sealed test
 families. Importantly, this pipeline was not the first development attempt: a
 map-conditioned selector failed on an earlier development set and was retired.
 The fixed generic-policy championship was specified afterward using training
@@ -61,13 +61,14 @@ diagnostic question:
 \end{enumerate}
 
 The principal result is positive but narrower than a claim of a winning bot.
-Across 16 test families, the champion scores \ChampionScore{} and the shipped
+Across \TestFamilyCount{} test families, the champion scores \ChampionScore{} and the shipped
 StrongBot default scores \DefaultScore{} against the same Supalosa revision.
 Their equally family-weighted difference is \ImprovementEstimate{} with a
 family-clustered 95\% confidence interval
-[\ImprovementCILower{},~\ImprovementCIUpper{}]. Fourteen family effects are
-positive and two are zero. However, the champion records only
-\ChampionWins{} wins in 256 games and many matches reach the tick cap. Its
+[\ImprovementCILower{},~\ImprovementCIUpper{}]. \PositiveFamilyCount{} family
+effects are positive and \ZeroFamilyCount{} are zero. However, the champion
+records only \ChampionWins{} wins in \ConfirmatoryGamesPerMethod{} games and
+many matches reach the tick cap. Its
 prespecified one-sided lower confidence bound for score above 0.5 is
 \ChampionAbsoluteLower{}, so the experiment does \emph{not} establish that
 StrongBot reliably beats Supalosa. The most faithful takeaway is that

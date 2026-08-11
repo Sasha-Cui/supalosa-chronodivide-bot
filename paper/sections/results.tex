@@ -1,14 +1,15 @@
 \section{Held-Out Results}
 \label{sec:results}
 
-All 128 confirmatory shards completed under the single prespecified Slurm
-project account, with exactly 512 launches and completions, no failed task,
+All \ConfirmatoryShardCount{} confirmatory shards completed under the single
+prespecified Slurm project account, with exactly \ConfirmatoryGameCount{}
+launches and completions, no failed task,
 no additional attempt, and one irreversible unblinding. Table~\ref{tab:main}
 reports both prespecified endpoints.
 
 \begin{table}[t]
 \centering
-\caption{Frozen confirmatory result on 16 sealed families. W/D/L counts are
+\caption{Frozen confirmatory result on \TestFamilyCount{} sealed families. W/D/L counts are
 descriptive; inference treats the map family as the cluster.}
 \label{tab:main}
 \small
@@ -28,16 +29,18 @@ one-sided 95\% lower \ChampionAbsoluteLower{}; fail \\
 
 \subsection{Relative improvement passes}
 
-The default scores \DefaultScore{} (1 win, 100 draws, 155 losses), whereas the
-champion scores \ChampionScore{} (47 wins, 180 draws, 29 losses). The
+The default scores \DefaultScore{} (\DefaultWins{} win, \DefaultDraws{} draws,
+\DefaultLosses{} losses), whereas the champion scores \ChampionScore{}
+(\ChampionWins{} wins, \ChampionDraws{} draws, \ChampionLosses{} losses). The
 equally-family-weighted champion-minus-default estimate is
 \ImprovementEstimate{}, with clustered standard error \ImprovementSE{} and
 95\% interval [\ImprovementCILower{},~\ImprovementCIUpper{}]. Its lower endpoint
 is above zero, passing the relative gate.
 
-Figure~\ref{fig:family-effects} shows every family effect. Fourteen are
-positive, two are exactly zero, and none is negative at the family-average
-level. Effects range from 0 to 0.844; thus the mean is not produced by a single
+Figure~\ref{fig:family-effects} shows every family effect.
+\PositiveFamilyCount{} are positive, \ZeroFamilyCount{} are exactly zero, and
+none is negative at the family-average level. Effects range from
+\MinimumFamilyEffect{} to \MaximumFamilyEffect{}; thus the mean is not produced by a single
 family, although effect magnitude is heterogeneous. These points are estimates
 from 16 games per method and family, not independent confidence intervals.
 
@@ -52,7 +55,7 @@ from 16 games per method and family, not independent confidence intervals.
 \end{figure}
 
 As post-confirmatory sensitivity checks, an independent Python reducer reread
-all 512 raw completion records and reproduced the point estimates, standard
+all \ConfirmatoryGameCount{} raw completion records and reproduced the point estimates, standard
 errors, and bounds exactly. A 100,000-replicate family bootstrap yielded a 95\%
 interval [\ImprovementBootstrapLower{},~\ImprovementBootstrapUpper{}], and the
 exact family sign-flip two-sided value was
@@ -62,10 +65,12 @@ result but did not replace the frozen estimator.
 \subsection{Absolute superiority does not pass}
 
 The champion's score margin over 0.5 is \ChampionAbsoluteMargin{}, with
-family-clustered standard error 0.032. Its prespecified one-sided 95\% lower
-bound is \ChampionAbsoluteLower{}, so the absolute-strength gate fails. Six
-family scores are above 0.5, five equal 0.5, and five fall below 0.5. The
-diagnostic family-bootstrap interval for champion score, [0.482, 0.604], leads
+family-clustered standard error \ChampionAbsoluteSE{}. Its prespecified
+one-sided 95\% lower bound is \ChampionAbsoluteLower{}, so the absolute-strength
+gate fails. \FamiliesAboveHalfCount{} family scores are above 0.5,
+\FamiliesEqualHalfCount{} equal 0.5, and \FamiliesBelowHalfCount{} fall below
+0.5. The diagnostic family-bootstrap interval for champion score,
+[\ChampionBootstrapLower{}, \ChampionBootstrapUpper{}], leads
 to the same caution. Therefore, the correct result is not ``StrongBot reliably
 beats Supalosa.'' It is ``the configured StrongBot robustly improves its
 shipped default against pinned Supalosa on this family population.''
@@ -73,18 +78,20 @@ shipped default against pinned Supalosa on this family population.''
 \subsection{The gain is mostly avoided losses}
 
 Because both methods use the same family, engine seed, opponent stream, and
-physical slot, the 256 per-method games form direct outcome pairs.
-Figure~\ref{fig:transitions} shows their transition matrix. Of 155 default
-losses, 104 become champion draws and 28 become champion wins. Eighteen default
-draws become wins, while six regress to losses. Overall, \ImprovedPairCount{}
+physical slot, the \ConfirmatoryGamesPerMethod{} per-method games form direct
+outcome pairs. Figure~\ref{fig:transitions} shows their transition matrix. Of
+\DefaultLosses{} default losses, \LossToDrawPairCount{} become champion draws
+and \LossToWinPairCount{} become champion wins. \DrawToWinPairCount{} default
+draws become wins, while \DrawToLossPairCount{} regress to losses. Overall, \ImprovedPairCount{}
 pairs improve, \RegressedPairCount{} regress, and \UnchangedPairCount{} have
-the same frozen score. The policy gains 46 wins and avoids 126 losses relative
+the same frozen score. The policy gains \ChampionWinGainCount{} wins and avoids
+\ChampionLossAvoidedCount{} losses relative
 to default, but its most common improvement is loss-to-tick-cap survival.
 
 \begin{figure}[t]
   \centering
   \input{generated/outcome_transitions}
-  \caption{Paired outcome transitions over 256 matched
+  \caption{Paired outcome transitions over \ConfirmatoryGamesPerMethod{} matched
   family--seed--slot cells. Rows are default outcomes; columns are champion
   outcomes. Cell shading reflects count and all counts, including zeros, are
   shown.}

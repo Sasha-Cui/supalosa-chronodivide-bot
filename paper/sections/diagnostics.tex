@@ -14,11 +14,13 @@ using four new common seed blocks on the ten open method-v2 development
 families. The complete design contains \MechanismGameCount{} games (six
 methods, ten families, four seed blocks, and reciprocal slots).
 
-The champion scores 0.581, compared with 0.499 for the equal average of the
+The champion scores \MechanismChampionScore{}, compared with
+\MechanismLocalAverageScore{} for the equal average of the
 five run-local policies. The difference is \MechanismEstimate{}, but its
 family-clustered 95\% interval
 [\MechanismCILower{},~\MechanismCIUpper{}] includes zero. All five pairwise
-point differences favor the champion (0.019 to 0.131), while every pairwise
+point differences favor the champion (\MechanismPairwiseMinimum{} to
+\MechanismPairwiseMaximum{}), while every pairwise
 interval crosses zero. This evidence is consistent with common-seed selection
 being useful, but ten families do not statistically resolve the mechanism.
 
@@ -57,10 +59,12 @@ multiplicity-controlled criterion.
 
 \subsection{Terminal army and economy pattern}
 
-A deterministic analyzer validated and reduced all 1,472 raw completion
+A deterministic analyzer validated and reduced all \TerminalRawRecordCount{} raw completion
 records from the confirmatory and two diagnostic panels. Across confirmatory
 pairs, the champion improves its candidate-minus-opponent terminal balance by
-30.58 combatants and 31.19 total units while holding 1,217.93 fewer credits.
+\ConfirmatoryTerminalCombatantDifference{} combatants and
+\ConfirmatoryTerminalUnitDifference{} total units while holding
+\ConfirmatoryTerminalCreditReduction{} fewer credits.
 Outcome changes mechanically alter terminal snapshots, so we also examine the
 \StableDrawPairCount{} pairs that remain tick-cap draws under both methods.
 They have identical score and duration, yet the champion ends with
@@ -69,8 +73,10 @@ They have identical score and duration, yet the champion ends with
 \StableDrawCreditDifference{} relative credits.
 
 The strategy-revert panel has the same qualitative pattern: the champion has
-19.89 more relative combatants, 15.70 more relative units, and 857.68 fewer
-credits overall. These endpoints are consistent with converting banked
+\StrategyTerminalCombatantDifference{} more relative combatants,
+\StrategyTerminalUnitDifference{} more relative units, and
+\StrategyTerminalCreditReduction{} fewer credits overall. These endpoints
+are consistent with converting banked
 resources into fielded combat power. They do not establish when or how that
 conversion occurred, because the preserved games contain no action trace,
 production timeline, combat log, or intermediate state trajectory. Likewise,

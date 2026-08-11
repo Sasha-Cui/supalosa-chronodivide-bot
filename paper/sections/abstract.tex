@@ -8,15 +8,17 @@ The pipeline groups map revisions into families, screens simulator
 compatibility without policy outcomes, isolates a pinned Supalosa opponent,
 controls engine and participant randomness, swaps physical starts, seals
 held-out outcomes, and binds every result to source, runtime, map, plan, and
-scheduler commitments. Five run-distinct 32-policy searches use deterministic
+scheduler commitments. Five run-distinct \OptimizerCandidateCount{}-policy
+searches use deterministic
 mutations and successive halving; a common-seed championship then selects one
 coordinate-free generic policy using training families only. In a frozen
-512-game evaluation over 16 sealed
+\ConfirmatoryGameCount{}-game evaluation over \TestFamilyCount{} sealed
 families, the selected policy scores \ChampionScore{} versus \DefaultScore{}
 for the shipped StrongBot default. The equally family-weighted improvement is
 \ImprovementEstimate{} (family-clustered 95\% CI
-[\ImprovementCILower{},~\ImprovementCIUpper{}]); 14 family effects are positive
-and two are zero. A separate prespecified gate does not establish absolute
+[\ImprovementCILower{},~\ImprovementCIUpper{}]); \PositiveFamilyCount{} family
+effects are positive and \ZeroFamilyCount{} are zero. A separate prespecified
+gate does not establish absolute
 superiority: the one-sided 95\% lower bound for the selected policy's score
 margin above 0.5 is \ChampionAbsoluteLower{}. Paired outcomes show that the
 configured policy primarily replaces losses with survival or wins. Component

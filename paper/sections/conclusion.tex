@@ -3,10 +3,11 @@
 We converted an exploratory Chrono Divide bot project into a deterministic,
 family-disjoint, provenance-bound scripted-policy configuration study. Five
 successive-halving searches and a common-seed championship selected one policy
-from training families. Across 16 sealed test families, its score improves on
+from training families. Across \TestFamilyCount{} sealed test families, its score improves on
 the shipped default by \ImprovementEstimate{} (family-clustered 95\% CI
-[\ImprovementCILower{},~\ImprovementCIUpper{}]); 14 effects are positive and two
-are zero, and the gain mainly converts losses to tick-cap draws.
+[\ImprovementCILower{},~\ImprovementCIUpper{}]); \PositiveFamilyCount{} effects
+are positive and \ZeroFamilyCount{} are zero, and the gain mainly converts
+losses to tick-cap draws.
 
 Yet its one-sided lower score margin against Supalosa is
 \ChampionAbsoluteLower{}, so absolute superiority is not established. Endpoint

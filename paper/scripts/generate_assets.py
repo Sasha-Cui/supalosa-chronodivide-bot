@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+from decimal import Decimal, ROUND_HALF_UP
 import hashlib
 import json
 import math
@@ -97,12 +98,19 @@ def fmt(value: float, digits: int = 3) -> str:
     return f"{float(value):.{digits}f}"
 
 
+def fmt_half_up(value: float, digits: int) -> str:
+    quantum = Decimal(1).scaleb(-digits)
+    rounded = Decimal(str(value)).quantize(quantum, rounding=ROUND_HALF_UP)
+    return f"{rounded:.{digits}f}"
+
+
 def write(path: Path, content: str) -> None:
     path.write_text(content.rstrip() + "\n", encoding="utf-8")
 
 
 def generate_metrics(
     confirmatory: dict[str, Any],
+    family_data: dict[str, Any],
     mechanism: dict[str, Any],
     component: dict[str, Any],
     terminal: dict[str, Any],
@@ -121,12 +129,60 @@ def generate_metrics(
         if row["ablationMethodId"] == "revertStrategy"
     )
     paired = terminal["confirmatory"]["championMinusDefaultPaired"]
+    transition_matrix = paired["outcomeTransitionCounts"]
     draw_to_draw = paired["outcomeTransitionDetails"]["drawToDraw"]
     stable_terminal = draw_to_draw["terminalCandidateMinusBaselineDifference"]
+    overall_terminal = paired["terminalCandidateMinusBaselineDifference"]
+    strategy_terminal = terminal["component"]["championMinusKeyReverts"][
+        "revertStrategy"
+    ]["terminalCandidateMinusBaselineDifference"]
+    family_effects = [row["championMinusDefault"] for row in family_data["families"]]
+    paired_counts = {
+        float(score): count for score, count in paired["pairedScoreDifferenceCounts"].items()
+    }
+    improved_pairs = sum(count for score, count in paired_counts.items() if score > 0)
+    regressed_pairs = sum(count for score, count in paired_counts.items() if score < 0)
+    unchanged_pairs = paired_counts.get(0.0, 0)
+    mechanism_methods = mechanism["descriptiveMethods"]
+    local_scores = [
+        method["score"]
+        for method_id, method in mechanism_methods.items()
+        if method_id.startswith("local")
+    ]
+    mechanism_pairwise = [
+        row["estimate"] for row in mechanism["pairwiseChampionMinusLocal"]
+    ]
+    games_per_method = sum(records["champion"][key] for key in ("wins", "draws", "losses"))
+    if games_per_method != sum(records["default"][key] for key in ("wins", "draws", "losses")):
+        raise ValueError("confirmatory per-method game counts differ")
 
     expect_close(improvement["estimate"], paired["scoreDifference"], "terminal score effect")
     expect_close(records["champion"]["score"], terminal["confirmatory"]["methods"]["champion"]["score"], "champion score")
     expect_close(records["default"]["score"], terminal["confirmatory"]["methods"]["default"]["score"], "default score")
+    if len(family_effects) != confirmatory["design"]["familyCount"]:
+        raise ValueError("confirmatory family count drift")
+    signs = {
+        "positive": sum(effect > 0 for effect in family_effects),
+        "zero": sum(effect == 0 for effect in family_effects),
+        "negative": sum(effect < 0 for effect in family_effects),
+    }
+    if signs != {
+        "positive": improvement["positiveFamilies"],
+        "zero": improvement["zeroFamilies"],
+        "negative": improvement["negativeFamilies"],
+    }:
+        raise ValueError("confirmatory family sign counts drift")
+    if improved_pairs + regressed_pairs + unchanged_pairs != paired["pairedGames"]:
+        raise ValueError("paired outcome direction counts drift")
+    if paired["winCountDifference"] != records["champion"]["wins"] - records["default"]["wins"]:
+        raise ValueError("confirmatory win difference drift")
+    if -paired["lossCountDifference"] != records["default"]["losses"] - records["champion"]["losses"]:
+        raise ValueError("confirmatory loss difference drift")
+    expect_close(
+        mechanism_effect["estimate"],
+        mechanism_methods["champion"]["score"] - sum(local_scores) / len(local_scores),
+        "mechanism score contrast",
+    )
     if supported["targetCount"] != 54 or supported["exclusionCounts"] != {"fail": 6, "review": 7}:
         raise ValueError("supported family population drift")
     if roles["roleCounts"] != {"development": 12, "reserve": 4, "test": 16, "train": 22}:
@@ -164,6 +220,8 @@ def generate_metrics(
         "ChampionshipGameCount": "2,112",
         "DevelopmentGameCount": "440",
         "ConfirmatoryGameCount": "512",
+        "ConfirmatoryShardCount": str(confirmatory["scheduler"]["taskCount"]),
+        "ConfirmatoryGamesPerMethod": str(games_per_method),
         "MechanismGameCount": "480",
         "ComponentGameCount": "480",
         "TotalGameCount": "8,704",
@@ -178,7 +236,11 @@ def generate_metrics(
         "ImprovementCILower": fmt(improvement["confidenceInterval"]["lower"]),
         "ImprovementCIUpper": fmt(improvement["confidenceInterval"]["upper"]),
         "ChampionAbsoluteMargin": fmt(absolute["estimate"]),
+        "ChampionAbsoluteSE": fmt(absolute["familyClusteredStandardError"]),
         "ChampionAbsoluteLower": fmt(absolute["oneSidedLowerBound"]),
+        "FamiliesAboveHalfCount": str(absolute["familiesAboveHalf"]),
+        "FamiliesEqualHalfCount": str(absolute["familiesEqualHalf"]),
+        "FamiliesBelowHalfCount": str(absolute["familiesBelowHalf"]),
         "DefaultWins": str(records["default"]["wins"]),
         "DefaultDraws": str(records["default"]["draws"]),
         "DefaultLosses": str(records["default"]["losses"]),
@@ -190,7 +252,15 @@ def generate_metrics(
         "NegativeFamilyCount": str(improvement["negativeFamilies"]),
         "ImprovementBootstrapLower": fmt(sensitivity["improvementBootstrap95Interval"]["lower"]),
         "ImprovementBootstrapUpper": fmt(sensitivity["improvementBootstrap95Interval"]["upper"]),
+        "ChampionBootstrapLower": fmt(sensitivity["championScoreBootstrap95Interval"]["lower"]),
+        "ChampionBootstrapUpper": fmt(sensitivity["championScoreBootstrap95Interval"]["upper"]),
         "ImprovementSignFlipP": "0.000122",
+        "MinimumFamilyEffect": fmt(min(family_effects)),
+        "MaximumFamilyEffect": fmt(max(family_effects)),
+        "MechanismChampionScore": fmt(mechanism_methods["champion"]["score"]),
+        "MechanismLocalAverageScore": fmt(sum(local_scores) / len(local_scores)),
+        "MechanismPairwiseMinimum": fmt(min(mechanism_pairwise)),
+        "MechanismPairwiseMaximum": fmt(max(mechanism_pairwise)),
         "MechanismEstimate": fmt(mechanism_effect["estimate"]),
         "MechanismCILower": fmt(mechanism_effect["confidenceInterval"]["lower"]),
         "MechanismCIUpper": fmt(mechanism_effect["confidenceInterval"]["upper"]),
@@ -202,13 +272,26 @@ def generate_metrics(
         "StrategyOrdinaryUpper": fmt(strategy["unadjusted95"]["upper"]),
         "StrategyFamilywiseLower": fmt(strategy["bonferroniFamilywise95"]["lower"]),
         "StrategyFamilywiseUpper": fmt(strategy["bonferroniFamilywise95"]["upper"]),
-        "ImprovedPairCount": "150",
-        "RegressedPairCount": "6",
-        "UnchangedPairCount": "100",
+        "ImprovedPairCount": str(improved_pairs),
+        "RegressedPairCount": str(regressed_pairs),
+        "UnchangedPairCount": str(unchanged_pairs),
+        "LossToDrawPairCount": str(transition_matrix["baseline"]["draw"]),
+        "LossToWinPairCount": str(transition_matrix["baseline"]["candidate"]),
+        "DrawToWinPairCount": str(transition_matrix["draw"]["candidate"]),
+        "DrawToLossPairCount": str(transition_matrix["draw"]["baseline"]),
+        "ChampionWinGainCount": str(paired["winCountDifference"]),
+        "ChampionLossAvoidedCount": str(-paired["lossCountDifference"]),
+        "TerminalRawRecordCount": f"{sum(row['games'] for row in terminal['campaignIntegrity'].values()):,}",
+        "ConfirmatoryTerminalCombatantDifference": fmt(overall_terminal["combatants"], 2),
+        "ConfirmatoryTerminalUnitDifference": fmt(overall_terminal["units"], 2),
+        "ConfirmatoryTerminalCreditReduction": fmt_half_up(abs(overall_terminal["credits"]), 2),
         "StableDrawPairCount": str(draw_to_draw["games"]),
         "StableDrawCombatantDifference": fmt(stable_terminal["combatants"], 2),
         "StableDrawUnitDifference": fmt(stable_terminal["units"], 2),
         "StableDrawCreditDifference": fmt(stable_terminal["credits"], 2),
+        "StrategyTerminalCombatantDifference": fmt(strategy_terminal["combatants"], 2),
+        "StrategyTerminalUnitDifference": fmt(strategy_terminal["units"], 2),
+        "StrategyTerminalCreditReduction": fmt_half_up(abs(strategy_terminal["credits"]), 2),
     }
     return "\n".join(
         rf"\newcommand{{\{name}}}{{{value}}}" for name, value in macros.items()
@@ -427,6 +510,7 @@ def generate_all(
     outputs = {
         "metrics.tex": generate_metrics(
             confirmatory,
+            families,
             mechanism,
             component,
             terminal,

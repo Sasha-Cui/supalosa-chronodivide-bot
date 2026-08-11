@@ -39,6 +39,11 @@ class GeneratePaperAssetsTest(unittest.TestCase):
             self.assertIn(r"\newcommand{\AcceptedAllocationCount}{562}", metrics)
             self.assertIn(r"\newcommand{\AcceptedCoreHours}{288.72}", metrics)
             self.assertIn(r"\newcommand{\AcceptedPeakRSSGiB}{1.63}", metrics)
+            self.assertIn(r"\newcommand{\ChampionAbsoluteSE}{0.032}", metrics)
+            self.assertIn(r"\newcommand{\ChampionBootstrapLower}{0.482}", metrics)
+            self.assertIn(r"\newcommand{\LossToDrawPairCount}{104}", metrics)
+            self.assertIn(r"\newcommand{\TerminalRawRecordCount}{1,472}", metrics)
+            self.assertIn(r"\newcommand{\StrategyTerminalCreditReduction}{857.68}", metrics)
             family_plot = (Path(directory) / "family_effects_plot.tex").read_text(encoding="utf-8")
             self.assertEqual(family_plot.count("mark=*"), 1)
             self.assertIn("(0.84375000,16)", family_plot)
@@ -81,6 +86,73 @@ class GeneratePaperAssetsTest(unittest.TestCase):
         incomplete.pop(next(iter(incomplete)))
         with self.assertRaisesRegex(ValueError, "manifest names differ"):
             MODULE.validate_expected_hashes(incomplete)
+
+    def test_critical_result_literals_live_only_in_generated_metrics(self) -> None:
+        sources = [REPO / "paper" / "main.tex", REPO / "paper" / "supplement.tex"]
+        sources.extend(sorted((REPO / "paper" / "sections").glob("*.tex")))
+        manuscript = "\n".join(path.read_text(encoding="utf-8") for path in sources)
+        for literal in (
+            "0.199",
+            "0.535",
+            "0.336",
+            "0.215",
+            "0.457",
+            "-0.021",
+            "288.72",
+            "1.63",
+            "8,704",
+        ):
+            with self.subTest(literal=literal):
+                self.assertNotIn(literal, manuscript)
+
+    def test_confirmatory_boundary_repeats_at_reader_entry_points(self) -> None:
+        section_dir = REPO / "paper" / "sections"
+        entry_points = {
+            name: (section_dir / f"{name}.tex").read_text(encoding="utf-8")
+            for name in ("abstract", "introduction", "results", "conclusion")
+        }
+        for name, text in entry_points.items():
+            for macro in (
+                r"\ImprovementEstimate",
+                r"\ImprovementCILower",
+                r"\ImprovementCIUpper",
+                r"\ChampionAbsoluteLower",
+            ):
+                with self.subTest(section=name, macro=macro):
+                    self.assertIn(macro, text)
+        required_failure_language = {
+            "abstract": "does not establish absolute superiority",
+            "introduction": r"does \emph{not} establish",
+            "results": "absolute-strength gate fails",
+            "conclusion": "absolute superiority is not established",
+        }
+        for name, phrase in required_failure_language.items():
+            with self.subTest(section=name):
+                self.assertIn(phrase, " ".join(entry_points[name].split()))
+
+    def test_review_sources_remain_anonymous(self) -> None:
+        main = (REPO / "paper" / "main.tex").read_text(encoding="utf-8")
+        supplement = (REPO / "paper" / "supplement.tex").read_text(encoding="utf-8")
+        for text in (main, supplement):
+            self.assertIn(r"\author{Anonymous Author(s)}", text)
+            self.assertIn(r"\institute{Anonymous institution}", text)
+        sources = [main, supplement]
+        sources.extend(
+            path.read_text(encoding="utf-8")
+            for path in sorted((REPO / "paper" / "sections").glob("*.tex"))
+        )
+        manuscript = "\n".join(sources)
+        for denied in (
+            "Sasha" + " Cui",
+            "sasha.z.cui" + "@gmail.com",
+            "zc" + "362",
+            "pi_" + "jss233",
+            "/nfs/" + "roberts",
+            "github.com/" + "Sasha" + "-" + "Cui",
+            "Yale" + " University",
+        ):
+            with self.subTest(denied=denied):
+                self.assertNotIn(denied, manuscript)
 
 
 if __name__ == "__main__":
