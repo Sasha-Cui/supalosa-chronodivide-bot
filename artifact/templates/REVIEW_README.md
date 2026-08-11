@@ -35,7 +35,7 @@ unchanged. To compile the PDFs, use a TeX Live distribution with Springer
 make -C paper main supplement
 ```
 
-Expected output is a 17-page `paper/build/main.pdf` and a five-page
+Expected output is a 16-page `paper/build/main.pdf` and a five-page
 `paper/build/supplement.pdf`. The non-reference main-paper content ends on page
 14. PDF byte hashes may vary with TeX distribution metadata; the committed TeX
 fragment hashes are the reproducibility check.
