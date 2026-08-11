@@ -1,127 +1,142 @@
 # Venue strategy
 
-Verified 2026-08-04 from official venue pages. Recheck the call and remote-
-presentation instructions immediately before submission.
+Verified **2026-08-11** from official venue pages. Recheck the call,
+registration price, and presenter instructions immediately before submission.
 
 ## Decision
 
-**Provisional primary target: EvoApplications 2027, Soft Computing Applied
-to Games (SCAG) special session, conditional on written confirmation of remote
-presentation.** Its scope explicitly includes empirical analysis of
-computational-intelligence techniques, game-based benchmarking, and competitive
-coevolution. That is a close fit for a leakage-controlled comparison of global
-and map-structure-conditioned StrongBot configurations.
+**Primary target: EvoApplications 2027, Soft Computing Applied to Games (SCAG)
+special session.** This is the best topical and ambition-level fit for the
+completed study. EvoApplications explicitly welcomes applications of
+evolutionary computation, including significant work in progress, while SCAG
+has historically solicited learning in games, empirical analysis of
+computational-intelligence techniques, and game-based benchmarking. The five
+independent randomized policy searches and their leakage-controlled evaluation
+give the paper a genuine evolutionary-computation application, even though the
+successive-halving method itself is not novel.
 
 - Paper deadline: **2026-11-01**.
-- Internal paper-ready deadline: **2026-10-20**.
-- Format: double-blind Springer LNCS, 14 pages plus unlimited references.
-- Conference: 2027-03-31 through 2027-04-02 in Mainz, Germany.
-- Attendance: EvoStar 2027 is explicitly hybrid, and the 2026 event published
-  dedicated instructions and registration for online presenters. The 2027
-  presenter and registration instructions are not yet posted, however, so
-  remote presentation is highly plausible but not yet guaranteed. Obtain
-  written confirmation by early September 2026 and retain it with the
-  submission records; do not submit if physical attendance is required.
-- Official pages: [SCAG scope](https://www.evostar.org/2027/evoapps/scag/),
+- Internal full-draft deadline: **2026-09-20**.
+- Internal submission-ready deadline: **2026-10-15**.
+- Notification: **2027-01-10**; camera-ready: **2027-01-24**.
+- Format: double-blind Springer LNCS, **14 pages plus unlimited references and
+  acknowledgements**.
+- Review: at least three program-committee reviewers.
+- Conference: **2027-03-31 through 2027-04-02**, Mainz, Germany, in **hybrid
+  mode**.
+- Attendance: at least one author must register, attend, and present. The event
+  states that it is hybrid, but the 2027 site does not yet spell out online
+  presenter selection or online registration. Obtain written confirmation that
+  an accepted paper may be presented remotely before submission; retain the
+  response in the submission records.
+- Official pages: [SCAG session](https://www.evostar.org/2027/evoapps/scag/),
+  [EvoApplications call](https://www.evostar.org/2027/evoapps/),
   [important dates](https://www.evostar.org/2027/important-dates/),
   [submission instructions](https://www.evostar.org/2027/submit-paper/), and
   [hybrid conference statement](https://www.evostar.org/2027/).
 
-The project is currently **below** submission standard because deterministic
-engine control, family-disjoint splits, the conditioned method, independent
-optimizer runs, and confirmatory results are not complete. It will be **near**
-SCAG standard if the workshop MVP passes its frozen primary endpoint and the
-artifact is reproducible.
+The project is now **near the expected SCAG standard**: its empirical program
+is complete, the relative confirmatory endpoint passed, the failed absolute
+endpoint is reported, and every result is tied to frozen manifests and job
+records. It is not yet submission-ready because the manuscript, anonymous
+artifact, license boundary, and clean-clone reproduction remain unfinished.
 
-Likely reviewer concerns are that the contribution is ordinary bot tuning, the
-single Supalosa opponent limits external validity, map descriptors leak identity,
-the proprietary game limits reproduction, or improvements come from unequal
-simulation budgets. The paper must answer these with an equal-launched-budget
-design, descriptor-shuffle control, family-disjoint sealed test, coordinate-free
-features, paired starts/seeds, complete provenance, and a precise one-opponent
-claim.
+Likely reviewer concerns and the required answers are:
+
+| Concern | Evidence or response required in the paper |
+| --- | --- |
+| This is ordinary hand tuning | Describe the fixed policy space, five independent searches, common-seed championship, and held-out evaluation; claim an empirical workflow, not a new optimizer. |
+| Only one opponent and matchup are studied | State this limitation in the abstract, introduction, and conclusion; define the estimand as performance against pinned Supalosa on the supported family population. |
+| Map or test leakage explains the gain | Show revision-aware family grouping, pre-training role commitments, training-only championship, single development gate, and one-time sealed test opening. |
+| The simulator or opponent is contaminated | Document explicit seeds, reciprocal physical starts, source/runtime hashes, and independent loading of the pinned opponent. |
+| Individual games are treated as independent | Use family-level estimands and the frozen family-clustered interval; keep match-level counts descriptive. |
+| The mechanism is overstated | Lead with the passed relative endpoint; label component and terminal analyses post-confirmatory and acknowledge multiplicity and endpoint-only limitations. |
+| The commercial game prevents reproduction | Release author-owned code, plans, hashes, metadata, aggregates, and asset-acquisition instructions; do not redistribute third-party maps or game assets without permission. |
 
 ## Fallbacks
 
-### ICAART 2027 — conditional only
+### ICAART 2027 — earlier, broader, and more expensive fallback
 
-ICAART covers agent architectures, simulation, evolutionary computing,
-planning, and uncertainty. Its first regular-paper deadline is 2026-09-15 and
-its second regular/position round is 2026-10-22. A completed empirical study
-should be submitted as a regular paper, not relabeled as a position paper.
+ICAART covers agents, simulation, evolutionary computing, planning, and
+learning. It is a broader and weaker topical fit than SCAG, but its site gives
+specific online oral and poster instructions and says speakers may present
+remotely when unable to travel.
 
-ICAART states that remote presentation is allowed only exceptionally when a
-speaker cannot travel. It is therefore not an unconditional fit for the owner's
-attendance requirement. Use it only after obtaining written remote-presentation
-approval from the organizers. Official pages:
-[call and dates](https://icaart.scitevents.org/CallforPapers.aspx?y=2027),
-[presentation policy](https://icaart.scitevents.org/presentationdetails.aspx), and
-[paper categories](https://icaart.scitevents.org/Guidelines.aspx?y=2027).
+- First regular-paper deadline: **2026-09-15**.
+- Second position/regular-paper deadline: **2026-10-22**.
+- Workshop and special-session paper deadline: **2026-12-03**.
+- Conference: **2027-02-23 through 2027-02-25**.
+- Early speaker registration: **EUR 620** for members or **EUR 680** for
+  nonmembers at the currently posted rates.
+- Remote status: supported exceptionally for speakers unable to travel; online
+  presentations are live over Zoom and require presence even when a backup
+  video is uploaded. Ask the secretariat to confirm eligibility before paying.
+- Official pages: [call and dates](https://icaart.scitevents.org/CallForPapers.aspx?y=2027),
+  [conference and hybrid statement](https://icaart.scitevents.org/home.aspx),
+  [online presentation instructions](https://icaart.scitevents.org/presentationdetails.aspx),
+  and [registration fees](https://icaart.scitevents.org/RegistrationFees.aspx?y=2027).
 
-The SPIKE eSports special session has a 2026-12-03 deadline, but its emphasis on
-player/team performance and strategy prediction is weaker than SCAG for this
-agent-configuration study.
+If the manuscript is unusually strong by early September, ICAART's first
+regular round is possible but unnecessarily rushed. The October round is the
+practical fallback if EvoStar does not confirm remote presentation. Submit the
+completed study as a regular paper, not as a position paper. The SPIKE eSports
+special session is available in December but emphasizes player and team
+performance more than agent configuration.
 
-### Entertainment Computing — guaranteed no-travel fallback
+### Entertainment Computing — no-travel archival fallback
 
 Elsevier's *Entertainment Computing* is a rolling journal with no conference
-attendance or presentation requirement. Its scope explicitly includes computer
-and video games and theoretical, technical, and empirical work in entertainment
-computing. It is the strongest fallback if remote presentation is not confirmed
-or the SCAG deadline is missed.
+presentation requirement. Its scope includes computer and video games and
+theoretical, technical, and empirical work in entertainment computing. It is a
+reasonable archival fallback if neither conference confirms remote
+presentation, although the user's preference is a lower-tier conference or
+workshop rather than a journal. Official page:
+[Entertainment Computing](https://www.sciencedirect.com/journal/entertainment-computing).
 
-This route requires the comprehensive study rather than a thin workshop MVP:
-family-disjoint evaluation, powered uncertainty, mechanism ablations, exact
-reproducibility, and a candid one-game/one-opponent scope. Subscription
-publication does not require an author fee; open access is optional. Official
-page: [Entertainment Computing](https://www.sciencedirect.com/journal/entertainment-computing).
-
-### IOCAC 2027 — remote dissemination fallback only
+### IOCAC 2027 — fully online dissemination fallback only
 
 The International Online Conference on Applied Computing is fully virtual and
-free, with an abstract deadline of 2027-02-26 and a later 4--8 page proceedings
-option. Its game-AI fit and archival value are substantially weaker than SCAG
-or *Entertainment Computing*, so use it only as a no-travel dissemination
-fallback, not as the primary publication target. Official page:
-[IOCAC 2027](https://sciforum.net/event/IOCAC2027/home).
+free, with an abstract deadline of **2027-02-26** and an online event on
+**2027-06-28 through 2027-06-30**. Its game-AI fit and archival value are much
+weaker than SCAG or ICAART, so use it only for dissemination, not as the main
+paper. Official page: [IOCAC 2027](https://sciforum.net/event/IOCAC2027/home).
 
 ### FDG 2027 — watch list
 
-FDG is thematically plausible and its 2026 edition supported hybrid sessions,
-but no official FDG 2027 call or attendance policy was available on 2026-08-04.
-Monitor the [FDG conference series](https://www.foundationsofdigitalgames.org/)
-and use it only if the new call confirms both scope and remote presentation.
+FDG is thematically plausible, but no official 2027 call and remote-presenter
+policy was verified on 2026-08-11. Monitor the
+[FDG conference series](https://www.foundationsofdigitalgames.org/) and consider
+it only if the eventual call fits the deadline and explicitly permits remote
+presentation.
 
 ## Excluded current options
 
-- **EXAG 2026:** topical, but the official call requires an in-person oral
-  presentation. It conflicts with the attendance constraint.
-- **IEEE CoG:** the 2026 deadlines passed, current materials do not offer a
-  remote-presenter route, and no official 2027 call is posted.
-- **NeurIPS/ICLR/general-ML flagships:** wrong ambition and contribution level
-  for this single-game, single-opponent empirical study.
-- **TMLR/DMLR:** possible only after a substantially broader study or a legally
-  redistributable maintained benchmark; neither is the present target.
+- NeurIPS, ICLR, ICML, and similarly broad flagships: the one-game,
+  one-opponent empirical contribution does not support that ambition or scope.
+- IEEE Conference on Games 2026: its deadline has passed, and no official 2027
+  call with a remote-presenter route is available yet.
+- Any event that requires an in-person talk: incompatible with the author's
+  stated attendance constraint.
 
 ## Submission gate
 
-Submit to SCAG only if all of the following are true by 2026-10-20:
+Submit to SCAG only when all of the following are true:
 
-1. Explicit seed control and same-seed deterministic replay tests pass.
-2. At least 26 family-disjoint held-out map families survive contamination and
-   fidelity screening, unless a development-only variance recalibration made
-   before protocol freeze justifies and records a different minimum.
-3. The global and conditioned methods receive equal launched-attempt budgets.
-4. Ten independent primary optimizer runs and the fixed-count sealed
-   evaluation are complete; five-run screens remain development-only.
-5. The primary estimate, uncertainty analysis, and all prespecified ablations
-   are generated from registered manifests.
-6. The paper states the one-Supalosa-opponent limitation and does not imply
-   broad game-AI superiority.
-7. Releasable original code, manifests, hashes, metadata, and aggregate results
-   reproduce every table and figure.
+1. The LNCS manuscript fits 14 pages excluding references and acknowledgements,
+   and the abstract, introduction, results, and conclusion use the frozen claim
+   boundary.
+2. Every reported number and figure is regenerated from committed aggregate
+   artifacts, with an automated consistency check against the result registry.
+3. The paper distinguishes the passed champion-versus-default endpoint from the
+   failed champion-versus-Supalosa absolute-strength endpoint.
+4. The one-opponent, one-faction matchup, fixed tick cap, supported-map, and
+   endpoint-only diagnostic limitations are explicit.
+5. The anonymous artifact reproduces the tables and figures in a clean
+   environment and contains no author-identifying URLs or metadata.
+6. The release manifest separates author-owned code and metadata from
+   third-party maps, MIX archives, and game assets.
+7. Written remote-presentation confirmation has been obtained from EvoStar.
 
-If these gates miss the deadline, do not convert exploratory results into a
-confirmatory claim. Prefer *Entertainment Computing* as the guaranteed
-no-travel route; use FDG 2027 only if its eventual call explicitly permits
-remote presentation, and treat IOCAC as dissemination rather than the main paper.
+No more outcome-bearing games should be added to the opened family population
+to improve the story. Any future opponent, faction, or instrumented-trajectory
+study must be registered as a separately versioned prospective experiment.
