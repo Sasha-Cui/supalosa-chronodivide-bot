@@ -4,6 +4,7 @@ import path from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import {
+    assertResearchAccessMode,
     buildResearchRunSummary,
     LoadedResearchRole,
     loadResearchRole,
@@ -98,6 +99,12 @@ const validDevelopmentV2Plan = (): Record<string, unknown> => {
     };
 };
 
+const validConfirmatoryPlan = (): Record<string, unknown> => ({
+    ...validDevelopmentV2Plan(),
+    role: "test",
+    purpose: "confirmatory-evaluation",
+});
+
 const temporaryDirectories: string[] = [];
 
 afterEach(() => {
@@ -154,6 +161,17 @@ describe("strict research run plan", () => {
         expect(() => parseResearchRunPlan(wrong)).toThrow(/champion, default/);
     });
 
+    test("keeps sealed test execution behind the separate confirmatory access mode", () => {
+        const plan = parseResearchRunPlan(validConfirmatoryPlan());
+        expect(plan.role).toBe("test");
+        expect(plan.purpose).toBe("confirmatory-evaluation");
+        expect(() => assertResearchAccessMode(plan, "standard")).toThrow(/separate confirmatory runner/);
+        expect(() => assertResearchAccessMode(parseResearchRunPlan(validDevelopmentV2Plan()), "confirmatory")).toThrow(
+            /only sealed test/,
+        );
+        expect(() => assertResearchAccessMode(plan, "confirmatory")).not.toThrow();
+    });
+
     test("seals development outcomes from summaries and scheduler output", () => {
         const accounting = {
             generatedAt: "2026-08-09T00:00:00.000Z",
@@ -173,12 +191,16 @@ describe("strict research run plan", () => {
         expect(sealed).not.toHaveProperty("draws");
         expect(sealed).not.toHaveProperty("candidateScoreRate");
 
+        const sealedTest = buildResearchRunSummary("test", accounting);
+        expect(sealedTest).toEqual(sealed);
+
         const open = buildResearchRunSummary("train", accounting);
         expect(open).toMatchObject({ outcomeAccess: "open-training", candidateWins: 3, baselineWins: 1 });
     });
 
-    test("rejects sealed roles, map overrides, country changes, and seed drift", () => {
-        expect(() => parseResearchRunPlan({ ...validPlan(), role: "test" })).toThrow(/test and reserve are inaccessible/);
+    test("rejects reserve roles, map overrides, country changes, and seed drift", () => {
+        expect(() => parseResearchRunPlan({ ...validPlan(), role: "reserve" })).toThrow(/reserve is inaccessible/);
+        expect(() => parseResearchRunPlan({ ...validPlan(), role: "test" })).toThrow(/not allowed for role test/);
         expect(() => parseResearchRunPlan({ ...validPlan(), candidateCountry: Countries.FRANCE })).toThrow(/Arabs mirror/);
         expect(() => parseResearchRunPlan({ ...validPlan(), mapName: "secret.map" })).toThrow(/unexpected=\[mapName\]/);
         const drifted = validPlan();

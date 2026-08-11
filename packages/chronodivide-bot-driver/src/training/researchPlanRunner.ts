@@ -19,14 +19,15 @@ export const RESEARCH_PLAN_SCHEMA_VERSION = 1 as const;
 export const RESEARCH_ROLE_MANIFEST_STATUS = "PRIVATE_FAMILY_ROLE_MANIFEST_NO_POLICY_OUTCOMES" as const;
 export const RESEARCH_PUBLIC_ROLE_STATUS = "FROZEN_FAMILY_ROLE_COMMITMENTS_IDENTITIES_PRIVATE" as const;
 
-export type ResearchRole = "train" | "development";
+export type ResearchRole = "train" | "development" | "test";
 export type ResearchPurpose =
     | "train-smoke"
     | "optimizer-search"
     | "development-qc"
     | "development-evaluation"
     | "development-v2-qc"
-    | "development-v2-evaluation";
+    | "development-v2-evaluation"
+    | "confirmatory-evaluation";
 
 export type ResearchPlanPolicy = {
     policyId: string;
@@ -97,9 +98,12 @@ const DEVELOPMENT_PURPOSES: ResearchPurpose[] = [
     "development-v2-qc",
     "development-v2-evaluation",
 ];
+const TEST_PURPOSES: ResearchPurpose[] = ["confirmatory-evaluation"];
 
 const developmentMethodIds = (purpose: ResearchPurpose): readonly string[] =>
-    purpose === "development-v2-qc" || purpose === "development-v2-evaluation"
+    purpose === "development-v2-qc" ||
+    purpose === "development-v2-evaluation" ||
+    purpose === "confirmatory-evaluation"
         ? ["champion", "default"]
         : ["conditioned", "global"];
 
@@ -190,11 +194,15 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
     if (!IDENTIFIER_PATTERN.test(runId)) {
         throw new Error(`runId may contain only letters, digits, dot, underscore, and hyphen`);
     }
-    if (value.role !== "train" && value.role !== "development") {
-        throw new Error("Research plan role must be train or development; test and reserve are inaccessible here");
+    if (value.role !== "train" && value.role !== "development" && value.role !== "test") {
+        throw new Error("Research plan role must be train, development, or test; reserve is inaccessible");
     }
     const role = value.role;
-    const allowedPurposes = role === "train" ? TRAIN_PURPOSES : DEVELOPMENT_PURPOSES;
+    const allowedPurposes = role === "train"
+        ? TRAIN_PURPOSES
+        : role === "development"
+            ? DEVELOPMENT_PURPOSES
+            : TEST_PURPOSES;
     if (typeof value.purpose !== "string" || !allowedPurposes.includes(value.purpose as ResearchPurpose)) {
         throw new Error(`Research purpose ${String(value.purpose)} is not allowed for role ${role}`);
     }
@@ -237,7 +245,7 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
             "requestedEngineSeed",
             "candidateSlot",
         ];
-        if (role === "development") {
+        if (role === "development" || role === "test") {
             expectedKeys.push("methodId");
         }
         assertExactKeys(`Episode ${index}`, raw, expectedKeys);
@@ -247,11 +255,11 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
         if (!IDENTIFIER_PATTERN.test(episodeId) || !IDENTIFIER_PATTERN.test(familyId)) {
             throw new Error(`Episode ${index} identifiers contain forbidden characters`);
         }
-        const methodId = role === "development" ? expectString(raw, "methodId") : policyId;
+        const methodId = role === "development" || role === "test" ? expectString(raw, "methodId") : policyId;
         if (!IDENTIFIER_PATTERN.test(methodId)) {
             throw new Error(`Episode ${index} methodId contains forbidden characters`);
         }
-        if (role === "development" && !developmentMethodIds(purpose).includes(methodId)) {
+        if ((role === "development" || role === "test") && !developmentMethodIds(purpose).includes(methodId)) {
             throw new Error(
                 `Episode ${index} development methodId must be one of ${developmentMethodIds(purpose).join(", ")}`,
             );
@@ -299,8 +307,8 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
     }
     const methodIds = [...schedules.keys()].sort();
     const expectedDevelopmentMethodIds = developmentMethodIds(purpose);
-    if (role === "development" && methodIds.join(",") !== expectedDevelopmentMethodIds.join(",")) {
-        throw new Error(`Development plans must contain exactly ${expectedDevelopmentMethodIds.join(" and ")} methods`);
+    if ((role === "development" || role === "test") && methodIds.join(",") !== expectedDevelopmentMethodIds.join(",")) {
+        throw new Error(`Sealed comparison plans must contain exactly ${expectedDevelopmentMethodIds.join(" and ")} methods`);
     }
     const reference = [...(schedules.get(methodIds[0]) ?? [])].sort();
     for (const methodId of methodIds) {
@@ -540,7 +548,7 @@ export const buildResearchRunSummary = (
         complete: accounting.completed + accounting.technicalFailures === accounting.requestedLaunches,
         technicallyClean: accounting.technicalFailures === 0,
     };
-    if (role === "development") {
+    if (role !== "train") {
         return {
             ...technicalSummary,
             outcomeAccess: "sealed-private-events",
@@ -599,7 +607,18 @@ const requireEnvPath = (name: string): string => {
     return path.resolve(value);
 };
 
-const main = async (): Promise<void> => {
+export type ResearchAccessMode = "standard" | "confirmatory";
+
+export const assertResearchAccessMode = (plan: ResearchRunPlan, accessMode: ResearchAccessMode): void => {
+    if (accessMode === "standard" && plan.role === "test") {
+        throw new Error("Sealed test plans require the separate confirmatory runner");
+    }
+    if (accessMode === "confirmatory" && (plan.role !== "test" || plan.purpose !== "confirmatory-evaluation")) {
+        throw new Error("The confirmatory runner accepts only sealed test confirmatory-evaluation plans");
+    }
+};
+
+export const runResearchPlanFromEnvironment = async (accessMode: ResearchAccessMode): Promise<void> => {
     const repoRoot = gitRoot();
     const driverRoot = path.join(repoRoot, "packages", "chronodivide-bot-driver");
     if (path.resolve(process.cwd()) !== driverRoot) {
@@ -616,6 +635,7 @@ const main = async (): Promise<void> => {
     }
     const planBytesSha256 = sha256File(planPath);
     const plan = parseResearchRunPlan(parseJsonFile(planPath));
+    assertResearchAccessMode(plan, accessMode);
     const publicCommitmentsPath = path.join(
         repoRoot,
         "research",
@@ -634,7 +654,7 @@ const main = async (): Promise<void> => {
         mixDir,
         maps: mapNames,
         effectiveConfig: {
-            runner: "researchPlanRunner-v1",
+            runner: accessMode === "confirmatory" ? "researchConfirmatoryPlanRunner-v1" : "researchPlanRunner-v1",
             planPath,
             planBytesSha256,
             role: plan.role,
@@ -650,7 +670,7 @@ const main = async (): Promise<void> => {
             candidateCountry: plan.candidateCountry,
             baselineCountry: plan.baselineCountry,
             maxTicks: plan.maxTicks,
-            outcomeAccess: plan.role === "development" ? "sealed-private-events" : "open-training",
+            outcomeAccess: plan.role === "train" ? "open-training" : "sealed-private-events",
         },
         baseline: baselineFactory.descriptor,
         gameSeedBase: plan.engineSeedBase,
@@ -737,7 +757,7 @@ const main = async (): Promise<void> => {
 const invokedModuleUrl = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : null;
 
 if (import.meta.url === invokedModuleUrl) {
-    main().catch((error) => {
+    runResearchPlanFromEnvironment("standard").catch((error) => {
         console.error(error);
         process.exitCode = 1;
     });

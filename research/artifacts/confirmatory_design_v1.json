@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "status": "FROZEN_BEFORE_TEST_IDENTITY_ACCESS",
+  "methodVersion": 2,
+  "testIdentitiesPrivate": true,
+  "testArtifactSha256": "63c22710de11e3490260fb78ed9246456eaf0bca9dec6bffdf266b7e5cf4e8b2",
+  "testRoleCommitmentSha256": "2f6dcce3c9021f050bc84eae69ea12b9fd094af8b78bf0567724ac4a156f4716",
+  "splitCommitmentSha256": "6b78f6c550096a4a3fffe5b2c4d1f2128e33b0f80e6462e541b98d6408d1fe0a",
+  "sourcePopulationCommitmentSha256": "ece688c14d8c02b98754a88f04e42581f4c6c6044d742a7b8d4e0feaa5177fa5",
+  "championArtifactSha256": "40a53c142fa30725ea5d22032d4b6dfcda4f358e15e1b8d36ac6a102b76e9ee1",
+  "championPolicyId": "ab0071009cbd5f1fc9e2f1a76a562455a0ebeacf77dac1cd9c13b9fc6374203f",
+  "defaultPolicyId": "8fc9e46aba10fb84d7283e16a4ccde12d3e3e429c29d5caca5b42dd5a25cef4a",
+  "developmentUnblindingSha256": "2d07f8d0bec8befb470342081e4753d0e910d7aa211873f8ea11aed3ecd0202d",
+  "engineSeedBase": 60000000,
+  "familyRankDomain": "chrono-divide-confirmatory-v1",
+  "familyCount": 16,
+  "blocksPerFamily": 8,
+  "reciprocalSlotsPerMethod": 2,
+  "methodCount": 2,
+  "shardCount": 128,
+  "launchedGameCount": 512,
+  "maxTicks": 18000,
+  "schedulerAccount": "pi_jss233",
+  "outcomeAccess": "sealed-private-events",
+  "attemptPolicy": {
+    "inRunRetries": 0,
+    "maxPrelaunchAttemptsPerShard": 3,
+    "postLaunchRetryAuthorized": false,
+    "componentLaunchHardCap": 512
+  },
+  "analysis": {
+    "improvement": "two-sided family-clustered 95% confidence interval for champion-minus-default",
+    "championAbsolute": "one-sided family-clustered 95% lower bound for champion score minus 0.5",
+    "degreesOfFreedom": 15,
+    "twoSidedCriticalValue": 2.131449545559323,
+    "oneSidedCriticalValue": 1.7530503556925547,
+    "successRequiresBothLowerBoundsAboveZero": true,
+    "singleUnblinding": true
+  }
+}
