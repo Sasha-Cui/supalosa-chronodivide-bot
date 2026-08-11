@@ -113,7 +113,7 @@ class FallbackManuscriptTest(unittest.TestCase):
             "Leakage-Resistant Evaluation of Scripted RTS Agent Configuration in "
             "Chrono Divide",
         )
-        self.assertEqual(metadata["abstractWordCount"], 193)
+        self.assertEqual(metadata["abstractWordCount"], 197)
         self.assertIn("0.336", metadata["abstract"])
         self.assertIn("-0.021", metadata["abstract"])
         self.assertNotRegex(metadata["abstract"], r"[\\{}]")
