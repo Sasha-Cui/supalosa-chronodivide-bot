@@ -83,6 +83,11 @@ class TerminalStateAnalysisTests(unittest.TestCase):
         self.assertEqual(comparison["outcomeTransitionCounts"]["draw"]["candidate"], 1)
         self.assertEqual(comparison["outcomeTransitionCounts"]["baseline"]["draw"], 1)
         self.assertEqual(comparison["pairedScoreDifferenceCounts"], {"0.5": 2})
+        self.assertEqual(comparison["outcomeTransitionDetails"]["drawToCandidate"]["games"], 1)
+        self.assertEqual(
+            comparison["outcomeTransitionDetails"]["baselineToDraw"]["meanScoreDifference"],
+            0.5,
+        )
         self.assertEqual(
             comparison["terminalCandidateMinusBaselineDifference"]["combatants"], 0.0
         )

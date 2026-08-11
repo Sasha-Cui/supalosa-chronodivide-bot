@@ -306,6 +306,7 @@ def paired_comparison(
     reference_rows: list[dict[str, Any]],
     *,
     include_families: bool = True,
+    include_transition_details: bool = True,
 ) -> dict[str, Any]:
     candidate = {pair_key(row): row for row in candidate_rows}
     reference = {pair_key(row): row for row in reference_rows}
@@ -315,11 +316,13 @@ def paired_comparison(
         raise ValueError("method pairing cells do not match")
 
     transitions: dict[str, Counter[str]] = {outcome: Counter() for outcome in OUTCOMES}
+    transition_keys: dict[tuple[str, str], list[tuple[Any, ...]]] = defaultdict(list)
     paired_score_differences: Counter[str] = Counter()
     for key in sorted(candidate):
         left = candidate[key]
         right = reference[key]
         transitions[str(right["winner"])][str(left["winner"])] += 1
+        transition_keys[(str(right["winner"]), str(left["winner"]))].append(key)
         difference = score(left) - score(right)
         paired_score_differences[f"{difference:g}"] += 1
 
@@ -356,6 +359,36 @@ def paired_comparison(
             for metric in TERMINAL_METRICS
         },
     }
+    if include_transition_details:
+        output["outcomeTransitionDetails"] = {
+            f"{reference_outcome}To{candidate_outcome.capitalize()}": {
+                "games": len(keys),
+                "meanScoreDifference": mean(
+                    score(candidate[key]) - score(reference[key]) for key in keys
+                ),
+                "meanTickDifference": mean(
+                    float(candidate[key]["ticks"]) - float(reference[key]["ticks"])
+                    for key in keys
+                ),
+                "terminalCandidateMinusBaselineDifference": {
+                    metric: mean(
+                        (
+                            float(candidate[key]["candidate"][metric])
+                            - float(candidate[key]["baseline"][metric])
+                        )
+                        - (
+                            float(reference[key]["candidate"][metric])
+                            - float(reference[key]["baseline"][metric])
+                        )
+                        for key in keys
+                    )
+                    for metric in TERMINAL_METRICS
+                },
+            }
+            for reference_outcome in OUTCOMES
+            for candidate_outcome in OUTCOMES
+            if (keys := transition_keys.get((reference_outcome, candidate_outcome)))
+        }
     if include_families:
         family_ids = sorted({str(row["familyId"]) for row in candidate_rows})
         output["byFamily"] = {
@@ -363,6 +396,7 @@ def paired_comparison(
                 [row for row in candidate_rows if row["familyId"] == family_id],
                 [row for row in reference_rows if row["familyId"] == family_id],
                 include_families=False,
+                include_transition_details=False,
             )
             for family_id in family_ids
         }
