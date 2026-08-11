@@ -163,9 +163,9 @@ Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 commit `7cdbe0d` hardens its direct-identity denylist, and the current builder
 tests enforce the exact eight-input reviewer description. Commit `d53f822`
 adds the exact SCITEPRESS candidate, a package-local manifest verifier, and
-Git-free build checks. The current 102,615-byte review archive is
+Git-free build checks. The current 103,324-byte review archive is
 byte-deterministic at SHA-256
-`74c038f20daf4cae2c95c1fc930ebc862304eda52442afda724a2f83f1fa7fb0`.
+`39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437`.
 Its 60-file immutable manifest verifies, all artifact tests pass, and an
 earlier independent macOS extraction established package portability by passing
 22 packaged tests and rebuilding the three manuscript formats without undefined
@@ -281,6 +281,16 @@ regeneration, passed all 23 packaged tests and the 11-page, 39,210-character,
 nine-font deep check, and reproduced all three production PDFs byte for byte.
 All 34 pages passed rendered contact-sheet QA, and each changed page passed
 full-resolution inspection.
+
+Commit `74fc518` adds a claim-to-evidence map to the anonymous reviewer package.
+It links all eight aggregate records exactly once, names their authoritative
+fields, and labels sensitivity and post-confirmatory records so they cannot be
+mistaken for confirmatory support. Two deterministic builds of the updated
+103,324-byte, 60-file archive match at SHA-256
+`39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437`.
+A fresh Git-free reconstruction verified both manifests, passed all 23
+packaged tests and the 11-page deep check, and reproduced all PDF and portal
+metadata hashes exactly. No manuscript source or empirical claim changed.
 Decide one venue by 2026-08-25 and do not submit to both archival venues
 simultaneously.
 

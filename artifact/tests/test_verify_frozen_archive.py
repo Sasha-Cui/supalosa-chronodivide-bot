@@ -24,9 +24,9 @@ class VerifyFrozenArchiveTest(unittest.TestCase):
         summary = MODULE.verify_current_source(ROOT, identity)
         self.assertEqual(
             summary["sha256"],
-            "74c038f20daf4cae2c95c1fc930ebc862304eda52442afda724a2f83f1fa7fb0",
+            "39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437",
         )
-        self.assertEqual(summary["sizeBytes"], 102615)
+        self.assertEqual(summary["sizeBytes"], 103324)
         self.assertEqual(summary["immutableFileCount"], 60)
 
         with tempfile.TemporaryDirectory() as directory:

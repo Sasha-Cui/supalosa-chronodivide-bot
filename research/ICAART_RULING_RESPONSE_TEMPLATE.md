@@ -15,7 +15,7 @@ record before use.
 | --- | --- |
 | Reviewed submission source | `ccc0c101de207a7100fd553e15efc4fa18108a35` |
 | ICAART PDF SHA-256 | `98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07` |
-| Aggregate artifact SHA-256 | `74c038f20daf4cae2c95c1fc930ebc862304eda52442afda724a2f83f1fa7fb0` |
+| Aggregate artifact SHA-256 | `39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437` |
 | Portal metadata SHA-256 | `285af4e101ea36d6e5190a3c0ceb5d4a52ded5e56f96210b1295360bb077e4ca` |
 
 ## Outbound record

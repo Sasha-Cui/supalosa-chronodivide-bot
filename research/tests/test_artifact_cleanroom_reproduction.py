@@ -16,11 +16,11 @@ class ArtifactCleanroomReproductionTest(unittest.TestCase):
 
         for expected in (
             "ccc0c101de207a7100fd553e15efc4fa18108a35",
-            "74c038f20daf4cae2c95c1fc930ebc862304eda52442afda724a2f83f1fa7fb0",
+            "39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437",
             "efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3",
             "7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56",
             "98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07",
-            "102,615 bytes",
+            "103,324 bytes",
             "tar -xzf",
             "Python: 3.12.3",
             "TeX Live 2024",

@@ -13,9 +13,9 @@ empirical experiment.
   `ccc0c101de207a7100fd553e15efc4fa18108a35`
 - Archive: `chrono-divide-review-artifact.tar.gz`
 - Archive format: gzip-compressed POSIX tar
-- Archive size: 102,615 bytes
+- Archive size: 103,324 bytes
 - Archive SHA-256:
-  `74c038f20daf4cae2c95c1fc930ebc862304eda52442afda724a2f83f1fa7fb0`
+  `39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437`
 - Extracted root: `chrono-divide-review-artifact/`
 - Python: 3.12.3
 - TeX: TeX Live 2024 (`texlive/20240312-GCC-13.3.0`)
@@ -58,6 +58,9 @@ The manifest was checked before and after regeneration. The SHA-256 of
 - All 60 immutable files verified before regeneration.
 - All 23 packaged manuscript tests passed.
 - All 60 immutable files verified again after regeneration.
+- The reviewer README maps every one of the eight frozen aggregate records
+  exactly once to its manuscript question and authoritative JSON fields, while
+  preserving the confirmatory-versus-diagnostic boundary.
 - LNCS paper SHA-256:
   `efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3`
 - LNCS supplement SHA-256:
@@ -83,5 +86,6 @@ from eight sanitized, frozen aggregate JSON inputs. It does not reproduce
 simulations, optimizer selection, bot execution, raw-game aggregation, or the
 private unblinding workflow. Those claims remain tied to the committed
 protocol records, aggregate hashes, job-level registry, and preserved private
-evidence. No additional outcome-bearing game was launched or inspected for
-this audit.
+evidence. The claim-to-evidence map is reviewer navigation, not new evidence
+or a broader claim. No additional outcome-bearing game was launched or
+inspected for this audit.

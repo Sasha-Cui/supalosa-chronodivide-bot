@@ -52,8 +52,8 @@ the anonymous branch during review.
 - Supplement PDF SHA-256:
   `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`
 - Deterministic anonymous artifact SHA-256:
-  `74c038f20daf4cae2c95c1fc930ebc862304eda52442afda724a2f83f1fa7fb0`
-- Anonymous artifact size: 102,615 bytes; 60 immutable manifested files.
+  `39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437`
+- Anonymous artifact size: 103,324 bytes; 60 immutable manifested files.
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the

@@ -21,7 +21,7 @@ Verify these files before beginning. Stop if any value differs.
 | ICAART PDF | `98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07` |
 | LNCS PDF | `efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3` |
 | LNCS supplement | `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56` |
-| Anonymous artifact | `74c038f20daf4cae2c95c1fc930ebc862304eda52442afda724a2f83f1fa7fb0` |
+| Anonymous artifact | `39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437` |
 | ICAART portal metadata | `285af4e101ea36d6e5190a3c0ceb5d4a52ded5e56f96210b1295360bb077e4ca` |
 
 Run from the repository root:

@@ -166,8 +166,8 @@ The final repository-wide verification runs all 141 tests: 115 research tests,
 11 paper tests, 12 SCITEPRESS tests, and three artifact tests.
 
 The deterministic anonymous review archive has SHA-256
-`74c038f20daf4cae2c95c1fc930ebc862304eda52442afda724a2f83f1fa7fb0`
-and size 102,615 bytes. Two independent builds produced that same hash. The
+`39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437`
+and size 103,324 bytes. Two independent builds produced that same hash. The
 archive contains 60 manifested immutable files, normalized `0/0` ownership and
 epoch timestamps, no Git tree, no bot packages, and no direct author,
 scheduler-account, institution, or private-path token. It now contains both the
@@ -381,6 +381,17 @@ The fresh extraction verified all 60 files before and after regeneration,
 passed all 23 packaged tests, reproduced all three production PDFs, and passed
 the 11-page, 39,210-character, nine-font deep check. Contact-sheet inspection
 covered all 34 pages, and all changed pages passed full-resolution inspection.
+
+Commit `74fc518` adds a reviewer-facing claim-to-evidence map without changing
+either manuscript. It links all eight frozen aggregate records exactly once,
+names their authoritative fields, and prevents diagnostic records from being
+read as confirmatory evidence. Two deterministic 103,324-byte builds of the
+updated 60-file archive match at SHA-256
+`39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437`.
+A fresh Git-free extraction verified the manifest before and after generation,
+passed all 23 packaged tests and the deep ICAART check, and reproduced the
+LNCS, supplement, ICAART, and portal-metadata bytes exactly. The unchanged PDF
+hashes retain the complete visual QA recorded above.
 
 ## Remaining submission gates
 

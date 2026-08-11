@@ -138,7 +138,7 @@ interpretation of the EvoStar code, but it is not blanket clearance.
   Obtain a written ruling before changing its visibility.
 - Reviewer-artifact ambiguity: the public complete-paper instructions describe
   a PDF submission but do not specify a supplementary-file field or an
-  anonymous external-link route. Ask whether the 102,615-byte identity-neutral
+  anonymous external-link route. Ask whether the 103,324-byte identity-neutral
   aggregate artifact can accompany the review submission and, if so, by which
   mechanism. If not, keep all essential evidence in the paper and describe the
   artifact as release material rather than implying reviewer access.

@@ -96,8 +96,8 @@ package-local exporter produced its then-current 197-word portal metadata JSON
 at SHA-256
 `6eb561c409fad9bb24b362ec9634d8fb00cc4a9ad7a6983ddb82a0cd7033e498`.
 
-The current rebuilt archive is 102,615 bytes with 60 immutable files and SHA-256
-`74c038f20daf4cae2c95c1fc930ebc862304eda52442afda724a2f83f1fa7fb0`.
+The current rebuilt archive is 103,324 bytes with 60 immutable files and SHA-256
+`39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437`.
 Its two copied build READMEs no longer name the institutional compute cluster,
 the archive denylist rejects that token, and a whole-package regression check
 prevents recurrence. That earlier independent build also passed the
@@ -282,6 +282,17 @@ and after regeneration, passed all 23 packaged tests and the deep submission
 check, and reproduced all three production PDFs byte for byte. All 34 pages
 passed contact-sheet inspection, and every changed page passed full-resolution
 inspection without a visual defect.
+
+Commit `74fc518` improves reviewer navigation without modifying the candidate:
+the anonymous README maps every frozen aggregate to the claim it supports and
+its authoritative JSON fields, while explicitly preventing diagnostic records
+from rescuing the failed absolute gate. Two deterministic 103,324-byte builds
+of the updated 60-file archive match at SHA-256
+`39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437`.
+A new Git-free TeX Live 2024 extraction verified both manifests, passed all 23
+packaged tests and the 11-page deep check, and reproduced all three PDF hashes
+and the portal-metadata hash exactly. The unchanged PDF therefore retains the
+complete visual inspection above.
 
 ## Unresolved submission gates
 
