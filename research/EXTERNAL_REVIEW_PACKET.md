@@ -6,17 +6,44 @@ This protocol is for the final human review that the authors cannot replace
 with another internal audit. It tests whether the manuscript communicates its
 actual bounded claim without repository context or author coaching.
 
-## What to send
+## Frozen handoff identity
+
+Use exactly one venue-formatted PDF in a review; do not ask the same reader to
+compare formats.
+
+| Candidate | Source commit | PDF SHA-256 |
+| --- | --- | --- |
+| LNCS / SCAG | `ba7a3b6ce19a650b19978e4d7fb0ffa952e23cd0` | `7dac69efb0410517a2131cc300e5bedf3e536c771e2de940f959dc0380ebc095` |
+| SCITEPRESS / ICAART | `ba7a3b6ce19a650b19978e4d7fb0ffa952e23cd0` | `724b2e29e2392b529ea24204d902722622b13de25cdba96c6ec9677abf997bca` |
+
+Record the selected hash before sending. If it does not match, stop and locate
+the drift rather than asking the reader to review an unidentified build.
+
+## Phase A: unprimed venue-style review
 
 Send only the anonymous main PDF. Do not initially send the repository,
 supplement, reviewer audit, result registry, or an explanation of the intended
-takeaway. Ask the reader to spend at most 45 minutes on a normal conference
-review pass. After the cold read, the supplement may be provided for a separate
-reproducibility check.
+takeaway. Do not send the targeted questions below yet: they reveal that a
+stronger endpoint fails and that the comparator differs from the deployed
+default, which would coach the read.
 
-## Neutral reader questions
+Ask the reader to spend at most 45 minutes on a normal regular-paper review.
+For an ICAART-calibrated pass, give only this neutral prompt:
 
-Ask the reader to answer these before discussing the paper with an author:
+> Review this anonymous regular paper for relevance, originality, technical
+> quality, significance, and presentation. Summarize its main claim, assign a
+> 1--5 score with one-sentence justification for each criterion, identify the
+> strongest acceptance and rejection arguments, list required versus optional
+> revisions, and vote accept, borderline, or reject with confidence.
+
+The reader must return and timestamp this review before receiving Phase B.
+Preserve it verbatim. A missing claim boundary in Phase A is evidence about the
+paper even if the reader later answers a targeted question correctly.
+
+## Phase B: targeted comprehension audit
+
+Only after locking the unprimed review, ask the reader to answer these before
+discussing the paper with an author:
 
 1. In one sentence, what is the paper's principal claim?
 2. What result is positive, and what stronger result explicitly fails?
@@ -30,9 +57,8 @@ Ask the reader to answer these before discussing the paper with an author:
    they not establish?
 7. Name the two most serious threats to generalization.
 8. Which paragraph, table, figure, or term was hardest to understand?
-9. If reviewing for an applied game-AI workshop or special session, would you
-   vote accept, borderline, or reject? Give the strongest reason for and
-   against acceptance.
+9. If reviewing for the selected venue, would you vote accept, borderline, or
+   reject? Give the strongest reason for and against acceptance.
 10. Identify every sentence that sounds stronger than the evidence.
 11. Why is the frozen reference not the deployed StrongBot default, and what
     limitation follows from that choice?
@@ -57,8 +83,9 @@ elements alone communicate all of the following:
 
 ## Pass criteria
 
-The manuscript passes the cold read only if the reader independently reports
-all four core boundaries:
+The manuscript passes the cold read only if the reader reports all four core
+boundaries. At least core boundaries 1--3 should appear independently in the
+unprimed Phase A review; Phase B checks all four precisely:
 
 1. the positive claim is champion versus the frozen generic StrongBot reference,
    not champion versus Supalosa or the deployed StrongBot default;
@@ -67,9 +94,15 @@ all four core boundaries:
    a novel optimizer; and
 4. the component/terminal analyses are post-confirmatory and non-causal.
 
-Any failure on these four items requires a wording or structure revision. A
-request for a new outcome-bearing analysis should be recorded as future work,
-not executed on the opened family population.
+If a boundary appears only after its Phase B prompt, diagnose the corresponding
+entry point before editing; do not assume that prompting repaired the paper.
+Any wording change must be claim-preserving. A request for a new
+outcome-bearing analysis should be recorded as future work, not executed on the
+opened family population.
+
+After both phases are locked, the supplement may be provided for a separate
+reproducibility check. Do not let successful artifact use retroactively change
+the unprimed manuscript review.
 
 ## Response record
 
@@ -77,9 +110,11 @@ Store the completed responses privately with:
 
 - review date and manuscript commit/hash;
 - reader's relevant background, without naming them in the anonymous paper;
-- time spent and whether the supplement was consulted;
+- Phase A and Phase B timestamps, time spent, and whether the supplement was
+  consulted afterward;
+- the five criterion scores, overall vote, confidence, and verbatim review;
 - each misunderstanding and the exact source edit made in response; and
-- final accept/borderline/reject vote.
+- whether the four boundaries appeared unprompted or only after Phase B.
 
 After any edit, rerun the paper tests, citation/anonymity scan, page-limit check,
 and full rendered-PDF inspection before changing the submission hashes.

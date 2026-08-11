@@ -132,7 +132,11 @@ commit and all three hashes together; never mix files from different freezes.
 
 - [ ] Independent cold reader completed
       [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md).
-- [ ] Reader correctly identified all four claim boundaries without coaching.
+- [ ] Reader completed and timestamped the unprimed venue-style review before
+      receiving the targeted comprehension questions.
+- [ ] Reader identified the principal relative claim, failed absolute endpoint,
+      and non-novel environment/optimizer framing without coaching; all four
+      core boundaries were correct after the separate comprehension audit.
 - [x] A separate visual/caption pass found no misleading standalone element.
 - [ ] Author list/order, affiliations, acknowledgements, funding, conflicts,
       and corresponding-author details are prepared privately; title, abstract,
