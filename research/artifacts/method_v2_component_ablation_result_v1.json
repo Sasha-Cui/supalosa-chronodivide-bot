@@ -1,0 +1,112 @@
+{
+  "schemaVersion": 1,
+  "status": "COMPLETE_POST_CONFIRMATORY_COMPONENT_DIAGNOSTIC_PRIMARY_INTERVAL_INCLUDES_ZERO",
+  "methodVersion": 2,
+  "sourceGitCommit": "4ada6ed1d260e77df5948226631630695022266e",
+  "scheduler": {
+    "account": "pi_jss233",
+    "arrayJobId": "21938403",
+    "taskCount": 40,
+    "uniqueTaskJobIds": 40,
+    "uniqueRawJobIds": 40,
+    "completedTasks": 40,
+    "failedTasks": 0,
+    "additionalAttempts": 0
+  },
+  "predecessorZeroLaunchFailure": {
+    "sourceGitCommit": "5b3cb036e071f9a5e6e74f7d113f8e5f3040d806",
+    "arrayJobId": "21938264",
+    "taskCount": 40,
+    "failedTasks": 40,
+    "launchCountedEvents": 0,
+    "outcomeBearingGames": 0,
+    "reusedGames": 0,
+    "failureArtifactSha256": "9481d3055d0f79c7b3bc021dbc95647cca52363d13ad3be346125881c3954b89",
+    "disposition": "RETIRED_AND_EXCLUDED"
+  },
+  "evidence": {
+    "campaignSha256": "346d0e96fce3d9b64bee32ab8b2d513210f1962c42aea4225f165508447768d3",
+    "launchSha256": "49c04f4e3d215b160d5e99b43ce543c77cb21c0fd6fc9cb3bb2bb522c1821e1a",
+    "technicalGateSha256": "66790dcbc94db5dc334c58915efd08f542e7b9d94102a7b03aa4d4dc18133a53",
+    "analysisSha256": "1bb149fc578a700a1476093b5d9c941b73582527fd57d6b5ad153a49517e6e94",
+    "resultArtifactCommitmentSha256": "f464e3a634f1eb75c203afb21fa7a7d9ddbba6317e8006f9d2f13ef922f92f95"
+  },
+  "design": {
+    "familyCount": 10,
+    "blocksPerFamily": 4,
+    "reciprocalSlotsPerMethod": 2,
+    "methodCount": 6,
+    "blockCount": 40,
+    "launchedGameCount": 480,
+    "technicalFailures": 0,
+    "analysisCount": 1
+  },
+  "primaryComponentContrast": {
+    "estimand": "champion minus equal average of five single-group reverts to default-policy settings",
+    "estimate": 0.057499999999999996,
+    "familyClusteredStandardError": 0.026951602714660378,
+    "twoSidedConfidence": 0.95,
+    "confidenceInterval": {
+      "lower": -0.00346876112831853,
+      "upper": 0.11846876112831853
+    },
+    "positiveFamilies": 9,
+    "zeroFamilies": 0,
+    "negativeFamilies": 1
+  },
+  "descriptiveMethods": {
+    "champion": { "wins": 19, "draws": 58, "losses": 3, "score": 0.6 },
+    "revertDefenseGrowth": { "wins": 24, "draws": 54, "losses": 2, "score": 0.6375 },
+    "revertEmergencyDefense": { "wins": 20, "draws": 55, "losses": 5, "score": 0.59375 },
+    "revertForceAttack": { "wins": 22, "draws": 54, "losses": 4, "score": 0.6125 },
+    "revertScouting": { "wins": 19, "draws": 58, "losses": 3, "score": 0.6 },
+    "revertStrategy": { "wins": 8, "draws": 27, "losses": 45, "score": 0.26875 }
+  },
+  "pairwiseChampionMinusAblation": [
+    {
+      "ablationMethodId": "revertDefenseGrowth",
+      "estimate": -0.0375,
+      "unadjusted95": { "lower": -0.0899798251409582, "upper": 0.014979825140958206 },
+      "bonferroniFamilywise95": { "lower": -0.1128929938626129, "upper": 0.03789299386261289 }
+    },
+    {
+      "ablationMethodId": "revertEmergencyDefense",
+      "estimate": 0.00625,
+      "unadjusted95": { "lower": -0.04727742996250702, "upper": 0.05977742996250702 },
+      "bonferroniFamilywise95": { "lower": -0.0706479924724469, "upper": 0.0831479924724469 }
+    },
+    {
+      "ablationMethodId": "revertForceAttack",
+      "estimate": -0.0125,
+      "unadjusted95": { "lower": -0.05867608972247962, "upper": 0.033676089722479624 },
+      "bonferroniFamilywise95": { "lower": -0.07883699025664864, "upper": 0.05383699025664865 }
+    },
+    {
+      "ablationMethodId": "revertScouting",
+      "estimate": 0.0,
+      "variance": 0.0,
+      "unadjusted95": { "lower": null, "upper": null },
+      "bonferroniFamilywise95": { "lower": null, "upper": null }
+    },
+    {
+      "ablationMethodId": "revertStrategy",
+      "estimate": 0.33125,
+      "unadjusted95": { "lower": 0.09556150531880803, "upper": 0.566938494681192 },
+      "bonferroniFamilywise95": { "lower": -0.007342233972964407, "upper": 0.6698422339729644 }
+    }
+  ],
+  "independentReproduction": {
+    "status": "EXACT_MATCH",
+    "rawCompletionRecords": 480,
+    "commonSeedReciprocalCells": 80,
+    "verifiedMethodScores": 6,
+    "verifiedPairwiseContrasts": 5,
+    "verifiedIntervalFamilies": ["unadjusted95", "bonferroniFamilywise95"]
+  },
+  "claimBoundary": {
+    "supported": "The strategy group is the dominant observed component signal on the open development panel, while the aggregate champion-versus-revert contrast is suggestive.",
+    "notSupported": "Any individual component has a multiplicity-controlled causal effect, every selected setting is helpful, the confirmatory gate is rescued, or the champion reliably beats Supalosa.",
+    "confirmatoryClaimRescueAuthorized": false,
+    "policySelectionAuthorized": false
+  }
+}
