@@ -1,75 +1,96 @@
-# Research Status
+# Research status
 
-Last reconciled: **2026-08-07**
+Last reconciled: **2026-08-11**
 
-## Bottom Line
+## Bottom line
 
-The repository contains a credible research pipeline, but it does not yet
-contain a paper result showing that StrongBot reliably beats the independently
-loaded Supalosa baseline. The current positive hypothesis is that a learned or
-selected generic StrongBot policy improves win probability while retaining
-cross-map and worst-group robustness. That hypothesis still requires a frozen
-policy interface, prospective splits, and sealed confirmatory games.
+The core empirical program is complete and paper writing may begin. The frozen
+method-v2 champion substantially improves the shipped StrongBot default across
+16 sealed Chrono Divide map families against one pinned, independently loaded
+Supalosa bot. The relative effect passes its prespecified confirmatory gate; the
+separate claim that the champion reliably beats Supalosa does not.
 
-## Completed Gates
+No Chrono Divide simulation job is active. Do not launch more outcome-bearing
+games on the opened family population for this paper.
 
-| Gate | Evidence | Interpretation |
-| --- | --- | --- |
-| Fresh-process seed replay | Job 21291720: 10/10 same-seed traces matched and the different seed diverged | Deterministic replay endpoint passed; all games were tick-cap draws, so this is not policy evidence |
-| Original 127-family compatibility review | Jobs 21606315 and 21606800: 4 pass, 0 review, 7 fail in the 11-family stress set | The available engine assets do not support the full Temperate/Snow/Urban/Desert population |
-| Temperate source-population screen | Job 21608050: 67/67 families, 134/134 sessions, 54 pass, 7 review, 6 fail | Outcome-free technical screen only |
-| Independent Temperate confirmation | Job 21608882: identical normalized 54/7/6 family evidence, no retries | The compatibility classification reproduced exactly; still no policy outcome |
-| Supported population freeze | Commit `be6be43`: exact 54-family intersection, exclusions, source hashes, and commitments | Outcome/role-blind candidate population fixed |
-| Private family roles | Commit `c87c9d5`: 22 train, 12 development, 16 test, and 4 reserve families | Test identities remain outside training/development commands |
-| Strict research runner | Commits `f3569f4`, `6dfbc9e`, `5db7f4c`, `74f868c`: policy gate, seeded runner, plans, and reducer | Historical parameter trainer is superseded for new evidence |
-| End-to-end training smoke | Job 21655228: 2/2 launches accounted, no technical failures, 529 MiB peak RSS | Default policy lost both reciprocal training games; calibration only, not a paper result |
+## Main result
 
-The first stage-zero submission attempt (jobs 21655409--21655413) was cancelled
-within 11 seconds when a subsequent selector build changed the runtime tree.
-No runner event file or counted engine launch was created. Those job IDs and
-their superseded `37c9358` plans are retained but are not training evidence.
+| Method | Games | W/D/L | Score |
+| --- | ---: | ---: | ---: |
+| Shipped StrongBot default | 256 | 1 / 100 / 155 | 0.19922 |
+| Frozen method-v2 champion | 256 | 47 / 180 / 29 | 0.53516 |
 
-The two Temperate evidence trees are committed by SHA-256 values
-`68e51b29b0d96f395d48142f8cdb4a89bab00ddec6d0ab4b235e266d2e8364e3`
-and `c8b8e94da46e494258896f934608a53ac7f15e3be8bbc1c2cd92c7795c7f12f4`.
-Both bundles are retained under
-`/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/map-compatibility-temperate-v1/full`.
+The equally family-weighted champion-minus-default estimate is **0.33594** with
+family-clustered standard error **0.05695** and two-sided 95% confidence interval
+**[0.21456, 0.45732]**. Fourteen family effects are positive and two are zero.
 
-## What Is Admissible Now
+The champion's absolute score margin above 0.5 is 0.03516, but its prespecified
+one-sided 95% lower margin is **-0.02117**. Therefore:
 
-- The deterministic endpoint and exact runtime/source provenance are suitable
-  infrastructure evidence.
-- The 67-family Temperate compatibility denominator and the reproduced 54/7/6
-  classifications may be reported as outcome-free simulator screening.
-- The exact intersection of the 54 pass families may be frozen prospectively
-  as the candidate source population, with all 13 exclusions disclosed.
+- supported: optimization robustly improves the StrongBot default against the
+  pinned Supalosa version on the supported test-family population;
+- unsupported: the champion reliably beats Supalosa, a new general learning
+  algorithm, broad game-AI superiority, or a paradigm shift.
 
-## What Is Not Yet Admissible
+See [`METHOD_V2_CONFIRMATORY_RESULT.md`](METHOD_V2_CONFIRMATORY_RESULT.md) for
+the immutable confirmatory ledger.
 
-- Historical results under `benchmark-results/` do not establish a clean
-  StrongBot-versus-Supalosa effect. Several used the modified local package as
-  both candidate and baseline, tuned starts, incomplete provenance, or
-  outcome-informed configuration work.
-- A compatibility `pass` is not evidence that either bot plays well, that every
-  start is valid, or that a match will terminate.
-- No result currently supports “reliably wins over Supalosa,” a general gaming
-  paradigm shift, or generalization beyond the supported Temperate subset.
-- The frozen family roles exist, but no optimizer run or held-out method
-  comparison has completed.
+## Completed empirical path
 
-## Next Admissible Sequence
+The finalized path contains **8,704** accepted policy games, all run under
+Slurm account `pi_jss233`:
 
-1. Execute the five frozen 936-launch training runs using the successive-
-   halving protocol in `OPTIMIZER_PROTOCOL.md`.
-2. Fit the global and coordinate-free descriptor-conditioned selectors from the
-   same six-policy finalist data in each run.
-3. Run the outcome-free development seed/start compatibility gate.
-4. Run the fixed pre-confirmatory diagnostic allocation and apply its declared
-   signal/variance rules once.
-5. Freeze the method and power design, implement the separate sealed evaluator,
-   and only then launch confirmatory policy evaluation.
+| Stage | Job IDs | Games | Status |
+| --- | --- | ---: | --- |
+| Five successive-halving optimizer runs | `21655584`--`21655588`; `21749720`, `21749724`--`21749727`; controller `21749797`; `21759850`--`21759854` | 4,680 | Complete, zero accepted technical failures |
+| Common-seed championship | `21788958`, `21799790` | 2,112 | Complete; champion frozen |
+| Fresh method-v2 development | `21920172`, `21920905`, `21922464` | 440 | Complete; single gate passed |
+| Sealed confirmatory evaluation | `21925439` | 512 | Complete; relative pass, absolute fail |
+| Common-seed optimizer diagnostic | `21928633` | 480 | Complete; suggestive |
+| Policy-component diagnostic | `21938403` | 480 | Complete; suggestive |
 
-Use [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) for job-level provenance,
-[`SUPPORTED_SCOPE_DECISION.md`](SUPPORTED_SCOPE_DECISION.md) for the population
-decision, and [`METHOD_INTERFACE_GATE.md`](METHOD_INTERFACE_GATE.md) for the
-runner contract.
+The component predecessor array `21938264` failed before its first counted
+launch and contributed no game. All failed and superseded attempts remain
+preserved. The exact finalizer hashes, shard counts, and claim boundary are in
+[`EMPIRICAL_COMPLETION_AUDIT.md`](EMPIRICAL_COMPLETION_AUDIT.md).
+
+## Diagnostic interpretation
+
+- The champion exceeds the equal average of five independently selected local
+  optimizer policies by 0.08250, but the 95% interval
+  [-0.02679, 0.19179] includes zero.
+- The champion exceeds the equal average of five single-component reverts by
+  0.05750, but the 95% interval [-0.00347, 0.11847] includes zero.
+- Reverting the joint infantry+rush strategy group gives the largest observed
+  decline (0.33125), but its Bonferroni familywise 95% interval
+  [-0.00734, 0.66984] also includes zero.
+- Champion and the scouting revert are endpoint-identical in all 80 paired
+  games.
+- In 76 confirmatory pairs that remain draw-to-draw, the champion ends with
+  22.71 more relative combatants and 683.82 fewer relative credits. This is
+  consistent with converting banked resources into combat power, but the logs
+  contain no within-game trajectory.
+
+See [`METHOD_V2_MECHANISM_ABLATION_RESULT.md`](METHOD_V2_MECHANISM_ABLATION_RESULT.md),
+[`METHOD_V2_COMPONENT_ABLATION_RESULT.md`](METHOD_V2_COMPONENT_ABLATION_RESULT.md),
+and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.md).
+
+## Remaining paper work
+
+The blockers are editorial and release-oriented, not additional training:
+
+1. rewrite the paper formulation around the observed robust improvement and
+   reproducible evaluation protocol;
+2. create tables and figures directly from committed aggregate artifacts;
+3. verify and complete the primary-source bibliography;
+4. confirm a remote-presentation venue and its current deadline;
+5. document the asset-license boundary and package the author-owned code,
+   manifests, hashes, metadata, and aggregates; and
+6. run a clean-clone reproduction and final claim audit.
+
+The candid submission decision is **go** for a scoped lower-tier game-AI or
+evolutionary-computation workshop/special session, and **no-go** for a broad or
+methodological flagship claim.
+
+Use [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) for job-level provenance and
+[`PAPER_PLAN.md`](PAPER_PLAN.md) for the manuscript formulation.

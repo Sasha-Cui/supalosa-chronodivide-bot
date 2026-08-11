@@ -1,61 +1,74 @@
 # Chrono Divide research layer
 
 This directory is the paper and reproducibility layer for the stronger-bot
-fork. It preserves the forensic conclusion that “Chrono Divide” names the
-browser Red Alert 2 reconstruction; it is not a chronological data split. The
-working study is cross-map and cross-start generalization of scripted RTS
-policies, and its positive policy hypothesis remains untested.
+fork. “Chrono Divide” is the browser Red Alert 2 reconstruction used as the game
+simulator; it is not a chronological data split. The completed study concerns
+family-disjoint evaluation and configuration of a generic scripted RTS policy.
 
-## Read in This Order
+## Read in this order
 
-1. [`STATUS.md`](STATUS.md) — current evidence, active blockers, and the next
-   admissible experiment.
-2. [`SUPPORTED_SCOPE_DECISION.md`](SUPPORTED_SCOPE_DECISION.md) — why the
-   current source population is Temperate-only and how the 54-family candidate
-   subset was obtained.
-3. [`PAPER_PLAN.md`](PAPER_PLAN.md) — candidate formulations, primary paper
-   direction, abstract, and outline.
-4. [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) — append-only mapping from every
+1. [`STATUS.md`](STATUS.md) — current result and the remaining paper work.
+2. [`EMPIRICAL_COMPLETION_AUDIT.md`](EMPIRICAL_COMPLETION_AUDIT.md) — final
+   execution reconciliation, empirical sufficiency decision, and claim freeze.
+3. [`METHOD_V2_CONFIRMATORY_RESULT.md`](METHOD_V2_CONFIRMATORY_RESULT.md) —
+   immutable held-out result and its failed absolute-strength gate.
+4. [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.md)
+   — descriptive outcome and terminal-state decomposition.
+5. [`PAPER_PLAN.md`](PAPER_PLAN.md) — manuscript framing, outline, and abstract.
+6. [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) — append-only mapping from every
    interpreted result to its configuration, artifact, revision, and job ID.
-5. [`FORENSIC_AUDIT.md`](FORENSIC_AUDIT.md) — original inventory,
-   reproducibility assessment, leakage audit, and reconstructed objective.
+7. [`FORENSIC_AUDIT.md`](FORENSIC_AUDIT.md) — original inventory, leakage audit,
+   and reconstruction of the pre-research project.
 
-## Study Design and Claim Boundaries
+## Frozen result boundary
+
+The method-v2 champion scores 0.53516 and the shipped StrongBot default scores
+0.19922 over 256 paired games per method on 16 sealed families. The
+equally-family-weighted improvement is 0.33594 with a family-clustered 95%
+interval [0.21456, 0.45732]. The champion's one-sided lower score margin versus
+0.5 is negative, so the repository does not support “reliably beats Supalosa.”
+
+All current families have been assigned or exposed by the completed program.
+Do not add outcome-bearing games to the present paper after unblinding. A new
+opponent, new map population, or instrumented trajectory study must be a
+separately versioned prospective experiment.
+
+## Protocol and result map
 
 | Topic | Document |
 | --- | --- |
-| Owner decisions and positive primary hypothesis | [`DECISIONS_2026-08-04.md`](DECISIONS_2026-08-04.md) |
-| Coordinate-free policy interface and equal-budget contract | [`METHOD_INTERFACE_GATE.md`](METHOD_INTERFACE_GATE.md) |
-| Prospective successive-halving training algorithm | [`OPTIMIZER_PROTOCOL.md`](OPTIMIZER_PROTOCOL.md) |
-| Outcome-free compatibility protocol | [`MAP_FIDELITY_GATE.md`](MAP_FIDELITY_GATE.md) |
-| Original 127-family no-go review | [`FULL_SCREEN_READINESS_REVIEW.md`](FULL_SCREEN_READINESS_REVIEW.md) |
-| Map-family construction and eligibility | [`MAP_FAMILY_ELIGIBILITY.md`](MAP_FAMILY_ELIGIBILITY.md) |
-| Compromised capacity exercise; not a final split | [`PROVISIONAL_FAMILY_SPLIT.md`](PROVISIONAL_FAMILY_SPLIT.md) |
-| Diagnostic allocation and unblinding rule | [`DIAGNOSTIC_PROTOCOL.md`](DIAGNOSTIC_PROTOCOL.md) |
-| Compute gates and weekly sequence | [`EXECUTION_ROADMAP.md`](EXECUTION_ROADMAP.md) |
+| Final execution and go/no-go audit | [`EMPIRICAL_COMPLETION_AUDIT.md`](EMPIRICAL_COMPLETION_AUDIT.md) |
+| Method-v2 training and selection | [`METHOD_V2_PROTOCOL.md`](METHOD_V2_PROTOCOL.md) |
+| Fresh development gate | [`METHOD_V2_DEVELOPMENT_PROTOCOL.md`](METHOD_V2_DEVELOPMENT_PROTOCOL.md) |
+| Confirmatory result | [`METHOD_V2_CONFIRMATORY_RESULT.md`](METHOD_V2_CONFIRMATORY_RESULT.md) |
+| Optimizer-selection diagnostic | [`METHOD_V2_MECHANISM_ABLATION_RESULT.md`](METHOD_V2_MECHANISM_ABLATION_RESULT.md) |
+| Policy-component diagnostic | [`METHOD_V2_COMPONENT_ABLATION_RESULT.md`](METHOD_V2_COMPONENT_ABLATION_RESULT.md) |
+| Terminal-state decomposition | [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.md) |
+| Supported map population | [`SUPPORTED_SCOPE_DECISION.md`](SUPPORTED_SCOPE_DECISION.md) |
+| Map-family construction | [`MAP_FAMILY_ELIGIBILITY.md`](MAP_FAMILY_ELIGIBILITY.md) |
+| Simulator compatibility | [`MAP_FIDELITY_GATE.md`](MAP_FIDELITY_GATE.md) |
+| Deterministic policy interface | [`METHOD_INTERFACE_GATE.md`](METHOD_INTERFACE_GATE.md) |
 | Literature and novelty boundary | [`RELATED_WORK.md`](RELATED_WORK.md) |
-| Environment and randomness constraints | [`ENVIRONMENT.md`](ENVIRONMENT.md) |
-| Venue fit and dated deadline checks | [`VENUE_STRATEGY.md`](VENUE_STRATEGY.md) |
+| Environment contract | [`ENVIRONMENT.md`](ENVIRONMENT.md) |
+| Venue fit and deadlines | [`VENUE_STRATEGY.md`](VENUE_STRATEGY.md) |
 
-## Reproducibility Layout
+## Reproducibility layout
 
-- [`artifacts/`](artifacts/) contains small, committed inventories, role-blind
-  target manifests, power designs, and execution descriptors. See
-  [`artifacts/README.md`](artifacts/README.md) before editing or adding one.
-- [`scripts/`](scripts/) contains inventory, selection, gate, supervisor,
-  verification, power, and aggregation tooling.
-- [`slurm/`](slurm/) contains the allocation entry points for `pi_jss233`.
-- [`tests/`](tests/) contains the Python protocol and verifier tests.
-- [`configs/`](configs/) contains frozen small pilot/split inputs.
-- [`environment.toml`](environment.toml) records the research environment
-  contract.
+- [`artifacts/`](artifacts/) contains committed inventories, commitments,
+  designs, and aggregate results. Do not hand-edit generated artifacts.
+- [`scripts/`](scripts/) contains inventory, gate, verification, aggregation,
+  and terminal-state analysis tools.
+- [`slurm/`](slurm/) contains the frozen `pi_jss233` launch entry points.
+- [`tests/`](tests/) contains Python protocol and verifier tests.
+- [`configs/`](configs/) contains frozen small inputs.
+- [`environment.toml`](environment.toml) records the research environment.
 
-Large execution bundles are deliberately outside Git. Current compatibility
-evidence is retained under
-`/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence`; each
-interpreted bundle must also appear in `RESULT_REGISTRY.tsv`. Proprietary maps,
-MIX archives, and copied game assets must not be added to the research layer.
+Large execution bundles remain outside Git under
+`/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence`. Every
+interpreted bundle must also appear in [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv).
+Author-owned code, manifests, hashes, metadata, and aggregates may be released;
+proprietary maps, MIX archives, and copied game assets remain subject to their
+third-party licenses and must not be added here by default.
 
-Historical engineering outputs under the repository's `benchmark-results/`
-directory are preserved separately. Their existence does not make them paper
-evidence.
+Historical outputs under `benchmark-results/` are preserved separately. Their
+existence does not make them admissible paper evidence.
