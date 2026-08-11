@@ -31,8 +31,9 @@ the anonymous branch during review.
       reverified from the official call on the upload date.
 - [ ] No simultaneous submission to an incompatible archival venue.
 - [ ] Human author completes the evidence, citation, code, and line-by-line
-      verification in `AUTHORSHIP_AND_AI_POLICY.md`; retain a private signed
-      record tied to the manuscript commit and PDF hash.
+      verification in `HUMAN_AUTHOR_VERIFICATION_PACKET.md` under the policy in
+      `AUTHORSHIP_AND_AI_POLICY.md`; retain a private signed record tied to the
+      manuscript commit and PDF hash.
 
 ## Frozen paper identity
 

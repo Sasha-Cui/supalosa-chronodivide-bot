@@ -59,6 +59,9 @@ following before signing or submitting the paper:
 
 Completion should be recorded privately with the manuscript commit and PDF
 hash. A checkbox without the underlying review is not evidence.
+Use `HUMAN_AUTHOR_VERIFICATION_PACKET.md` for the evidence-indexed procedure
+and private sign-off template. The tracked packet must remain blank; completing
+it mechanically or through another AI review does not satisfy this gate.
 
 ## Chair question and decision rule
 
