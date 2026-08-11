@@ -134,6 +134,11 @@ class GeneratePaperAssetsTest(unittest.TestCase):
         for name, phrase in required_failure_language.items():
             with self.subTest(section=name):
                 self.assertIn(phrase, " ".join(entry_points[name].split()))
+        for name, text in entry_points.items():
+            normalized = " ".join(text.lower().split())
+            with self.subTest(section=name, boundary="joint gate"):
+                self.assertIn("joint", normalized)
+                self.assertIn("fail", normalized)
 
     def test_generic_reference_is_not_described_as_shipped_default(self) -> None:
         section_dir = REPO / "paper" / "sections"

@@ -67,11 +67,12 @@ result but did not replace the frozen estimator.
 The champion's score margin over 0.5 is \ChampionAbsoluteMargin{}, with
 family-clustered standard error \ChampionAbsoluteSE{}. Its prespecified
 one-sided 95\% lower bound is \ChampionAbsoluteLower{}, so the absolute-strength
-gate fails. \FamiliesAboveHalfCount{} family scores are above 0.5,
+gate fails. Because the frozen protocol requires both gates, its joint success
+criterion also fails. \FamiliesAboveHalfCount{} family scores are above 0.5,
 \FamiliesEqualHalfCount{} equal 0.5, and \FamiliesBelowHalfCount{} fall below
 0.5. The diagnostic family-bootstrap interval for champion score,
 [\ChampionBootstrapLower{}, \ChampionBootstrapUpper{}], leads
-to the same caution. Therefore, the correct result is not ``StrongBot reliably
+to the same caution. Therefore, the correct positive result is not ``StrongBot reliably
 beats Supalosa.'' It is ``the configured StrongBot robustly improves the frozen
 generic reference against pinned Supalosa on this family population.''
 

@@ -34,6 +34,8 @@ class FallbackManuscriptTest(unittest.TestCase):
         words = re.findall(r"[A-Za-z0-9][A-Za-z0-9'&.-]*", visible)
         self.assertGreaterEqual(len(words), 70)
         self.assertLessEqual(len(words), 200)
+        self.assertIn("joint", source.lower())
+        self.assertIn("fails", source.lower())
 
     def test_review_sources_are_anonymous(self) -> None:
         paths = [
