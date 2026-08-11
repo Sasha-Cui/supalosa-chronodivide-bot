@@ -15,12 +15,12 @@ class ArtifactCleanroomReproductionTest(unittest.TestCase):
         builder = BUILDER.read_text(encoding="utf-8")
 
         for expected in (
-            "92a4c870b6e697682b51fa41fd0f785c97c6b121",
-            "10f270f49d38d2a3d2175f598795fca8d8e7ca57c5736f0971e2462d2ee42d0c",
-            "c44c0d5739a33ae4155c18f0eba8c480785f4e3e1b9e2250dc03a43733a6d0a1",
+            "e365e37b52dfcea24c3c26f5130b7ac37a9366ac",
+            "53e0aed782f6a1c42329c33bac849bc2cad3225982184dc6db7f8ea7d0ca9e3e",
+            "7303ab1c2c1f8ea0abfb2abe4d4c56b3111d4b3ccd7e55e714836d6c0ce33f92",
             "7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56",
-            "7d4c26640a5f4da34783d1a533c8cfeb807d2d7b37a1e52acdc37b8cf6386c07",
-            "102,179 bytes",
+            "42f5cdb1b08ea8fff04fdefc4898dd336c8556c6cafb57f07e1d2139ed0daf28",
+            "102,198 bytes",
             "tar -xzf",
             "Python: 3.12.3",
             "TeX Live 2024",

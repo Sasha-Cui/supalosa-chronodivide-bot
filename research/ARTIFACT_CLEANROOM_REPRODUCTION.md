@@ -10,12 +10,12 @@ empirical experiment.
 ## Frozen identities
 
 - Reviewed manuscript source at the start of the run:
-  `92a4c870b6e697682b51fa41fd0f785c97c6b121`
+  `e365e37b52dfcea24c3c26f5130b7ac37a9366ac`
 - Archive: `chrono-divide-review-artifact.tar.gz`
 - Archive format: gzip-compressed POSIX tar
-- Archive size: 102,179 bytes
+- Archive size: 102,198 bytes
 - Archive SHA-256:
-  `10f270f49d38d2a3d2175f598795fca8d8e7ca57c5736f0971e2462d2ee42d0c`
+  `53e0aed782f6a1c42329c33bac849bc2cad3225982184dc6db7f8ea7d0ca9e3e`
 - Extracted root: `chrono-divide-review-artifact/`
 - Python: 3.12.3
 - TeX: TeX Live 2024 (`texlive/20240312-GCC-13.3.0`)
@@ -59,12 +59,12 @@ The manifest was checked before and after regeneration. The SHA-256 of
 - All 22 packaged manuscript tests passed.
 - All 60 immutable files verified again after regeneration.
 - LNCS paper SHA-256:
-  `c44c0d5739a33ae4155c18f0eba8c480785f4e3e1b9e2250dc03a43733a6d0a1`
+  `7303ab1c2c1f8ea0abfb2abe4d4c56b3111d4b3ccd7e55e714836d6c0ce33f92`
 - LNCS supplement SHA-256:
   `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`
 - SCITEPRESS paper SHA-256:
-  `7d4c26640a5f4da34783d1a533c8cfeb807d2d7b37a1e52acdc37b8cf6386c07`
-- The SCITEPRESS deep check passed with 11 A4 pages, 39,102 extracted
+  `42f5cdb1b08ea8fff04fdefc4898dd336c8556c6cafb57f07e1d2139ed0daf28`
+- The SCITEPRESS deep check passed with 11 A4 pages, 39,123 extracted
   non-whitespace characters, nine embedded fonts, and anonymous PDF metadata.
 - All 34 rebuilt pages were rendered with Poppler and inspected as complete
   contact sheets. No clipping, overlap, unreadable text, contrast defect,

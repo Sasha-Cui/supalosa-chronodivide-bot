@@ -157,26 +157,26 @@ Commit `0f3e690` adds a deterministic plain-text ICAART portal-metadata export
 and tests the same exporter inside the anonymous artifact. It leaves all
 manuscript PDF bytes unchanged while replacing the earlier approximate abstract
 count with the then-current exact expanded text; the acceptance-oriented
-abstract now has 193 words.
+abstract at that freeze had 193 words.
 
 Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 commit `7cdbe0d` hardens its direct-identity denylist, and the current builder
 tests enforce the exact eight-input reviewer description. Commit `d53f822`
 adds the exact SCITEPRESS candidate, a package-local manifest verifier, and
-Git-free build checks. The current 102,179-byte review archive is
+Git-free build checks. The current 102,198-byte review archive is
 byte-deterministic at SHA-256
-`10f270f49d38d2a3d2175f598795fca8d8e7ca57c5736f0971e2462d2ee42d0c`.
+`53e0aed782f6a1c42329c33bac849bc2cad3225982184dc6db7f8ea7d0ca9e3e`.
 Its 60-file immutable manifest verifies, all artifact tests pass, and an
-independent macOS extraction passes 22 packaged tests and rebuilds the 18-page
-LNCS paper, five-page supplement, and 11-page A4 SCITEPRESS candidate without
-undefined references, overflow, or BibTeX warnings. All fonts are embedded and
-all 34 pages received a rendered layout check.
+earlier independent macOS extraction established package portability by passing
+22 packaged tests and rebuilding the three manuscript formats without undefined
+references, overflow, or BibTeX warnings.
 
-A second fresh, Git-free reconstruction with Python 3.12.3 and TeX Live 2024
-verified the same 60 files before and after regeneration, passed the same 22
+The current artifact received a fresh Git-free reconstruction with Python
+3.12.3 and TeX Live 2024. It verified all 60 files before and after regeneration, passed all 22
 packaged tests and deep submission check, and reproduced all three production
 PDF hashes byte for byte. Its full command and identity record is
 [`ARTIFACT_CLEANROOM_REPRODUCTION.md`](ARTIFACT_CLEANROOM_REPRODUCTION.md).
+All fonts are embedded and all 34 pages received a rendered layout check.
 
 Commit `bda13e4` adds an evidence-indexed reviewer-response guide covering the
 weak-reference boundary, ordinary-tuning objection, one-opponent scope, high
@@ -210,9 +210,9 @@ eligibility still needs a written ruling; its presenter page documents live
 online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS submission format that reuses the frozen main-paper sections and result
-macros. The current candidate is 11 A4 pages with a 193-word expanded abstract and 39,102 extracted
+macros. The current candidate is 11 A4 pages with a 197-word expanded abstract and 39,123 extracted
 non-whitespace characters; two clean builds match at SHA-256
-`7d4c26640a5f4da34783d1a533c8cfeb807d2d7b37a1e52acdc37b8cf6386c07`,
+`42f5cdb1b08ea8fff04fdefc4898dd336c8556c6cafb57f07e1d2139ed0daf28`,
 and every page passed visual and anonymity QA. It is not authorized for upload
 until ICAART confirms exceptional remote eligibility/procedure and double-blind
 AI-disclosure placement. The home page now establishes remote support for
@@ -238,6 +238,15 @@ were rendered and the changed pages were inspected at full resolution. The
 package-only `853e2ff` fix corrects the LNCS content-page description and
 protects it with a regression test. Frozen empirical results and claim
 boundaries are unchanged.
+
+Commit `e365e37` closes the remaining reader-entry-point mismatch by naming
+the reusable evidence contract in both submission abstracts. The edit is
+claim-preserving and leaves every frozen empirical value untouched. A fresh
+Git-free TeX Live 2024 extraction verified the 60-file manifest before and
+after regeneration, passed all 22 packaged tests and the deep submission
+check, and reproduced the production LNCS, supplement, and ICAART PDFs byte for
+byte. Complete 34-page contact-sheet inspection and full-resolution inspection
+of both reflowed first pages found no visual defect.
 Decide one venue by 2026-08-25 and do not submit to both archival venues
 simultaneously.
 
