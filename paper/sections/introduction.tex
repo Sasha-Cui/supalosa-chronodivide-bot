@@ -23,13 +23,11 @@ use it for scripted-agent research and a bounded empirical case study of what
 that process finds. The comparator is a frozen generic StrongBot reference
 under this interface, not the deployed map-profile-enabled default.
 
-The repository initially contained many exploratory head-to-head runs and
-parameter searches. A forensic reconstruction found that these artifacts were
-not paper evidence: some used wall-clock-derived engine randomness, several
-permitted exact-map behavior, maps were reused adaptively, source snapshots
-were incomplete, and historical wins could not be tied to one clean baseline
-and runtime. We therefore treated the existing bot as a starting point rather
-than treating old performance as a result. The replacement design freezes
+Initial exploratory runs were not paper evidence: some used wall-clock-derived
+engine randomness, permitted exact-map behavior, reused maps adaptively, lacked
+complete source snapshots, or could not tie wins to one clean baseline and
+runtime. We retained the bot, not those outcomes, as the starting point. The
+replacement design freezes
 revision-aware map families, uses outcome-free compatibility screening,
 creates family-disjoint roles before training, controls engine and
 participant-specific randomness, evaluates reciprocal physical starts, and
@@ -74,17 +72,17 @@ many matches reach the tick cap. Its
 prespecified one-sided lower confidence bound for score above 0.5 is
 \ChampionAbsoluteLower{}. Consequently, the frozen joint criterion fails even
 though the relative endpoint passes, and the experiment does \emph{not}
-establish that StrongBot reliably beats Supalosa. The most faithful takeaway is that
-configuration robustly improves a weak generic reference against this opponent,
-mainly by turning losses into survival or wins.
+establish that StrongBot reliably beats Supalosa. The most faithful takeaway is
+that configuration robustly improves the prospectively frozen generic reference
+against this opponent, mainly by turning losses into survival or wins.
 
 Our contributions are threefold:
 
 \begin{enumerate}
-  \item We operationalize Chrono Divide as a deterministic, provenance-bound
-  scripted-agent evaluation substrate, with revision-aware family roles,
-  outcome-free compatibility checks, reciprocal starts, identity-keyed random
-  streams, sealed outcomes, and fail-closed job accounting.
+  \item We contribute a leakage-resistant Chrono Divide evaluation protocol:
+  revision-aware map families, outcome-free compatibility checks, reciprocal
+  starts, identity-keyed random streams, sealed outcomes, and fail-closed job
+  accounting.
   \item We implement a reproducible training-only configuration pipeline:
   five run-distinct mutation-generated candidate pools screened by successive
   halving, followed by a common-seed championship over their finalists. The

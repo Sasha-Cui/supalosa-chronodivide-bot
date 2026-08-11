@@ -30,6 +30,23 @@ class FallbackManuscriptTest(unittest.TestCase):
             self.assertIn(rf"\input{{../paper/sections/{stem}}}", source)
         self.assertNotIn(r"\input{../paper/sections/abstract}", source)
 
+    def test_main_paper_has_no_dangling_supplement_reference(self) -> None:
+        section_root = ROOT / "paper" / "sections"
+        sections = (
+            "introduction",
+            "related_work",
+            "environment",
+            "protocol",
+            "results",
+            "diagnostics",
+            "reproducibility",
+            "conclusion",
+        )
+        source = "\n".join(
+            (section_root / f"{stem}.tex").read_text() for stem in sections
+        )
+        self.assertNotIn("supplement", source.lower())
+
     def test_abstract_is_within_official_word_bounds(self) -> None:
         source = (FALLBACK / "abstract.tex").read_text()
         visible = re.sub(r"\\[A-Za-z]+\*?(?:\{\})?", " VALUE ", source)
