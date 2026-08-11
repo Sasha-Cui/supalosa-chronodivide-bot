@@ -15,9 +15,14 @@ family-disjoint evaluation and configuration of a generic scripted RTS policy.
 4. [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.md)
    — descriptive outcome and terminal-state decomposition.
 5. [`PAPER_PLAN.md`](PAPER_PLAN.md) — manuscript framing, outline, and abstract.
-6. [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) — append-only mapping from every
+6. [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md) and
+   [`REVIEWER_AUDIT.md`](REVIEWER_AUDIT.md) — build/visual checks and the candid
+   reviewer-style acceptance audit.
+7. [`ANONYMITY_RELEASE_RISK.md`](ANONYMITY_RELEASE_RISK.md) — double-blind and
+   upstream-license actions required before submission or public bot release.
+8. [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) — append-only mapping from every
    interpreted result to its configuration, artifact, revision, and job ID.
-7. [`FORENSIC_AUDIT.md`](FORENSIC_AUDIT.md) — original inventory, leakage audit,
+9. [`FORENSIC_AUDIT.md`](FORENSIC_AUDIT.md) — original inventory, leakage audit,
    and reconstruction of the pre-research project.
 
 ## Frozen result boundary
@@ -51,6 +56,10 @@ separately versioned prospective experiment.
 | Literature and novelty boundary | [`RELATED_WORK.md`](RELATED_WORK.md) |
 | Environment contract | [`ENVIRONMENT.md`](ENVIRONMENT.md) |
 | Venue fit and deadlines | [`VENUE_STRATEGY.md`](VENUE_STRATEGY.md) |
+| Manuscript QA | [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md) |
+| Reviewer-style decision | [`REVIEWER_AUDIT.md`](REVIEWER_AUDIT.md) |
+| Anonymity and release risk | [`ANONYMITY_RELEASE_RISK.md`](ANONYMITY_RELEASE_RISK.md) |
+| Anonymous artifact builder | [`../artifact/README.md`](../artifact/README.md) |
 
 ## Reproducibility layout
 

@@ -14,6 +14,8 @@ The original upstream documentation is still useful for basic setup and online p
 | Run benchmarks, training, or driver tests | `packages/chronodivide-bot-driver` |
 | See the current paper-readiness status | [`research/STATUS.md`](research/STATUS.md) |
 | Navigate the audit, protocols, and paper plan | [`research/README.md`](research/README.md) |
+| Read or build the anonymous paper | [`paper/README.md`](paper/README.md) |
+| Build the reviewer artifact | [`artifact/README.md`](artifact/README.md) |
 | Trace a result to its configuration and Slurm job | [`research/RESULT_REGISTRY.tsv`](research/RESULT_REGISTRY.tsv) |
 | Understand old generated outputs | [`benchmark-results/README.md`](benchmark-results/README.md) |
 
@@ -23,17 +25,21 @@ for provenance, but they are not automatically admissible paper evidence.
 
 ## Current Status
 
-This branch has moved beyond the stock Supalosa baseline in several controlled head-to-head scenarios, especially on tuned map starts. It is not yet a complete ladder-ready AI. Some maps still draw, some water/naval games do not close, and several map profiles are tuned for specific starts rather than broadly generalized.
+The paper study is complete and frozen. On 16 sealed Temperate map families,
+the configured StrongBot scores 0.53516 and the shipped StrongBot default scores
+0.19922 against one pinned Supalosa revision. The equally family-weighted
+improvement is 0.33594 with family-clustered 95% CI [0.21456, 0.45732]. The
+separate absolute-strength gate failed, so this repository does **not** support
+the claim that StrongBot reliably beats Supalosa. See
+[`research/STATUS.md`](research/STATUS.md) and the anonymous manuscript under
+[`paper/`](paper/) before using any result in a claim.
 
-Those are engineering observations, not yet a confirmatory paper result. The
-research pipeline has passed its deterministic replay gate and completed two
-reproducible, outcome-free compatibility screens of the 67-family Temperate
-source population. It has **not** yet produced an admissible
-StrongBot-versus-Supalosa policy estimate. See
-[`research/STATUS.md`](research/STATUS.md) before
-using any result in a claim.
+The bot is not a complete ladder-ready AI. Some maps still draw, water/naval
+games often do not close, and several legacy map profiles are tuned for specific
+starts. The following validation highlights are historical engineering
+observations, not admissible paper evidence:
 
-Recent validation highlights:
+### Exploratory validation highlights
 
 - Simple 1v1, Iraq/Arabs mirror: trained infantry profile wins from both starts in focused runs.
 - Simple 1v1, Iraq/Arabs vs France/French baseline: trained profile also wins in focused runs.

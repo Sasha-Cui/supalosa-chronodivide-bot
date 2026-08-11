@@ -86,18 +86,23 @@ hash-pinned aggregate artifacts. The final build has no overfull boxes,
 undefined references, missing citations, or BibTeX warnings, and all 21 pages
 have received a rendered visual check.
 
+Commit `3c5af39` adds a deterministic anonymous aggregate-artifact builder. A
+clean `git archive` of that commit passed all paper and artifact tests and
+reproduced the 58 KB review archive byte-for-byte at SHA-256
+`0c8fff25c274abbddbd4ed92ecd04979bfc1c323b346173168bc3116e1bf16c3`.
+An extracted reviewer copy also rebuilt the 16-page paper and five-page
+supplement without warnings.
+
 The remaining blockers are release- and submission-oriented, not additional
 training:
 
-1. reproduce the paper assets and tests from a clean clone without private
-   absolute paths;
-2. create and validate an identity-neutral artifact bundle containing only
-   releasable author-owned code, manifests, hashes, metadata, and aggregates;
-3. finish the asset-license and acquisition instructions for omitted third-party
-   game content;
-4. obtain written confirmation that EvoStar permits remote presentation; and
-5. complete a reviewer-style claim, accessibility, statistics, and submission
-   metadata audit.
+1. obtain permission or a licensing decision from Supalosa before publicly
+   redistributing the combined bot, whose upstream package is `UNLICENSED`;
+2. resolve the double-blind risk created by the named public GitHub repository
+   containing the paper and unique result text;
+3. obtain written confirmation that EvoStar permits remote presentation; and
+4. complete final reviewer edits, accessibility checks, submission metadata,
+   and a post-edit PDF QA pass.
 
 The candid submission decision is **go** for a scoped lower-tier game-AI or
 evolutionary-computation workshop/special session, and **no-go** for a broad or

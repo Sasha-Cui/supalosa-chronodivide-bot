@@ -57,13 +57,28 @@ The claim audit confirmed that the paper:
 - does not claim a new environment, new general optimizer, causal component,
   broad generalization, reliable Supalosa superiority, or paradigm shift.
 
+## Clean export and reviewer artifact
+
+A `git archive` export of committed main revision `3c5af39` passed five paper
+generator tests, two artifact-builder tests, and the three frozen
+family-exporter tests. It regenerated all paper fragments without byte drift.
+
+The deterministic anonymous review archive has SHA-256
+`0c8fff25c274abbddbd4ed92ecd04979bfc1c323b346173168bc3116e1bf16c3`.
+Two independent builds produced that same hash. The archive contains 35
+manifested files, normalized `0/0` ownership and epoch timestamps, no Git tree,
+no bot packages, and no direct author, scheduler-account, institution, or
+private-path token. An extracted copy passed its manifest and generator tests
+and compiled the expected 16-page paper and five-page supplement with no LaTeX
+or BibTeX warning.
+
 ## Remaining submission gates
 
-1. Reproduce tests and generated assets in a clean clone without private paths.
-2. Produce an identity-neutral artifact bundle and scan both archive metadata
-   and file content for author identifiers.
-3. Finalize the third-party asset boundary and acquisition instructions.
-4. Obtain written confirmation that the primary venue permits remote
+1. Resolve permission and licensing for any public release of the combined bot;
+   the aggregate reviewer artifact deliberately excludes it.
+2. Resolve double-blind exposure from the named public repository before
+   submission.
+3. Obtain written confirmation that the primary venue permits remote
    presentation.
-5. Repeat this QA after the final reviewer edits and before uploading the
+4. Repeat this QA after the final reviewer edits and before uploading the
    submission PDF.

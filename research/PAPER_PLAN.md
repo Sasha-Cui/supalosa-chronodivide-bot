@@ -388,7 +388,8 @@ redistribution of third-party maps or game archives without verified rights.
 - [x] Primary-source related work verified and BibTeX committed.
 - [x] Tables and figures generated and tested from artifacts.
 - [x] Full manuscript drafted in the target template.
-- [ ] Clean-clone reproduction succeeds without private absolute paths.
-- [ ] Release bundle and asset-license statement complete.
+- [x] Clean-export reproduction succeeds without private absolute paths.
+- [x] Anonymous aggregate review bundle and third-party boundary complete.
+- [ ] Public combined-bot license or upstream permission resolved.
 - [ ] Remote presentation and deadline reconfirmed from official venue pages.
 - [ ] Final claim, statistics, accessibility, and anonymity audits pass.

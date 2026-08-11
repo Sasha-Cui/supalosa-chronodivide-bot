@@ -138,6 +138,9 @@ Submit to SCAG only when all of the following are true:
 6. The release manifest separates author-owned code and metadata from
    third-party maps, MIX archives, and game assets.
 7. Written remote-presentation confirmation has been obtained from EvoStar.
+8. The program chair has confirmed the intended handling of the named public
+   repository, or the repository has been made non-public for the double-blind
+   review period without rewriting the evidence history.
 
 No more outcome-bearing games should be added to the opened family population
 to improve the story. Any future opponent, faction, or instrumented-trajectory
