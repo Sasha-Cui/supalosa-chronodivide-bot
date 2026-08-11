@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import math
+import re
 from pathlib import Path
 from typing import Any
 
@@ -33,10 +34,36 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def load_frozen(artifact_dir: Path, filename: str) -> dict[str, Any]:
+def validate_expected_hashes(payload: dict[str, Any]) -> dict[str, str]:
+    expected_names = set(EXPECTED_ARTIFACT_HASHES)
+    actual_names = set(payload)
+    if actual_names != expected_names:
+        missing = sorted(expected_names - actual_names)
+        extra = sorted(actual_names - expected_names)
+        raise ValueError(f"artifact hash manifest names differ: missing={missing}, extra={extra}")
+    validated: dict[str, str] = {}
+    for filename, digest in payload.items():
+        if not isinstance(digest, str) or re.fullmatch(r"[0-9a-f]{64}", digest) is None:
+            raise ValueError(f"invalid SHA-256 for {filename}: {digest!r}")
+        validated[filename] = digest
+    return validated
+
+
+def load_hash_manifest(path: Path) -> dict[str, str]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise ValueError("artifact hash manifest must be one JSON object")
+    return validate_expected_hashes(payload)
+
+
+def load_frozen(
+    artifact_dir: Path,
+    filename: str,
+    expected_artifact_hashes: dict[str, str],
+) -> dict[str, Any]:
     path = artifact_dir / filename
     actual = sha256(path)
-    expected = EXPECTED_ARTIFACT_HASHES[filename]
+    expected = expected_artifact_hashes[filename]
     if actual != expected:
         raise ValueError(f"artifact hash drift for {filename}: {actual} != {expected}")
     payload = json.loads(path.read_text(encoding="utf-8"))
@@ -338,11 +365,22 @@ def generate_study_flow(supported: dict[str, Any], roles: dict[str, Any]) -> str
 """
 
 
-def generate_all(repo_root: Path, output_dir: Path) -> dict[str, Any]:
+def generate_all(
+    repo_root: Path,
+    output_dir: Path,
+    expected_artifact_hashes: dict[str, str] | None = None,
+) -> dict[str, Any]:
+    expected_hashes = validate_expected_hashes(
+        dict(
+            EXPECTED_ARTIFACT_HASHES
+            if expected_artifact_hashes is None
+            else expected_artifact_hashes
+        )
+    )
     artifact_dir = repo_root / "research" / "artifacts"
     inputs = {
-        name: load_frozen(artifact_dir, name)
-        for name in EXPECTED_ARTIFACT_HASHES
+        name: load_frozen(artifact_dir, name, expected_hashes)
+        for name in expected_hashes
     }
     confirmatory = inputs["method_v2_confirmatory_result_v1.json"]
     families = inputs["method_v2_confirmatory_family_diagnostics_v1.json"]
@@ -377,7 +415,7 @@ def generate_all(repo_root: Path, output_dir: Path) -> dict[str, Any]:
         "generator": "paper/scripts/generate_assets.py",
         "inputs": {
             f"research/artifacts/{name}": digest
-            for name, digest in sorted(EXPECTED_ARTIFACT_HASHES.items())
+            for name, digest in sorted(expected_hashes.items())
         },
         "outputs": {
             filename: hashlib.sha256((content.rstrip() + "\n").encode("utf-8")).hexdigest()
@@ -392,9 +430,19 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--repo-root", type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument("--output-dir", type=Path)
+    parser.add_argument(
+        "--artifact-hash-manifest",
+        type=Path,
+        help="optional JSON filename-to-SHA256 map for a sanitized review artifact",
+    )
     args = parser.parse_args()
     output_dir = args.output_dir or args.repo_root / "paper" / "generated"
-    generate_all(args.repo_root.resolve(), output_dir.resolve())
+    expected_hashes = (
+        load_hash_manifest(args.artifact_hash_manifest.resolve())
+        if args.artifact_hash_manifest
+        else None
+    )
+    generate_all(args.repo_root.resolve(), output_dir.resolve(), expected_hashes)
 
 
 if __name__ == "__main__":
