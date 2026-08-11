@@ -85,8 +85,10 @@ review artifact.
   result registry.
 - Render every PDF page one last time and inspect at normal reading scale.
 - Upload early enough to download and inspect the venue-generated submission
-  copy. Keep an 8-page short-paper reduction plan available in case the venue
-  changes the acceptance type after review.
+  copy. If the venue classifies the accepted regular submission as a short
+  paper, apply
+  [`ICAART_SHORT_PAPER_REDUCTION_PLAN.md`](ICAART_SHORT_PAPER_REDUCTION_PLAN.md)
+  rather than deleting evidence ad hoc.
 
 Exit condition: verified ICAART submission by **2026-09-15 AoE**.
 

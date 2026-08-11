@@ -80,12 +80,15 @@ separately versioned prospective experiment.
 | Venue decision handoff | [`VENUE_DECISION_PACKET.md`](VENUE_DECISION_PACKET.md) |
 | ICAART public-policy reconciliation | [`ICAART_POLICY_RECONCILIATION.md`](ICAART_POLICY_RECONCILIATION.md) |
 | Accepted-paper venue calibration | [`SCAG_ACCEPTED_PAPER_CALIBRATION.md`](SCAG_ACCEPTED_PAPER_CALIBRATION.md) |
+| ICAART reviewer-criteria audit | [`ICAART_REVIEW_SCORECARD.md`](ICAART_REVIEW_SCORECARD.md) |
+| ICAART short-paper contingency | [`ICAART_SHORT_PAPER_REDUCTION_PLAN.md`](ICAART_SHORT_PAPER_REDUCTION_PLAN.md) |
 | Manuscript QA | [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md) |
 | SCITEPRESS submission-candidate QA | [`SCITEPRESS_QA.md`](SCITEPRESS_QA.md) |
 | Reviewer-style decision | [`REVIEWER_AUDIT.md`](REVIEWER_AUDIT.md) |
 | Reviewer-response evidence index | [`REVIEW_RESPONSE_GUIDE.md`](REVIEW_RESPONSE_GUIDE.md) |
 | Anonymity and release risk | [`ANONYMITY_RELEASE_RISK.md`](ANONYMITY_RELEASE_RISK.md) |
 | Authorship and generative-AI policy | [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md) |
+| Human author verification packet | [`HUMAN_AUTHOR_VERIFICATION_PACKET.md`](HUMAN_AUTHOR_VERIFICATION_PACKET.md) |
 | External contact drafts | [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md) |
 | Independent cold-read protocol | [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md) |
 | Dated submission roadmap | [`SUBMISSION_ROADMAP.md`](SUBMISSION_ROADMAP.md) |
