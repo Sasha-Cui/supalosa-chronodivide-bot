@@ -92,7 +92,7 @@ and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.m
 
 ## Manuscript status and remaining work
 
-Commit `419a0f7` is the current anonymous manuscript source revision. It
+Commit `9f37a9e` is the current anonymous manuscript source revision. It
 sharpens the held-out-evaluation title, states two confirmatory research
 questions and one explicitly descriptive diagnostic question, removes causal-sounding
 mechanism language, and adds primary prior art on hidden-level evaluation and
@@ -116,13 +116,14 @@ exclusion in the abstract, and makes the large family-consistent avoided-loss
 takeaway explicit in the conclusion. Commit `297d5b8` adds the fourth
 SCITEPRESS LaTeX pass required for settled cross-references and rejects rerun
 warnings prospectively. The latest acceptance-criteria pass also makes the
-leakage-resistant evaluation protocol explicit as the contribution and removes
-a main-paper dependency on supplement-only label definitions. The main PDF is
-16 pages with main text ending on page
+leakage-resistant evaluation protocol explicit as the contribution, removes
+a main-paper dependency on supplement-only label definitions, and positions
+the study against map-specific program synthesis. The main PDF is
+17 pages with main text ending on page
 14 and references continuing
 afterward; the supplement is five pages. All reported tables and figures are
 generated from hash-pinned aggregate artifacts. The final build has no overfull boxes, undefined
-references, missing citations, or BibTeX warnings. All 21 LNCS/supplement pages
+references, missing citations, or BibTeX warnings. All 22 LNCS/supplement pages
 and all 10 SCITEPRESS pages have received rendered visual checks. The current PDF SHA-256 values are recorded in
 [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md).
 
@@ -132,12 +133,12 @@ statistic, and expanding the outcome labels. The edit is claim-preserving: all
 frozen inputs, estimates, uncertainty, citations, abstract fields, and portal
 metadata remain unchanged.
 
-Commit `91f9978` completes a proposition-level citation precheck over all 27
-bibliography keys and 35 key-by-citation placements. The only source change is
-to cite the exact game-API package and pinned Supalosa repository alongside the
-Chrono Divide project page at both environment-description placements. No
-wording, empirical result, method, scope boundary, conclusion, bibliography
-entry, or portal field changed. Both main-paper formats were re-rendered and
+Commit `9f37a9e` completes a proposition-level citation precheck over all 28
+bibliography keys and 36 key-by-citation placements. The source changes cite
+the exact game-API package and pinned Supalosa repository alongside the Chrono
+Divide project page and add the closest map-specific program-synthesis
+precedent. No empirical result, method, scope boundary, conclusion, or portal
+field changed. Both main-paper formats were re-rendered and
 inspected; the supplement remains byte-identical. Human source reading remains
 an explicit pre-submission gate.
 
@@ -150,14 +151,14 @@ Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 commit `7cdbe0d` hardens its direct-identity denylist, and the current builder
 tests enforce the exact eight-input reviewer description. Commit `d53f822`
 adds the exact SCITEPRESS candidate, a package-local manifest verifier, and
-Git-free build checks. The current 99,619-byte review archive is
+Git-free build checks. The current 99,946-byte review archive is
 byte-deterministic at SHA-256
-`57307d0ace24191719b8ccaf3a5ddc463e0c43f4e581d835890c1397dc516f03`.
+`5d35375d1b8e9adec474ccd86a44ac23107deacc6acc1ee2b9e404012dd23c84`.
 Its 60-file immutable manifest verifies, all artifact tests pass, and an
-independent macOS extraction passes 21 packaged tests and rebuilds the 16-page
+independent macOS extraction passes 21 packaged tests and rebuilds the 17-page
 LNCS paper, five-page supplement, and 10-page A4 SCITEPRESS candidate without
 undefined references, overflow, or BibTeX warnings. All fonts are embedded and
-all 31 pages received a rendered layout check.
+all 32 pages received a rendered layout check.
 
 Commit `bda13e4` adds an evidence-indexed reviewer-response guide covering the
 weak-reference boundary, ordinary-tuning objection, one-opponent scope, high
@@ -189,9 +190,9 @@ guidance permits disclosed AI-assisted writing, revision, and code; its
 presenter page documents live online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS submission format that reuses the frozen main-paper sections and result
-macros. It is 10 A4 pages with a 195-word expanded abstract and 36,409 extracted
+macros. It is 10 A4 pages with a 195-word expanded abstract and 36,642 extracted
 non-whitespace characters; two clean builds match at SHA-256
-`6f605941b8a0bee2b14d875bc973166f2710981746ffb245f563a74618926093`,
+`c756fa0fab503967df04b594ce8f18cd22429ef2ab8eb2cf1ec648f1c3608060`,
 and every page passed visual and anonymity QA. It is not authorized for upload
 until ICAART confirms exceptional remote eligibility/procedure and double-blind
 AI-disclosure placement. The home page now establishes remote support for

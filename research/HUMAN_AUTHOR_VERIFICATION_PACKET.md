@@ -17,17 +17,17 @@ Verify these files before beginning. Stop if any value differs.
 
 | Item | Frozen identity |
 | --- | --- |
-| Reviewed source | `91f9978ae6df7d400e751712c07a8e8816fc9c07` |
-| ICAART PDF | `6f605941b8a0bee2b14d875bc973166f2710981746ffb245f563a74618926093` |
-| LNCS PDF | `d5ea2c2893f4452b3889489101b74c9151f1d41a5f51b316acd3e25fbe29755e` |
+| Reviewed source | `9f37a9e15f6676d94d121716c151b8f637c69fb5` |
+| ICAART PDF | `c756fa0fab503967df04b594ce8f18cd22429ef2ab8eb2cf1ec648f1c3608060` |
+| LNCS PDF | `93ae48646ea7ac1417a716efc12cda9d69f5b809bdbf2790499b176909ad8c88` |
 | LNCS supplement | `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98` |
-| Anonymous artifact | `57307d0ace24191719b8ccaf3a5ddc463e0c43f4e581d835890c1397dc516f03` |
+| Anonymous artifact | `5d35375d1b8e9adec474ccd86a44ac23107deacc6acc1ee2b9e404012dd23c84` |
 | ICAART portal metadata | `b6c79cacfc78289ccface7d0793d46c6c6317451e3f9cdc0b0984731fba2ea47` |
 
 Run from the repository root:
 
 ```text
-git rev-parse 91f9978
+git rev-parse 9f37a9e
 sha256sum paper/build/main.pdf paper/build/supplement.pdf
 sha256sum paper_scitepress/build/main.pdf
 sha256sum artifact/dist/chrono-divide-review-artifact.tar.gz
@@ -155,6 +155,7 @@ recorded locator, or completing a row below.
 | `liu2016microbehaviors` | Microbehavior parameters and transfer to unseen combat scenarios were studied | related work | `[ ]` |
 | `mora2012noisy` | Noisy RTS fitness motivates repeated combats, maps, and reevaluation | related work; supplement | `[ ]` |
 | `castejon2026tales` | Recent work compares evolutionary training modes for a weighted game bot | related work | `[ ]` |
+| `marino2021programmatic` | Map-specific programmatic $\mu$RTS strategies were synthesized from a domain-specific language | related work | `[ ]` |
 | `fernandezAres2012map` | Specialized policies were selected using online map characterization | related work; supplement | `[ ]` |
 | `hutter2011smac` | SMAC configures algorithms over problem instances | related work | `[ ]` |
 | `lopezIbanez2016irace` | irace separates configuration and evaluation instances | related work | `[ ]` |

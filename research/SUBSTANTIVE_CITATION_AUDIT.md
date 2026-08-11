@@ -4,16 +4,16 @@ Verified: **2026-08-11**
 
 ## Scope, identity, and boundary
 
-This is a machine-assisted proposition-level precheck of the 27 bibliography
-keys used at 35 key-by-citation placements in the shared manuscript sources.
+This is a machine-assisted proposition-level precheck of the 28 bibliography
+keys used at 36 key-by-citation placements in the shared manuscript sources.
 It is bound to:
 
 - reviewed submission source:
-  `91f9978ae6df7d400e751712c07a8e8816fc9c07`;
+  `9f37a9e15f6676d94d121716c151b8f637c69fb5`;
 - LNCS PDF SHA-256:
-  `d5ea2c2893f4452b3889489101b74c9151f1d41a5f51b316acd3e25fbe29755e`;
+  `93ae48646ea7ac1417a716efc12cda9d69f5b809bdbf2790499b176909ad8c88`;
 - ICAART PDF SHA-256:
-  `6f605941b8a0bee2b14d875bc973166f2710981746ffb245f563a74618926093`.
+  `c756fa0fab503967df04b594ce8f18cd22429ef2ab8eb2cf1ec648f1c3608060`.
 
 The check compared every cited proposition with the primary paper,
 publisher record, project page, package record, or pinned repository named
@@ -49,6 +49,7 @@ Classifications mean:
 | `liu2016microbehaviors` | Microbehavior parameters were evolved and evaluated beyond their training combat scenarios; [IEEE article abstract and experiments](https://doi.org/10.1109/TCIAIG.2016.2544844). | supported |
 | `mora2012noisy` | Noisy RTS fitness motivates repeated games, multiple maps, and incumbent reevaluation; [journal paper, methods and Sections 4--5](https://doi.org/10.1007/s11390-012-1281-5). | supported |
 | `castejon2026tales` | The work compares coevolution, fixed, and hybrid training modes for a bot governed by weighted behavioral rules; [Springer chapter](https://doi.org/10.1007/978-3-032-23607-4_33). | supported |
+| `marino2021programmatic` | Map-specific programmatic $\mu$RTS strategies were synthesized from a domain-specific language; [AAAI paper, introduction and method](https://doi.org/10.1609/aaai.v35i1.16114). | supported |
 | `fernandezAres2012map` | Specialized policies are selected using online map characterization; [IEEE paper abstract and method, pp. 417--423](https://doi.org/10.1109/CIG.2012.6374185). | supported |
 | `hutter2011smac` | SMAC configures algorithms over training instances and evaluates configurations on separate test instances; [author-hosted paper, Sections 4.2 and 5.1 and Table 2](https://www.cs.ubc.ca/sites/default/files/tr/2010/TR-2010-10_0.pdf). | supported |
 | `lopezIbanez2016irace` | irace tunes over a set of training instances, while the documented workflow evaluates selected configurations on separate testing instances; [article Sections 2.2 and 3.2 and Appendix A.1](https://doi.org/10.1016/j.orp.2016.09.002) and [official workflow documentation](https://mlopez-ibanez.github.io/irace/). The separation is a workflow boundary, not an assertion that the core racing loop consumes test outcomes. | supported with wording boundary |
@@ -66,15 +67,16 @@ Classifications mean:
 
 ## Correction and disposition
 
-The only manuscript edit justified by this audit was source attribution. The
-Chrono Divide website supports the reconstruction claim, while the exact
+The manuscript edits justified by this audit were source attribution and
+closest-work positioning. The Chrono Divide website supports the reconstruction
+claim, while the exact
 offline interface and pinned bot revision are supported by the package and
-repository records. Commit `91f9978ae6df7d400e751712c07a8e8816fc9c07`
+repository records. Commit `9f37a9e15f6676d94d121716c151b8f637c69fb5`
 therefore cites all three sources at the two environment-description
-placements. No empirical result, method description, scope boundary,
-conclusion, bibliography entry, or paper claim changed.
+placements and adds the closest map-specific program-synthesis precedent. No empirical result,
+method description, scope boundary, or conclusion changed.
 
-All 27 keys have a source-support classification above. This precheck found
+All 28 keys have a source-support classification above. This precheck found
 no citation use that required claim removal or a bibliographic replacement.
 Human source reading and the blank statuses in
 `research/HUMAN_AUTHOR_VERIFICATION_PACKET.md` remain mandatory before
