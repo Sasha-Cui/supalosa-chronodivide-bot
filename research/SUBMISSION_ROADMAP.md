@@ -88,6 +88,9 @@ review artifact.
 - Run the final claim/statistics audit against committed JSON artifacts and the
   result registry.
 - Render every PDF page one last time and inspect at normal reading scale.
+- Verify that [`ICAART_REBUTTAL_EVIDENCE_PACKET.md`](ICAART_REBUTTAL_EVIDENCE_PACKET.md)
+  names the exact submitted PDF, metadata, and anonymous-artifact hashes; retain
+  a private offline copy for human-only use if a rebuttal is invited.
 - Immediately before the initial upload, archive the exact candidate and
   activate the public-AI confidentiality embargo in
   `AUTHORSHIP_AND_AI_POLICY.md`. After upload, keep the submitted manuscript,

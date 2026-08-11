@@ -85,6 +85,12 @@ commit and all three hashes together; never mix files from different freezes.
       ordered topics with source hashes; no LaTeX macro needs manual expansion.
 - [x] Portal metadata JSON SHA-256 is
       `285af4e101ea36d6e5190a3c0ceb5d4a52ded5e56f96210b1295360bb077e4ca`.
+- [x] `ICAART_REBUTTAL_EVIDENCE_PACKET.md` maps 12 likely objections to exact
+      pages, frozen aggregates, and claim boundaries without adding empirical
+      analysis or confidential review content.
+- [ ] Immediately before upload, verify the packet's four bound identities and
+      retain a private offline copy for human-only rebuttal preparation under
+      `AUTHORSHIP_AND_AI_POLICY.md`.
 - [ ] ICAART confirms author eligibility, request procedure, confirmation
       timing, and use of the published standard Speaker fee for the documented
       exceptional live-online route.

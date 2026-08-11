@@ -303,6 +303,15 @@ wording for approval instead of asking the venue to invent it from scratch.
 Decide one venue by 2026-08-25 and do not submit to both archival venues
 simultaneously.
 
+`ICAART_REBUTTAL_EVIDENCE_PACKET.md` now freezes a human-only response aid
+before the under-review confidentiality embargo begins. It maps 12 foreseeable
+objections to exact pages and authoritative aggregate records, preserves the
+failed absolute gate and all scope limits, and forbids new outcome-bearing
+analysis or public-AI processing of confidential feedback. The packet is bound
+to the current reviewed source, ICAART PDF, portal metadata, and anonymous
+artifact identities. It changes no manuscript source, PDF, empirical record,
+or submission state.
+
 The candid submission decision is **go** for a scoped lower-tier agent,
 game-AI, or algorithm-configuration conference/workshop, and **no-go** for a
 broad or methodological flagship claim.

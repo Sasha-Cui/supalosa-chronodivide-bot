@@ -58,7 +58,12 @@ project is deliberately conservative:
   confidential post-submission work.
 
 Archive the submitted PDF, source identity, and disclosure record before the
-embargo begins. Do not use a public AI system to draft an ICAART rebuttal.
+embargo begins. Also retain a private offline copy of
+[`ICAART_REBUTTAL_EVIDENCE_PACKET.md`](ICAART_REBUTTAL_EVIDENCE_PACKET.md),
+after verifying that its bound PDF hash matches the submitted file. The packet
+is a pre-submission fact index, not permission to process a confidential review
+with a public AI system. Do not use a public AI system to draft an ICAART
+rebuttal.
 
 ## Required author verification
 
