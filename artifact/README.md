@@ -15,8 +15,9 @@ creates a metadata-normalized tarball.
 Build and test from the repository root:
 
 ```bash
-python3 -m unittest artifact.tests.test_build_anonymous_artifact -v
+python3 -m unittest discover -s artifact/tests -v
 python3 artifact/scripts/build_anonymous_artifact.py
+python3 artifact/scripts/verify_frozen_archive.py
 ```
 
 The archive is written under `artifact/dist/` and is intentionally ignored by
@@ -37,3 +38,6 @@ python3 verify_manifest.py
 
 The complete clean-room reconstruction record is
 [`research/ARTIFACT_CLEANROOM_REPRODUCTION.md`](../research/ARTIFACT_CLEANROOM_REPRODUCTION.md).
+`FROZEN_IDENTITY.json` is the machine-readable submission identity. The final
+verification command rebuilds from current source and rejects either source
+drift or a stale file under `artifact/dist/`.

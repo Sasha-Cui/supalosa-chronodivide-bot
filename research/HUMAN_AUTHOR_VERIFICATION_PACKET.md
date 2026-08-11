@@ -30,6 +30,7 @@ Run from the repository root:
 git rev-parse 5ed5dad
 sha256sum paper/build/main.pdf paper/build/supplement.pdf
 sha256sum paper_scitepress/build/main.pdf
+python3 artifact/scripts/verify_frozen_archive.py
 sha256sum artifact/dist/chrono-divide-review-artifact.tar.gz
 make -C paper_scitepress metadata
 sha256sum paper_scitepress/build/submission_metadata.json

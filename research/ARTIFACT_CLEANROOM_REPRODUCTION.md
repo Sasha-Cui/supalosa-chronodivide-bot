@@ -24,6 +24,11 @@ The archive was extracted into a newly created directory. The extracted tree
 contained no Git tree. Only manifested package members were available to the
 commands below.
 
+The submission-side machine identity is recorded separately in
+`artifact/FROZEN_IDENTITY.json`. Before upload,
+`python3 artifact/scripts/verify_frozen_archive.py` rebuilds the archive from
+current source and verifies both that build and the ignored distribution file.
+
 ## Clean-room procedure
 
 Run from outside a repository checkout, replacing the archive path and fresh

@@ -125,6 +125,9 @@ commit and all three hashes together; never mix files from different freezes.
 - [x] `make -C paper check main supplement` passes in a clean committed export.
 - [x] Anonymous artifact self-verifier checks all 60 immutable files and rejects
       missing, changed, or unexpected entries.
+- [x] `python3 artifact/scripts/verify_frozen_archive.py` rebuilds the archive
+      from current source and rejects both source drift and a stale ignored
+      distribution file against `artifact/FROZEN_IDENTITY.json`.
 - [x] A fresh Git-free extraction on an independent macOS toolchain passes all
       22 packaged tests and rebuilds the 18-page paper, 5-page supplement, and
       exact 11-page SCITEPRESS candidate without actionable warnings.

@@ -160,8 +160,8 @@ one venue-ruling-template test, one external-review-response-template test,
 and one substantive-citation-audit test (31 tests total). They regenerated all paper
 fragments without byte drift.
 
-The final repository-wide verification runs all 139 tests: 115 research tests,
-10 paper tests, 12 SCITEPRESS tests, and two artifact tests.
+The final repository-wide verification runs all 140 tests: 115 research tests,
+10 paper tests, 12 SCITEPRESS tests, and three artifact tests.
 
 The deterministic anonymous review archive has SHA-256
 `8ede1a73f07bd06dcd8fa5a9c647984a55ecc9101cd715f6bf71171a2fb5b9d1`
@@ -215,6 +215,14 @@ three rebuilt PDFs were byte-identical to the production hashes above. The
 fonts. All 34 rebuilt pages were rendered and inspected without a layout or
 readability defect. The command transcript, environment, identities, and
 scope boundary are frozen in `ARTIFACT_CLEANROOM_REPRODUCTION.md`.
+
+The ignored distribution path can retain an archive built from a transient
+source state even when tracked files are clean. The fail-closed pre-upload
+command `python3 artifact/scripts/verify_frozen_archive.py` now rebuilds the
+package from current source, checks it against `artifact/FROZEN_IDENTITY.json`,
+and independently rejects a stale `artifact/dist` file. The mismatched archive
+that exposed this gap was preserved under a hash-named untracked evidence path;
+the canonical distribution file again matches the frozen identity.
 
 The final close-work refreeze at `e91674f` adds the AAAI 2022 learned-sketch
 and AAAI 2023 bilevel-synthesis successors, explicitly disclaims synthesis and

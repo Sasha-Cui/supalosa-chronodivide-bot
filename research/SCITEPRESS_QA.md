@@ -109,6 +109,11 @@ above. Its deep submission check and complete 11-page rendered inspection also
 passed. See `ARTIFACT_CLEANROOM_REPRODUCTION.md` for the auditable transcript
 and the explicit boundary that this package does not rerun simulations.
 
+A separate frozen-identity verifier now rebuilds the archive from current
+source before checking the ignored distribution file. This closes the
+operational gap in which a stale `artifact/dist` output could survive beside a
+clean source tree; it changes neither manuscript source nor PDF bytes.
+
 ## Reviewer-assignment metadata
 
 The title and abstract already identify a scripted RTS agent, the Chrono Divide
