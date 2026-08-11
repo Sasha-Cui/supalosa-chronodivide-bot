@@ -37,9 +37,11 @@ successive-halving method itself is not novel.
 
 The project is now **near the expected SCAG standard**: its empirical program
 is complete, the relative confirmatory endpoint passed, the failed absolute
-endpoint is reported, and every result is tied to frozen manifests and job
-records. It is not yet submission-ready because the manuscript, anonymous
-artifact, license boundary, and clean-clone reproduction remain unfinished.
+endpoint is reported, every result is tied to frozen manifests and job records,
+and a complete anonymous LNCS manuscript and supplement are committed at
+`81e87e2`. It is not yet submission-ready because the anonymous artifact,
+license boundary, clean-clone reproduction, reviewer audit, and written remote
+presentation confirmation remain unfinished.
 
 Likely reviewer concerns and the required answers are:
 

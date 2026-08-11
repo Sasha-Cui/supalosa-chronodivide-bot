@@ -4,7 +4,8 @@ Last reconciled: **2026-08-11**
 
 ## Bottom line
 
-The core empirical program is complete and paper writing may begin. The frozen
+The core empirical program is complete and the first full paper draft is built,
+visually checked, committed, and pushed. The frozen
 method-v2 champion substantially improves the shipped StrongBot default across
 16 sealed Chrono Divide map families against one pinned, independently loaded
 Supalosa bot. The relative effect passes its prespecified confirmatory gate; the
@@ -75,18 +76,28 @@ See [`METHOD_V2_MECHANISM_ABLATION_RESULT.md`](METHOD_V2_MECHANISM_ABLATION_RESU
 [`METHOD_V2_COMPONENT_ABLATION_RESULT.md`](METHOD_V2_COMPONENT_ABLATION_RESULT.md),
 and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.md).
 
-## Remaining paper work
+## Manuscript status and remaining work
 
-The blockers are editorial and release-oriented, not additional training:
+Commit `81e87e2` adds the complete anonymous LNCS manuscript, supplement,
+21-entry bibliography, and deterministic paper build. The main PDF is 16 pages
+with main text ending on page 14 and references continuing afterward; the
+supplement is five pages. All reported tables and figures are generated from
+hash-pinned aggregate artifacts. The final build has no overfull boxes,
+undefined references, missing citations, or BibTeX warnings, and all 21 pages
+have received a rendered visual check.
 
-1. rewrite the paper formulation around the observed robust improvement and
-   reproducible evaluation protocol;
-2. create tables and figures directly from committed aggregate artifacts;
-3. verify and complete the primary-source bibliography;
-4. confirm a remote-presentation venue and its current deadline;
-5. document the asset-license boundary and package the author-owned code,
-   manifests, hashes, metadata, and aggregates; and
-6. run a clean-clone reproduction and final claim audit.
+The remaining blockers are release- and submission-oriented, not additional
+training:
+
+1. reproduce the paper assets and tests from a clean clone without private
+   absolute paths;
+2. create and validate an identity-neutral artifact bundle containing only
+   releasable author-owned code, manifests, hashes, metadata, and aggregates;
+3. finish the asset-license and acquisition instructions for omitted third-party
+   game content;
+4. obtain written confirmation that EvoStar permits remote presentation; and
+5. complete a reviewer-style claim, accessibility, statistics, and submission
+   metadata audit.
 
 The candid submission decision is **go** for a scoped lower-tier game-AI or
 evolutionary-computation workshop/special session, and **no-go** for a broad or

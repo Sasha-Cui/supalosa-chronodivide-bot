@@ -7,7 +7,7 @@ citation search and coverage of work published after these papers.
 | Work | What it establishes | Consequence for this project |
 |---|---|---|
 | Fernández-Ares et al. (2011), [“Optimizing Strategy Parameters in a Game Bot”](https://doi.org/10.1007/978-3-642-21498-1_41), IWANN, pp. 325–332 | Evolutionary optimization of constants, weights, and probabilities in a hand-designed Planet Wars rule system, evaluated across maps. | Evolving scripted-bot parameters is prior art, not this project's novelty. |
-| Mora et al. (2012), [“Effect of Noisy Fitness in Real-Time Strategy Games Player Behaviour Optimisation Using Evolutionary Algorithms”](https://doi.org/10.1007/s11390-012-1281-5), JCST 27(5):1007–1023 | Repeated combats, multiple maps, and elite/incumbent reevaluation mitigate noisy fitness in RTS bot tuning. | Chrono Divide outcomes vary under an uncontrolled wall-clock-derived seed; the current one-pass sequential trainer lacks explicit seeds, paired reevaluation, and known noisy-fitness controls. |
+| Mora et al. (2012), [“Effect of Noisy Fitness in Real-Time Strategy Games Player Behaviour Optimisation Using Evolutionary Algorithms”](https://doi.org/10.1007/s11390-012-1281-5), JCST 27(5):1007–1023 | Repeated combats, multiple maps, and elite/incumbent reevaluation mitigate noisy fitness in RTS bot tuning. | The reconstructed legacy runs exposed uncontrolled wall-clock randomness; the frozen study therefore uses explicit engine and participant streams, reciprocal starts, common-seed comparisons, and family-level inference. |
 | Young & Hawes (2012), [“Evolutionary Learning of Goal Priorities in a Real-Time Strategy Game”](https://doi.org/10.1609/aiide.v8i1.12503), AIIDE 8(1):87–92 | Case-injected genetic optimization of StarCraft goal-priority profiles and comparison to static knowledge. | Seeded evolutionary tuning of high-level scripted priorities is established. |
 | Othman et al. (2012), [“Simulation-based Optimization of StarCraft Tactical AI through Evolutionary Computation”](https://doi.org/10.1109/CIG.2012.6374182), IEEE CIG, pp. 394–401 | Simulation-based evolutionary refinement of XML-configured StarCraft tactical behavior. | A simulator plus evolutionary tactical tuning is established; equal-launched-budget comparisons and transfer are needed. |
 | Liu, Louis & Ballinger (2016), [“Evolving Effective Microbehaviors in Real-Time Strategy Games”](https://doi.org/10.1109/TCIAIG.2016.2544844), IEEE TCIAIG 8(4):351–362 | GA tuning of 14 potential-field/influence-map parameters, including limited transfer to unseen combat scenarios. | Unseen-scenario transfer has direct precedent; this paper must go beyond a single tuned map and compare mechanisms. |
@@ -26,8 +26,9 @@ citation search and coverage of work published after these papers.
   a heavier commercial-game precedent for task standardization.
 - Ontañón et al. (2018), [*The First microRTS Artificial Intelligence
   Competition*](https://doi.org/10.1609/aimag.v39i1.2777), established μRTS as
-  a shared simplified RTS competition substrate. Its deterministic setting
-  contrasts with Chrono Divide's observed, uncontrolled cross-process variability.
+  a shared simplified RTS competition substrate. Chrono Divide required an
+  additional seed-isolation layer to make cross-process comparisons
+  deterministic.
 - Andersen, Goodwin & Granmo (2018), [*Deep RTS: A Game Environment for Deep
   Reinforcement Learning in Real-Time Strategy Games*](https://doi.org/10.1109/CIG.2018.8490409),
   foregrounded the speed/fidelity tradeoff in accelerated RTS simulation.
@@ -59,25 +60,26 @@ Not novel on present evidence:
 - observing that stochastic match fitness is noisy;
 - testing transfer to unseen scenarios in principle.
 
-Potentially novel if demonstrated rigorously:
+Supported contribution in the frozen study:
 
-- an exact-provenance framework and reconstruction showing how RTS bot development
-  practices create baseline, map-family, start, and adaptive-test leakage;
-- an equal-launched-budget decomposition of map-profile, exact-coordinate, pooled, and
-  robust configuration effects on held-out and worst-group performance;
-- a low-cost evaluation protocol with physical-start pairing, family-disjoint
-  maps, repeated optimizer runs, and hierarchical uncertainty in Chrono Divide;
-- a legally releasable manifest/hash benchmark that produces stable ranking
-  changes across multiple independently authored agents.
+- an exact-provenance reconstruction identifying baseline, map-family, start,
+  randomness, and adaptive-test failure modes in exploratory RTS bot runs;
+- a low-cost Chrono Divide evaluation protocol with reciprocal starts,
+  participant-isolated random streams, family-disjoint roles, repeated searches,
+  sealed outcomes, and family-clustered uncertainty;
+- a held-out case study showing a 0.336 family-weighted improvement over the
+  shipped default while preserving a negative absolute-strength conclusion;
+- an author-owned manifest/hash artifact layer whose aggregate results can be
+  regenerated without redistributing third-party game assets.
 
-The strongest novelty sentence is deliberately conditional:
+The strongest novelty sentence supported by the completed evidence is:
 
-> If confirmed, this study shows that the apparent strength of a scripted RTS
-> agent depends materially on configuration context, and that pooled or
-> risk-aware tuning changes held-out and worst-group performance under the same
-> launched-simulation budget.
+> This study contributes an integrated, leakage-resistant configuration and
+> evaluation workflow for a scripted Chrono Divide agent, together with held-out
+> evidence that the workflow substantially improves a weak shipped default
+> against one pinned opponent without establishing absolute superiority.
 
-A full review should additionally cover generalization across procedural game
-levels, benchmark overfitting, multi-task algorithm configuration, group
-robustness, and statistical evaluation under deterministic or dependent game
-simulation. Do not claim a literature gap until that review is complete.
+The manuscript bibliography now covers the primary sources used by the paper.
+It remains a scoped review rather than evidence of a universal literature gap;
+the paper therefore claims an integrated empirical contribution rather than
+that no prior reproducible game-agent configuration workflow exists.

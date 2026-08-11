@@ -1,7 +1,7 @@
 # Results-driven paper plan
 
-Status: **empirical program complete; manuscript formulation frozen for first
-draft**.
+Status: **empirical program complete; full evidence-bound manuscript and
+supplement committed at `81e87e2`; release QA in progress**.
 
 ## Recommended paper
 
@@ -163,7 +163,7 @@ The confirmatory design contains 16 families, eight new seed blocks/family, two
 reciprocal candidate slots, and two methods: 512 games total. The primary
 estimand is the equally-family-weighted champion-minus-default score difference
 after reciprocal-slot averaging. The primary interval uses the frozen
-finite-family cluster sandwich and Student-$t_9$ critical value.
+finite-family cluster sandwich and Student-$t_{15}$ critical value.
 
 The confirmatory gate had two components:
 
@@ -313,23 +313,25 @@ supported map population.
 
 ## Tables and figures
 
-Required main-paper items:
+Committed main-paper items:
 
 1. **Figure 1 — Study flow:** 67 screened families to frozen roles, five
    searches, championship, fresh development, and sealed test.
-2. **Table 1 — Reproducibility contract:** simulator, agent, seed, start,
-   family, source/runtime, retry, and outcome-access controls.
-3. **Table 2 — Simulation budget:** 8,704 games by stage and job array.
-4. **Figure 2 — Per-family confirmatory effects:** 16 champion-minus-default
-   points with zero line; do not show unearned game-level intervals.
-5. **Table 3 — Main confirmatory result:** scores, records, clustered interval,
+2. **Table 1 — Search allocation:** exact successive-halving policy, family,
+   slot, and launched-game counts.
+3. **Table 2 — Policy differences:** every stored default/champion difference.
+4. **Table 3 — Main confirmatory result:** scores, records, clustered interval,
    and both gate decisions.
+5. **Figure 2 — Per-family confirmatory effects:** 16 champion-minus-default
+   points with zero line; do not show unearned game-level intervals.
 6. **Figure 3 — Paired outcome transitions:** default loss/draw/win to champion
    loss/draw/win counts.
 7. **Figure 4 — Component contrasts:** five champion-minus-revert estimates
    with ordinary and familywise intervals.
-8. **Table 4 — Champion/default parameter differences and terminal-state
-   decomposition.**
+
+The complete 8,704-game job ledger, public family-ID mapping, policy-space
+summary, artifact commitments, adaptation history, and reproduction commands
+are in the supplement.
 
 Appendix/supplement:
 
@@ -383,9 +385,9 @@ redistribution of third-party maps or game archives without verified rights.
 - [x] Frozen training, development, and confirmatory runs complete.
 - [x] Relative effect, absolute gate, sensitivity audit, and diagnostics frozen.
 - [x] Job/result registry and empirical completion audit reconciled.
-- [ ] Primary-source related work verified and BibTeX committed.
-- [ ] Tables and figures generated and tested from artifacts.
-- [ ] Full manuscript drafted in the target template.
+- [x] Primary-source related work verified and BibTeX committed.
+- [x] Tables and figures generated and tested from artifacts.
+- [x] Full manuscript drafted in the target template.
 - [ ] Clean-clone reproduction succeeds without private absolute paths.
 - [ ] Release bundle and asset-license statement complete.
 - [ ] Remote presentation and deadline reconfirmed from official venue pages.
