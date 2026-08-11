@@ -49,6 +49,10 @@ class BuildAnonymousArtifactTest(unittest.TestCase):
                 (package / "README.md").read_text(),
             )
             self.assertIn(
+                "Expected output is a 17-page",
+                (package / "README.md").read_text(),
+            )
+            self.assertIn(
                 "eight sanitized aggregate JSON records",
                 " ".join((package / "THIRD_PARTY.md").read_text().split()),
             )
