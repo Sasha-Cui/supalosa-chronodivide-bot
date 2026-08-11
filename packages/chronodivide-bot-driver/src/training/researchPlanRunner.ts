@@ -27,6 +27,7 @@ export type ResearchPurpose =
     | "development-evaluation"
     | "development-v2-qc"
     | "development-v2-evaluation"
+    | "mechanism-ablation"
     | "confirmatory-evaluation";
 
 export type ResearchPlanPolicy = {
@@ -97,15 +98,20 @@ const DEVELOPMENT_PURPOSES: ResearchPurpose[] = [
     "development-evaluation",
     "development-v2-qc",
     "development-v2-evaluation",
+    "mechanism-ablation",
 ];
 const TEST_PURPOSES: ResearchPurpose[] = ["confirmatory-evaluation"];
 
-const developmentMethodIds = (purpose: ResearchPurpose): readonly string[] =>
-    purpose === "development-v2-qc" ||
-    purpose === "development-v2-evaluation" ||
-    purpose === "confirmatory-evaluation"
+const developmentMethodIds = (purpose: ResearchPurpose): readonly string[] => {
+    if (purpose === "mechanism-ablation") {
+        return ["champion", "local0", "local1", "local2", "local3", "local4"];
+    }
+    return purpose === "development-v2-qc" ||
+        purpose === "development-v2-evaluation" ||
+        purpose === "confirmatory-evaluation"
         ? ["champion", "default"]
         : ["conditioned", "global"];
+};
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null && !Array.isArray(value);
@@ -640,7 +646,9 @@ export const runResearchPlanFromEnvironment = async (accessMode: ResearchAccessM
         repoRoot,
         "research",
         "artifacts",
-        plan.purpose === "development-v2-qc" || plan.purpose === "development-v2-evaluation"
+        plan.purpose === "development-v2-qc" ||
+        plan.purpose === "development-v2-evaluation" ||
+        plan.purpose === "mechanism-ablation"
             ? "method_v2_development_role_commitment.json"
             : "family_role_commitments_v1.json",
     );

@@ -105,6 +105,30 @@ const validConfirmatoryPlan = (): Record<string, unknown> => ({
     purpose: "confirmatory-evaluation",
 });
 
+const validMechanismAblationPlan = (): Record<string, unknown> => {
+    const plan = validDevelopmentV2Plan();
+    const policyIds = [firstPolicyId, secondPolicyId];
+    const policies = [
+        { policyId: firstPolicyId, policy: firstPolicy },
+        { policyId: secondPolicyId, policy: secondPolicy },
+    ];
+    const methods = ["champion", "local0", "local1", "local2", "local3", "local4"];
+    return {
+        ...plan,
+        purpose: "mechanism-ablation",
+        policies,
+        episodes: methods.flatMap((methodId, methodIndex) => [0, 1].map((candidateSlot) => ({
+            episodeId: `${methodId}-slot-${candidateSlot}`,
+            familyId: "mf_alpha",
+            methodId,
+            policyId: policyIds[methodIndex % policyIds.length],
+            seedBlockIndex: 7,
+            requestedEngineSeed: ENGINE_SEED_BASE + 7,
+            candidateSlot,
+        }))),
+    };
+};
+
 const temporaryDirectories: string[] = [];
 
 afterEach(() => {
@@ -159,6 +183,18 @@ describe("strict research run plan", () => {
         const wrong = validDevelopmentV2Plan();
         (wrong.episodes as Array<Record<string, unknown>>)[0].methodId = "global";
         expect(() => parseResearchRunPlan(wrong)).toThrow(/champion, default/);
+    });
+
+    test("accepts only the six fixed post-confirmatory mechanism methods", () => {
+        const plan = parseResearchRunPlan(validMechanismAblationPlan());
+        expect(new Set(plan.episodes.map(({ methodId }) => methodId))).toEqual(
+            new Set(["champion", "local0", "local1", "local2", "local3", "local4"]),
+        );
+        const incomplete = validMechanismAblationPlan();
+        incomplete.episodes = (incomplete.episodes as Array<Record<string, unknown>>).filter(
+            ({ methodId }) => methodId !== "local4",
+        );
+        expect(() => parseResearchRunPlan(incomplete)).toThrow(/exactly champion and local0 and local1/);
     });
 
     test("keeps sealed test execution behind the separate confirmatory access mode", () => {
