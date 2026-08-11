@@ -5,7 +5,7 @@ Reviewed: **2026-08-11**
 ## Purpose and evidence boundary
 
 This is an internal acceptance-risk audit of the anonymous SCITEPRESS regular
-paper at repository commit `440d30766f546c2a97c591f7d7c50c4e66ed07e5`.
+paper at repository commit `419a0f72188f957ae144262f62c62bcc11a66ac3`.
 It is not an independent review, an acceptance-probability estimate, or a
 substitute for the unprimed human cold read in `EXTERNAL_REVIEW_PACKET.md`.
 
@@ -49,7 +49,7 @@ evaluation protocol despite narrow opponent breadth.
 | Figures adequate? | Yes after repair. Figures show study flow, all family effects, paired transitions, and component intervals. | Figure 2 no longer depends on an unavailable supplement; its family labels are defined in place. |
 | Conclusions/future work convincing? | Yes. The conclusion answers both confirmatory gates and states the non-causal diagnostic boundary; the immediately preceding limitations identify the next prospective extension. | Cold-read whether the final paragraph remains appropriately bounded rather than merely defensive. |
 | References current and appropriate? | Yes. The bibliography includes the closest game-agent configuration work, generalization/evaluation foundations, exact pinned software sources, and a 2026 ICAART game paper. | Human author still verifies every primary source and citation use. |
-| Formatting adjustment? | None currently. The candidate is 10 A4 pages under the 12-page full-paper limit, with embedded fonts and settled references. | Repeat full render after these edits. |
+| Formatting adjustment? | None currently. The candidate is 10 A4 pages under the 12-page full-paper limit, with embedded fonts and settled references. | Full post-edit render completed; repeat only after a later source change. |
 | Improve English? | No systemic issue found. | Human line edit remains mandatory under the authorship policy. |
 
 ## Decision-critical objections

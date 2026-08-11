@@ -4,13 +4,13 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `8242720bd603a8ac72ef5f28496b412f573b294e`
+- Source commit: `419a0f72188f957ae144262f62c62bcc11a66ac3`
 - Main source: `paper/main.tex`
 - Supplement source: `paper/supplement.tex`
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 16 pages total; non-reference content ends on page 14
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `c7e0dd7afcaeda08a54eb16848b52481b15bcc44efa2f826f1b336177dd0874b`
+- Main PDF SHA-256: `a93b9a759d52848bd0fb39c39d6edcd6d2e554573beb58c6f0ce214cb303a2aa`
 - Supplement PDF SHA-256: `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98`
 
 The PDFs are build products and are not committed. Their hashes identify the
@@ -99,6 +99,14 @@ references begin on page 15, and the supplement is byte-identical. Commit
 `297d5b8` also added a fourth SCITEPRESS LaTeX pass and a fail-closed regression
 test for unsettled cross-references.
 
+The acceptance-criteria refreeze at `419a0f7` tightens the forensic motivation,
+states the leakage-resistant evaluation protocol as the principal technical
+contribution, and removes the main paper's dependency on a supplement for
+interpreting family labels. Two clean Bouchet builds reproduced the PDF hashes
+above. Fresh Poppler renders covered all 16 main-paper pages, all five
+supplement pages, and all 10 SCITEPRESS pages; the changed contribution and
+family-effect pages were also inspected at full resolution.
+
 The claim audit confirmed that the paper:
 
 - leads with champion-versus-frozen-reference improvement, not absolute
@@ -116,15 +124,15 @@ The claim audit confirmed that the paper:
 
 ## Clean export and reviewer artifact
 
-A committed manuscript revision at `8242720` and the portable-artifact repair
+A committed manuscript revision at `419a0f72188f957ae144262f62c62bcc11a66ac3` and the portable-artifact repair
 at `d53f822144bd0b3fffe3b4d778770091f77900b8` passed ten paper-generator and
-manuscript-invariant tests, seven SCITEPRESS tests, two artifact-builder tests,
-and the three frozen family-exporter tests (22 tests total). They regenerated
+manuscript-invariant tests, eight SCITEPRESS tests, two artifact-builder tests,
+and the three frozen family-exporter tests (23 tests total). They regenerated
 all paper fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
-`fdbfebd63a28baba4bdde307bdc8db5d87ac8059b549513c11811e3d46078866`
-and size 93,395 bytes. Two independent builds produced that same hash. The
+`47a9e56aeb0d67c01703bf16f9f7ab48b842273d7595d289d6fad67817fc9c0a`
+and size 93,381 bytes. Two independent builds produced that same hash. The
 archive contains 58 manifested immutable files, normalized `0/0` ownership and
 epoch timestamps, no Git tree, no bot packages, and no direct author,
 scheduler-account, institution, or private-path token. It now contains both the
@@ -136,13 +144,13 @@ rejects missing, changed, or unexpected immutable files.
 
 A fresh extraction on an independent macOS machine used Python 3.14.2, GNU
 Make 3.81, and TeX Live 2022 rather than Bouchet's Python 3.9 and TeX Live 2024.
-The manifest verified both before and after deterministic regeneration, all 17
+The manifest verified both before and after deterministic regeneration, all 18
 packaged manuscript tests passed, and the Git-free build produced the expected
 16-page Letter LNCS paper, five-page Letter supplement, and 10-page A4
 SCITEPRESS candidate. The local-toolchain PDF identities were respectively
-`9af19c32be858bdd1af5749ff4cf165237ff23ba027950b33c795e6960b0b859`,
+`20a17d2304ca5e6761c2b6696fc4a8581c1835b09fe4bc889c098abcca560030`,
 `82e54a6266bdc211530d6cde92443c6707f78e975dbdd77cc1a4c6b2db8cc20b`,
-and `7f6b2e26352290ea689e03671f3e48053f4ac932fe6cddc5812e863ed04ad3d9`.
+and `5681311606accf025bc6261037523582578825f10a4544572b6032e49059e01d`.
 PDF bytes legitimately differ across TeX distributions, while all immutable
 sources and generated fragments remain manifest-bound. All fonts were embedded;
 the final logs contained no overfull box, unresolved reference/citation, rerun,

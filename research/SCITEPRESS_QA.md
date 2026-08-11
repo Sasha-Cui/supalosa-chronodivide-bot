@@ -5,15 +5,15 @@ Prepared: **2026-08-11**
 ## Frozen candidate identity
 
 - Candidate introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
-- Current reviewed source: `8242720bd603a8ac72ef5f28496b412f573b294e`
-- Authoritative shared manuscript source: `8242720bd603a8ac72ef5f28496b412f573b294e`
+- Current reviewed source: `419a0f72188f957ae144262f62c62bcc11a66ac3`
+- Authoritative shared manuscript source: `419a0f72188f957ae144262f62c62bcc11a66ac3`
 - Portable artifact/build QA: `d53f822144bd0b3fffe3b4d778770091f77900b8`
 - Build entry point: `paper_scitepress/main.tex`
 - Target: ICAART 2027 regular paper, anonymous SCITEPRESS review format
-- PDF: 10 A4 pages, 164,393 bytes
-- PDF SHA-256: `56fdc8e6b1c29f6c29b54cef205bdb75772034a8924bbbebeabf8bd9f6f29408`
+- PDF: 10 A4 pages, 164,295 bytes
+- PDF SHA-256: `1a92466bc627a3edc3d757542289df03121bdbe4ebccdc8947508cf7b084747c`
 - Abstract: 197 words
-- Extracted submission length: 36,435 non-whitespace characters
+- Extracted submission length: 36,231 non-whitespace characters
 
 The PDF is a build product and is not committed. The hash identifies the exact
 file rendered and inspected in this QA pass.
@@ -41,7 +41,7 @@ make -C paper_scitepress clean
 make -C paper_scitepress check
 ```
 
-completed successfully. Seven candidate-specific tests passed, the shared paper
+completed successfully. Eight candidate-specific tests passed, the shared paper
 generator produced no Git drift, BibTeX emitted no warning, LaTeX emitted no
 overfull box or undefined citation/reference, and the build checker enforced a
 maximum of 12 pages. Commit `297d5b8` adds the fourth post-BibTeX LaTeX pass
@@ -51,7 +51,7 @@ PDF hash above. The fixed `SOURCE_DATE_EPOCH` is a stable reproducibility
 constant established at the earlier comparator-justified freeze; the current
 reviewed source identity is recorded above.
 
-The extracted PDF contains 36,435 non-whitespace characters, within ICAART's
+The extracted PDF contains 36,231 non-whitespace characters, within ICAART's
 10,000--50,000 review-submission interval. Its 197-word abstract is within the
 official 70--200-word interval. The page is A4 and the current 10-page build is
 below the 12-page full-paper proceedings limit.
@@ -61,10 +61,10 @@ below the 12-page full-paper proceedings limit.
 The repaired anonymous archive packages this exact SCITEPRESS source rather
 than only the LNCS secondary format. A fresh Git-free extraction on macOS using
 Python 3.14.2, GNU Make 3.81, and TeX Live 2022 verified all 58 immutable files
-before and after regeneration, passed the ten shared and seven
+before and after regeneration, passed the ten shared and eight
 SCITEPRESS-specific tests, and completed `make -C paper_scitepress check`.
-The result is a 10-page A4 PDF of 164,234 bytes with SHA-256
-`7f6b2e26352290ea689e03671f3e48053f4ac932fe6cddc5812e863ed04ad3d9`.
+The result is a 10-page A4 PDF of 164,132 bytes with SHA-256
+`5681311606accf025bc6261037523582578825f10a4544572b6032e49059e01d`.
 That byte identity is intentionally recorded separately from the Bouchet TeX
 Live 2024 identity above; the package manifest and generated-fragment hashes,
 not cross-version PDF bytes, are the portable invariant. The independent final
@@ -99,6 +99,10 @@ The final conclusion edit changed only page 9. That page was rendered at full
 resolution and inspected; the conclusion remains adjacent to the limitations,
 references begin cleanly below it, and pages 1--8 and 10 are pixel-identical to
 the preceding inspected freeze.
+The acceptance-criteria edit then tightened the contribution framing and made
+the family-effect caption self-contained. A fresh 10-page render found the
+revised contribution and caption legible and found no change to the paper's
+claim boundary or conclusion.
 The study-flow diagram was widened to two columns after the first pass; the
 final pass found no clipped or overlapping text, invisible content, broken
 glyph, unreadable plot label, margin violation, misleading caption, or malformed
