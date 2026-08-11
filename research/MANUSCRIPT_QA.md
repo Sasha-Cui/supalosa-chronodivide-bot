@@ -4,14 +4,14 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `82bae41ebafbebb4aa4c428dfa4676a395fd1ccb`
+- Source commit: `64957e5dce9680a509c1d9101094cca20f795a04`
 - Main source: `paper/main.tex`
 - Supplement source: `paper/supplement.tex`
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 16 pages total; non-reference content ends on page 14
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `60bf33022a521e6bc7b2de85fedc498b5aa4b52f5f5b5bf9edc6bdcab43d3e74`
-- Supplement PDF SHA-256: `3ca30d9f3aa6826f6540f495fef9326442db0f31d2b47961e552ad81cc7f2b08`
+- Main PDF SHA-256: `2fe30264c2cba4772bae6bbc231721c0c8d4cd13302f7d6314a2d756ee600b68`
+- Supplement PDF SHA-256: `8e14a20bf05fc0d24b9ece5a00dbc365de0a249c75d64daef24c20274efeebb0`
 
 The PDFs are build products and are not committed. Their hashes identify the
 exact artifacts inspected during this QA pass.
@@ -42,8 +42,9 @@ The final logs contain:
 All 16 main-paper pages and all five supplement pages were rendered with
 Poppler and visually inspected. After the final title, research-question,
 diagnostic-wording, and prior-art-positioning edits, all 16 main-paper pages
-and all five supplement pages were rendered and inspected again. The pass
-checked title-page anonymity, text and background contrast,
+and all five supplement pages were rendered and inspected again. The final
+method-classification edit received another complete 21-page pass. The checks
+covered title-page anonymity, text and background contrast,
 margins, line wrapping, tables, plot labels, captions, page numbers,
 bibliography links, and section transitions. The final source contains no
 author NetID, institution name, literal Slurm account, personal repository URL,
@@ -62,12 +63,12 @@ The claim audit confirmed that the paper:
 
 ## Clean export and reviewer artifact
 
-A committed main revision at `82bae41` passed five paper-generator tests, two
+A committed main revision at `64957e5` passed five paper-generator tests, two
 artifact-builder tests, and the three frozen family-exporter tests. It
 regenerated all paper fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
-`1dd829195a08bdc6f6fe5226027aa49941e5e86eb8a60769b5c1ca5987b69c11`.
+`ac31dd4c3553c3e6af30e308984912348ec2ea89241759518faa76e4b2377548`.
 Two independent builds produced that same hash. The archive contains 35
 manifested files, normalized `0/0` ownership and epoch timestamps, no Git tree,
 no bot packages, and no direct author, scheduler-account, institution, or

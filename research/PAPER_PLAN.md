@@ -1,14 +1,14 @@
 # Results-driven paper plan
 
 Status: **empirical program complete; submission-candidate manuscript at
-`82bae41`; deterministic anonymous artifact and internal QA complete**.
+`64957e5`; deterministic anonymous artifact and internal QA complete**.
 
 ## Recommended paper
 
 **Title:** *Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono
 Divide*
 
-The primary target is a lower-tier game-AI/evolutionary-computation workshop or
+The primary target is a lower-tier game-AI/algorithm-configuration workshop or
 special session. The paper is an empirical evaluation and reproducibility
 contribution, with an agent-configuration case study. It is not a new general
 learning-algorithm paper.
@@ -59,7 +59,7 @@ The paper should claim exactly three contributions:
    numbers, reciprocal starts, clean opponent loading, sealed outcomes, and
    complete job provenance.
 2. **Configured StrongBot policy.** We implement a coordinate-free 32-policy,
-   three-stage successive-halving search with five independent candidate pools,
+   three-stage successive-halving search with five run-distinct candidate pools,
    followed by a common-seed championship that selects one generic policy from
    30 finalists without test access.
 3. **Held-out empirical evidence.** We show a large, family-consistent

@@ -78,11 +78,13 @@ and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.m
 
 ## Manuscript status and remaining work
 
-Commit `82bae41` is the current anonymous LNCS manuscript revision. It sharpens
+Commit `64957e5` is the current anonymous LNCS manuscript revision. It sharpens
 the held-out-evaluation title, states two confirmatory research questions and
 one explicitly descriptive diagnostic question, removes causal-sounding
 mechanism language, and adds primary prior art on hidden-level evaluation and
-protocol sensitivity without changing any result. The main PDF is 16 pages with
+protocol sensitivity and classifies the search as deterministic mutation-based
+finite configuration rather than iterative population-based evolution, without
+changing any result. The main PDF is 16 pages with
 main text ending on page 14 and references continuing afterward; the supplement
 is five pages. All reported tables and figures are generated from hash-pinned
 aggregate artifacts. The final build has no overfull boxes, undefined
@@ -92,7 +94,7 @@ received rendered visual checks. The current PDF SHA-256 values are recorded in
 
 Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder.
 The current 60 KB review archive is byte-deterministic at SHA-256
-`1dd829195a08bdc6f6fe5226027aa49941e5e86eb8a60769b5c1ca5987b69c11`.
+`ac31dd4c3553c3e6af30e308984912348ec2ea89241759518faa76e4b2377548`.
 Its 35-file manifest verifies, all artifact tests pass, and an extracted
 reviewer copy rebuilds the 16-page paper and five-page supplement without
 warnings.
@@ -102,16 +104,14 @@ training:
 
 1. obtain permission or a licensing decision from Supalosa before publicly
    redistributing the combined bot, whose upstream package is `UNLICENSED`;
-2. resolve the double-blind risk created by the named public GitHub repository
-   containing the paper and unique result text;
-3. obtain written confirmation that EvoStar accepts the paper's application and
-   evaluation emphasis, permits remote presentation, and allows the intended
-   supplement/artifact route; and
-4. obtain a cold read from an independent technical reader, incorporate only
+2. obtain written confirmation that EvoStar accepts the paper's application and
+   evaluation emphasis, permits remote presentation, and permits the proposed
+   handling of the prior named public repository; and
+3. obtain a cold read from an independent technical reader, incorporate only
    claim-preserving clarity corrections, and repeat final PDF QA.
 
 The candid submission decision is **go** for a scoped lower-tier game-AI or
-evolutionary-computation workshop/special session, and **no-go** for a broad or
+algorithm-configuration workshop/special session, and **no-go** for a broad or
 methodological flagship claim.
 
 Use [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) for job-level provenance and

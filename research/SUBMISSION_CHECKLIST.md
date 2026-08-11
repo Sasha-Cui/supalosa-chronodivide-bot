@@ -13,8 +13,9 @@ the anonymous branch during review.
 - [ ] Chair confirms fully remote presentation is permitted.
 - [ ] Chair rules on the previously public named repository under double-blind
       review.
-- [ ] Chair confirms whether a separate supplement and reviewer artifact are
-      accepted and considered during review.
+- [ ] Anonymous supplement and reviewer artifact together fit the official
+      10 MB supplementary-material field; every essential detail remains in
+      the main paper.
 - [ ] Deadline, timezone, page limit, review model, and registration requirement
       reverified from the official call on the upload date.
 - [ ] No simultaneous submission to an incompatible archival venue.
@@ -24,15 +25,15 @@ the anonymous branch during review.
 - Title: **Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono
   Divide**
 - Anonymous manuscript source commit:
-  `82bae41ebafbebb4aa4c428dfa4676a395fd1ccb`
+  `64957e5dce9680a509c1d9101094cca20f795a04`
 - Main PDF: 16 pages total; non-reference material ends on page 14.
 - Main PDF SHA-256:
-  `60bf33022a521e6bc7b2de85fedc498b5aa4b52f5f5b5bf9edc6bdcab43d3e74`
+  `2fe30264c2cba4772bae6bbc231721c0c8d4cd13302f7d6314a2d756ee600b68`
 - Supplement: 5 pages.
 - Supplement PDF SHA-256:
-  `3ca30d9f3aa6826f6540f495fef9326442db0f31d2b47961e552ad81cc7f2b08`
+  `8e14a20bf05fc0d24b9ece5a00dbc365de0a249c75d64daef24c20274efeebb0`
 - Deterministic anonymous artifact SHA-256:
-  `1dd829195a08bdc6f6fe5226027aa49941e5e86eb8a60769b5c1ca5987b69c11`
+  `ac31dd4c3553c3e6af30e308984912348ec2ea89241759518faa76e4b2377548`
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
