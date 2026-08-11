@@ -172,6 +172,19 @@ class FallbackManuscriptTest(unittest.TestCase):
             self.assertIn(required, keywords)
         self.assertNotIn("distribution shift", keywords)
 
+    def test_bibliography_fit_does_not_shrink_reference_text(self) -> None:
+        source = (FALLBACK / "main.tex").read_text()
+        self.assertIn(
+            r"\renewcommand{\thebibliography}[1]",
+            source,
+        )
+        bibliography_hook = source.split(
+            r"\renewcommand{\thebibliography}[1]", maxsplit=1
+        )[1].split(r"\begin{document}", maxsplit=1)[0]
+        self.assertIn(r"\setlength{\itemsep}{0pt}", bibliography_hook)
+        self.assertNotIn(r"\footnotesize", bibliography_hook)
+        self.assertNotIn(r"\scriptsize", bibliography_hook)
+
     def test_vendor_files_match_the_official_archive(self) -> None:
         manifest = [
             line

@@ -66,6 +66,15 @@ Agents, Algorithm Configuration, Reproducible Evaluation.}
 % equations. A uniform 9-point display size preserves the shared equations.
 \AtBeginEnvironment{equation}{\small}
 
+% Keep the expanded, current bibliography inside the review-page limit without
+% shrinking its text. The base article list otherwise inserts 2 pt between all
+% 30 entries, which alone consumes more than five lines of column height.
+\let\scitepressthebibliography\thebibliography
+\renewcommand{\thebibliography}[1]{%
+  \scitepressthebibliography{#1}%
+  \setlength{\itemsep}{0pt}%
+}
+
 \begin{document}
 \onecolumn
 \maketitle
