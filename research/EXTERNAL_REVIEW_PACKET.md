@@ -34,6 +34,8 @@ Ask the reader to answer these before discussing the paper with an author:
    vote accept, borderline, or reject? Give the strongest reason for and
    against acceptance.
 10. Identify every sentence that sounds stronger than the evidence.
+11. Why is the frozen reference not the deployed StrongBot default, and what
+    limitation follows from that choice?
 
 Do not correct the reader during this questionnaire. A mistaken answer is
 evidence of a manuscript communication failure, not a reader failure.
@@ -46,6 +48,7 @@ elements alone communicate all of the following:
 
 - configured champion versus frozen-generic-reference improvement: 0.336 with a
   family-clustered 95% interval [0.215, 0.457];
+- no comparison with the map-profile-enabled deployed StrongBot default;
 - absolute superiority over Supalosa not established;
 - 16 sealed map families and family-level inference;
 - the gain is mostly avoided losses/tick-cap survival;

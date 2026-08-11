@@ -17,9 +17,10 @@ family-disjoint evaluation and configuration of a generic scripted RTS policy.
 5. [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.md)
    — descriptive outcome and terminal-state decomposition.
 6. [`PAPER_PLAN.md`](PAPER_PLAN.md) — manuscript framing, outline, and abstract.
-7. [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md) and
-   [`REVIEWER_AUDIT.md`](REVIEWER_AUDIT.md) — build/visual checks and the candid
-   reviewer-style acceptance audit.
+7. [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md),
+   [`REVIEWER_AUDIT.md`](REVIEWER_AUDIT.md), and
+   [`REVIEW_RESPONSE_GUIDE.md`](REVIEW_RESPONSE_GUIDE.md) — build/visual checks,
+   the candid acceptance audit, and evidence-indexed bounded responses.
 8. [`SCAG_ACCEPTED_PAPER_CALIBRATION.md`](SCAG_ACCEPTED_PAPER_CALIBRATION.md)
    — comparison with the 2024--2026 SCAG proceedings and the resulting venue
    fit boundary.
@@ -77,6 +78,7 @@ separately versioned prospective experiment.
 | Accepted-paper venue calibration | [`SCAG_ACCEPTED_PAPER_CALIBRATION.md`](SCAG_ACCEPTED_PAPER_CALIBRATION.md) |
 | Manuscript QA | [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md) |
 | Reviewer-style decision | [`REVIEWER_AUDIT.md`](REVIEWER_AUDIT.md) |
+| Reviewer-response evidence index | [`REVIEW_RESPONSE_GUIDE.md`](REVIEW_RESPONSE_GUIDE.md) |
 | Anonymity and release risk | [`ANONYMITY_RELEASE_RISK.md`](ANONYMITY_RELEASE_RISK.md) |
 | Authorship and generative-AI policy | [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md) |
 | External contact drafts | [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md) |

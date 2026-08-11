@@ -85,10 +85,11 @@ calibration, and current status must all preserve this distinction.
    exact hashes and acquisition instructions, and a future permission-dependent
    implementation release.
 7. **“The baseline is artificially weak.”** The paper cannot answer that the
-   reference is the deployed product baseline. It can answer that the
-   coordinate-free reference was frozen prospectively as candidate 0 and
-   evaluated under the identical generic-policy boundary. Lack of a deployed
-   map-profile baseline remains an explicit limitation.
+   reference is the deployed product baseline. It now explains that candidate 0
+   was frozen prospectively and shares the coordinate-free envelope used by
+   every candidate, whereas the deployed map profiles encode map identity and
+   are outside the estimand. It also states that the low reference can magnify
+   the relative effect and that no deployed-policy improvement was estimated.
 
 ## Empirical decision
 
@@ -134,6 +135,8 @@ configuration procedure is not an evolutionary strategy.
    [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md), focused on whether
    the claim boundary, study flow, and adaptation sequence are understandable
    without repository context.
+   Use [`REVIEW_RESPONSE_GUIDE.md`](REVIEW_RESPONSE_GUIDE.md) only after the
+   reader has answered independently; it is an evidence index, not coaching.
 4. Repeat the citation, page-limit, anonymity, manifest, and rendered-PDF checks
    after the last editorial change.
 5. Require the human author to complete the primary-evidence, citation, code,

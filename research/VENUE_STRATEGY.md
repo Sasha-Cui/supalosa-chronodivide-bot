@@ -73,6 +73,7 @@ Likely reviewer concerns and the required answers are:
 | Concern | Evidence or response required in the paper |
 | --- | --- |
 | This is ordinary hand tuning | Describe the fixed policy space, five run-distinct deterministic searches, common-seed championship, and held-out evaluation; claim an empirical workflow, not a new optimizer. |
+| The reference is artificially weak | State that it was prospectively frozen inside the common coordinate-free interface; disclose that the map-profile-enabled deployed policy is outside the estimand and that its performance was not measured. |
 | This is not an evolutionary algorithm | Agree. Call it deterministic mutation-based finite configuration with multi-fidelity selection. Ground SCAG fit in applied game-agent configuration, empirical CI analysis, and game benchmarking rather than manufacturing optimizer novelty. |
 | Only one opponent and matchup are studied | State this limitation in the abstract, introduction, and conclusion; define the estimand as performance against pinned Supalosa on the supported family population. |
 | Map or test leakage explains the gain | Show revision-aware family grouping, pre-training role commitments, training-only championship, single development gate, and one-time sealed test opening. |
@@ -166,8 +167,9 @@ Submit to SCAG only when all of the following are true:
    boundary.
 2. Every reported number and figure is regenerated from committed aggregate
    artifacts, with an automated consistency check against the result registry.
-3. The paper distinguishes the passed champion-versus-default endpoint from the
-   failed champion-versus-Supalosa absolute-strength endpoint.
+3. The paper distinguishes the passed champion-versus-reference endpoint from
+   the failed champion-versus-Supalosa absolute-strength endpoint and does not
+   imply a comparison with the deployed StrongBot default.
 4. The one-opponent, one-faction matchup, fixed tick cap, supported-map, and
    endpoint-only diagnostic limitations are explicit.
 5. The anonymous artifact reproduces the tables and figures in a clean
