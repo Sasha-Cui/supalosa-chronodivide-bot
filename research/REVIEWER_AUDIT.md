@@ -121,6 +121,26 @@ The calibration supports the current borderline/weak-accept assessment; it
 does not remove the need for a written topical-scope ruling because our
 configuration procedure is not an evolutionary strategy.
 
+## Calibration against accepted ICAART papers
+
+Three nearby papers from the official ICAART 2025--2026 proceedings were also
+read in full: a configurable board-game environment evaluated with seven
+agents and 2,100 tournament games, a four-architecture GPT-5 comparison over
+360 evaluated instances, and a literature-grounded simulation-analysis
+position paper with no new experiment. Relative to this sample, the current
+manuscript is stronger on held-out design, family leakage, uncertainty,
+negative-endpoint reporting, and aggregate reproducibility. It is weaker than
+the game-environment paper on independent-agent breadth and, correctly, does
+not claim a new environment or optimizer.
+
+This supports a separate **weak-accept assessment for an ICAART regular paper,
+with meaningful reviewer variance**. The main scientific rejection risk
+remains the one-opponent scope and failed absolute endpoint, not empirical
+execution quality. ICAART is operationally safer only if the secretariat
+confirms the online route and the double-blind placement of the required AI
+disclosure. See
+[`ICAART_ACCEPTED_PAPER_CALIBRATION.md`](ICAART_ACCEPTED_PAPER_CALIBRATION.md).
+
 ## Remaining acceptance work
 
 1. Ask the EvoStar/SCAG organizers in writing whether the paper's application

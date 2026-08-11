@@ -154,8 +154,13 @@ non-whitespace characters; two clean builds match at SHA-256
 `9c606c4c5bc92ce762422aa79be79f14ab34e7b4bbe2616ae5f3cef3ff3c3082`,
 and every page passed visual and anonymity QA. It is not authorized for upload
 until ICAART confirms online-route election and double-blind AI-disclosure
-placement. Decide one venue by 2026-09-01 and do not submit to both archival
-venues simultaneously.
+placement. A full-text comparison with three nearby accepted ICAART 2025--2026
+papers rates the current submission weak accept with meaningful reviewer
+variance: the empirical controls exceed that sample, while one-opponent breadth
+and contribution positioning remain the scientific risks. See
+[`ICAART_ACCEPTED_PAPER_CALIBRATION.md`](ICAART_ACCEPTED_PAPER_CALIBRATION.md).
+Decide one venue by 2026-09-01 and do not submit to both archival venues
+simultaneously.
 
 The candid submission decision is **go** for a scoped lower-tier game-AI or
 algorithm-configuration workshop/special session, and **no-go** for a broad or

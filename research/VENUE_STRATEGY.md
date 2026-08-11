@@ -127,6 +127,17 @@ clean builds at SHA-256
 `9c606c4c5bc92ce762422aa79be79f14ab34e7b4bbe2616ae5f3cef3ff3c3082`.
 All pages passed rendered inspection; see `SCITEPRESS_QA.md`.
 
+The fallback is also calibrated against three nearby accepted ICAART 2025--2026
+papers read in full: a new one-game environment with a 2,100-game tournament,
+a 360-instance controlled architecture comparison, and an eight-page
+simulation-analysis position paper. The Chrono Divide manuscript is stronger
+than this sample on leakage control, held-out evaluation, uncertainty,
+negative-endpoint reporting, and aggregate reproducibility. It is weaker than
+the environment paper on independent baseline breadth and does not claim a new
+environment or optimizer. The resulting internal assessment is **weak accept
+with meaningful reviewer variance**, not guaranteed acceptance. See
+[`ICAART_ACCEPTED_PAPER_CALIBRATION.md`](ICAART_ACCEPTED_PAPER_CALIBRATION.md).
+
 Use the dated rule in `VENUE_DECISION_PACKET.md` because the first regular
 round arrives before the EvoStar deadline. Send both venue inquiries
 immediately. By **2026-09-01**, either commit to ICAART's September 15
