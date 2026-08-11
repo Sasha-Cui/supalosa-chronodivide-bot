@@ -17,17 +17,17 @@ Verify these files before beginning. Stop if any value differs.
 
 | Item | Frozen identity |
 | --- | --- |
-| Reviewed source | `9f37a9e15f6676d94d121716c151b8f637c69fb5` |
-| ICAART PDF | `c756fa0fab503967df04b594ce8f18cd22429ef2ab8eb2cf1ec648f1c3608060` |
-| LNCS PDF | `93ae48646ea7ac1417a716efc12cda9d69f5b809bdbf2790499b176909ad8c88` |
+| Reviewed source | `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c` |
+| ICAART PDF | `7e5d150fc6066b2ca5abb52ce9c7a1abd1f51e7bf2e6d0dfd899531645be112e` |
+| LNCS PDF | `d29f38c3b65829c18b7215bc7e8a8c8e8ca81d1daea85859f24b1536489d8628` |
 | LNCS supplement | `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98` |
-| Anonymous artifact | `5d35375d1b8e9adec474ccd86a44ac23107deacc6acc1ee2b9e404012dd23c84` |
-| ICAART portal metadata | `b6c79cacfc78289ccface7d0793d46c6c6317451e3f9cdc0b0984731fba2ea47` |
+| Anonymous artifact | `f67f5483aa7e74f3930766fed7191e6240a6a72ab4baf043cc93ce1b0bcf2c06` |
+| ICAART portal metadata | `a9d0bf2c0d665a2ce2dd398a6fa7ec2ad69f641a344e4873d9f72202775eb30f` |
 
 Run from the repository root:
 
 ```text
-git rev-parse 9f37a9e
+git rev-parse e91674f
 sha256sum paper/build/main.pdf paper/build/supplement.pdf
 sha256sum paper_scitepress/build/main.pdf
 sha256sum artifact/dist/chrono-divide-review-artifact.tar.gz
@@ -136,7 +136,7 @@ when the manuscript makes a detailed methodological claim.
 `research/CITATION_INTEGRITY_AUDIT.md` records an automated resolution and
 title/year metadata precheck. `research/SUBSTANTIVE_CITATION_AUDIT.md` records
 a machine-assisted proposition-level precheck, including the one source-
-placement correction made before this candidate was frozen. Both are useful
+placement and closest-work corrections made before this candidate was frozen. Both are useful
 review aids, but neither replaces reading the primary source, checking the
 recorded locator, or completing a row below.
 
@@ -156,6 +156,8 @@ recorded locator, or completing a row below.
 | `mora2012noisy` | Noisy RTS fitness motivates repeated combats, maps, and reevaluation | related work; supplement | `[ ]` |
 | `castejon2026tales` | Recent work compares evolutionary training modes for a weighted game bot | related work | `[ ]` |
 | `marino2021programmatic` | Map-specific programmatic $\mu$RTS strategies were synthesized from a domain-specific language | related work | `[ ]` |
+| `medeiros2022sketches` | Learned sketches guide programmatic-strategy synthesis in $\mu$RTS | related work | `[ ]` |
+| `aleixo2023bilevel` | Bilevel feature--program search strengthens programmatic-strategy synthesis in $\mu$RTS | related work | `[ ]` |
 | `fernandezAres2012map` | Specialized policies were selected using online map characterization | related work; supplement | `[ ]` |
 | `hutter2011smac` | SMAC configures algorithms over problem instances | related work | `[ ]` |
 | `lopezIbanez2016irace` | irace separates configuration and evaluation instances | related work | `[ ]` |

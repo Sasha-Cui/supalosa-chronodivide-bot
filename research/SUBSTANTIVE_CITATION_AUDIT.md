@@ -4,16 +4,16 @@ Verified: **2026-08-11**
 
 ## Scope, identity, and boundary
 
-This is a machine-assisted proposition-level precheck of the 28 bibliography
-keys used at 36 key-by-citation placements in the shared manuscript sources.
+This is a machine-assisted proposition-level precheck of the 30 bibliography
+keys used at 38 key-by-citation placements in the shared manuscript sources.
 It is bound to:
 
 - reviewed submission source:
-  `9f37a9e15f6676d94d121716c151b8f637c69fb5`;
+  `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`;
 - LNCS PDF SHA-256:
-  `93ae48646ea7ac1417a716efc12cda9d69f5b809bdbf2790499b176909ad8c88`;
+  `d29f38c3b65829c18b7215bc7e8a8c8e8ca81d1daea85859f24b1536489d8628`;
 - ICAART PDF SHA-256:
-  `c756fa0fab503967df04b594ce8f18cd22429ef2ab8eb2cf1ec648f1c3608060`.
+  `7e5d150fc6066b2ca5abb52ce9c7a1abd1f51e7bf2e6d0dfd899531645be112e`.
 
 The check compared every cited proposition with the primary paper,
 publisher record, project page, package record, or pinned repository named
@@ -50,6 +50,8 @@ Classifications mean:
 | `mora2012noisy` | Noisy RTS fitness motivates repeated games, multiple maps, and incumbent reevaluation; [journal paper, methods and Sections 4--5](https://doi.org/10.1007/s11390-012-1281-5). | supported |
 | `castejon2026tales` | The work compares coevolution, fixed, and hybrid training modes for a bot governed by weighted behavioral rules; [Springer chapter](https://doi.org/10.1007/978-3-032-23607-4_33). | supported |
 | `marino2021programmatic` | Map-specific programmatic $\mu$RTS strategies were synthesized from a domain-specific language; [AAAI paper, introduction and method](https://doi.org/10.1609/aaai.v35i1.16114). | supported |
+| `medeiros2022sketches` | Behavioral cloning is used to learn program sketches that guide programmatic-strategy synthesis in $\mu$RTS; [AAAI paper, abstract, introduction, and method](https://doi.org/10.1609/aaai.v36i7.20744). | supported |
+| `aleixo2023bilevel` | Bilevel search jointly considers state features and programs to strengthen the search signal for programmatic-strategy synthesis in $\mu$RTS; [AAAI paper, abstract, introduction, and method](https://doi.org/10.1609/aaai.v37i4.25626). | supported |
 | `fernandezAres2012map` | Specialized policies are selected using online map characterization; [IEEE paper abstract and method, pp. 417--423](https://doi.org/10.1109/CIG.2012.6374185). | supported |
 | `hutter2011smac` | SMAC configures algorithms over training instances and evaluates configurations on separate test instances; [author-hosted paper, Sections 4.2 and 5.1 and Table 2](https://www.cs.ubc.ca/sites/default/files/tr/2010/TR-2010-10_0.pdf). | supported |
 | `lopezIbanez2016irace` | irace tunes over a set of training instances, while the documented workflow evaluates selected configurations on separate testing instances; [article Sections 2.2 and 3.2 and Appendix A.1](https://doi.org/10.1016/j.orp.2016.09.002) and [official workflow documentation](https://mlopez-ibanez.github.io/irace/). The separation is a workflow boundary, not an assertion that the core racing loop consumes test outcomes. | supported with wording boundary |
@@ -71,12 +73,13 @@ The manuscript edits justified by this audit were source attribution and
 closest-work positioning. The Chrono Divide website supports the reconstruction
 claim, while the exact
 offline interface and pinned bot revision are supported by the package and
-repository records. Commit `9f37a9e15f6676d94d121716c151b8f637c69fb5`
+repository records. Commit `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`
 therefore cites all three sources at the two environment-description
-placements and adds the closest map-specific program-synthesis precedent. No empirical result,
-method description, scope boundary, or conclusion changed.
+placements and positions the evaluation contribution against the closest
+map-specific and later program-synthesis work. No empirical result, method
+description, scope boundary, or conclusion changed.
 
-All 28 keys have a source-support classification above. This precheck found
+All 30 keys have a source-support classification above. This precheck found
 no citation use that required claim removal or a bibliographic replacement.
 Human source reading and the blank statuses in
 `research/HUMAN_AUTHOR_VERIFICATION_PACKET.md` remain mandatory before

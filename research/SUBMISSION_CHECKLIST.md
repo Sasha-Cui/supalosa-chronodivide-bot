@@ -40,16 +40,16 @@ the anonymous branch during review.
 - Title: **Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono
   Divide**
 - Anonymous manuscript source commit:
-  `9f37a9e15f6676d94d121716c151b8f637c69fb5`
+  `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`
 - Main PDF: 17 pages total; non-reference material ends on page 14.
 - Main PDF SHA-256:
-  `93ae48646ea7ac1417a716efc12cda9d69f5b809bdbf2790499b176909ad8c88`
+  `d29f38c3b65829c18b7215bc7e8a8c8e8ca81d1daea85859f24b1536489d8628`
 - Supplement: 5 pages.
 - Supplement PDF SHA-256:
   `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98`
 - Deterministic anonymous artifact SHA-256:
-  `5d35375d1b8e9adec474ccd86a44ac23107deacc6acc1ee2b9e404012dd23c84`
-- Anonymous artifact size: 99,946 bytes; 60 immutable manifested files.
+  `f67f5483aa7e74f3930766fed7191e6240a6a72ab4baf043cc93ce1b0bcf2c06`
+- Anonymous artifact size: 100,837 bytes; 60 immutable manifested files.
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
@@ -59,12 +59,12 @@ commit and all three hashes together; never mix files from different freezes.
 
 - [x] Separate SCITEPRESS source committed at
       `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`; the current reviewed source is
-      `9f37a9e15f6676d94d121716c151b8f637c69fb5` and changes no frozen empirical
+      `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c` and changes no frozen empirical
       artifact.
-- [x] PDF is 10 A4 pages, with a 195-word expanded abstract and 36,642 extracted
+- [x] PDF is 10 A4 pages, with a 195-word expanded abstract and 36,949 extracted
       non-whitespace characters.
 - [x] PDF SHA-256 is
-      `c756fa0fab503967df04b594ce8f18cd22429ef2ab8eb2cf1ec648f1c3608060`.
+      `7e5d150fc6066b2ca5abb52ce9c7a1abd1f51e7bf2e6d0dfd899531645be112e`.
 - [x] Two clean builds are byte-identical; all ten pages, metadata, fonts,
       anonymity tokens, tables, plots, equations, and references were checked.
 - [x] ICAART reviewer assignment is frozen to **Agents** with the call topics
@@ -77,7 +77,7 @@ commit and all three hashes together; never mix files from different freezes.
       plain-text portal title, expanded 195-word abstract, keywords, area, and
       ordered topics with source hashes; no LaTeX macro needs manual expansion.
 - [x] Portal metadata JSON SHA-256 is
-      `b6c79cacfc78289ccface7d0793d46c6c6317451e3f9cdc0b0984731fba2ea47`.
+      `a9d0bf2c0d665a2ce2dd398a6fa7ec2ad69f641a344e4873d9f72202775eb30f`.
 - [ ] ICAART confirms author eligibility, request procedure, and fee class for
       the documented exceptional live-online route.
 - [ ] ICAART specifies whether the named code repository must be private during
@@ -122,7 +122,7 @@ commit and all three hashes together; never mix files from different freezes.
 - [x] Anonymous artifact self-verifier checks all 60 immutable files and rejects
       missing, changed, or unexpected entries.
 - [x] A fresh Git-free extraction on an independent macOS toolchain passes all
-      21 packaged tests and rebuilds the 17-page paper, 5-page supplement, and
+      22 packaged tests and rebuilds the 17-page paper, 5-page supplement, and
       exact 10-page SCITEPRESS candidate without actionable warnings.
 - [x] Main, supplement, and SCITEPRESS PDFs have been rendered after the last
       edit; no clipping, overlap, invisible text, or illegible plot label.

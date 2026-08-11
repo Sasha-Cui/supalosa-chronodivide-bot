@@ -4,13 +4,13 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `9f37a9e15f6676d94d121716c151b8f637c69fb5`
+- Source commit: `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`
 - Main source: `paper/main.tex`
 - Supplement source: `paper/supplement.tex`
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 17 pages total; non-reference content ends on page 14
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `93ae48646ea7ac1417a716efc12cda9d69f5b809bdbf2790499b176909ad8c88`
+- Main PDF SHA-256: `d29f38c3b65829c18b7215bc7e8a8c8e8ca81d1daea85859f24b1536489d8628`
 - Supplement PDF SHA-256: `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98`
 
 The PDFs are build products and are not committed. Their hashes identify the
@@ -35,7 +35,7 @@ The final LNCS logs contain:
 - zero overfull boxes;
 - zero undefined or multiply defined references;
 - zero BibTeX warnings;
-- 28 citation keys, 28 bibliography entries, no missing keys, and no unused
+- 30 citation keys, 30 bibliography entries, no missing keys, and no unused
   entries; and
 - deterministic regenerated paper fragments whose input and output hashes are
   recorded in `paper/generated/asset_manifest.json` for all eight frozen
@@ -55,7 +55,7 @@ MACO paper and DOI `10.5220/0014358500004052`; the 25-author StarCraft II
 reference uses standard `et al.` formatting while retaining its identifier and
 DOI.
 
-A proposition-level precheck mapped all 28 bibliography keys across 36
+A proposition-level precheck mapped all 30 bibliography keys across 38
 key-by-citation placements to primary-source locators. It found one attribution
 boundary: the Chrono Divide homepage supports the reconstruction claim but not
 the exact offline API or pinned opponent. The refreeze added the package and
@@ -129,7 +129,7 @@ Commit `0f3e690` adds a deterministic plain-text ICAART metadata exporter and
 does not change manuscript content or PDF bytes. Its output expands every
 result macro, contains no residual LaTeX, records the exact 195-word abstract,
 and has SHA-256
-`b6c79cacfc78289ccface7d0793d46c6c6317451e3f9cdc0b0984731fba2ea47`.
+`a9d0bf2c0d665a2ce2dd398a6fa7ec2ad69f641a344e4873d9f72202775eb30f`.
 
 The claim audit confirmed that the paper:
 
@@ -148,18 +148,18 @@ The claim audit confirmed that the paper:
 
 ## Clean export and reviewer artifact
 
-A committed submission revision at `9f37a9e15f6676d94d121716c151b8f637c69fb5`
+A committed submission revision at `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`
 and the portable-artifact repair at
 `d53f822144bd0b3fffe3b4d778770091f77900b8` passed ten paper-generator and
-manuscript-invariant tests, eleven SCITEPRESS tests, two artifact-builder tests,
+manuscript-invariant tests, twelve SCITEPRESS tests, two artifact-builder tests,
 the three frozen family-exporter tests, one author-verification-packet test,
 one venue-ruling-template test, one external-review-response-template test,
-and one substantive-citation-audit test (30 tests total). They regenerated all paper
+and one substantive-citation-audit test (31 tests total). They regenerated all paper
 fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
-`5d35375d1b8e9adec474ccd86a44ac23107deacc6acc1ee2b9e404012dd23c84`
-and size 99,946 bytes. Two independent builds produced that same hash. The
+`f67f5483aa7e74f3930766fed7191e6240a6a72ab4baf043cc93ce1b0bcf2c06`
+and size 100,837 bytes. Two independent builds produced that same hash. The
 archive contains 60 manifested immutable files, normalized `0/0` ownership and
 epoch timestamps, no Git tree, no bot packages, and no direct author,
 scheduler-account, institution, or private-path token. It now contains both the
@@ -176,13 +176,13 @@ This closes a source-artifact anonymity leak without changing either PDF.
 
 A fresh extraction on an independent macOS machine used Python 3.12.13, GNU
 Make 3.81, and TeX Live 2022 rather than Bouchet's Python 3.9 and TeX Live 2024.
-The manifest verified both before and after deterministic regeneration, all 21
+The manifest verified both before and after deterministic regeneration, all 22
 packaged manuscript tests passed, and the Git-free build produced the expected
 17-page Letter LNCS paper, five-page Letter supplement, and 10-page A4
 SCITEPRESS candidate. The local-toolchain PDF identities were respectively
-`73372315912a7051247b24d82fa417f36379a4b80efc39c1d9722812d7625bb2`,
+`05b824d074ad72dc032d80dd4735c0a5fb130569be802095dcf55015e28a80b2`,
 `82e54a6266bdc211530d6cde92443c6707f78e975dbdd77cc1a4c6b2db8cc20b`,
-and `fed87281977dc286eefe161818dceb74836b9f3218d7857d162d0f5b8a6c55d4`.
+and `1282332d134ebd4c12ffdce506a0ff9919250e682d116b9d4d97afebd5babb29`.
 PDF bytes legitimately differ across TeX distributions, while all immutable
 sources and generated fragments remain manifest-bound. All fonts were embedded;
 the final logs contained no overfull box, unresolved reference/citation, rerun,
@@ -190,7 +190,7 @@ or multiply-defined-label warning. Contact-sheet inspection covered all 32
 pages, and every SCITEPRESS page was additionally inspected at full resolution.
 
 The production candidate additionally passed the new Poppler-backed
-`submission-check`: exactly 10 A4 pages, 36,642 non-whitespace characters under
+`submission-check`: exactly 10 A4 pages, 36,949 non-whitespace characters under
 the documented default reading order, 195 abstract words, empty review
 identity metadata, no forms/JavaScript/encryption/rotation, nine embedded fonts
 with Unicode maps, exact PDF-to-portal title/abstract/keyword agreement, and
@@ -199,6 +199,19 @@ same deep check passed the independent macOS build. After the citation-source
 correction and close-work addition, a fresh 27-page render confirmed clean current ICAART and LNCS
 layouts; the five-page supplement retained its byte-identical previously
 inspected hash.
+
+The final close-work refreeze at `e91674f` adds the AAAI 2022 learned-sketch
+and AAAI 2023 bilevel-synthesis successors, explicitly disclaims synthesis and
+optimizer novelty, and keeps exact software provenance behind concise link
+labels. The ICAART bibliography retains its 9-point text and removes only the
+inter-entry gap; `abf5e94` binds the resulting 36,949-character candidate in
+the fail-closed submission check. Fresh contact-sheet inspection covered all
+17 LNCS and all 10 ICAART pages at the production hashes; related-work pages
+and both complete reference lists were also inspected at full resolution. A
+second TeX Live 2022 pass confirmed the same 10-page ICAART fit, including its
+related-work and reference pages. No clipping, overlap, broken link label,
+margin violation, or unreadable text was found. The five-page supplement is
+byte-identical to the previously inspected freeze.
 
 The inspected PDFs have empty Author, Title, Subject, and Keywords metadata;
 contain no identifying binary strings, JavaScript, forms, or encryption; and

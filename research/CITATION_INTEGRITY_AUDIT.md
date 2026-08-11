@@ -7,9 +7,9 @@ Verified: **2026-08-11**
 This is a resolution and metadata precheck for the bibliography used by:
 
 - reviewed submission source:
-  `9f37a9e15f6676d94d121716c151b8f637c69fb5`;
+  `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`;
 - ICAART PDF SHA-256:
-  `c756fa0fab503967df04b594ce8f18cd22429ef2ab8eb2cf1ec648f1c3608060`.
+  `7e5d150fc6066b2ca5abb52ce9c7a1abd1f51e7bf2e6d0dfd899531645be112e`.
 
 It verifies structural citation coverage, DOI registration, endpoint
 availability, and agreement of titles and publication years. It does **not**
@@ -24,8 +24,8 @@ the current candidate. Neither audit replaces the author's source reading.
 
 ## Structural checks
 
-- `paper/references.bib` contains exactly 28 entries with distinct keys.
-- The shared manuscript sources cite all 28 keys.
+- `paper/references.bib` contains exactly 30 entries with distinct keys.
+- The shared manuscript sources cite all 30 keys.
 - No cited key is missing from the bibliography.
 - No bibliography entry is uncited.
 - The generated ICAART paper has a settled reference list and no unresolved
@@ -33,7 +33,7 @@ the current candidate. Neither audit replaces the author's source reading.
 
 ## DOI-backed sources
 
-Twenty-one entries have registered DOIs. Title and publication year returned by
+Twenty-three entries have registered DOIs. Title and publication year returned by
 DOI content negotiation, the Crossref metadata API, or the official publisher
 record agree with the BibTeX entry.
 
@@ -46,6 +46,8 @@ record agree with the BibTeX entry.
 | `liu2016microbehaviors` | [10.1109/TCIAIG.2016.2544844](https://doi.org/10.1109/TCIAIG.2016.2544844) | registered; title/year match |
 | `fernandezAres2012map` | [10.1109/CIG.2012.6374185](https://doi.org/10.1109/CIG.2012.6374185) | registered; title/year match |
 | `marino2021programmatic` | [10.1609/aaai.v35i1.16114](https://doi.org/10.1609/aaai.v35i1.16114) | registered; title/year match |
+| `medeiros2022sketches` | [10.1609/aaai.v36i7.20744](https://doi.org/10.1609/aaai.v36i7.20744) | registered; title/year match |
+| `aleixo2023bilevel` | [10.1609/aaai.v37i4.25626](https://doi.org/10.1609/aaai.v37i4.25626) | registered; title/year match |
 | `hutter2011smac` | [10.1007/978-3-642-25566-3_40](https://doi.org/10.1007/978-3-642-25566-3_40) | registered; title/year match |
 | `lopezIbanez2016irace` | [10.1016/j.orp.2016.09.002](https://doi.org/10.1016/j.orp.2016.09.002) | registered; title/year match |
 | `lucas2018ntbea` | [10.1109/CEC.2018.8477869](https://doi.org/10.1109/CEC.2018.8477869) | registered; title/year match |

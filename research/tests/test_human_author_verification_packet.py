@@ -16,7 +16,7 @@ class HumanAuthorVerificationPacketTest(unittest.TestCase):
             encoding="utf-8"
         )
         keys = re.findall(r"^@[A-Za-z]+\{([^,]+),", bibliography, re.MULTILINE)
-        self.assertEqual(len(keys), 28)
+        self.assertEqual(len(keys), 30)
         for key in keys:
             self.assertIn(f"`{key}`", packet, key)
 

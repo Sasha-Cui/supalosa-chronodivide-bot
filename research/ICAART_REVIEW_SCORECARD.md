@@ -8,9 +8,9 @@ This is an internal acceptance-risk audit of the anonymous SCITEPRESS regular
 paper whose scientific claims were frozen at
 `419a0f72188f957ae144262f62c62bcc11a66ac3`, whose claim-preserving terminology
 refreeze is `77d93359242756f07afba30d88fb2db8fd97e7b2`, whose citation-source
-refreeze and current reviewed source is `9f37a9e15f6676d94d121716c151b8f637c69fb5`, and
+refreeze and current reviewed source is `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`, and
 whose PDF SHA-256 is
-`c756fa0fab503967df04b594ce8f18cd22429ef2ab8eb2cf1ec648f1c3608060`.
+`7e5d150fc6066b2ca5abb52ce9c7a1abd1f51e7bf2e6d0dfd899531645be112e`.
 The surrounding governance tree was rechecked at
 `0178203382836043baf27e1053ee3e55bf8c4a52`. This is not an independent
 review, an acceptance-probability estimate, or a substitute for the unprimed
@@ -39,7 +39,7 @@ Official sources checked on 2026-08-11:
 | Originality | 3/5 | The original contribution is the integrated leakage-resistant Chrono Divide evaluation protocol: revision-aware families, sealed role access, participant-isolated common randomness, reciprocal starts, clustered inference, and fail-closed provenance. | Successive halving and the individual controls are established; the paper must not be read as claiming optimizer or environment novelty. |
 | Technical quality | 5/5 | The study has family-disjoint roles, a transparently retired method, fresh development, one-time sealed evaluation, paired design, family-clustered uncertainty, negative-gate reporting, exact accounting, and deterministic aggregate reproduction. | Family construction is heuristic, the endpoint has many tick-cap draws, and full replay depends on third-party content. |
 | Significance | 3/5 | The held-out effect is large and family-consistent, and the study shows how strong execution controls narrow an initially diffuse bot-strength story into one positive relative result and one failed absolute result. | One independent opponent, one faction mirror, a low-scoring generic reference, and no deployed-default comparison limit practical generality. |
-| Presentation | 4/5 | All ten A4 pages were re-rendered and inspected at the frozen hash. The paper is visually clean, RQ-led, explicit about the failed joint gate, and supported by four interpretable figures and three compact tables. Its 36,642 extracted non-whitespace characters satisfy the official 10,000--50,000 submission band. | The method is dense, and defensive caveats can obscure the positive evaluation contribution on a fast read. |
+| Presentation | 4/5 | All ten A4 pages were re-rendered and inspected at the frozen hash. The paper is visually clean, RQ-led, explicit about the failed joint gate, and supported by four interpretable figures and three compact tables. Its 36,949 extracted non-whitespace characters satisfy the official 10,000--50,000 submission band. | The method is dense, and defensive caveats can obscure the positive evaluation contribution on a fast read. |
 
 Overall internal recommendation: **weak accept, with meaningful reviewer
 variance**. Technical quality is well above the likely rejection threshold;
@@ -57,7 +57,7 @@ evaluation protocol despite narrow opponent breadth.
 | Figures adequate? | Yes after repair. Figures show study flow, all family effects, paired transitions, and component intervals. | Figure 2 no longer depends on an unavailable supplement; its family labels are defined in place. |
 | Conclusions/future work convincing? | Yes. The conclusion answers both confirmatory gates and states the non-causal diagnostic boundary; the immediately preceding limitations identify the next prospective extension. | Cold-read whether the final paragraph remains appropriately bounded rather than merely defensive. |
 | References current and appropriate? | Yes. The bibliography includes the closest game-agent configuration work, map-specific program synthesis, generalization/evaluation foundations, exact pinned software sources, and a 2026 ICAART game paper. | Human author still verifies every primary source and citation use. |
-| Formatting adjustment? | None currently. The candidate is 10 A4 pages and 36,642 non-whitespace characters, with embedded fonts and settled references. A later full-paper acceptance permits 12 proceedings pages; a short-paper acceptance permits 8. | Full post-edit render completed; repeat only after a later source change. Retain an 8-page camera-ready reduction plan rather than compressing the review version preemptively. |
+| Formatting adjustment? | None currently. The candidate is 10 A4 pages and 36,949 non-whitespace characters, with embedded fonts and settled references. A later full-paper acceptance permits 12 proceedings pages; a short-paper acceptance permits 8. | Full post-edit render completed; repeat only after a later source change. Retain an 8-page camera-ready reduction plan rather than compressing the review version preemptively. |
 | Improve English? | No systemic issue found. | Human line edit remains mandatory under the authorship policy. |
 
 ## Adversarial no-edit decision

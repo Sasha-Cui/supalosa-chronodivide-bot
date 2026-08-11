@@ -92,7 +92,7 @@ and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.m
 
 ## Manuscript status and remaining work
 
-Commit `9f37a9e` is the current anonymous manuscript source revision. It
+Commit `e91674f` is the current anonymous manuscript source revision. It
 sharpens the held-out-evaluation title, states two confirmatory research
 questions and one explicitly descriptive diagnostic question, removes causal-sounding
 mechanism language, and adds primary prior art on hidden-level evaluation and
@@ -133,11 +133,11 @@ statistic, and expanding the outcome labels. The edit is claim-preserving: all
 frozen inputs, estimates, uncertainty, citations, abstract fields, and portal
 metadata remain unchanged.
 
-Commit `9f37a9e` completes a proposition-level citation precheck over all 28
-bibliography keys and 36 key-by-citation placements. The source changes cite
+Commit `e91674f` completes a proposition-level citation precheck over all 30
+bibliography keys and 38 key-by-citation placements. The source changes cite
 the exact game-API package and pinned Supalosa repository alongside the Chrono
-Divide project page and add the closest map-specific program-synthesis
-precedent. No empirical result, method, scope boundary, conclusion, or portal
+Divide project page and add the closest map-specific and later
+programmatic-strategy-synthesis precedents. No empirical result, method, scope boundary, conclusion, or portal
 field changed. Both main-paper formats were re-rendered and
 inspected; the supplement remains byte-identical. Human source reading remains
 an explicit pre-submission gate.
@@ -151,11 +151,11 @@ Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 commit `7cdbe0d` hardens its direct-identity denylist, and the current builder
 tests enforce the exact eight-input reviewer description. Commit `d53f822`
 adds the exact SCITEPRESS candidate, a package-local manifest verifier, and
-Git-free build checks. The current 99,946-byte review archive is
+Git-free build checks. The current 100,837-byte review archive is
 byte-deterministic at SHA-256
-`5d35375d1b8e9adec474ccd86a44ac23107deacc6acc1ee2b9e404012dd23c84`.
+`f67f5483aa7e74f3930766fed7191e6240a6a72ab4baf043cc93ce1b0bcf2c06`.
 Its 60-file immutable manifest verifies, all artifact tests pass, and an
-independent macOS extraction passes 21 packaged tests and rebuilds the 17-page
+independent macOS extraction passes 22 packaged tests and rebuilds the 17-page
 LNCS paper, five-page supplement, and 10-page A4 SCITEPRESS candidate without
 undefined references, overflow, or BibTeX warnings. All fonts are embedded and
 all 32 pages received a rendered layout check.
@@ -190,9 +190,9 @@ guidance permits disclosed AI-assisted writing, revision, and code; its
 presenter page documents live online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS submission format that reuses the frozen main-paper sections and result
-macros. It is 10 A4 pages with a 195-word expanded abstract and 36,642 extracted
+macros. It is 10 A4 pages with a 195-word expanded abstract and 36,949 extracted
 non-whitespace characters; two clean builds match at SHA-256
-`c756fa0fab503967df04b594ce8f18cd22429ef2ab8eb2cf1ec648f1c3608060`,
+`7e5d150fc6066b2ca5abb52ce9c7a1abd1f51e7bf2e6d0dfd899531645be112e`,
 and every page passed visual and anonymity QA. It is not authorized for upload
 until ICAART confirms exceptional remote eligibility/procedure and double-blind
 AI-disclosure placement. The home page now establishes remote support for

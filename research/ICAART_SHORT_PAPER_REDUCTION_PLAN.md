@@ -18,11 +18,11 @@ recheck it and the acceptance notice before editing.
 The source candidate for any reduction is:
 
 - reviewed submission source:
-  `9f37a9e15f6676d94d121716c151b8f637c69fb5`;
+  `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`;
 - ten-page PDF SHA-256:
-  `c756fa0fab503967df04b594ce8f18cd22429ef2ab8eb2cf1ec648f1c3608060`;
+  `7e5d150fc6066b2ca5abb52ce9c7a1abd1f51e7bf2e6d0dfd899531645be112e`;
 - expanded abstract: 195 lexical words;
-- extracted non-whitespace characters: 36,642.
+- extracted non-whitespace characters: 36,949.
 
 Do not compress the review version preemptively. A shorter review paper would
 remove evidence that directly answers ICAART's technical-quality and critical-

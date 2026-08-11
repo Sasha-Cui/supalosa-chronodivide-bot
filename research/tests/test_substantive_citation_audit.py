@@ -18,16 +18,16 @@ class SubstantiveCitationAuditTest(unittest.TestCase):
         keys = re.findall(r"@\w+\s*\{\s*([^,\s]+)", bibliography)
         rows = re.findall(r"^\| `([^`]+)` \|", audit, flags=re.MULTILINE)
 
-        self.assertEqual(28, len(keys))
+        self.assertEqual(30, len(keys))
         self.assertEqual(set(keys), set(rows))
         self.assertEqual({key: 1 for key in keys}, dict(Counter(rows)))
 
     def test_audit_is_bound_to_current_candidate_and_human_boundary(self) -> None:
         audit = AUDIT.read_text(encoding="utf-8")
         for digest in (
-            "9f37a9e15f6676d94d121716c151b8f637c69fb5",
-            "93ae48646ea7ac1417a716efc12cda9d69f5b809bdbf2790499b176909ad8c88",
-            "c756fa0fab503967df04b594ce8f18cd22429ef2ab8eb2cf1ec648f1c3608060",
+            "e91674f4eff69c4ceccb3a65e617cfb91d01ec5c",
+            "d29f38c3b65829c18b7215bc7e8a8c8e8ca81d1daea85859f24b1536489d8628",
+            "7e5d150fc6066b2ca5abb52ce9c7a1abd1f51e7bf2e6d0dfd899531645be112e",
         ):
             self.assertIn(digest, audit)
 
@@ -47,7 +47,7 @@ class SubstantiveCitationAuditTest(unittest.TestCase):
                 cited.extend(key.strip() for key in group.split(","))
 
         self.assertEqual(expected, set(cited))
-        self.assertEqual(36, len(cited))
+        self.assertEqual(38, len(cited))
 
 
 if __name__ == "__main__":
