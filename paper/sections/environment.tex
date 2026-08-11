@@ -1,14 +1,19 @@
 \section{Environment and Validity Controls}
 \label{sec:environment}
 
-Table~\ref{tab:threat-controls} maps the principal evaluation threats to the
-controls that determine what evidence is admissible. These biases are not
-repaired by simply repeating more games.
+We use \emph{evidence contract} to mean a joint, executable campaign-admission
+rule: instance lineage and analysis units, physical starts and random-stream
+ownership, comparator identities, outcome-access boundaries, and attempt
+semantics must all match their frozen commitments before outcomes enter an
+estimate. A violation invalidates the campaign rather than becoming a
+post-hoc exclusion. This is an operational audit boundary, not proof against
+unknown dependencies. Table~\ref{tab:threat-controls} maps each modeled threat
+to its control; these biases are not repaired by simply repeating more games.
 
 \begin{table}[t]
 \centering
-\caption{Threat-to-control map. Each control changes the admissible evidence
-or analysis unit rather than merely increasing the repeat count.}
+\caption{Threat-to-control map. The rows apply jointly; each control changes
+the admissible evidence or analysis unit rather than the repeat count alone.}
 \label{tab:threat-controls}
 \small
 \begin{tabular}{@{}>{\raggedright\arraybackslash}p{0.18\linewidth}@{\hspace{0.025\linewidth}}

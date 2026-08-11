@@ -150,6 +150,42 @@ class GeneratePaperAssetsTest(unittest.TestCase):
                 self.assertIn("joint", normalized)
                 self.assertIn("fail", normalized)
 
+    def test_evidence_contract_is_a_joint_admission_rule(self) -> None:
+        section_dir = REPO / "paper" / "sections"
+        sections = {
+            name: " ".join(
+                (section_dir / f"{name}.tex").read_text(encoding="utf-8").split()
+            )
+            for name in (
+                "abstract",
+                "introduction",
+                "related_work",
+                "environment",
+                "conclusion",
+            )
+        }
+        self.assertIn("evidence contract", sections["abstract"])
+        self.assertIn(
+            "fixed jointly before a campaign is admitted as evidence",
+            sections["introduction"],
+        )
+        self.assertIn(
+            "joint, executable campaign-admission rule",
+            sections["environment"],
+        )
+        self.assertIn(
+            "operational audit boundary, not proof",
+            sections["environment"],
+        )
+        self.assertIn(
+            "rather than claiming novelty for any component",
+            sections["related_work"],
+        )
+        self.assertIn(
+            "The reusable result is the evidence contract",
+            sections["conclusion"],
+        )
+
     def test_generic_reference_is_not_described_as_shipped_default(self) -> None:
         section_dir = REPO / "paper" / "sections"
         sections = {
