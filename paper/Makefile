@@ -6,6 +6,10 @@ ASSET_ARGS := $(if $(ARTIFACT_HASH_MANIFEST),--artifact-hash-manifest $(ARTIFACT
 TEST_ENV := $(if $(ARTIFACT_HASH_MANIFEST),CHRONO_PAPER_ARTIFACT_HASH_MANIFEST=$(abspath $(ARTIFACT_HASH_MANIFEST)),)
 RESEARCH_EXPORT_TEST := ../research/tests/test_export_confirmatory_family_diagnostics.py
 
+export SOURCE_DATE_EPOCH ?= 1786455918
+export FORCE_SOURCE_DATE := 1
+export TZ := UTC
+
 .PHONY: all assets check check-generated clean main supplement
 
 all: main supplement
