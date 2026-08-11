@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "status": "COMPLETE_JOINT_GATE_FAILED_IMPROVEMENT_PASSED",
+  "methodVersion": 2,
+  "sourceGitCommit": "698dc7601b61a80e091ce7b8ac2b9e681685bc69",
+  "scheduler": {
+    "account": "pi_jss233",
+    "arrayJobId": "21925439",
+    "taskCount": 128,
+    "uniqueTaskJobIds": 128,
+    "completedTasks": 128,
+    "failedTasks": 0,
+    "additionalAttempts": 0
+  },
+  "evidence": {
+    "campaignSha256": "c358d4acf8bac57b8a22c5cdf749e486becde8d8b326903ce176ed23dbd8f589",
+    "launchSha256": "bad2dc330e88feaf8f905faf7096b930aafae42ec5d5c010ce6247efc9499dd1",
+    "technicalGateSha256": "dc656b966933edde0bbec2911d11a44a0a1c4244d5aaf647cadfe1b043dbf523",
+    "unblindingSha256": "2f55de50b4cb4a110b3d8d48a3734866e23fac954f2254ef47556bd041fc0cfb",
+    "resultArtifactCommitmentSha256": "6418b7c5e91bf512e83a26ae7cfa818fcca7d0ee2b4046a263260b83e5f53f9a"
+  },
+  "design": {
+    "familyCount": 16,
+    "blocksPerFamily": 8,
+    "reciprocalSlotsPerMethod": 2,
+    "methodCount": 2,
+    "blockCount": 128,
+    "launchedGameCount": 512,
+    "technicalFailures": 0,
+    "unblindingCount": 1
+  },
+  "prespecifiedImprovement": {
+    "estimand": "equally-family-weighted champion-minus-default score difference",
+    "estimate": 0.3359375,
+    "familyClusteredStandardError": 0.056947355531958926,
+    "twoSidedConfidence": 0.95,
+    "confidenceInterval": {
+      "lower": 0.21455708493060094,
+      "upper": 0.45731791506939906
+    },
+    "passed": true,
+    "positiveFamilies": 14,
+    "zeroFamilies": 2,
+    "negativeFamilies": 0
+  },
+  "prespecifiedChampionAbsolute": {
+    "estimand": "equally-family-weighted champion score minus 0.5 against the pinned Supalosa opponent",
+    "championScore": 0.53515625,
+    "estimate": 0.03515625,
+    "familyClusteredStandardError": 0.03213271531055486,
+    "oneSidedConfidence": 0.95,
+    "oneSidedLowerBound": -0.021174018004535798,
+    "passed": false,
+    "familiesAboveHalf": 6,
+    "familiesEqualHalf": 5,
+    "familiesBelowHalf": 5
+  },
+  "descriptiveRecords": {
+    "default": {
+      "wins": 1,
+      "draws": 100,
+      "losses": 155,
+      "score": 0.19921875
+    },
+    "champion": {
+      "wins": 47,
+      "draws": 180,
+      "losses": 29,
+      "score": 0.53515625
+    }
+  },
+  "postConfirmatorySensitivity": {
+    "status": "DIAGNOSTIC_ONLY_DOES_NOT_REPLACE_FROZEN_GATE",
+    "independentRawRecordReproduction": "PASSED",
+    "familyBootstrapSeed": 20260811,
+    "familyBootstrapReplicates": 100000,
+    "improvementBootstrap95Interval": {
+      "lower": 0.23046875,
+      "upper": 0.447265625
+    },
+    "improvementExactFamilySignFlipTwoSidedP": 0.0001220703125,
+    "championScoreBootstrap95Interval": {
+      "lower": 0.482421875,
+      "upper": 0.603515625
+    }
+  },
+  "claimBoundary": {
+    "supported": "The frozen training-and-selection pipeline substantially improves the candidate score over the default policy against the pinned Supalosa opponent across the committed test-family population.",
+    "notSupported": "The method-v2 champion reliably beats Supalosa across test map families.",
+    "jointSuccessGatePassed": false,
+    "allResultsReportable": true
+  }
+}
