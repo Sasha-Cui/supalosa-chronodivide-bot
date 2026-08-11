@@ -41,14 +41,29 @@ whose evaluation can be audited.
 \paragraph{Generalization and statistical evaluation.}
 CoinRun and Procgen demonstrated that game agents can overfit even sizable
 sets of levels and motivated explicit training--test distributions
-\cite{cobbe2019coinrun,cobbe2020procgen}. Chrono Divide maps are not procedural
-independent draws: exact copies and revisions can coexist. We consequently
-split at a conservatively constructed family level rather than at a filename
-level. The inferential unit is also the family, not each correlated match.
+\cite{cobbe2019coinrun,cobbe2020procgen}. The GVGAI learning track likewise
+trains on visible levels and evaluates hidden ones; Balla et al. show that the
+choice of training levels and environment stochasticity materially affect
+generalization~\cite{balla2020generalisation}. Held-out level evaluation is
+therefore established. Chrono Divide adds a different data problem: its maps
+are not procedural independent draws, because exact copies and revisions can
+coexist. We consequently split at a conservatively constructed family level
+rather than at a filename level. The inferential unit is also the family, not
+each correlated match.
 Agarwal et al. showed how point estimates from a few tasks or runs can reverse
 under uncertainty-aware analysis~\cite{agarwal2021precipice}. We use balanced
 family estimands, family-clustered intervals, and diagnostic family bootstrap
 and sign-flip analyses.
+
+Protocol variation can change conclusions even within one standardized game
+platform: Machado et al. audit divergent Arcade Learning Environment practices
+and introduce controlled stochasticity~\cite{machado2018ale}, while Henderson
+et al. document sensitivity to environment nondeterminism, random seeds, and
+reporting choices in deep RL~\cite{henderson2018matters}. Our policies are
+scripted rather than learned by RL, but the evaluation threat transfers to
+stochastic head-to-head simulation. We therefore pin the runtime and expose
+the simulator and participant random streams rather than treating repeat count
+alone as reproducibility.
 
 Shared seeds and reciprocal starts act as paired simulation controls. Common
 random numbers are a classical variance-reduction design for comparing

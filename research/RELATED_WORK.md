@@ -24,6 +24,18 @@ citation search and coverage of work published after these papers.
   Learning*](https://arxiv.org/abs/1708.04782), introduced SC2LE/PySC2,
   mini-games, expert replays, and standardized supervised/RL interfaces. It is
   a heavier commercial-game precedent for task standardization.
+- Machado et al. (2018), [*Revisiting the Arcade Learning Environment:
+  Evaluation Protocols and Open Problems for General
+  Agents*](https://doi.org/10.1613/jair.5699), show that divergent evaluation
+  practices can make results within one nominal benchmark incomparable and
+  introduce controlled stochasticity. This is the closest precedent for
+  treating simulator randomness and evaluation protocol as first-class study
+  variables.
+- Henderson et al. (2018), [*Deep Reinforcement Learning That
+  Matters*](https://doi.org/10.1609/aaai.v32i1.11694), document sensitivity to
+  environment nondeterminism, random seeds, hyperparameters, and reporting
+  choices. StrongBot is scripted rather than deep RL, but its head-to-head
+  outcomes have the same need for controlled randomness and uncertainty.
 - Ontañón et al. (2018), [*The First microRTS Artificial Intelligence
   Competition*](https://doi.org/10.1609/aimag.v39i1.2777), established μRTS as
   a shared simplified RTS competition substrate. Chrono Divide required an
@@ -36,6 +48,12 @@ citation search and coverage of work published after these papers.
   Challenge*](https://arxiv.org/abs/1902.04043), standardized decentralized
   micromanagement scenarios and MARL evaluation. This SMAC benchmark is
   distinct from the SMAC algorithm configurator cited above.
+- Balla, Lucas & Pérez-Liébana (2020), [*Evaluating Generalisation in General
+  Video Game Playing*](https://doi.org/10.1109/CoG47356.2020.9231530), train on
+  visible GVGAI levels and evaluate hidden ones, finding that training-level
+  selection and stochasticity affect transfer. Hidden-level evaluation is
+  therefore prior art; this study's narrower distinction is revision-aware map
+  families and sealed outcome access in a nonprocedural corpus.
 - Agarwal et al. (2021), [*Deep Reinforcement Learning at the Edge of the
   Statistical Precipice*](https://proceedings.neurips.cc/paper/2021/hash/f514cec81cb148559cf475e7426eed5e-Abstract.html),
   motivates task-stratified intervals, performance profiles, and probability of
