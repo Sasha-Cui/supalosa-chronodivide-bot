@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build a deterministic, identity-neutral paper review artifact."""
+"""Build a deterministic, identity-neutral manuscript review artifact."""
 
 from __future__ import annotations
 
@@ -65,11 +65,24 @@ def sanitize_payload(value: Any) -> Any:
     return value
 
 
-def copy_paper(repo_root: Path, package_root: Path) -> None:
-    shutil.copytree(
-        repo_root / "paper",
-        package_root / "paper",
-        ignore=shutil.ignore_patterns("build", "__pycache__", "*.pyc"),
+def copy_manuscripts(repo_root: Path, package_root: Path) -> None:
+    for directory in ("paper", "paper_scitepress"):
+        shutil.copytree(
+            repo_root / directory,
+            package_root / directory,
+            ignore=shutil.ignore_patterns("build", "__pycache__", "*.pyc"),
+        )
+
+
+def sync_scitepress_assets(package_root: Path) -> None:
+    source_generated = package_root / "paper" / "generated"
+    target_generated = package_root / "paper_scitepress" / "generated"
+    target_generated.mkdir(parents=True, exist_ok=True)
+    for source in sorted(source_generated.glob("*.tex")):
+        shutil.copyfile(source, target_generated / source.name)
+    shutil.copyfile(
+        package_root / "paper" / "references.bib",
+        package_root / "paper_scitepress" / "references.bib",
     )
 
 
@@ -155,7 +168,7 @@ def build_package(repo_root: Path, package_root: Path) -> dict[str, str]:
     source_module = load_generator(source_generator)
     filenames = sorted(source_module.EXPECTED_ARTIFACT_HASHES)
 
-    copy_paper(repo_root, package_root)
+    copy_manuscripts(repo_root, package_root)
     sanitized_hashes = write_sanitized_artifacts(repo_root, package_root, filenames)
     copied_generator = package_root / "paper" / "scripts" / "generate_assets.py"
     replace_generator_hashes(
@@ -166,6 +179,10 @@ def build_package(repo_root: Path, package_root: Path) -> dict[str, str]:
 
     shutil.copyfile(repo_root / "artifact" / "templates" / "REVIEW_README.md", package_root / "README.md")
     shutil.copyfile(repo_root / "artifact" / "THIRD_PARTY.md", package_root / "THIRD_PARTY.md")
+    shutil.copyfile(
+        repo_root / "artifact" / "scripts" / "verify_package_manifest.py",
+        package_root / "verify_manifest.py",
+    )
     (package_root / "artifact_hashes.json").write_text(
         json.dumps(sanitized_hashes, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
@@ -173,6 +190,7 @@ def build_package(repo_root: Path, package_root: Path) -> dict[str, str]:
 
     copied_module = load_generator(copied_generator)
     copied_module.generate_all(package_root, package_root / "paper" / "generated")
+    sync_scitepress_assets(package_root)
     anonymity_scan(package_root)
     return write_manifest(package_root)
 

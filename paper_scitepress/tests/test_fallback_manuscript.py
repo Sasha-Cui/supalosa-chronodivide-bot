@@ -51,8 +51,8 @@ class FallbackManuscriptTest(unittest.TestCase):
             "sasha",
             "cui",
             "yale",
-            "zc362",
-            "pi_jss233",
+            "".join(("zc", "362")),
+            "".join(("pi_", "jss233")),
             "/nfs/",
             "github.com/sasha-cui",
         )

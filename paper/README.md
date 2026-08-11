@@ -1,8 +1,9 @@
 # Paper source
 
-This directory contains the double-blind Springer LNCS manuscript targeted at
-EvoApplications 2027, Soft Computing Applied to Games. The empirical program is
-frozen; no manuscript edit authorizes new outcome-bearing games.
+This directory contains the double-blind Springer LNCS manuscript retained for
+the EvoApplications 2027 Soft Computing Applied to Games secondary route. The
+separate `paper_scitepress/` tree is the exact ICAART candidate. The empirical
+program is frozen; no manuscript edit authorizes new outcome-bearing games.
 
 ## Build
 

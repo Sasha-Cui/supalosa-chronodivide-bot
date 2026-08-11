@@ -17,12 +17,14 @@ Verified on **2026-08-11**.
 
 ## Included
 
-The artifact contains the anonymous paper source, author-written paper asset
-generator and tests, generated TeX fragments, and eight sanitized aggregate
-JSON records needed to regenerate every reported table and figure. Sanitization
+The artifact contains the anonymous LNCS/SCAG and exact SCITEPRESS/ICAART
+manuscript sources, the official unmodified SCITEPRESS template files,
+author-written paper asset generator and tests, a self-contained package
+manifest verifier, generated TeX fragments, and eight sanitized aggregate JSON
+records needed to regenerate every reported table and figure. Sanitization
 redacts the literal scheduler account and project source commit fields while
 preserving job IDs, design counts, estimates, intervals, result commitments,
-family IDs, and all values used by the manuscript.
+family IDs, and all values used by the manuscripts.
 
 The included material is supplied for peer review. A public open-source release
 of the bot requires a separate permission and licensing decision from the

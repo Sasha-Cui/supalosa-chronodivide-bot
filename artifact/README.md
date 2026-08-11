@@ -1,13 +1,15 @@
 # Anonymous review artifact builder
 
-This directory builds an identity-neutral, paper-only review artifact. It does
+This directory builds an identity-neutral, manuscript-only review artifact. It does
 not package the StrongBot or Supalosa implementation, maps, MIX archives,
 Chrono Divide runtime, game assets, private execution bundles, or Git history.
 
-The builder copies the paper source and its deterministic generator, sanitizes
-the eight frozen aggregate JSON inputs used by the paper, replaces their pinned
-hashes in the copied generator, regenerates every table and figure fragment,
-checks for direct author identifiers, writes a file-level SHA-256 manifest, and
+The builder copies both the LNCS/SCAG and exact SCITEPRESS/ICAART manuscript
+sources plus their deterministic generator, sanitizes the eight frozen
+aggregate JSON inputs used by the manuscripts, replaces their pinned hashes in
+the copied generator, regenerates every table and figure fragment, synchronizes
+the SCITEPRESS copies, checks for direct author identifiers, installs a
+self-contained manifest verifier, writes a file-level SHA-256 manifest, and
 creates a metadata-normalized tarball.
 
 Build and test from the repository root:
