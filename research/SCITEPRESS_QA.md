@@ -7,6 +7,7 @@ Prepared: **2026-08-11**
 - Candidate introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
 - Current reviewed source: `8242720bd603a8ac72ef5f28496b412f573b294e`
 - Authoritative shared manuscript source: `8242720bd603a8ac72ef5f28496b412f573b294e`
+- Portable artifact/build QA: `d53f822144bd0b3fffe3b4d778770091f77900b8`
 - Build entry point: `paper_scitepress/main.tex`
 - Target: ICAART 2027 regular paper, anonymous SCITEPRESS review format
 - PDF: 10 A4 pages, 164,393 bytes
@@ -54,6 +55,22 @@ The extracted PDF contains 36,435 non-whitespace characters, within ICAART's
 10,000--50,000 review-submission interval. Its 197-word abstract is within the
 official 70--200-word interval. The page is A4 and the current 10-page build is
 below the 12-page full-paper proceedings limit.
+
+## Independent artifact reproduction
+
+The repaired anonymous archive packages this exact SCITEPRESS source rather
+than only the LNCS secondary format. A fresh Git-free extraction on macOS using
+Python 3.14.2, GNU Make 3.81, and TeX Live 2022 verified all 58 immutable files
+before and after regeneration, passed the ten shared and seven
+SCITEPRESS-specific tests, and completed `make -C paper_scitepress check`.
+The result is a 10-page A4 PDF of 164,234 bytes with SHA-256
+`7f6b2e26352290ea689e03671f3e48053f4ac932fe6cddc5812e863ed04ad3d9`.
+That byte identity is intentionally recorded separately from the Bouchet TeX
+Live 2024 identity above; the package manifest and generated-fragment hashes,
+not cross-version PDF bytes, are the portable invariant. The independent final
+log had no overfull box, unresolved reference/citation, rerun, or
+multiply-defined-label warning, all fonts were embedded, and all ten pages were
+inspected at full resolution.
 
 ## Reviewer-assignment metadata
 
