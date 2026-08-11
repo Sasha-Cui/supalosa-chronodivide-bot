@@ -18,11 +18,11 @@ recheck it and the acceptance notice before editing.
 The source candidate for any reduction is:
 
 - reviewed submission source:
-  `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`;
-- ten-page PDF SHA-256:
-  `7e5d150fc6066b2ca5abb52ce9c7a1abd1f51e7bf2e6d0dfd899531645be112e`;
-- expanded abstract: 195 lexical words;
-- extracted non-whitespace characters: 36,949.
+  `bc0e6096ed89c7640bcbab5f3a4e7444e82f3b89`;
+- 11-page PDF SHA-256:
+  `271363cdad2e6128588b34e5a64f7ddb38487cf3669067406516118b80797c71`;
+- expanded abstract: 196 lexical words;
+- extracted non-whitespace characters: 37,970.
 
 Do not compress the review version preemptively. A shorter review paper would
 remove evidence that directly answers ICAART's technical-quality and critical-
@@ -63,11 +63,11 @@ mechanism claim.
 
 ## Current page budget
 
-The reviewed candidate is ten A4 pages. Main text and figures occupy page 1
-through roughly the first third of page 9; references occupy the remainder of
-page 9 and all of page 10, approximately 1.6 pages. An eight-page version
-therefore needs to reduce the body by about two pages while preserving a
-readable reference list.
+The reviewed candidate is 11 A4 pages. Main text and figures occupy page 1
+through roughly the first half of page 9; references occupy the remainder of
+page 9 and pages 10--11. An eight-page version therefore needs to remove about
+three pages while preserving the threat-to-control map, core evidence, explicit
+limitations, and a readable reference list.
 
 Current shared-section source sizes are:
 

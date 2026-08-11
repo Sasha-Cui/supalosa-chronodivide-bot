@@ -8,9 +8,11 @@ This is an internal acceptance-risk audit of the anonymous SCITEPRESS regular
 paper whose scientific claims were frozen at
 `419a0f72188f957ae144262f62c62bcc11a66ac3`, whose claim-preserving terminology
 refreeze is `77d93359242756f07afba30d88fb2db8fd97e7b2`, whose citation-source
-refreeze and current reviewed source is `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`, and
+refreeze is `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`, whose acceptance-oriented
+presentation refreeze and current reviewed source is
+`bc0e6096ed89c7640bcbab5f3a4e7444e82f3b89`, and
 whose PDF SHA-256 is
-`7e5d150fc6066b2ca5abb52ce9c7a1abd1f51e7bf2e6d0dfd899531645be112e`.
+`271363cdad2e6128588b34e5a64f7ddb38487cf3669067406516118b80797c71`.
 The surrounding governance tree was rechecked at
 `0178203382836043baf27e1053ee3e55bf8c4a52`. This is not an independent
 review, an acceptance-probability estimate, or a substitute for the unprimed
@@ -39,7 +41,7 @@ Official sources checked on 2026-08-11:
 | Originality | 3/5 | The original contribution is the integrated leakage-resistant Chrono Divide evaluation protocol: revision-aware families, sealed role access, participant-isolated common randomness, reciprocal starts, clustered inference, and fail-closed provenance. | Successive halving and the individual controls are established; the paper must not be read as claiming optimizer or environment novelty. |
 | Technical quality | 5/5 | The study has family-disjoint roles, a transparently retired method, fresh development, one-time sealed evaluation, paired design, family-clustered uncertainty, negative-gate reporting, exact accounting, and deterministic aggregate reproduction. | Family construction is heuristic, the endpoint has many tick-cap draws, and full replay depends on third-party content. |
 | Significance | 3/5 | The held-out effect is large and family-consistent, and the study shows how strong execution controls narrow an initially diffuse bot-strength story into one positive relative result and one failed absolute result. | One independent opponent, one faction mirror, a low-scoring generic reference, and no deployed-default comparison limit practical generality. |
-| Presentation | 4/5 | All ten A4 pages were re-rendered and inspected at the frozen hash. The paper is visually clean, RQ-led, explicit about the failed joint gate, and supported by four interpretable figures and three compact tables. Its 36,949 extracted non-whitespace characters satisfy the official 10,000--50,000 submission band. | The method is dense, and defensive caveats can obscure the positive evaluation contribution on a fast read. |
+| Presentation | 4/5 | All 11 A4 pages were re-rendered and inspected at the frozen hash. The title and abstract foreground leakage-resistant evaluation rather than optimizer novelty, and a new threat-to-control table makes the reusable design visible before the dense implementation detail. Four figures and four tables remain legible; 37,970 extracted non-whitespace characters satisfy the official 10,000--50,000 submission band. | The method remains dense, and the bounded positive claim still demands attentive reading. |
 
 Overall internal recommendation: **weak accept, with meaningful reviewer
 variance**. Technical quality is well above the likely rejection threshold;
@@ -50,23 +52,25 @@ evaluation protocol despite narrow opponent breadth.
 
 | Reviewer prompt | Current answer | Required action |
 | --- | --- | --- |
-| Abstract and introduction adequate? | Yes. They name the existing environment, bounded claim, failed absolute gate, contribution type, and scope. | Contribution item 1 now states the methodological object directly: a leakage-resistant Chrono Divide evaluation protocol. |
+| Abstract and introduction adequate? | Yes. They name the existing environment, leakage-resistant protocol, separate configuration pipeline, bounded claim, failed absolute gate, and scope. | The new title and threat-to-control map reinforce contribution item 1 without strengthening the evidence claim. |
 | Needs more experimental results? | Not within the frozen paper. More seeds on opened test families add no generalization units. A second opponent or faction requires a new prospective study. | Keep as future work; do not append post hoc games. |
 | Needs comparative evaluation? | This is the main likely objection. The paper compares a frozen generic reference and component reverts, but not independent configurators or multiple opponents. | Preserve the explicit boundary. Do not imply optimizer superiority. |
 | Improve critical discussion? | No material omission found. The paper foregrounds adaptation, baseline identity, high draws, one-opponent scope, heuristic families, and diagnostic limits. | Retain every limitation through final edits. |
 | Figures adequate? | Yes after repair. Figures show study flow, all family effects, paired transitions, and component intervals. | Figure 2 no longer depends on an unavailable supplement; its family labels are defined in place. |
 | Conclusions/future work convincing? | Yes. The conclusion answers both confirmatory gates and states the non-causal diagnostic boundary; the immediately preceding limitations identify the next prospective extension. | Cold-read whether the final paragraph remains appropriately bounded rather than merely defensive. |
 | References current and appropriate? | Yes. The bibliography includes the closest game-agent configuration work, map-specific program synthesis, generalization/evaluation foundations, exact pinned software sources, and a 2026 ICAART game paper. | Human author still verifies every primary source and citation use. |
-| Formatting adjustment? | None currently. The candidate is 10 A4 pages and 36,949 non-whitespace characters, with embedded fonts and settled references. A later full-paper acceptance permits 12 proceedings pages; a short-paper acceptance permits 8. | Full post-edit render completed; repeat only after a later source change. Retain an 8-page camera-ready reduction plan rather than compressing the review version preemptively. |
+| Formatting adjustment? | None currently. The candidate is 11 A4 pages and 37,970 non-whitespace characters, with embedded fonts and settled references. A later full-paper acceptance permits 12 proceedings pages; a short-paper acceptance permits 8. | Full post-edit render completed; repeat only after a later source change. Retain an 8-page camera-ready reduction plan rather than compressing the review version preemptively. |
 | Improve English? | No systemic issue found. | Human line edit remains mandatory under the authorship policy. |
 
-## Adversarial no-edit decision
+## Acceptance-oriented revision decision
 
-The complete ten-page PDF was extracted and rendered again after the
-author-verification packet landed on `main`. Every page was inspected at
-normal reading scale and at full rendered resolution. No clipping, overlap,
-missing glyph, broken cross-reference, illegible plot label, malformed
-reference, or anonymity disclosure was found.
+The fresh fast-review pass found one repairable presentation risk: the old
+title led with configuration even though the paper disclaims optimizer novelty,
+and the controls that constitute the methodological contribution were
+distributed across dense prose. Commit `bc0e609` therefore retitles the paper
+around leakage-resistant evaluation, distinguishes protocol from configuration
+in both abstracts, and adds a five-row threat-to-control map. It changes no
+result, estimator, experimental input, conclusion, or scope boundary.
 
 The content was then read against each current ICAART reviewer prompt. The
 principal rejection risk is unchanged: a reviewer may judge one opponent, one
@@ -77,11 +81,17 @@ already states it in the abstract, introduction, limitations, and conclusion.
 Adding post-hoc games, a simulated deployed baseline, stronger mechanism
 language, or an optimizer-novelty claim would weaken the evidence.
 
-Decision: **make no manuscript change from this audit**. Preserve the frozen
-PDF until either the unprimed human cold read identifies a concrete
-misunderstanding or the venue supplies required disclosure instructions. Any
-later edit must remain claim-preserving and trigger a complete rebuild,
-character count, anonymity scan, and rendered-page inspection.
+The complete 11-page PDF and independent TeX Live 2022 rebuild were then
+inspected at contact-sheet and full-page resolution, including the title,
+threat-to-control table, every reflowed page, and the complete reference list.
+No clipping, overlap, missing glyph, broken cross-reference, illegible plot or
+table label, malformed reference, or anonymity disclosure was found.
+
+Decision: **retain the acceptance-oriented revision and freeze its scientific
+content**. Preserve the PDF until either the unprimed human cold read identifies
+a concrete misunderstanding or the venue supplies required disclosure
+instructions. Any later edit must remain claim-preserving and trigger a complete
+rebuild, character count, anonymity scan, and rendered-page inspection.
 
 ## Decision-critical objections
 
@@ -121,7 +131,8 @@ must confirm that this connection is legible without repository context.
 2. Use **Agents** as the main area and select **Agent Models and
    Architectures**, **Simulation**, and **Task Planning and Execution** if those
    exact topics are offered.
-3. Keep the title, failed-gate language, and comparator boundary unchanged.
+3. Keep the acceptance-oriented title, failed-gate language, and comparator
+   boundary unchanged.
 4. Do not add outcome-bearing evidence to the opened population.
 5. Complete an unprimed human cold read. A reader must independently recover
    the relative-versus-absolute distinction, existing-environment boundary,

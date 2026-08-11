@@ -4,14 +4,14 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`
+- Source commit: `bc0e6096ed89c7640bcbab5f3a4e7444e82f3b89`
 - Main source: `paper/main.tex`
 - Supplement source: `paper/supplement.tex`
 - Target format: Springer LNCS, anonymous submission
-- Main PDF: 17 pages total; non-reference content ends on page 14
+- Main PDF: 18 pages total; non-reference content ends on page 15
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `d29f38c3b65829c18b7215bc7e8a8c8e8ca81d1daea85859f24b1536489d8628`
-- Supplement PDF SHA-256: `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98`
+- Main PDF SHA-256: `666695c812fe504507aae7f3e7d813698ec64df3f74ad973a19ec73f2ee98d64`
+- Supplement PDF SHA-256: `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`
 
 The PDFs are build products and are not committed. Their hashes identify the
 exact artifacts inspected during this QA pass.
@@ -127,9 +127,9 @@ remain clean.
 
 Commit `0f3e690` adds a deterministic plain-text ICAART metadata exporter and
 does not change manuscript content or PDF bytes. Its output expands every
-result macro, contains no residual LaTeX, records the exact 195-word abstract,
+result macro, contains no residual LaTeX, records the exact 196-word abstract,
 and has SHA-256
-`a9d0bf2c0d665a2ce2dd398a6fa7ec2ad69f641a344e4873d9f72202775eb30f`.
+`8935329266d8b20e53a718371eb74e86ba15a645d6469106f3cc86b74c6c8e4a`.
 
 The claim audit confirmed that the paper:
 
@@ -148,7 +148,7 @@ The claim audit confirmed that the paper:
 
 ## Clean export and reviewer artifact
 
-A committed submission revision at `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`
+A committed submission revision at `bc0e6096ed89c7640bcbab5f3a4e7444e82f3b89`
 and the portable-artifact repair at
 `d53f822144bd0b3fffe3b4d778770091f77900b8` passed ten paper-generator and
 manuscript-invariant tests, twelve SCITEPRESS tests, two artifact-builder tests,
@@ -158,8 +158,8 @@ and one substantive-citation-audit test (31 tests total). They regenerated all p
 fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
-`f67f5483aa7e74f3930766fed7191e6240a6a72ab4baf043cc93ce1b0bcf2c06`
-and size 100,837 bytes. Two independent builds produced that same hash. The
+`022b5dfdb9c6e58c6c42e4ee13e0e661e1210d5c6b5620b7314d22f31a732bf4`
+and size 101,342 bytes. Two independent builds produced that same hash. The
 archive contains 60 manifested immutable files, normalized `0/0` ownership and
 epoch timestamps, no Git tree, no bot packages, and no direct author,
 scheduler-account, institution, or private-path token. It now contains both the
@@ -178,20 +178,21 @@ A fresh extraction on an independent macOS machine used Python 3.12.13, GNU
 Make 3.81, and TeX Live 2022 rather than Bouchet's Python 3.9 and TeX Live 2024.
 The manifest verified both before and after deterministic regeneration, all 22
 packaged manuscript tests passed, and the Git-free build produced the expected
-17-page Letter LNCS paper, five-page Letter supplement, and 10-page A4
+18-page Letter LNCS paper, five-page Letter supplement, and 11-page A4
 SCITEPRESS candidate. The local-toolchain PDF identities were respectively
-`05b824d074ad72dc032d80dd4735c0a5fb130569be802095dcf55015e28a80b2`,
-`82e54a6266bdc211530d6cde92443c6707f78e975dbdd77cc1a4c6b2db8cc20b`,
-and `1282332d134ebd4c12ffdce506a0ff9919250e682d116b9d4d97afebd5babb29`.
+`458899355c925f68c69f3f8950c8dda9ed39dbdc5a681a637500aec71a5c8935`,
+`f78a88d16e217aef0a18f0948d3148055ccb2514ae6935cc00832935ffa75f2e`,
+and `0a504938b2c6021fecf7bcec0e9db6e2354af971e72c7555b84f33a0cc647e3c`.
 PDF bytes legitimately differ across TeX distributions, while all immutable
 sources and generated fragments remain manifest-bound. All fonts were embedded;
 the final logs contained no overfull box, unresolved reference/citation, rerun,
-or multiply-defined-label warning. Contact-sheet inspection covered all 32
-pages, and every SCITEPRESS page was additionally inspected at full resolution.
+or multiply-defined-label warning. Contact-sheet inspection covered all 34
+pages; the changed title, threat-to-control table, reflowed transitions, and
+complete final reference pages were additionally inspected at full resolution.
 
 The production candidate additionally passed the new Poppler-backed
-`submission-check`: exactly 10 A4 pages, 36,949 non-whitespace characters under
-the documented default reading order, 195 abstract words, empty review
+`submission-check`: exactly 11 A4 pages, 37,970 non-whitespace characters under
+the documented default reading order, 196 abstract words, empty review
 identity metadata, no forms/JavaScript/encryption/rotation, nine embedded fonts
 with Unicode maps, exact PDF-to-portal title/abstract/keyword agreement, and
 SHA-256 agreement between the metadata JSON and its three source files. The
@@ -212,6 +213,19 @@ second TeX Live 2022 pass confirmed the same 10-page ICAART fit, including its
 related-work and reference pages. No clipping, overlap, broken link label,
 margin violation, or unreadable text was found. The five-page supplement is
 byte-identical to the previously inspected freeze.
+
+The acceptance-oriented refreeze at `bc0e609` retitles the paper around its
+actual leakage-resistant evaluation contribution, aligns both abstracts with
+that framing, and adds a full-width threat-to-control map that makes the
+prespecified safeguards auditable at reviewer reading speed. It changes no
+frozen empirical input, result, estimator, uncertainty interval, or claim
+boundary. Two clean production builds reproduced the 18-page LNCS, five-page
+supplement, and 11-page ICAART hashes recorded above. A separate TeX Live 2022
+artifact build produced the three cross-toolchain identities recorded above.
+Contact sheets covered all 34 pages, and the retitled first pages, both
+threat-to-control tables, reflowed transitions, and complete final reference
+pages were inspected at full resolution. No clipping, overlap, unreadable
+label, contrast defect, broken link, or margin violation was found.
 
 The inspected PDFs have empty Author, Title, Subject, and Keywords metadata;
 contain no identifying binary strings, JavaScript, forms, or encryption; and

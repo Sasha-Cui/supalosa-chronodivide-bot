@@ -131,7 +131,7 @@ interpretation of the EvoStar code.
   Obtain a written ruling before changing its visibility.
 - Reviewer-artifact ambiguity: the public complete-paper instructions describe
   a PDF submission but do not specify a supplementary-file field or an
-  anonymous external-link route. Ask whether the 100,837-byte identity-neutral
+  anonymous external-link route. Ask whether the 101,342-byte identity-neutral
   aggregate artifact can accompany the review submission and, if so, by which
   mechanism. If not, keep all essential evidence in the paper and describe the
   artifact as release material rather than implying reviewer access.
@@ -145,12 +145,15 @@ interpretation of the EvoStar code.
 The public-policy evidence and exact remaining questions are frozen in
 `ICAART_POLICY_RECONCILIATION.md`.
 
-The SCITEPRESS conversion was completed prospectively on 2026-08-11 without
-changing the frozen science. It is 10 A4 pages, has a 195-word expanded abstract and
-36,949 extracted non-whitespace characters, and reproduces byte-for-byte across
-clean Bouchet builds at SHA-256
-`7e5d150fc6066b2ca5abb52ce9c7a1abd1f51e7bf2e6d0dfd899531645be112e`.
-All pages passed rendered inspection; see `SCITEPRESS_QA.md`.
+The SCITEPRESS conversion and acceptance-oriented presentation pass were
+completed on 2026-08-11 without changing the frozen science. The current
+candidate is 11 A4 pages, has a 196-word expanded abstract and 37,970 extracted
+non-whitespace characters, and has SHA-256
+`271363cdad2e6128588b34e5a64f7ddb38487cf3669067406516118b80797c71`.
+Its title, abstracts, and threat-to-control map foreground the evaluation
+contribution without introducing a stronger claim. All pages passed rendered
+inspection under TeX Live 2024 and an independent TeX Live 2022 build; see
+`SCITEPRESS_QA.md`.
 
 For reviewer assignment, use the main **Agents** area and the exact call topics
 **Agent Models and Architectures**, **Simulation**, and **Task Planning and

@@ -75,7 +75,7 @@ empirical submission can omit validation.
 | Environment novelty | Weaker than MACO by design | Chrono Divide already exists. The manuscript states this on page 1 and claims an auditable research use of the environment, not its creation. |
 | Mechanism evidence | More conservative | The component and terminal analyses are labeled post-confirmatory and do not establish the proposed infantry-rush mechanism. |
 | Reproducibility | Stronger | Every reported aggregate is hash-bound; the anonymous artifact regenerates all tables and figures and rebuilds both paper formats. Full match replication retains an explicit third-party asset boundary. |
-| Presentation readiness | Comparable or stronger | The 10-page SCITEPRESS version satisfies the posted character and abstract limits, is byte-reproducible, and has passed rendered page and anonymity checks. |
+| Presentation readiness | Comparable or stronger | The 11-page SCITEPRESS version satisfies the posted character and abstract limits, is byte-reproducible, foregrounds its evaluation contribution with a threat-to-control map, and has passed rendered page and anonymity checks. |
 
 ## Acceptance assessment
 

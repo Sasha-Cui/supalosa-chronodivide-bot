@@ -79,7 +79,7 @@ Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 >
 > I am considering a 2027 regular-paper submission on reproducible
 > configuration and held-out evaluation of a scripted real-time-strategy
-> agent. I have prepared an anonymous 10-page version in the official
+> agent. I have prepared an anonymous 11-page version in the official
 > SCITEPRESS template. Before submitting it, could you please clarify four
 > points?
 >

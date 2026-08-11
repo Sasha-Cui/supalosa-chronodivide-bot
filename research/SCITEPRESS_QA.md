@@ -5,20 +5,21 @@ Prepared: **2026-08-11**
 ## Frozen candidate identity
 
 - Candidate introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
-- Current reviewed source: `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`
+- Current reviewed source: `bc0e6096ed89c7640bcbab5f3a4e7444e82f3b89`
 - Scientific-claim freeze: `419a0f72188f957ae144262f62c62bcc11a66ac3`
 - Claim-preserving terminology refreeze: `77d93359242756f07afba30d88fb2db8fd97e7b2`
 - Citation-source refreeze: `e91674f4eff69c4ceccb3a65e617cfb91d01ec5c`
 - Submission-length contract refreeze: `abf5e9460a99ace48aa3a48c33076b8108c4d1df`
+- Acceptance-oriented framing refreeze: `bc0e6096ed89c7640bcbab5f3a4e7444e82f3b89`
 - Portable artifact/build QA: `d53f822144bd0b3fffe3b4d778770091f77900b8`
 - Submission metadata exporter: `0f3e690310894e8ab0bf6bb33c9e6f0c4e2bc8d0`
 - Build entry point: `paper_scitepress/main.tex`
 - Target: ICAART 2027 regular paper, anonymous SCITEPRESS review format
-- PDF: 10 A4 pages, 165,874 bytes
-- PDF SHA-256: `7e5d150fc6066b2ca5abb52ce9c7a1abd1f51e7bf2e6d0dfd899531645be112e`
-- Expanded plain-text abstract: 195 words
-- Extracted submission length: 36,949 non-whitespace characters
-- Portal metadata JSON SHA-256: `a9d0bf2c0d665a2ce2dd398a6fa7ec2ad69f641a344e4873d9f72202775eb30f`
+- PDF: 11 A4 pages, 168,002 bytes
+- PDF SHA-256: `271363cdad2e6128588b34e5a64f7ddb38487cf3669067406516118b80797c71`
+- Expanded plain-text abstract: 196 words
+- Extracted submission length: 37,970 non-whitespace characters
+- Portal metadata JSON SHA-256: `8935329266d8b20e53a718371eb74e86ba15a645d6469106f3cc86b74c6c8e4a`
 
 The PDF is a build product and is not committed. The hash identifies the exact
 file rendered and inspected in this QA pass.
@@ -58,9 +59,9 @@ PDF hash above. The fixed `SOURCE_DATE_EPOCH` is a stable reproducibility
 constant established at the earlier comparator-justified freeze; the current
 reviewed source identity is recorded above.
 
-The extracted PDF contains 36,949 non-whitespace characters, within ICAART's
-10,000--50,000 review-submission interval. Its 195-word expanded abstract is within the
-official 70--200-word interval. The page is A4 and the current 10-page build is
+The extracted PDF contains 37,970 non-whitespace characters, within ICAART's
+10,000--50,000 review-submission interval. Its 196-word expanded abstract is within the
+official 70--200-word interval. The page is A4 and the current 11-page build is
 below the 12-page full-paper proceedings limit.
 
 The separate submission check now enforces those values against the built PDF
@@ -69,7 +70,7 @@ non-A4 geometry, nonempty identity metadata, encryption, forms, JavaScript,
 page rotation, missing Unicode maps or embedded fonts, PDF-to-portal
 title/abstract/keyword drift, and metadata source-hash drift. Poppler's default
 reading order is the frozen character-count method; layout mode has a different
-count and is deliberately not mixed with the submitted 36,949-character
+count and is deliberately not mixed with the submitted 37,970-character
 identity.
 
 ## Independent artifact reproduction
@@ -79,22 +80,24 @@ than only the LNCS secondary format. A fresh Git-free extraction on macOS using
 Python 3.12.13, GNU Make 3.81, and TeX Live 2022 verified all 60 immutable files
 before and after regeneration, passed the ten shared and twelve
 SCITEPRESS-specific tests, and completed `make -C paper_scitepress check`.
-The result is a 10-page A4 PDF of 165,703 bytes with SHA-256
-`1282332d134ebd4c12ffdce506a0ff9919250e682d116b9d4d97afebd5babb29`.
+The result is an 11-page A4 PDF with SHA-256
+`0a504938b2c6021fecf7bcec0e9db6e2354af971e72c7555b84f33a0cc647e3c`.
 That byte identity is intentionally recorded separately from the Bouchet TeX
 Live 2024 identity above; the package manifest and generated-fragment hashes,
 not cross-version PDF bytes, are the portable invariant. The independent final
 log had no overfull box, unresolved reference/citation, rerun, or
-multiply-defined-label warning, all fonts were embedded, and all ten pages were
-inspected at full resolution. The package-local exporter produced the same
-195-word portal metadata JSON and SHA-256 recorded above.
+multiply-defined-label warning, all fonts were embedded, and all 11 pages were
+inspected. The changed title, threat-to-control table, reflowed transitions,
+and final reference page were additionally inspected at full resolution. The
+package-local exporter produced the same 196-word portal metadata JSON and
+SHA-256 recorded above.
 
-The rebuilt archive is 100,837 bytes with 60 immutable files and SHA-256
-`f67f5483aa7e74f3930766fed7191e6240a6a72ab4baf043cc93ce1b0bcf2c06`.
+The rebuilt archive is 101,342 bytes with 60 immutable files and SHA-256
+`022b5dfdb9c6e58c6c42e4ee13e0e661e1210d5c6b5620b7314d22f31a732bf4`.
 Its two copied build READMEs no longer name the institutional compute cluster,
 the archive denylist rejects that token, and a whole-package regression check
 prevents recurrence. The independent build also passed the Poppler-backed deep
-submission check with the same 10-page, 36,949-character, nine-font result.
+submission check with the same 11-page, 37,970-character, nine-font result.
 
 ## Reviewer-assignment metadata
 
@@ -110,7 +113,7 @@ submission-system topic selections and rationale are frozen in
 
 ## Visual, metadata, and anonymity checks
 
-All ten pages were rendered with Poppler and inspected at full resolution.
+All 11 current pages were rendered with Poppler and inspected.
 The explicit joint-gate wording and pinned-source citation revision received a
 further complete ten-page pass.
 The final venue-local MACO citation and compact StarCraft II author formatting
@@ -163,6 +166,17 @@ reference lists were inspected at full resolution with no defect. The
 five-page supplement remained byte-identical to its previously inspected
 freeze. The fresh TeX Live 2022 artifact build also retained the 10-page fit;
 its related-work and reference pages were inspected at full resolution.
+
+The acceptance-oriented refreeze at `bc0e609` changes the title and both
+abstracts to foreground the paper's actual leakage-resistant evaluation
+contribution, and adds a full-width threat-to-control map tying each validity
+risk to its prespecified safeguard. It changes no empirical input, result,
+estimator, uncertainty interval, or claim boundary. The production candidate
+is now 11 pages and remains within both official length limits. Contact-sheet
+inspection covered the complete 34-page production set across the LNCS paper,
+supplement, and ICAART candidate; all changed and final reference pages were
+also checked at full resolution. The independent TeX Live 2022 build passed
+the same deep submission check and reproduced all immutable generated assets.
 
 ## Unresolved submission gates
 

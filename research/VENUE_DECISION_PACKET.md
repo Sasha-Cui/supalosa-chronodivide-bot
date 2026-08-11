@@ -11,8 +11,8 @@ send email, authorize submission, or replace a written venue ruling.
 | --- | --- | --- |
 | Topical fit | Best: applied game-agent configuration and evaluation | Adequate but broader: agents, simulation, planning, and evolutionary computing |
 | First deadline | 2026-11-01 | 2026-09-15 AoE |
-| Current paper | 14-page LNCS body plus references | 10-page SCITEPRESS A4 paper |
-| Current PDF hash | `d29f38c3b65829c18b7215bc7e8a8c8e8ca81d1daea85859f24b1536489d8628` | `7e5d150fc6066b2ca5abb52ce9c7a1abd1f51e7bf2e6d0dfd899531645be112e` |
+| Current paper | 15-page LNCS body plus references | 11-page SCITEPRESS A4 paper |
+| Current PDF hash | `666695c812fe504507aae7f3e7d813698ec64df3f74ad973a19ec73f2ee98d64` | `271363cdad2e6128588b34e5a64f7ddb38487cf3669067406516118b80797c71` |
 | Remote presentation | Conference says hybrid; remote-presenter election is not explicit | Home page permits exceptional remote presentation when travel is impossible; procedure and fee class need confirmation |
 | AI policy | Eligibility unresolved because assistance exceeded copy editing | Assistance is permitted with disclosure; blind-review placement is unresolved |
 | Double-blind risk | Prior named public repository requires a ruling | Submitted-paper posting is prohibited; named code-repository handling is unspecified and requires a ruling |
