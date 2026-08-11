@@ -30,6 +30,10 @@ the anonymous branch during review.
 - [ ] Deadline, timezone, page limit, review model, and registration requirement
       reverified from the official call on the upload date.
 - [ ] No simultaneous submission to an incompatible archival venue.
+- [ ] At the initial upload, archive the submitted identity and activate the
+      under-review confidentiality embargo: do not provide the manuscript,
+      confidential reviews, or rebuttal text to a public generative-AI service
+      until the official selection result.
 - [ ] Human author completes the evidence, citation, code, and line-by-line
       verification in `HUMAN_AUTHOR_VERIFICATION_PACKET.md` under the policy in
       `AUTHORSHIP_AND_AI_POLICY.md`; retain a private signed record tied to the

@@ -14,7 +14,8 @@ send email, authorize submission, or replace a written venue ruling.
 | Current paper | 15-page LNCS body plus references | 11-page SCITEPRESS A4 paper |
 | Current PDF hash | `3b6ce71b2c569aecd8f18ccc40370f5c7ec9dc3bc2f5b1f88ca24ede37dfccd4` | `d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413` |
 | Remote presentation | Conference says hybrid; remote-presenter election is not explicit | Home page permits exceptional remote presentation when travel is impossible; procedure and fee class need confirmation |
-| AI policy | Eligibility unresolved because assistance exceeded copy editing | Assistance is permitted with disclosure; blind-review placement is unresolved |
+| AI policy | Eligibility unresolved because assistance exceeded copy editing | Writing/revision are permitted and AI-generated code is disclosure-covered; project-specific implementation eligibility and blind-review placement remain unresolved |
+| Under-review AI confidentiality | Resolve with chairs if selected | Public-platform embargo is explicit; activate it at initial upload |
 | Double-blind risk | Prior named public repository requires a ruling | Submitted-paper posting is prohibited; named code-repository handling is unspecified and requires a ruling |
 
 Neither venue is currently cleared for upload. The remaining uncertainty is
@@ -48,6 +49,12 @@ Send the two factual inquiries in `CONTACT_TEMPLATES.md` now:
 Do not describe the AI work as copy editing. Do not send both manuscripts as
 submissions, and do not make either PDF public during review. An anonymous PDF
 may be supplied privately if a chair requests it.
+
+For ICAART, the initial upload also starts the project's conservative
+public-AI confidentiality embargo. Archive the exact submitted identity first,
+then do not provide the manuscript, confidential reviews, or rebuttal drafts to
+Codex, ChatGPT, or another public generative-AI service until the official
+selection result.
 
 ## Required response record
 

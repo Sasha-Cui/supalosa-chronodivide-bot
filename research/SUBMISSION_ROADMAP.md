@@ -39,7 +39,7 @@ pending. The aggregate-only artifact is sufficient if the venue permits it and
 does not depend on bot redistribution; the paper remains self-contained if the
 venue does not accept review artifacts.
 
-The SCITEPRESS conversion is already complete and visually validated at ten
+The SCITEPRESS conversion is already complete and visually validated at 11
 pages. Use `VENUE_DECISION_PACKET.md` to select exactly one route by
 **2026-08-25**; this parallel policy inquiry and format preparation is not
 simultaneous submission.
@@ -87,6 +87,11 @@ review artifact.
 - Run the final claim/statistics audit against committed JSON artifacts and the
   result registry.
 - Render every PDF page one last time and inspect at normal reading scale.
+- Immediately before the initial upload, archive the exact candidate and
+  activate the public-AI confidentiality embargo in
+  `AUTHORSHIP_AND_AI_POLICY.md`. After upload, keep the submitted manuscript,
+  confidential reviews, and rebuttal drafts out of public generative-AI
+  services until the official selection result.
 - Upload early enough to download and inspect the venue-generated submission
   copy. If the venue classifies the accepted regular submission as a short
   paper, apply

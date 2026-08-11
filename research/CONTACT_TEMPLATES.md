@@ -95,8 +95,9 @@ Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 >    ICAART's double-blind policy? If it must be private during review, please
 >    confirm the required timing and whether its prior visibility affects
 >    eligibility.
-> 3. The ICAART AI-tools policy permits disclosed assistance with manuscript
->    writing, revision, and code. OpenAI Codex assisted this project with
+> 3. The ICAART AI-tools policy permits disclosed writing and revision
+>    assistance and expressly covers AI-generated code in its disclosure rule.
+>    OpenAI Codex assisted this project with
 >    software implementation, experiment orchestration, research auditing,
 >    statistical cross-checks, literature triage, and manuscript drafting and
 >    revision. The human author will personally verify the evidence, citations,
@@ -108,8 +109,8 @@ Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 >    the references be acceptable in the review version? Please specify the
 >    required placement, wording, and citation form, including whether a single
 >    disclosure may identify all affected sections.
-> 4. I have a small identity-neutral aggregate artifact that regenerates every
->    reported table and figure but contains no author identity, bot packages,
+> 4. I have a 101,528-byte identity-neutral aggregate artifact that regenerates
+>    every reported table and figure but contains no author identity, bot packages,
 >    maps, game assets, or private raw logs. The public complete-paper
 >    instructions describe the review PDF but do not specify supplementary
 >    files or anonymous external links. May this artifact accompany the review

@@ -26,16 +26,39 @@ project history as copy editing. Obtain a written ruling from EvoApplications
 before submission.
 
 ICAART 2027 is the operational primary candidate. Its official
-[AI-tools guidance](https://icaart.scitevents.org/AiTools.aspx) permits
-responsible AI assistance with manuscript writing, revision, and code, requires
-disclosure of the tool and affected content, and keeps human authors fully
-accountable. The 2027 guidelines also say that affected sections should cite
-the AI system. The same double-blind call asks authors to omit acknowledgments,
-so the secretariat must specify where both the disclosure and system citation
-belong in the review version. The factual inquiry is in
+[AI-tools guidance](https://icaart.scitevents.org/AiTools.aspx?y=2027) explicitly
+permits responsible manuscript writing, revision, literature-overview, and
+language assistance. It also treats AI-generated code as content that must be
+disclosed and prohibits fabrication or manipulation of research code or
+results. Because this project includes substantial implementation and
+orchestration assistance, the inquiry asks for project-specific eligibility
+rather than inferring it. The policy requires disclosure of the tool and
+affected content and keeps human authors fully accountable. The 2027 guidelines
+also say that affected sections should cite the AI system. The same
+double-blind call asks authors to omit acknowledgments, so the secretariat must
+specify where both the disclosure and system citation belong in the review
+version. The factual inquiry is in
 [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md), and the conflicting public
 instructions are reconciled in
 [`ICAART_POLICY_RECONCILIATION.md`](ICAART_POLICY_RECONCILIATION.md).
+
+## Under-review confidentiality embargo
+
+ICAART's AI-tools policy says that manuscripts under review must not be
+processed through public AI platforms. The operational boundary for this
+project is deliberately conservative:
+
+- pre-submission assistance must be disclosed and independently verified as
+  described above;
+- at the initial PRIMORIS upload, stop providing the submitted manuscript,
+  confidential reviews, or rebuttal drafts to Codex, ChatGPT, or another
+  public generative-AI service;
+- keep that embargo active until the final selection result; and
+- use only human review or a venue-approved, contractually private system for
+  confidential post-submission work.
+
+Archive the submitted PDF, source identity, and disclosure record before the
+embargo begins. Do not use a public AI system to draft an ICAART rebuttal.
 
 ## Required author verification
 
@@ -56,6 +79,8 @@ following before signing or submitting the paper:
    to a generative system contrary to applicable terms.
 7. Approve and retain the exact disclosure language required by the venue and
    publisher.
+8. Confirm that the under-review public-AI embargo is documented and ready to
+   activate at the initial upload.
 
 Completion should be recorded privately with the manuscript commit and PDF
 hash. A checkbox without the underlying review is not evidence.

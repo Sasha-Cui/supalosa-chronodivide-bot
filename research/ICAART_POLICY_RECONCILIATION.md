@@ -6,6 +6,18 @@ This record distinguishes what ICAART 2027's current public pages establish
 from what still needs a written answer for this submission. It does not send a
 message, register a paper, or authorize upload.
 
+## Public-evidence matrix
+
+| Item | Public rule verified 2026-08-11 | Submission-specific status |
+| --- | --- | --- |
+| First-round deadline | 2026-09-15 Anywhere on Earth | Resolved |
+| Conference | 2027-02-23 through 2027-02-25, Valletta | Resolved |
+| Remote presentation | Speakers unable to travel may exceptionally present remotely; live online oral and poster procedures are published | Procedure, approval timing, and fee class unresolved |
+| Generative-AI eligibility | Writing, revision, literature-overview, and language assistance are explicitly allowed; AI-generated code is expressly covered by the disclosure rule, while fabrication or manipulation is prohibited | Project-specific implementation/orchestration eligibility, blind-review disclosure placement, and system-citation form unresolved |
+| Under-review AI confidentiality | A manuscript under review must not be processed through a public AI platform | Resolved; activate the conservative embargo at initial upload |
+| Double-blind repository handling | Public posting of the submitted paper is prohibited during review | Previously public named code repository remains unresolved |
+| Reviewer artifact | Complete-paper instructions specify the PDF submission only | Attachment or anonymous-link route unresolved |
+
 ## Remote presentation
 
 The conference home page now states that speakers who cannot travel may,
@@ -36,6 +48,15 @@ should cite the system, while the double-blind rule tells authors to omit the
 acknowledgments section. Public text therefore does not identify a compliant
 blind-review location or citation form.
 
+The AI-tools page separately says that a manuscript under review must not be
+processed through a public AI platform. As a conservative operational rule,
+from the initial upload until the official selection result, do not provide the
+submitted manuscript, confidential reviews, or rebuttal text to Codex, ChatGPT,
+or another public generative-AI service. Use human or offline tools unless the
+venue and service terms establish a compliant private route. This embargo does
+not retroactively prohibit the disclosed pre-submission assistance, but it
+does stop machine-assisted manuscript and rebuttal work once review begins.
+
 ## Previously public named repository
 
 The guidelines prohibit posting the submitted paper on public preprint,
@@ -53,7 +74,7 @@ The complete-paper guidelines require a PDF submission through PRIMORIS but do
 not identify a supplementary-file field, anonymous external-link mechanism,
 accepted archive type, or size limit for reviewer artifacts. The documented
 10 MB upload on the presenter page is for a conference poster, not a paper
-review artifact. The existing 100,837-byte identity-neutral aggregate archive
+review artifact. The existing 101,528-byte identity-neutral aggregate archive
 is ready, but its existence does not prove that ICAART reviewers can receive
 it. All essential claims and methods therefore remain in the main paper. Ask
 the secretariat whether the artifact may accompany review and by which exact
@@ -88,3 +109,4 @@ link back to the same pages is not a resolution.
 - [Generative-AI tools policy](https://icaart.scitevents.org/AiTools.aspx?y=2027)
 - [Submission, anonymity, and review rules](https://icaart.scitevents.org/Guidelines.aspx?y=2027)
 - [Submission deadlines in Anywhere-on-Earth time](https://icaart.scitevents.org/ImportantDates.aspx?y=2027)
+- [Registration deadlines and speaker-registration rule](https://icaart.scitevents.org/ImportantInformation.aspx?y=2027)

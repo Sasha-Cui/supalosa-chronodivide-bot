@@ -6,9 +6,10 @@ registration price, and presenter instructions immediately before submission.
 ## Decision
 
 **Operational primary target: ICAART 2027, first-round regular paper, subject
-to the four written rulings below.** Its public policy permits the recorded
-AI-assisted writing and code work with disclosure, and its site explicitly
-documents an exceptional live-online presentation route. Those two facts make
+to the four written rulings below.** Its public policy permits writing and
+revision assistance, expressly subjects AI-generated code to disclosure, and
+its site explicitly documents an exceptional live-online presentation route.
+Those facts make
 it the safest current match to the author's no-travel requirement and the
 project's actual provenance. Its broader Agents area is a weaker topical fit
 than SCAG, but calibration against recent accepted ICAART papers supports a
@@ -100,15 +101,16 @@ Likely reviewer concerns and the required answers are:
 ICAART covers agents, simulation, evolutionary computing, planning, and
 learning. It is a broader and weaker topical fit than SCAG, but its official
 site gives specific live-online oral and poster instructions. Its generative-AI
-policy explicitly permits responsible assistance with writing, revision, and
-code when the tool and affected content are disclosed and the human authors
-remain accountable. This is materially safer than relying on an unresolved
-interpretation of the EvoStar code.
+policy explicitly permits responsible writing and revision, includes
+AI-generated code in the disclosure rule, and keeps human authors accountable.
+The actual implementation and orchestration history still needs a
+project-specific ruling. This is materially safer than relying on an unresolved
+interpretation of the EvoStar code, but it is not blanket clearance.
 
 - First regular-paper deadline: **2026-09-15**.
 - Second position/regular-paper deadline: **2026-10-22**.
 - Workshop and special-session paper deadline: **2026-12-03**.
-- Conference: **2027-02-23 through 2027-02-26**.
+- Conference: **2027-02-23 through 2027-02-25**, Valletta, Malta.
 - Format: SCITEPRESS two-column A4 template. A regular paper may be accepted as
   a 12-page full paper or an 8-page short paper. Review submissions must contain
   10,000--50,000 non-whitespace characters, and the template requires a
@@ -125,6 +127,11 @@ interpretation of the EvoStar code.
   acknowledgments and a citation to the AI system in affected sections, while
   the same double-blind instructions require acknowledgments to be omitted.
   Obtain the secretariat's exact review-version placement instruction.
+- Under-review AI confidentiality: the public AI-tools rule prohibits
+  processing a manuscript under review through a public AI platform. Archive
+  the final candidate at initial upload and keep the manuscript, confidential
+  reviews, and rebuttal drafts out of public generative-AI services until the
+  official selection result.
 - Repository ambiguity: the submitted PDF is not publicly posted, but the
   public rules do not say how a previously public named implementation
   repository affects anonymity or whether it must be private during review.
@@ -137,8 +144,8 @@ interpretation of the EvoStar code.
   artifact as release material rather than implying reviewer access.
 - Official pages: [call and dates](https://icaart.scitevents.org/CallForPapers.aspx?y=2027),
   [paper-length definitions](https://icaart.scitevents.org/Glossary.aspx),
-  [online presentation instructions](https://icaart.scitevents.org/presentationdetails.aspx),
-  [generative-AI policy](https://icaart.scitevents.org/AiTools.aspx),
+  [online presentation instructions](https://icaart.scitevents.org/presentationdetails.aspx?y=2027),
+  [generative-AI policy](https://icaart.scitevents.org/AiTools.aspx?y=2027),
   [templates](https://icaart.scitevents.org/Templates.aspx), and
   [registration fees](https://icaart.scitevents.org/RegistrationFees.aspx?y=2027).
 

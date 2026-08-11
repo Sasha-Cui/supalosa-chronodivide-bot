@@ -160,7 +160,7 @@ one venue-ruling-template test, one external-review-response-template test,
 and one substantive-citation-audit test (31 tests total). They regenerated all paper
 fragments without byte drift.
 
-The final repository-wide verification runs all 135 tests: 111 research tests,
+The final repository-wide verification runs all 136 tests: 112 research tests,
 10 paper tests, 12 SCITEPRESS tests, and two artifact tests.
 
 The deterministic anonymous review archive has SHA-256

@@ -191,9 +191,11 @@ defines the unprimed/targeted sequence, and
 for locking the response, scoring comprehension, and separating feasible
 presentation repairs from requests for post-hoc evidence.
 
-ICAART 2027 is now the operational primary candidate: its official
-guidance permits disclosed AI-assisted writing, revision, and code; its
-presenter page documents live online talks; and its first regular-paper
+ICAART 2027 is now the operational primary candidate: its official guidance
+permits disclosed writing and revision assistance and expressly covers
+AI-generated code in the disclosure rule, while project-specific implementation
+eligibility still needs a written ruling; its presenter page documents live
+online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS submission format that reuses the frozen main-paper sections and result
 macros. The current candidate is 11 A4 pages with a 193-word expanded abstract and 38,261 extracted
