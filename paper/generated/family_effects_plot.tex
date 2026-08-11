@@ -1,0 +1,23 @@
+
+\begin{tikzpicture}
+\begin{axis}[
+  width=\linewidth,
+  height=6.2cm,
+  xmin=-0.04, xmax=0.90,
+  ymin=0.4, ymax=16.6,
+  xtick={0,0.2,0.4,0.6,0.8},
+  ytick={1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16},
+  yticklabels={F01,F02,F03,F04,F05,F06,F07,F08,F09,F10,F11,F12,F13,F14,F15,F16},
+  xlabel={Champion $-$ default score},
+  axis line style={draw=ChronoInk},
+  tick label style={text=ChronoInk,font=\scriptsize},
+  label style={text=ChronoInk,font=\small},
+  grid=major,
+  grid style={draw=ChronoGrid},
+  clip=false
+]
+\addplot[draw=ChronoInk,dashed,line width=0.7pt] coordinates {(0,0.4) (0,16.6)};
+\addplot[only marks,mark=*,mark size=2.2pt,draw=ChronoBlue,fill=ChronoBlue]
+  coordinates {(0.00000000,1) (0.00000000,2) (0.12500000,3) (0.18750000,4) (0.21875000,5) (0.21875000,6) (0.25000000,7) (0.28125000,8) (0.31250000,9) (0.37500000,10) (0.43750000,11) (0.43750000,12) (0.46875000,13) (0.59375000,14) (0.62500000,15) (0.84375000,16)};
+\end{axis}
+\end{tikzpicture}

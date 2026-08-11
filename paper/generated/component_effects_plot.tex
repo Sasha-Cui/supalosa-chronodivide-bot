@@ -1,0 +1,22 @@
+
+\begin{tikzpicture}
+\begin{axis}[
+  width=\linewidth,
+  height=5.2cm,
+  xmin=-0.15, xmax=0.72,
+  ymin=0.4, ymax=5.6,
+  xtick={-0.1,0,0.1,0.3,0.5,0.7},
+  ytick={1,2,3,4,5},
+  yticklabels={{Defense growth},{Emergency defense},{Forced attack},{Scouting},{Infantry + rush}},
+  xlabel={Champion $-$ one-group revert score},
+  axis line style={draw=ChronoInk},
+  tick label style={text=ChronoInk,font=\scriptsize},
+  label style={text=ChronoInk,font=\small},
+  grid=major,
+  grid style={draw=ChronoGrid},
+  clip=false
+]
+\addplot[draw=ChronoInk,dashed,line width=0.7pt] coordinates {(0,0.4) (0,5.6)};
+\draw[ChronoBlue,line width=1.1pt] (axis cs:-0.08997983,1.12) -- (axis cs:0.01497983,1.12); \addplot[only marks,mark=*,mark size=1.8pt,draw=ChronoBlue,fill=ChronoBlue] coordinates {(-0.03750000,1.12)}; \draw[ChronoOrange,line width=1.1pt] (axis cs:-0.11289299,0.88) -- (axis cs:0.03789299,0.88); \addplot[only marks,mark=square*,mark size=1.7pt,draw=ChronoOrange,fill=ChronoOrange] coordinates {(-0.03750000,0.88)}; \draw[ChronoBlue,line width=1.1pt] (axis cs:-0.04727743,2.12) -- (axis cs:0.05977743,2.12); \addplot[only marks,mark=*,mark size=1.8pt,draw=ChronoBlue,fill=ChronoBlue] coordinates {(0.00625000,2.12)}; \draw[ChronoOrange,line width=1.1pt] (axis cs:-0.07064799,1.88) -- (axis cs:0.08314799,1.88); \addplot[only marks,mark=square*,mark size=1.7pt,draw=ChronoOrange,fill=ChronoOrange] coordinates {(0.00625000,1.88)}; \draw[ChronoBlue,line width=1.1pt] (axis cs:-0.05867609,3.12) -- (axis cs:0.03367609,3.12); \addplot[only marks,mark=*,mark size=1.8pt,draw=ChronoBlue,fill=ChronoBlue] coordinates {(-0.01250000,3.12)}; \draw[ChronoOrange,line width=1.1pt] (axis cs:-0.07883699,2.88) -- (axis cs:0.05383699,2.88); \addplot[only marks,mark=square*,mark size=1.7pt,draw=ChronoOrange,fill=ChronoOrange] coordinates {(-0.01250000,2.88)}; \addplot[only marks,mark=diamond*,mark size=2pt,draw=ChronoMuted,fill=ChronoMuted] coordinates {(0.00000000,4)}; \draw[ChronoBlue,line width=1.1pt] (axis cs:0.09556151,5.12) -- (axis cs:0.56693849,5.12); \addplot[only marks,mark=*,mark size=1.8pt,draw=ChronoBlue,fill=ChronoBlue] coordinates {(0.33125000,5.12)}; \draw[ChronoOrange,line width=1.1pt] (axis cs:-0.00734223,4.88) -- (axis cs:0.66984223,4.88); \addplot[only marks,mark=square*,mark size=1.7pt,draw=ChronoOrange,fill=ChronoOrange] coordinates {(0.33125000,4.88)};
+\end{axis}
+\end{tikzpicture}
