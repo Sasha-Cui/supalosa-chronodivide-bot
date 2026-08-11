@@ -9,15 +9,17 @@ targets, static defense, all-in behavior, forced attacks, and emergency
 defense. Each field has a finite declared choice set. The interface disables
 default map profiles, exact-map tactics, coordinate routes, placement anchors,
 orientation gates, and map signatures. A policy is one canonical JSON object
-whose SHA-256 is its identity. Thus deployment receives game state but no
-family ID or map-specific configuration.
+whose SHA-256 is its identity. Thus every search candidate receives game state
+but no family ID or map-specific configuration. This shared coordinate-free
+envelope defines the comparison. The fork's deployed default is not admissible
+because its built-in profiles and exact-map tactics encode map identity; no
+result estimates performance relative to that policy.
 
 Each of five run indices deterministically creates 32 distinct policies.
-Candidate 0 is a frozen generic reference (labeled \texttt{default} in the
-immutable artifacts), not the fork's map-profile-enabled deployed default.
-Candidates 1--8 anchor each
-non-default attack composition; candidates 9--17 anchor each non-default
-strategic plan. Every non-default candidate receives 6--14 additional
+Candidate 0 is the prospectively frozen generic reference (labeled
+\texttt{default} in the immutable artifacts). Candidates 1--8 anchor each
+alternative attack composition; candidates 9--17 anchor each alternative
+strategic plan. Every non-reference candidate receives 6--14 additional
 hash-ranked mutations over the declared fields. Generation reads no gameplay
 outcome and fails on a duplicate policy hash.
 

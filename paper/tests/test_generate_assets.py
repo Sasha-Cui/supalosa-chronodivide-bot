@@ -149,8 +149,13 @@ class GeneratePaperAssetsTest(unittest.TestCase):
             with self.subTest(section=name):
                 self.assertIn("reference", sections[name].lower())
         self.assertIn(
-            "not the fork's map-profile-enabled deployed default",
-            sections["protocol"],
+            "deployed default is not admissible",
+            sections["protocol"].lower(),
+        )
+        self.assertIn("Comparator boundary", sections["reproducibility"])
+        self.assertIn(
+            "does not estimate improvement over the deployed policy",
+            sections["reproducibility"],
         )
 
     def test_review_sources_remain_anonymous(self) -> None:
