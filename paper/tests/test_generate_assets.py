@@ -144,6 +144,7 @@ class GeneratePaperAssetsTest(unittest.TestCase):
         manuscript = "\n".join(sections.values()).lower()
         self.assertNotIn("shipped default", manuscript)
         self.assertNotIn("shipped strongbot default", manuscript)
+        self.assertNotIn("candidate is the default", manuscript)
         for name in ("abstract", "introduction", "results", "conclusion"):
             with self.subTest(section=name):
                 self.assertIn("reference", sections[name].lower())
