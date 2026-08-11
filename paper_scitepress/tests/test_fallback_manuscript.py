@@ -63,6 +63,21 @@ class FallbackManuscriptTest(unittest.TestCase):
         self.assertIn(r"\ImprovementEstimate{}", text)
         self.assertIn(r"\ChampionAbsoluteLower{}", text)
 
+    def test_keywords_target_game_agent_reviewers(self) -> None:
+        source = (FALLBACK / "main.tex").read_text()
+        match = re.search(r"\\keywords\{([^}]*)\}", source, re.DOTALL)
+        self.assertIsNotNone(match)
+        keywords = " ".join(match.group(1).split()).lower()
+        for required in (
+            "game artificial intelligence",
+            "real-time strategy games",
+            "scripted agents",
+            "algorithm configuration",
+            "reproducible evaluation",
+        ):
+            self.assertIn(required, keywords)
+        self.assertNotIn("distribution shift", keywords)
+
     def test_vendor_files_match_the_official_archive(self) -> None:
         manifest = [
             line
