@@ -28,6 +28,7 @@ export type ResearchPurpose =
     | "development-v2-qc"
     | "development-v2-evaluation"
     | "mechanism-ablation"
+    | "component-ablation"
     | "confirmatory-evaluation";
 
 export type ResearchPlanPolicy = {
@@ -99,12 +100,23 @@ const DEVELOPMENT_PURPOSES: ResearchPurpose[] = [
     "development-v2-qc",
     "development-v2-evaluation",
     "mechanism-ablation",
+    "component-ablation",
 ];
 const TEST_PURPOSES: ResearchPurpose[] = ["confirmatory-evaluation"];
 
 const developmentMethodIds = (purpose: ResearchPurpose): readonly string[] => {
     if (purpose === "mechanism-ablation") {
         return ["champion", "local0", "local1", "local2", "local3", "local4"];
+    }
+    if (purpose === "component-ablation") {
+        return [
+            "champion",
+            "revertDefenseGrowth",
+            "revertEmergencyDefense",
+            "revertForceAttack",
+            "revertScouting",
+            "revertStrategy",
+        ];
     }
     return purpose === "development-v2-qc" ||
         purpose === "development-v2-evaluation" ||

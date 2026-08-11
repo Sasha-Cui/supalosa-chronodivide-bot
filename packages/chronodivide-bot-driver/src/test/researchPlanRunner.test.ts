@@ -129,6 +129,37 @@ const validMechanismAblationPlan = (): Record<string, unknown> => {
     };
 };
 
+const validComponentAblationPlan = (): Record<string, unknown> => {
+    const plan = validDevelopmentV2Plan();
+    const policyIds = [firstPolicyId, secondPolicyId];
+    const policies = [
+        { policyId: firstPolicyId, policy: firstPolicy },
+        { policyId: secondPolicyId, policy: secondPolicy },
+    ];
+    const methods = [
+        "champion",
+        "revertDefenseGrowth",
+        "revertEmergencyDefense",
+        "revertForceAttack",
+        "revertScouting",
+        "revertStrategy",
+    ];
+    return {
+        ...plan,
+        purpose: "component-ablation",
+        policies,
+        episodes: methods.flatMap((methodId, methodIndex) => [0, 1].map((candidateSlot) => ({
+            episodeId: `${methodId}-slot-${candidateSlot}`,
+            familyId: "mf_alpha",
+            methodId,
+            policyId: policyIds[methodIndex % policyIds.length],
+            seedBlockIndex: 7,
+            requestedEngineSeed: ENGINE_SEED_BASE + 7,
+            candidateSlot,
+        }))),
+    };
+};
+
 const temporaryDirectories: string[] = [];
 
 afterEach(() => {
@@ -195,6 +226,23 @@ describe("strict research run plan", () => {
             ({ methodId }) => methodId !== "local4",
         );
         expect(() => parseResearchRunPlan(incomplete)).toThrow(/exactly champion and local0 and local1/);
+    });
+
+    test("accepts only the six fixed post-confirmatory component methods", () => {
+        const plan = parseResearchRunPlan(validComponentAblationPlan());
+        expect(new Set(plan.episodes.map(({ methodId }) => methodId))).toEqual(new Set([
+            "champion",
+            "revertDefenseGrowth",
+            "revertEmergencyDefense",
+            "revertForceAttack",
+            "revertScouting",
+            "revertStrategy",
+        ]));
+        const incomplete = validComponentAblationPlan();
+        incomplete.episodes = (incomplete.episodes as Array<Record<string, unknown>>).filter(
+            ({ methodId }) => methodId !== "revertStrategy",
+        );
+        expect(() => parseResearchRunPlan(incomplete)).toThrow(/exactly champion and revertDefenseGrowth/);
     });
 
     test("keeps sealed test execution behind the separate confirmatory access mode", () => {
