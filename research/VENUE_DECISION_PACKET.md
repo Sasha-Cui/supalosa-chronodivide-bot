@@ -13,9 +13,9 @@ send email, authorize submission, or replace a written venue ruling.
 | First deadline | 2026-11-01 | 2026-09-15 AoE |
 | Current paper | 14-page LNCS body plus references | 10-page SCITEPRESS A4 paper |
 | Current PDF hash | `7dac69efb0410517a2131cc300e5bedf3e536c771e2de940f959dc0380ebc095` | `724b2e29e2392b529ea24204d902722622b13de25cdba96c6ec9677abf997bca` |
-| Remote presentation | Conference says hybrid; remote-presenter election is not explicit | Live online oral/poster procedures are explicit; election still needs confirmation |
+| Remote presentation | Conference says hybrid; remote-presenter election is not explicit | Home page permits exceptional remote presentation when travel is impossible; procedure and fee class need confirmation |
 | AI policy | Eligibility unresolved because assistance exceeded copy editing | Assistance is permitted with disclosure; blind-review placement is unresolved |
-| Double-blind risk | Prior named public repository requires a ruling | Public submitted-paper posting is prohibited during review; repository handling should still be confirmed if asked |
+| Double-blind risk | Prior named public repository requires a ruling | Submitted-paper posting is prohibited; named code-repository handling is unspecified and requires a ruling |
 
 Neither venue is currently cleared for upload. The remaining uncertainty is
 governance, not manuscript or experiment completion.
@@ -33,9 +33,10 @@ Send the two factual inquiries in `CONTACT_TEMPLATES.md` now:
 1. SCAG chairs and EvoApplications programme chairs: request one written reply
    covering scope, fully remote presentation, prior public repository exposure,
    and eligibility/disclosure for the recorded Codex assistance.
-2. ICAART secretariat: request written confirmation that a regular-paper author
-   may elect the live online route and exact instructions for AI disclosure in
-   the double-blind version.
+2. ICAART secretariat: request the exceptional remote-route procedure and fee
+   class, a ruling on the named public code repository, and exact instructions
+   for AI disclosure in the double-blind version. The public evidence and
+   remaining ambiguities are in `ICAART_POLICY_RECONCILIATION.md`.
 
 Do not describe the AI work as copy editing. Do not send both manuscripts as
 submissions, and do not make either PDF public during review. An anonymous PDF
@@ -65,8 +66,8 @@ project's exact circumstances.
   workable written rulings by **2026-08-20**. It remains the stronger topical
   fit.
 - **Choose ICAART's September 15 regular round** if SCAG remains unresolved and
-  ICAART confirms both remote election and disclosure placement by
-  **2026-08-25**.
+  ICAART confirms remote eligibility/procedure, repository handling, and
+  disclosure placement by **2026-08-25**.
 - Make the one-venue decision by **2026-09-01**. If ICAART is chosen, insert the
   approved disclosure, perform the human verification and cold read, and
   refreeze by **2026-09-08**, leaving one week for PRIMORIS upload checks.

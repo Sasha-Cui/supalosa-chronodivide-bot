@@ -71,7 +71,7 @@ copy editing.
 
 ## ICAART secretariat
 
-**Subject:** ICAART 2027: online presentation and double-blind AI disclosure
+**Subject:** ICAART 2027: remote procedure, repository anonymity, and AI disclosure
 
 Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 
@@ -80,13 +80,22 @@ Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 > I am considering a 2027 regular-paper submission on reproducible
 > configuration and held-out evaluation of a scripted real-time-strategy
 > agent. I have prepared an anonymous 10-page version in the official
-> SCITEPRESS template. Before submitting it, could you please clarify two
+> SCITEPRESS template. Before submitting it, could you please clarify three
 > points?
 >
-> 1. The presenter instructions describe live online oral and poster
->    presentations over Zoom. May an author elect this online route for an
->    accepted regular paper without traveling to the physical venue?
-> 2. The ICAART AI-tools policy permits disclosed assistance with manuscript
+> 1. The ICAART home page says speakers who are unable to travel may
+>    exceptionally present remotely, and the presenter page documents live
+>    Zoom oral and poster sessions. I need to present without traveling. Would
+>    this qualify for the exceptional remote route? If so, what procedure should
+>    I follow, when is it confirmed, and which speaker registration category and
+>    fee apply?
+> 2. The anonymous paper has not been posted publicly, but the author-developed
+>    implementation and research records have previously been visible in a
+>    named public GitHub repository. Does that code repository conflict with
+>    ICAART's double-blind policy? If it must be private during review, please
+>    confirm the required timing and whether its prior visibility affects
+>    eligibility.
+> 3. The ICAART AI-tools policy permits disclosed assistance with manuscript
 >    writing, revision, and code. OpenAI Codex assisted this project with
 >    software implementation, experiment orchestration, research auditing,
 >    statistical cross-checks, literature triage, and manuscript drafting and
@@ -94,9 +103,11 @@ Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 >    code, and final manuscript and remain fully accountable. The 2027
 >    guidelines require AI-generated text to be disclosed in acknowledgments
 >    and say that affected sections should cite the AI system, but the same
->    double-blind instructions require authors to omit acknowledgments. Where
->    should the disclosure and any system citation appear in the review
->    version, and what exact wording or citation form do you require?
+>    double-blind instructions require authors to omit acknowledgments. Would
+>    an identity-neutral “Generative-AI Assistance Disclosure” section before
+>    the references be acceptable in the review version? Please specify the
+>    required placement, wording, and citation form, including whether a single
+>    disclosure may identify all affected sections.
 >
 > The paper reports a completed 8,704-game study with family-disjoint training
 > and evaluation. Its configured policy improves a prospectively frozen generic
@@ -109,9 +120,11 @@ Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
 > Best regards,
 > [author name]
 
-Retain the answer with the submission record. The public AI policy establishes
-that disclosed assistance is allowed in principle, but the disclosure location
-and availability of the online route still require confirmation.
+Retain the answer with the submission record. Public guidance already
+establishes exceptional remote support for speakers unable to travel and allows
+disclosed AI assistance in principle. The unresolved items are the remote
+procedure/registration class, named-repository handling, and blind-review
+disclosure implementation; see `ICAART_POLICY_RECONCILIATION.md`.
 
 ## Supalosa
 

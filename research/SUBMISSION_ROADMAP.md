@@ -15,8 +15,10 @@ on the opened family population.
   beyond-copy-editing use of OpenAI Codex. Do not submit under a grammar-only
   description.
 - Send the ICAART inquiry in `CONTACT_TEMPLATES.md` in parallel so that the
-  online-presentation route and double-blind disclosure location are known
-  before the validated fallback is activated for submission.
+  exceptional remote-route procedure and fee class, named-repository handling,
+  and double-blind disclosure location are known before the validated fallback
+  is activated for submission. The public-policy boundary is in
+  `ICAART_POLICY_RECONCILIATION.md`.
 - Begin the human verification checklist in
   [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md), including
   primary evidence, all citations, experiment-affecting code, and the complete
@@ -40,9 +42,11 @@ preparation is not simultaneous submission.
 ## 18--31 August 2026: independent reading pass
 
 - Give the PDF, not the repository, to one technically literate reader using
-  the neutral prompts in [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md).
-- Ask the reader to summarize the claim, method-v1/method-v2 sequence, and why
-  0.535 does not establish reliable superiority.
+  Phase A of [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md); do not
+  reveal the targeted comprehension questions.
+- Lock the unprimed venue-style review before sending Phase B, which asks the
+  reader to explain the claim, method-v1/method-v2 sequence, and why 0.535 does
+  not establish reliable superiority.
 - Repair any point the reader cannot explain correctly after one reading.
 - Ask a second reader to check only figures, tables, captions, and limitations.
 - Rebuild and repeat page, citation, anonymity, and visual QA after edits.

@@ -30,6 +30,7 @@ family-disjoint evaluation and configuration of a generic scripted RTS policy.
    generative-AI use boundary, author-verification requirements, and venue
    eligibility gate.
 11. [`VENUE_DECISION_PACKET.md`](VENUE_DECISION_PACKET.md),
+   [`ICAART_POLICY_RECONCILIATION.md`](ICAART_POLICY_RECONCILIATION.md),
    [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md),
    [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md), and
    [`SUBMISSION_ROADMAP.md`](SUBMISSION_ROADMAP.md) — send-ready external
@@ -77,6 +78,7 @@ separately versioned prospective experiment.
 | Environment contract | [`ENVIRONMENT.md`](ENVIRONMENT.md) |
 | Venue fit and deadlines | [`VENUE_STRATEGY.md`](VENUE_STRATEGY.md) |
 | Venue decision handoff | [`VENUE_DECISION_PACKET.md`](VENUE_DECISION_PACKET.md) |
+| ICAART public-policy reconciliation | [`ICAART_POLICY_RECONCILIATION.md`](ICAART_POLICY_RECONCILIATION.md) |
 | Accepted-paper venue calibration | [`SCAG_ACCEPTED_PAPER_CALIBRATION.md`](SCAG_ACCEPTED_PAPER_CALIBRATION.md) |
 | Manuscript QA | [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md) |
 | SCITEPRESS fallback QA | [`SCITEPRESS_QA.md`](SCITEPRESS_QA.md) |

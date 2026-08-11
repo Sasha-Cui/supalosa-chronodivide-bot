@@ -11,10 +11,16 @@ the anonymous branch during review.
 - [ ] Exactly one archival target is selected by 2026-09-01.
 - [ ] If SCAG is selected, its chairs confirm the application/evaluation
       contribution is in scope.
-- [ ] The selected venue confirms fully remote presentation is permitted.
+- [ ] If ICAART is selected, the secretariat confirms the author qualifies and
+      provides the procedure, confirmation timing, and speaker fee class for
+      its publicly documented exceptional remote route.
+- [ ] If SCAG is selected, its chairs confirm fully remote presentation is
+      permitted.
 - [ ] If SCAG is selected, its chairs rule on the previously public named
       repository under double-blind
       review.
+- [ ] If ICAART is selected, the secretariat rules on the previously public
+      named implementation repository and any required visibility change.
 - [ ] The selected venue rules on the recorded beyond-copy-editing use of
       OpenAI Codex and specifies any required disclosure and citation.
 - [x] Anonymous supplement and reviewer artifact together fit the official
@@ -64,8 +70,10 @@ commit and all three hashes together; never mix files from different freezes.
 - [x] The PDF keywords are exactly **Game Artificial Intelligence**,
       **Real-time Strategy Games**, **Scripted Agents**, **Algorithm
       Configuration**, and **Reproducible Evaluation**.
-- [ ] ICAART confirms that the presenting author may elect the documented live
-      online route without physical attendance.
+- [ ] ICAART confirms author eligibility, request procedure, and fee class for
+      the documented exceptional live-online route.
+- [ ] ICAART specifies whether the named code repository must be private during
+      review and whether prior public visibility affects eligibility.
 - [ ] ICAART specifies where the required AI acknowledgment and affected-
       section system citation belong in the double-blind review version.
 - [ ] If ICAART is selected, apply only the approved disclosure and

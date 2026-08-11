@@ -104,21 +104,29 @@ interpretation of the EvoStar code.
   70--200-word abstract.
 - Early speaker registration: **EUR 620** for members or **EUR 680** for
   nonmembers at the currently posted rates.
-- Remote status: the official presenter page gives complete live Zoom
-  instructions for online oral and poster presentations and requires the
-  presenter to attend synchronously even when a backup video is uploaded. Ask
-  the secretariat to confirm that this route is available to the paper before
-  paying.
+- Remote status: the home page explicitly permits exceptional remote
+  presentation for speakers unable to travel. The presenter page gives complete
+  live Zoom instructions and requires synchronous attendance even with a backup
+  video. The registration table has no online-speaker row, so ask only for the
+  author's eligibility, exception procedure, confirmation timing, and
+  applicable fee class before paying.
 - AI-disclosure ambiguity: the guidelines require disclosure in the
   acknowledgments and a citation to the AI system in affected sections, while
   the same double-blind instructions require acknowledgments to be omitted.
   Obtain the secretariat's exact review-version placement instruction.
+- Repository ambiguity: the submitted PDF is not publicly posted, but the
+  public rules do not say how a previously public named implementation
+  repository affects anonymity or whether it must be private during review.
+  Obtain a written ruling before changing its visibility.
 - Official pages: [call and dates](https://icaart.scitevents.org/CallForPapers.aspx?y=2027),
   [paper-length definitions](https://icaart.scitevents.org/Glossary.aspx),
   [online presentation instructions](https://icaart.scitevents.org/presentationdetails.aspx),
   [generative-AI policy](https://icaart.scitevents.org/AiTools.aspx),
   [templates](https://icaart.scitevents.org/Templates.aspx), and
   [registration fees](https://icaart.scitevents.org/RegistrationFees.aspx?y=2027).
+
+The public-policy evidence and exact remaining questions are frozen in
+`ICAART_POLICY_RECONCILIATION.md`.
 
 The SCITEPRESS conversion was completed prospectively on 2026-08-11 without
 changing the frozen science. It is 10 A4 pages, has a 197-word abstract and

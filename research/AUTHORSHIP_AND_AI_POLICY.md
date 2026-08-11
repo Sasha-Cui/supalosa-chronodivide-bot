@@ -33,7 +33,9 @@ accountable. The 2027 guidelines also say that affected sections should cite
 the AI system. The same double-blind call asks authors to omit acknowledgments,
 so the secretariat must specify where both the disclosure and system citation
 belong in the review version. The factual inquiry is in
-[`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md).
+[`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md), and the conflicting public
+instructions are reconciled in
+[`ICAART_POLICY_RECONCILIATION.md`](ICAART_POLICY_RECONCILIATION.md).
 
 ## Required author verification
 
@@ -73,9 +75,10 @@ required.
   allows transparent declared assistance.
 - If no ruling arrives, treat eligibility as unresolved and use a verified
   fallback rather than gambling on silent noncompliance.
-- For ICAART, obtain a written instruction for the disclosure location and
-  retain it with the final manuscript hash. The permission is not a reason to
-  reduce the human verification requirement.
+- For ICAART, obtain a written instruction for the disclosure location,
+  wording, and system-citation form and retain it with the final manuscript
+  hash. Public permission is not a reason to reduce the human verification
+  requirement.
 
 ## Draft disclosure, if permitted
 

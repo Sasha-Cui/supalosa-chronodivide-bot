@@ -156,8 +156,12 @@ macros. It is 10 A4 pages with a 197-word abstract and 36,611 extracted
 non-whitespace characters; two clean builds match at SHA-256
 `724b2e29e2392b529ea24204d902722622b13de25cdba96c6ec9677abf997bca`,
 and every page passed visual and anonymity QA. It is not authorized for upload
-until ICAART confirms online-route election and double-blind AI-disclosure
-placement. A full-text comparison with three nearby accepted ICAART 2025--2026
+until ICAART confirms exceptional remote eligibility/procedure and double-blind
+AI-disclosure placement. The home page now establishes remote support for
+speakers unable to travel; the remaining remote question is procedural. Named
+code-repository handling also remains unresolved; see
+[`ICAART_POLICY_RECONCILIATION.md`](ICAART_POLICY_RECONCILIATION.md). A
+full-text comparison with three nearby accepted ICAART 2025--2026
 papers rates the current submission weak accept with meaningful reviewer
 variance: the empirical controls exceed that sample, while one-opponent breadth
 and contribution positioning remain the scientific risks. See
