@@ -92,7 +92,7 @@ and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.m
 
 ## Manuscript status and remaining work
 
-Commit `3f09836` is the current anonymous manuscript source revision. It
+Commit `297d8b3` is the current anonymous manuscript source revision. It
 sharpens the held-out-evaluation title, states two confirmatory research
 questions and one explicitly descriptive diagnostic question, removes causal-sounding
 mechanism language, and adds primary prior art on hidden-level evaluation and
@@ -108,19 +108,22 @@ map-profile-enabled constructor as outside that estimand, and states explicitly
 that the experiment does not estimate improvement over the deployed default.
 It also reports explicitly that the failed absolute gate fails the joint
 two-gate criterion, cites the exact pinned game-API package and opponent
-revision, and makes both LNCS PDFs byte-reproducible.
+revision, cites the recent ICAART MACO game-testbed paper, and uses standard
+compact author formatting to avoid an orphan bibliography page. Both LNCS PDFs
+remain byte-reproducible.
 The main
 PDF is 16 pages with main text ending on page 14 and references continuing
 afterward; the supplement is five pages. All reported tables and figures are
 generated from hash-pinned aggregate artifacts. The final build has no overfull boxes, undefined
-references, missing citations, or BibTeX warnings, and all 21 pages have
-received rendered visual checks. The current PDF SHA-256 values are recorded in
+references, missing citations, or BibTeX warnings. All 21 LNCS/supplement pages
+and all 10 fallback pages have received rendered visual checks. The current PDF SHA-256 values are recorded in
 [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md).
 
 Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
-and commit `7cdbe0d` hardens its direct-identity denylist. The current 65,548-byte
+commit `7cdbe0d` hardens its direct-identity denylist, and the current builder
+tests enforce the exact eight-input reviewer description. The current 65,475-byte
 review archive is byte-deterministic at SHA-256
-`f7b43e42826a6c6d2760f1ef87bedb3003bb61a484b424ea6f54c10b48a27b4b`.
+`fc1960a02216be892e2d9aca7f1b041571a7bef5c5cd6a8fe809f43875c52c0d`.
 Its 36-file manifest verifies, all artifact tests pass, and an extracted
 reviewer copy rebuilds the 16-page paper and five-page supplement without
 undefined references, overflow, or BibTeX warnings.
@@ -149,9 +152,9 @@ guidance permits disclosed AI-assisted writing, revision, and code; its
 presenter page documents live online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS fallback that reuses the frozen main-paper sections and result
-macros. It is 10 A4 pages with a 197-word abstract and 36,469 extracted
+macros. It is 10 A4 pages with a 197-word abstract and 36,427 extracted
 non-whitespace characters; two clean builds match at SHA-256
-`9c606c4c5bc92ce762422aa79be79f14ab34e7b4bbe2616ae5f3cef3ff3c3082`,
+`7cb677ae5d4ef03b51445fe42c3992bcddbb7a9aea8e22447a1809b100313239`,
 and every page passed visual and anonymity QA. It is not authorized for upload
 until ICAART confirms online-route election and double-blind AI-disclosure
 placement. A full-text comparison with three nearby accepted ICAART 2025--2026

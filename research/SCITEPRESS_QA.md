@@ -5,14 +5,14 @@ Prepared: **2026-08-11**
 ## Frozen fallback identity
 
 - Fallback introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
-- Current reviewed source: `3f09836947c9c9fd1c0b26bfc1091eac18580957`
-- Authoritative shared manuscript source: `3f09836947c9c9fd1c0b26bfc1091eac18580957`
+- Current reviewed source: `297d8b3f02acb76f2335869ebd2bfb4bf5f06f5a`
+- Authoritative shared manuscript source: `297d8b3f02acb76f2335869ebd2bfb4bf5f06f5a`
 - Build entry point: `paper_scitepress/main.tex`
 - Target: ICAART 2027 regular paper, anonymous SCITEPRESS review format
-- PDF: 10 A4 pages, 164,424 bytes
-- PDF SHA-256: `9c606c4c5bc92ce762422aa79be79f14ab34e7b4bbe2616ae5f3cef3ff3c3082`
+- PDF: 10 A4 pages, 164,381 bytes
+- PDF SHA-256: `7cb677ae5d4ef03b51445fe42c3992bcddbb7a9aea8e22447a1809b100313239`
 - Abstract: 197 words
-- Extracted submission length: 36,469 non-whitespace characters
+- Extracted submission length: 36,427 non-whitespace characters
 
 The PDF is a build product and is not committed. The hash identifies the exact
 file rendered and inspected in this QA pass.
@@ -48,7 +48,7 @@ PDF hash above. The fixed `SOURCE_DATE_EPOCH` is a stable reproducibility
 constant established at the earlier comparator-justified freeze; the current
 reviewed source identity is recorded above.
 
-The extracted PDF contains 36,469 non-whitespace characters, within ICAART's
+The extracted PDF contains 36,427 non-whitespace characters, within ICAART's
 10,000--50,000 review-submission interval. Its 197-word abstract is within the
 official 70--200-word interval. The page is A4 and the current 10-page build is
 below the 12-page full-paper proceedings limit.
@@ -58,6 +58,9 @@ below the 12-page full-paper proceedings limit.
 All ten pages were rendered with Poppler and inspected at full resolution.
 The explicit joint-gate wording and pinned-source citation revision received a
 further complete ten-page pass.
+The final venue-local MACO citation and compact StarCraft II author formatting
+received another complete ten-page pass as part of a 31-page cross-format
+inspection.
 The study-flow diagram was widened to two columns after the first pass; the
 final pass found no clipped or overlapping text, invisible content, broken
 glyph, unreadable plot label, margin violation, misleading caption, or malformed

@@ -4,13 +4,13 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `3f09836947c9c9fd1c0b26bfc1091eac18580957`
+- Source commit: `297d8b3f02acb76f2335869ebd2bfb4bf5f06f5a`
 - Main source: `paper/main.tex`
 - Supplement source: `paper/supplement.tex`
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 16 pages total; non-reference content ends on page 14
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `e14f8265fb8b386fc2434927737eca15e5989be56cf141fba9f551b790e1aa05`
+- Main PDF SHA-256: `e37b536750b337533273425a67c8d1a0a330dfef6d992d17a0a2556a30b3984c`
 - Supplement PDF SHA-256: `f56e60797d24b08694e9fa2a8676e431f972f253f6c101747052af2303ceea98`
 
 The PDFs are build products and are not committed. Their hashes identify the
@@ -33,7 +33,7 @@ The final logs contain:
 - zero overfull boxes;
 - zero undefined or multiply defined references;
 - zero BibTeX warnings;
-- 26 citation keys, 26 bibliography entries, no missing keys, and no unused
+- 27 citation keys, 27 bibliography entries, no missing keys, and no unused
   entries; and
 - deterministic regenerated paper fragments whose input and output hashes are
   recorded in `paper/generated/asset_manifest.json` for all eight frozen
@@ -48,6 +48,10 @@ chapter page, verified game API 0.75.0 against the committed npm lock and
 installed package metadata, and resolved the full Supalosa opponent hash from
 the public upstream remote. The API and opponent citations now point to those
 exact pinned versions rather than only to moving project landing pages.
+The final venue-local addition was checked against the official ICAART 2026
+MACO paper and DOI `10.5220/0014358500004052`; the 25-author StarCraft II
+reference uses standard `et al.` formatting while retaining its identifier and
+DOI.
 
 ## Visual and content checks
 
@@ -73,6 +77,11 @@ bibliography links, and section transitions. The final source contains no
 author NetID, institution name, literal Slurm account, personal repository URL,
 or private absolute path.
 
+The final ICAART game-testbed citation and bibliography compaction received a
+fresh complete 31-page pass over the 16-page LNCS paper, five-page supplement,
+and 10-page SCITEPRESS fallback. The conclusion remains on LNCS page 14,
+references begin on page 15, and no orphan bibliography page remains.
+
 The claim audit confirmed that the paper:
 
 - leads with champion-versus-frozen-reference improvement, not absolute
@@ -90,18 +99,20 @@ The claim audit confirmed that the paper:
 
 ## Clean export and reviewer artifact
 
-A committed main revision at `3f09836` passed nine paper-generator and
+A committed main revision at `297d8b3` passed nine paper-generator and
 manuscript-invariant tests, two
 artifact-builder tests, and the three frozen family-exporter tests. It
 regenerated all paper fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
-`f7b43e42826a6c6d2760f1ef87bedb3003bb61a484b424ea6f54c10b48a27b4b`
-and size 65,548 bytes.
+`fc1960a02216be892e2d9aca7f1b041571a7bef5c5cd6a8fe809f43875c52c0d`
+and size 65,475 bytes.
 Two independent builds produced that same hash. The archive contains 36
 manifested files, normalized `0/0` ownership and epoch timestamps, no Git tree,
 no bot packages, and no direct author, scheduler-account, institution, or
-private-path token. An extracted copy passed its manifest and generator tests
+private-path token. Its reviewer-facing README and third-party boundary report
+the exact eight sanitized JSON inputs, and regression tests enforce that count.
+An extracted copy passed its manifest and generator tests
 and compiled the expected 16-page paper and five-page supplement with no
 undefined references, overflow, or BibTeX warning; its only final-log warning
 was the same harmless `amsmath` accent notice.
