@@ -1,0 +1,3958 @@
+{
+  "analysisSourceGitCommit": "806f6857b7eb28802a4827dd71d2046d155db48e",
+  "analysisType": "post-outcome descriptive terminal-state decomposition",
+  "campaignIntegrity": {
+    "component": {
+      "allShardsCompleteAndTechnicallyClean": true,
+      "families": 10,
+      "games": 480,
+      "methods": [
+        "champion",
+        "revertDefenseGrowth",
+        "revertEmergencyDefense",
+        "revertForceAttack",
+        "revertScouting",
+        "revertStrategy"
+      ],
+      "purpose": "component-ablation",
+      "rawCompletionCommitmentSha256": "34ee0a7ac2f7f08a2edb2f849bcb3af1da582d022530989c272f515b8bdba055",
+      "shardPlansCommitmentSha256": "cd3f67701e041b5fd5260edf031e6bd4a309ef8feae6eaa57c9f1d4fc87e4532",
+      "shards": 40,
+      "sourceGitCommit": "4ada6ed1d260e77df5948226631630695022266e"
+    },
+    "confirmatory": {
+      "allShardsCompleteAndTechnicallyClean": true,
+      "families": 16,
+      "games": 512,
+      "methods": [
+        "champion",
+        "default"
+      ],
+      "purpose": "confirmatory-evaluation",
+      "rawCompletionCommitmentSha256": "edf2fbca7b4d77540d063a46bd2b9cdcaf1c6da5672ac2e23a33b462feee017e",
+      "shardPlansCommitmentSha256": "1065d1fa71ff4301c0e908f427ed1378d68086d448a73f1235c1b1c49f342ec9",
+      "shards": 128,
+      "sourceGitCommit": "698dc7601b61a80e091ce7b8ac2b9e681685bc69"
+    },
+    "mechanism": {
+      "allShardsCompleteAndTechnicallyClean": true,
+      "families": 10,
+      "games": 480,
+      "methods": [
+        "champion",
+        "local0",
+        "local1",
+        "local2",
+        "local3",
+        "local4"
+      ],
+      "purpose": "mechanism-ablation",
+      "rawCompletionCommitmentSha256": "7c4459cb2910623b6faaab197b8ad2c12d3ecb2543c790acf2fee0d7405981a2",
+      "shardPlansCommitmentSha256": "c82eae2e71b2f8eb960af12ce8c2706b0ef20b3b7f568dc3404b5ce6aa822bdc",
+      "shards": 40,
+      "sourceGitCommit": "29ced1d76c39acf63f73ba6951c6d537e4335a9f"
+    }
+  },
+  "component": {
+    "championMinusKeyReverts": {
+      "revertScouting": {
+        "drawCountDifference": 0,
+        "lossCountDifference": 0,
+        "outcomeTransitionCounts": {
+          "baseline": {
+            "baseline": 3,
+            "candidate": 0,
+            "draw": 0
+          },
+          "candidate": {
+            "baseline": 0,
+            "candidate": 19,
+            "draw": 0
+          },
+          "draw": {
+            "baseline": 0,
+            "candidate": 0,
+            "draw": 58
+          }
+        },
+        "outcomeTransitionDetails": {
+          "baselineToBaseline": {
+            "games": 3,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": 0.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 0.0,
+              "combatants": 0.0,
+              "conyards": 0.0,
+              "credits": 0.0,
+              "factories": 0.0,
+              "harvesters": 0.0,
+              "refineries": 0.0,
+              "units": 0.0
+            }
+          },
+          "candidateToCandidate": {
+            "games": 19,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": 0.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 0.0,
+              "combatants": 0.0,
+              "conyards": 0.0,
+              "credits": 0.0,
+              "factories": 0.0,
+              "harvesters": 0.0,
+              "refineries": 0.0,
+              "units": 0.0
+            }
+          },
+          "drawToDraw": {
+            "games": 58,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": 0.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 0.0,
+              "combatants": 0.0,
+              "conyards": 0.0,
+              "credits": 0.0,
+              "factories": 0.0,
+              "harvesters": 0.0,
+              "refineries": 0.0,
+              "units": 0.0
+            }
+          }
+        },
+        "pairedGames": 80,
+        "pairedScoreDifferenceCounts": {
+          "0": 80
+        },
+        "scoreDifference": 0.0,
+        "terminalCandidateMinusBaselineDifference": {
+          "buildings": 0.0,
+          "combatants": 0.0,
+          "conyards": 0.0,
+          "credits": 0.0,
+          "factories": 0.0,
+          "harvesters": 0.0,
+          "refineries": 0.0,
+          "units": 0.0
+        },
+        "tickCapDrawCountDifference": 0,
+        "winCountDifference": 0
+      },
+      "revertStrategy": {
+        "drawCountDifference": 31,
+        "lossCountDifference": -42,
+        "outcomeTransitionCounts": {
+          "baseline": {
+            "baseline": 2,
+            "candidate": 10,
+            "draw": 33
+          },
+          "candidate": {
+            "baseline": 0,
+            "candidate": 4,
+            "draw": 4
+          },
+          "draw": {
+            "baseline": 1,
+            "candidate": 5,
+            "draw": 21
+          }
+        },
+        "outcomeTransitionDetails": {
+          "baselineToBaseline": {
+            "games": 2,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": 3078.5,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -4.0,
+              "combatants": -7.5,
+              "conyards": 0.0,
+              "credits": -584.0,
+              "factories": 0.0,
+              "harvesters": 0.0,
+              "refineries": 0.0,
+              "units": -11.5
+            }
+          },
+          "baselineToCandidate": {
+            "games": 10,
+            "meanScoreDifference": 1.0,
+            "meanTickDifference": 5515.5,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 10.6,
+              "combatants": 73.0,
+              "conyards": 0.2,
+              "credits": -627.2,
+              "factories": 2.2,
+              "harvesters": 2.0,
+              "refineries": 2.0,
+              "units": 87.8
+            }
+          },
+          "baselineToDraw": {
+            "games": 33,
+            "meanScoreDifference": 0.5,
+            "meanTickDifference": 8443.39393939394,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 1.6363636363636365,
+              "combatants": 36.72727272727273,
+              "conyards": 0.18181818181818182,
+              "credits": -827.4545454545455,
+              "factories": 1.0,
+              "harvesters": 0.9393939393939394,
+              "refineries": 0.9696969696969697,
+              "units": 40.18181818181818
+            }
+          },
+          "candidateToCandidate": {
+            "games": 4,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": -1260.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -19.75,
+              "combatants": -62.5,
+              "conyards": -1.0,
+              "credits": -886.5,
+              "factories": -4.0,
+              "harvesters": -6.75,
+              "refineries": -4.75,
+              "units": -88.0
+            }
+          },
+          "candidateToDraw": {
+            "games": 4,
+            "meanScoreDifference": -0.5,
+            "meanTickDifference": 1324.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -24.0,
+              "combatants": -72.0,
+              "conyards": -0.5,
+              "credits": 3998.0,
+              "factories": -2.75,
+              "harvesters": -7.0,
+              "refineries": -4.0,
+              "units": -103.5
+            }
+          },
+          "drawToBaseline": {
+            "games": 1,
+            "meanScoreDifference": -0.5,
+            "meanTickDifference": -753.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -23.0,
+              "combatants": -11.0,
+              "conyards": -1.0,
+              "credits": -920.0,
+              "factories": -4.0,
+              "harvesters": -10.0,
+              "refineries": -5.0,
+              "units": -44.0
+            }
+          },
+          "drawToCandidate": {
+            "games": 5,
+            "meanScoreDifference": 0.5,
+            "meanTickDifference": -1631.8,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -1.6,
+              "combatants": -31.8,
+              "conyards": -0.4,
+              "credits": -7423.4,
+              "factories": -2.0,
+              "harvesters": -3.6,
+              "refineries": -1.8,
+              "units": -35.0
+            }
+          },
+          "drawToDraw": {
+            "games": 21,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": 0.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -11.047619047619047,
+              "combatants": 17.714285714285715,
+              "conyards": -0.7142857142857143,
+              "credits": -394.14285714285717,
+              "factories": -0.6666666666666666,
+              "harvesters": -4.571428571428571,
+              "refineries": -2.4761904761904763,
+              "units": 2.857142857142857
+            }
+          }
+        },
+        "pairedGames": 80,
+        "pairedScoreDifferenceCounts": {
+          "-0.5": 5,
+          "0": 27,
+          "0.5": 38,
+          "1": 10
+        },
+        "scoreDifference": 0.33125,
+        "terminalCandidateMinusBaselineDifference": {
+          "buildings": -3.575,
+          "combatants": 19.8875,
+          "conyards": -0.2,
+          "credits": -857.675,
+          "factories": 0.0,
+          "harvesters": -1.6,
+          "refineries": -0.6125,
+          "units": 15.7
+        },
+        "tickCapDrawCountDifference": 31,
+        "winCountDifference": 11
+      }
+    },
+    "championVersusRevertScoutingExactEndpointEquivalence": {
+      "allPairedGamesExactlyEquivalent": true,
+      "comparedFields": [
+        "mapName",
+        "mapSha256",
+        "requestedEngineSeed",
+        "botRandomSeed",
+        "candidateBotRandomSeed",
+        "baselineBotRandomSeed",
+        "engineSeedEpochMs",
+        "candidateSlot",
+        "candidateStart",
+        "baselineStart",
+        "maxTicks",
+        "ticks",
+        "finished",
+        "winner",
+        "candidateScore",
+        "candidateDefeated",
+        "baselineDefeated",
+        "candidate",
+        "baseline"
+      ],
+      "exactlyEquivalentGames": 80,
+      "fieldMismatchCounts": {},
+      "interpretationBoundary": "Endpoint equivalence does not prove identical within-game behavior; the preserved records contain no action or trajectory telemetry.",
+      "pairedGames": 80
+    },
+    "methods": {
+      "champion": {
+        "byOutcome": {
+          "baseline": {
+            "finishedGames": 3,
+            "games": 3,
+            "meanTicks": 16049.333333333334,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 9.333333333333334,
+                "combatants": 18.666666666666668,
+                "conyards": 1.0,
+                "credits": 0.0,
+                "factories": 1.6666666666666667,
+                "harvesters": 1.0,
+                "refineries": 1.0,
+                "units": 29.0
+              },
+              "candidateMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 17.333333333333332,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -9.333333333333334,
+                "combatants": -18.666666666666668,
+                "conyards": -1.0,
+                "credits": 17.333333333333332,
+                "factories": -1.6666666666666667,
+                "harvesters": -1.0,
+                "refineries": -1.0,
+                "units": -29.0
+              }
+            }
+          },
+          "candidate": {
+            "finishedGames": 19,
+            "games": 19,
+            "meanTicks": 13729.947368421053,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 374.2105263157895,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMean": {
+                "buildings": 5.947368421052632,
+                "combatants": 57.31578947368421,
+                "conyards": 0.0,
+                "credits": 707.421052631579,
+                "factories": 1.5263157894736843,
+                "harvesters": 2.6315789473684212,
+                "refineries": 1.2105263157894737,
+                "units": 67.10526315789474
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 5.947368421052632,
+                "combatants": 57.31578947368421,
+                "conyards": 0.0,
+                "credits": 333.2105263157895,
+                "factories": 1.5263157894736843,
+                "harvesters": 2.6315789473684212,
+                "refineries": 1.2105263157894737,
+                "units": 67.10526315789474
+              }
+            }
+          },
+          "draw": {
+            "finishedGames": 0,
+            "games": 58,
+            "meanTicks": 18000.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 9.379310344827585,
+                "combatants": 7.931034482758621,
+                "conyards": 0.7068965517241379,
+                "credits": 156.0,
+                "factories": 1.5517241379310345,
+                "harvesters": 0.9137931034482759,
+                "refineries": 0.8620689655172413,
+                "units": 18.396551724137932
+              },
+              "candidateMean": {
+                "buildings": 5.275862068965517,
+                "combatants": 26.29310344827586,
+                "conyards": 0.034482758620689655,
+                "credits": 501.3448275862069,
+                "factories": 1.293103448275862,
+                "harvesters": 1.293103448275862,
+                "refineries": 1.0344827586206897,
+                "units": 33.741379310344826
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -4.103448275862069,
+                "combatants": 18.362068965517242,
+                "conyards": -0.6724137931034483,
+                "credits": 345.3448275862069,
+                "factories": -0.25862068965517243,
+                "harvesters": 0.3793103448275862,
+                "refineries": 0.1724137931034483,
+                "units": 15.344827586206897
+              }
+            }
+          }
+        },
+        "draws": 58,
+        "finishedGames": 22,
+        "games": 80,
+        "losses": 3,
+        "meanTicks": 16912.7125,
+        "score": 0.6,
+        "terminal": {
+          "baselineMean": {
+            "buildings": 7.15,
+            "combatants": 6.45,
+            "conyards": 0.55,
+            "credits": 201.975,
+            "factories": 1.1875,
+            "harvesters": 0.7,
+            "refineries": 0.6625,
+            "units": 14.425
+          },
+          "candidateMean": {
+            "buildings": 5.2375,
+            "combatants": 32.675,
+            "conyards": 0.025,
+            "credits": 532.1375,
+            "factories": 1.3,
+            "harvesters": 1.5625,
+            "refineries": 1.0375,
+            "units": 40.4
+          },
+          "candidateMinusBaselineMean": {
+            "buildings": -1.9125,
+            "combatants": 26.225,
+            "conyards": -0.525,
+            "credits": 330.1625,
+            "factories": 0.1125,
+            "harvesters": 0.8625,
+            "refineries": 0.375,
+            "units": 25.975
+          }
+        },
+        "tickCapDraws": 58,
+        "wins": 19
+      },
+      "revertDefenseGrowth": {
+        "byOutcome": {
+          "baseline": {
+            "finishedGames": 2,
+            "games": 2,
+            "meanTicks": 16759.5,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 9.0,
+                "combatants": 16.5,
+                "conyards": 1.0,
+                "credits": 329.5,
+                "factories": 2.0,
+                "harvesters": 1.0,
+                "refineries": 1.0,
+                "units": 26.5
+              },
+              "candidateMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 3.5,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -9.0,
+                "combatants": -16.5,
+                "conyards": -1.0,
+                "credits": -326.0,
+                "factories": -2.0,
+                "harvesters": -1.0,
+                "refineries": -1.0,
+                "units": -26.5
+              }
+            }
+          },
+          "candidate": {
+            "finishedGames": 24,
+            "games": 24,
+            "meanTicks": 14115.083333333334,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 334.875,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMean": {
+                "buildings": 5.916666666666667,
+                "combatants": 52.083333333333336,
+                "conyards": 0.0,
+                "credits": 639.1666666666666,
+                "factories": 1.5416666666666667,
+                "harvesters": 2.4583333333333335,
+                "refineries": 1.2083333333333333,
+                "units": 61.625
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 5.916666666666667,
+                "combatants": 52.083333333333336,
+                "conyards": 0.0,
+                "credits": 304.2916666666667,
+                "factories": 1.5416666666666667,
+                "harvesters": 2.4583333333333335,
+                "refineries": 1.2083333333333333,
+                "units": 61.625
+              }
+            }
+          },
+          "draw": {
+            "finishedGames": 0,
+            "games": 54,
+            "meanTicks": 18000.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 9.425925925925926,
+                "combatants": 8.444444444444445,
+                "conyards": 0.7777777777777778,
+                "credits": 218.38888888888889,
+                "factories": 1.6296296296296295,
+                "harvesters": 0.9259259259259259,
+                "refineries": 0.9074074074074074,
+                "units": 18.925925925925927
+              },
+              "candidateMean": {
+                "buildings": 5.166666666666667,
+                "combatants": 24.59259259259259,
+                "conyards": 0.037037037037037035,
+                "credits": 193.07407407407408,
+                "factories": 1.2407407407407407,
+                "harvesters": 1.2407407407407407,
+                "refineries": 1.0185185185185186,
+                "units": 31.833333333333332
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -4.2592592592592595,
+                "combatants": 16.14814814814815,
+                "conyards": -0.7407407407407407,
+                "credits": -25.314814814814813,
+                "factories": -0.3888888888888889,
+                "harvesters": 0.3148148148148148,
+                "refineries": 0.1111111111111111,
+                "units": 12.907407407407407
+              }
+            }
+          }
+        },
+        "draws": 54,
+        "finishedGames": 26,
+        "games": 80,
+        "losses": 2,
+        "meanTicks": 16803.5125,
+        "score": 0.6375,
+        "terminal": {
+          "baselineMean": {
+            "buildings": 6.5875,
+            "combatants": 6.1125,
+            "conyards": 0.55,
+            "credits": 256.1125,
+            "factories": 1.15,
+            "harvesters": 0.65,
+            "refineries": 0.6375,
+            "units": 13.4375
+          },
+          "candidateMean": {
+            "buildings": 5.2625,
+            "combatants": 32.225,
+            "conyards": 0.025,
+            "credits": 322.1625,
+            "factories": 1.3,
+            "harvesters": 1.575,
+            "refineries": 1.05,
+            "units": 39.975
+          },
+          "candidateMinusBaselineMean": {
+            "buildings": -1.325,
+            "combatants": 26.1125,
+            "conyards": -0.525,
+            "credits": 66.05,
+            "factories": 0.15,
+            "harvesters": 0.925,
+            "refineries": 0.4125,
+            "units": 26.5375
+          }
+        },
+        "tickCapDraws": 54,
+        "wins": 24
+      },
+      "revertEmergencyDefense": {
+        "byOutcome": {
+          "baseline": {
+            "finishedGames": 5,
+            "games": 5,
+            "meanTicks": 10986.4,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 6.4,
+                "combatants": 18.6,
+                "conyards": 1.0,
+                "credits": 182.8,
+                "factories": 1.4,
+                "harvesters": 1.0,
+                "refineries": 1.0,
+                "units": 26.0
+              },
+              "candidateMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 676.4,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -6.4,
+                "combatants": -18.6,
+                "conyards": -1.0,
+                "credits": 493.6,
+                "factories": -1.4,
+                "harvesters": -1.0,
+                "refineries": -1.0,
+                "units": -26.0
+              }
+            }
+          },
+          "candidate": {
+            "finishedGames": 20,
+            "games": 20,
+            "meanTicks": 14049.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 576.95,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMean": {
+                "buildings": 5.85,
+                "combatants": 56.8,
+                "conyards": 0.0,
+                "credits": 534.85,
+                "factories": 1.5,
+                "harvesters": 2.7,
+                "refineries": 1.2,
+                "units": 66.55
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 5.85,
+                "combatants": 56.8,
+                "conyards": 0.0,
+                "credits": -42.1,
+                "factories": 1.5,
+                "harvesters": 2.7,
+                "refineries": 1.2,
+                "units": 66.55
+              }
+            }
+          },
+          "draw": {
+            "finishedGames": 0,
+            "games": 55,
+            "meanTicks": 18000.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 9.763636363636364,
+                "combatants": 8.690909090909091,
+                "conyards": 0.7454545454545455,
+                "credits": 124.2909090909091,
+                "factories": 1.709090909090909,
+                "harvesters": 1.018181818181818,
+                "refineries": 0.9636363636363636,
+                "units": 19.563636363636363
+              },
+              "candidateMean": {
+                "buildings": 5.327272727272727,
+                "combatants": 22.69090909090909,
+                "conyards": 0.05454545454545454,
+                "credits": 53.67272727272727,
+                "factories": 1.3454545454545455,
+                "harvesters": 1.1818181818181819,
+                "refineries": 1.018181818181818,
+                "units": 30.01818181818182
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -4.4363636363636365,
+                "combatants": 14.0,
+                "conyards": -0.6909090909090909,
+                "credits": -70.61818181818182,
+                "factories": -0.36363636363636365,
+                "harvesters": 0.16363636363636364,
+                "refineries": 0.05454545454545454,
+                "units": 10.454545454545455
+              }
+            }
+          }
+        },
+        "draws": 55,
+        "finishedGames": 25,
+        "games": 80,
+        "losses": 5,
+        "meanTicks": 16573.9,
+        "score": 0.59375,
+        "terminal": {
+          "baselineMean": {
+            "buildings": 7.1125,
+            "combatants": 7.1375,
+            "conyards": 0.575,
+            "credits": 241.1125,
+            "factories": 1.2625,
+            "harvesters": 0.7625,
+            "refineries": 0.725,
+            "units": 15.075
+          },
+          "candidateMean": {
+            "buildings": 5.125,
+            "combatants": 29.8,
+            "conyards": 0.0375,
+            "credits": 212.8875,
+            "factories": 1.3,
+            "harvesters": 1.4875,
+            "refineries": 1.0,
+            "units": 37.275
+          },
+          "candidateMinusBaselineMean": {
+            "buildings": -1.9875,
+            "combatants": 22.6625,
+            "conyards": -0.5375,
+            "credits": -28.225,
+            "factories": 0.0375,
+            "harvesters": 0.725,
+            "refineries": 0.275,
+            "units": 22.2
+          }
+        },
+        "tickCapDraws": 55,
+        "wins": 20
+      },
+      "revertForceAttack": {
+        "byOutcome": {
+          "baseline": {
+            "finishedGames": 4,
+            "games": 4,
+            "meanTicks": 16401.25,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 8.25,
+                "combatants": 17.0,
+                "conyards": 0.75,
+                "credits": 0.0,
+                "factories": 1.25,
+                "harvesters": 1.0,
+                "refineries": 0.75,
+                "units": 26.5
+              },
+              "candidateMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 59.5,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -8.25,
+                "combatants": -17.0,
+                "conyards": -0.75,
+                "credits": 59.5,
+                "factories": -1.25,
+                "harvesters": -1.0,
+                "refineries": -0.75,
+                "units": -26.5
+              }
+            }
+          },
+          "candidate": {
+            "finishedGames": 22,
+            "games": 22,
+            "meanTicks": 13251.272727272728,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 364.0,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMean": {
+                "buildings": 6.090909090909091,
+                "combatants": 44.5,
+                "conyards": 0.0,
+                "credits": 248.72727272727272,
+                "factories": 1.5909090909090908,
+                "harvesters": 2.909090909090909,
+                "refineries": 1.2727272727272727,
+                "units": 54.68181818181818
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 6.090909090909091,
+                "combatants": 44.5,
+                "conyards": 0.0,
+                "credits": -115.27272727272727,
+                "factories": 1.5909090909090908,
+                "harvesters": 2.909090909090909,
+                "refineries": 1.2727272727272727,
+                "units": 54.68181818181818
+              }
+            }
+          },
+          "draw": {
+            "finishedGames": 0,
+            "games": 54,
+            "meanTicks": 18000.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 7.407407407407407,
+                "combatants": 10.074074074074074,
+                "conyards": 0.3888888888888889,
+                "credits": 124.79629629629629,
+                "factories": 1.1851851851851851,
+                "harvesters": 0.7407407407407407,
+                "refineries": 0.6666666666666666,
+                "units": 18.64814814814815
+              },
+              "candidateMean": {
+                "buildings": 5.074074074074074,
+                "combatants": 10.25925925925926,
+                "conyards": 0.037037037037037035,
+                "credits": 70.98148148148148,
+                "factories": 1.2222222222222223,
+                "harvesters": 1.1111111111111112,
+                "refineries": 1.0,
+                "units": 17.27777777777778
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -2.3333333333333335,
+                "combatants": 0.18518518518518517,
+                "conyards": -0.35185185185185186,
+                "credits": -53.81481481481482,
+                "factories": 0.037037037037037035,
+                "harvesters": 0.37037037037037035,
+                "refineries": 0.3333333333333333,
+                "units": -1.3703703703703705
+              }
+            }
+          }
+        },
+        "draws": 54,
+        "finishedGames": 26,
+        "games": 80,
+        "losses": 4,
+        "meanTicks": 16614.1625,
+        "score": 0.6125,
+        "terminal": {
+          "baselineMean": {
+            "buildings": 5.4125,
+            "combatants": 7.65,
+            "conyards": 0.3,
+            "credits": 184.3375,
+            "factories": 0.8625,
+            "harvesters": 0.55,
+            "refineries": 0.4875,
+            "units": 13.9125
+          },
+          "candidateMean": {
+            "buildings": 5.1,
+            "combatants": 19.1625,
+            "conyards": 0.025,
+            "credits": 119.2875,
+            "factories": 1.2625,
+            "harvesters": 1.55,
+            "refineries": 1.025,
+            "units": 26.7
+          },
+          "candidateMinusBaselineMean": {
+            "buildings": -0.3125,
+            "combatants": 11.5125,
+            "conyards": -0.275,
+            "credits": -65.05,
+            "factories": 0.4,
+            "harvesters": 1.0,
+            "refineries": 0.5375,
+            "units": 12.7875
+          }
+        },
+        "tickCapDraws": 54,
+        "wins": 22
+      },
+      "revertScouting": {
+        "byOutcome": {
+          "baseline": {
+            "finishedGames": 3,
+            "games": 3,
+            "meanTicks": 16049.333333333334,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 9.333333333333334,
+                "combatants": 18.666666666666668,
+                "conyards": 1.0,
+                "credits": 0.0,
+                "factories": 1.6666666666666667,
+                "harvesters": 1.0,
+                "refineries": 1.0,
+                "units": 29.0
+              },
+              "candidateMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 17.333333333333332,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -9.333333333333334,
+                "combatants": -18.666666666666668,
+                "conyards": -1.0,
+                "credits": 17.333333333333332,
+                "factories": -1.6666666666666667,
+                "harvesters": -1.0,
+                "refineries": -1.0,
+                "units": -29.0
+              }
+            }
+          },
+          "candidate": {
+            "finishedGames": 19,
+            "games": 19,
+            "meanTicks": 13729.947368421053,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 374.2105263157895,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMean": {
+                "buildings": 5.947368421052632,
+                "combatants": 57.31578947368421,
+                "conyards": 0.0,
+                "credits": 707.421052631579,
+                "factories": 1.5263157894736843,
+                "harvesters": 2.6315789473684212,
+                "refineries": 1.2105263157894737,
+                "units": 67.10526315789474
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 5.947368421052632,
+                "combatants": 57.31578947368421,
+                "conyards": 0.0,
+                "credits": 333.2105263157895,
+                "factories": 1.5263157894736843,
+                "harvesters": 2.6315789473684212,
+                "refineries": 1.2105263157894737,
+                "units": 67.10526315789474
+              }
+            }
+          },
+          "draw": {
+            "finishedGames": 0,
+            "games": 58,
+            "meanTicks": 18000.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 9.379310344827585,
+                "combatants": 7.931034482758621,
+                "conyards": 0.7068965517241379,
+                "credits": 156.0,
+                "factories": 1.5517241379310345,
+                "harvesters": 0.9137931034482759,
+                "refineries": 0.8620689655172413,
+                "units": 18.396551724137932
+              },
+              "candidateMean": {
+                "buildings": 5.275862068965517,
+                "combatants": 26.29310344827586,
+                "conyards": 0.034482758620689655,
+                "credits": 501.3448275862069,
+                "factories": 1.293103448275862,
+                "harvesters": 1.293103448275862,
+                "refineries": 1.0344827586206897,
+                "units": 33.741379310344826
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -4.103448275862069,
+                "combatants": 18.362068965517242,
+                "conyards": -0.6724137931034483,
+                "credits": 345.3448275862069,
+                "factories": -0.25862068965517243,
+                "harvesters": 0.3793103448275862,
+                "refineries": 0.1724137931034483,
+                "units": 15.344827586206897
+              }
+            }
+          }
+        },
+        "draws": 58,
+        "finishedGames": 22,
+        "games": 80,
+        "losses": 3,
+        "meanTicks": 16912.7125,
+        "score": 0.6,
+        "terminal": {
+          "baselineMean": {
+            "buildings": 7.15,
+            "combatants": 6.45,
+            "conyards": 0.55,
+            "credits": 201.975,
+            "factories": 1.1875,
+            "harvesters": 0.7,
+            "refineries": 0.6625,
+            "units": 14.425
+          },
+          "candidateMean": {
+            "buildings": 5.2375,
+            "combatants": 32.675,
+            "conyards": 0.025,
+            "credits": 532.1375,
+            "factories": 1.3,
+            "harvesters": 1.5625,
+            "refineries": 1.0375,
+            "units": 40.4
+          },
+          "candidateMinusBaselineMean": {
+            "buildings": -1.9125,
+            "combatants": 26.225,
+            "conyards": -0.525,
+            "credits": 330.1625,
+            "factories": 0.1125,
+            "harvesters": 0.8625,
+            "refineries": 0.375,
+            "units": 25.975
+          }
+        },
+        "tickCapDraws": 58,
+        "wins": 19
+      },
+      "revertStrategy": {
+        "byOutcome": {
+          "baseline": {
+            "finishedGames": 45,
+            "games": 45,
+            "meanTicks": 8884.377777777778,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 6.177777777777778,
+                "combatants": 28.044444444444444,
+                "conyards": 0.7333333333333333,
+                "credits": 460.0,
+                "factories": 1.4444444444444444,
+                "harvesters": 1.0,
+                "refineries": 1.0,
+                "units": 35.48888888888889
+              },
+              "candidateMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 1073.3111111111111,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -6.177777777777778,
+                "combatants": -28.044444444444444,
+                "conyards": -0.7333333333333333,
+                "credits": 613.3111111111111,
+                "factories": -1.4444444444444444,
+                "harvesters": -1.0,
+                "refineries": -1.0,
+                "units": -35.48888888888889
+              }
+            }
+          },
+          "candidate": {
+            "finishedGames": 8,
+            "games": 8,
+            "meanTicks": 16991.5,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 172.375,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMean": {
+                "buildings": 22.75,
+                "combatants": 135.625,
+                "conyards": 0.625,
+                "credits": 1308.375,
+                "factories": 5.0,
+                "harvesters": 10.625,
+                "refineries": 5.625,
+                "units": 169.375
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 22.75,
+                "combatants": 135.625,
+                "conyards": 0.625,
+                "credits": 1136.0,
+                "factories": 5.0,
+                "harvesters": 10.625,
+                "refineries": 5.625,
+                "units": 169.375
+              }
+            }
+          },
+          "draw": {
+            "finishedGames": 0,
+            "games": 27,
+            "meanTicks": 18000.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 9.925925925925926,
+                "combatants": 13.74074074074074,
+                "conyards": 0.7777777777777778,
+                "credits": 209.92592592592592,
+                "factories": 1.7777777777777777,
+                "harvesters": 1.6666666666666667,
+                "refineries": 1.6296296296296295,
+                "units": 25.62962962962963
+              },
+              "candidateMean": {
+                "buildings": 18.40740740740741,
+                "combatants": 39.074074074074076,
+                "conyards": 0.8518518518518519,
+                "credits": 2370.6666666666665,
+                "factories": 3.037037037037037,
+                "harvesters": 7.481481481481482,
+                "refineries": 4.555555555555555,
+                "units": 65.03703703703704
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 8.481481481481481,
+                "combatants": 25.333333333333332,
+                "conyards": 0.07407407407407407,
+                "credits": 2160.740740740741,
+                "factories": 1.2592592592592593,
+                "harvesters": 5.814814814814815,
+                "refineries": 2.925925925925926,
+                "units": 39.407407407407405
+              }
+            }
+          }
+        },
+        "draws": 27,
+        "finishedGames": 53,
+        "games": 80,
+        "losses": 45,
+        "meanTicks": 12771.6125,
+        "score": 0.26875,
+        "terminal": {
+          "baselineMean": {
+            "buildings": 6.825,
+            "combatants": 20.4125,
+            "conyards": 0.675,
+            "credits": 346.8375,
+            "factories": 1.4125,
+            "harvesters": 1.125,
+            "refineries": 1.1125,
+            "units": 28.6125
+          },
+          "candidateMean": {
+            "buildings": 8.4875,
+            "combatants": 26.75,
+            "conyards": 0.35,
+            "credits": 1534.675,
+            "factories": 1.525,
+            "harvesters": 3.5875,
+            "refineries": 2.1,
+            "units": 38.8875
+          },
+          "candidateMinusBaselineMean": {
+            "buildings": 1.6625,
+            "combatants": 6.3375,
+            "conyards": -0.325,
+            "credits": 1187.8375,
+            "factories": 0.1125,
+            "harvesters": 2.4625,
+            "refineries": 0.9875,
+            "units": 10.275
+          }
+        },
+        "tickCapDraws": 27,
+        "wins": 8
+      }
+    }
+  },
+  "confirmatory": {
+    "championMinusDefaultPaired": {
+      "byFamily": {
+        "mf_536b69726d6973682047616d65": {
+          "drawCountDifference": -7,
+          "lossCountDifference": 0,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 6,
+              "candidate": 0,
+              "draw": 0
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 1,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 0,
+              "candidate": 7,
+              "draw": 2
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "0": 9,
+            "0.5": 7
+          },
+          "scoreDifference": 0.21875,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": -2.375,
+            "combatants": 9.0,
+            "conyards": 0.375,
+            "credits": -4583.375,
+            "factories": -0.6875,
+            "harvesters": -3.875,
+            "refineries": -1.5,
+            "units": 2.75
+          },
+          "tickCapDrawCountDifference": -7,
+          "winCountDifference": 7
+        },
+        "mf_69962e7efc29cb5b": {
+          "drawCountDifference": 0,
+          "lossCountDifference": 0,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 16
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "0": 16
+          },
+          "scoreDifference": 0.0,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": -12.9375,
+            "combatants": 33.1875,
+            "conyards": -0.8125,
+            "credits": -814.9375,
+            "factories": -0.25,
+            "harvesters": -5.6875,
+            "refineries": -3.625,
+            "units": 15.4375
+          },
+          "tickCapDrawCountDifference": 0,
+          "winCountDifference": 0
+        },
+        "mf_dc29052d730e0060": {
+          "drawCountDifference": 15,
+          "lossCountDifference": -15,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 1,
+              "candidate": 0,
+              "draw": 15
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "0": 1,
+            "0.5": 15
+          },
+          "scoreDifference": 0.46875,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": 3.25,
+            "combatants": 40.125,
+            "conyards": 0.0,
+            "credits": 12.4375,
+            "factories": 0.8125,
+            "harvesters": 0.9375,
+            "refineries": 1.0,
+            "units": 46.125
+          },
+          "tickCapDrawCountDifference": 15,
+          "winCountDifference": 0
+        },
+        "mf_death": {
+          "drawCountDifference": 4,
+          "lossCountDifference": -4,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 5
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 1,
+              "candidate": 0,
+              "draw": 10
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "-0.5": 1,
+            "0": 10,
+            "0.5": 5
+          },
+          "scoreDifference": 0.125,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": -2.375,
+            "combatants": 29.0625,
+            "conyards": -0.75,
+            "credits": -437.4375,
+            "factories": -0.4375,
+            "harvesters": -1.625,
+            "refineries": -0.375,
+            "units": 26.125
+          },
+          "tickCapDrawCountDifference": 4,
+          "winCountDifference": 0
+        },
+        "mf_doradodescent": {
+          "drawCountDifference": 6,
+          "lossCountDifference": -6,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 11
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 5,
+              "candidate": 0,
+              "draw": 0
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "-0.5": 5,
+            "0.5": 11
+          },
+          "scoreDifference": 0.1875,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": -2.0625,
+            "combatants": 11.4375,
+            "conyards": -0.1875,
+            "credits": -2630.1875,
+            "factories": 0.8125,
+            "harvesters": -1.125,
+            "refineries": -0.3125,
+            "units": 8.3125
+          },
+          "tickCapDrawCountDifference": 6,
+          "winCountDifference": 0
+        },
+        "mf_mp09du": {
+          "drawCountDifference": 0,
+          "lossCountDifference": 0,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 16
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "0": 16
+          },
+          "scoreDifference": 0.0,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": 0.0,
+            "combatants": 0.0,
+            "conyards": 0.0,
+            "credits": 0.0,
+            "factories": 0.0,
+            "harvesters": 0.0,
+            "refineries": 0.0,
+            "units": 0.0
+          },
+          "tickCapDrawCountDifference": 0,
+          "winCountDifference": 0
+        },
+        "mf_mp11t2": {
+          "drawCountDifference": 9,
+          "lossCountDifference": -9,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 9
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 7
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "0": 7,
+            "0.5": 9
+          },
+          "scoreDifference": 0.28125,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": -4.375,
+            "combatants": 36.0,
+            "conyards": -0.125,
+            "credits": -694.5,
+            "factories": 0.625,
+            "harvesters": -2.125,
+            "refineries": -0.9375,
+            "units": 30.1875
+          },
+          "tickCapDrawCountDifference": 9,
+          "winCountDifference": 0
+        },
+        "mf_mp14t2": {
+          "drawCountDifference": 2,
+          "lossCountDifference": -6,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 0,
+              "candidate": 1,
+              "draw": 5
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 0,
+              "candidate": 3,
+              "draw": 7
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "0": 7,
+            "0.5": 8,
+            "1": 1
+          },
+          "scoreDifference": 0.3125,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": -2.6875,
+            "combatants": 36.5625,
+            "conyards": -0.125,
+            "credits": -269.5,
+            "factories": 1.5,
+            "harvesters": -1.4375,
+            "refineries": -1.0,
+            "units": 33.5
+          },
+          "tickCapDrawCountDifference": 2,
+          "winCountDifference": 4
+        },
+        "mf_mp17du": {
+          "drawCountDifference": -6,
+          "lossCountDifference": -1,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 6,
+              "candidate": 1,
+              "draw": 0
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 0,
+              "candidate": 6,
+              "draw": 3
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "0": 9,
+            "0.5": 6,
+            "1": 1
+          },
+          "scoreDifference": 0.25,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": -0.0625,
+            "combatants": 14.3125,
+            "conyards": 0.625,
+            "credits": -3349.25,
+            "factories": 0.375,
+            "harvesters": -0.5,
+            "refineries": -0.5625,
+            "units": 13.6875
+          },
+          "tickCapDrawCountDifference": -6,
+          "winCountDifference": 7
+        },
+        "mf_mp27t8": {
+          "drawCountDifference": 7,
+          "lossCountDifference": -7,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 1,
+              "candidate": 0,
+              "draw": 7
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 8
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "0": 9,
+            "0.5": 7
+          },
+          "scoreDifference": 0.21875,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": -4.875,
+            "combatants": 35.4375,
+            "conyards": -0.125,
+            "credits": -887.1875,
+            "factories": 0.0625,
+            "harvesters": -1.0625,
+            "refineries": -0.5,
+            "units": 30.3125
+          },
+          "tickCapDrawCountDifference": 7,
+          "winCountDifference": 0
+        },
+        "mf_newhghts": {
+          "drawCountDifference": 7,
+          "lossCountDifference": -13,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 3,
+              "candidate": 6,
+              "draw": 7
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "0": 3,
+            "0.5": 7,
+            "1": 6
+          },
+          "scoreDifference": 0.59375,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": 9.8125,
+            "combatants": 42.4375,
+            "conyards": 0.75,
+            "credits": -93.125,
+            "factories": 2.125,
+            "harvesters": 1.5625,
+            "refineries": 1.5,
+            "units": 55.3125
+          },
+          "tickCapDrawCountDifference": 7,
+          "winCountDifference": 6
+        },
+        "mf_riverram": {
+          "drawCountDifference": 4,
+          "lossCountDifference": -12,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 4,
+              "candidate": 8,
+              "draw": 4
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "0": 4,
+            "0.5": 4,
+            "1": 8
+          },
+          "scoreDifference": 0.625,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": 5.625,
+            "combatants": 46.875,
+            "conyards": 0.5,
+            "credits": -2081.0625,
+            "factories": 2.4375,
+            "harvesters": 1.25,
+            "refineries": 1.1875,
+            "units": 54.4375
+          },
+          "tickCapDrawCountDifference": 4,
+          "winCountDifference": 8
+        },
+        "mf_seaofiso": {
+          "drawCountDifference": 12,
+          "lossCountDifference": -12,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 12
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 4
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "0": 4,
+            "0.5": 12
+          },
+          "scoreDifference": 0.375,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": 2.5625,
+            "combatants": 50.75,
+            "conyards": -0.25,
+            "credits": -368.25,
+            "factories": 1.0,
+            "harvesters": -0.25,
+            "refineries": 0.3125,
+            "units": 54.25
+          },
+          "tickCapDrawCountDifference": 12,
+          "winCountDifference": 0
+        },
+        "mf_tanyas": {
+          "drawCountDifference": 14,
+          "lossCountDifference": -14,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 2,
+              "candidate": 0,
+              "draw": 14
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "0": 2,
+            "0.5": 14
+          },
+          "scoreDifference": 0.4375,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": 4.75,
+            "combatants": 15.9375,
+            "conyards": 0.0,
+            "credits": -18.6875,
+            "factories": 0.5625,
+            "harvesters": 0.375,
+            "refineries": 0.375,
+            "units": 23.875
+          },
+          "tickCapDrawCountDifference": 14,
+          "winCountDifference": 0
+        },
+        "mf_tn04t2": {
+          "drawCountDifference": -1,
+          "lossCountDifference": -13,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 0,
+              "candidate": 12,
+              "draw": 1
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 0,
+              "candidate": 2,
+              "draw": 1
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "0": 1,
+            "0.5": 3,
+            "1": 12
+          },
+          "scoreDifference": 0.84375,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": 8.25,
+            "combatants": 49.125,
+            "conyards": 0.75,
+            "credits": -763.875,
+            "factories": 2.0,
+            "harvesters": 1.3125,
+            "refineries": 1.4375,
+            "units": 59.6875
+          },
+          "tickCapDrawCountDifference": -1,
+          "winCountDifference": 14
+        },
+        "mf_unrepent": {
+          "drawCountDifference": 14,
+          "lossCountDifference": -14,
+          "outcomeTransitionCounts": {
+            "baseline": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 14
+            },
+            "candidate": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 0
+            },
+            "draw": {
+              "baseline": 0,
+              "candidate": 0,
+              "draw": 2
+            }
+          },
+          "pairedGames": 16,
+          "pairedScoreDifferenceCounts": {
+            "0": 2,
+            "0.5": 14
+          },
+          "scoreDifference": 0.4375,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": 3.5625,
+            "combatants": 39.0625,
+            "conyards": -0.1875,
+            "credits": -2507.875,
+            "factories": 0.875,
+            "harvesters": 1.0625,
+            "refineries": 1.125,
+            "units": 45.0625
+          },
+          "tickCapDrawCountDifference": 14,
+          "winCountDifference": 0
+        }
+      },
+      "drawCountDifference": 80,
+      "lossCountDifference": -126,
+      "outcomeTransitionCounts": {
+        "baseline": {
+          "baseline": 23,
+          "candidate": 28,
+          "draw": 104
+        },
+        "candidate": {
+          "baseline": 0,
+          "candidate": 1,
+          "draw": 0
+        },
+        "draw": {
+          "baseline": 6,
+          "candidate": 18,
+          "draw": 76
+        }
+      },
+      "outcomeTransitionDetails": {
+        "baselineToBaseline": {
+          "games": 23,
+          "meanScoreDifference": 0.0,
+          "meanTickDifference": 3138.391304347826,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": -1.173913043478261,
+            "combatants": 6.434782608695652,
+            "conyards": 0.0,
+            "credits": 181.8695652173913,
+            "factories": -0.08695652173913043,
+            "harvesters": -0.08695652173913043,
+            "refineries": -0.08695652173913043,
+            "units": 5.391304347826087
+          }
+        },
+        "baselineToCandidate": {
+          "games": 28,
+          "meanScoreDifference": 1.0,
+          "meanTickDifference": 4874.0,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": 13.107142857142858,
+            "combatants": 57.5,
+            "conyards": 1.0357142857142858,
+            "credits": -1574.357142857143,
+            "factories": 2.8214285714285716,
+            "harvesters": 2.0,
+            "refineries": 2.0,
+            "units": 73.82142857142857
+          }
+        },
+        "baselineToDraw": {
+          "games": 104,
+          "meanScoreDifference": 0.5,
+          "meanTickDifference": 7047.836538461538,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": 4.548076923076923,
+            "combatants": 39.05769230769231,
+            "conyards": 0.125,
+            "credits": -941.0288461538462,
+            "factories": 1.2307692307692308,
+            "harvesters": 1.0769230769230769,
+            "refineries": 1.0673076923076923,
+            "units": 46.09615384615385
+          }
+        },
+        "candidateToCandidate": {
+          "games": 1,
+          "meanScoreDifference": 0.0,
+          "meanTickDifference": -12867.0,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": -12.0,
+            "combatants": 15.0,
+            "conyards": 0.0,
+            "credits": -8398.0,
+            "factories": -2.0,
+            "harvesters": -7.0,
+            "refineries": -4.0,
+            "units": -4.0
+          }
+        },
+        "drawToBaseline": {
+          "games": 6,
+          "meanScoreDifference": -0.5,
+          "meanTickDifference": -3372.0,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": -13.5,
+            "combatants": -37.0,
+            "conyards": -1.0,
+            "credits": 21.5,
+            "factories": -0.8333333333333334,
+            "harvesters": -5.166666666666667,
+            "refineries": -2.8333333333333335,
+            "units": -55.833333333333336
+          }
+        },
+        "drawToCandidate": {
+          "games": 18,
+          "meanScoreDifference": 0.5,
+          "meanTickDifference": -10893.5,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": -1.5555555555555556,
+            "combatants": 27.22222222222222,
+            "conyards": 0.8333333333333334,
+            "credits": -6321.333333333333,
+            "factories": 0.5555555555555556,
+            "harvesters": -4.0,
+            "refineries": -1.7777777777777777,
+            "units": 21.88888888888889
+          }
+        },
+        "drawToDraw": {
+          "games": 76,
+          "meanScoreDifference": 0.0,
+          "meanTickDifference": 0.0,
+          "terminalCandidateMinusBaselineDifference": {
+            "buildings": -7.828947368421052,
+            "combatants": 22.710526315789473,
+            "conyards": -0.5789473684210527,
+            "credits": -683.8157894736842,
+            "factories": -0.25,
+            "harvesters": -3.0921052631578947,
+            "refineries": -1.868421052631579,
+            "units": 12.43421052631579
+          }
+        }
+      },
+      "pairedGames": 256,
+      "pairedScoreDifferenceCounts": {
+        "-0.5": 6,
+        "0": 100,
+        "0.5": 122,
+        "1": 28
+      },
+      "scoreDifference": 0.3359375,
+      "terminalCandidateMinusBaselineDifference": {
+        "buildings": 0.37890625,
+        "combatants": 30.58203125,
+        "conyards": 0.02734375,
+        "credits": -1217.92578125,
+        "factories": 0.73828125,
+        "harvesters": -0.69921875,
+        "refineries": -0.1171875,
+        "units": 31.19140625
+      },
+      "tickCapDrawCountDifference": 80,
+      "winCountDifference": 46
+    },
+    "methods": {
+      "champion": {
+        "byOutcome": {
+          "baseline": {
+            "finishedGames": 29,
+            "games": 29,
+            "meanTicks": 10069.724137931034,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 7.724137931034483,
+                "combatants": 29.79310344827586,
+                "conyards": 1.0,
+                "credits": 943.7931034482758,
+                "factories": 0.896551724137931,
+                "harvesters": 0.9310344827586207,
+                "refineries": 0.9310344827586207,
+                "units": 38.62068965517241
+              },
+              "candidateMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 3652.344827586207,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -7.724137931034483,
+                "combatants": -29.79310344827586,
+                "conyards": -1.0,
+                "credits": 2708.551724137931,
+                "factories": -0.896551724137931,
+                "harvesters": -0.9310344827586207,
+                "refineries": -0.9310344827586207,
+                "units": -38.62068965517241
+              }
+            }
+          },
+          "candidate": {
+            "finishedGames": 47,
+            "games": 47,
+            "meanTicks": 10371.63829787234,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 3736.7659574468084,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMean": {
+                "buildings": 5.595744680851064,
+                "combatants": 26.382978723404257,
+                "conyards": 0.3191489361702128,
+                "credits": 742.3404255319149,
+                "factories": 1.1063829787234043,
+                "harvesters": 0.9787234042553191,
+                "refineries": 0.9787234042553191,
+                "units": 33.744680851063826
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 5.595744680851064,
+                "combatants": 26.382978723404257,
+                "conyards": 0.3191489361702128,
+                "credits": -2994.425531914894,
+                "factories": 1.1063829787234043,
+                "harvesters": 0.9787234042553191,
+                "refineries": 0.9787234042553191,
+                "units": 33.744680851063826
+              }
+            }
+          },
+          "draw": {
+            "finishedGames": 0,
+            "games": 180,
+            "meanTicks": 18000.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 10.5,
+                "combatants": 8.25,
+                "conyards": 0.7888888888888889,
+                "credits": 1545.8666666666666,
+                "factories": 1.5888888888888888,
+                "harvesters": 1.0277777777777777,
+                "refineries": 1.0277777777777777,
+                "units": 20.194444444444443
+              },
+              "candidateMean": {
+                "buildings": 5.211111111111111,
+                "combatants": 20.011111111111113,
+                "conyards": 0.011111111111111112,
+                "credits": 1260.5277777777778,
+                "factories": 0.9888888888888889,
+                "harvesters": 0.8611111111111112,
+                "refineries": 0.85,
+                "units": 27.155555555555555
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -5.288888888888889,
+                "combatants": 11.761111111111111,
+                "conyards": -0.7777777777777778,
+                "credits": -285.3388888888889,
+                "factories": -0.6,
+                "harvesters": -0.16666666666666666,
+                "refineries": -0.17777777777777778,
+                "units": 6.961111111111111
+              }
+            }
+          }
+        },
+        "draws": 180,
+        "finishedGames": 76,
+        "games": 256,
+        "losses": 29,
+        "meanTicks": 15701.12890625,
+        "score": 0.53515625,
+        "terminal": {
+          "baselineMean": {
+            "buildings": 8.2578125,
+            "combatants": 9.17578125,
+            "conyards": 0.66796875,
+            "credits": 1879.8984375,
+            "factories": 1.21875,
+            "harvesters": 0.828125,
+            "refineries": 0.828125,
+            "units": 18.57421875
+          },
+          "candidateMean": {
+            "buildings": 4.69140625,
+            "combatants": 18.9140625,
+            "conyards": 0.06640625,
+            "credits": 1436.33984375,
+            "factories": 0.8984375,
+            "harvesters": 0.78515625,
+            "refineries": 0.77734375,
+            "units": 25.2890625
+          },
+          "candidateMinusBaselineMean": {
+            "buildings": -3.56640625,
+            "combatants": 9.73828125,
+            "conyards": -0.6015625,
+            "credits": -443.55859375,
+            "factories": -0.3203125,
+            "harvesters": -0.04296875,
+            "refineries": -0.05078125,
+            "units": 6.71484375
+          }
+        },
+        "tickCapDraws": 180,
+        "wins": 47
+      },
+      "default": {
+        "byOutcome": {
+          "baseline": {
+            "finishedGames": 155,
+            "games": 155,
+            "meanTicks": 9611.670967741935,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 9.587096774193549,
+                "combatants": 28.574193548387097,
+                "conyards": 0.9806451612903225,
+                "credits": 669.058064516129,
+                "factories": 1.664516129032258,
+                "harvesters": 1.1548387096774193,
+                "refineries": 1.1548387096774193,
+                "units": 39.806451612903224
+              },
+              "candidateMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 1662.7290322580645,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -9.587096774193549,
+                "combatants": -28.574193548387097,
+                "conyards": -0.9806451612903225,
+                "credits": 993.6709677419354,
+                "factories": -1.664516129032258,
+                "harvesters": -1.1548387096774193,
+                "refineries": -1.1548387096774193,
+                "units": -39.806451612903224
+              }
+            }
+          },
+          "candidate": {
+            "finishedGames": 1,
+            "games": 1,
+            "meanTicks": 17232.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 80.0,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMean": {
+                "buildings": 18.0,
+                "combatants": 7.0,
+                "conyards": 1.0,
+                "credits": 0.0,
+                "factories": 3.0,
+                "harvesters": 8.0,
+                "refineries": 5.0,
+                "units": 33.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 18.0,
+                "combatants": 7.0,
+                "conyards": 1.0,
+                "credits": -80.0,
+                "factories": 3.0,
+                "harvesters": 8.0,
+                "refineries": 5.0,
+                "units": 33.0
+              }
+            }
+          },
+          "draw": {
+            "finishedGames": 0,
+            "games": 100,
+            "meanTicks": 18000.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 6.91,
+                "combatants": 11.19,
+                "conyards": 0.74,
+                "credits": 2299.59,
+                "factories": 1.35,
+                "harvesters": 0.91,
+                "refineries": 0.96,
+                "units": 19.46
+              },
+              "candidateMean": {
+                "buildings": 11.49,
+                "combatants": 2.05,
+                "conyards": 0.64,
+                "credits": 2742.58,
+                "factories": 1.19,
+                "harvesters": 4.3,
+                "refineries": 2.87,
+                "units": 18.17
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 4.58,
+                "combatants": -9.14,
+                "conyards": -0.1,
+                "credits": 442.99,
+                "factories": -0.16,
+                "harvesters": 3.39,
+                "refineries": 1.91,
+                "units": -1.29
+              }
+            }
+          }
+        },
+        "draws": 100,
+        "finishedGames": 156,
+        "games": 256,
+        "losses": 155,
+        "meanTicks": 12918.12890625,
+        "score": 0.19921875,
+        "terminal": {
+          "baselineMean": {
+            "buildings": 8.50390625,
+            "combatants": 21.671875,
+            "conyards": 0.8828125,
+            "credits": 1303.68359375,
+            "factories": 1.53515625,
+            "harvesters": 1.0546875,
+            "refineries": 1.07421875,
+            "units": 31.703125
+          },
+          "candidateMean": {
+            "buildings": 4.55859375,
+            "combatants": 0.828125,
+            "conyards": 0.25390625,
+            "credits": 2078.05078125,
+            "factories": 0.4765625,
+            "harvesters": 1.7109375,
+            "refineries": 1.140625,
+            "units": 7.2265625
+          },
+          "candidateMinusBaselineMean": {
+            "buildings": -3.9453125,
+            "combatants": -20.84375,
+            "conyards": -0.62890625,
+            "credits": 774.3671875,
+            "factories": -1.05859375,
+            "harvesters": 0.65625,
+            "refineries": 0.06640625,
+            "units": -24.4765625
+          }
+        },
+        "tickCapDraws": 100,
+        "wins": 1
+      }
+    }
+  },
+  "interpretationBoundary": [
+    "This analysis was designed after outcomes were available and is descriptive only.",
+    "Terminal snapshots do not identify trajectories, actions, timing, or a causal mechanism.",
+    "A tick-cap draw can contain a large terminal material advantage; the frozen endpoint still scores it as 0.5.",
+    "No new game was launched and no policy, family, seed, or endpoint was selected using this analysis.",
+    "The frozen confirmatory and multiplicity-controlled component conclusions remain unchanged."
+  ],
+  "mechanism": {
+    "championMinusEachLocalOptimizer": {
+      "local0": {
+        "drawCountDifference": -3,
+        "lossCountDifference": 0,
+        "outcomeTransitionCounts": {
+          "baseline": {
+            "baseline": 1,
+            "candidate": 0,
+            "draw": 5
+          },
+          "candidate": {
+            "baseline": 0,
+            "candidate": 13,
+            "draw": 3
+          },
+          "draw": {
+            "baseline": 5,
+            "candidate": 6,
+            "draw": 47
+          }
+        },
+        "outcomeTransitionDetails": {
+          "baselineToBaseline": {
+            "games": 1,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": 7023.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -1.0,
+              "combatants": 1.0,
+              "conyards": 0.0,
+              "credits": 624.0,
+              "factories": -1.0,
+              "harvesters": 0.0,
+              "refineries": 0.0,
+              "units": 0.0
+            }
+          },
+          "baselineToDraw": {
+            "games": 5,
+            "meanScoreDifference": 0.5,
+            "meanTickDifference": 7269.6,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 2.8,
+              "combatants": 15.2,
+              "conyards": 0.4,
+              "credits": -162.6,
+              "factories": 0.2,
+              "harvesters": 1.0,
+              "refineries": 0.8,
+              "units": 19.4
+            }
+          },
+          "candidateToCandidate": {
+            "games": 13,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": -613.9230769230769,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 0.23076923076923078,
+              "combatants": 6.615384615384615,
+              "conyards": 0.0,
+              "credits": 350.3076923076923,
+              "factories": 0.0,
+              "harvesters": 0.0,
+              "refineries": 0.0,
+              "units": 6.846153846153846
+            }
+          },
+          "candidateToDraw": {
+            "games": 3,
+            "meanScoreDifference": -0.5,
+            "meanTickDifference": 968.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -9.666666666666666,
+              "combatants": -26.333333333333332,
+              "conyards": 0.0,
+              "credits": -243.66666666666666,
+              "factories": 0.0,
+              "harvesters": -0.3333333333333333,
+              "refineries": 0.3333333333333333,
+              "units": -37.0
+            }
+          },
+          "drawToBaseline": {
+            "games": 5,
+            "meanScoreDifference": -0.5,
+            "meanTickDifference": -2849.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -3.6,
+              "combatants": -20.6,
+              "conyards": -0.2,
+              "credits": 289.2,
+              "factories": -1.6,
+              "harvesters": -1.0,
+              "refineries": -1.0,
+              "units": -25.8
+            }
+          },
+          "drawToCandidate": {
+            "games": 6,
+            "meanScoreDifference": 0.5,
+            "meanTickDifference": -1970.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 9.666666666666666,
+              "combatants": 31.666666666666668,
+              "conyards": 0.16666666666666666,
+              "credits": 1099.1666666666667,
+              "factories": 0.8333333333333334,
+              "harvesters": 1.3333333333333333,
+              "refineries": 1.3333333333333333,
+              "units": 43.166666666666664
+            }
+          },
+          "drawToDraw": {
+            "games": 47,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": 0.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 0.7446808510638298,
+              "combatants": 11.936170212765957,
+              "conyards": -0.02127659574468085,
+              "credits": 300.97872340425533,
+              "factories": 0.10638297872340426,
+              "harvesters": -0.1276595744680851,
+              "refineries": -0.02127659574468085,
+              "units": 12.680851063829786
+            }
+          }
+        },
+        "pairedGames": 80,
+        "pairedScoreDifferenceCounts": {
+          "-0.5": 8,
+          "0": 61,
+          "0.5": 11
+        },
+        "scoreDifference": 0.018750000000000044,
+        "terminalCandidateMinusBaselineDifference": {
+          "buildings": 0.775,
+          "combatants": 9.15,
+          "conyards": 0.0125,
+          "credits": 322.7625,
+          "factories": 0.025,
+          "harvesters": 0.0125,
+          "refineries": 0.0875,
+          "units": 10.0125
+        },
+        "tickCapDrawCountDifference": -3,
+        "winCountDifference": 3
+      },
+      "local1": {
+        "drawCountDifference": -13,
+        "lossCountDifference": -2,
+        "outcomeTransitionCounts": {
+          "baseline": {
+            "baseline": 1,
+            "candidate": 0,
+            "draw": 7
+          },
+          "candidate": {
+            "baseline": 0,
+            "candidate": 2,
+            "draw": 2
+          },
+          "draw": {
+            "baseline": 5,
+            "candidate": 17,
+            "draw": 46
+          }
+        },
+        "outcomeTransitionDetails": {
+          "baselineToBaseline": {
+            "games": 1,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": 8217.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -4.0,
+              "combatants": 11.0,
+              "conyards": 0.0,
+              "credits": -427.0,
+              "factories": 0.0,
+              "harvesters": 0.0,
+              "refineries": 0.0,
+              "units": 7.0
+            }
+          },
+          "baselineToDraw": {
+            "games": 7,
+            "meanScoreDifference": 0.5,
+            "meanTickDifference": 6344.428571428572,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 4.428571428571429,
+              "combatants": 38.0,
+              "conyards": 0.7142857142857143,
+              "credits": -956.1428571428571,
+              "factories": 2.142857142857143,
+              "harvesters": 1.0,
+              "refineries": 1.0,
+              "units": 44.142857142857146
+            }
+          },
+          "candidateToCandidate": {
+            "games": 2,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": -1878.5,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -5.0,
+              "combatants": 21.0,
+              "conyards": -1.0,
+              "credits": -58.5,
+              "factories": -0.5,
+              "harvesters": 0.0,
+              "refineries": 0.0,
+              "units": 17.0
+            }
+          },
+          "candidateToDraw": {
+            "games": 2,
+            "meanScoreDifference": -0.5,
+            "meanTickDifference": 2612.5,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -10.5,
+              "combatants": -64.5,
+              "conyards": -1.5,
+              "credits": -753.0,
+              "factories": 0.5,
+              "harvesters": -1.0,
+              "refineries": -1.0,
+              "units": -75.0
+            }
+          },
+          "drawToBaseline": {
+            "games": 5,
+            "meanScoreDifference": -0.5,
+            "meanTickDifference": -2807.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -7.4,
+              "combatants": -43.8,
+              "conyards": -0.8,
+              "credits": 88.8,
+              "factories": -0.2,
+              "harvesters": -1.0,
+              "refineries": -1.0,
+              "units": -52.2
+            }
+          },
+          "drawToCandidate": {
+            "games": 17,
+            "meanScoreDifference": 0.5,
+            "meanTickDifference": -3888.235294117647,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 5.411764705882353,
+              "combatants": 63.8235294117647,
+              "conyards": -0.058823529411764705,
+              "credits": 331.7647058823529,
+              "factories": 1.411764705882353,
+              "harvesters": 2.411764705882353,
+              "refineries": 0.8235294117647058,
+              "units": 72.94117647058823
+            }
+          },
+          "drawToDraw": {
+            "games": 46,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": 0.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -5.391304347826087,
+              "combatants": 18.282608695652176,
+              "conyards": -0.6739130434782609,
+              "credits": 111.23913043478261,
+              "factories": -0.15217391304347827,
+              "harvesters": 0.45652173913043476,
+              "refineries": 0.15217391304347827,
+              "units": 14.043478260869565
+            }
+          }
+        },
+        "pairedGames": 80,
+        "pairedScoreDifferenceCounts": {
+          "-0.5": 7,
+          "0": 49,
+          "0.5": 24
+        },
+        "scoreDifference": 0.10625000000000007,
+        "terminalCandidateMinusBaselineDifference": {
+          "buildings": -2.4625,
+          "combatants": 23.7125,
+          "conyards": -0.45,
+          "credits": 30.725,
+          "factories": 0.3875,
+          "harvesters": 0.775,
+          "refineries": 0.2625,
+          "units": 22.8125
+        },
+        "tickCapDrawCountDifference": -13,
+        "winCountDifference": 15
+      },
+      "local2": {
+        "drawCountDifference": -17,
+        "lossCountDifference": -2,
+        "outcomeTransitionCounts": {
+          "baseline": {
+            "baseline": 0,
+            "candidate": 3,
+            "draw": 5
+          },
+          "candidate": {
+            "baseline": 0,
+            "candidate": 0,
+            "draw": 0
+          },
+          "draw": {
+            "baseline": 6,
+            "candidate": 16,
+            "draw": 50
+          }
+        },
+        "outcomeTransitionDetails": {
+          "baselineToCandidate": {
+            "games": 3,
+            "meanScoreDifference": 1.0,
+            "meanTickDifference": 2150.3333333333335,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 12.666666666666666,
+              "combatants": 58.333333333333336,
+              "conyards": 1.0,
+              "credits": -276.6666666666667,
+              "factories": 3.0,
+              "harvesters": 3.3333333333333335,
+              "refineries": 2.3333333333333335,
+              "units": 75.33333333333333
+            }
+          },
+          "baselineToDraw": {
+            "games": 5,
+            "meanScoreDifference": 0.5,
+            "meanTickDifference": 6755.4,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 3.2,
+              "combatants": 43.2,
+              "conyards": 0.6,
+              "credits": -47.8,
+              "factories": 0.8,
+              "harvesters": 2.2,
+              "refineries": 1.8,
+              "units": 49.2
+            }
+          },
+          "drawToBaseline": {
+            "games": 6,
+            "meanScoreDifference": -0.5,
+            "meanTickDifference": -2709.6666666666665,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -7.833333333333333,
+              "combatants": -13.833333333333334,
+              "conyards": -0.8333333333333334,
+              "credits": -106.33333333333333,
+              "factories": -1.0,
+              "harvesters": -1.1666666666666667,
+              "refineries": -1.1666666666666667,
+              "units": -22.833333333333332
+            }
+          },
+          "drawToCandidate": {
+            "games": 16,
+            "meanScoreDifference": 0.5,
+            "meanTickDifference": -4237.6875,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 2.5,
+              "combatants": 52.1875,
+              "conyards": 0.0625,
+              "credits": -6644.5625,
+              "factories": 1.0,
+              "harvesters": 1.0625,
+              "refineries": -0.25,
+              "units": 57.1875
+            }
+          },
+          "drawToDraw": {
+            "games": 50,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": 0.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -3.2,
+              "combatants": 14.56,
+              "conyards": -0.8,
+              "credits": -1072.76,
+              "factories": 0.06,
+              "harvesters": 0.18,
+              "refineries": -0.12,
+              "units": 12.4
+            }
+          }
+        },
+        "pairedGames": 80,
+        "pairedScoreDifferenceCounts": {
+          "-0.5": 6,
+          "0": 50,
+          "0.5": 21,
+          "1": 3
+        },
+        "scoreDifference": 0.13125000000000003,
+        "terminalCandidateMinusBaselineDifference": {
+          "buildings": -1.4125,
+          "combatants": 23.3875,
+          "conyards": -0.475,
+          "credits": -2020.725,
+          "factories": 0.325,
+          "harvesters": 0.5,
+          "refineries": -0.0125,
+          "units": 23.375
+        },
+        "tickCapDrawCountDifference": -17,
+        "winCountDifference": 19
+      },
+      "local3": {
+        "drawCountDifference": -15,
+        "lossCountDifference": -1,
+        "outcomeTransitionCounts": {
+          "baseline": {
+            "baseline": 1,
+            "candidate": 0,
+            "draw": 6
+          },
+          "candidate": {
+            "baseline": 0,
+            "candidate": 1,
+            "draw": 2
+          },
+          "draw": {
+            "baseline": 5,
+            "candidate": 18,
+            "draw": 47
+          }
+        },
+        "outcomeTransitionDetails": {
+          "baselineToBaseline": {
+            "games": 1,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": 7821.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -4.0,
+              "combatants": 10.0,
+              "conyards": 0.0,
+              "credits": 139.0,
+              "factories": 0.0,
+              "harvesters": 0.0,
+              "refineries": 0.0,
+              "units": 6.0
+            }
+          },
+          "baselineToDraw": {
+            "games": 6,
+            "meanScoreDifference": 0.5,
+            "meanTickDifference": 5409.333333333333,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 5.833333333333333,
+              "combatants": 43.0,
+              "conyards": 0.6666666666666666,
+              "credits": -654.8333333333334,
+              "factories": 2.5,
+              "harvesters": 1.8333333333333333,
+              "refineries": 1.5,
+              "units": 51.333333333333336
+            }
+          },
+          "candidateToCandidate": {
+            "games": 1,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": -1671.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -11.0,
+              "combatants": 96.0,
+              "conyards": -1.0,
+              "credits": 5300.0,
+              "factories": -1.0,
+              "harvesters": 1.0,
+              "refineries": -2.0,
+              "units": 87.0
+            }
+          },
+          "candidateToDraw": {
+            "games": 2,
+            "meanScoreDifference": -0.5,
+            "meanTickDifference": 3244.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -11.5,
+              "combatants": -36.5,
+              "conyards": -0.5,
+              "credits": -113.0,
+              "factories": -1.0,
+              "harvesters": 1.5,
+              "refineries": 0.0,
+              "units": -47.5
+            }
+          },
+          "drawToBaseline": {
+            "games": 5,
+            "meanScoreDifference": -0.5,
+            "meanTickDifference": -2807.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -11.0,
+              "combatants": -37.8,
+              "conyards": -1.0,
+              "credits": -477.4,
+              "factories": -1.2,
+              "harvesters": -1.2,
+              "refineries": -1.4,
+              "units": -50.0
+            }
+          },
+          "drawToCandidate": {
+            "games": 18,
+            "meanScoreDifference": 0.5,
+            "meanTickDifference": -4244.444444444444,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 4.277777777777778,
+              "combatants": 60.0,
+              "conyards": 0.05555555555555555,
+              "credits": -114.05555555555556,
+              "factories": 1.4444444444444444,
+              "harvesters": 2.6666666666666665,
+              "refineries": 1.3333333333333333,
+              "units": 68.05555555555556
+            }
+          },
+          "drawToDraw": {
+            "games": 47,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": 0.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -5.595744680851064,
+              "combatants": 13.297872340425531,
+              "conyards": -0.7021276595744681,
+              "credits": 92.04255319148936,
+              "factories": -0.1702127659574468,
+              "harvesters": 0.1702127659574468,
+              "refineries": 0.10638297872340426,
+              "units": 8.595744680851064
+            }
+          }
+        },
+        "pairedGames": 80,
+        "pairedScoreDifferenceCounts": {
+          "-0.5": 7,
+          "0": 49,
+          "0.5": 24
+        },
+        "scoreDifference": 0.10625000000000007,
+        "terminalCandidateMinusBaselineDifference": {
+          "buildings": -3.05,
+          "combatants": 22.5875,
+          "conyards": -0.4375,
+          "credits": 14.625,
+          "factories": 0.3,
+          "harvesters": 0.8125,
+          "refineries": 0.3625,
+          "units": 21.0625
+        },
+        "tickCapDrawCountDifference": -15,
+        "winCountDifference": 16
+      },
+      "local4": {
+        "drawCountDifference": -10,
+        "lossCountDifference": 1,
+        "outcomeTransitionCounts": {
+          "baseline": {
+            "baseline": 0,
+            "candidate": 0,
+            "draw": 5
+          },
+          "candidate": {
+            "baseline": 0,
+            "candidate": 9,
+            "draw": 1
+          },
+          "draw": {
+            "baseline": 6,
+            "candidate": 10,
+            "draw": 49
+          }
+        },
+        "outcomeTransitionDetails": {
+          "baselineToDraw": {
+            "games": 5,
+            "meanScoreDifference": 0.5,
+            "meanTickDifference": 4047.8,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 3.8,
+              "combatants": 7.2,
+              "conyards": 0.6,
+              "credits": 30.6,
+              "factories": 0.8,
+              "harvesters": 0.8,
+              "refineries": 0.6,
+              "units": 11.8
+            }
+          },
+          "candidateToCandidate": {
+            "games": 9,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": -1385.5555555555557,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 0.2222222222222222,
+              "combatants": 7.222222222222222,
+              "conyards": 0.0,
+              "credits": -356.77777777777777,
+              "factories": 0.0,
+              "harvesters": 0.1111111111111111,
+              "refineries": 0.1111111111111111,
+              "units": 7.666666666666667
+            }
+          },
+          "candidateToDraw": {
+            "games": 1,
+            "meanScoreDifference": -0.5,
+            "meanTickDifference": 3564.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -4.0,
+              "combatants": -13.0,
+              "conyards": 0.0,
+              "credits": -165.0,
+              "factories": 0.0,
+              "harvesters": -1.0,
+              "refineries": -1.0,
+              "units": -18.0
+            }
+          },
+          "drawToBaseline": {
+            "games": 6,
+            "meanScoreDifference": -0.5,
+            "meanTickDifference": -2709.6666666666665,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": -4.0,
+              "combatants": -24.833333333333332,
+              "conyards": -0.16666666666666666,
+              "credits": 344.1666666666667,
+              "factories": -1.3333333333333333,
+              "harvesters": -0.8333333333333334,
+              "refineries": -0.8333333333333334,
+              "units": -30.5
+            }
+          },
+          "drawToCandidate": {
+            "games": 10,
+            "meanScoreDifference": 0.5,
+            "meanTickDifference": -3379.7,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 12.2,
+              "combatants": 5.5,
+              "conyards": 0.3,
+              "credits": -1221.1,
+              "factories": 1.8,
+              "harvesters": 1.2,
+              "refineries": 1.5,
+              "units": 19.0
+            }
+          },
+          "drawToDraw": {
+            "games": 49,
+            "meanScoreDifference": 0.0,
+            "meanTickDifference": 0.0,
+            "terminalCandidateMinusBaselineDifference": {
+              "buildings": 1.4489795918367347,
+              "combatants": -4.36734693877551,
+              "conyards": 0.061224489795918366,
+              "credits": -124.59183673469387,
+              "factories": 0.3877551020408163,
+              "harvesters": 0.30612244897959184,
+              "refineries": 0.32653061224489793,
+              "units": -2.7346938775510203
+            }
+          }
+        },
+        "pairedGames": 80,
+        "pairedScoreDifferenceCounts": {
+          "-0.5": 7,
+          "0": 58,
+          "0.5": 15
+        },
+        "scoreDifference": 0.050000000000000044,
+        "terminalCandidateMinusBaselineDifference": {
+          "buildings": 2.325,
+          "combatants": -2.75,
+          "conyards": 0.1,
+          "credits": -243.425,
+          "factories": 0.4125,
+          "harvesters": 0.325,
+          "refineries": 0.3625,
+          "units": -0.2125
+        },
+        "tickCapDrawCountDifference": -10,
+        "winCountDifference": 9
+      }
+    },
+    "methods": {
+      "champion": {
+        "byOutcome": {
+          "baseline": {
+            "finishedGames": 6,
+            "games": 6,
+            "meanTicks": 15290.333333333334,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 9.0,
+                "combatants": 22.666666666666668,
+                "conyards": 1.0,
+                "credits": 146.66666666666666,
+                "factories": 2.0,
+                "harvesters": 1.0,
+                "refineries": 1.0,
+                "units": 32.666666666666664
+              },
+              "candidateMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 432.5,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -9.0,
+                "combatants": -22.666666666666668,
+                "conyards": -1.0,
+                "credits": 285.8333333333333,
+                "factories": -2.0,
+                "harvesters": -1.0,
+                "refineries": -1.0,
+                "units": -32.666666666666664
+              }
+            }
+          },
+          "candidate": {
+            "finishedGames": 19,
+            "games": 19,
+            "meanTicks": 13854.526315789473,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 504.8421052631579,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMean": {
+                "buildings": 6.0,
+                "combatants": 58.89473684210526,
+                "conyards": 0.0,
+                "credits": 818.6315789473684,
+                "factories": 1.5263157894736843,
+                "harvesters": 2.6315789473684212,
+                "refineries": 1.2105263157894737,
+                "units": 68.73684210526316
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 6.0,
+                "combatants": 58.89473684210526,
+                "conyards": 0.0,
+                "credits": 313.7894736842105,
+                "factories": 1.5263157894736843,
+                "harvesters": 2.6315789473684212,
+                "refineries": 1.2105263157894737,
+                "units": 68.73684210526316
+              }
+            }
+          },
+          "draw": {
+            "finishedGames": 0,
+            "games": 55,
+            "meanTicks": 18000.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 8.709090909090909,
+                "combatants": 7.7272727272727275,
+                "conyards": 0.6363636363636364,
+                "credits": 175.78181818181818,
+                "factories": 1.4727272727272727,
+                "harvesters": 0.9454545454545454,
+                "refineries": 0.8727272727272727,
+                "units": 17.6
+              },
+              "candidateMean": {
+                "buildings": 5.363636363636363,
+                "combatants": 24.581818181818182,
+                "conyards": 0.05454545454545454,
+                "credits": 291.8909090909091,
+                "factories": 1.3272727272727274,
+                "harvesters": 1.3272727272727274,
+                "refineries": 1.0363636363636364,
+                "units": 32.018181818181816
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -3.3454545454545452,
+                "combatants": 16.854545454545455,
+                "conyards": -0.5818181818181818,
+                "credits": 116.10909090909091,
+                "factories": -0.14545454545454545,
+                "harvesters": 0.38181818181818183,
+                "refineries": 0.16363636363636364,
+                "units": 14.418181818181818
+              }
+            }
+          }
+        },
+        "draws": 55,
+        "finishedGames": 25,
+        "games": 80,
+        "losses": 6,
+        "meanTicks": 16812.225,
+        "score": 0.58125,
+        "terminal": {
+          "baselineMean": {
+            "buildings": 6.6625,
+            "combatants": 7.0125,
+            "conyards": 0.5125,
+            "credits": 251.75,
+            "factories": 1.1625,
+            "harvesters": 0.725,
+            "refineries": 0.675,
+            "units": 14.55
+          },
+          "candidateMean": {
+            "buildings": 5.1125,
+            "combatants": 30.8875,
+            "conyards": 0.0375,
+            "credits": 427.5375,
+            "factories": 1.275,
+            "harvesters": 1.5375,
+            "refineries": 1.0,
+            "units": 38.3375
+          },
+          "candidateMinusBaselineMean": {
+            "buildings": -1.55,
+            "combatants": 23.875,
+            "conyards": -0.475,
+            "credits": 175.7875,
+            "factories": 0.1125,
+            "harvesters": 0.8125,
+            "refineries": 0.325,
+            "units": 23.7875
+          }
+        },
+        "tickCapDraws": 55,
+        "wins": 19
+      },
+      "local0": {
+        "byOutcome": {
+          "baseline": {
+            "finishedGames": 6,
+            "games": 6,
+            "meanTicks": 10436.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 6.5,
+                "combatants": 18.166666666666668,
+                "conyards": 1.0,
+                "credits": 186.5,
+                "factories": 1.1666666666666667,
+                "harvesters": 1.0,
+                "refineries": 1.0,
+                "units": 25.666666666666668
+              },
+              "candidateMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 449.1666666666667,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -6.5,
+                "combatants": -18.166666666666668,
+                "conyards": -1.0,
+                "credits": 262.6666666666667,
+                "factories": -1.1666666666666667,
+                "harvesters": -1.0,
+                "refineries": -1.0,
+                "units": -25.666666666666668
+              }
+            }
+          },
+          "candidate": {
+            "finishedGames": 16,
+            "games": 16,
+            "meanTicks": 14133.3125,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 459.8125,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMean": {
+                "buildings": 5.6875,
+                "combatants": 53.5,
+                "conyards": 0.0,
+                "credits": 364.4375,
+                "factories": 1.5,
+                "harvesters": 2.625,
+                "refineries": 1.125,
+                "units": 63.0625
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 5.6875,
+                "combatants": 53.5,
+                "conyards": 0.0,
+                "credits": -95.375,
+                "factories": 1.5,
+                "harvesters": 2.625,
+                "refineries": 1.125,
+                "units": 63.0625
+              }
+            }
+          },
+          "draw": {
+            "finishedGames": 0,
+            "games": 58,
+            "meanTicks": 18000.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 9.689655172413794,
+                "combatants": 11.344827586206897,
+                "conyards": 0.6379310344827587,
+                "credits": 257.51724137931035,
+                "factories": 1.603448275862069,
+                "harvesters": 0.896551724137931,
+                "refineries": 0.9482758620689655,
+                "units": 22.275862068965516
+              },
+              "candidateMean": {
+                "buildings": 5.586206896551724,
+                "combatants": 18.775862068965516,
+                "conyards": 0.06896551724137931,
+                "credits": 53.93103448275862,
+                "factories": 1.4310344827586208,
+                "harvesters": 1.3793103448275863,
+                "refineries": 1.0689655172413792,
+                "units": 26.53448275862069
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -4.103448275862069,
+                "combatants": 7.431034482758621,
+                "conyards": -0.5689655172413793,
+                "credits": -203.58620689655172,
+                "factories": -0.1724137931034483,
+                "harvesters": 0.4827586206896552,
+                "refineries": 0.1206896551724138,
+                "units": 4.258620689655173
+              }
+            }
+          }
+        },
+        "draws": 58,
+        "finishedGames": 22,
+        "games": 80,
+        "losses": 6,
+        "meanTicks": 16659.3625,
+        "score": 0.5625,
+        "terminal": {
+          "baselineMean": {
+            "buildings": 7.5125,
+            "combatants": 9.5875,
+            "conyards": 0.5375,
+            "credits": 292.65,
+            "factories": 1.25,
+            "harvesters": 0.725,
+            "refineries": 0.7625,
+            "units": 18.075
+          },
+          "candidateMean": {
+            "buildings": 5.1875,
+            "combatants": 24.3125,
+            "conyards": 0.05,
+            "credits": 145.675,
+            "factories": 1.3375,
+            "harvesters": 1.525,
+            "refineries": 1.0,
+            "units": 31.85
+          },
+          "candidateMinusBaselineMean": {
+            "buildings": -2.325,
+            "combatants": 14.725,
+            "conyards": -0.4875,
+            "credits": -146.975,
+            "factories": 0.0875,
+            "harvesters": 0.8,
+            "refineries": 0.2375,
+            "units": 13.775
+          }
+        },
+        "tickCapDraws": 58,
+        "wins": 16
+      },
+      "local1": {
+        "byOutcome": {
+          "baseline": {
+            "finishedGames": 8,
+            "games": 8,
+            "meanTicks": 11143.625,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 6.75,
+                "combatants": 27.25,
+                "conyards": 1.0,
+                "credits": 36.625,
+                "factories": 1.75,
+                "harvesters": 1.0,
+                "refineries": 1.0,
+                "units": 35.0
+              },
+              "candidateMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 803.625,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -6.75,
+                "combatants": -27.25,
+                "conyards": -1.0,
+                "credits": 767.0,
+                "factories": -1.75,
+                "harvesters": -1.0,
+                "refineries": -1.0,
+                "units": -35.0
+              }
+            }
+          },
+          "candidate": {
+            "finishedGames": 4,
+            "games": 4,
+            "meanTicks": 14467.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 499.25,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMean": {
+                "buildings": 8.5,
+                "combatants": 41.5,
+                "conyards": 1.0,
+                "credits": 399.0,
+                "factories": 0.75,
+                "harvesters": 1.0,
+                "refineries": 1.0,
+                "units": 51.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 8.5,
+                "combatants": 41.5,
+                "conyards": 1.0,
+                "credits": -100.25,
+                "factories": 0.75,
+                "harvesters": 1.0,
+                "refineries": 1.0,
+                "units": 51.0
+              }
+            }
+          },
+          "draw": {
+            "finishedGames": 0,
+            "games": 68,
+            "meanTicks": 18000.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 8.323529411764707,
+                "combatants": 12.676470588235293,
+                "conyards": 0.75,
+                "credits": 136.3235294117647,
+                "factories": 1.8970588235294117,
+                "harvesters": 1.2647058823529411,
+                "refineries": 1.2352941176470589,
+                "units": 22.544117647058822
+              },
+              "candidateMean": {
+                "buildings": 9.691176470588236,
+                "combatants": 13.632352941176471,
+                "conyards": 0.7794117647058824,
+                "credits": 222.64705882352942,
+                "factories": 1.7352941176470589,
+                "harvesters": 1.3676470588235294,
+                "refineries": 1.3676470588235294,
+                "units": 24.808823529411764
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 1.3676470588235294,
+                "combatants": 0.9558823529411765,
+                "conyards": 0.029411764705882353,
+                "credits": 86.32352941176471,
+                "factories": -0.16176470588235295,
+                "harvesters": 0.10294117647058823,
+                "refineries": 0.1323529411764706,
+                "units": 2.264705882352941
+              }
+            }
+          }
+        },
+        "draws": 68,
+        "finishedGames": 12,
+        "games": 80,
+        "losses": 8,
+        "meanTicks": 17137.7125,
+        "score": 0.475,
+        "terminal": {
+          "baselineMean": {
+            "buildings": 7.75,
+            "combatants": 13.5,
+            "conyards": 0.7375,
+            "credits": 144.5,
+            "factories": 1.7875,
+            "harvesters": 1.175,
+            "refineries": 1.15,
+            "units": 22.6625
+          },
+          "candidateMean": {
+            "buildings": 8.6625,
+            "combatants": 13.6625,
+            "conyards": 0.7125,
+            "credits": 289.5625,
+            "factories": 1.5125,
+            "harvesters": 1.2125,
+            "refineries": 1.2125,
+            "units": 23.6375
+          },
+          "candidateMinusBaselineMean": {
+            "buildings": 0.9125,
+            "combatants": 0.1625,
+            "conyards": -0.025,
+            "credits": 145.0625,
+            "factories": -0.275,
+            "harvesters": 0.0375,
+            "refineries": 0.0625,
+            "units": 0.975
+          }
+        },
+        "tickCapDraws": 68,
+        "wins": 4
+      },
+      "local2": {
+        "byOutcome": {
+          "baseline": {
+            "finishedGames": 8,
+            "games": 8,
+            "meanTicks": 11601.375,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 7.125,
+                "combatants": 19.5,
+                "conyards": 1.0,
+                "credits": 279.25,
+                "factories": 1.375,
+                "harvesters": 1.375,
+                "refineries": 1.375,
+                "units": 28.0
+              },
+              "candidateMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 417.25,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -7.125,
+                "combatants": -19.5,
+                "conyards": -1.0,
+                "credits": 138.0,
+                "factories": -1.375,
+                "harvesters": -1.375,
+                "refineries": -1.375,
+                "units": -28.0
+              }
+            }
+          },
+          "draw": {
+            "finishedGames": 0,
+            "games": 72,
+            "meanTicks": 18000.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 8.166666666666666,
+                "combatants": 15.291666666666666,
+                "conyards": 0.75,
+                "credits": 189.27777777777777,
+                "factories": 1.7638888888888888,
+                "harvesters": 1.1666666666666667,
+                "refineries": 1.0972222222222223,
+                "units": 24.98611111111111
+              },
+              "candidateMean": {
+                "buildings": 8.805555555555555,
+                "combatants": 18.0,
+                "conyards": 0.8611111111111112,
+                "credits": 2614.5138888888887,
+                "factories": 1.6805555555555556,
+                "harvesters": 1.6666666666666667,
+                "refineries": 1.625,
+                "units": 28.555555555555557
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 0.6388888888888888,
+                "combatants": 2.7083333333333335,
+                "conyards": 0.1111111111111111,
+                "credits": 2425.2361111111113,
+                "factories": -0.08333333333333333,
+                "harvesters": 0.5,
+                "refineries": 0.5277777777777778,
+                "units": 3.5694444444444446
+              }
+            }
+          }
+        },
+        "draws": 72,
+        "finishedGames": 8,
+        "games": 80,
+        "losses": 8,
+        "meanTicks": 17360.1375,
+        "score": 0.45,
+        "terminal": {
+          "baselineMean": {
+            "buildings": 8.0625,
+            "combatants": 15.7125,
+            "conyards": 0.775,
+            "credits": 198.275,
+            "factories": 1.725,
+            "harvesters": 1.1875,
+            "refineries": 1.125,
+            "units": 25.2875
+          },
+          "candidateMean": {
+            "buildings": 7.925,
+            "combatants": 16.2,
+            "conyards": 0.775,
+            "credits": 2394.7875,
+            "factories": 1.5125,
+            "harvesters": 1.5,
+            "refineries": 1.4625,
+            "units": 25.7
+          },
+          "candidateMinusBaselineMean": {
+            "buildings": -0.1375,
+            "combatants": 0.4875,
+            "conyards": 0.0,
+            "credits": 2196.5125,
+            "factories": -0.2125,
+            "harvesters": 0.3125,
+            "refineries": 0.3375,
+            "units": 0.4125
+          }
+        },
+        "tickCapDraws": 72,
+        "wins": 0
+      },
+      "local3": {
+        "byOutcome": {
+          "baseline": {
+            "finishedGames": 7,
+            "games": 7,
+            "meanTicks": 11928.57142857143,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 7.428571428571429,
+                "combatants": 23.0,
+                "conyards": 0.8571428571428571,
+                "credits": 206.85714285714286,
+                "factories": 1.7142857142857142,
+                "harvesters": 1.2857142857142858,
+                "refineries": 1.2857142857142858,
+                "units": 31.857142857142858
+              },
+              "candidateMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 568.5714285714286,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -7.428571428571429,
+                "combatants": -23.0,
+                "conyards": -0.8571428571428571,
+                "credits": 361.7142857142857,
+                "factories": -1.7142857142857142,
+                "harvesters": -1.2857142857142858,
+                "refineries": -1.2857142857142858,
+                "units": -31.857142857142858
+              }
+            }
+          },
+          "candidate": {
+            "finishedGames": 3,
+            "games": 3,
+            "meanTicks": 15606.333333333334,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 654.0,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMean": {
+                "buildings": 11.666666666666666,
+                "combatants": 34.0,
+                "conyards": 0.3333333333333333,
+                "credits": 196.0,
+                "factories": 2.0,
+                "harvesters": 1.6666666666666667,
+                "refineries": 1.6666666666666667,
+                "units": 48.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 11.666666666666666,
+                "combatants": 34.0,
+                "conyards": 0.3333333333333333,
+                "credits": -458.0,
+                "factories": 2.0,
+                "harvesters": 1.6666666666666667,
+                "refineries": 1.6666666666666667,
+                "units": 48.0
+              }
+            }
+          },
+          "draw": {
+            "finishedGames": 0,
+            "games": 70,
+            "meanTicks": 18000.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 8.1,
+                "combatants": 10.871428571428572,
+                "conyards": 0.8,
+                "credits": 133.81428571428572,
+                "factories": 1.8857142857142857,
+                "harvesters": 1.1142857142857143,
+                "refineries": 1.1285714285714286,
+                "units": 20.257142857142856
+              },
+              "candidateMean": {
+                "buildings": 10.057142857142857,
+                "combatants": 13.185714285714285,
+                "conyards": 0.8285714285714286,
+                "credits": 301.45714285714286,
+                "factories": 1.7571428571428571,
+                "harvesters": 1.1714285714285715,
+                "refineries": 1.1428571428571428,
+                "units": 24.5
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 1.957142857142857,
+                "combatants": 2.3142857142857145,
+                "conyards": 0.02857142857142857,
+                "credits": 167.64285714285714,
+                "factories": -0.12857142857142856,
+                "harvesters": 0.05714285714285714,
+                "refineries": 0.014285714285714285,
+                "units": 4.242857142857143
+              }
+            }
+          }
+        },
+        "draws": 70,
+        "finishedGames": 10,
+        "games": 80,
+        "losses": 7,
+        "meanTicks": 17378.9875,
+        "score": 0.475,
+        "terminal": {
+          "baselineMean": {
+            "buildings": 7.7375,
+            "combatants": 11.525,
+            "conyards": 0.775,
+            "credits": 159.7125,
+            "factories": 1.8,
+            "harvesters": 1.0875,
+            "refineries": 1.1,
+            "units": 20.5125
+          },
+          "candidateMean": {
+            "buildings": 9.2375,
+            "combatants": 12.8125,
+            "conyards": 0.7375,
+            "credits": 320.875,
+            "factories": 1.6125,
+            "harvesters": 1.0875,
+            "refineries": 1.0625,
+            "units": 23.2375
+          },
+          "candidateMinusBaselineMean": {
+            "buildings": 1.5,
+            "combatants": 1.2875,
+            "conyards": -0.0375,
+            "credits": 161.1625,
+            "factories": -0.1875,
+            "harvesters": 0.0,
+            "refineries": -0.0375,
+            "units": 2.725
+          }
+        },
+        "tickCapDraws": 70,
+        "wins": 3
+      },
+      "local4": {
+        "byOutcome": {
+          "baseline": {
+            "finishedGames": 5,
+            "games": 5,
+            "meanTicks": 13952.2,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 6.8,
+                "combatants": 18.0,
+                "conyards": 1.0,
+                "credits": 228.0,
+                "factories": 1.8,
+                "harvesters": 1.0,
+                "refineries": 1.0,
+                "units": 25.8
+              },
+              "candidateMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 237.8,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -6.8,
+                "combatants": -18.0,
+                "conyards": -1.0,
+                "credits": 9.8,
+                "factories": -1.8,
+                "harvesters": -1.0,
+                "refineries": -1.0,
+                "units": -25.8
+              }
+            }
+          },
+          "candidate": {
+            "finishedGames": 10,
+            "games": 10,
+            "meanTicks": 14393.9,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 0.0,
+                "combatants": 0.0,
+                "conyards": 0.0,
+                "credits": 479.5,
+                "factories": 0.0,
+                "harvesters": 0.0,
+                "refineries": 0.0,
+                "units": 0.0
+              },
+              "candidateMean": {
+                "buildings": 5.7,
+                "combatants": 54.1,
+                "conyards": 0.0,
+                "credits": 1140.1,
+                "factories": 1.4,
+                "harvesters": 2.3,
+                "refineries": 1.1,
+                "units": 63.4
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": 5.7,
+                "combatants": 54.1,
+                "conyards": 0.0,
+                "credits": 660.6,
+                "factories": 1.4,
+                "harvesters": 2.3,
+                "refineries": 1.1,
+                "units": 63.4
+              }
+            }
+          },
+          "draw": {
+            "finishedGames": 0,
+            "games": 65,
+            "meanTicks": 18000.0,
+            "terminal": {
+              "baselineMean": {
+                "buildings": 10.707692307692307,
+                "combatants": 7.753846153846154,
+                "conyards": 0.676923076923077,
+                "credits": 139.7846153846154,
+                "factories": 1.876923076923077,
+                "harvesters": 1.1692307692307693,
+                "refineries": 1.2,
+                "units": 19.923076923076923
+              },
+              "candidateMean": {
+                "buildings": 5.584615384615384,
+                "combatants": 33.58461538461538,
+                "conyards": 0.046153846153846156,
+                "credits": 553.3538461538461,
+                "factories": 1.4307692307692308,
+                "harvesters": 1.4923076923076923,
+                "refineries": 1.0615384615384615,
+                "units": 41.69230769230769
+              },
+              "candidateMinusBaselineMean": {
+                "buildings": -5.123076923076923,
+                "combatants": 25.83076923076923,
+                "conyards": -0.6307692307692307,
+                "credits": 413.5692307692308,
+                "factories": -0.4461538461538462,
+                "harvesters": 0.3230769230769231,
+                "refineries": -0.13846153846153847,
+                "units": 21.76923076923077
+              }
+            }
+          }
+        },
+        "draws": 65,
+        "finishedGames": 15,
+        "games": 80,
+        "losses": 5,
+        "meanTicks": 17296.25,
+        "score": 0.53125,
+        "terminal": {
+          "baselineMean": {
+            "buildings": 9.125,
+            "combatants": 7.425,
+            "conyards": 0.6125,
+            "credits": 187.7625,
+            "factories": 1.6375,
+            "harvesters": 1.0125,
+            "refineries": 1.0375,
+            "units": 17.8
+          },
+          "candidateMean": {
+            "buildings": 5.25,
+            "combatants": 34.05,
+            "conyards": 0.0375,
+            "credits": 606.975,
+            "factories": 1.3375,
+            "harvesters": 1.5,
+            "refineries": 1.0,
+            "units": 41.8
+          },
+          "candidateMinusBaselineMean": {
+            "buildings": -3.875,
+            "combatants": 26.625,
+            "conyards": -0.575,
+            "credits": 419.2125,
+            "factories": -0.3,
+            "harvesters": 0.4875,
+            "refineries": -0.0375,
+            "units": 24.0
+          }
+        },
+        "tickCapDraws": 65,
+        "wins": 10
+      }
+    }
+  },
+  "schemaVersion": 1
+}
