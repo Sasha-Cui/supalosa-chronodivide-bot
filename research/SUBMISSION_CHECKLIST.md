@@ -30,15 +30,15 @@ the anonymous branch during review.
 - Title: **Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono
   Divide**
 - Anonymous manuscript source commit:
-  `d545418104b2fb4953e25a5f2654cdc5fe2985e8`
+  `cb891b47c9bb5ad3ac75c2d67b59865d56a7e1d1`
 - Main PDF: 16 pages total; non-reference material ends on page 14.
 - Main PDF SHA-256:
-  `789aa1cede3e3c9eb41dbb64bf1ddb0010a64f64621c1e0d6920eabb2d0479ee`
+  `f9ff3b79f46a896b8c4d5b5e98d73c83fa640e45ec18b8a245d29effe5460f47`
 - Supplement: 5 pages.
 - Supplement PDF SHA-256:
-  `49753e464cbd11e422fbd067886be316ef72a874a814f53d825dd6a3ef3ac13c`
+  `ab8624eb934b903d802501c1e2426352b8438d25a0fb3eb97d8e807047a18266`
 - Deterministic anonymous artifact SHA-256:
-  `f2e8b44e8eba0ffc96c2854307c037b17631a0cf4e2036bd15a3a026b9831d86`
+  `b6edfce7c4fb70b37df7014dc828af416c4f3e42811027efe59a0ad0f50e1d37`
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
@@ -61,6 +61,9 @@ commit and all three hashes together; never mix files from different freezes.
       superiority, broad game-AI dominance, or a paradigm shift.
 - [x] The frozen generic reference is not described as StrongBot's shipped or
       deployed map-profile-enabled default.
+- [x] The protocol explains why that deployed default is outside the shared
+      coordinate-free interface, and the limitations state that no deployed-
+      default improvement is estimated.
 - [x] No new outcome-bearing evidence from the opened family population has
       been added.
 

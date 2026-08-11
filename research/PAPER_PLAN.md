@@ -1,7 +1,7 @@
 # Results-driven paper plan
 
 Status: **empirical program complete; submission-candidate manuscript at
-`d545418`; deterministic anonymous artifact and internal QA complete**.
+`cb891b4`; deterministic anonymous artifact and internal QA complete**.
 
 ## Recommended paper
 
@@ -337,6 +337,16 @@ figure may contain a hand-copied result without a scripted consistency test.
 
 ## Likely reviewer objections and direct answers
 
+**“The reference is much weaker than the bot users would actually run.”**
+
+The estimate is deliberately conditional on the shared coordinate-free
+research interface: all candidates disable built-in map profiles and exact-map
+tactics, while the deployed constructor does not. State this estimand before
+the result, acknowledge that the 0.199 reference can make the relative gain
+look larger than a product-level improvement, and do not imply any comparison
+with the deployed default. The evidence-indexed response map is in
+`REVIEW_RESPONSE_GUIDE.md`.
+
 **“This is ordinary hand-coded bot tuning.”**
 
 Agree on the algorithmic boundary. The contribution is the reproducible,
@@ -382,4 +392,5 @@ redistribution of third-party maps or game archives without verified rights.
 - [x] Anonymous aggregate review bundle and third-party boundary complete.
 - [ ] Public combined-bot license or upstream permission resolved.
 - [ ] Remote presentation and deadline reconfirmed from official venue pages.
-- [ ] Final claim, statistics, accessibility, and anonymity audits pass.
+- [x] Current-candidate claim, statistics, accessibility, and anonymity audits
+      pass; repeat after any accepted external-review edit.

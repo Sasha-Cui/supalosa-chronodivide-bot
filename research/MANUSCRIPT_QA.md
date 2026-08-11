@@ -4,14 +4,14 @@ Last updated: **2026-08-11**
 
 ## Frozen manuscript
 
-- Source commit: `d545418104b2fb4953e25a5f2654cdc5fe2985e8`
+- Source commit: `cb891b47c9bb5ad3ac75c2d67b59865d56a7e1d1`
 - Main source: `paper/main.tex`
 - Supplement source: `paper/supplement.tex`
 - Target format: Springer LNCS, anonymous submission
 - Main PDF: 16 pages total; non-reference content ends on page 14
 - Supplement PDF: 5 pages
-- Main PDF SHA-256: `789aa1cede3e3c9eb41dbb64bf1ddb0010a64f64621c1e0d6920eabb2d0479ee`
-- Supplement PDF SHA-256: `49753e464cbd11e422fbd067886be316ef72a874a814f53d825dd6a3ef3ac13c`
+- Main PDF SHA-256: `f9ff3b79f46a896b8c4d5b5e98d73c83fa640e45ec18b8a245d29effe5460f47`
+- Supplement PDF SHA-256: `ab8624eb934b903d802501c1e2426352b8438d25a0fb3eb97d8e807047a18266`
 
 The PDFs are build products and are not committed. Their hashes identify the
 exact artifacts inspected during this QA pass.
@@ -54,7 +54,9 @@ pass. The final resource-accounting addition received another complete
 21-page pass. The artifact-derived claim refactor received a final complete
 21-page pass. The comparator-identity correction received another complete
 layout pass, including fresh renders of every changed supplement page. The
-checks covered title-page anonymity, text and background
+final coordinate-free comparator rationale and explicit deployed-default
+limitation received a further complete 16-page main-paper pass. The checks
+covered title-page anonymity, text and background
 contrast, margins, line wrapping, tables, plot labels, captions, page numbers,
 bibliography links, and section transitions. The final source contains no
 author NetID, institution name, literal Slurm account, personal repository URL,
@@ -63,7 +65,9 @@ or private absolute path.
 The claim audit confirmed that the paper:
 
 - leads with champion-versus-frozen-reference improvement, not absolute
-  superiority or a comparison with the deployed StrongBot default;
+  superiority or a comparison with the deployed StrongBot default, and
+  explains why the map-profile-enabled default is outside the prespecified
+  coordinate-free comparison;
 - reports the failed one-sided absolute-strength gate in the abstract,
   introduction, results, and conclusion;
 - labels optimizer, component, and terminal analyses post-confirmatory;
@@ -74,14 +78,14 @@ The claim audit confirmed that the paper:
 
 ## Clean export and reviewer artifact
 
-A committed main revision at `d545418` passed nine paper-generator and
+A committed main revision at `cb891b4` passed nine paper-generator and
 manuscript-invariant tests, two
 artifact-builder tests, and the three frozen family-exporter tests. It
 regenerated all paper fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256
-`f2e8b44e8eba0ffc96c2854307c037b17631a0cf4e2036bd15a3a026b9831d86`
-and size 64,986 bytes.
+`b6edfce7c4fb70b37df7014dc828af416c4f3e42811027efe59a0ad0f50e1d37`
+and size 65,116 bytes.
 Two independent builds produced that same hash. The archive contains 36
 manifested files, normalized `0/0` ownership and epoch timestamps, no Git tree,
 no bot packages, and no direct author, scheduler-account, institution, or

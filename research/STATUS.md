@@ -91,7 +91,7 @@ and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.m
 
 ## Manuscript status and remaining work
 
-Commit `d545418` is the current anonymous LNCS manuscript source revision. It
+Commit `cb891b4` is the current anonymous LNCS manuscript source revision. It
 sharpens the held-out-evaluation title, states two confirmatory research
 questions and one explicitly descriptive diagnostic question, removes causal-sounding
 mechanism language, and adds primary prior art on hidden-level evaluation and
@@ -101,7 +101,11 @@ cites the closest recent SCAG training-mode comparison, reports exact
 accepted-path resource use, and derives secondary reported values from frozen
 aggregate artifacts without changing any scientific result. It also corrects
 the comparator identity from an inaccurate shipped-default description to the
-prospectively frozen generic research reference. The main
+prospectively frozen generic research reference. It now explains that every
+candidate shares a coordinate-free policy interface, identifies the deployed
+map-profile-enabled constructor as outside that estimand, and states explicitly
+that the experiment does not estimate improvement over the deployed default.
+The main
 PDF is 16 pages with main text ending on page 14 and references continuing
 afterward; the supplement is five pages. All reported tables and figures are
 generated from hash-pinned aggregate artifacts. The final build has no overfull boxes, undefined
@@ -112,10 +116,15 @@ received rendered visual checks. The current PDF SHA-256 values are recorded in
 Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
 and commit `7cdbe0d` hardens its direct-identity denylist. The current 65 KB
 review archive is byte-deterministic at SHA-256
-`f2e8b44e8eba0ffc96c2854307c037b17631a0cf4e2036bd15a3a026b9831d86`.
+`b6edfce7c4fb70b37df7014dc828af416c4f3e42811027efe59a0ad0f50e1d37`.
 Its 36-file manifest verifies, all artifact tests pass, and an extracted
 reviewer copy rebuilds the 16-page paper and five-page supplement without
 undefined references, overflow, or BibTeX warnings.
+
+Commit `bda13e4` adds an evidence-indexed reviewer-response guide covering the
+weak-reference boundary, ordinary-tuning objection, one-opponent scope, high
+draw rate, post-confirmatory diagnostics, and artifact/release limitations.
+It is a preparation aid, not a license to add claims beyond the frozen paper.
 
 The remaining blockers are release- and submission-oriented, not additional
 training:
