@@ -77,6 +77,25 @@ study, or trajectory-instrumented mechanism study would be valuable follow-up
 work, but each requires a new registered population and should not be appended
 post hoc to this submission.
 
+## Calibration against accepted SCAG papers
+
+The 2024--2026 SCAG proceedings contain eight papers. Five 2025--2026 papers
+were read in full and compared with this manuscript. Recent accepted work
+includes one-game studies with 100 games per AI pairing and no interval
+estimates, as well as repeated-run evolutionary studies with several training
+modes and opponents. This manuscript is stronger than that sample on leakage
+control, uncertainty, negative-result reporting, and aggregate
+reproducibility. It is weaker on algorithmic novelty and opponent breadth.
+
+The closest recent paper, Castejón et al. (SCAG 2026), evolves 20 weights for a
+scripted card-game bot and compares fixed, coevolutionary, and hybrid training
+over five runs. It is now cited explicitly in the manuscript. The full
+comparison and its evidence boundary are recorded in
+[`SCAG_ACCEPTED_PAPER_CALIBRATION.md`](SCAG_ACCEPTED_PAPER_CALIBRATION.md).
+The calibration supports the current borderline/weak-accept assessment; it
+does not remove the need for a written topical-scope ruling because our
+configuration procedure is not an evolutionary strategy.
+
 ## Remaining acceptance work
 
 1. Ask the EvoStar/SCAG organizers in writing whether the paper's application
@@ -96,8 +115,7 @@ post hoc to this submission.
 
 ## Go/no-go
 
-- **Go** for a scoped applied game-AI, game-agent evaluation, or
-  evolutionary-computation applications session after the four remaining items
-  above.
+- **Go** for a scoped applied game-AI, algorithm-configuration, or game-agent
+  evaluation session after the four remaining items above.
 - **No-go** for a flagship general-ML venue, a paper titled as a new optimizer,
   or any claim that the bot reliably beats Supalosa or broadly advances game AI.

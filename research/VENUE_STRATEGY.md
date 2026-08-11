@@ -53,6 +53,15 @@ public-repository exposure. The supplementary-material upload route is already
 documented by the official submission instructions. Public redistribution of
 the combined bot separately depends on upstream permission.
 
+This assessment is also calibrated against the eight papers in the 2024--2026
+SCAG proceedings. A full-text review of the five 2025--2026 papers found that
+the current manuscript exceeds the sample on leakage control, uncertainty,
+negative endpoint reporting, and aggregate reproducibility, but trails it on
+algorithmic novelty and breadth of independent opponents. See
+[`SCAG_ACCEPTED_PAPER_CALIBRATION.md`](SCAG_ACCEPTED_PAPER_CALIBRATION.md).
+The comparison strengthens the case that the paper is technically credible at
+this level; it does not substitute for the requested written scope ruling.
+
 Likely reviewer concerns and the required answers are:
 
 | Concern | Evidence or response required in the paper |
