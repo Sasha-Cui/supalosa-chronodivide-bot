@@ -345,6 +345,30 @@ export const serializeResearchRunPlan = (plan: ResearchRunPlan): string => JSON.
     })) : plan.episodes,
 }, null, 2);
 
+/**
+ * Read historical runner records that serialized the parser-normalized train
+ * model instead of the strict wire schema. The only tolerated extra field is
+ * a train episode methodId exactly equal to its policyId; everything else is
+ * delegated to the same strict parser.
+ */
+export const parseRecordedResearchRunPlan = (value: unknown): ResearchRunPlan => {
+    if (!isRecord(value) || value.role !== "train" || !Array.isArray(value.episodes)) {
+        return parseResearchRunPlan(value);
+    }
+    const episodes = value.episodes.map((raw, index) => {
+        if (!isRecord(raw) || !("methodId" in raw)) {
+            return raw;
+        }
+        if (typeof raw.policyId !== "string" || raw.methodId !== raw.policyId) {
+            throw new Error(`Recorded train episode ${index} methodId must equal its policyId`);
+        }
+        const normalized = { ...raw };
+        delete normalized.methodId;
+        return normalized;
+    });
+    return parseResearchRunPlan({ ...value, episodes });
+};
+
 const parseJsonFile = (filePath: string): unknown => JSON.parse(fs.readFileSync(filePath, "utf8"));
 
 export const loadResearchRole = (plan: ResearchRunPlan, context: StrictPlanContext): LoadedResearchRole => {
@@ -619,7 +643,11 @@ const main = async (): Promise<void> => {
     const manifestPath = path.join(outDir, "manifest.json");
     const eventsPath = path.join(outDir, "events.jsonl");
     const summaryPath = path.join(outDir, "summary.json");
-    fs.writeFileSync(manifestPath, JSON.stringify({ planBytesSha256, plan, manifest }, null, 2), { flag: "wx" });
+    fs.writeFileSync(manifestPath, JSON.stringify({
+        planBytesSha256,
+        plan: JSON.parse(serializeResearchRunPlan(plan)),
+        manifest,
+    }, null, 2), { flag: "wx" });
     fs.writeFileSync(eventsPath, "", { flag: "wx" });
     appendJsonLine(eventsPath, { event: "run_start", planBytesSha256, launchedEpisodeCount: specs.length });
 

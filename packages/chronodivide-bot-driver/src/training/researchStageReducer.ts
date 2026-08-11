@@ -13,7 +13,12 @@ import {
     RESEARCH_STAGE2_POLICY_COUNT,
     ResearchCampaignManifest,
 } from "./researchPlanGenerator.js";
-import { parseResearchRunPlan, ResearchPlanPolicy, sha256File } from "./researchPlanRunner.js";
+import {
+    parseRecordedResearchRunPlan,
+    parseResearchRunPlan,
+    ResearchPlanPolicy,
+    sha256File,
+} from "./researchPlanRunner.js";
 import { parseResearchPolicy, researchPolicySha256 } from "./researchPolicy.js";
 
 export const RESEARCH_SELECTION_UTILITY_VERSION = 1 as const;
@@ -209,8 +214,10 @@ export const loadCompleteCampaignResults = (
         if (!isRecord(manifestValue) || !isRecord(summaryValue) || !isRecord(manifestValue.manifest)) {
             throw new Error(`Malformed runner manifest or summary for shard ${shard.runId}`);
         }
-        const parsedPlan = parseResearchRunPlan(manifestValue.plan);
+        const parsedPlan = parseResearchRunPlan(readJson(shard.planFile));
+        const recordedPlan = parseRecordedResearchRunPlan(manifestValue.plan);
         if (
+            JSON.stringify(recordedPlan) !== JSON.stringify(parsedPlan) ||
             parsedPlan.runId !== shard.runId ||
             manifestValue.planBytesSha256 !== shard.planSha256 ||
             summaryValue.runId !== shard.runId ||

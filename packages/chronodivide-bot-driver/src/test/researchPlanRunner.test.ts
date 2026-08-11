@@ -8,6 +8,7 @@ import {
     LoadedResearchRole,
     loadResearchRole,
     materializeEpisodeSpecs,
+    parseRecordedResearchRunPlan,
     parseResearchRunPlan,
     ResearchRunPlan,
     serializeResearchRunPlan,
@@ -109,6 +110,14 @@ describe("strict research run plan", () => {
         const developmentWire = JSON.parse(serializeResearchRunPlan(development)) as Record<string, unknown>;
         expect((developmentWire.episodes as Array<Record<string, unknown>>)[0]).toHaveProperty("methodId");
         expect(parseResearchRunPlan(developmentWire)).toEqual(development);
+    });
+
+    test("accepts only the historical derived method ID in recorded train plans", () => {
+        const train = parseResearchRunPlan(validPlan());
+        expect(parseRecordedResearchRunPlan(train)).toEqual(train);
+        const forged = structuredClone(train) as unknown as Record<string, unknown>;
+        (forged.episodes as Array<Record<string, unknown>>)[0].methodId = ZERO_SHA;
+        expect(() => parseRecordedResearchRunPlan(forged)).toThrow(/methodId must equal its policyId/);
     });
 
     test("balances development by method identity even when both methods select the same policy", () => {
