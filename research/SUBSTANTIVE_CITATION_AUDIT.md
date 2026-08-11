@@ -4,8 +4,8 @@ Verified: **2026-08-11**
 
 ## Scope, identity, and boundary
 
-This is a machine-assisted proposition-level precheck of the 30 bibliography
-keys used at 38 key-by-citation placements in the shared manuscript sources.
+This is a machine-assisted proposition-level precheck of the 32 bibliography
+keys used at 40 key-by-citation placements in the shared manuscript sources.
 It is bound to:
 
 - reviewed submission source:
@@ -52,6 +52,8 @@ Classifications mean:
 | `marino2021programmatic` | Map-specific programmatic $\mu$RTS strategies were synthesized from a domain-specific language; [AAAI paper, introduction and method](https://doi.org/10.1609/aaai.v35i1.16114). | supported |
 | `medeiros2022sketches` | Behavioral cloning is used to learn program sketches that guide programmatic-strategy synthesis in $\mu$RTS; [AAAI paper, abstract, introduction, and method](https://doi.org/10.1609/aaai.v36i7.20744). | supported |
 | `aleixo2023bilevel` | Bilevel search jointly considers state features and programs to strengthen the search signal for programmatic-strategy synthesis in $\mu$RTS; [AAAI paper, abstract, introduction, and method](https://doi.org/10.1609/aaai.v37i4.25626). | supported |
+| `moraes2023opponents` | Local Learner actively selects a set of reference strategies to strengthen the search signal for programmatic-strategy synthesis and is evaluated in $\mu$RTS; [IJCAI paper, abstract and Sections 1, 5, and 6](https://doi.org/10.24963/ijcai.2023/539). | supported |
+| `moraes2024semantic` | Library-induced neighborhoods approximate a programmatic language's semantic space and improve sample efficiency in $\mu$RTS; [IJCAI paper, abstract and Sections 1 and 4](https://doi.org/10.24963/ijcai.2024/662). | supported |
 | `fernandezAres2012map` | Specialized policies are selected using online map characterization; [IEEE paper abstract and method, pp. 417--423](https://doi.org/10.1109/CIG.2012.6374185). | supported |
 | `hutter2011smac` | SMAC configures algorithms over training instances and evaluates configurations on separate test instances; [author-hosted paper, Sections 4.2 and 5.1 and Table 2](https://www.cs.ubc.ca/sites/default/files/tr/2010/TR-2010-10_0.pdf). | supported |
 | `lopezIbanez2016irace` | irace tunes over a set of training instances, while the documented workflow evaluates selected configurations on separate testing instances; [article Sections 2.2 and 3.2 and Appendix A.1](https://doi.org/10.1016/j.orp.2016.09.002) and [official workflow documentation](https://mlopez-ibanez.github.io/irace/). The separation is a workflow boundary, not an assertion that the core racing loop consumes test outcomes. | supported with wording boundary |
@@ -79,7 +81,7 @@ placements and positions the evaluation contribution against the closest
 map-specific and later program-synthesis work. No empirical result, method
 description, scope boundary, or conclusion changed.
 
-All 30 keys have a source-support classification above. This precheck found
+All 32 keys have a source-support classification above. This precheck found
 no citation use that required claim removal or a bibliographic replacement.
 Human source reading and the blank statuses in
 `research/HUMAN_AUTHOR_VERIFICATION_PACKET.md` remain mandatory before

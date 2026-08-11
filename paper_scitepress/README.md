@@ -18,7 +18,7 @@ and `pdffonts` on `PATH` and run the deeper candidate check:
 make -C paper_scitepress submission-check
 ```
 
-That target checks the frozen 11-page and 38,261-non-whitespace-character
+That target checks the frozen 11-page and 38,760-non-whitespace-character
 identity as well as A4 geometry, empty author/title metadata, encryption,
 forms, JavaScript, page rotation, embedded fonts with Unicode maps, the
 70--200-word abstract rule, PDF-to-portal title/abstract/keyword agreement,

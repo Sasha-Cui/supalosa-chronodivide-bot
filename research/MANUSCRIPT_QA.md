@@ -37,7 +37,7 @@ The final LNCS logs contain:
 - zero overfull boxes;
 - zero undefined or multiply defined references;
 - zero BibTeX warnings;
-- 30 citation keys, 30 bibliography entries, no missing keys, and no unused
+- 32 citation keys, 32 bibliography entries, no missing keys, and no unused
   entries; and
 - deterministic regenerated paper fragments whose input and output hashes are
   recorded in `paper/generated/asset_manifest.json` for all eight frozen
@@ -57,7 +57,7 @@ MACO paper and DOI `10.5220/0014358500004052`; the 25-author StarCraft II
 reference uses standard `et al.` formatting while retaining its identifier and
 DOI.
 
-A proposition-level precheck mapped all 30 bibliography keys across 38
+A proposition-level precheck mapped all 32 bibliography keys across 40
 key-by-citation placements to primary-source locators. It found one attribution
 boundary: the Chrono Divide homepage supports the reconstruction claim but not
 the exact offline API or pinned opponent. The refreeze added the package and
@@ -197,7 +197,7 @@ pages; the changed title, threat-to-control table, reflowed transitions, and
 complete final reference pages were additionally inspected at full resolution.
 
 The production candidate additionally passed the new Poppler-backed
-`submission-check`: exactly 11 A4 pages, 38,261 non-whitespace characters under
+`submission-check`: exactly 11 A4 pages, 38,760 non-whitespace characters under
 the documented default reading order, 193 abstract words, empty review
 identity metadata, no forms/JavaScript/encryption/rotation, nine embedded fonts
 with Unicode maps, exact PDF-to-portal title/abstract/keyword agreement, and
@@ -251,7 +251,7 @@ above. A Git-free TeX Live 2022 extraction produced local PDF identities
 `f78a88d16e217aef0a18f0948d3148055ccb2514ae6935cc00832935ffa75f2e`,
 and `2037e3ed5626360dfd09cda2790547cfdf4fe27c7d8d2052e23c51e881f7e2a4`
 for the LNCS paper, supplement, and SCITEPRESS paper respectively. Both
-toolchains pass the 11-page, 38,261-character, nine-font anonymous-submission
+toolchains pass the 11-page, 38,760-character, nine-font anonymous-submission
 check. All 34 production pages were rendered; every changed page and both
 complete reference endings were inspected at full resolution with no clipping,
 overlap, contrast defect, missing glyph, or margin violation.

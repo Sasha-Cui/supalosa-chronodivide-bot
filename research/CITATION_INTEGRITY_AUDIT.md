@@ -24,8 +24,8 @@ the current candidate. Neither audit replaces the author's source reading.
 
 ## Structural checks
 
-- `paper/references.bib` contains exactly 30 entries with distinct keys.
-- The shared manuscript sources cite all 30 keys.
+- `paper/references.bib` contains exactly 32 entries with distinct keys.
+- The shared manuscript sources cite all 32 keys.
 - No cited key is missing from the bibliography.
 - No bibliography entry is uncited.
 - The generated ICAART paper has a settled reference list and no unresolved
@@ -33,7 +33,7 @@ the current candidate. Neither audit replaces the author's source reading.
 
 ## DOI-backed sources
 
-Twenty-three entries have registered DOIs. Title and publication year returned by
+Twenty-five entries have registered DOIs. Title and publication year returned by
 DOI content negotiation, the Crossref metadata API, or the official publisher
 record agree with the BibTeX entry.
 
@@ -48,6 +48,8 @@ record agree with the BibTeX entry.
 | `marino2021programmatic` | [10.1609/aaai.v35i1.16114](https://doi.org/10.1609/aaai.v35i1.16114) | registered; title/year match |
 | `medeiros2022sketches` | [10.1609/aaai.v36i7.20744](https://doi.org/10.1609/aaai.v36i7.20744) | registered; title/year match |
 | `aleixo2023bilevel` | [10.1609/aaai.v37i4.25626](https://doi.org/10.1609/aaai.v37i4.25626) | registered; title/year match |
+| `moraes2023opponents` | [10.24963/ijcai.2023/539](https://doi.org/10.24963/ijcai.2023/539) | official IJCAI record; title/year/pages match |
+| `moraes2024semantic` | [10.24963/ijcai.2024/662](https://doi.org/10.24963/ijcai.2024/662) | official IJCAI record; title/year/pages match |
 | `hutter2011smac` | [10.1007/978-3-642-25566-3_40](https://doi.org/10.1007/978-3-642-25566-3_40) | registered; title/year match |
 | `lopezIbanez2016irace` | [10.1016/j.orp.2016.09.002](https://doi.org/10.1016/j.orp.2016.09.002) | registered; title/year match |
 | `lucas2018ntbea` | [10.1109/CEC.2018.8477869](https://doi.org/10.1109/CEC.2018.8477869) | registered; title/year match |
@@ -85,8 +87,9 @@ All seven non-DOI endpoints returned HTTP 200 at the pinned path.
 ## Disposition
 
 No broken key, missing citation, uncited entry, unregistered DOI, dead URL, or
-title/year mismatch was found. No bibliography or manuscript edit is justified
-by this metadata audit.
+title/year mismatch was found. The 2026-08-11 closest-work refresh added the
+two IJCAI records above; no further bibliography or manuscript edit is
+justified by this metadata audit.
 
 Before submission, the human author must still:
 

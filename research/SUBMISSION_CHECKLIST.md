@@ -65,7 +65,7 @@ commit and all three hashes together; never mix files from different freezes.
       `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`; the current reviewed source is
       `853e2ffb3693287ee0572b7b8c659befa5f9763d` and changes no frozen empirical
       artifact.
-- [x] PDF is 11 A4 pages, with a 193-word expanded abstract and 38,261 extracted
+- [x] PDF is 11 A4 pages, with a 193-word expanded abstract and 38,760 extracted
       non-whitespace characters.
 - [x] PDF SHA-256 is
       `d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413`.

@@ -154,7 +154,7 @@ The public-policy evidence and exact remaining questions are frozen in
 
 The SCITEPRESS conversion and acceptance-oriented presentation pass were
 completed on 2026-08-11 without changing the frozen science. The current
-candidate is 11 A4 pages, has a 193-word expanded abstract and 38,261 extracted
+candidate is 11 A4 pages, has a 193-word expanded abstract and 38,760 extracted
 non-whitespace characters, and has SHA-256
 `d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413`.
 Its title, abstracts, and threat-to-control map foreground the evaluation

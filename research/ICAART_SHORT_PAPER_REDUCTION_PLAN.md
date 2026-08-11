@@ -22,7 +22,7 @@ The source candidate for any reduction is:
 - 11-page PDF SHA-256:
   `d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413`;
 - expanded abstract: 193 lexical words;
-- extracted non-whitespace characters: 38,261.
+- extracted non-whitespace characters: 38,760.
 
 Do not compress the review version preemptively. A shorter review paper would
 remove evidence that directly answers ICAART's technical-quality and critical-

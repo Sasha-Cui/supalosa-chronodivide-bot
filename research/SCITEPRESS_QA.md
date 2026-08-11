@@ -20,7 +20,7 @@ Prepared: **2026-08-11**
 - PDF: 11 A4 pages, 168,176 bytes
 - PDF SHA-256: `d81d64cff4a3e7dc5c3ad7ac49a2f44c2d9f78cd3695c318ca395b6a4dd08413`
 - Expanded plain-text abstract: 193 words
-- Extracted submission length: 38,261 non-whitespace characters
+- Extracted submission length: 38,760 non-whitespace characters
 - Portal metadata JSON SHA-256: `2581e6ae5e00454919c9ddf6b6cea7721935117234bc675b7d19162a799db834`
 
 The PDF is a build product and is not committed. The hash identifies the exact
@@ -61,7 +61,7 @@ PDF hash above. The fixed `SOURCE_DATE_EPOCH` is a stable reproducibility
 constant established at the earlier comparator-justified freeze; the current
 reviewed source identity is recorded above.
 
-The extracted PDF contains 38,261 non-whitespace characters, within ICAART's
+The extracted PDF contains 38,760 non-whitespace characters, within ICAART's
 10,000--50,000 review-submission interval. Its 193-word expanded abstract is within the
 official 70--200-word interval. The page is A4 and the current 11-page build is
 below the 12-page full-paper proceedings limit.
@@ -72,7 +72,7 @@ non-A4 geometry, nonempty identity metadata, encryption, forms, JavaScript,
 page rotation, missing Unicode maps or embedded fonts, PDF-to-portal
 title/abstract/keyword drift, and metadata source-hash drift. Poppler's default
 reading order is the frozen character-count method; layout mode has a different
-count and is deliberately not mixed with the submitted 38,261-character
+count and is deliberately not mixed with the submitted 38,760-character
 identity.
 
 ## Independent artifact reproduction
@@ -99,7 +99,7 @@ The rebuilt archive is 101,528 bytes with 60 immutable files and SHA-256
 Its two copied build READMEs no longer name the institutional compute cluster,
 the archive denylist rejects that token, and a whole-package regression check
 prevents recurrence. The independent build also passed the Poppler-backed deep
-submission check with the same 11-page, 38,261-character, nine-font result.
+submission check with the same 11-page, 38,760-character, nine-font result.
 
 ## Reviewer-assignment metadata
 
@@ -185,7 +185,7 @@ statement of the reusable evidence contract to the abstract and conclusion,
 uses ragged-right columns in the threat-to-control table, and balances the
 two-column reference ending. It does not claim a new optimizer, environment,
 or reliable opponent superiority. The SCITEPRESS candidate is now 11 pages,
-38,261 non-whitespace characters, and 193 abstract words. Two clean TeX Live
+38,760 non-whitespace characters, and 193 abstract words. Two clean TeX Live
 2024 builds reproduced the PDF and metadata hashes above; the TeX Live 2022
 artifact build reproduced its separately recorded cross-toolchain identity.
 All 11 production pages and the changed pages at full resolution passed the

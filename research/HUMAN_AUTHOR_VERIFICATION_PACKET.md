@@ -158,6 +158,8 @@ recorded locator, or completing a row below.
 | `marino2021programmatic` | Map-specific programmatic $\mu$RTS strategies were synthesized from a domain-specific language | related work | `[ ]` |
 | `medeiros2022sketches` | Learned sketches guide programmatic-strategy synthesis in $\mu$RTS | related work | `[ ]` |
 | `aleixo2023bilevel` | Bilevel feature--program search strengthens programmatic-strategy synthesis in $\mu$RTS | related work | `[ ]` |
+| `moraes2023opponents` | Local Learner selects reference strategies to guide programmatic-strategy synthesis in $\mu$RTS | related work | `[ ]` |
+| `moraes2024semantic` | Library-induced semantic-space neighborhoods improve programmatic-policy search efficiency in $\mu$RTS | related work | `[ ]` |
 | `fernandezAres2012map` | Specialized policies were selected using online map characterization | related work; supplement | `[ ]` |
 | `hutter2011smac` | SMAC configures algorithms over problem instances | related work | `[ ]` |
 | `lopezIbanez2016irace` | irace separates configuration and evaluation instances | related work | `[ ]` |
