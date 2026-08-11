@@ -3,6 +3,7 @@ import path from "node:path";
 import { CreateOfflineOpts, GameApi, ObjectType, cdapi } from "@chronodivide/game-api";
 import { SupalosaBot } from "@supalosa/chronodivide-bot/dist/bot/bot.js";
 import { StrongStrategy, StrongStrategyOptions } from "@supalosa/chronodivide-bot/dist/bot/strategy/strongStrategy.js";
+import { BuildingEliminationTelemetryEvent } from "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
 import { StrongBot, StrongBotOptions } from "@supalosa/chronodivide-bot/dist/bot/strongBot.js";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { BaselineFactory, loadBaselineFactory } from "./baselineLoader.js";
@@ -694,16 +695,18 @@ const runMatch = async (
     baselineFactory: BaselineFactory,
     traceIntervalTicks: number,
     onTraceSnapshot: (snapshot: MatchTraceSnapshot) => void,
+    onCandidatePolicyEvent: (event: BuildingEliminationTelemetryEvent) => void,
 ): Promise<MatchResult | null> => {
     const startedAt = Date.now();
     const candidateName = `Strong_seed_block_${seedBlockIndex}`;
     const baselineName = `Supalosa_seed_block_${seedBlockIndex}`;
+    const candidateStrategy = new StrongStrategy(strongStrategyOptions, onCandidatePolicyEvent);
     const candidate = new StrongBot(
         candidateName,
         candidateCountry,
         [],
         false,
-        new StrongStrategy(strongStrategyOptions),
+        candidateStrategy,
         strongBotOptions,
     );
     const baseline = baselineFactory.create(baselineName, baselineCountry);
@@ -984,6 +987,20 @@ const main = async () => {
                                     fs.appendFileSync(
                                         eventsPath,
                                         JSON.stringify({ event: "trace_snapshot", snapshot }) + "\n",
+                                    ),
+                                (policyEvent) =>
+                                    fs.appendFileSync(
+                                        eventsPath,
+                                        JSON.stringify({
+                                            event: "candidate_policy_event",
+                                            match: attemptMatch,
+                                            seedBlockIndex,
+                                            mapName,
+                                            candidateCountry,
+                                            baselineCountry,
+                                            candidateSlot,
+                                            policyEvent,
+                                        }) + "\n",
                                     ),
                             );
                             if (!result) {

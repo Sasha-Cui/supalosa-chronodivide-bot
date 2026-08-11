@@ -7,6 +7,7 @@ import { NavalAssaultMissionFactory } from "../logic/mission/missions/navalAssau
 import {
     BuildingEliminationMissionFactory,
     BuildingEliminationOptions,
+    BuildingEliminationTelemetrySink,
 } from "../logic/mission/missions/buildingEliminationMission.js";
 import { SupabotContext } from "../logic/common/context.js";
 import { MissionController } from "../logic/mission/missionController.js";
@@ -749,7 +750,10 @@ export class StrongStrategy implements Strategy {
     private buildingEliminationFactory: BuildingEliminationMissionFactory;
     private navalAssaultFactory = new NavalAssaultMissionFactory();
 
-    constructor(private options: StrongStrategyOptions = {}) {
+    constructor(
+        private options: StrongStrategyOptions = {},
+        private buildingEliminationTelemetrySink: BuildingEliminationTelemetrySink = () => undefined,
+    ) {
         const strategicPlan = options.strategicPlan ?? { enabled: true, plan: "hfo" as const };
         const isIslandTechPlan = strategicPlan.plan === "islandTech";
         const baseDefence = options.base?.defence ?? {};
@@ -818,50 +822,90 @@ export class StrongStrategy implements Strategy {
         this.allInAttackFactory = new AllInAttackMissionFactory(
             hasDefinedOption(options.allIn) ? options.allIn : DEFAULT_HFO_WEST_ALL_IN_OPTIONS,
         );
-        this.buildingEliminationFactory = new BuildingEliminationMissionFactory(options.buildingElimination);
+        this.buildingEliminationFactory = new BuildingEliminationMissionFactory(
+            options.buildingElimination,
+            this.buildingEliminationTelemetrySink,
+        );
     }
 
     onAiUpdate(context: SupabotContext, missionController: MissionController, logger: DebugLogger): Strategy {
         if ((this.options.defaultMapProfiles ?? true) && !hasExplicitProfileOptions(this.options)) {
             if (this.isSimple1v1Map(context)) {
                 logger("Strong strategy profile: simpleInfantry");
-                return new StrongStrategy(SIMPLE_INFANTRY_PROFILE).onAiUpdate(context, missionController, logger);
+                return new StrongStrategy(SIMPLE_INFANTRY_PROFILE, this.buildingEliminationTelemetrySink).onAiUpdate(
+                    context,
+                    missionController,
+                    logger,
+                );
             }
             if (context.matchAwareness.isNavalMap()) {
                 logger("Strong strategy profile: naval");
-                return new StrongStrategy(NAVAL_PROFILE).onAiUpdate(context, missionController, logger);
+                return new StrongStrategy(NAVAL_PROFILE, this.buildingEliminationTelemetrySink).onAiUpdate(
+                    context,
+                    missionController,
+                    logger,
+                );
             }
             if (this.isRiverRampageLowerStart(context)) {
                 logger("Strong strategy profile: riverRampageLower");
-                return new StrongStrategy(RIVER_RAMPAGE_LOWER_PROFILE).onAiUpdate(context, missionController, logger);
+                return new StrongStrategy(
+                    RIVER_RAMPAGE_LOWER_PROFILE,
+                    this.buildingEliminationTelemetrySink,
+                ).onAiUpdate(context, missionController, logger);
             }
             if (this.isYinYangUpperStart(context)) {
                 logger("Strong strategy profile: yinYangUpper");
-                return new StrongStrategy(YIN_YANG_UPPER_PROFILE).onAiUpdate(context, missionController, logger);
+                return new StrongStrategy(YIN_YANG_UPPER_PROFILE, this.buildingEliminationTelemetrySink).onAiUpdate(
+                    context,
+                    missionController,
+                    logger,
+                );
             }
             if (this.isPeakOfPerfectionWeakStart(context)) {
                 logger("Strong strategy profile: peakOfPerfectionWeak");
-                return new StrongStrategy(PEAK_OF_PERFECTION_WEAK_PROFILE).onAiUpdate(context, missionController, logger);
+                return new StrongStrategy(
+                    PEAK_OF_PERFECTION_WEAK_PROFILE,
+                    this.buildingEliminationTelemetrySink,
+                ).onAiUpdate(context, missionController, logger);
             }
             if (this.isOtmqSouthwestStart(context)) {
                 logger("Strong strategy profile: otmqSouthwest");
-                return new StrongStrategy(OTMQ_SOUTHWEST_PROFILE).onAiUpdate(context, missionController, logger);
+                return new StrongStrategy(OTMQ_SOUTHWEST_PROFILE, this.buildingEliminationTelemetrySink).onAiUpdate(
+                    context,
+                    missionController,
+                    logger,
+                );
             }
             if (this.isPinchPointUpperStart(context)) {
                 logger("Strong strategy profile: pinchPointUpper");
-                return new StrongStrategy(PINCH_POINT_UPPER_PROFILE).onAiUpdate(context, missionController, logger);
+                return new StrongStrategy(PINCH_POINT_UPPER_PROFILE, this.buildingEliminationTelemetrySink).onAiUpdate(
+                    context,
+                    missionController,
+                    logger,
+                );
             }
             if (this.isTikalLowerStart(context)) {
                 logger("Strong strategy profile: tikalLowerRush");
-                return new StrongStrategy(TIKAL_LOWER_PROFILE).onAiUpdate(context, missionController, logger);
+                return new StrongStrategy(TIKAL_LOWER_PROFILE, this.buildingEliminationTelemetrySink).onAiUpdate(
+                    context,
+                    missionController,
+                    logger,
+                );
             }
             if (this.isSouthPacificMap(context)) {
                 logger("Strong strategy profile: southPacificHfoBottom");
-                return new StrongStrategy(SOUTH_PACIFIC_PROFILE).onAiUpdate(context, missionController, logger);
+                return new StrongStrategy(SOUTH_PACIFIC_PROFILE, this.buildingEliminationTelemetrySink).onAiUpdate(
+                    context,
+                    missionController,
+                    logger,
+                );
             }
             if (this.isDryHeatEastVsAlliedStart(context)) {
                 logger("Strong strategy profile: dryHeatEastAllied");
-                return new StrongStrategy(DRY_HEAT_EAST_ALLIED_PROFILE).onAiUpdate(context, missionController, logger);
+                return new StrongStrategy(
+                    DRY_HEAT_EAST_ALLIED_PROFILE,
+                    this.buildingEliminationTelemetrySink,
+                ).onAiUpdate(context, missionController, logger);
             }
         }
         if (this.options.macroBoost?.enabled) {

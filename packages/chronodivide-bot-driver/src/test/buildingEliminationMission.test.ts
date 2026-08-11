@@ -3,7 +3,10 @@ import {
     assignAttackersToTargets,
     BuildingTargetDescriptor,
     getBuildingTargetWeight,
+    isPreemptibleBuildingEliminationMission,
     rankBuildingTargets,
+    rankSweepPoints,
+    reconcileRememberedBuildingTargets,
 } from "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
 
 const target = (overrides: Partial<BuildingTargetDescriptor>): BuildingTargetDescriptor => ({
@@ -64,5 +67,36 @@ describe("building elimination policy", () => {
             new Set(["left", "right"]),
         );
         expect(assignments).toHaveLength(attackers.length);
+    });
+
+    test("memory is retained under fog and invalidated after its tile is re-observed empty", () => {
+        const hidden = target({ id: 7, x: 20, y: 30, visible: false });
+        const retained = reconcileRememberedBuildingTargets(new Map([[7, hidden]]), [], () => false);
+        expect(retained.invalidatedIds).toEqual([]);
+        expect(retained.remembered.get(7)).toEqual(hidden);
+
+        const invalidated = reconcileRememberedBuildingTargets(retained.remembered, [], () => true);
+        expect(invalidated.invalidatedIds).toEqual([7]);
+        expect(invalidated.remembered.size).toBe(0);
+    });
+
+    test("sweeps stale low-visibility sectors before recently visited sectors", () => {
+        const candidates = [
+            { x: 1, y: 1, visibility: 0.1, lastSwept: 950 },
+            { x: 2, y: 2, visibility: 0.8, lastSwept: 0 },
+            { x: 3, y: 3, visibility: 0.2, lastSwept: 0 },
+        ];
+        expect(rankSweepPoints(candidates, 1000, 100, 2)).toEqual([
+            { x: 3, y: 3 },
+            { x: 2, y: 2 },
+        ]);
+    });
+
+    test("preemption is restricted to competing attack missions", () => {
+        expect(isPreemptibleBuildingEliminationMission("attack_12")).toBe(true);
+        expect(isPreemptibleBuildingEliminationMission("retreat-from-attack_12")).toBe(true);
+        expect(isPreemptibleBuildingEliminationMission("allInAttack")).toBe(true);
+        expect(isPreemptibleBuildingEliminationMission("defence_12")).toBe(false);
+        expect(isPreemptibleBuildingEliminationMission("buildingElimination")).toBe(false);
     });
 });

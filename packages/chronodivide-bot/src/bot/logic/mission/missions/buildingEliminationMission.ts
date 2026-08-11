@@ -43,6 +43,45 @@ export type BuildingTargetDescriptor = {
 
 export type PointDescriptor = { x: number; y: number };
 
+export type BuildingEliminationTelemetryEvent =
+    | {
+          schemaVersion: 1;
+          event: "activated";
+          tick: number;
+          observationMode: BuildingEliminationObservationMode;
+          ownCombatants: number;
+          enemyCombatants: number;
+          reservedCombatants: number;
+          preemptedMissions: string[];
+      }
+    | {
+          schemaVersion: 1;
+          event: "memory_invalidated";
+          tick: number;
+          buildingIds: number[];
+      }
+    | {
+          schemaVersion: 1;
+          event: "target_orders";
+          tick: number;
+          attackerCount: number;
+          targets: Array<{ id: number | null; name: string; x: number; y: number; visible: boolean }>;
+      }
+    | {
+          schemaVersion: 1;
+          event: "sweep_orders";
+          tick: number;
+          attackerCount: number;
+          targets: PointDescriptor[];
+      };
+
+export type BuildingEliminationTelemetrySink = (event: BuildingEliminationTelemetryEvent) => void;
+
+export type SweepPointDescriptor = PointDescriptor & {
+    visibility: number;
+    lastSwept: number;
+};
+
 const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     enabled: false,
     minTick: 9000,
@@ -173,6 +212,56 @@ export const assignAttackersToTargets = <T extends PointDescriptor, U extends Po
     });
 };
 
+export const reconcileRememberedBuildingTargets = (
+    current: ReadonlyMap<number, BuildingTargetDescriptor>,
+    visible: BuildingTargetDescriptor[],
+    isTileVisible: (target: BuildingTargetDescriptor) => boolean,
+): { remembered: Map<number, BuildingTargetDescriptor>; invalidatedIds: number[] } => {
+    const remembered = new Map(current);
+    for (const target of visible) {
+        if (target.id !== undefined) {
+            remembered.set(target.id, { ...target, visible: true });
+        }
+    }
+    const visibleIds = new Set(visible.flatMap((target) => (target.id === undefined ? [] : [target.id])));
+    const invalidatedIds: number[] = [];
+    for (const [id, target] of remembered.entries()) {
+        if (visibleIds.has(id)) {
+            continue;
+        }
+        if (isTileVisible(target)) {
+            remembered.delete(id);
+            invalidatedIds.push(id);
+        } else {
+            remembered.set(id, { ...target, visible: false });
+        }
+    }
+    return { remembered, invalidatedIds: invalidatedIds.sort((left, right) => left - right) };
+};
+
+export const rankSweepPoints = (
+    candidates: SweepPointDescriptor[],
+    tick: number,
+    revisitTicks: number,
+    maximum: number,
+): PointDescriptor[] =>
+    candidates
+        .slice()
+        .sort((left, right) => {
+            const leftRecent = tick < left.lastSwept + revisitTicks ? 1 : 0;
+            const rightRecent = tick < right.lastSwept + revisitTicks ? 1 : 0;
+            if (leftRecent !== rightRecent) return leftRecent - rightRecent;
+            if (left.visibility !== right.visibility) return left.visibility - right.visibility;
+            if (left.lastSwept !== right.lastSwept) return left.lastSwept - right.lastSwept;
+            if (left.x !== right.x) return left.x - right.x;
+            return left.y - right.y;
+        })
+        .slice(0, Math.max(1, maximum))
+        .map(({ x, y }) => ({ x, y }));
+
+export const isPreemptibleBuildingEliminationMission = (name: string): boolean =>
+    name.startsWith("attack_") || name.startsWith("retreat-from-attack") || name === "allInAttack";
+
 const getEnemyUnits = (
     context: SupabotContext,
     observationMode: BuildingEliminationObservationMode,
@@ -209,10 +298,12 @@ class BuildingEliminationMission extends Mission {
     private lastOrderAt = Number.NEGATIVE_INFINITY;
     private rememberedBuildings = new Map<number, BuildingTargetDescriptor>();
     private lastSweepAt = new Map<string, number>();
+    private lastOrderTelemetrySignature = "";
 
     constructor(
         private options: Required<BuildingEliminationOptions>,
         logger: DebugLogger,
+        private telemetrySink: BuildingEliminationTelemetrySink,
     ) {
         super(BUILDING_ELIMINATION_MISSION_NAME, logger);
     }
@@ -258,20 +349,22 @@ class BuildingEliminationMission extends Mission {
             "visibleOnly",
             (unit) => unit.rules.type === ObjectType.Building,
         );
-        for (const unit of visibleBuildings) {
-            this.rememberedBuildings.set(unit.id, toTargetDescriptor(unit, true));
-        }
-        const visibleIds = new Set(visibleBuildings.map((unit) => unit.id));
-        for (const [id, target] of this.rememberedBuildings.entries()) {
-            if (visibleIds.has(id)) {
-                continue;
-            }
-            const tile = context.game.mapApi.getTile(target.x, target.y);
-            if (tile && context.game.mapApi.isVisibleTile(tile, context.player.name)) {
-                this.rememberedBuildings.delete(id);
-            } else {
-                this.rememberedBuildings.set(id, { ...target, visible: false });
-            }
+        const reconciled = reconcileRememberedBuildingTargets(
+            this.rememberedBuildings,
+            visibleBuildings.map((unit) => toTargetDescriptor(unit, true)),
+            (target) => {
+                const tile = context.game.mapApi.getTile(target.x, target.y);
+                return !!tile && context.game.mapApi.isVisibleTile(tile, context.player.name);
+            },
+        );
+        this.rememberedBuildings = reconciled.remembered;
+        if (reconciled.invalidatedIds.length > 0) {
+            this.telemetrySink({
+                schemaVersion: 1,
+                event: "memory_invalidated",
+                tick: context.game.getCurrentTick(),
+                buildingIds: reconciled.invalidatedIds,
+            });
         }
     }
 
@@ -289,10 +382,11 @@ class BuildingEliminationMission extends Mission {
             this.options.observationMode,
             (unit) => unit.rules.type === ObjectType.Building,
         );
+        const visibleEnemyIds = new Set(context.game.getVisibleUnits(context.player.name, "enemy"));
         const currentTargetById = new Map(currentTargets.map((unit) => [unit.id, unit]));
         const descriptors =
             currentTargets.length > 0
-                ? currentTargets.map((unit) => toTargetDescriptor(unit, true))
+                ? currentTargets.map((unit) => toTargetDescriptor(unit, visibleEnemyIds.has(unit.id)))
                 : [...this.rememberedBuildings.values()];
         const rankedTargets = rankBuildingTargets(
             descriptors,
@@ -301,6 +395,19 @@ class BuildingEliminationMission extends Mission {
         ).slice(0, this.options.maxTargetGroups);
 
         if (rankedTargets.length > 0) {
+            this.emitOrderTelemetry({
+                schemaVersion: 1,
+                event: "target_orders",
+                tick: context.game.getCurrentTick(),
+                attackerCount: units.length,
+                targets: rankedTargets.map((target) => ({
+                    id: target.id ?? null,
+                    name: target.name,
+                    x: target.x,
+                    y: target.y,
+                    visible: target.visible,
+                })),
+            });
             const assignments = assignAttackersToTargets(
                 units.map((unit) => ({ ...unit, x: unit.tile.rx, y: unit.tile.ry })),
                 rankedTargets,
@@ -320,6 +427,13 @@ class BuildingEliminationMission extends Mission {
             return;
         }
         const sweepPoints = this.selectSweepPoints(context, this.options.maxTargetGroups);
+        this.emitOrderTelemetry({
+            schemaVersion: 1,
+            event: "sweep_orders",
+            tick: context.game.getCurrentTick(),
+            attackerCount: units.length,
+            targets: sweepPoints,
+        });
         const assignments = assignAttackersToTargets(
             units.map((unit) => ({ ...unit, x: unit.tile.rx, y: unit.tile.ry })),
             sweepPoints,
@@ -335,7 +449,7 @@ class BuildingEliminationMission extends Mission {
     }
 
     private selectSweepPoints(context: MissionContext, maximum: number): PointDescriptor[] {
-        const candidates: Array<PointDescriptor & { visibility: number; lastSwept: number }> = [];
+        const candidates: SweepPointDescriptor[] = [];
         context.matchAwareness.getSectorCache().forEach((x, y, cell) => {
             const tile = context.game.mapApi.getTile(x, y);
             if (
@@ -353,26 +467,33 @@ class BuildingEliminationMission extends Mission {
                 lastSwept,
             });
         });
-        const tick = context.game.getCurrentTick();
-        return candidates
-            .sort((left, right) => {
-                const leftRecent = tick < left.lastSwept + this.options.sweepRevisitTicks ? 1 : 0;
-                const rightRecent = tick < right.lastSwept + this.options.sweepRevisitTicks ? 1 : 0;
-                if (leftRecent !== rightRecent) return leftRecent - rightRecent;
-                if (left.visibility !== right.visibility) return left.visibility - right.visibility;
-                if (left.lastSwept !== right.lastSwept) return left.lastSwept - right.lastSwept;
-                if (left.x !== right.x) return left.x - right.x;
-                return left.y - right.y;
-            })
-            .slice(0, Math.max(1, maximum))
-            .map(({ x, y }) => ({ x, y }));
+        return rankSweepPoints(
+            candidates,
+            context.game.getCurrentTick(),
+            this.options.sweepRevisitTicks,
+            maximum,
+        );
+    }
+
+    private emitOrderTelemetry(
+        event: Extract<BuildingEliminationTelemetryEvent, { event: "target_orders" | "sweep_orders" }>,
+    ): void {
+        const signature = JSON.stringify({ ...event, tick: 0 });
+        if (signature === this.lastOrderTelemetrySignature) {
+            return;
+        }
+        this.lastOrderTelemetrySignature = signature;
+        this.telemetrySink(event);
     }
 }
 
 export class BuildingEliminationMissionFactory {
     private options: Required<BuildingEliminationOptions>;
 
-    constructor(options: BuildingEliminationOptions = {}) {
+    constructor(
+        options: BuildingEliminationOptions = {},
+        private telemetrySink: BuildingEliminationTelemetrySink = () => undefined,
+    ) {
         const definedOptions = Object.fromEntries(
             Object.entries(options).filter(([, value]) => value !== undefined),
         ) as BuildingEliminationOptions;
@@ -412,24 +533,30 @@ export class BuildingEliminationMissionFactory {
             return;
         }
 
-        this.preemptAttacks(missionController);
-        missionController.addMission(new BuildingEliminationMission(this.options, logger));
+        const preemptedMissions = this.preemptAttacks(missionController);
+        this.telemetrySink({
+            schemaVersion: 1,
+            event: "activated",
+            tick: context.game.getCurrentTick(),
+            observationMode: this.options.observationMode,
+            ownCombatants: ownCombatants.length,
+            enemyCombatants: enemyCombatants.length,
+            reservedCombatants: this.options.reserveCombatants,
+            preemptedMissions,
+        });
+        missionController.addMission(new BuildingEliminationMission(this.options, logger, this.telemetrySink));
     }
 
-    private preemptAttacks(missionController: MissionController): void {
+    private preemptAttacks(missionController: MissionController): string[] {
         if (!this.options.preemptExistingAttacks) {
-            return;
+            return [];
         }
-        missionController
+        const names = missionController
             .getMissions()
-            .filter((mission) => {
-                const name = mission.getUniqueName();
-                return (
-                    name.startsWith("attack_") ||
-                    name.startsWith("retreat-from-attack") ||
-                    name === "allInAttack"
-                );
-            })
-            .forEach((mission) => missionController.disbandMission(mission.getUniqueName()));
+            .map((mission) => mission.getUniqueName())
+            .filter(isPreemptibleBuildingEliminationMission)
+            .sort();
+        names.forEach((name) => missionController.disbandMission(name));
+        return names;
     }
 }
