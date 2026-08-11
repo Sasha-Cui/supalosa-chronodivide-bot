@@ -32,7 +32,8 @@ family-disjoint evaluation and configuration of a generic scripted RTS policy.
 11. [`VENUE_DECISION_PACKET.md`](VENUE_DECISION_PACKET.md),
    [`ICAART_POLICY_RECONCILIATION.md`](ICAART_POLICY_RECONCILIATION.md),
    [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md),
-   [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md), and
+   [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md),
+   [`EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md`](EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md), and
    [`SUBMISSION_ROADMAP.md`](SUBMISSION_ROADMAP.md) — send-ready external
    questions, a neutral cold-read protocol, and the dated path to one selected
    venue deadline.
@@ -93,6 +94,7 @@ separately versioned prospective experiment.
 | Human author verification packet | [`HUMAN_AUTHOR_VERIFICATION_PACKET.md`](HUMAN_AUTHOR_VERIFICATION_PACKET.md) |
 | External contact drafts | [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md) |
 | Independent cold-read protocol | [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md) |
+| Blank private cold-read response record | [`EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md`](EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md) |
 | Dated submission roadmap | [`SUBMISSION_ROADMAP.md`](SUBMISSION_ROADMAP.md) |
 | Submission freeze checklist | [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md) |
 | Anonymous artifact builder | [`../artifact/README.md`](../artifact/README.md) |

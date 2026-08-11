@@ -49,6 +49,9 @@ simultaneous submission.
 - Give the PDF, not the repository, to one technically literate reader using
   Phase A of [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md); do not
   reveal the targeted comprehension questions.
+- Before sending, copy
+  [`EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md`](EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md)
+  to the private submission record and bind it to the selected PDF hash.
 - Lock the unprimed venue-style review before sending Phase B, which asks the
   reader to explain the claim, method-v1/method-v2 sequence, and why 0.535 does
   not establish reliable superiority.

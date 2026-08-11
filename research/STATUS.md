@@ -169,6 +169,12 @@ training:
 4. obtain a cold read from an independent technical reader, incorporate only
    claim-preserving clarity corrections, and repeat final PDF QA.
 
+The cold-read handoff is operationally complete: `EXTERNAL_REVIEW_PACKET.md`
+defines the unprimed/targeted sequence, and
+`EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md` is a blank, hash-bound private-copy form
+for locking the response, scoring comprehension, and separating feasible
+presentation repairs from requests for post-hoc evidence.
+
 ICAART 2027 is now the operational primary candidate: its official
 guidance permits disclosed AI-assisted writing, revision, and code; its
 presenter page documents live online talks; and its first regular-paper

@@ -144,7 +144,8 @@ and the portable-artifact repair at
 `d53f822144bd0b3fffe3b4d778770091f77900b8` passed ten paper-generator and
 manuscript-invariant tests, nine SCITEPRESS tests, two artifact-builder tests,
 the three frozen family-exporter tests, one author-verification-packet test,
-and one venue-ruling-template test (26 tests total). They regenerated all paper
+one venue-ruling-template test, and one external-review-response-template test
+(27 tests total). They regenerated all paper
 fragments without byte drift.
 
 The deterministic anonymous review archive has SHA-256

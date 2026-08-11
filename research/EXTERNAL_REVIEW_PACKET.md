@@ -18,6 +18,9 @@ compare formats.
 
 Record the selected hash before sending. If it does not match, stop and locate
 the drift rather than asking the reader to review an unidentified build.
+Before sending, copy `EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md` into the private
+submission record. Use that copy to lock Phase A, hash the returned responses,
+score the four claim boundaries, and classify every requested change.
 
 ## Phase A: unprimed venue-style review
 
@@ -115,6 +118,9 @@ Store the completed responses privately with:
 - the five criterion scores, overall vote, confidence, and verbatim review;
 - each misunderstanding and the exact source edit made in response; and
 - whether the four boundaries appeared unprompted or only after Phase B.
+
+Use the private copy of `EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md` for this record;
+do not commit reviewer identity, correspondence, or completed answers.
 
 After any edit, rerun the paper tests, citation/anonymity scan, page-limit check,
 and full rendered-PDF inspection before changing the submission hashes.
