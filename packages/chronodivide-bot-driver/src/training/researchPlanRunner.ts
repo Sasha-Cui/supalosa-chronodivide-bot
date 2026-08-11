@@ -125,6 +125,14 @@ const developmentMethodIds = (purpose: ResearchPurpose): readonly string[] => {
         : ["conditioned", "global"];
 };
 
+export const publicRoleCommitmentsFileName = (purpose: ResearchPurpose): string =>
+    purpose === "development-v2-qc" ||
+    purpose === "development-v2-evaluation" ||
+    purpose === "mechanism-ablation" ||
+    purpose === "component-ablation"
+        ? "method_v2_development_role_commitment.json"
+        : "family_role_commitments_v1.json";
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
     typeof value === "object" && value !== null && !Array.isArray(value);
 
@@ -658,11 +666,7 @@ export const runResearchPlanFromEnvironment = async (accessMode: ResearchAccessM
         repoRoot,
         "research",
         "artifacts",
-        plan.purpose === "development-v2-qc" ||
-        plan.purpose === "development-v2-evaluation" ||
-        plan.purpose === "mechanism-ablation"
-            ? "method_v2_development_role_commitment.json"
-            : "family_role_commitments_v1.json",
+        publicRoleCommitmentsFileName(plan.purpose),
     );
     const role = loadResearchRole(plan, { publicCommitmentsPath, privateRoleRoot, repoRoot });
     const specs = materializeEpisodeSpecs(plan, role);

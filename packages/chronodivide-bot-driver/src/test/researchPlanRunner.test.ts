@@ -11,6 +11,7 @@ import {
     materializeEpisodeSpecs,
     parseRecordedResearchRunPlan,
     parseResearchRunPlan,
+    publicRoleCommitmentsFileName,
     ResearchRunPlan,
     serializeResearchRunPlan,
     sha256File,
@@ -169,6 +170,19 @@ afterEach(() => {
 });
 
 describe("strict research run plan", () => {
+    test("routes every method-v2 development purpose to the method-v2 role commitment", () => {
+        for (const purpose of [
+            "development-v2-qc",
+            "development-v2-evaluation",
+            "mechanism-ablation",
+            "component-ablation",
+        ] as const) {
+            expect(publicRoleCommitmentsFileName(purpose)).toBe("method_v2_development_role_commitment.json");
+        }
+        expect(publicRoleCommitmentsFileName("development-qc")).toBe("family_role_commitments_v1.json");
+        expect(publicRoleCommitmentsFileName("confirmatory-evaluation")).toBe("family_role_commitments_v1.json");
+    });
+
     test("accepts a shared equal-budget reciprocal schedule", () => {
         const plan = parseResearchRunPlan(validPlan());
         expect(plan.role).toBe("train");
