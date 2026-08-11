@@ -9,11 +9,16 @@ any third party.
 
 **Subject:** EvoApplications 2027 SCAG: scope, remote presentation, and review-policy questions
 
+Suggested recipients: the SCAG organizers listed on the official call, with
+the EvoApplications programme chairs copied. Replace `(at)` with `@` only in
+the private message: `alberto.tonda(at)inra.fr`, `amorag(at)ugr.es`,
+`mjdiaz(at)unex.es`, and `jamal(at)uma.es`.
+
 > Dear EvoApplications/SCAG Chairs,
 >
 > I am preparing a submission to the 2027 Soft Computing Applied to Games
 > session on reproducible configuration and held-out evaluation of a scripted
-> real-time-strategy agent. Before submitting, could you please clarify two
+> real-time-strategy agent. Before submitting, could you please clarify three
 > policy points?
 >
 > 1. If the paper is accepted, may the presenting author deliver the talk fully
@@ -29,12 +34,23 @@ any third party.
 >    reproducible evaluation protocol plus held-out evidence for a scripted game
 >    agent. Is that application/evaluation emphasis within the intended SCAG
 >    scope?
-> 4. May authors upload a separate anonymous supplement and a small reviewer
->    artifact in addition to the 14-page paper? If so, are reviewers expected to
->    consult them, or must every essential detail remain in the main PDF?
+>
+> For context, the anonymous study uses five run-distinct, deterministically
+> mutation-generated 32-policy pools, successive halving, and a training-only
+> common-seed championship. Evaluation groups map revisions into disjoint
+> families and opens 16 sealed families once. The configured policy improves
+> its shipped default by 0.336 (family-clustered 95% CI [0.215, 0.457]) against
+> one pinned external opponent, but a separate prespecified gate does not
+> establish that it reliably beats that opponent. The paper claims an applied
+> configuration-and-evaluation workflow, not optimizer novelty or broad game-AI
+> superiority.
+>
+> I plan to use the official 10 MB supplementary-material field for a separate
+> anonymous supplement and a small aggregate reproducibility artifact while
+> keeping all essential claims and methods in the main paper.
 >
 > I would appreciate a written ruling before registration or submission. I am
-> happy to provide a short anonymous summary if useful.
+> happy to provide the anonymous manuscript if useful.
 >
 > Best regards,
 > [author name]

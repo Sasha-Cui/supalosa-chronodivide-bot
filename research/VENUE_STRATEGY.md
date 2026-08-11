@@ -8,12 +8,14 @@ registration price, and presenter instructions immediately before submission.
 **Primary target: EvoApplications 2027, Soft Computing Applied to Games (SCAG)
 special session.** This is the best topical and ambition-level fit for the
 completed study. EvoApplications explicitly welcomes applications of
-evolutionary computation, including significant work in progress, while SCAG
-has historically solicited learning in games, empirical analysis of
-computational-intelligence techniques, and game-based benchmarking. The five
-independent randomized policy searches and their leakage-controlled evaluation
-give the paper a genuine evolutionary-computation application, even though the
-successive-halving method itself is not novel.
+evolutionary computation, including significant work in progress, while SCAG's
+current call lists empirical analysis of computational-intelligence techniques
+for games and game-based benchmarking and says bio-inspired approaches are
+especially encouraged rather than required. The study uses five run-distinct,
+deterministically mutation-generated policy pools and successive halving. This
+is finite algorithm configuration, not a conventional iterative evolutionary
+algorithm; the venue fit rests on the applied game-agent configuration and
+evaluation contribution and should be confirmed in writing.
 
 - Paper deadline: **2026-11-01**.
 - Internal full-draft deadline: **2026-09-20**.
@@ -22,6 +24,11 @@ successive-halving method itself is not novel.
 - Format: double-blind Springer LNCS, **14 pages plus unlimited references and
   acknowledgements**.
 - Review: at least three program-committee reviewers.
+- Supplementary material: the official submission page provides a 10 MB
+  EasyChair supplementary-material field and permits identity-neutral external
+  links. The current supplement and 60 KB aggregate artifact fit this route;
+  every essential claim and method detail must nevertheless remain in the main
+  paper.
 - Conference: **2027-03-31 through 2027-04-02**, Mainz, Germany, in **hybrid
   mode**.
 - Attendance: at least one author must register, attend, and present. The event
@@ -41,15 +48,17 @@ confirmatory endpoint passed, the failed absolute endpoint is reported, every
 result is tied to frozen manifests and job records, the anonymous LNCS paper
 and supplement have received full rendered QA, and the deterministic aggregate
 artifact passes a clean extraction and rebuild. Submission still depends on
-written rulings about topical scope, remote presentation, prior public-repository
-exposure, and supplementary material. Public redistribution of the combined
-bot separately depends on upstream permission.
+written rulings about topical scope, remote presentation, and prior
+public-repository exposure. The supplementary-material upload route is already
+documented by the official submission instructions. Public redistribution of
+the combined bot separately depends on upstream permission.
 
 Likely reviewer concerns and the required answers are:
 
 | Concern | Evidence or response required in the paper |
 | --- | --- |
-| This is ordinary hand tuning | Describe the fixed policy space, five independent searches, common-seed championship, and held-out evaluation; claim an empirical workflow, not a new optimizer. |
+| This is ordinary hand tuning | Describe the fixed policy space, five run-distinct deterministic searches, common-seed championship, and held-out evaluation; claim an empirical workflow, not a new optimizer. |
+| This is not an evolutionary algorithm | Agree. Call it deterministic mutation-based finite configuration with multi-fidelity selection. Ground SCAG fit in applied game-agent configuration, empirical CI analysis, and game benchmarking rather than manufacturing optimizer novelty. |
 | Only one opponent and matchup are studied | State this limitation in the abstract, introduction, and conclusion; define the estimand as performance against pinned Supalosa on the supported family population. |
 | Map or test leakage explains the gain | Show revision-aware family grouping, pre-training role commitments, training-only championship, single development gate, and one-time sealed test opening. |
 | The simulator or opponent is contaminated | Document explicit seeds, reciprocal physical starts, source/runtime hashes, and independent loading of the pinned opponent. |
@@ -69,7 +78,7 @@ remotely when unable to travel.
 - First regular-paper deadline: **2026-09-15**.
 - Second position/regular-paper deadline: **2026-10-22**.
 - Workshop and special-session paper deadline: **2026-12-03**.
-- Conference: **2027-02-23 through 2027-02-25**.
+- Conference: **2027-02-23 through 2027-02-26**.
 - Early speaker registration: **EUR 620** for members or **EUR 680** for
   nonmembers at the currently posted rates.
 - Remote status: supported exceptionally for speakers unable to travel; online
@@ -136,7 +145,8 @@ Submit to SCAG only when all of the following are true:
 4. The one-opponent, one-faction matchup, fixed tick cap, supported-map, and
    endpoint-only diagnostic limitations are explicit.
 5. The anonymous artifact reproduces the tables and figures in a clean
-   environment and contains no author-identifying URLs or metadata.
+   environment, contains no author-identifying URLs or metadata, and keeps the
+   complete supplementary upload below the official 10 MB limit.
 6. The release manifest separates author-owned code and metadata from
    third-party maps, MIX archives, and game assets.
 7. Written remote-presentation confirmation has been obtained from EvoStar.

@@ -9,8 +9,9 @@ on the opened family population.
 ## 11--17 August 2026: external policy decisions
 
 - Send the three drafts in [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md).
-- Obtain written scope, remote-presentation, double-blind repository, and
-  supplement/artifact rulings from EvoStar/SCAG.
+- Obtain written scope, remote-presentation, and double-blind repository
+  rulings from EvoStar/SCAG. The official 10 MB supplementary-material field is
+  already documented; keep every essential claim and method in the main paper.
 - Request explicit redistribution/license terms from Supalosa.
 - Request Chrono Divide citation, version-pinning, and acquisition guidance.
 - If the chair requires a non-public repository, change visibility without

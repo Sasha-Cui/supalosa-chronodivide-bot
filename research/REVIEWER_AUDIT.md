@@ -55,11 +55,14 @@ Indicative reviewer dimensions:
 4. **“The mechanism is storytelling.”** The component familywise interval
    crosses zero and terminal records are endpoint-only. The paper correctly uses
    “suggests” and “consistent with” and does not make mechanism a contribution.
-5. **“This is not evolutionary computation.”** The search uses mutation-style
-   finite policy generation and successive halving but is not a new evolutionary
-   algorithm. SCAG must accept the work as game-agent configuration/evaluation;
-   if the chair views the session narrowly, ICAART or an entertainment-computing
-   venue is a safer fit.
+5. **“This is not an evolutionary algorithm.”** Correct. The search uses
+   deterministic mutation-based finite configuration and successive halving,
+   not iterative population-based evolution. SCAG's call includes empirical
+   analysis of CI techniques for games and game-based benchmarking and says
+   bio-inspired approaches are especially encouraged rather than mandatory.
+   The paper must rely on that applied configuration/evaluation fit and obtain
+   a written scope ruling; if the organizers interpret the session narrowly,
+   ICAART or an entertainment-computing venue is safer.
 6. **“The artifact is not full replication.”** The review bundle regenerates
    aggregates, not matches. The response is the explicit third-party boundary,
    exact hashes and acquisition instructions, and a future permission-dependent
@@ -76,11 +79,11 @@ post hoc to this submission.
 
 ## Remaining acceptance work
 
-1. Ask the EvoStar/SCAG chair in writing whether the paper's application and
-   evaluation emphasis is in scope, whether remote presentation is allowed,
-   whether a named public implementation repository posted before submission
-   conflicts with double-blind review, and whether the supplement/artifact may
-   accompany the main PDF.
+1. Ask the EvoStar/SCAG organizers in writing whether the paper's application
+   and evaluation emphasis is in scope, whether remote presentation is
+   allowed, and whether a named public implementation repository posted before
+   submission conflicts with double-blind review. The official submission page
+   already provides a 10 MB supplementary-material field.
 2. Ask Supalosa for explicit permission and preferred attribution/license for
    public redistribution of the derived bot. Until then, release only the
    aggregate reviewer artifact.
