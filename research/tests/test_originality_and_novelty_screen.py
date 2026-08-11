@@ -39,6 +39,7 @@ class OriginalityAndNoveltyScreenTest(unittest.TestCase):
             "moraes2023opponents",
             "moraes2024semantic",
             "ouessai2022evolving",
+            "bhatia2023generally",
         ):
             self.assertIn(f"{{{key},", bibliography)
             self.assertIn(key, related)
@@ -48,6 +49,9 @@ class OriginalityAndNoveltyScreenTest(unittest.TestCase):
             screen,
         )
         self.assertIn("reusable result is the evidence contract", screen)
+        self.assertIn("Policies of Multiple Skill Levels", screen)
+        self.assertIn("Building Placement Optimization", screen)
+        self.assertIn("TowerMind", screen)
         self.assertIn("No returned exact-phrase result", screen)
 
 

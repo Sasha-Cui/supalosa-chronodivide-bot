@@ -37,7 +37,7 @@ The final LNCS logs contain:
 - zero overfull boxes;
 - zero undefined or multiply defined references;
 - zero BibTeX warnings;
-- 33 citation keys, 33 bibliography entries, no missing keys, and no unused
+- 34 citation keys, 34 bibliography entries, no missing keys, and no unused
   entries; and
 - deterministic regenerated paper fragments whose input and output hashes are
   recorded in `paper/generated/asset_manifest.json` for all eight frozen
@@ -57,7 +57,7 @@ MACO paper and DOI `10.5220/0014358500004052`; the 25-author StarCraft II
 reference uses standard `et al.` formatting while retaining its identifier and
 DOI.
 
-A proposition-level precheck mapped all 33 bibliography keys across 41
+A proposition-level precheck mapped all 34 bibliography keys across 42
 key-by-citation placements to primary-source locators. It found one attribution
 boundary: the Chrono Divide homepage supports the reconstruction claim but not
 the exact offline API or pinned opponent. The refreeze added the package and
@@ -65,7 +65,10 @@ repository citations to both environment-description groups and, after a fresh
 close-work search, added Mariño et al.'s map-specific program-synthesis
 precedent, then added the closest located automatic RTS action-preselection
 configuration precedent and its map--opponent-specific boundary. Empirical
-claims and the supplement did not change; see
+claims and the supplement did not change. A final current-literature refresh
+also added Bhatia et al.'s Generals.io diagnosis of scripted-bot
+starting-position bias to motivate the reciprocal-start control while keeping
+the family-disjoint and sealed-evaluation distinction explicit; see
 `SUBSTANTIVE_CITATION_AUDIT.md`.
 
 ## Visual and content checks

@@ -4,8 +4,8 @@ Verified: **2026-08-11**
 
 ## Scope, identity, and boundary
 
-This is a machine-assisted proposition-level precheck of the 33 bibliography
-keys used at 41 key-by-citation placements in the shared manuscript sources.
+This is a machine-assisted proposition-level precheck of the 34 bibliography
+keys used at 42 key-by-citation placements in the shared manuscript sources.
 It is bound to:
 
 - reviewed submission source:
@@ -68,6 +68,7 @@ Classifications mean:
 | `agarwal2021precipice` | Aggregate point estimates from few runs or tasks can be unstable and uncertainty-aware evaluation is needed; [NeurIPS paper abstract and evaluation methodology](https://proceedings.neurips.cc/paper/2021/hash/f514cec81cb148559cf475e7426eed5e-Abstract.html). The source motivates robust aggregate evaluation; it does not prescribe this paper's exact family-clustered estimator. | supported with wording boundary |
 | `machado2018ale` | Protocol variation and controlled stochasticity materially affect ALE evaluation; [JAIR paper abstract and protocol review](https://arxiv.org/abs/1709.06009). | supported |
 | `henderson2018matters` | Environment nondeterminism, seeds, and reporting choices can change deep-RL conclusions; [AAAI paper abstract and experiments](https://arxiv.org/abs/1709.06560). | supported |
+| `bhatia2023generally` | The Generally Genius framework supports scripted-agent development and data collection in Generals.io; its Flobot case study finds quadrant-dependent performance, links the pattern to direction-biased path selection, and evaluates an unbiased repair; [AIIDE paper abstract and pp. 400, 404--406](https://doi.org/10.1609/aiide.v19i1.27536). | supported with wording boundary |
 | `schruben2011crn` | Common random numbers are a paired simulation variance-reduction method; [Wiley reference entry](https://onlinelibrary.wiley.com/doi/abs/10.1002/9780470400531.eorms0166). | supported |
 
 ## Correction and disposition
@@ -82,10 +83,13 @@ placements and positions the evaluation contribution against the closest
 map-specific and later program-synthesis work. Commit
 `92a4c870b6e697682b51fa41fd0f785c97c6b121` additionally records the close
 automatic action-preselection configuration precedent while distinguishing
-its map--opponent-specific setup. No empirical result, method description,
-scope boundary, or conclusion changed.
+its map--opponent-specific setup. The 2026-08-11 refresh also records Bhatia et
+al.'s data-driven diagnosis of physical-start bias in a scripted RTS bot and
+distinguishes that precedent from reciprocal, family-disjoint, sealed
+evaluation. No empirical result, method description, scope boundary, or
+conclusion changed.
 
-All 33 keys have a source-support classification above. This precheck found
+All 34 keys have a source-support classification above. This precheck found
 no citation use that required claim removal or a bibliographic replacement.
 Human source reading and the blank statuses in
 `research/HUMAN_AUTHOR_VERIFICATION_PACKET.md` remain mandatory before

@@ -18,7 +18,7 @@ class SubstantiveCitationAuditTest(unittest.TestCase):
         keys = re.findall(r"@\w+\s*\{\s*([^,\s]+)", bibliography)
         rows = re.findall(r"^\| `([^`]+)` \|", audit, flags=re.MULTILINE)
 
-        self.assertEqual(33, len(keys))
+        self.assertEqual(34, len(keys))
         self.assertEqual(set(keys), set(rows))
         self.assertEqual({key: 1 for key in keys}, dict(Counter(rows)))
 
@@ -47,7 +47,7 @@ class SubstantiveCitationAuditTest(unittest.TestCase):
                 cited.extend(key.strip() for key in group.split(","))
 
         self.assertEqual(expected, set(cited))
-        self.assertEqual(41, len(cited))
+        self.assertEqual(42, len(cited))
 
 
 if __name__ == "__main__":

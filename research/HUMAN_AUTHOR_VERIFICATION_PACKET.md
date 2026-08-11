@@ -180,6 +180,7 @@ replace primary-source reading or review of a venue-generated similarity report.
 | `agarwal2021precipice` | Few-task point estimates can be unstable; uncertainty-aware evaluation is needed | related work; supplement | `[ ]` |
 | `machado2018ale` | Protocol variation and controlled stochasticity matter in ALE | related work | `[ ]` |
 | `henderson2018matters` | Environment nondeterminism, seeds, and reporting choices affect conclusions | related work | `[ ]` |
+| `bhatia2023generally` | A Generals.io framework exposed quadrant-dependent scripted-bot performance, connected it to directional path-selection bias, and evaluated a repair | related work | `[ ]` |
 | `schruben2011crn` | Common random numbers provide paired simulation variance reduction | related work | `[ ]` |
 
 For every row, record one of: `verified`, `wording corrected`, `citation

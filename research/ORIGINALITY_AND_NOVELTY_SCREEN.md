@@ -31,7 +31,9 @@ available, remain the relevant pre-submission controls.
 Searches covered combinations of `programmatic strategies`, `microRTS`,
 `real-time strategy`, `program synthesis`, `map-independent`, `opponent`,
 `semantic space`, `automatic configuration`, `action pre-selection`,
-`evaluation`, and publication years 2018--2026. Candidate
+`starting position`, `strength estimation`, `evaluation`, and publication years
+2012--2026. The 2024 and 2025 AIIDE proceedings were also screened by title
+and abstract for game-agent evaluation and RTS work. Candidate
 records were checked against primary publisher or proceedings pages rather
 than secondary summaries.
 
@@ -43,6 +45,10 @@ than secondary summaries.
 | Ouessai et al. (2022), [Evolving Action Pre-Selection Parameters for MCTS in Real-Time Strategy Games](https://doi.org/10.1016/j.entcom.2022.100493) | Evolves parametric action-preselection heuristics for particular $\mu$RTS map--opponent settings and compares the resulting agent on those maps. | Added in `92a4c87`; closest automatic RTS configuration precedent found, but it does not use the present family-disjoint held-out estimand. |
 | Moraes et al. (2023), [Choosing Well Your Opponents](https://doi.org/10.24963/ijcai.2023/539) | Selects reference-strategy sets to guide synthesis and evaluates in $\mu$RTS. | Added in `5ed5dad`; closest recent opponent-guidance precedent, but it is a synthesis method rather than a leakage-control protocol. |
 | Moraes and Lelis (2024), [Searching for Programmatic Policies in Semantic Spaces](https://doi.org/10.24963/ijcai.2024/662) | Searches library-induced semantic neighborhoods for sample-efficient synthesis in $\mu$RTS. | Added in `5ed5dad`; current synthesis precedent, but methodologically distinct from finite parameter configuration and held-out evaluation. |
+| Bhatia et al. (2023), [Generally Genius](https://doi.org/10.1609/aiide.v19i1.27536) | Uses a Generals.io development/data framework to identify quadrant-dependent performance in a scripted bot, connect it to direction-biased path selection, and evaluate a repair. | Added in this refresh; directly motivates reciprocal physical starts, but does not construct family-disjoint roles or seal adaptation from evaluation. |
+| Kuboki et al. (2025), [Policies of Multiple Skill Levels for Better Strength Estimation in Games](https://doi.org/10.1609/aiide.v21i1.36812) | Estimates human Go and chess skill levels from learned strength scores and policy features using few matches. | Checked but not added: it estimates player ratings rather than comparing scripted policies under a held-out simulator design. |
+| Barriga et al. (2014), [Building Placement Optimization in Real-Time Strategy Games](https://doi.org/10.1609/aiide.v10i2.12735) | Evolves StarCraft building layouts in SparCraft scenarios and reports sensitivity to the similarity between predicted training attackers and evaluated attackers. | Checked but not added: it is an optimization case study, not an evaluation protocol or general-policy configuration precedent. |
+| Wang et al. (2026), [TowerMind](https://doi.org/10.1609/aaai.v40i31.39818) | Introduces a tower-defense learning environment and benchmark for language-model agents. | Checked but not added: it is relevant to the environment landscape, but the present paper neither introduces Chrono Divide nor evaluates language-model agents. |
 | Yang and Ontañón (2018), [Learning Map-Independent Evaluation Functions for RTS Games](https://doi.org/10.1109/CIG.2018.8490369) | Learns evaluation functions intended to transfer across maps. | Checked but not added: it concerns learned state evaluation, not scripted-policy configuration or family-level leakage control. |
 
 No archival publication specifically studying a Chrono Divide bot was located
@@ -75,15 +81,16 @@ independent external sources.
 
 ## Disposition
 
-Across the two closest-work passes, the search justified three citation
-additions and no scientific-claim change. The updated paper classifies
+Across the closest-work passes, the search justified four citation additions
+and no scientific-claim change. The updated paper classifies
 opponent-set guidance and semantic-space neighborhoods as prior synthesis work,
 and map--opponent-specific action-preselection evolution as prior automatic RTS
-configuration, then retains the narrower claim: family-disjoint,
+configuration. It now also distinguishes prior data-driven diagnosis of
+starting-position bias from the present reciprocal, family-disjoint,
 provenance-bound evaluation for one scripted Chrono Divide agent and one pinned
 opponent. No returned exact-phrase result triggered a source-attribution repair.
 
-Before submission, the author must still read all 33 primary sources, complete
+Before submission, the author must still read all 34 primary sources, complete
 `HUMAN_AUTHOR_VERIFICATION_PACKET.md`, check any venue-generated similarity
 report, and investigate every flagged passage rather than relying on this
 screen.

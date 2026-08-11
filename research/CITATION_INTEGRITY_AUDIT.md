@@ -24,8 +24,8 @@ the current candidate. Neither audit replaces the author's source reading.
 
 ## Structural checks
 
-- `paper/references.bib` contains exactly 33 entries with distinct keys.
-- The shared manuscript sources cite all 33 keys.
+- `paper/references.bib` contains exactly 34 entries with distinct keys.
+- The shared manuscript sources cite all 34 keys.
 - No cited key is missing from the bibliography.
 - No bibliography entry is uncited.
 - The generated ICAART paper has a settled reference list and no unresolved
@@ -33,7 +33,7 @@ the current candidate. Neither audit replaces the author's source reading.
 
 ## DOI-backed sources
 
-Twenty-six entries have registered DOIs. Title and publication year returned by
+Twenty-seven entries have registered DOIs. Title and publication year returned by
 DOI content negotiation, the Crossref metadata API, or the official publisher
 record agree with the BibTeX entry.
 
@@ -59,6 +59,7 @@ record agree with the BibTeX entry.
 | `balla2020generalisation` | [10.1109/CoG47356.2020.9231530](https://doi.org/10.1109/CoG47356.2020.9231530) | registered; title/year match |
 | `machado2018ale` | [10.1613/jair.5699](https://doi.org/10.1613/jair.5699) | registered; title/year match |
 | `henderson2018matters` | [10.1609/aaai.v32i1.11694](https://doi.org/10.1609/aaai.v32i1.11694) | registered; title/year match |
+| `bhatia2023generally` | [10.1609/aiide.v19i1.27536](https://doi.org/10.1609/aiide.v19i1.27536) | official AIIDE record; title/authors/year/volume/pages match |
 | `ontanon2018microrts` | [10.1609/aimag.v39i1.2777](https://doi.org/10.1609/aimag.v39i1.2777) | registered; title/year match |
 | `vinyals2017sc2le` | [10.48550/arXiv.1708.04782](https://doi.org/10.48550/arXiv.1708.04782) | registered; title/year match |
 | `samvelyan2019smac` | [10.48550/arXiv.1902.04043](https://doi.org/10.48550/arXiv.1902.04043) | registered; title/year match |
@@ -89,8 +90,10 @@ All seven non-DOI endpoints returned HTTP 200 at the pinned path.
 
 No broken key, missing citation, uncited entry, unregistered DOI, dead URL, or
 title/year mismatch was found. The 2026-08-11 closest-work refresh added the
-two IJCAI records and the Entertainment Computing record above; no further
-bibliography or manuscript edit is justified by this metadata audit.
+two IJCAI records, the Entertainment Computing record, and the AIIDE
+Generally Genius record above. The latter directly supports the new bounded
+starting-position comparison; no broader manuscript claim is inferred from
+its metadata.
 
 Before submission, the human author must still:
 
