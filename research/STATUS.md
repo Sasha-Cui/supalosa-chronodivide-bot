@@ -152,9 +152,9 @@ guidance permits disclosed AI-assisted writing, revision, and code; its
 presenter page documents live online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS fallback that reuses the frozen main-paper sections and result
-macros. It is 10 A4 pages with a 197-word abstract and 36,427 extracted
+macros. It is 10 A4 pages with a 197-word abstract and 36,604 extracted
 non-whitespace characters; two clean builds match at SHA-256
-`7cb677ae5d4ef03b51445fe42c3992bcddbb7a9aea8e22447a1809b100313239`,
+`8012e45816c75f4d6dd4c8da18839f6afcb4e69ab53b355796b7afe8c9c1b39a`,
 and every page passed visual and anonymity QA. It is not authorized for upload
 until ICAART confirms online-route election and double-blind AI-disclosure
 placement. A full-text comparison with three nearby accepted ICAART 2025--2026
@@ -162,6 +162,9 @@ papers rates the current submission weak accept with meaningful reviewer
 variance: the empirical controls exceed that sample, while one-opponent breadth
 and contribution positioning remain the scientific risks. See
 [`ICAART_ACCEPTED_PAPER_CALIBRATION.md`](ICAART_ACCEPTED_PAPER_CALIBRATION.md).
+The ICAART metadata now targets the Agents reviewer pool rather than generic
+distribution-shift ML; exact area, topic, and keyword choices are recorded in
+[`ICAART_REVIEWER_ASSIGNMENT_AUDIT.md`](ICAART_REVIEWER_ASSIGNMENT_AUDIT.md).
 Decide one venue by 2026-09-01 and do not submit to both archival venues
 simultaneously.
 

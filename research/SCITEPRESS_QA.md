@@ -5,14 +5,14 @@ Prepared: **2026-08-11**
 ## Frozen fallback identity
 
 - Fallback introduced at: `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`
-- Current reviewed source: `297d8b3f02acb76f2335869ebd2bfb4bf5f06f5a`
+- Current reviewed source: `a1bf46b9ef758938e458bd6782bf8518c44fa205`
 - Authoritative shared manuscript source: `297d8b3f02acb76f2335869ebd2bfb4bf5f06f5a`
 - Build entry point: `paper_scitepress/main.tex`
 - Target: ICAART 2027 regular paper, anonymous SCITEPRESS review format
-- PDF: 10 A4 pages, 164,381 bytes
-- PDF SHA-256: `7cb677ae5d4ef03b51445fe42c3992bcddbb7a9aea8e22447a1809b100313239`
+- PDF: 10 A4 pages, 164,387 bytes
+- PDF SHA-256: `8012e45816c75f4d6dd4c8da18839f6afcb4e69ab53b355796b7afe8c9c1b39a`
 - Abstract: 197 words
-- Extracted submission length: 36,427 non-whitespace characters
+- Extracted submission length: 36,604 non-whitespace characters
 
 The PDF is a build product and is not committed. The hash identifies the exact
 file rendered and inspected in this QA pass.
@@ -40,7 +40,7 @@ make -C paper_scitepress clean
 make -C paper_scitepress check
 ```
 
-completed successfully. Five fallback-specific tests passed, the shared paper
+completed successfully. Six fallback-specific tests passed, the shared paper
 generator produced no Git drift, BibTeX emitted no warning, LaTeX emitted no
 overfull box or undefined citation/reference, and the build checker enforced a
 maximum of 12 pages. Two independent clean builds were byte-identical at the
@@ -48,10 +48,22 @@ PDF hash above. The fixed `SOURCE_DATE_EPOCH` is a stable reproducibility
 constant established at the earlier comparator-justified freeze; the current
 reviewed source identity is recorded above.
 
-The extracted PDF contains 36,427 non-whitespace characters, within ICAART's
+The extracted PDF contains 36,604 non-whitespace characters, within ICAART's
 10,000--50,000 review-submission interval. Its 197-word abstract is within the
 official 70--200-word interval. The page is A4 and the current 10-page build is
 below the 12-page full-paper proceedings limit.
+
+## Reviewer-assignment metadata
+
+The title and abstract already identify a scripted RTS agent, the Chrono Divide
+environment, the configuration workflow, and the bounded empirical result.
+The keyword block now targets the accurate reviewer pool with **Game Artificial
+Intelligence**, **Real-time Strategy Games**, **Scripted Agents**, **Algorithm
+Configuration**, and **Reproducible Evaluation**. The previous **Distribution
+Shift** keyword was removed because it was not the paper's principal framing or
+an ICAART 2027 topic. A regression test protects the corrected block. The
+submission-system topic selections and rationale are frozen in
+`ICAART_REVIEWER_ASSIGNMENT_AUDIT.md`.
 
 ## Visual, metadata, and anonymity checks
 
@@ -61,6 +73,9 @@ further complete ten-page pass.
 The final venue-local MACO citation and compact StarCraft II author formatting
 received another complete ten-page pass as part of a 31-page cross-format
 inspection.
+The final keyword-only edit received a fresh ten-page rendered inspection. The
+new first-page keyword line is legible and remains inside its minipage; pages
+2--10 are pixel-identical to the previously inspected freeze.
 The study-flow diagram was widened to two columns after the first pass; the
 final pass found no clipped or overlapping text, invisible content, broken
 glyph, unreadable plot label, margin violation, misleading caption, or malformed

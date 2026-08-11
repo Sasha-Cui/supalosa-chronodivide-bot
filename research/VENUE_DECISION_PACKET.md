@@ -12,13 +12,19 @@ send email, authorize submission, or replace a written venue ruling.
 | Topical fit | Best: applied game-agent configuration and evaluation | Adequate but broader: agents, simulation, planning, and evolutionary computing |
 | First deadline | 2026-11-01 | 2026-09-15 AoE |
 | Current paper | 14-page LNCS body plus references | 10-page SCITEPRESS A4 paper |
-| Current PDF hash | `e37b536750b337533273425a67c8d1a0a330dfef6d992d17a0a2556a30b3984c` | `7cb677ae5d4ef03b51445fe42c3992bcddbb7a9aea8e22447a1809b100313239` |
+| Current PDF hash | `e37b536750b337533273425a67c8d1a0a330dfef6d992d17a0a2556a30b3984c` | `8012e45816c75f4d6dd4c8da18839f6afcb4e69ab53b355796b7afe8c9c1b39a` |
 | Remote presentation | Conference says hybrid; remote-presenter election is not explicit | Live online oral/poster procedures are explicit; election still needs confirmation |
 | AI policy | Eligibility unresolved because assistance exceeded copy editing | Assistance is permitted with disclosure; blind-review placement is unresolved |
 | Double-blind risk | Prior named public repository requires a ruling | Public submitted-paper posting is prohibited during review; repository handling should still be confirmed if asked |
 
 Neither venue is currently cleared for upload. The remaining uncertainty is
 governance, not manuscript or experiment completion.
+
+ICAART reviewer assignment is already frozen: submit under **Agents**, choose
+**Agent Models and Architectures**, **Simulation**, and **Task Planning and
+Execution** when the exact call taxonomy is available, and copy the title,
+abstract, and five keywords from `ICAART_REVIEWER_ASSIGNMENT_AUDIT.md` without
+adding a broader ML claim.
 
 ## Actions requiring the author
 

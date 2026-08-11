@@ -50,14 +50,20 @@ commit and all three hashes together; never mix files from different freezes.
 
 - [x] Separate SCITEPRESS source committed at
       `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`; the current reviewed source is
-      `297d8b3f02acb76f2335869ebd2bfb4bf5f06f5a` and changes no frozen empirical
+      `a1bf46b9ef758938e458bd6782bf8518c44fa205` and changes no frozen empirical
       artifact.
-- [x] PDF is 10 A4 pages, with a 197-word abstract and 36,427 extracted
+- [x] PDF is 10 A4 pages, with a 197-word abstract and 36,604 extracted
       non-whitespace characters.
 - [x] PDF SHA-256 is
-      `7cb677ae5d4ef03b51445fe42c3992bcddbb7a9aea8e22447a1809b100313239`.
+      `8012e45816c75f4d6dd4c8da18839f6afcb4e69ab53b355796b7afe8c9c1b39a`.
 - [x] Two clean builds are byte-identical; all ten pages, metadata, fonts,
       anonymity tokens, tables, plots, equations, and references were checked.
+- [x] ICAART reviewer assignment is frozen to **Agents** with the call topics
+      **Agent Models and Architectures**, **Simulation**, and **Task Planning
+      and Execution**, if those exact choices are offered in PRIMORIS.
+- [x] The PDF keywords are exactly **Game Artificial Intelligence**,
+      **Real-time Strategy Games**, **Scripted Agents**, **Algorithm
+      Configuration**, and **Reproducible Evaluation**.
 - [ ] ICAART confirms that the presenting author may elect the documented live
       online route without physical attendance.
 - [ ] ICAART specifies where the required AI acknowledgment and affected-
@@ -129,8 +135,9 @@ commit and all three hashes together; never mix files from different freezes.
 - [ ] Reader correctly identified all four claim boundaries without coaching.
 - [x] A separate visual/caption pass found no misleading standalone element.
 - [ ] Author list/order, affiliations, acknowledgements, funding, conflicts,
-      keywords, abstract, and corresponding-author details are prepared
-      privately and match every submission field.
+      and corresponding-author details are prepared privately; title, abstract,
+      keywords, area, and topics match `ICAART_REVIEWER_ASSIGNMENT_AUDIT.md`
+      if ICAART is selected.
 - [ ] Uploaded files were downloaded from the venue and compared with the local
       hashes/rendering.
 - [ ] Submission ID, confirmation email, exact uploaded files, hashes, and chair
