@@ -7,7 +7,7 @@ any third party.
 
 ## EvoStar / EvoApplications / SCAG chairs
 
-**Subject:** EvoApplications 2027 SCAG: scope, remote presentation, and review-policy questions
+**Subject:** EvoApplications 2027 SCAG: scope, remote presentation, and policy questions
 
 Suggested recipients: the SCAG organizers listed on the official call, with
 the EvoApplications programme chairs copied. Replace `(at)` with `@` only in
@@ -18,7 +18,7 @@ the private message: `alberto.tonda(at)inra.fr`, `amorag(at)ugr.es`,
 >
 > I am preparing a submission to the 2027 Soft Computing Applied to Games
 > session on reproducible configuration and held-out evaluation of a scripted
-> real-time-strategy agent. Before submitting, could you please clarify three
+> real-time-strategy agent. Before submitting, could you please clarify four
 > policy points?
 >
 > 1. If the paper is accepted, may the presenting author deliver the talk fully
@@ -34,6 +34,15 @@ the private message: `alberto.tonda(at)inra.fr`, `amorag(at)ugr.es`,
 >    reproducible evaluation protocol plus held-out evidence for a scripted game
 >    agent. Is that application/evaluation emphasis within the intended SCAG
 >    scope?
+> 4. OpenAI Codex has assisted beyond copy editing, including software
+>    implementation, experiment orchestration, research auditing, statistical
+>    cross-checks, literature triage, and manuscript drafting and revision. I
+>    remain solely accountable for the work, will personally verify the primary
+>    evidence and cited sources, and will make any required disclosure. The
+>    published EvoStar code says that AI may enhance clarity but should not
+>    produce material, whereas Springer Nature permits broader declared use with
+>    human accountability. Is this project eligible for EvoApplications, and if
+>    so, what disclosure do you require?
 >
 > For context, the anonymous study uses five run-distinct, deterministically
 > mutation-generated 32-policy pools, successive halving, and a training-only
@@ -56,7 +65,8 @@ the private message: `alberto.tonda(at)inra.fr`, `amorag(at)ugr.es`,
 > [author name]
 
 Retain the response with the submission records. Do not infer permission from
-the word “hybrid” alone.
+the word “hybrid” alone, and do not describe the recorded AI assistance as
+copy editing.
 
 ## Supalosa
 

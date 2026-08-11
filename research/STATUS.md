@@ -107,8 +107,11 @@ training:
    redistributing the combined bot, whose upstream package is `UNLICENSED`;
 2. obtain written confirmation that EvoStar accepts the paper's application and
    evaluation emphasis, permits remote presentation, and permits the proposed
-   handling of the prior named public repository; and
-3. obtain a cold read from an independent technical reader, incorporate only
+   handling of the prior named public repository;
+3. obtain a written EvoStar ruling on the recorded beyond-copy-editing use of
+   OpenAI Codex, complete the human evidence/citation/code/manuscript verification,
+   and make any required disclosure; and
+4. obtain a cold read from an independent technical reader, incorporate only
    claim-preserving clarity corrections, and repeat final PDF QA.
 
 The candid submission decision is **go** for a scoped lower-tier game-AI or

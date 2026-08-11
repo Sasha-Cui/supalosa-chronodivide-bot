@@ -13,12 +13,17 @@ the anonymous branch during review.
 - [ ] Chair confirms fully remote presentation is permitted.
 - [ ] Chair rules on the previously public named repository under double-blind
       review.
+- [ ] Chair rules on the recorded beyond-copy-editing use of OpenAI Codex and
+      specifies any required disclosure.
 - [ ] Anonymous supplement and reviewer artifact together fit the official
       10 MB supplementary-material field; every essential detail remains in
       the main paper.
 - [ ] Deadline, timezone, page limit, review model, and registration requirement
       reverified from the official call on the upload date.
 - [ ] No simultaneous submission to an incompatible archival venue.
+- [ ] Human author completes the evidence, citation, code, and line-by-line
+      verification in `AUTHORSHIP_AND_AI_POLICY.md`; retain a private signed
+      record tied to the manuscript commit and PDF hash.
 
 ## Frozen paper identity
 
@@ -69,6 +74,8 @@ commit and all three hashes together; never mix files from different freezes.
       personal email, or named repository URL appears in review files.
 - [ ] PDF metadata, archive member metadata, and submission fields are checked
       separately from visible text.
+- [ ] Any required generative-AI disclosure is accurate, venue-approved, and
+      does not falsely characterize the recorded assistance as copy editing.
 - [ ] The submitted archive hash matches the retained local archive exactly.
 
 ## Rights and release boundary

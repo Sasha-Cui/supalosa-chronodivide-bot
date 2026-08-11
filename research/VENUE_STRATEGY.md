@@ -49,9 +49,15 @@ result is tied to frozen manifests and job records, the anonymous LNCS paper
 and supplement have received full rendered QA, and the deterministic aggregate
 artifact passes a clean extraction and rebuild. Submission still depends on
 written rulings about topical scope, remote presentation, and prior
-public-repository exposure. The supplementary-material upload route is already
-documented by the official submission instructions. Public redistribution of
-the combined bot separately depends on upstream permission.
+public-repository exposure. A fourth written ruling is now required for
+generative-AI eligibility and disclosure: Codex assisted beyond copy editing,
+while the latest discoverable EvoStar code says AI should not produce material.
+Springer Nature permits broader declared use with human accountability, but the
+venue-specific rule controls submission eligibility. See
+[`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md). The
+supplementary-material upload route is already documented by the official
+submission instructions. Public redistribution of the combined bot separately
+depends on upstream permission.
 
 This assessment is also calibrated against the eight papers in the 2024--2026
 SCAG proceedings. A full-text review of the five 2025--2026 papers found that
@@ -162,6 +168,9 @@ Submit to SCAG only when all of the following are true:
 8. The program chair has confirmed the intended handling of the named public
    repository, or the repository has been made non-public for the double-blind
    review period without rewriting the evidence history.
+9. The program chair has ruled on the recorded generative-AI assistance and any
+   required disclosure, and the author has completed the primary-evidence,
+   citation, code, and line-by-line manuscript verification.
 
 No more outcome-bearing games should be added to the opened family population
 to improve the story. Any future opponent, faction, or instrumented-trajectory

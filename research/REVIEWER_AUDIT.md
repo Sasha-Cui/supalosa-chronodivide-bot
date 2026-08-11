@@ -100,9 +100,11 @@ configuration procedure is not an evolutionary strategy.
 
 1. Ask the EvoStar/SCAG organizers in writing whether the paper's application
    and evaluation emphasis is in scope, whether remote presentation is
-   allowed, and whether a named public implementation repository posted before
-   submission conflicts with double-blind review. The official submission page
-   already provides a 10 MB supplementary-material field.
+   allowed, whether a named public implementation repository posted before
+   submission conflicts with double-blind review, and whether the recorded
+   beyond-copy-editing use of Codex is eligible and requires disclosure. The
+   official submission page already provides a 10 MB supplementary-material
+   field.
 2. Ask Supalosa for explicit permission and preferred attribution/license for
    public redistribution of the derived bot. Until then, release only the
    aggregate reviewer artifact.
@@ -112,6 +114,10 @@ configuration procedure is not an evolutionary strategy.
    without repository context.
 4. Repeat the citation, page-limit, anonymity, manifest, and rendered-PDF checks
    after the last editorial change.
+5. Require the human author to complete the primary-evidence, citation, code,
+   and line-by-line verification in
+   [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md). This internal
+   review cannot substitute for author accountability.
 
 ## Go/no-go
 

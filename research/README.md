@@ -23,16 +23,19 @@ family-disjoint evaluation and configuration of a generic scripted RTS policy.
    fit boundary.
 8. [`ANONYMITY_RELEASE_RISK.md`](ANONYMITY_RELEASE_RISK.md) — double-blind and
    upstream-license actions required before submission or public bot release.
-9. [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md),
+9. [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md) — factual
+   generative-AI use boundary, author-verification requirements, and venue
+   eligibility gate.
+10. [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md),
    [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md), and
    [`SUBMISSION_ROADMAP.md`](SUBMISSION_ROADMAP.md) — send-ready external
    questions, a neutral cold-read protocol, and the dated path to the
    2026-11-01 deadline.
-10. [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md) — the final claim,
+11. [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md) — the final claim,
    anonymity, rights, artifact, and upload freeze record.
-11. [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) — append-only mapping from every
+12. [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) — append-only mapping from every
    interpreted result to its configuration, artifact, revision, and job ID.
-12. [`FORENSIC_AUDIT.md`](FORENSIC_AUDIT.md) — original inventory, leakage audit,
+13. [`FORENSIC_AUDIT.md`](FORENSIC_AUDIT.md) — original inventory, leakage audit,
    and reconstruction of the pre-research project.
 
 ## Frozen result boundary
@@ -70,6 +73,7 @@ separately versioned prospective experiment.
 | Manuscript QA | [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md) |
 | Reviewer-style decision | [`REVIEWER_AUDIT.md`](REVIEWER_AUDIT.md) |
 | Anonymity and release risk | [`ANONYMITY_RELEASE_RISK.md`](ANONYMITY_RELEASE_RISK.md) |
+| Authorship and generative-AI policy | [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md) |
 | External contact drafts | [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md) |
 | Independent cold-read protocol | [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md) |
 | Dated submission roadmap | [`SUBMISSION_ROADMAP.md`](SUBMISSION_ROADMAP.md) |

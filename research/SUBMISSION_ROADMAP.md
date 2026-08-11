@@ -10,16 +10,24 @@ on the opened family population.
 
 - Send the three drafts in [`CONTACT_TEMPLATES.md`](CONTACT_TEMPLATES.md).
 - Obtain written scope, remote-presentation, and double-blind repository
-  rulings from EvoStar/SCAG. The official 10 MB supplementary-material field is
-  already documented; keep every essential claim and method in the main paper.
+  rulings from EvoStar/SCAG.
+- Obtain a written eligibility and disclosure ruling for the recorded
+  beyond-copy-editing use of OpenAI Codex. Do not submit under a grammar-only
+  description.
+- Begin the human verification checklist in
+  [`AUTHORSHIP_AND_AI_POLICY.md`](AUTHORSHIP_AND_AI_POLICY.md), including
+  primary evidence, all citations, experiment-affecting code, and the complete
+  manuscript. The official 10 MB supplementary-material field is already
+  documented; keep every essential claim and method in the main paper.
 - Request explicit redistribution/license terms from Supalosa.
 - Request Chrono Divide citation, version-pinning, and acquisition guidance.
 - If the chair requires a non-public repository, change visibility without
   deleting or rewriting evidence history.
 
-Exit condition: the venue and anonymity route are known, even if upstream code
-permission is still pending. The aggregate-only artifact is sufficient for
-review and does not depend on bot redistribution.
+Exit condition: venue, anonymity, remote-presentation, and generative-AI
+eligibility routes are known, even if upstream code permission is still
+pending. The aggregate-only artifact is sufficient for review and does not
+depend on bot redistribution.
 
 ## 18--31 August 2026: independent reading pass
 
@@ -71,8 +79,10 @@ Exit condition: upload-ready package by the internal **2026-10-15** deadline.
 ## Fallback trigger
 
 If EvoStar rejects remote presentation, says the prior public repository is
-incompatible with double-blind review, or considers the paper out of SCAG
-scope, activate the venue fallback rather than weakening the methodology:
+incompatible with double-blind review, considers the paper out of SCAG scope,
+or disallows the recorded generative-AI assistance, activate a policy-compatible
+venue fallback rather than conceal the project history or weaken the
+methodology:
 
 1. reverify ICAART's **2026-10-22** regular-paper round and remote exception;
 2. otherwise use the **2026-12-03** ICAART workshop/special-session round if a
