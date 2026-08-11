@@ -1,21 +1,16 @@
 \section{Conclusion}
 
-We reconstructed an exploratory Chrono Divide bot project into a deterministic,
-family-disjoint, provenance-bound evaluation of scripted policy configuration.
-Five successive-halving searches and a common-seed championship selected one
-generic StrongBot policy using training families only. On 16 sealed test
-families, that policy improves score over the shipped default by
-\ImprovementEstimate{} (family-clustered 95\% CI
-[\ImprovementCILower{},~\ImprovementCIUpper{}]), with positive effects on 14
-families and zero effects on two. The practical gain is mainly fewer losses:
-many default losses become tick-cap draws, and fewer become wins.
+We converted an exploratory Chrono Divide bot project into a deterministic,
+family-disjoint, provenance-bound scripted-policy configuration study. Five
+successive-halving searches and a common-seed championship selected one policy
+from training families. Across 16 sealed test families, its score improves on
+the shipped default by \ImprovementEstimate{} (family-clustered 95\% CI
+[\ImprovementCILower{},~\ImprovementCIUpper{}]); 14 effects are positive and two
+are zero, and the gain mainly converts losses to tick-cap draws.
 
-The study also gives a necessary negative answer. The champion's one-sided
-lower score margin against Supalosa is \ChampionAbsoluteLower{}, so reliable
-absolute superiority is not established. Post-confirmatory evidence points to
-an infantry-rush configuration and greater conversion of resources into
-fielded units, but neither endpoint snapshots nor any component contrast
-establishes a mechanism after familywise multiplicity control. The contribution
-is therefore a reproducible configuration-and-evaluation workflow plus a strong
-bounded relative result---not a new game environment, a new general optimizer,
-or a claim of broad game-AI dominance.
+Yet its one-sided lower score margin against Supalosa is
+\ChampionAbsoluteLower{}, so absolute superiority is not established. Endpoint
+and component diagnostics suggest an infantry-rush policy that fields more units
+but establish no mechanism after familywise correction. The contribution is a
+reproducible configuration/evaluation workflow and bounded relative result---not
+a new environment, optimizer, or broad game-AI dominance claim.
