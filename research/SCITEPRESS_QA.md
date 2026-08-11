@@ -12,7 +12,7 @@ Prepared: **2026-08-11**
 - Target: ICAART 2027 regular paper, anonymous SCITEPRESS review format
 - PDF: 10 A4 pages, 164,295 bytes
 - PDF SHA-256: `1a92466bc627a3edc3d757542289df03121bdbe4ebccdc8947508cf7b084747c`
-- Abstract: 197 words
+- Expanded plain-text abstract: 195 words
 - Extracted submission length: 36,231 non-whitespace characters
 
 The PDF is a build product and is not committed. The hash identifies the exact
@@ -52,7 +52,7 @@ constant established at the earlier comparator-justified freeze; the current
 reviewed source identity is recorded above.
 
 The extracted PDF contains 36,231 non-whitespace characters, within ICAART's
-10,000--50,000 review-submission interval. Its 197-word abstract is within the
+10,000--50,000 review-submission interval. Its 195-word expanded abstract is within the
 official 70--200-word interval. The page is A4 and the current 10-page build is
 below the 12-page full-paper proceedings limit.
 

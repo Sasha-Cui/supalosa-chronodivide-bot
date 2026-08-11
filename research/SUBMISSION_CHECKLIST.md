@@ -60,7 +60,7 @@ commit and all three hashes together; never mix files from different freezes.
       `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`; the current reviewed source is
       `419a0f72188f957ae144262f62c62bcc11a66ac3` and changes no frozen empirical
       artifact.
-- [x] PDF is 10 A4 pages, with a 197-word abstract and 36,231 extracted
+- [x] PDF is 10 A4 pages, with a 195-word expanded abstract and 36,231 extracted
       non-whitespace characters.
 - [x] PDF SHA-256 is
       `1a92466bc627a3edc3d757542289df03121bdbe4ebccdc8947508cf7b084747c`.
@@ -72,6 +72,9 @@ commit and all three hashes together; never mix files from different freezes.
 - [x] The PDF keywords are exactly **Game Artificial Intelligence**,
       **Real-time Strategy Games**, **Scripted Agents**, **Algorithm
       Configuration**, and **Reproducible Evaluation**.
+- [x] `make -C paper_scitepress metadata` deterministically exports the exact
+      plain-text portal title, expanded 195-word abstract, keywords, area, and
+      ordered topics with source hashes; no LaTeX macro needs manual expansion.
 - [ ] ICAART confirms author eligibility, request procedure, and fee class for
       the documented exceptional live-online route.
 - [ ] ICAART specifies whether the named code repository must be private during

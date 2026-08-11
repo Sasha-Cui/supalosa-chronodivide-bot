@@ -18,9 +18,10 @@ repository, AI-disclosure, or reviewer-artifact gates.
 - **Paper class:** Regular paper reporting completed and validated research
 
 Use the exact topic labels only if PRIMORIS offers the published call taxonomy.
-If the form limits the number of topics, retain them in the order above. Copy
-the abstract from `paper_scitepress/abstract.tex`; do not improvise a stronger
-submission-system summary.
+If the form limits the number of topics, retain them in the order above. Run
+`make -C paper_scitepress metadata` and copy the plain-text fields from
+`paper_scitepress/build/submission_metadata.json`; do not paste LaTeX commands
+or improvise a stronger submission-system summary.
 
 ## Evidence for the assignment
 
@@ -80,7 +81,7 @@ candidate addresses each without adding post-hoc evidence:
 
 | Reviewer question | Current evidence | Residual action |
 | --- | --- | --- |
-| Are the abstract and introduction adequate? | The 197-word abstract names the existing environment, method, estimand, passed relative gate, failed absolute/joint gate, and scope; the introduction states three RQs and contributions. | Independent cold reader must recover the same boundaries unprompted. |
+| Are the abstract and introduction adequate? | The 195-word expanded abstract names the existing environment, method, estimand, passed relative gate, failed absolute/joint gate, and scope; the introduction states three RQs and contributions. | Independent cold reader must recover the same boundaries unprompted. |
 | Are more experimental results needed? | The completed design has 8,704 games and one sealed 512-game family-clustered confirmation; more games on opened families would not add generalization units. | Acknowledge that a second opponent or matchup is prospective future work. |
 | Is more comparative evaluation needed? | The paper compares champion and frozen in-class reference, five run-local selections, and five component reverts. | One independent opponent remains the largest scientific weakness; do not imply broad baseline coverage. |
 | Should critical discussion improve? | Six explicit limitations cover opponent/matchup, supported maps, comparator, draws/cap, configurator baselines, and adaptation/diagnostic power. | Preserve this space during any page-limited edit. |
@@ -99,7 +100,8 @@ or contributes a new optimizer.
 ## Upload-time controls
 
 1. Select **Agents**, then the three preferred call topics when available.
-2. Paste the frozen title, abstract, and keywords exactly.
+2. Regenerate `paper_scitepress/build/submission_metadata.json` from the frozen
+   source and paste its title, abstract, and keywords exactly.
 3. Do not add **distribution shift**, **multi-agent learning**, **new game
    environment**, or **state-of-the-art bot** to free-text fields.
 4. Recheck the downloaded venue-rendered PDF against the retained SHA-256.

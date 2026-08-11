@@ -8,7 +8,7 @@ export SOURCE_DATE_EPOCH ?= 1786455918
 export FORCE_SOURCE_DATE := 1
 export TZ := UTC
 
-.PHONY: all assets check check-generated clean main test
+.PHONY: all assets check check-generated clean main metadata test
 
 all: main
 
@@ -33,6 +33,9 @@ check-generated: assets
 test:
 	cd .. && $(PYTHON) -m unittest paper_scitepress.tests.test_fallback_manuscript -v
 
+metadata: assets build
+	$(PYTHON) scripts/export_submission_metadata.py --output build/submission_metadata.json
+
 build:
 	mkdir -p build
 
@@ -43,7 +46,7 @@ main: assets build
 	$(TEX_ENV) pdflatex $(TEX_FLAGS) main.tex
 	$(TEX_ENV) pdflatex $(TEX_FLAGS) main.tex
 
-check: test check-generated main
+check: test check-generated main metadata
 	$(PYTHON) scripts/check_build.py build/main.log build/main.blg build/main.pdf
 
 clean:

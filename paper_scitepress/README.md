@@ -18,6 +18,12 @@ That value is a reproducibility constant, not the current source identity;
 A clean build should produce the same PDF bytes under the pinned Bouchet TeX
 toolchain.
 
+`make check` also writes `build/submission_metadata.json`. This is the exact
+plain-text title, expanded abstract, keywords, area, and ordered topic list for
+the submission form, with source hashes and the abstract word count. Regenerate
+it from the reviewed source instead of copying LaTeX commands or improvising a
+stronger portal summary.
+
 ## Official template provenance
 
 The four unmodified files in `vendor/` came from the official conference

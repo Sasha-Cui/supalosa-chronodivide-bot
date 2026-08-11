@@ -52,6 +52,25 @@ class BuildAnonymousArtifactTest(unittest.TestCase):
                 (package / "paper" / "references.bib").read_bytes(),
                 (package / "paper_scitepress" / "references.bib").read_bytes(),
             )
+            metadata_run = subprocess.run(
+                [
+                    sys.executable,
+                    str(
+                        package
+                        / "paper_scitepress"
+                        / "scripts"
+                        / "export_submission_metadata.py"
+                    ),
+                ],
+                cwd=package,
+                check=False,
+                capture_output=True,
+                text=True,
+            )
+            self.assertEqual(metadata_run.returncode, 0, metadata_run.stderr)
+            submission_metadata = json.loads(metadata_run.stdout)
+            self.assertEqual(submission_metadata["abstractWordCount"], 195)
+            self.assertNotIn("\\", submission_metadata["abstract"])
 
             aggregate_inputs = sorted(
                 (package / "research" / "artifacts").glob("*.json")

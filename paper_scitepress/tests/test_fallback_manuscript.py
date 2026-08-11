@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import json
 import re
 import subprocess
 import sys
@@ -49,13 +50,65 @@ class FallbackManuscriptTest(unittest.TestCase):
 
     def test_abstract_is_within_official_word_bounds(self) -> None:
         source = (FALLBACK / "abstract.tex").read_text()
-        visible = re.sub(r"\\[A-Za-z]+\*?(?:\{\})?", " VALUE ", source)
-        visible = re.sub(r"[{}~\\]", " ", visible)
-        words = re.findall(r"[A-Za-z0-9][A-Za-z0-9'&.-]*", visible)
-        self.assertGreaterEqual(len(words), 70)
-        self.assertLessEqual(len(words), 200)
+        completed = subprocess.run(
+            [
+                sys.executable,
+                str(FALLBACK / "scripts" / "export_submission_metadata.py"),
+            ],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+        word_count = json.loads(completed.stdout)["abstractWordCount"]
+        self.assertGreaterEqual(word_count, 70)
+        self.assertLessEqual(word_count, 200)
         self.assertIn("joint", source.lower())
         self.assertIn("fails", source.lower())
+
+    def test_submission_metadata_is_plain_and_deterministic(self) -> None:
+        script = FALLBACK / "scripts" / "export_submission_metadata.py"
+        with tempfile.TemporaryDirectory() as directory:
+            first = Path(directory) / "first.json"
+            second = Path(directory) / "second.json"
+            for output in (first, second):
+                subprocess.run(
+                    [sys.executable, str(script), "--output", str(output)],
+                    check=True,
+                )
+            self.assertEqual(first.read_bytes(), second.read_bytes())
+            metadata = json.loads(first.read_text(encoding="utf-8"))
+
+        self.assertEqual(metadata["paperClass"], "Regular paper")
+        self.assertEqual(metadata["area"], "Agents")
+        self.assertEqual(
+            metadata["topics"],
+            [
+                "Agent Models and Architectures",
+                "Simulation",
+                "Task Planning and Execution",
+            ],
+        )
+        self.assertEqual(
+            metadata["title"],
+            "Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono Divide",
+        )
+        self.assertEqual(metadata["abstractWordCount"], 195)
+        self.assertIn("0.336", metadata["abstract"])
+        self.assertIn("-0.021", metadata["abstract"])
+        self.assertNotRegex(metadata["abstract"], r"[\\{}]")
+        self.assertEqual(
+            metadata["keywords"],
+            [
+                "Game Artificial Intelligence",
+                "Real-time Strategy Games",
+                "Scripted Agents",
+                "Algorithm Configuration",
+                "Reproducible Evaluation",
+            ],
+        )
+        self.assertEqual(len(metadata["sourceSha256"]), 3)
+        for digest in metadata["sourceSha256"].values():
+            self.assertRegex(digest, r"^[0-9a-f]{64}$")
 
     def test_review_sources_are_anonymous(self) -> None:
         paths = [

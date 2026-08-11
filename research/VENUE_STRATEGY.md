@@ -146,7 +146,7 @@ The public-policy evidence and exact remaining questions are frozen in
 `ICAART_POLICY_RECONCILIATION.md`.
 
 The SCITEPRESS conversion was completed prospectively on 2026-08-11 without
-changing the frozen science. It is 10 A4 pages, has a 197-word abstract and
+changing the frozen science. It is 10 A4 pages, has a 195-word expanded abstract and
 36,231 extracted non-whitespace characters, and reproduces byte-for-byte across
 clean builds at SHA-256
 `1a92466bc627a3edc3d757542289df03121bdbe4ebccdc8947508cf7b084747c`.

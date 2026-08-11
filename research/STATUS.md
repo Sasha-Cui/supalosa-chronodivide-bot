@@ -163,7 +163,7 @@ guidance permits disclosed AI-assisted writing, revision, and code; its
 presenter page documents live online talks; and its first regular-paper
 deadline is 2026-09-15. Commit `e1b10b5` adds a separate deterministic
 SCITEPRESS submission format that reuses the frozen main-paper sections and result
-macros. It is 10 A4 pages with a 197-word abstract and 36,231 extracted
+macros. It is 10 A4 pages with a 195-word expanded abstract and 36,231 extracted
 non-whitespace characters; two clean builds match at SHA-256
 `1a92466bc627a3edc3d757542289df03121bdbe4ebccdc8947508cf7b084747c`,
 and every page passed visual and anonymity QA. It is not authorized for upload
