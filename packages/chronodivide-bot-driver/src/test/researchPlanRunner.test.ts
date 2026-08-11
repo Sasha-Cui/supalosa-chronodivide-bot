@@ -292,7 +292,16 @@ describe("strict research run plan", () => {
         };
         const spec = materializeEpisodeSpecs(plan, role)[0];
         expect(validateResearchEpisodeSpec(spec).mapName).toBe("alpha.map");
+        expect(validateResearchEpisodeSpec({ ...spec, mapName: "alpha.mpr" }).mapName).toBe("alpha.mpr");
         expect(() => validateResearchEpisodeSpec({ ...spec, mapName: "private/alpha.map" })).toThrow(/basename/);
+        expect(() => validateResearchEpisodeSpec({ ...spec, mapName: "alpha.zip" })).toThrow(/\.map or \.mpr/);
+        expect(() => materializeEpisodeSpecs(plan, {
+            ...role,
+            targets: [{
+                ...role.targets[0],
+                representative: { ...role.targets[0].representative, path: "private/path/alpha.zip" },
+            }],
+        })).toThrow(/\.map or \.mpr/);
         expect(() => validateResearchEpisodeSpec({ ...spec, policyId: ZERO_SHA })).toThrow(/canonical policy/);
     });
 });

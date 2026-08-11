@@ -99,8 +99,11 @@ export const validateResearchEpisodeSpec = (spec: ResearchEpisodeSpec): Research
     assertIdentifier("familyId", spec.familyId);
     assertIdentifier("methodId", spec.methodId);
     assertIdentifier("policyId", spec.policyId);
-    if (spec.mapName !== spec.mapName.split(/[\\/]/).pop() || !spec.mapName.toLowerCase().endsWith(".map")) {
-        throw new Error(`Research episode mapName must be a basename ending in .map; got ${spec.mapName}`);
+    if (
+        spec.mapName !== spec.mapName.split(/[\\/]/).pop() ||
+        !/\.(map|mpr)$/i.test(spec.mapName)
+    ) {
+        throw new Error(`Research episode mapName must be a basename ending in .map or .mpr; got ${spec.mapName}`);
     }
     if (!SHA256_PATTERN.test(spec.mapSha256)) {
         throw new Error(`Research episode mapSha256 must be a lowercase SHA-256 digest; got ${spec.mapSha256}`);

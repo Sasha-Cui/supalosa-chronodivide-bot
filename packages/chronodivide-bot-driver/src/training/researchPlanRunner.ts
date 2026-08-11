@@ -11,6 +11,7 @@ import {
     RESEARCH_EPISODE_SCHEMA_VERSION,
     ResearchEpisodeSpec,
     runResearchEpisode,
+    validateResearchEpisodeSpec,
 } from "./researchEpisode.js";
 import { parseResearchPolicy, ResearchPolicyConfig, researchPolicySha256 } from "./researchPolicy.js";
 
@@ -488,7 +489,7 @@ export const materializeEpisodeSpecs = (
         if (!policy) {
             throw new Error(`Episode ${episode.episodeId} policy is undeclared`);
         }
-        return {
+        return validateResearchEpisodeSpec({
             schemaVersion: RESEARCH_EPISODE_SCHEMA_VERSION,
             episodeId: episode.episodeId,
             familyId: episode.familyId,
@@ -503,7 +504,7 @@ export const materializeEpisodeSpecs = (
             candidateCountry: plan.candidateCountry,
             baselineCountry: plan.baselineCountry,
             maxTicks: plan.maxTicks,
-        };
+        });
     });
 };
 
