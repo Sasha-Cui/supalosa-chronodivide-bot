@@ -15,7 +15,7 @@ the anonymous branch during review.
       review.
 - [ ] Chair rules on the recorded beyond-copy-editing use of OpenAI Codex and
       specifies any required disclosure.
-- [ ] Anonymous supplement and reviewer artifact together fit the official
+- [x] Anonymous supplement and reviewer artifact together fit the official
       10 MB supplementary-material field; every essential detail remains in
       the main paper.
 - [ ] Deadline, timezone, page limit, review model, and registration requirement
@@ -30,15 +30,15 @@ the anonymous branch during review.
 - Title: **Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono
   Divide**
 - Anonymous manuscript source commit:
-  `f8b4feaccf4f1b087787f2931e057d6b4c30e4e2`
+  `b08b75e1b07ff6e6e4cec88a4038d31dfa39bc61`
 - Main PDF: 16 pages total; non-reference material ends on page 14.
 - Main PDF SHA-256:
-  `b69f3a669456d693c0d351dc142fd0d57fd615c2084039dcd166fd392a02205f`
+  `200aa4c5514f20a0588293fec54f943f54ce70a35edd96ee5822f95ad2202871`
 - Supplement: 5 pages.
 - Supplement PDF SHA-256:
-  `9b4810f79e0869759f80007bb468ba53095d7819d47f0882e9d38d4facf19e9e`
+  `f2d85c1bee116af0f49187c6aeeab0e0084eb0d7661746a3781001d41d749a9f`
 - Deterministic anonymous artifact SHA-256:
-  `0d57486641d76303ecc96cdb10ce84534b19672c9fe01d52d2bc51cce9bb6315`
+  `7feb00236f8f7f6d944399b395b9b94160802aa0cea29f360805c0fd225ea7f6`
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
@@ -46,49 +46,51 @@ commit and all three hashes together; never mix files from different freezes.
 
 ## Scientific consistency
 
-- [ ] Abstract, RQ1, results, and conclusion report champion-minus-default as
+- [x] Abstract, RQ1, results, and conclusion report champion-minus-default as
       the positive confirmatory claim.
-- [ ] Abstract, RQ2, results, and conclusion report the failed absolute gate.
-- [ ] Exactly 512 confirmatory games, 16 sealed families, and 256 games per
+- [x] Abstract, RQ2, results, and conclusion report the failed absolute gate.
+- [x] Exactly 512 confirmatory games, 16 sealed families, and 256 games per
       method are reported consistently.
-- [ ] Improvement is 0.33594; family-clustered 95% CI is [0.21456, 0.45732].
-- [ ] Champion score is 0.53516; one-sided lower margin above 0.5 is -0.02117.
-- [ ] W/D/L counts are default 1/100/155 and champion 47/180/29.
-- [ ] Fourteen family effects are positive, two zero, and none negative.
-- [ ] Component and terminal-state evidence is labeled post-confirmatory and
+- [x] Improvement is 0.33594; family-clustered 95% CI is [0.21456, 0.45732].
+- [x] Champion score is 0.53516; one-sided lower margin above 0.5 is -0.02117.
+- [x] W/D/L counts are default 1/100/155 and champion 47/180/29.
+- [x] Fourteen family effects are positive, two zero, and none negative.
+- [x] Component and terminal-state evidence is labeled post-confirmatory and
       non-causal.
-- [ ] No claim introduces Chrono Divide, a novel optimizer, reliable Supalosa
+- [x] No claim introduces Chrono Divide, a novel optimizer, reliable Supalosa
       superiority, broad game-AI dominance, or a paradigm shift.
-- [ ] No new outcome-bearing evidence from the opened family population has
+- [x] No new outcome-bearing evidence from the opened family population has
       been added.
 
 ## Reproducibility and anonymity
 
-- [ ] `make -C paper check main supplement` passes in a clean committed export.
-- [ ] Anonymous artifact manifest verifies all 36 files.
-- [ ] A fresh extracted artifact rebuilds the 16-page paper and 5-page
+- [x] `make -C paper check main supplement` passes in a clean committed export.
+- [x] Anonymous artifact manifest verifies all 36 files.
+- [x] A fresh extracted artifact rebuilds the 16-page paper and 5-page
       supplement without actionable warnings (the known template-level
       `amsmath` accent notice is acceptable).
-- [ ] Main and supplement PDFs have been rendered page by page after the last
+- [x] Main and supplement PDFs have been rendered page by page after the last
       edit; no clipping, overlap, invisible text, or illegible plot label.
-- [ ] No author name, NetID, institution, scheduler account, private path,
+- [x] No author name, NetID, institution, scheduler account, private path,
       personal email, or named repository URL appears in review files.
-- [ ] PDF metadata, archive member metadata, and submission fields are checked
-      separately from visible text.
+- [x] PDF metadata and archive member metadata are checked separately from
+      visible text; PDF author/title fields are empty and archive ownership and
+      timestamps are normalized.
+- [ ] Submission-system fields are checked separately at upload time.
 - [ ] Any required generative-AI disclosure is accurate, venue-approved, and
       does not falsely characterize the recorded assistance as copy editing.
 - [ ] The submitted archive hash matches the retained local archive exactly.
 
 ## Rights and release boundary
 
-- [ ] Anonymous artifact contains no StrongBot/Supalosa bot packages, maps, MIX
+- [x] Anonymous artifact contains no StrongBot/Supalosa bot packages, maps, MIX
       archives, Chrono Divide runtime, Red Alert 2 assets, or private raw logs.
-- [ ] `THIRD_PARTY.md` accompanies the artifact.
+- [x] `THIRD_PARTY.md` accompanies the artifact.
 - [ ] Supalosa's written permission/license is retained before any public
       redistribution of the combined bot.
 - [ ] Chrono Divide acquisition, version, citation, and permitted redistribution
       language follow the maintainer's written guidance.
-- [ ] Public code/data availability statements distinguish aggregate
+- [x] Public code/data availability statements distinguish aggregate
       reproducibility from full match replay.
 
 ## Human review and upload
@@ -96,7 +98,7 @@ commit and all three hashes together; never mix files from different freezes.
 - [ ] Independent cold reader completed
       [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md).
 - [ ] Reader correctly identified all four claim boundaries without coaching.
-- [ ] A separate visual/caption pass found no misleading standalone element.
+- [x] A separate visual/caption pass found no misleading standalone element.
 - [ ] Author list/order, affiliations, acknowledgements, funding, conflicts,
       keywords, abstract, and corresponding-author details are prepared
       privately and match every submission field.

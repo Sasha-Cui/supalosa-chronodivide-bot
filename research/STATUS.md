@@ -85,14 +85,15 @@ and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.m
 
 ## Manuscript status and remaining work
 
-Commit `f8b4fea` is the current anonymous LNCS manuscript source revision. It
+Commit `b08b75e` is the current anonymous LNCS manuscript source revision. It
 sharpens the held-out-evaluation title, states two confirmatory research
 questions and one explicitly descriptive diagnostic question, removes causal-sounding
 mechanism language, and adds primary prior art on hidden-level evaluation and
 protocol sensitivity, classifies the search as deterministic mutation-based
 finite configuration rather than iterative population-based evolution, and
-cites the closest recent SCAG training-mode comparison, and reports exact
-accepted-path resource use without changing any scientific result. The main
+cites the closest recent SCAG training-mode comparison, reports exact
+accepted-path resource use, and derives secondary reported values from frozen
+aggregate artifacts without changing any scientific result. The main
 PDF is 16 pages with main text ending on page 14 and references continuing
 afterward; the supplement is five pages. All reported tables and figures are
 generated from hash-pinned aggregate artifacts. The final build has no overfull boxes, undefined
@@ -100,9 +101,10 @@ references, missing citations, or BibTeX warnings, and all 21 pages have
 received rendered visual checks. The current PDF SHA-256 values are recorded in
 [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md).
 
-Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder.
-The current 62 KB review archive is byte-deterministic at SHA-256
-`0d57486641d76303ecc96cdb10ce84534b19672c9fe01d52d2bc51cce9bb6315`.
+Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder,
+and commit `7cdbe0d` hardens its direct-identity denylist. The current 65 KB
+review archive is byte-deterministic at SHA-256
+`7feb00236f8f7f6d944399b395b9b94160802aa0cea29f360805c0fd225ea7f6`.
 Its 36-file manifest verifies, all artifact tests pass, and an extracted
 reviewer copy rebuilds the 16-page paper and five-page supplement without
 undefined references, overflow, or BibTeX warnings.
@@ -120,6 +122,13 @@ training:
    and make any required disclosure; and
 4. obtain a cold read from an independent technical reader, incorporate only
    claim-preserving clarity corrections, and repeat final PDF QA.
+
+ICAART 2027 is now the verified policy-compatible fallback: its official
+guidance permits disclosed AI-assisted writing, revision, and code; its
+presenter page documents live online talks; and its first regular-paper
+deadline is 2026-09-15. If EvoStar has not supplied affirmative written rulings
+by 2026-08-20, begin the 12-page SCITEPRESS conversion and decide the venue by
+2026-09-01. Do not submit to both archival venues simultaneously.
 
 The candid submission decision is **go** for a scoped lower-tier game-AI or
 algorithm-configuration workshop/special session, and **no-go** for a broad or
