@@ -8,7 +8,7 @@ export SOURCE_DATE_EPOCH ?= 1786455918
 export FORCE_SOURCE_DATE := 1
 export TZ := UTC
 
-.PHONY: all assets check check-generated clean main metadata test
+.PHONY: all assets check check-generated clean main metadata submission-check test
 
 all: main
 
@@ -48,6 +48,12 @@ main: assets build
 
 check: test check-generated main metadata
 	$(PYTHON) scripts/check_build.py build/main.log build/main.blg build/main.pdf
+
+submission-check: check
+	$(PYTHON) scripts/check_submission.py \
+		--expected-pages 10 \
+		--expected-characters 36355 \
+		build/main.pdf build/submission_metadata.json
 
 clean:
 	rm -rf build generated references.bib

@@ -11,11 +11,26 @@ Build from the repository root with:
 make -C paper_scitepress check
 ```
 
+Before freezing a review submission, put Poppler 25.x's `pdfinfo`, `pdftotext`,
+and `pdffonts` on `PATH` and run the deeper candidate check:
+
+```bash
+make -C paper_scitepress submission-check
+```
+
+That target checks the frozen 10-page and 36,355-non-whitespace-character
+identity as well as A4 geometry, empty author/title metadata, encryption,
+forms, JavaScript, page rotation, embedded fonts with Unicode maps, the
+70--200-word abstract rule, PDF-to-portal title/abstract/keyword agreement,
+and SHA-256 binding of the portal metadata to its source files. It requires
+Poppler's `pdfinfo`, `pdftotext`, and `pdffonts`; the ordinary reproducibility
+build remains available through `make check` without those tools.
+
 The build uses a fixed `SOURCE_DATE_EPOCH` established at the comparator-
 justified manuscript freeze `cb891b47c9bb5ad3ac75c2d67b59865d56a7e1d1`.
 That value is a reproducibility constant, not the current source identity;
 `research/SCITEPRESS_QA.md` records the inspected source commit and PDF hash.
-A clean build should produce the same PDF bytes under the pinned Bouchet TeX
+A clean build should produce the same PDF bytes under the pinned TeX Live 2024
 toolchain.
 
 `make check` also writes `build/submission_metadata.json`. This is the exact
