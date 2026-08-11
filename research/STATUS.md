@@ -55,6 +55,13 @@ launch and contributed no game. All failed and superseded attempts remain
 preserved. The exact finalizer hashes, shard counts, and claim boundary are in
 [`EMPIRICAL_COMPLETION_AUDIT.md`](EMPIRICAL_COMPLETION_AUDIT.md).
 
+Exact scheduler accounting for the accepted path records 562 simulation-shard
+allocations, each with one CPU core and 6 GiB requested memory, totaling 288.72
+core-hours and no GPU allocation. Peak recorded batch-step RSS was 1.63 GiB.
+The sanitized aggregate is hash-pinned in the paper generator; the private
+allocation- and step-level `sacct` exports remain outside Git. See
+[`COMPUTE_ACCOUNTING.md`](COMPUTE_ACCOUNTING.md).
+
 ## Diagnostic interpretation
 
 - The champion exceeds the equal average of five independently selected local
@@ -78,25 +85,25 @@ and [`METHOD_V2_TERMINAL_STATE_ANALYSIS.md`](METHOD_V2_TERMINAL_STATE_ANALYSIS.m
 
 ## Manuscript status and remaining work
 
-Commit `c02a28c` is the current anonymous LNCS manuscript revision. It sharpens
-the held-out-evaluation title, states two confirmatory research questions and
-one explicitly descriptive diagnostic question, removes causal-sounding
+Commit `f8b4fea` is the current anonymous LNCS manuscript source revision. It
+sharpens the held-out-evaluation title, states two confirmatory research
+questions and one explicitly descriptive diagnostic question, removes causal-sounding
 mechanism language, and adds primary prior art on hidden-level evaluation and
 protocol sensitivity, classifies the search as deterministic mutation-based
 finite configuration rather than iterative population-based evolution, and
-cites the closest recent SCAG training-mode comparison without changing any
-result. The main PDF is 16 pages with
-main text ending on page 14 and references continuing afterward; the supplement
-is five pages. All reported tables and figures are generated from hash-pinned
-aggregate artifacts. The final build has no overfull boxes, undefined
+cites the closest recent SCAG training-mode comparison, and reports exact
+accepted-path resource use without changing any scientific result. The main
+PDF is 16 pages with main text ending on page 14 and references continuing
+afterward; the supplement is five pages. All reported tables and figures are
+generated from hash-pinned aggregate artifacts. The final build has no overfull boxes, undefined
 references, missing citations, or BibTeX warnings, and all 21 pages have
 received rendered visual checks. The current PDF SHA-256 values are recorded in
 [`MANUSCRIPT_QA.md`](MANUSCRIPT_QA.md).
 
 Commit `3c5af39` adds the deterministic anonymous aggregate-artifact builder.
-The current 60 KB review archive is byte-deterministic at SHA-256
-`a34227d89ffa128017037d4db359c5e0b003ae80f820f747df7c96fd3a96809c`.
-Its 35-file manifest verifies, all artifact tests pass, and an extracted
+The current 62 KB review archive is byte-deterministic at SHA-256
+`0d57486641d76303ecc96cdb10ce84534b19672c9fe01d52d2bc51cce9bb6315`.
+Its 36-file manifest verifies, all artifact tests pass, and an extracted
 reviewer copy rebuilds the 16-page paper and five-page supplement without
 undefined references, overflow, or BibTeX warnings.
 

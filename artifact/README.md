@@ -5,7 +5,7 @@ not package the StrongBot or Supalosa implementation, maps, MIX archives,
 Chrono Divide runtime, game assets, private execution bundles, or Git history.
 
 The builder copies the paper source and its deterministic generator, sanitizes
-the seven frozen aggregate JSON inputs used by the paper, replaces their pinned
+the eight frozen aggregate JSON inputs used by the paper, replaces their pinned
 hashes in the copied generator, regenerates every table and figure fragment,
 checks for direct author identifiers, writes a file-level SHA-256 manifest, and
 creates a metadata-normalized tarball.

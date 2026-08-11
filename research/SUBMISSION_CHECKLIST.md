@@ -30,15 +30,15 @@ the anonymous branch during review.
 - Title: **Configuring a Scripted RTS Agent: Held-Out Evaluation in Chrono
   Divide**
 - Anonymous manuscript source commit:
-  `c02a28c3cc9da676f242ecc18e876575e284c066`
+  `f8b4feaccf4f1b087787f2931e057d6b4c30e4e2`
 - Main PDF: 16 pages total; non-reference material ends on page 14.
 - Main PDF SHA-256:
-  `eed87d34eab33ffe9045f1a7c41efd269ca2fabb4eacadb7929e5c1655bc6cfd`
+  `b69f3a669456d693c0d351dc142fd0d57fd615c2084039dcd166fd392a02205f`
 - Supplement: 5 pages.
 - Supplement PDF SHA-256:
-  `10f6062eadabc1b7c71ff7c37a09b67e24d3c87a3fd7bae08e81c5dd97ece48a`
+  `9b4810f79e0869759f80007bb468ba53095d7819d47f0882e9d38d4facf19e9e`
 - Deterministic anonymous artifact SHA-256:
-  `a34227d89ffa128017037d4db359c5e0b003ae80f820f747df7c96fd3a96809c`
+  `0d57486641d76303ecc96cdb10ce84534b19672c9fe01d52d2bc51cce9bb6315`
 
 These PDF hashes identify the current inspected build and will change when TeX
 metadata or source is rebuilt. After any accepted editorial change, update the
@@ -65,9 +65,10 @@ commit and all three hashes together; never mix files from different freezes.
 ## Reproducibility and anonymity
 
 - [ ] `make -C paper check main supplement` passes in a clean committed export.
-- [ ] Anonymous artifact manifest verifies all 35 files.
+- [ ] Anonymous artifact manifest verifies all 36 files.
 - [ ] A fresh extracted artifact rebuilds the 16-page paper and 5-page
-      supplement without warnings.
+      supplement without actionable warnings (the known template-level
+      `amsmath` accent notice is acceptable).
 - [ ] Main and supplement PDFs have been rendered page by page after the last
       edit; no clipping, overlap, invisible text, or illegible plot label.
 - [ ] No author name, NetID, institution, scheduler account, private path,
