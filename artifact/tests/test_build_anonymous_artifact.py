@@ -89,6 +89,10 @@ class BuildAnonymousArtifactTest(unittest.TestCase):
                 (package / "README.md").read_text(),
             )
             self.assertIn(
+                "ends on page 15",
+                (package / "README.md").read_text(),
+            )
+            self.assertIn(
                 "python3 verify_manifest.py",
                 (package / "README.md").read_text(),
             )

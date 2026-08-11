@@ -49,7 +49,7 @@ make -C paper_scitepress check
 Expected output is an 18-page `paper/build/main.pdf`, a five-page
 `paper/build/supplement.pdf`, and an 11-page A4
 `paper_scitepress/build/main.pdf`. The LNCS non-reference main-paper content
-ends on page 14. PDF byte hashes may vary across TeX distributions; the package
+ends on page 15. PDF byte hashes may vary across TeX distributions; the package
 manifest and committed generated-fragment hashes are the portable
 reproducibility checks.
 
