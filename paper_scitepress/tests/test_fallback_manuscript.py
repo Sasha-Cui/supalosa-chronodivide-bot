@@ -84,6 +84,10 @@ class FallbackManuscriptTest(unittest.TestCase):
         self.assertLessEqual(word_count, 200)
         self.assertIn("joint", source.lower())
         self.assertIn("fails", source.lower())
+        self.assertIn(
+            "campaign is admitted only if every commitment matches its frozen plan",
+            " ".join(source.split()),
+        )
 
     def test_submission_metadata_is_plain_and_deterministic(self) -> None:
         script = FALLBACK / "scripts" / "export_submission_metadata.py"
@@ -113,7 +117,7 @@ class FallbackManuscriptTest(unittest.TestCase):
             "Leakage-Resistant Evaluation of Scripted RTS Agent Configuration in "
             "Chrono Divide",
         )
-        self.assertEqual(metadata["abstractWordCount"], 197)
+        self.assertEqual(metadata["abstractWordCount"], 193)
         self.assertIn("0.336", metadata["abstract"])
         self.assertIn("-0.021", metadata["abstract"])
         self.assertNotRegex(metadata["abstract"], r"[\\{}]")

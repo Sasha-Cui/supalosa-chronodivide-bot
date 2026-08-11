@@ -69,7 +69,7 @@ class BuildAnonymousArtifactTest(unittest.TestCase):
             )
             self.assertEqual(metadata_run.returncode, 0, metadata_run.stderr)
             submission_metadata = json.loads(metadata_run.stdout)
-            self.assertEqual(submission_metadata["abstractWordCount"], 197)
+            self.assertEqual(submission_metadata["abstractWordCount"], 193)
             self.assertNotIn("\\", submission_metadata["abstract"])
 
             aggregate_inputs = sorted(
