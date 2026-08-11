@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "status": "COMPLETE_POST_CONFIRMATORY_DIAGNOSTIC_INTERVAL_INCLUDES_ZERO",
+  "methodVersion": 2,
+  "sourceGitCommit": "29ced1d76c39acf63f73ba6951c6d537e4335a9f",
+  "scheduler": {
+    "account": "pi_jss233",
+    "arrayJobId": "21928633",
+    "taskCount": 40,
+    "uniqueTaskJobIds": 40,
+    "uniqueRawJobIds": 40,
+    "completedTasks": 40,
+    "failedTasks": 0,
+    "additionalAttempts": 0
+  },
+  "evidence": {
+    "campaignSha256": "b2f80c0664bbe8443b46280d162c89d7d6a8cec73b0c12440dc9c0b6d1f87f5f",
+    "launchSha256": "705246fadd877b30fbb6f2985875bc62e3b8ac166f3f87313bb3a15b2f58ba0a",
+    "optimizerOutcomeOnlyAuditSha256": "e51d56a197edd4ffed23d7b20f453504beea2ccd94e78e25472f9c3085f0cf77",
+    "technicalGateSha256": "6a31736e54bad88d030e79eb10b2cdcd9f44d09e1c1a0d17f7476ffb102fdb91",
+    "analysisSha256": "75651cccbfd52430196578a8306eff84ab35d9a6dfd4dca5ffcab515cb7e64fc",
+    "resultArtifactCommitmentSha256": "6b9b544d3edb8d096043683d707688ab4cde72cbb75019bd108af183835f8de9"
+  },
+  "design": {
+    "familyCount": 10,
+    "blocksPerFamily": 4,
+    "reciprocalSlotsPerMethod": 2,
+    "methodCount": 6,
+    "blockCount": 40,
+    "launchedGameCount": 480,
+    "technicalFailures": 0,
+    "analysisCount": 1
+  },
+  "mechanismContrast": {
+    "estimand": "championship champion minus equal average of five independently selected optimizer-run policies",
+    "estimate": 0.08250000000000002,
+    "familyClusteredStandardError": 0.048311776802119163,
+    "twoSidedConfidence": 0.95,
+    "confidenceInterval": {
+      "lower": -0.026788831937657923,
+      "upper": 0.19178883193765794
+    },
+    "positiveFamilies": 7,
+    "zeroFamilies": 1,
+    "negativeFamilies": 2
+  },
+  "descriptiveMethods": {
+    "champion": { "wins": 19, "draws": 55, "losses": 6, "score": 0.58125 },
+    "local0": { "wins": 16, "draws": 58, "losses": 6, "score": 0.5625 },
+    "local1": { "wins": 4, "draws": 68, "losses": 8, "score": 0.475 },
+    "local2": { "wins": 0, "draws": 72, "losses": 8, "score": 0.45 },
+    "local3": { "wins": 3, "draws": 70, "losses": 7, "score": 0.475 },
+    "local4": { "wins": 10, "draws": 65, "losses": 5, "score": 0.53125 }
+  },
+  "pairwiseChampionMinusLocal": [
+    { "localMethodId": "local0", "estimate": 0.01875, "confidenceInterval": { "lower": -0.06827794452800927, "upper": 0.10577794452800927 } },
+    { "localMethodId": "local1", "estimate": 0.10625, "confidenceInterval": { "lower": -0.04285718646471191, "upper": 0.2553571864647119 } },
+    { "localMethodId": "local2", "estimate": 0.13125, "confidenceInterval": { "lower": -0.04184619112038368, "upper": 0.3043461911203837 } },
+    { "localMethodId": "local3", "estimate": 0.10625, "confidenceInterval": { "lower": -0.03831938997116856, "upper": 0.25081938997116854 } },
+    { "localMethodId": "local4", "estimate": 0.05, "confidenceInterval": { "lower": -0.031082548829451218, "upper": 0.13108254882945122 } }
+  ],
+  "independentReproduction": {
+    "status": "EXACT_MATCH",
+    "rawCompletionRecords": 480,
+    "commonSeedReciprocalCells": 80,
+    "verifiedMethodScores": 6,
+    "verifiedPairwiseContrasts": 5
+  },
+  "claimBoundary": {
+    "supported": "The post-confirmatory open-development diagnostic is consistent with the common-seed championship selecting a policy that is better on average than the five ordinary per-run selections.",
+    "notSupported": "The championship mechanism is statistically established, the confirmatory gate is rescued, or the champion reliably beats Supalosa.",
+    "confirmatoryClaimRescueAuthorized": false,
+    "policySelectionAuthorized": false
+  }
+}
