@@ -47,6 +47,8 @@ TOOL_SOURCE_PATHS = (
     "research/scripts/map_fidelity_supervisor.py",
     "research/scripts/select_map_fidelity_preflight.py",
     "research/scripts/select_temperate_fidelity_targets.py",
+    "research/scripts/freeze_method_v3_fresh_fidelity_population.py",
+    "research/scripts/retrieve_method_v3_fresh_maps.py",
     "research/slurm/map_fidelity_gate_v1.sbatch",
 )
 PREFLIGHT_PLAN_RELATIVE_PATH = (

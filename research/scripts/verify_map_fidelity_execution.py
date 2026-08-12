@@ -33,6 +33,7 @@ ARTIFACT_KIND = "independent_map_fidelity_execution_verification"
 DURABLE_GATE_ROOTS = {
     "original": GATE.DURABLE_EVIDENCE_ROOT / "map-compatibility-gate-v2",
     "temperate": GATE.DURABLE_EVIDENCE_ROOT / "map-compatibility-temperate-v1",
+    "fresh": GATE.DURABLE_EVIDENCE_ROOT / "map-compatibility-method-v3-fresh-v1",
 }
 DEFAULT_SACCT = Path("/opt/slurm/25.11.6/bin/sacct")
 JOB_ID_PATTERN = re.compile(r"^[1-9][0-9]*$")
@@ -187,11 +188,11 @@ def validate_run_root(
 ) -> Path:
     strict_job_id(job_id)
     if profile not in DURABLE_GATE_ROOTS:
-        raise VerificationError("profile must be original or temperate")
+        raise VerificationError("profile must be original, temperate, or fresh")
     if scope not in {"preflight", "full"}:
         raise VerificationError("scope must be preflight or full")
-    if profile == "temperate" and scope != "full":
-        raise VerificationError("temperate profile requires full scope")
+    if profile in {"temperate", "fresh"} and scope != "full":
+        raise VerificationError(f"{profile} profile requires full scope")
     expected = DURABLE_GATE_ROOTS[profile] / scope / job_id
     GATE.reject_symlink_components(expected, "durable execution root")
     try:

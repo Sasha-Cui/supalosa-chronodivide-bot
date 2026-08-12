@@ -31,6 +31,8 @@ packages/chronodivide-bot-launcher/
 # maps - only allow maps directly in the test data 
 *.map
 !packages/chronodivide-bot-driver/data/*.map
+# Public retrieval metadata is releasable; third-party fresh map bytes are not.
+packages/chronodivide-bot-driver/data/method_v3_fresh_*.map
 packages/chronodivide-bot-driver/benchmark-results/
 packages/chronodivide-bot-driver/demo-videos/
 packages/chronodivide-bot-driver/packages/chronodivide-bot-driver/benchmark-results/

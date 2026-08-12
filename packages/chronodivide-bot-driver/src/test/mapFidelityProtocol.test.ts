@@ -38,10 +38,17 @@ describe("outcome-free map fidelity protocol", () => {
         const catalog = "research/artifacts/map_family_catalog.json";
         const temperate = expectedWorkerCommittedInputPaths(temperateTarget, catalog, null);
         const original = expectedWorkerCommittedInputPaths(sourceTarget, catalog, null);
+        const freshTarget =
+            "research/artifacts/method_v3_fresh_role_blind_fidelity_targets_v1.json";
+        const freshCatalog =
+            "research/artifacts/method_v3_fresh_map_family_catalog_v1.json";
+        const fresh = expectedWorkerCommittedInputPaths(freshTarget, freshCatalog, null);
 
         expect(temperate.slice(-3)).toEqual([temperateTarget, catalog, sourceTarget]);
         expect(original.slice(-2)).toEqual([sourceTarget, catalog]);
         expect(original.filter((entry) => entry === sourceTarget)).toHaveLength(1);
+        expect(fresh.slice(-2)).toEqual([freshTarget, freshCatalog]);
+        expect(fresh).not.toContain(sourceTarget);
     });
 
     it("categorizes known parser and asset warnings", () => {

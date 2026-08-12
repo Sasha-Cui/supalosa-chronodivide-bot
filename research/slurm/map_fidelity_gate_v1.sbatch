@@ -62,8 +62,18 @@ case "$MAP_FIDELITY_PROFILE" in
             exit 2
         fi
         ;;
+    fresh)
+        EVIDENCE_BASE=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/map-compatibility-method-v3-fresh-v1
+        CATALOG="$REPO/research/artifacts/method_v3_fresh_map_family_catalog_v1.json"
+        TARGETS="$REPO/research/artifacts/method_v3_fresh_role_blind_fidelity_targets_v1.json"
+        EXPECTED_FAMILIES=66
+        if [[ "$MAP_FIDELITY_SCOPE" != "full" ]]; then
+            echo "The fresh profile requires MAP_FIDELITY_SCOPE=full" >&2
+            exit 2
+        fi
+        ;;
     *)
-        echo "MAP_FIDELITY_PROFILE must be original or temperate" >&2
+        echo "MAP_FIDELITY_PROFILE must be original, temperate, or fresh" >&2
         exit 2
         ;;
 esac

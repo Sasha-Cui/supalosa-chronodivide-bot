@@ -65,14 +65,18 @@ class RunRootTests(unittest.TestCase):
             root = Path(temporary)
             original = root / "original"
             temperate = root / "temperate"
+            fresh = root / "fresh"
             original_run = original / "full" / JOB_ID
             temperate_run = temperate / "full" / JOB_ID
+            fresh_run = fresh / "full" / JOB_ID
             original_run.mkdir(parents=True, mode=0o700)
             temperate_run.mkdir(parents=True, mode=0o700)
+            fresh_run.mkdir(parents=True, mode=0o700)
             previous = VERIFIER.DURABLE_GATE_ROOTS
             VERIFIER.DURABLE_GATE_ROOTS = {
                 "original": original,
                 "temperate": temperate,
+                "fresh": fresh,
             }
             try:
                 self.assertEqual(
@@ -92,6 +96,18 @@ class RunRootTests(unittest.TestCase):
                 ):
                     VERIFIER.validate_run_root(
                         temperate_run, "temperate", "preflight", JOB_ID
+                    )
+                self.assertEqual(
+                    VERIFIER.validate_run_root(
+                        fresh_run, "fresh", "full", JOB_ID
+                    ),
+                    fresh_run,
+                )
+                with self.assertRaisesRegex(
+                    VERIFIER.VerificationError, "requires full scope"
+                ):
+                    VERIFIER.validate_run_root(
+                        fresh_run, "fresh", "preflight", JOB_ID
                     )
             finally:
                 VERIFIER.DURABLE_GATE_ROOTS = previous
