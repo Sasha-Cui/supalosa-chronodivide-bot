@@ -12,6 +12,7 @@ import { StrongBot, StrongBotOptions } from "@supalosa/chronodivide-bot/dist/bot
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { BaselineFactory, loadBaselineFactory } from "./baselineLoader.js";
 import { ExperimentManifest, createExperimentManifest } from "./provenance.js";
+import { buildCountryPairs, CountryPairingMode } from "./countryPairing.js";
 import {
     MAX_ENGINE_SEED,
     createReciprocalSeedBlock,
@@ -610,6 +611,14 @@ const parseCountries = (name: string, defaultValue: Countries[]): Countries[] =>
     });
 };
 
+const parseCountryPairing = (): CountryPairingMode => {
+    const raw = process.env.COUNTRY_PAIRING ?? "cross";
+    if (raw !== "cross" && raw !== "mirror") {
+        throw new Error(`COUNTRY_PAIRING must be cross or mirror, got ${raw}`);
+    }
+    return raw;
+};
+
 const parseMaps = (): string[] => {
     return (process.env.MAPS || "simple-1v1-no-preview.map")
         .split(",")
@@ -867,6 +876,8 @@ const main = async () => {
     const maxTicks = parseIntEnv("MAX_TICKS", 12000);
     const candidateCountries = parseCountries("CANDIDATE_COUNTRIES", [Countries.IRAQ, Countries.FRANCE]);
     const baselineCountries = parseCountries("BASELINE_COUNTRIES", [Countries.IRAQ, Countries.FRANCE]);
+    const countryPairing = parseCountryPairing();
+    const countryPairs = buildCountryPairs(candidateCountries, baselineCountries, countryPairing);
     const candidateStarts = parseStartFilters("CANDIDATE_STARTS");
     const baselineStarts = parseStartFilters("BASELINE_STARTS");
     const startFilterMaxAttempts = parseIntEnv("START_FILTER_MAX_ATTEMPTS", 40);
@@ -924,6 +935,8 @@ const main = async () => {
         maxTicks,
         candidateCountries,
         baselineCountries,
+        countryPairing,
+        countryPairs,
         candidateStarts: candidateStarts ?? null,
         baselineStarts: baselineStarts ?? null,
         startFilterMaxAttempts,
@@ -974,103 +987,101 @@ const main = async () => {
 
     const results: MatchResult[] = [];
     const requestedMatches =
-        maps.length * candidateCountries.length * baselineCountries.length * matchesPerPair * candidateSlots.length;
+        maps.length * countryPairs.length * matchesPerPair * candidateSlots.length;
     let rejectedStartAttempts = 0;
     let match = matchStartOffset + 1;
     let seedBlockCursor = seedBlockStartOffset;
     for (const mapName of maps) {
-        for (const candidateCountry of candidateCountries) {
-            for (const baselineCountry of baselineCountries) {
-                for (let repeat = 0; repeat < matchesPerPair; repeat++) {
-                    const reciprocalSeedBlock = usesPairedSeedBlocks
-                        ? createReciprocalSeedBlock(gameSeedBase, seedBlockCursor++)
-                        : null;
-                    const pairedSeedBlockIndex = reciprocalSeedBlock?.seedBlockIndex ?? null;
-                    const pairedEngineSeed = reciprocalSeedBlock?.requestedEngineSeed ?? null;
-                    for (const candidateSlot of candidateSlots) {
-                        let result: MatchResult | null = null;
-                        for (let attempt = 0; attempt < startFilterMaxAttempts && !result; attempt++) {
-                            const attemptMatch = match;
-                            const seedBlockIndex = pairedSeedBlockIndex ?? seedBlockCursor++;
-                            const requestedEngineSeed =
-                                pairedEngineSeed ?? derivePairedEngineSeed(gameSeedBase, seedBlockIndex);
-                            result = await runMatch(
-                                match++,
-                                seedBlockIndex,
-                                usesPairedSeedBlocks,
-                                requestedEngineSeed,
-                                mapName,
-                                candidateCountry,
-                                baselineCountry,
-                                candidateSlot,
-                                maxTicks,
-                                strongStrategyOptions,
-                                strongBotOptions,
-                                candidateStarts,
-                                baselineStarts,
-                                baselineFactory,
-                                traceIntervalTicks,
-                                (snapshot) =>
-                                    fs.appendFileSync(
-                                        eventsPath,
-                                        JSON.stringify({ event: "trace_snapshot", snapshot }) + "\n",
-                                    ),
-                                (policyEvent) =>
-                                    fs.appendFileSync(
-                                        eventsPath,
-                                        JSON.stringify({
-                                            event: "candidate_policy_event",
-                                            match: attemptMatch,
-                                            seedBlockIndex,
-                                            mapName,
-                                            candidateCountry,
-                                            baselineCountry,
-                                            candidateSlot,
-                                            policyEvent,
-                                        }) + "\n",
-                                    ),
-                            );
-                            if (!result) {
-                                rejectedStartAttempts++;
+        for (const { candidateCountry, baselineCountry } of countryPairs) {
+            for (let repeat = 0; repeat < matchesPerPair; repeat++) {
+                const reciprocalSeedBlock = usesPairedSeedBlocks
+                    ? createReciprocalSeedBlock(gameSeedBase, seedBlockCursor++)
+                    : null;
+                const pairedSeedBlockIndex = reciprocalSeedBlock?.seedBlockIndex ?? null;
+                const pairedEngineSeed = reciprocalSeedBlock?.requestedEngineSeed ?? null;
+                for (const candidateSlot of candidateSlots) {
+                    let result: MatchResult | null = null;
+                    for (let attempt = 0; attempt < startFilterMaxAttempts && !result; attempt++) {
+                        const attemptMatch = match;
+                        const seedBlockIndex = pairedSeedBlockIndex ?? seedBlockCursor++;
+                        const requestedEngineSeed =
+                            pairedEngineSeed ?? derivePairedEngineSeed(gameSeedBase, seedBlockIndex);
+                        result = await runMatch(
+                            match++,
+                            seedBlockIndex,
+                            usesPairedSeedBlocks,
+                            requestedEngineSeed,
+                            mapName,
+                            candidateCountry,
+                            baselineCountry,
+                            candidateSlot,
+                            maxTicks,
+                            strongStrategyOptions,
+                            strongBotOptions,
+                            candidateStarts,
+                            baselineStarts,
+                            baselineFactory,
+                            traceIntervalTicks,
+                            (snapshot) =>
+                                fs.appendFileSync(
+                                    eventsPath,
+                                    JSON.stringify({ event: "trace_snapshot", snapshot }) + "\n",
+                                ),
+                            (policyEvent) =>
                                 fs.appendFileSync(
                                     eventsPath,
                                     JSON.stringify({
-                                        event: "match_rejected_start",
+                                        event: "candidate_policy_event",
                                         match: attemptMatch,
                                         seedBlockIndex,
-                                        pairedSeedBlock: usesPairedSeedBlocks,
-                                        attempt: attempt + 1,
-                                        repeat,
                                         mapName,
                                         candidateCountry,
                                         baselineCountry,
                                         candidateSlot,
-                                        requestedEngineSeed,
-                                        botRandomSeed: deriveBotRandomSeed(requestedEngineSeed),
-                                        candidateBotRandomSeed: deriveParticipantBotRandomSeed(
-                                            requestedEngineSeed,
-                                            "candidate",
-                                        ),
-                                        baselineBotRandomSeed: deriveParticipantBotRandomSeed(
-                                            requestedEngineSeed,
-                                            "baseline",
-                                        ),
-                                        engineSeedEpochMs: engineSeedToEpochMs(requestedEngineSeed),
+                                        policyEvent,
                                     }) + "\n",
-                                );
-                            }
-                        }
+                                ),
+                        );
                         if (!result) {
-                            throw new Error(
-                                `Unable to satisfy start filters candidate=${candidateStarts?.join(";") ?? "any"} ` +
-                                    `baseline=${baselineStarts?.join(";") ?? "any"} after ` +
-                                    `${startFilterMaxAttempts} attempts`,
+                            rejectedStartAttempts++;
+                            fs.appendFileSync(
+                                eventsPath,
+                                JSON.stringify({
+                                    event: "match_rejected_start",
+                                    match: attemptMatch,
+                                    seedBlockIndex,
+                                    pairedSeedBlock: usesPairedSeedBlocks,
+                                    attempt: attempt + 1,
+                                    repeat,
+                                    mapName,
+                                    candidateCountry,
+                                    baselineCountry,
+                                    candidateSlot,
+                                    requestedEngineSeed,
+                                    botRandomSeed: deriveBotRandomSeed(requestedEngineSeed),
+                                    candidateBotRandomSeed: deriveParticipantBotRandomSeed(
+                                        requestedEngineSeed,
+                                        "candidate",
+                                    ),
+                                    baselineBotRandomSeed: deriveParticipantBotRandomSeed(
+                                        requestedEngineSeed,
+                                        "baseline",
+                                    ),
+                                    engineSeedEpochMs: engineSeedToEpochMs(requestedEngineSeed),
+                                }) + "\n",
                             );
                         }
-                        results.push(result);
-                        fs.appendFileSync(eventsPath, JSON.stringify({ event: "match_complete", result }) + "\n");
-                        console.log(JSON.stringify(result));
                     }
+                    if (!result) {
+                        throw new Error(
+                            `Unable to satisfy start filters candidate=${candidateStarts?.join(";") ?? "any"} ` +
+                                `baseline=${baselineStarts?.join(";") ?? "any"} after ` +
+                                `${startFilterMaxAttempts} attempts`,
+                        );
+                    }
+                    results.push(result);
+                    fs.appendFileSync(eventsPath, JSON.stringify({ event: "match_complete", result }) + "\n");
+                    console.log(JSON.stringify(result));
                 }
             }
         }
