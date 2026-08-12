@@ -40,6 +40,31 @@ const compareRows = (left: MethodV3Stage2RankingRow, right: MethodV3Stage2Rankin
         (right.medianActualWinTick ?? Number.POSITIVE_INFINITY) ||
     left.policyId.localeCompare(right.policyId);
 
+const FLOAT_TOLERANCE = 1e-12;
+
+export const methodV3Stage2RankingRowsEquivalent = (
+    stored: MethodV3Stage2RankingRow[],
+    recomputed: MethodV3Stage2RankingRow[],
+): boolean => {
+    if (stored.length !== recomputed.length) return false;
+    const exactKeys = [
+        "rank", "policyId", "familyCountryCellCount", "gameCount", "wins", "draws", "losses",
+    ] as const;
+    const floatKeys = [
+        "actualWinProbability", "winMinusLossProbability", "worstDecileActualWinProbability",
+        "drawConversion", "drawProbability",
+    ] as const;
+    return stored.every((row, index) => {
+        const expected = recomputed[index];
+        if (!expected || exactKeys.some((key) => row[key] !== expected[key])) return false;
+        if (row.medianActualWinTick !== expected.medianActualWinTick) return false;
+        return floatKeys.every((key) =>
+            Number.isFinite(row[key]) && Number.isFinite(expected[key]) &&
+            Math.abs(row[key] - expected[key]) <= FLOAT_TOLERANCE
+        );
+    });
+};
+
 export const analyzeMethodV3DevelopmentFinalists = (runs: RunFinalizer[]): {
     developmentFinalists: ResearchPlanPolicy[];
     aggregateRanking: MethodV3Stage2RankingRow[];
@@ -68,7 +93,7 @@ export const analyzeMethodV3DevelopmentFinalists = (runs: RunFinalizer[]): {
             if (!policies.has(row.policyId)) throw new Error(`Run ${run.optimizerRunIndex} ranked a non-finalist`);
         }
         const recomputedRanking = rankMethodV3Stage2OutcomeRecords(run.finalists, run.finalistResults);
-        if (JSON.stringify(recomputedRanking) !== JSON.stringify(run.ranking)) {
+        if (!methodV3Stage2RankingRowsEquivalent(run.ranking, recomputedRanking)) {
             throw new Error(`Run ${run.optimizerRunIndex} ranking does not match its committed finalist results`);
         }
         runWinners.push(recomputedRanking[0].policyId);

@@ -1,5 +1,8 @@
 import { describe, expect, test } from "vitest";
-import { selectMethodV3DevelopmentFinalists } from "../training/methodV3Stage2CrossRunFinalizer.js";
+import {
+    methodV3Stage2RankingRowsEquivalent,
+    selectMethodV3DevelopmentFinalists,
+} from "../training/methodV3Stage2CrossRunFinalizer.js";
 import { rankMethodV3Stage2OutcomeRecords } from "../training/methodV3Stage2Reducer.js";
 import { projectMethodV3PolicyToStage2, METHOD_V3_STARTING_POLICY, researchPolicySha256 } from "../training/researchPolicy.js";
 
@@ -35,6 +38,25 @@ const resultsFor = (
 );
 
 describe("method-v3 Stage-2 cross-run finalist selection", () => {
+    test("accepts only rounding-scale drift in recomputed ranking metrics", () => {
+        const finalists = [policyFor(0), policyFor(1), policyFor(2)];
+        const ranking = rankMethodV3Stage2OutcomeRecords(finalists, resultsFor(finalists, 0));
+        const roundingOnly = ranking.map((row, index) => ({
+            ...row,
+            drawConversion: row.drawConversion + (index + 1) * Number.EPSILON,
+        }));
+        expect(methodV3Stage2RankingRowsEquivalent(roundingOnly, ranking)).toBe(true);
+        expect(methodV3Stage2RankingRowsEquivalent(
+            ranking.map((row, index) => index === 0 ? { ...row, drawConversion: row.drawConversion + 1e-6 } : row),
+            ranking,
+        )).toBe(false);
+        expect(methodV3Stage2RankingRowsEquivalent(
+            ranking.map((row, index) => index === 0 ? { ...row, wins: row.wins + 1 } : row),
+            ranking,
+        )).toBe(false);
+        expect(methodV3Stage2RankingRowsEquivalent([ranking[1], ranking[0], ranking[2]], ranking)).toBe(false);
+    });
+
     test("includes each distinct run winner and fills to five by the same ranking", () => {
         const policies = Array.from({ length: 8 }, (_, index) => policyFor(index));
         const runs = Array.from({ length: 5 }, (_, runIndex) => {

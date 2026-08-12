@@ -190,6 +190,7 @@ for RUN_INDEX in 0 3; do
         echo "Recovery run $RUN_INDEX has $SHARD_COUNT shards, expected 198" >&2
         exit 2
     fi
+    mkdir -p -m 0700 "$(dirname "$EVIDENCE_BASE")"
     mkdir -m 0700 "$EVIDENCE_BASE"
     ARRAY_JOB_ID=$($SBATCH --parsable --array="0-197%20" \
         --export="ALL,CAMPAIGN_ROOT=$CAMPAIGN_ROOT,EVIDENCE_BASE=$EVIDENCE_BASE" "$SHARD_JOB")
