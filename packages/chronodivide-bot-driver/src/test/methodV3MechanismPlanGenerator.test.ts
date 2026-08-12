@@ -20,6 +20,7 @@ describe("method-v3 mechanism plan generator", () => {
         const arms = buildMethodV3MechanismArms();
         const episodes = buildMethodV3MechanismEpisodes("mf_alpha", 7, 123456);
         expect(episodes).toHaveLength(18);
+        expect(episodes.every((episode) => !("methodId" in episode))).toBe(true);
         for (const arm of arms) {
             const rows = episodes.filter(({ policyId }) => policyId === arm.policyId);
             expect(rows.map(({ candidateSlot }) => candidateSlot).sort()).toEqual([0, 1]);

@@ -87,12 +87,11 @@ export const buildMethodV3MechanismEpisodes = (
     familyId: string,
     seedBlockIndex: number,
     requestedEngineSeed: number,
-): ResearchPlanEpisode[] =>
+): Array<Omit<ResearchPlanEpisode, "methodId">> =>
     buildMethodV3MechanismArms().flatMap((arm, armIndex) => ([0, 1] as const).map((candidateSlot) => ({
         episodeId: `a${armIndex}-b${seedBlockIndex}-s${candidateSlot}`,
         familyId,
         policyId: arm.policyId,
-        methodId: arm.policyId,
         seedBlockIndex,
         requestedEngineSeed,
         candidateSlot,
