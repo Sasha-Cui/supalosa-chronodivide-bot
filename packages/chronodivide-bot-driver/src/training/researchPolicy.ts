@@ -4,6 +4,7 @@ import { StrongStrategyOptions } from "@supalosa/chronodivide-bot/dist/bot/strat
 
 
 export const RESEARCH_POLICY_SCHEMA_VERSION = 1 as const;
+export const METHOD_V3_POLICY_SCHEMA_VERSION = 2 as const;
 
 export const RESEARCH_ATTACK_COMPOSITIONS = [
     "random",
@@ -33,7 +34,7 @@ export const RESEARCH_STRATEGIC_PLANS = [
 export type ResearchAttackComposition = typeof RESEARCH_ATTACK_COMPOSITIONS[number];
 export type ResearchStrategicPlan = typeof RESEARCH_STRATEGIC_PLANS[number];
 
-export type ResearchPolicyConfig = {
+export type ResearchPolicyConfigV1 = {
     schemaVersion: typeof RESEARCH_POLICY_SCHEMA_VERSION;
     attackCompositionPolicy: ResearchAttackComposition;
     strategicPlan: ResearchStrategicPlan;
@@ -65,7 +66,37 @@ export type ResearchPolicyConfig = {
     emergencyDefenseMaxDefenders: number;
 };
 
-const POLICY_KEYS: Array<keyof ResearchPolicyConfig> = [
+export const METHOD_V3_BUILDING_TARGET_PRIORITIES = ["production", "defense", "nearest"] as const;
+export const METHOD_V3_OBSERVATION_MODES = ["publicApi", "visibleOnly"] as const;
+
+export type MethodV3PolicyConfig = Omit<ResearchPolicyConfigV1, "schemaVersion"> & {
+    schemaVersion: typeof METHOD_V3_POLICY_SCHEMA_VERSION;
+    allInDisbandExistingAttacks: boolean;
+    rushSellEnabled: boolean;
+    finisherArtilleryTargetCount: number;
+    finisherArtilleryStartTick: number;
+    finisherArtilleryPriority: number;
+    finisherArtilleryTechLeadTicks: number;
+    finisherArtilleryTechPriority: number;
+    buildingEliminationEnabled: boolean;
+    buildingEliminationMinTick: number;
+    buildingEliminationMinCombatants: number;
+    buildingEliminationCombatantAdvantage: number;
+    buildingEliminationMaxEnemyCombatants: number;
+    buildingEliminationReserveCombatants: number;
+    buildingEliminationOrderIntervalTicks: number;
+    buildingEliminationMaxTargetGroups: number;
+    buildingEliminationTargetPriority: typeof METHOD_V3_BUILDING_TARGET_PRIORITIES[number];
+    buildingEliminationObservationMode: typeof METHOD_V3_OBSERVATION_MODES[number];
+    buildingEliminationDirectVisibleAttack: boolean;
+    buildingEliminationPreemptExistingAttacks: boolean;
+    buildingEliminationSweepWhenNoTargets: boolean;
+    buildingEliminationSweepRevisitTicks: number;
+};
+
+export type ResearchPolicyConfig = ResearchPolicyConfigV1 | MethodV3PolicyConfig;
+
+const POLICY_KEYS_V1: Array<keyof ResearchPolicyConfigV1> = [
     "schemaVersion",
     "attackCompositionPolicy",
     "strategicPlan",
@@ -97,7 +128,33 @@ const POLICY_KEYS: Array<keyof ResearchPolicyConfig> = [
     "emergencyDefenseMaxDefenders",
 ];
 
-export const DEFAULT_RESEARCH_POLICY: ResearchPolicyConfig = {
+const POLICY_KEYS_V2: Array<keyof MethodV3PolicyConfig> = [
+    ...(POLICY_KEYS_V1.filter((key) => key !== "schemaVersion") as Array<keyof MethodV3PolicyConfig>),
+    "schemaVersion",
+    "allInDisbandExistingAttacks",
+    "rushSellEnabled",
+    "finisherArtilleryTargetCount",
+    "finisherArtilleryStartTick",
+    "finisherArtilleryPriority",
+    "finisherArtilleryTechLeadTicks",
+    "finisherArtilleryTechPriority",
+    "buildingEliminationEnabled",
+    "buildingEliminationMinTick",
+    "buildingEliminationMinCombatants",
+    "buildingEliminationCombatantAdvantage",
+    "buildingEliminationMaxEnemyCombatants",
+    "buildingEliminationReserveCombatants",
+    "buildingEliminationOrderIntervalTicks",
+    "buildingEliminationMaxTargetGroups",
+    "buildingEliminationTargetPriority",
+    "buildingEliminationObservationMode",
+    "buildingEliminationDirectVisibleAttack",
+    "buildingEliminationPreemptExistingAttacks",
+    "buildingEliminationSweepWhenNoTargets",
+    "buildingEliminationSweepRevisitTicks",
+];
+
+export const DEFAULT_RESEARCH_POLICY: ResearchPolicyConfigV1 = {
     schemaVersion: RESEARCH_POLICY_SCHEMA_VERSION,
     attackCompositionPolicy: "assault",
     strategicPlan: "macro",
@@ -129,8 +186,41 @@ export const DEFAULT_RESEARCH_POLICY: ResearchPolicyConfig = {
     emergencyDefenseMaxDefenders: 24,
 };
 
+export const METHOD_V3_STARTING_POLICY: MethodV3PolicyConfig = {
+    ...DEFAULT_RESEARCH_POLICY,
+    schemaVersion: METHOD_V3_POLICY_SCHEMA_VERSION,
+    attackCompositionPolicy: "infantry",
+    strategicPlan: "rush",
+    defenceRadiusIncreasePerTick: 0.0001,
+    scoutCooldownTicks: 45,
+    forceAttackEnabled: false,
+    forceAttackMinCombatants: 4,
+    emergencyDefenseRadius: 64,
+    allInDisbandExistingAttacks: false,
+    rushSellEnabled: true,
+    finisherArtilleryTargetCount: 0,
+    finisherArtilleryStartTick: 12_600,
+    finisherArtilleryPriority: 120,
+    finisherArtilleryTechLeadTicks: 3_600,
+    finisherArtilleryTechPriority: 112,
+    buildingEliminationEnabled: false,
+    buildingEliminationMinTick: 9_000,
+    buildingEliminationMinCombatants: 12,
+    buildingEliminationCombatantAdvantage: 0,
+    buildingEliminationMaxEnemyCombatants: 999,
+    buildingEliminationReserveCombatants: 4,
+    buildingEliminationOrderIntervalTicks: 15,
+    buildingEliminationMaxTargetGroups: 3,
+    buildingEliminationTargetPriority: "production",
+    buildingEliminationObservationMode: "publicApi",
+    buildingEliminationDirectVisibleAttack: true,
+    buildingEliminationPreemptExistingAttacks: true,
+    buildingEliminationSweepWhenNoTargets: true,
+    buildingEliminationSweepRevisitTicks: 900,
+};
+
 export const RESEARCH_POLICY_SEARCH_SPACE: {
-    [K in keyof Omit<ResearchPolicyConfig, "schemaVersion">]: readonly ResearchPolicyConfig[K][];
+    [K in keyof Omit<ResearchPolicyConfigV1, "schemaVersion">]: readonly ResearchPolicyConfigV1[K][];
 } = {
     attackCompositionPolicy: RESEARCH_ATTACK_COMPOSITIONS,
     strategicPlan: RESEARCH_STRATEGIC_PLANS,
@@ -211,20 +301,23 @@ export const parseResearchPolicy = (value: unknown): ResearchPolicyConfig => {
     if (!isRecord(value)) {
         throw new Error("Research policy must be an object");
     }
+    const schemaVersion = value.schemaVersion;
+    if (schemaVersion !== RESEARCH_POLICY_SCHEMA_VERSION && schemaVersion !== METHOD_V3_POLICY_SCHEMA_VERSION) {
+        throw new Error(
+            `Research policy schemaVersion must be ${RESEARCH_POLICY_SCHEMA_VERSION} or ${METHOD_V3_POLICY_SCHEMA_VERSION}`,
+        );
+    }
+    const policyKeys = schemaVersion === RESEARCH_POLICY_SCHEMA_VERSION ? POLICY_KEYS_V1 : POLICY_KEYS_V2;
     const actualKeys = Object.keys(value).sort();
-    const expectedKeys = [...POLICY_KEYS].sort();
+    const expectedKeys = [...policyKeys].sort();
     if (actualKeys.length !== expectedKeys.length || actualKeys.some((key, index) => key !== expectedKeys[index])) {
-        const unexpected = actualKeys.filter((key) => !expectedKeys.includes(key as keyof ResearchPolicyConfig));
+        const unexpected = actualKeys.filter((key) => !expectedKeys.includes(key as never));
         const missing = expectedKeys.filter((key) => !actualKeys.includes(key));
         throw new Error(
             `Research policy schema mismatch; unexpected=[${unexpected.join(",")}] missing=[${missing.join(",")}]`,
         );
     }
-    if (value.schemaVersion !== RESEARCH_POLICY_SCHEMA_VERSION) {
-        throw new Error(`Research policy schemaVersion must be ${RESEARCH_POLICY_SCHEMA_VERSION}`);
-    }
-    return {
-        schemaVersion: RESEARCH_POLICY_SCHEMA_VERSION,
+    const common = {
         attackCompositionPolicy: expectChoice(value, "attackCompositionPolicy", RESEARCH_ATTACK_COMPOSITIONS),
         strategicPlan: expectChoice(value, "strategicPlan", RESEARCH_STRATEGIC_PLANS),
         attackGateEnabled: expectBoolean(value, "attackGateEnabled"),
@@ -254,12 +347,78 @@ export const parseResearchPolicy = (value: unknown): ResearchPolicyConfig => {
         emergencyDefenseRadius: expectNumber(value, "emergencyDefenseRadius", 1, 999),
         emergencyDefenseMaxDefenders: expectNumber(value, "emergencyDefenseMaxDefenders", 1, 999),
     };
+    if (schemaVersion === RESEARCH_POLICY_SCHEMA_VERSION) {
+        return { schemaVersion: RESEARCH_POLICY_SCHEMA_VERSION, ...common };
+    }
+    return {
+        schemaVersion: METHOD_V3_POLICY_SCHEMA_VERSION,
+        ...common,
+        allInDisbandExistingAttacks: expectBoolean(value, "allInDisbandExistingAttacks"),
+        rushSellEnabled: expectBoolean(value, "rushSellEnabled"),
+        finisherArtilleryTargetCount: expectNumber(value, "finisherArtilleryTargetCount", 0, 100),
+        finisherArtilleryStartTick: expectNumber(value, "finisherArtilleryStartTick", 0, 100_000),
+        finisherArtilleryPriority: expectNumber(value, "finisherArtilleryPriority", 1, 1_000),
+        finisherArtilleryTechLeadTicks: expectNumber(value, "finisherArtilleryTechLeadTicks", 0, 100_000),
+        finisherArtilleryTechPriority: expectNumber(value, "finisherArtilleryTechPriority", 1, 1_000),
+        buildingEliminationEnabled: expectBoolean(value, "buildingEliminationEnabled"),
+        buildingEliminationMinTick: expectNumber(value, "buildingEliminationMinTick", 0, 100_000),
+        buildingEliminationMinCombatants: expectNumber(value, "buildingEliminationMinCombatants", 0, 1_000),
+        buildingEliminationCombatantAdvantage: expectNumber(
+            value,
+            "buildingEliminationCombatantAdvantage",
+            -1_000,
+            1_000,
+        ),
+        buildingEliminationMaxEnemyCombatants: expectNumber(
+            value,
+            "buildingEliminationMaxEnemyCombatants",
+            0,
+            1_000,
+        ),
+        buildingEliminationReserveCombatants: expectNumber(
+            value,
+            "buildingEliminationReserveCombatants",
+            0,
+            1_000,
+        ),
+        buildingEliminationOrderIntervalTicks: expectNumber(
+            value,
+            "buildingEliminationOrderIntervalTicks",
+            1,
+            10_000,
+        ),
+        buildingEliminationMaxTargetGroups: expectNumber(value, "buildingEliminationMaxTargetGroups", 1, 64),
+        buildingEliminationTargetPriority: expectChoice(
+            value,
+            "buildingEliminationTargetPriority",
+            METHOD_V3_BUILDING_TARGET_PRIORITIES,
+        ),
+        buildingEliminationObservationMode: expectChoice(
+            value,
+            "buildingEliminationObservationMode",
+            METHOD_V3_OBSERVATION_MODES,
+        ),
+        buildingEliminationDirectVisibleAttack: expectBoolean(value, "buildingEliminationDirectVisibleAttack"),
+        buildingEliminationPreemptExistingAttacks: expectBoolean(
+            value,
+            "buildingEliminationPreemptExistingAttacks",
+        ),
+        buildingEliminationSweepWhenNoTargets: expectBoolean(value, "buildingEliminationSweepWhenNoTargets"),
+        buildingEliminationSweepRevisitTicks: expectNumber(
+            value,
+            "buildingEliminationSweepRevisitTicks",
+            0,
+            100_000,
+        ),
+    };
 };
 
 const orderedPolicy = (policy: ResearchPolicyConfig): Record<string, unknown> => {
     const result: Record<string, unknown> = {};
-    for (const key of POLICY_KEYS) {
-        result[key] = policy[key];
+    const keys = policy.schemaVersion === RESEARCH_POLICY_SCHEMA_VERSION ? POLICY_KEYS_V1 : POLICY_KEYS_V2;
+    const record = policy as unknown as Record<string, unknown>;
+    for (const key of keys) {
+        result[key] = record[key];
     }
     return result;
 };
@@ -271,6 +430,7 @@ export const researchPolicySha256 = (value: unknown): string => {
 
 export const buildResearchStrategyOptions = (value: unknown): StrongStrategyOptions => {
     const policy = parseResearchPolicy(value);
+    const methodV3 = policy.schemaVersion === METHOD_V3_POLICY_SCHEMA_VERSION ? policy : null;
     return {
         defaultMapProfiles: false,
         base: {
@@ -314,6 +474,12 @@ export const buildResearchStrategyOptions = (value: unknown): StrongStrategyOpti
             plan: policy.strategicPlan,
             rushSellTick: 7200,
             rushSellMinCombatants: 12,
+            rushSellEnabled: methodV3?.rushSellEnabled ?? true,
+            finisherArtilleryTargetCount: methodV3?.finisherArtilleryTargetCount ?? 0,
+            finisherArtilleryStartTick: methodV3?.finisherArtilleryStartTick ?? 12_600,
+            finisherArtilleryPriority: methodV3?.finisherArtilleryPriority ?? 120,
+            finisherArtilleryTechLeadTicks: methodV3?.finisherArtilleryTechLeadTicks ?? 3_600,
+            finisherArtilleryTechPriority: methodV3?.finisherArtilleryTechPriority ?? 112,
             dogTargetCount: 2,
             hfoBottomDogTargetCount: 2,
             antiInfantryDogTargetCount: 2,
@@ -331,10 +497,28 @@ export const buildResearchStrategyOptions = (value: unknown): StrongStrategyOpti
             minTick: policy.allInMinTick,
             minCombatants: policy.allInMinCombatants,
             combatantAdvantage: policy.allInCombatantAdvantage,
-            disbandExistingAttacks: false,
+            disbandExistingAttacks: methodV3?.allInDisbandExistingAttacks ?? false,
             directVisibleAttack: true,
             hfoWestVsEastOnly: false,
         },
+        buildingElimination: methodV3
+            ? {
+                enabled: methodV3.buildingEliminationEnabled,
+                minTick: methodV3.buildingEliminationMinTick,
+                minCombatants: methodV3.buildingEliminationMinCombatants,
+                combatantAdvantage: methodV3.buildingEliminationCombatantAdvantage,
+                maxEnemyCombatants: methodV3.buildingEliminationMaxEnemyCombatants,
+                reserveCombatants: methodV3.buildingEliminationReserveCombatants,
+                orderIntervalTicks: methodV3.buildingEliminationOrderIntervalTicks,
+                maxTargetGroups: methodV3.buildingEliminationMaxTargetGroups,
+                targetPriority: methodV3.buildingEliminationTargetPriority,
+                observationMode: methodV3.buildingEliminationObservationMode,
+                directVisibleAttack: methodV3.buildingEliminationDirectVisibleAttack,
+                preemptExistingAttacks: methodV3.buildingEliminationPreemptExistingAttacks,
+                sweepWhenNoTargets: methodV3.buildingEliminationSweepWhenNoTargets,
+                sweepRevisitTicks: methodV3.buildingEliminationSweepRevisitTicks,
+            }
+            : undefined,
     };
 };
 

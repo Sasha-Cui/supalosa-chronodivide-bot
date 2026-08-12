@@ -18,6 +18,7 @@ import {
 } from "../training/researchPlanRunner.js";
 import {
     DEFAULT_RESEARCH_POLICY,
+    METHOD_V3_STARTING_POLICY,
     ResearchPolicyConfig,
     researchPolicySha256,
 } from "../training/researchPolicy.js";
@@ -30,6 +31,7 @@ const firstPolicy = DEFAULT_RESEARCH_POLICY;
 const secondPolicy: ResearchPolicyConfig = { ...DEFAULT_RESEARCH_POLICY, attackGateMinTick: 5400 };
 const firstPolicyId = researchPolicySha256(firstPolicy);
 const secondPolicyId = researchPolicySha256(secondPolicy);
+const methodV3PolicyId = researchPolicySha256(METHOD_V3_STARTING_POLICY);
 
 const episodesFor = (policyId: string) => [0, 1].map((candidateSlot) => ({
     episodeId: `${policyId.slice(0, 8)}-slot-${candidateSlot}`,
@@ -85,6 +87,15 @@ const validDevelopmentPlan = (): Record<string, unknown> => {
         episodes: [...methodEpisodes("global"), ...methodEpisodes("conditioned")],
     };
 };
+
+const validMethodV3Plan = (): Record<string, unknown> => ({
+    ...validPlan(),
+    purpose: "method-v3-mechanism-screen",
+    candidateCountry: Countries.FRANCE,
+    baselineCountry: Countries.FRANCE,
+    policies: [{ policyId: methodV3PolicyId, policy: METHOD_V3_STARTING_POLICY }],
+    episodes: episodesFor(methodV3PolicyId),
+});
 
 const validDevelopmentV2Plan = (): Record<string, unknown> => {
     const plan = validDevelopmentPlan();
@@ -188,6 +199,22 @@ describe("strict research run plan", () => {
         expect(plan.role).toBe("train");
         expect(plan.episodes).toHaveLength(4);
         expect(new Set(plan.episodes.map(({ requestedEngineSeed }) => requestedEngineSeed))).toEqual(new Set([1007]));
+    });
+
+    test("accepts method-v3 schema-v2 policies for any exact country mirror", () => {
+        const plan = parseResearchRunPlan(validMethodV3Plan());
+        expect(plan.candidateCountry).toBe(Countries.FRANCE);
+        expect(plan.baselineCountry).toBe(Countries.FRANCE);
+        expect(plan.policies[0].policy.schemaVersion).toBe(2);
+
+        const asymmetric = validMethodV3Plan();
+        asymmetric.baselineCountry = Countries.IRAQ;
+        expect(() => parseResearchRunPlan(asymmetric)).toThrow(/exact supported-country mirror/);
+
+        const priorSchema = validMethodV3Plan();
+        priorSchema.policies = [{ policyId: firstPolicyId, policy: firstPolicy }];
+        priorSchema.episodes = episodesFor(firstPolicyId);
+        expect(() => parseResearchRunPlan(priorSchema)).toThrow(/schema-v2 policies/);
     });
 
     test("round-trips normalized train and development plans through their strict wire schemas", () => {

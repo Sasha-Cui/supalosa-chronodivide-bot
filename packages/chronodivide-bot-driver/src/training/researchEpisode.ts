@@ -2,6 +2,7 @@ import { CreateOfflineOpts, GameApi, ObjectType, cdapi } from "@chronodivide/gam
 import { StrongBot } from "@supalosa/chronodivide-bot/dist/bot/strongBot.js";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { StrongStrategy } from "@supalosa/chronodivide-bot/dist/bot/strategy/strongStrategy.js";
+import { BuildingEliminationTelemetryEvent } from "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
 import { BaselineFactory } from "../benchmark/baselineLoader.js";
 import {
     deriveBotRandomSeed,
@@ -178,6 +179,20 @@ const getWinner = (
 const scoreForWinner = (winner: ResearchEpisodeResult["winner"]): 0 | 0.5 | 1 =>
     winner === "candidate" ? 1 : winner === "baseline" ? 0 : 0.5;
 
+export const assertShortGameBuildingEliminationOutcome = (
+    winner: ResearchEpisodeResult["winner"],
+    candidateBuildings: number,
+    baselineBuildings: number,
+    episodeId: string,
+): void => {
+    if (winner === "candidate" && baselineBuildings !== 0) {
+        throw new Error(`Candidate win violates the short-game building-elimination invariant in ${episodeId}`);
+    }
+    if (winner === "baseline" && candidateBuildings !== 0) {
+        throw new Error(`Baseline win violates the short-game building-elimination invariant in ${episodeId}`);
+    }
+};
+
 const buildGameSettings = (
     mapName: string,
     candidate: StrongBot,
@@ -212,6 +227,7 @@ const buildGameSettings = (
 export const runResearchEpisode = async (
     rawSpec: ResearchEpisodeSpec,
     baselineFactory: BaselineFactory,
+    onCandidatePolicyEvent: (event: BuildingEliminationTelemetryEvent) => void = () => undefined,
 ): Promise<ResearchEpisodeResult> => {
     const spec = validateResearchEpisodeSpec(rawSpec);
     const startedAt = Date.now();
@@ -222,7 +238,7 @@ export const runResearchEpisode = async (
         spec.candidateCountry,
         [],
         false,
-        new StrongStrategy(buildResearchStrategyOptions(spec.policy)),
+        new StrongStrategy(buildResearchStrategyOptions(spec.policy), onCandidatePolicyEvent),
         buildResearchBotOptions(spec.policy),
     );
     const baseline = baselineFactory.create(baselineName, spec.baselineCountry);
@@ -257,6 +273,14 @@ export const runResearchEpisode = async (
                 throw new Error(`Missing final player stats for episode ${spec.episodeId}`);
             }
             const winner = getWinner(candidateStats.defeated, baselineStats.defeated);
+            const candidateSnapshot = getPlayerSnapshot(candidate.lastGameApi, candidateName);
+            const baselineSnapshot = getPlayerSnapshot(baseline.lastGameApi, baselineName);
+            assertShortGameBuildingEliminationOutcome(
+                winner,
+                candidateSnapshot.buildings,
+                baselineSnapshot.buildings,
+                spec.episodeId,
+            );
             return {
                 schemaVersion: RESEARCH_EPISODE_SCHEMA_VERSION,
                 episodeId: spec.episodeId,
@@ -286,8 +310,8 @@ export const runResearchEpisode = async (
                 outcomeEndpoint: RESEARCH_OUTCOME_ENDPOINT,
                 candidateDefeated: candidateStats.defeated,
                 baselineDefeated: baselineStats.defeated,
-                candidate: getPlayerSnapshot(candidate.lastGameApi, candidateName),
-                baseline: getPlayerSnapshot(baseline.lastGameApi, baselineName),
+                candidate: candidateSnapshot,
+                baseline: baselineSnapshot,
             };
         },
     );

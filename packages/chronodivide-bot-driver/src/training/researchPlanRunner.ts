@@ -13,7 +13,12 @@ import {
     runResearchEpisode,
     validateResearchEpisodeSpec,
 } from "./researchEpisode.js";
-import { parseResearchPolicy, ResearchPolicyConfig, researchPolicySha256 } from "./researchPolicy.js";
+import {
+    METHOD_V3_POLICY_SCHEMA_VERSION,
+    parseResearchPolicy,
+    ResearchPolicyConfig,
+    researchPolicySha256,
+} from "./researchPolicy.js";
 
 export const RESEARCH_PLAN_SCHEMA_VERSION = 1 as const;
 export const RESEARCH_ROLE_MANIFEST_STATUS = "PRIVATE_FAMILY_ROLE_MANIFEST_NO_POLICY_OUTCOMES" as const;
@@ -23,6 +28,7 @@ export type ResearchRole = "train" | "development" | "test";
 export type ResearchPurpose =
     | "train-smoke"
     | "optimizer-search"
+    | "method-v3-mechanism-screen"
     | "development-qc"
     | "development-evaluation"
     | "development-v2-qc"
@@ -62,8 +68,8 @@ export type ResearchRunPlan = {
     splitCommitmentSha256: string;
     sourcePopulationCommitmentSha256: string;
     engineSeedBase: number;
-    candidateCountry: Countries.IRAQ;
-    baselineCountry: Countries.IRAQ;
+    candidateCountry: Countries;
+    baselineCountry: Countries;
     maxTicks: number;
     policies: ResearchPlanPolicy[];
     episodes: ResearchPlanEpisode[];
@@ -93,7 +99,7 @@ export type StrictPlanContext = {
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;
 const GIT_COMMIT_PATTERN = /^[0-9a-f]{40}$/;
 const IDENTIFIER_PATTERN = /^[A-Za-z0-9._-]+$/;
-const TRAIN_PURPOSES: ResearchPurpose[] = ["train-smoke", "optimizer-search"];
+const TRAIN_PURPOSES: ResearchPurpose[] = ["train-smoke", "optimizer-search", "method-v3-mechanism-screen"];
 const DEVELOPMENT_PURPOSES: ResearchPurpose[] = [
     "development-qc",
     "development-evaluation",
@@ -233,7 +239,18 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
         throw new Error(`Research purpose ${String(value.purpose)} is not allowed for role ${role}`);
     }
     const purpose = value.purpose as ResearchPurpose;
-    if (value.candidateCountry !== Countries.IRAQ || value.baselineCountry !== Countries.IRAQ) {
+    const candidateCountry = value.candidateCountry;
+    const baselineCountry = value.baselineCountry;
+    const countries = new Set<string>(Object.values(Countries));
+    if (purpose === "method-v3-mechanism-screen") {
+        if (
+            typeof candidateCountry !== "string" ||
+            !countries.has(candidateCountry) ||
+            candidateCountry !== baselineCountry
+        ) {
+            throw new Error("Method-v3 mechanism plans require an exact supported-country mirror");
+        }
+    } else if (candidateCountry !== Countries.IRAQ || baselineCountry !== Countries.IRAQ) {
         throw new Error("Research plan v1 requires the prospectively fixed Arabs mirror matchup");
     }
     if (!Array.isArray(value.policies) || value.policies.length === 0) {
@@ -246,6 +263,12 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
         assertExactKeys(`Policy ${index}`, raw, ["policyId", "policy"]);
         const policyId = expectSha256(raw, "policyId");
         const policy = parseResearchPolicy(raw.policy);
+        if (
+            (purpose === "method-v3-mechanism-screen") !==
+            (policy.schemaVersion === METHOD_V3_POLICY_SCHEMA_VERSION)
+        ) {
+            throw new Error("Method-v3 mechanism plans require only schema-v2 policies; prior plans require schema v1");
+        }
         if (researchPolicySha256(policy) !== policyId) {
             throw new Error(`Policy ${index} policyId does not equal its canonical policy SHA-256`);
         }
@@ -371,8 +394,8 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
         splitCommitmentSha256: expectSha256(value, "splitCommitmentSha256"),
         sourcePopulationCommitmentSha256: expectSha256(value, "sourcePopulationCommitmentSha256"),
         engineSeedBase,
-        candidateCountry: Countries.IRAQ,
-        baselineCountry: Countries.IRAQ,
+        candidateCountry: candidateCountry as Countries,
+        baselineCountry: baselineCountry as Countries,
         maxTicks: expectSafeInteger(value, "maxTicks", 1, 100_000),
         policies,
         episodes,
@@ -739,7 +762,20 @@ export const runResearchPlanFromEnvironment = async (accessMode: ResearchAccessM
             candidateSlot: spec.candidateSlot,
         });
         try {
-            const result = await runResearchEpisode(spec, baselineFactory);
+            const result = await runResearchEpisode(spec, baselineFactory, (policyEvent) => {
+                appendJsonLine(eventsPath, {
+                    event: "candidate_policy_event",
+                    launchIndex,
+                    episodeId: spec.episodeId,
+                    familyId: spec.familyId,
+                    policyId: spec.policyId,
+                    methodId: spec.methodId,
+                    seedBlockIndex: spec.seedBlockIndex,
+                    requestedEngineSeed: spec.requestedEngineSeed,
+                    candidateSlot: spec.candidateSlot,
+                    policyEvent,
+                });
+            });
             completed++;
             candidateWins += result.winner === "candidate" ? 1 : 0;
             baselineWins += result.winner === "baseline" ? 1 : 0;
