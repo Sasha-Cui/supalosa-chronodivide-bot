@@ -33,7 +33,12 @@ RUN_ROOT="$EVIDENCE_BASE/$SLURM_JOB_ID"
 RUN_ID="method-v3-stage0-$SLURM_JOB_ID"
 
 JOB_LINE=$($SCONTROL show job -o "$SLURM_JOB_ID")
-JOB_ACCOUNT=$(tr ' ' '\n' <<< "$JOB_LINE" | awk -F= '$1 == "Account" {print $2; exit}')
+if [[ "$JOB_LINE" =~ (^|[[:space:]])Account=([^[:space:]]+) ]]; then
+    JOB_ACCOUNT=${BASH_REMATCH[2]}
+else
+    echo "Authoritative Slurm account is absent from scontrol output" >&2
+    exit 2
+fi
 if [[ "$JOB_ACCOUNT" != "pi_jss233" ]]; then
     echo "Authoritative account is $JOB_ACCOUNT, expected pi_jss233" >&2
     exit 2

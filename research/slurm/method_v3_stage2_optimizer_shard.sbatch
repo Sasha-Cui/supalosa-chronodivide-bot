@@ -63,7 +63,12 @@ case "$(realpath "$RESEARCH_PLAN")" in
 esac
 
 JOB_LINE=$($SCONTROL show job -o "$SLURM_JOB_ID")
-JOB_ACCOUNT=$(tr ' ' '\n' <<< "$JOB_LINE" | awk -F= '$1 == "Account" {print $2; exit}')
+if [[ "$JOB_LINE" =~ (^|[[:space:]])Account=([^[:space:]]+) ]]; then
+    JOB_ACCOUNT=${BASH_REMATCH[2]}
+else
+    echo "Authoritative Slurm account is absent from scontrol output" >&2
+    exit 2
+fi
 if [[ "$JOB_ACCOUNT" != "pi_jss233" ]]; then
     echo "Refusing method-v3 Stage 2 under account $JOB_ACCOUNT" >&2
     exit 2

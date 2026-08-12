@@ -48,7 +48,12 @@ fi
 STAGE0_GATE=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/method-v3/stage0-country-interface/$STAGE0_JOB_ID/stage0-gate.json
 
 JOB_LINE=$($SCONTROL show job -o "${SLURM_JOB_ID:?SLURM_JOB_ID is required}")
-JOB_ACCOUNT=$(tr ' ' '\n' <<< "$JOB_LINE" | awk -F= '$1 == "Account" {print $2; exit}')
+if [[ "$JOB_LINE" =~ (^|[[:space:]])Account=([^[:space:]]+) ]]; then
+    JOB_ACCOUNT=${BASH_REMATCH[2]}
+else
+    echo "Authoritative Slurm account is absent from scontrol output" >&2
+    exit 2
+fi
 if [[ "$JOB_ACCOUNT" != "pi_jss233" ]]; then
     echo "Refusing Stage-2 initialization under account $JOB_ACCOUNT" >&2
     exit 2

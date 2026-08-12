@@ -22,7 +22,12 @@ REPO=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot
 SCRATCH=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit
 SCONTROL=/opt/slurm/current/bin/scontrol
 JOB_LINE=$($SCONTROL show job -o "$SLURM_JOB_ID")
-JOB_ACCOUNT=$(tr ' ' '\n' <<< "$JOB_LINE" | awk -F= '$1 == "Account" {print $2; exit}')
+if [[ "$JOB_LINE" =~ (^|[[:space:]])Account=([^[:space:]]+) ]]; then
+    JOB_ACCOUNT=${BASH_REMATCH[2]}
+else
+    echo "Authoritative Slurm account is absent from scontrol output" >&2
+    exit 2
+fi
 if [[ "$JOB_ACCOUNT" != "pi_jss233" ]]; then
     echo "Refusing seed replay gate: authoritative Slurm account is $JOB_ACCOUNT, expected pi_jss233" >&2
     exit 2
