@@ -6,6 +6,7 @@ import { StrongStrategyOptions } from "@supalosa/chronodivide-bot/dist/bot/strat
 export const RESEARCH_POLICY_SCHEMA_VERSION = 1 as const;
 export const METHOD_V3_POLICY_SCHEMA_VERSION = 2 as const;
 export const METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION = 3 as const;
+export const METHOD_V4_POLICY_SCHEMA_VERSION = 4 as const;
 
 export const RESEARCH_ATTACK_COMPOSITIONS = [
     "random",
@@ -105,7 +106,16 @@ export type MethodV3Stage2PolicyConfig = Omit<MethodV3PolicyConfig, "schemaVersi
     buildingEliminationAdaptiveNavalTargetCount: number;
 };
 
-export type ResearchPolicyConfig = ResearchPolicyConfigV1 | MethodV3PolicyConfig | MethodV3Stage2PolicyConfig;
+export type MethodV4PolicyConfig = Omit<MethodV3Stage2PolicyConfig, "schemaVersion"> & {
+    schemaVersion: typeof METHOD_V4_POLICY_SCHEMA_VERSION;
+    preserveBaselineCore: boolean;
+};
+
+export type ResearchPolicyConfig =
+    | ResearchPolicyConfigV1
+    | MethodV3PolicyConfig
+    | MethodV3Stage2PolicyConfig
+    | MethodV4PolicyConfig;
 
 const POLICY_KEYS_V1: Array<keyof ResearchPolicyConfigV1> = [
     "schemaVersion",
@@ -174,6 +184,12 @@ const POLICY_KEYS_V3: Array<keyof MethodV3Stage2PolicyConfig> = [
     "buildingEliminationReassignStalledTargets",
     "buildingEliminationAdaptiveAirTargetCount",
     "buildingEliminationAdaptiveNavalTargetCount",
+];
+
+const POLICY_KEYS_V4: Array<keyof MethodV4PolicyConfig> = [
+    ...(POLICY_KEYS_V3.filter((key) => key !== "schemaVersion") as Array<keyof MethodV4PolicyConfig>),
+    "schemaVersion",
+    "preserveBaselineCore",
 ];
 
 export const DEFAULT_RESEARCH_POLICY: ResearchPolicyConfigV1 = {
@@ -252,6 +268,15 @@ export const projectMethodV3PolicyToStage2 = (
     buildingEliminationReassignStalledTargets: false,
     buildingEliminationAdaptiveAirTargetCount: 0,
     buildingEliminationAdaptiveNavalTargetCount: 0,
+});
+
+export const projectMethodV3Stage2PolicyToV4 = (
+    policy: MethodV3Stage2PolicyConfig,
+    preserveBaselineCore: boolean,
+): MethodV4PolicyConfig => ({
+    ...policy,
+    schemaVersion: METHOD_V4_POLICY_SCHEMA_VERSION,
+    preserveBaselineCore,
 });
 
 export const RESEARCH_POLICY_SEARCH_SPACE: {
@@ -340,10 +365,11 @@ export const parseResearchPolicy = (value: unknown): ResearchPolicyConfig => {
     if (
         schemaVersion !== RESEARCH_POLICY_SCHEMA_VERSION &&
         schemaVersion !== METHOD_V3_POLICY_SCHEMA_VERSION &&
-        schemaVersion !== METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION
+        schemaVersion !== METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION &&
+        schemaVersion !== METHOD_V4_POLICY_SCHEMA_VERSION
     ) {
         throw new Error(
-            `Research policy schemaVersion must be ${RESEARCH_POLICY_SCHEMA_VERSION}, ${METHOD_V3_POLICY_SCHEMA_VERSION}, or ${METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION}`,
+            `Research policy schemaVersion must be ${RESEARCH_POLICY_SCHEMA_VERSION}, ${METHOD_V3_POLICY_SCHEMA_VERSION}, ${METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION}, or ${METHOD_V4_POLICY_SCHEMA_VERSION}`,
         );
     }
     const policyKeys =
@@ -351,7 +377,9 @@ export const parseResearchPolicy = (value: unknown): ResearchPolicyConfig => {
             ? POLICY_KEYS_V1
             : schemaVersion === METHOD_V3_POLICY_SCHEMA_VERSION
               ? POLICY_KEYS_V2
-              : POLICY_KEYS_V3;
+              : schemaVersion === METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION
+                ? POLICY_KEYS_V3
+                : POLICY_KEYS_V4;
     const actualKeys = Object.keys(value).sort();
     const expectedKeys = [...policyKeys].sort();
     if (actualKeys.length !== expectedKeys.length || actualKeys.some((key, index) => key !== expectedKeys[index])) {
@@ -458,7 +486,7 @@ export const parseResearchPolicy = (value: unknown): ResearchPolicyConfig => {
     if (schemaVersion === METHOD_V3_POLICY_SCHEMA_VERSION) {
         return methodV3;
     }
-    return {
+    const stage2 = {
         ...methodV3,
         schemaVersion: METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION,
         buildingEliminationCapabilityAwareAttackers: expectBoolean(
@@ -487,6 +515,14 @@ export const parseResearchPolicy = (value: unknown): ResearchPolicyConfig => {
             100,
         ),
     };
+    if (schemaVersion === METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION) {
+        return stage2;
+    }
+    return {
+        ...stage2,
+        schemaVersion: METHOD_V4_POLICY_SCHEMA_VERSION,
+        preserveBaselineCore: expectBoolean(value, "preserveBaselineCore"),
+    };
 };
 
 const orderedPolicy = (policy: ResearchPolicyConfig): Record<string, unknown> => {
@@ -496,7 +532,9 @@ const orderedPolicy = (policy: ResearchPolicyConfig): Record<string, unknown> =>
             ? POLICY_KEYS_V1
             : policy.schemaVersion === METHOD_V3_POLICY_SCHEMA_VERSION
               ? POLICY_KEYS_V2
-              : POLICY_KEYS_V3;
+              : policy.schemaVersion === METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION
+                ? POLICY_KEYS_V3
+                : POLICY_KEYS_V4;
     const record = policy as unknown as Record<string, unknown>;
     for (const key of keys) {
         result[key] = record[key];
@@ -512,9 +550,15 @@ export const researchPolicySha256 = (value: unknown): string => {
 export const buildResearchStrategyOptions = (value: unknown): StrongStrategyOptions => {
     const policy = parseResearchPolicy(value);
     const methodV3 = policy.schemaVersion === RESEARCH_POLICY_SCHEMA_VERSION ? null : policy;
-    const stage2 = policy.schemaVersion === METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION ? policy : null;
+    const stage2 =
+        policy.schemaVersion === METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION ||
+        policy.schemaVersion === METHOD_V4_POLICY_SCHEMA_VERSION
+            ? policy
+            : null;
+    const methodV4 = policy.schemaVersion === METHOD_V4_POLICY_SCHEMA_VERSION ? policy : null;
     return {
         defaultMapProfiles: false,
+        preserveBaselineCore: methodV4?.preserveBaselineCore ?? false,
         base: {
             attackCompositionPolicy: policy.attackCompositionPolicy,
             attackGate: {
@@ -614,9 +658,12 @@ export const buildResearchStrategyOptions = (value: unknown): StrongStrategyOpti
 
 export const buildResearchBotOptions = (value: unknown): StrongBotOptions => {
     const policy = parseResearchPolicy(value);
+    const preserveBaselineCore =
+        policy.schemaVersion === METHOD_V4_POLICY_SCHEMA_VERSION && policy.preserveBaselineCore;
     return {
         defaultMapProfiles: false,
         exactMapTactics: false,
+        preserveBaselineCore,
         forceAttack: {
             enabled: policy.forceAttackEnabled,
             minTick: policy.forceAttackMinTick,
@@ -630,7 +677,7 @@ export const buildResearchBotOptions = (value: unknown): StrongBotOptions => {
         },
         harass: { enabled: false },
         emergencyDefense: {
-            enabled: true,
+            enabled: !preserveBaselineCore,
             radius: policy.emergencyDefenseRadius,
             minCombatants: 1,
             maxDefenders: policy.emergencyDefenseMaxDefenders,

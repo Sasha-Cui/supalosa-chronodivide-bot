@@ -6,6 +6,7 @@ import {
     METHOD_V3_STARTING_POLICY,
     parseResearchPolicy,
     projectMethodV3PolicyToStage2,
+    projectMethodV3Stage2PolicyToV4,
     RESEARCH_POLICY_SEARCH_SPACE,
     researchPolicySha256,
 } from "../training/researchPolicy.js";
@@ -126,6 +127,26 @@ describe("research policy interface", () => {
             adaptiveAirTargetCount: 4,
             adaptiveNavalTargetCount: 2,
         });
+    });
+
+    test("materializes method-v4 baseline preservation without hidden strong-bot behavior", () => {
+        const stage2 = projectMethodV3PolicyToStage2(METHOD_V3_STARTING_POLICY);
+        const policy = projectMethodV3Stage2PolicyToV4(stage2, true);
+        expect(parseResearchPolicy(policy)).toEqual(policy);
+        expect(researchPolicySha256(policy)).not.toBe(researchPolicySha256(stage2));
+
+        const strategy = buildResearchStrategyOptions(policy);
+        const bot = buildResearchBotOptions(policy);
+        expect(strategy.preserveBaselineCore).toBe(true);
+        expect(strategy.defaultMapProfiles).toBe(false);
+        expect(bot.preserveBaselineCore).toBe(true);
+        expect(bot.defaultMapProfiles).toBe(false);
+        expect(bot.exactMapTactics).toBe(false);
+        expect(bot.emergencyDefense?.enabled).toBe(false);
+
+        expect(() => parseResearchPolicy({ ...policy, preserveBaselineCore: undefined })).toThrow(
+            /preserveBaselineCore must be boolean/,
+        );
     });
 
     test("rejects method-v3 coordinate fields and invalid finisher values", () => {

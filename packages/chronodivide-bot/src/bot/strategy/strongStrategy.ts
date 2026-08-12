@@ -16,6 +16,7 @@ import { DefaultStrategy, DefaultStrategyOptions } from "./defaultStrategy.js";
 
 export type StrongStrategyOptions = {
     defaultMapProfiles?: boolean;
+    preserveBaselineCore?: boolean;
     base?: DefaultStrategyOptions;
     allIn?: AllInAttackMissionFactoryOptions;
     macroBoost?: {
@@ -728,6 +729,7 @@ const hasDefinedOption = (options: object | undefined): boolean =>
     !!options && Object.values(options).some((value) => value !== undefined);
 
 const hasExplicitProfileOptions = (options: StrongStrategyOptions): boolean =>
+    options.preserveBaselineCore !== undefined ||
     options.strategicPlan?.plan !== undefined ||
     options.base?.attackCompositionPolicy !== undefined ||
     options.base?.attackGate?.enabled !== undefined ||
@@ -761,7 +763,7 @@ export class StrongStrategy implements Strategy {
         const baseScouting = options.base?.scouting ?? {};
         const baseAttackGate = options.base?.attackGate ?? {};
         const baseAttackSuppression = options.base?.attackSuppression ?? {};
-        this.baseStrategy = new DefaultStrategy({
+        this.baseStrategy = options.preserveBaselineCore ? new DefaultStrategy() : new DefaultStrategy({
             ...options.base,
             expansion: {
                 ...options.base?.expansion,
@@ -908,14 +910,18 @@ export class StrongStrategy implements Strategy {
                 ).onAiUpdate(context, missionController, logger);
             }
         }
-        if (this.options.macroBoost?.enabled) {
-            this.macroBoostFactory.maybeCreateMissions(context, missionController, logger);
+        if (!this.options.preserveBaselineCore) {
+            if (this.options.macroBoost?.enabled) {
+                this.macroBoostFactory.maybeCreateMissions(context, missionController, logger);
+            }
+            this.staticDefenseBoostFactory.maybeCreateMissions(context, missionController, logger);
+            this.strategicPlanFactory.maybeCreateMissions(context, missionController, logger);
+            this.navalAssaultFactory.maybeCreateMissions(context, missionController, logger);
         }
-        this.staticDefenseBoostFactory.maybeCreateMissions(context, missionController, logger);
-        this.strategicPlanFactory.maybeCreateMissions(context, missionController, logger);
-        this.navalAssaultFactory.maybeCreateMissions(context, missionController, logger);
         this.baseStrategy = this.baseStrategy.onAiUpdate(context, missionController, logger);
-        this.allInAttackFactory.maybeCreateMissions(context, missionController, logger);
+        if (!this.options.preserveBaselineCore) {
+            this.allInAttackFactory.maybeCreateMissions(context, missionController, logger);
+        }
         this.buildingEliminationFactory.maybeCreateMissions(context, missionController, logger);
         return this;
     }

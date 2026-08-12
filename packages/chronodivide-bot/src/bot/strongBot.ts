@@ -149,6 +149,7 @@ export type HfoBottomHomeGuardOptions = {
 };
 
 export type StrongBotOptions = {
+    preserveBaselineCore?: boolean;
     forceAttack?: ForceAttackOptions;
     harass?: HarassOptions;
     emergencyDefense?: EmergencyDefenseOptions;
@@ -1258,6 +1259,7 @@ export class StrongBot extends SupalosaBot {
     private lastOtmqFinalSweepOrderAt = 0;
     private readonly enableDefaultMapProfiles: boolean;
     private readonly enableExactMapTactics: boolean;
+    private readonly preserveBaselineCore: boolean;
     private readonly explicitOptionOverrides: StrongBotOptions;
 
     constructor(
@@ -1272,6 +1274,7 @@ export class StrongBot extends SupalosaBot {
         this.explicitOptionOverrides = options;
         this.enableDefaultMapProfiles = options.defaultMapProfiles ?? true;
         this.enableExactMapTactics = options.exactMapTactics ?? true;
+        this.preserveBaselineCore = options.preserveBaselineCore ?? false;
         this.forceAttackOptions = { ...DEFAULT_FORCE_ATTACK_OPTIONS, ...definedOptions(options.forceAttack) };
         this.harassOptions = { ...DEFAULT_HARASS_OPTIONS, ...definedOptions(options.harass) };
         const emergencyDefenseOverrides = definedOptions(options.emergencyDefense);
@@ -1403,7 +1406,7 @@ export class StrongBot extends SupalosaBot {
         if (this.enableExactMapTactics && this.maybeHfoSideCloseout(game)) {
             return;
         }
-        if (this.maybeWonGameCloseout(game)) {
+        if (!this.preserveBaselineCore && this.maybeWonGameCloseout(game)) {
             return;
         }
         if (this.enableExactMapTactics && this.maybePeakEmergencyDefend(game)) {
