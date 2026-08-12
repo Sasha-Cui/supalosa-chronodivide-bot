@@ -1,6 +1,31 @@
 # Method-v3 prospective amendment 2: fresh Temperate map population
 
-Status: **prepared before any policy outcome on the new map population**.
+Status: **frozen on 2026-08-12 before compatibility execution and before any
+policy outcome on the new map population**.
+
+## Freeze record
+
+The role-blind, outcome-free inputs are fixed as follows:
+
+- implementation parent commit:
+  `d485555d03dd3ecca427e9a56a4d077a8b80cb75`;
+- committed catalog SHA-256:
+  `625bad85ba0c3d0bbf1fef3abfd81ea69d3f301a3d77c573bd32d2befd5b41f8`;
+- committed 66-family fidelity-target SHA-256:
+  `cf4c7da4a617e274cc7d422bd43d9ceacdd1777309c567682d4f53aea1f65f9c`;
+- target-population commitment:
+  `7a106dbb816dea419d63d428f6199604e2d7f50e85909c0337ff530880339bae`;
+- content-verifying retrieval-tool SHA-256:
+  `8535dc041113aa7350182f8f61ce108195d53b5c012b82df0044aecf886ef203`;
+  and
+- deterministic role-freezer SHA-256:
+  `43820e3a7ed21b984b62ab0e8223eb33cd30f8622c3d1000c0f95ba2bba71919`.
+
+The execution revision is the clean `main` commit containing this freeze record.
+Its identity is recorded by the Slurm evidence and independent verifier rather
+than embedded circularly in this file. No tracked source change is permitted
+after compatibility begins without invalidating this amendment and requiring a
+new prospective population version.
 
 This amendment expands only the outcome-blind map source, compatibility
 screen, and prospective role construction for method-v3 development and
