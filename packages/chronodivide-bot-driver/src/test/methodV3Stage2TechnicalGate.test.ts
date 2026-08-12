@@ -60,6 +60,32 @@ describe("method-v3 Stage-2 technical gate", () => {
             .toThrow(/launch record differs/);
     });
 
+    test("requires a recovery launcher parent for recovery campaigns", () => {
+        const campaignPath = fileURLToPath(import.meta.url);
+        const campaign = {
+            campaignVersion: "stage2-recovery-v1",
+            optimizerRunIndex: 0,
+            stage: 2,
+            shards: [{ shardIndex: 0 }],
+        } as unknown as MethodV3Stage2Campaign;
+        const record = {
+            schemaVersion: 1,
+            kind: "stage2_array_launch",
+            schedulerAccount: "pi_jss233",
+            jobId: "2200",
+            parentRecoveryLauncherJobId: "2199",
+            optimizerRunIndex: 0,
+            stage: 2,
+            shardCount: 1,
+            campaignPath,
+            campaignSha256: crypto.createHash("sha256").update(fs.readFileSync(campaignPath)).digest("hex"),
+        };
+        expect(() => validateMethodV3Stage2ArrayLaunch(record, campaign, campaignPath, "2200")).not.toThrow();
+        const { parentRecoveryLauncherJobId: _parent, ...missingParent } = record;
+        expect(() => validateMethodV3Stage2ArrayLaunch(missingParent, campaign, campaignPath, "2200"))
+            .toThrow(/launch record differs/);
+    });
+
     test("accepts only the frozen telemetry schema/event pairs", () => {
         const values = [
             { schemaVersion: 1, event: "activated", tick: 1, observationMode: "publicApi", ownCombatants: 2, enemyCombatants: 0, reservedCombatants: 0, preemptedMissions: [] },

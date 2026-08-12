@@ -4,11 +4,14 @@ import { METHOD_V3_COUNTRIES } from "./methodV3MechanismPlanGenerator.js";
 import { RoleTarget } from "./researchPlanRunner.js";
 
 export const METHOD_V3_STAGE2_ENGINE_SEED_BASE = 3_300_000_000 as const;
+export const METHOD_V3_STAGE2_RECOVERY_V1_ENGINE_SEED_BASE = 3_900_000_000 as const;
 export const METHOD_V3_STAGE2_RUN_SEED_STRIDE = 10_000_000 as const;
 export const METHOD_V3_STAGE2_STAGE_SEED_STRIDE = 1_000_000 as const;
 export const METHOD_V3_STAGE2_FAMILY_COUNTS = [6, 12, 22] as const;
 export const METHOD_V3_STAGE2_COUNTRY_COUNTS = [3, 6, 9] as const;
 export const METHOD_V3_STAGE2_POLICY_COUNTS = [24, 8, 3] as const;
+export const METHOD_V3_STAGE2_CAMPAIGN_VERSIONS = ["primary-v1", "stage2-recovery-v1"] as const;
+export type MethodV3Stage2CampaignVersion = typeof METHOD_V3_STAGE2_CAMPAIGN_VERSIONS[number];
 
 const rank = (domain: string, runIndex: number, value: string): string =>
     crypto
@@ -38,16 +41,26 @@ export const selectMethodV3Stage2Schedule = (
     targets: RoleTarget[],
     runIndex: number,
     stage: 0 | 1 | 2,
+    campaignVersion: MethodV3Stage2CampaignVersion = "primary-v1",
 ): { families: RoleTarget[]; countries: Countries[]; engineSeedBase: number } => {
     if (!Number.isSafeInteger(runIndex) || runIndex < 0 || runIndex > 4) {
         throw new Error("runIndex must be an integer in [0, 4]");
     }
     if (stage !== 0 && stage !== 1 && stage !== 2) throw new Error("stage must be 0, 1, or 2");
+    if (!METHOD_V3_STAGE2_CAMPAIGN_VERSIONS.includes(campaignVersion)) {
+        throw new Error(`Unsupported method-v3 Stage-2 campaign version ${campaignVersion}`);
+    }
+    if (campaignVersion === "stage2-recovery-v1" && (stage !== 2 || (runIndex !== 0 && runIndex !== 3))) {
+        throw new Error("stage2-recovery-v1 is authorized only for complete Stage 2 of optimizer runs 0 and 3");
+    }
+    const seedBase = campaignVersion === "stage2-recovery-v1"
+        ? METHOD_V3_STAGE2_RECOVERY_V1_ENGINE_SEED_BASE
+        : METHOD_V3_STAGE2_ENGINE_SEED_BASE;
     return {
         families: rankMethodV3Stage2Families(targets, runIndex).slice(0, METHOD_V3_STAGE2_FAMILY_COUNTS[stage]),
         countries: rankMethodV3Stage2Countries(runIndex).slice(0, METHOD_V3_STAGE2_COUNTRY_COUNTS[stage]),
         engineSeedBase:
-            METHOD_V3_STAGE2_ENGINE_SEED_BASE +
+            seedBase +
             runIndex * METHOD_V3_STAGE2_RUN_SEED_STRIDE +
             stage * METHOD_V3_STAGE2_STAGE_SEED_STRIDE,
     };

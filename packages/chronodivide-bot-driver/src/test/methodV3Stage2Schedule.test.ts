@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import {
     METHOD_V3_STAGE2_COUNTRY_COUNTS,
     METHOD_V3_STAGE2_FAMILY_COUNTS,
+    METHOD_V3_STAGE2_RECOVERY_V1_ENGINE_SEED_BASE,
     rankMethodV3Stage2Countries,
     selectMethodV3Stage2Schedule,
 } from "../training/methodV3Stage2Schedule.js";
@@ -44,5 +45,20 @@ describe("method-v3 Stage-2 nested schedule", () => {
             }
         }
         expect(countrySubsets.size).toBeGreaterThan(1);
+    });
+
+    test("uses a fresh, narrowly scoped domain for complete-stage recovery", () => {
+        for (const runIndex of [0, 3]) {
+            const primary = selectMethodV3Stage2Schedule(targets, runIndex, 2);
+            const recovery = selectMethodV3Stage2Schedule(targets, runIndex, 2, "stage2-recovery-v1");
+            expect(recovery.families).toEqual(primary.families);
+            expect(recovery.countries).toEqual(primary.countries);
+            expect(recovery.engineSeedBase).toBe(
+                METHOD_V3_STAGE2_RECOVERY_V1_ENGINE_SEED_BASE + runIndex * 10_000_000 + 2_000_000,
+            );
+            expect(recovery.engineSeedBase).not.toBe(primary.engineSeedBase);
+        }
+        expect(() => selectMethodV3Stage2Schedule(targets, 1, 2, "stage2-recovery-v1")).toThrow();
+        expect(() => selectMethodV3Stage2Schedule(targets, 0, 1, "stage2-recovery-v1")).toThrow();
     });
 });

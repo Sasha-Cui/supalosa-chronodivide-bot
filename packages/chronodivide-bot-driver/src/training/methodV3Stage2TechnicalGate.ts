@@ -19,9 +19,13 @@ import {
 } from "./methodV3Stage2PlanGenerator.js";
 import { generateMethodV3Stage2Policies } from "./methodV3Stage2Policies.js";
 import {
+    METHOD_V3_STAGE2_CAMPAIGN_VERSIONS,
     METHOD_V3_STAGE2_COUNTRY_COUNTS,
     METHOD_V3_STAGE2_FAMILY_COUNTS,
     METHOD_V3_STAGE2_POLICY_COUNTS,
+    METHOD_V3_STAGE2_RECOVERY_V1_ENGINE_SEED_BASE,
+    METHOD_V3_STAGE2_RUN_SEED_STRIDE,
+    METHOD_V3_STAGE2_STAGE_SEED_STRIDE,
 } from "./methodV3Stage2Schedule.js";
 import { METHOD_V3_STAGE2_SELECTION_RULE } from "./methodV3Stage2Reducer.js";
 import { parseResearchRunPlan, sha256File } from "./researchPlanRunner.js";
@@ -72,11 +76,14 @@ export const validateMethodV3Stage2ArrayLaunch = (
         value.shardCount !== campaign.shards.length ||
         path.resolve(String(value.campaignPath)) !== campaignPath ||
         value.campaignSha256 !== sha256File(campaignPath) ||
-        (campaign.stage === 0
-            ? (typeof value.parentInitializerJobId !== "string" &&
-                typeof value.parentInitializerJobId !== "number")
-            : (typeof value.parentControllerJobId !== "string" &&
-                typeof value.parentControllerJobId !== "number"))
+        ((campaign.campaignVersion ?? "primary-v1") === "stage2-recovery-v1"
+            ? (typeof value.parentRecoveryLauncherJobId !== "string" &&
+                typeof value.parentRecoveryLauncherJobId !== "number")
+            : campaign.stage === 0
+                ? (typeof value.parentInitializerJobId !== "string" &&
+                    typeof value.parentInitializerJobId !== "number")
+                : (typeof value.parentControllerJobId !== "string" &&
+                    typeof value.parentControllerJobId !== "number"))
     ) {
         throw new Error("Method-v3 Stage-2 array launch record differs from the frozen campaign or scheduler job");
     }
@@ -141,6 +148,8 @@ export const validateMethodV3Stage2Campaign = (value: unknown): MethodV3Stage2Ca
         (value.optimizerRunIndex as number) < 0 ||
         (value.optimizerRunIndex as number) > 4 ||
         (value.stage !== 0 && value.stage !== 1 && value.stage !== 2) ||
+        (value.campaignVersion !== undefined &&
+            !METHOD_V3_STAGE2_CAMPAIGN_VERSIONS.some((version) => version === value.campaignVersion)) ||
         value.outcomeAccess !== "open-training-only-no-paper-claim" ||
         value.actualWinInvariant !==
             "finished shortGame, Supalosa defeated, candidate alive, zero terminal Supalosa buildings" ||
@@ -158,6 +167,19 @@ export const validateMethodV3Stage2Campaign = (value: unknown): MethodV3Stage2Ca
         throw new Error("Method-v3 Stage-2 campaign has an invalid frozen schema");
     }
     const campaign = value as unknown as MethodV3Stage2Campaign;
+    const campaignVersion = campaign.campaignVersion ?? "primary-v1";
+    if (
+        campaignVersion === "stage2-recovery-v1" &&
+        (
+            campaign.stage !== 2 ||
+            (campaign.optimizerRunIndex !== 0 && campaign.optimizerRunIndex !== 3) ||
+            campaign.engineSeedBase !== METHOD_V3_STAGE2_RECOVERY_V1_ENGINE_SEED_BASE +
+                campaign.optimizerRunIndex * METHOD_V3_STAGE2_RUN_SEED_STRIDE +
+                campaign.stage * METHOD_V3_STAGE2_STAGE_SEED_STRIDE
+        )
+    ) {
+        throw new Error("Method-v3 Stage-2 recovery campaign is outside the prospectively authorized scope");
+    }
     const stage = campaign.stage;
     const expectedFamilies = METHOD_V3_STAGE2_FAMILY_COUNTS[stage];
     const expectedCountries = METHOD_V3_STAGE2_COUNTRY_COUNTS[stage];

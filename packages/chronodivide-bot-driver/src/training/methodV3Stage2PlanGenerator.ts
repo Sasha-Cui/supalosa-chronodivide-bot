@@ -30,6 +30,8 @@ import {
 } from "./researchPolicy.js";
 import { generateMethodV3Stage2Policies } from "./methodV3Stage2Policies.js";
 import {
+    METHOD_V3_STAGE2_CAMPAIGN_VERSIONS,
+    MethodV3Stage2CampaignVersion,
     METHOD_V3_STAGE2_POLICY_COUNTS,
     selectMethodV3Stage2Schedule,
 } from "./methodV3Stage2Schedule.js";
@@ -44,6 +46,7 @@ export type MethodV3Stage2Campaign = {
     generatedAt: string;
     optimizerRunIndex: number;
     stage: 0 | 1 | 2;
+    campaignVersion?: MethodV3Stage2CampaignVersion;
     sourceGitCommit: string;
     sourceRuntimeSha256: string;
     baselineGitCommit: string;
@@ -143,6 +146,14 @@ const requiredInteger = (name: string, minimum: number, maximum: number): number
         throw new Error(`${name} must be an integer in [${minimum}, ${maximum}]`);
     }
     return parsed;
+};
+
+const requestedCampaignVersion = (): MethodV3Stage2CampaignVersion => {
+    const value = process.env.METHOD_V3_STAGE2_CAMPAIGN_VERSION ?? "primary-v1";
+    if (!METHOD_V3_STAGE2_CAMPAIGN_VERSIONS.includes(value as MethodV3Stage2CampaignVersion)) {
+        throw new Error(`METHOD_V3_STAGE2_CAMPAIGN_VERSION must be one of ${METHOD_V3_STAGE2_CAMPAIGN_VERSIONS.join(", ")}`);
+    }
+    return value as MethodV3Stage2CampaignVersion;
 };
 
 const readJson = (filePath: string): unknown => JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -297,6 +308,7 @@ const main = async (): Promise<void> => {
     }
     const stage = requiredInteger("STAGE", 0, 2) as 0 | 1 | 2;
     const optimizerRunIndex = requiredInteger("OPTIMIZER_RUN_INDEX", 0, 4);
+    const campaignVersion = requestedCampaignVersion();
     const privateRoleRoot = requiredPath("RESEARCH_PRIVATE_ROLE_ROOT");
     const outRoot = requiredPath("OUT_ROOT");
     const stage1CampaignPath = requiredPath("STAGE1_CAMPAIGN");
@@ -320,7 +332,7 @@ const main = async (): Promise<void> => {
     }
 
     const role = readGeneratorRole(repoRoot, privateRoleRoot);
-    const schedule = selectMethodV3Stage2Schedule(role.targets, optimizerRunIndex, stage);
+    const schedule = selectMethodV3Stage2Schedule(role.targets, optimizerRunIndex, stage, campaignVersion);
     const baselineFactory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
     const generationManifest = createExperimentManifest({
         runId: `plan-method-v3-stage2-r${optimizerRunIndex}-s${stage}`,
@@ -331,6 +343,7 @@ const main = async (): Promise<void> => {
             outcomeAccess: false,
             optimizerRunIndex,
             stage,
+            campaignVersion,
             policyCount: policies.length,
             familyCount: schedule.families.length,
             countryCount: schedule.countries.length,
@@ -417,6 +430,7 @@ const main = async (): Promise<void> => {
         generatedAt: new Date().toISOString(),
         optimizerRunIndex,
         stage,
+        campaignVersion,
         sourceGitCommit: generationManifest.source.gitCommit,
         sourceRuntimeSha256: sourceRuntimeCommitmentSha256(generationManifest.source.runtimeTrees),
         baselineGitCommit: generationManifest.software.baseline.gitCommit,
