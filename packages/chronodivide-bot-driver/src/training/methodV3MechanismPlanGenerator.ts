@@ -20,7 +20,7 @@ import {
 
 export const METHOD_V3_STAGE1_ENGINE_SEED_BASE = 3_200_000_000 as const;
 export const METHOD_V3_STAGE1_MAX_TICKS = 18_000 as const;
-export const METHOD_V3_STAGE1_FAMILY_COUNT = 14 as const;
+export const METHOD_V3_STAGE1_FAMILY_COUNT = 22 as const;
 export const METHOD_V3_COUNTRIES = [
     Countries.USA,
     Countries.KOREA,

@@ -32,7 +32,7 @@ families cannot be satisfied. The method-v3 role freezer therefore was not run.
 
 ## Authorized development population
 
-Method-v3 Stages 1 and 2 may proceed on the 14 compatible families in the
+Method-v3 Stages 1 and 2 may proceed on the 22 compatible families in the
 original private `train` role. Those families and their prior outcomes are open
 development material. Their existing public/private commitment chain, exact
 representative bytes, and family identities remain unchanged.
@@ -44,7 +44,7 @@ map selection.
 
 Every Stage-1 arm must receive the identical schedule:
 
-- all 14 opened training families;
+- all 22 opened training families;
 - all nine same-country mirrors;
 - both reciprocal candidate slots;
 - one prospectively derived engine seed per family-country block; and

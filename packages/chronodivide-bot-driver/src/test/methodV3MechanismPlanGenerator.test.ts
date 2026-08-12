@@ -12,7 +12,7 @@ describe("method-v3 mechanism plan generator", () => {
     test("freezes the all-country reciprocal launch budget", () => {
         expect(METHOD_V3_COUNTRIES).toHaveLength(9);
         expect(new Set(METHOD_V3_COUNTRIES).size).toBe(9);
-        expect(METHOD_V3_STAGE1_FAMILY_COUNT * METHOD_V3_COUNTRIES.length * 2 * 9).toBe(2268);
+        expect(METHOD_V3_STAGE1_FAMILY_COUNT * METHOD_V3_COUNTRIES.length * 2 * 9).toBe(3564);
         expect(METHOD_V3_STAGE1_ENGINE_SEED_BASE).toBeLessThanOrEqual(0xffff_ffff);
     });
 

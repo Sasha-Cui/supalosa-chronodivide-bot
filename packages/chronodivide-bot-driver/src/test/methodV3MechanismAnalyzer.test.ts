@@ -14,7 +14,7 @@ const SHA = "b".repeat(64);
 const COMMIT = "b".repeat(40);
 
 const fixture = (): { campaign: MethodV3MechanismCampaign; results: Array<Record<string, unknown>> } => {
-    const selectedFamilies = Array.from({ length: 14 }, (_, index) => ({
+    const selectedFamilies = Array.from({ length: 22 }, (_, index) => ({
         familyId: `mf_${index}`,
         representativeSha256: `${index}`.padStart(64, "0"),
         descriptors: { startCount: 2 },
@@ -55,11 +55,11 @@ const fixture = (): { campaign: MethodV3MechanismCampaign; results: Array<Record
         actualWinInvariant: "shortGame engine defeat and zero terminal enemy buildings",
         mapProfilesEnabled: false,
         exactMapTacticsEnabled: false,
-        familyCount: 14,
+        familyCount: 22,
         countryCount: 9,
         reciprocalSlotCount: 2,
         policyCount: 9,
-        seedBlockCount: 126,
+        seedBlockCount: 198,
         launchedGameCount: METHOD_V3_STAGE1_LAUNCH_COUNT,
         engineSeedBase: METHOD_V3_STAGE1_ENGINE_SEED_BASE,
         maxTicks: METHOD_V3_STAGE1_MAX_TICKS,
@@ -101,15 +101,15 @@ describe("method-v3 mechanism analyzer", () => {
         expect(ranking).toHaveLength(9);
         expect(ranking[0]).toMatchObject({
             armId: "siege_finisher",
-            gameCount: 252,
-            wins: 252,
+            gameCount: 396,
+            wins: 396,
             draws: 0,
             losses: 0,
             equalFamilyCountryWinProbability: 1,
             equalFamilyCountryDrawProbability: 0,
         });
         expect(ranking[0].countryBreakdown).toHaveLength(9);
-        expect(ranking[0].countryBreakdown.every(({ games, wins }) => games === 28 && wins === 28)).toBe(true);
+        expect(ranking[0].countryBreakdown.every(({ games, wins }) => games === 44 && wins === 44)).toBe(true);
         expect(ranking[1].armId).toBe("retain_yard");
     });
 

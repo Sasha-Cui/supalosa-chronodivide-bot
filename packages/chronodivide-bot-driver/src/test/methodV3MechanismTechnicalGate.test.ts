@@ -17,7 +17,7 @@ const SHA = "a".repeat(64);
 const COMMIT = "a".repeat(40);
 
 const campaign = (): MethodV3MechanismCampaign => {
-    const selectedFamilies = Array.from({ length: 14 }, (_, index) => ({
+    const selectedFamilies = Array.from({ length: 22 }, (_, index) => ({
         familyId: `mf_${index}`,
         representativeSha256: `${index}`.padStart(64, "0"),
         descriptors: { startCount: 2 },
@@ -57,11 +57,11 @@ const campaign = (): MethodV3MechanismCampaign => {
         actualWinInvariant: "shortGame engine defeat and zero terminal enemy buildings",
         mapProfilesEnabled: false,
         exactMapTacticsEnabled: false,
-        familyCount: 14,
+        familyCount: 22,
         countryCount: 9,
         reciprocalSlotCount: 2,
         policyCount: 9,
-        seedBlockCount: 126,
+        seedBlockCount: 198,
         launchedGameCount: METHOD_V3_STAGE1_LAUNCH_COUNT,
         engineSeedBase: METHOD_V3_STAGE1_ENGINE_SEED_BASE,
         maxTicks: METHOD_V3_STAGE1_MAX_TICKS,
@@ -74,7 +74,7 @@ const campaign = (): MethodV3MechanismCampaign => {
 };
 
 describe("method-v3 mechanism technical gate", () => {
-    test("accepts only the frozen 126-block, 2,268-game schedule", () => {
+    test("accepts only the frozen 198-block, 3,564-game schedule", () => {
         const value = campaign();
         expect(validateMethodV3MechanismCampaign(value)).toBe(value);
         const drifted = structuredClone(value);

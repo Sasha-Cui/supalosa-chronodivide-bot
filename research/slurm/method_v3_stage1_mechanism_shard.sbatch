@@ -5,7 +5,7 @@
 #SBATCH --time=06:00:00
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=6G
-#SBATCH --array=0-125%20
+#SBATCH --array=0-197%20
 #SBATCH --output=/dev/null
 #SBATCH --error=/dev/null
 
@@ -43,8 +43,8 @@ if [[ ! -f "$PLAN_LIST" || ! -f "$CAMPAIGN" ]]; then
     echo "Frozen campaign plan list or manifest is missing: $CAMPAIGN_ROOT" >&2
     exit 2
 fi
-if [[ "$(wc -l < "$PLAN_LIST")" -ne 126 ]]; then
-    echo "Method-v3 Stage 1 requires exactly 126 plan shards" >&2
+if [[ "$(wc -l < "$PLAN_LIST")" -ne 198 ]]; then
+    echo "Method-v3 Stage 1 requires exactly 198 plan shards" >&2
     exit 2
 fi
 PLAN_NUMBER=$((TASK_ID + 1))
