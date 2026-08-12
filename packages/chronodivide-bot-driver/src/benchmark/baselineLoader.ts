@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { GameApi } from "@chronodivide/game-api";
+import { ActionsApi, GameApi, ProductionApi } from "@chronodivide/game-api";
 import { SupalosaBot } from "@supalosa/chronodivide-bot/dist/bot/bot.js";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { DefaultStrategy } from "@supalosa/chronodivide-bot/dist/bot/strategy/defaultStrategy.js";
@@ -9,6 +9,8 @@ import { BaselineDescriptor } from "./provenance.js";
 
 export type InspectableBaselineBot = SupalosaBot & {
     lastGameApi: GameApi | null;
+    lastPlayerActions: ActionsApi | null;
+    lastPlayerProduction: ProductionApi | null;
 };
 
 export type BaselineFactory = {
@@ -34,9 +36,13 @@ const localFactory = (packageRoot: string): BaselineFactory => ({
     create(name: string, country: Countries): InspectableBaselineBot {
         class InspectableLocalBot extends SupalosaBot {
             public lastGameApi: GameApi | null = null;
+            public lastPlayerActions: any = null;
+            public lastPlayerProduction: any = null;
 
             override onGameStart(game: GameApi): void {
                 this.lastGameApi = game;
+                this.lastPlayerActions = this.player.actions;
+                this.lastPlayerProduction = this.player.production;
                 super.onGameStart(game);
             }
 
@@ -70,9 +76,13 @@ const externalFactory = async (packageRoot: string): Promise<BaselineFactory> =>
 
     class InspectableExternalBot extends ExternalBot {
         public lastGameApi: GameApi | null = null;
+        public lastPlayerActions: any = null;
+        public lastPlayerProduction: any = null;
 
         override onGameStart(game: GameApi): void {
             this.lastGameApi = game;
+            this.lastPlayerActions = this.player.actions;
+            this.lastPlayerProduction = this.player.production;
             super.onGameStart(game);
         }
 

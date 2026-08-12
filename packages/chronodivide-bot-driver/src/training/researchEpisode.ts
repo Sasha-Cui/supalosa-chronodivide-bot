@@ -1,4 +1,4 @@
-import { CreateOfflineOpts, GameApi, ObjectType, cdapi } from "@chronodivide/game-api";
+import { Bot, CreateOfflineOpts, GameApi, ObjectType, OrderType, SpeedType, UnitData, cdapi } from "@chronodivide/game-api";
 import { StrongBot } from "@supalosa/chronodivide-bot/dist/bot/strongBot.js";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { StrongStrategy } from "@supalosa/chronodivide-bot/dist/bot/strategy/strongStrategy.js";
@@ -17,6 +17,7 @@ import {
     ResearchPolicyConfig,
     researchPolicySha256,
 } from "./researchPolicy.js";
+import { METHOD_V4_POLICY_SCHEMA_VERSION, MethodV4PolicyConfig } from "./researchPolicy.js";
 
 export const RESEARCH_EPISODE_SCHEMA_VERSION = 1 as const;
 export const RESEARCH_OUTCOME_ENDPOINT = "candidate-win=1,finished-or-tick-cap-draw=0.5,baseline-win=0" as const;
@@ -179,6 +180,309 @@ const getWinner = (
 const scoreForWinner = (winner: ResearchEpisodeResult["winner"]): 0 | 0.5 | 1 =>
     winner === "candidate" ? 1 : winner === "baseline" ? 0 : 0.5;
 
+const getEnemyUnits = (game: GameApi, playerName: string, filter: (unit: UnitData) => boolean): UnitData[] =>
+    game.getAllUnits()
+        .map((id) => game.getUnitData(id))
+        .filter((unit): unit is UnitData => {
+            if (!unit || unit.owner === playerName || !filter(unit)) return false;
+            try {
+                return game.getPlayerData(unit.owner).isCombatant && !game.areAlliedPlayers(playerName, unit.owner);
+            } catch {
+                return false;
+            }
+        });
+
+const canDamageBuilding = (attacker: UnitData, target: UnitData): boolean => {
+    if ((attacker.rules.c4 || attacker.rules.ivan) && target.rules.canC4) return true;
+    if (attacker.rules.spawns &&
+        (attacker.primaryWeapon?.projectileRules.isAntiGround || attacker.secondaryWeapon?.projectileRules.isAntiGround)) {
+        return true;
+    }
+    return [attacker.primaryWeapon, attacker.secondaryWeapon].some((weapon) =>
+        !!weapon?.projectileRules.isAntiGround && weapon.rules.damage > 0 &&
+        (weapon.warheadRules.verses.get(target.rules.armor) ?? 0) > 0,
+    );
+};
+
+const canReachBuilding = (game: GameApi, attacker: UnitData, target: UnitData): boolean => {
+    const speedType = attacker.rules.speedType ??
+        (attacker.type === ObjectType.Infantry ? SpeedType.Foot :
+            attacker.type === ObjectType.Aircraft ? SpeedType.Winged : null);
+    if (speedType === SpeedType.Winged || speedType === null) return true;
+    const maximumRange = Math.max(
+        1,
+        ...[attacker.primaryWeapon, attacker.secondaryWeapon]
+            .filter((weapon) => !!weapon?.projectileRules.isAntiGround)
+            .map((weapon) => weapon?.maxRange ?? 1),
+    );
+    const padding = Math.max(1, Math.ceil(maximumRange));
+    const right = target.tile.rx + Math.max(1, target.foundation.width) - 1;
+    const bottom = target.tile.ry + Math.max(1, target.foundation.height) - 1;
+    const subCell = attacker.type === ObjectType.Infantry;
+    const reachability = game.map.getReachabilityMap(speedType, subCell);
+    return game.mapApi.getTilesInRect({
+        x: target.tile.rx - padding,
+        y: target.tile.ry - padding,
+        width: target.foundation.width + padding * 2,
+        height: target.foundation.height + padding * 2,
+    }).some((tile) => {
+        const dx = tile.rx < target.tile.rx ? target.tile.rx - tile.rx : tile.rx > right ? tile.rx - right : 0;
+        const dy = tile.ry < target.tile.ry ? target.tile.ry - tile.ry : tile.ry > bottom ? tile.ry - bottom : 0;
+        return Math.sqrt(dx * dx + dy * dy) <= maximumRange &&
+            game.mapApi.isPassableTile(tile, speedType, !!tile.onBridgeLandType, subCell) &&
+            reachability.isReachable(
+                { tile: attacker.tile, onBridge: attacker.onBridge ?? false },
+                { tile, onBridge: !!tile.onBridgeLandType },
+            );
+    });
+};
+
+/**
+ * A narrow adapter around the independently loaded Supalosa runtime. It calls
+ * the pinned external bot first on every callback, and then adds only the
+ * schema-v4 literal building closeout order. No local strategy, mission,
+ * production, defence, or awareness code participates in preservation mode.
+ */
+export const createExternalBaselineOverlayCandidate = (
+    baselineFactory: BaselineFactory,
+    name: string,
+    country: Countries,
+    policy: MethodV4PolicyConfig,
+    telemetrySink: (event: BuildingEliminationTelemetryEvent) => void,
+): ReturnType<BaselineFactory["create"]> => {
+    const candidate = baselineFactory.create(name, country);
+    if (!policy.preserveBaselineCore) {
+        throw new Error("External baseline overlay requires preserveBaselineCore=true");
+    }
+    if (!policy.buildingEliminationEnabled) return candidate;
+
+    let activated = false;
+    let lastOrderAt = Number.NEGATIVE_INFINITY;
+    let lastOrderTelemetrySignature = "";
+    let lastAssignmentTelemetrySignature = "";
+    const targetProgress = new Map<number, {
+        hitPoints: number;
+        lastDamageTick: number;
+        lastProgressTelemetryTick: number;
+        stalled: boolean;
+    }>();
+    const originalTick = candidate.onGameTick.bind(candidate);
+    candidate.onGameTick = (game: GameApi): void => {
+        originalTick(game);
+        const tick = game.getCurrentTick();
+        if (tick < policy.buildingEliminationMinTick ||
+            tick < lastOrderAt + policy.buildingEliminationOrderIntervalTicks) return;
+
+        const self = game.getVisibleUnits(name, "self")
+            .map((id) => game.getUnitData(id))
+            .filter((unit): unit is UnitData => !!unit);
+        const buildings = getEnemyUnits(game, name, (unit) => unit.rules.type === ObjectType.Building);
+        if (buildings.length === 0) return;
+        const presentBuildingIds = new Set(buildings.map(({ id }) => id));
+        for (const target of buildings) {
+            const previous = targetProgress.get(target.id);
+            const damage = previous ? Math.max(0, previous.hitPoints - target.hitPoints) : 0;
+            const lastDamageTick = damage > 0 ? tick : (previous?.lastDamageTick ?? tick);
+            const stalled = tick - lastDamageTick >= policy.buildingEliminationStallTicks;
+            const lastProgressTelemetryTick = previous?.lastProgressTelemetryTick ?? Number.NEGATIVE_INFINITY;
+            if (damage > 0 && tick >= lastProgressTelemetryTick + 120) {
+                telemetrySink({
+                    schemaVersion: 2,
+                    event: "target_progress",
+                    tick,
+                    targetId: target.id,
+                    targetName: target.rules.name,
+                    hitPoints: target.hitPoints,
+                    previousHitPoints: previous?.hitPoints ?? target.hitPoints,
+                    damage,
+                });
+            }
+            if (stalled && previous?.stalled !== true) {
+                telemetrySink({
+                    schemaVersion: 2,
+                    event: "target_stalled",
+                    tick,
+                    targetId: target.id,
+                    targetName: target.rules.name,
+                    hitPoints: target.hitPoints,
+                    lastDamageTick,
+                    stallTicks: policy.buildingEliminationStallTicks,
+                });
+            }
+            targetProgress.set(target.id, {
+                hitPoints: target.hitPoints,
+                lastDamageTick,
+                lastProgressTelemetryTick: damage > 0 && tick >= lastProgressTelemetryTick + 120
+                    ? tick
+                    : lastProgressTelemetryTick,
+                stalled,
+            });
+        }
+        for (const targetId of targetProgress.keys()) {
+            if (!presentBuildingIds.has(targetId)) targetProgress.delete(targetId);
+        }
+        const enemyCombatants = getEnemyUnits(
+            game,
+            name,
+            (unit) => !!unit.rules.isSelectableCombatant && !unit.rules.harvester && unit.rules.type !== ObjectType.Building,
+        );
+        const start = game.getPlayerData(name).startLocation;
+        const eligible = self
+            .filter((unit) => !!unit.rules.isSelectableCombatant && !unit.rules.harvester &&
+                unit.rules.type !== ObjectType.Building && unit.rules.name !== "DOG" && unit.rules.name !== "ADOG" &&
+                (!!unit.primaryWeapon?.projectileRules.isAntiGround || !!unit.secondaryWeapon?.projectileRules.isAntiGround))
+            .sort((left, right) => {
+                const leftMobility = left.type === ObjectType.Aircraft || left.rules.speedType === SpeedType.Float ? 1 : 0;
+                const rightMobility = right.type === ObjectType.Aircraft || right.rules.speedType === SpeedType.Float ? 1 : 0;
+                if (leftMobility !== rightMobility) return rightMobility - leftMobility;
+                const leftDistance = (left.tile.rx - start.x) ** 2 + (left.tile.ry - start.y) ** 2;
+                const rightDistance = (right.tile.rx - start.x) ** 2 + (right.tile.ry - start.y) ** 2;
+                return rightDistance - leftDistance;
+            });
+        if (
+            eligible.length < policy.buildingEliminationMinCombatants + policy.buildingEliminationReserveCombatants ||
+            enemyCombatants.length > policy.buildingEliminationMaxEnemyCombatants ||
+            eligible.length - policy.buildingEliminationReserveCombatants <
+                enemyCombatants.length + policy.buildingEliminationCombatantAdvantage
+        ) return;
+        const attackers = eligible.slice(0, eligible.length - policy.buildingEliminationReserveCombatants);
+        const weight = (building: UnitData): number => {
+            if (policy.buildingEliminationTargetPriority === "nearest") return 0;
+            const power = new Set(["NAPOWR", "NANRCT", "GAPOWR"]).has(building.rules.name);
+            const defense = new Set(["NALASR", "TESLA", "NAFLAK", "NASAM", "GAPILL", "ATESLA", "GTGCAN", "GASPYSAT"])
+                .has(building.rules.name);
+            if (policy.buildingEliminationTargetPriority === "defense") {
+                if (power) return 8;
+                if (defense) return 7;
+            } else {
+                if (building.rules.constructionYard) return 8;
+                if (power) return 7;
+                if (building.rules.weaponsFactory || building.rules.nodBarracks || building.rules.gdiBarracks) return 6;
+            }
+            return 3;
+        };
+        const rankedTargets = buildings.slice().sort((left, right) => {
+            if (policy.buildingEliminationReassignStalledTargets) {
+                const stalledDifference = Number(targetProgress.get(right.id)?.stalled === true) -
+                    Number(targetProgress.get(left.id)?.stalled === true);
+                if (stalledDifference !== 0) return stalledDifference;
+            }
+            const weightDifference = weight(right) - weight(left);
+            if (weightDifference !== 0) return weightDifference;
+            const distance = (building: UnitData) => attackers.reduce((best, attacker) => Math.min(
+                best,
+                (attacker.tile.rx - building.tile.rx) ** 2 + (attacker.tile.ry - building.tile.ry) ** 2,
+            ), Number.POSITIVE_INFINITY);
+            return distance(left) - distance(right) || left.id - right.id;
+        });
+        const compatibility = new Map<string, boolean>();
+        let incompatiblePairs = 0;
+        let unreachablePairs = 0;
+        const isCompatible = (attacker: UnitData, target: UnitData): boolean => {
+            const key = `${attacker.id}|${target.id}`;
+            const cached = compatibility.get(key);
+            if (cached !== undefined) return cached;
+            if (policy.buildingEliminationCapabilityAwareAttackers && !canDamageBuilding(attacker, target)) {
+                incompatiblePairs++;
+                compatibility.set(key, false);
+                return false;
+            }
+            if (policy.buildingEliminationReachabilityAwareTargets && !canReachBuilding(game, attacker, target)) {
+                unreachablePairs++;
+                compatibility.set(key, false);
+                return false;
+            }
+            compatibility.set(key, true);
+            return true;
+        };
+        const targets = rankedTargets.filter((target) => attackers.some((attacker) =>
+            isCompatible(attacker, target),
+        )).slice(0, policy.buildingEliminationMaxTargetGroups);
+        if (targets.length === 0 || attackers.length === 0) return;
+        const groups = new Map<number, number[]>();
+        let assignedAttackers = 0;
+        for (const attacker of attackers) {
+            const compatible = targets.filter((target) =>
+                isCompatible(attacker, target),
+            );
+            if (compatible.length === 0) continue;
+            const target = compatible.reduce((best, item) => {
+                const bestLoad = groups.get(best.id)?.length ?? 0;
+                const itemLoad = groups.get(item.id)?.length ?? 0;
+                const bestDistance = (attacker.tile.rx - best.tile.rx) ** 2 + (attacker.tile.ry - best.tile.ry) ** 2;
+                const itemDistance = (attacker.tile.rx - item.tile.rx) ** 2 + (attacker.tile.ry - item.tile.ry) ** 2;
+                return itemDistance * (1 + itemLoad) < bestDistance * (1 + bestLoad) ? item : best;
+            }, compatible[0]);
+            groups.set(target.id, [...(groups.get(target.id) ?? []), attacker.id]);
+            assignedAttackers++;
+        }
+        const targetById = new Map(targets.map((target) => [target.id, target]));
+        const visibleEnemyIds = new Set(game.getVisibleUnits(name, "enemy"));
+        for (const [targetId, unitIds] of groups) {
+            const target = targetById.get(targetId);
+            if (!target) continue;
+            if (policy.buildingEliminationDirectVisibleAttack && visibleEnemyIds.has(targetId)) {
+                candidate.lastPlayerActions?.orderUnits(unitIds, OrderType.Attack, targetId);
+            } else {
+                candidate.lastPlayerActions?.orderUnits(
+                    unitIds,
+                    OrderType.AttackMove,
+                    target.tile.rx,
+                    target.tile.ry,
+                );
+            }
+        }
+        if (!activated) {
+            activated = true;
+            telemetrySink({
+                schemaVersion: 1,
+                event: "activated",
+                tick,
+                observationMode: "publicApi",
+                ownCombatants: eligible.length,
+                enemyCombatants: enemyCombatants.length,
+                reservedCombatants: policy.buildingEliminationReserveCombatants,
+                preemptedMissions: policy.buildingEliminationPreemptExistingAttacks ? ["external-orders-overridden"] : [],
+            });
+        }
+        const orderEvent: BuildingEliminationTelemetryEvent = {
+            schemaVersion: 1,
+            event: "target_orders",
+            tick,
+            attackerCount: assignedAttackers,
+            targets: targets.map((target) => ({
+                id: target.id,
+                name: target.rules.name,
+                x: target.tile.rx,
+                y: target.tile.ry,
+                visible: visibleEnemyIds.has(target.id),
+            })),
+        };
+        const orderSignature = JSON.stringify({ ...orderEvent, tick: 0 });
+        if (orderSignature !== lastOrderTelemetrySignature) {
+            telemetrySink(orderEvent);
+            lastOrderTelemetrySignature = orderSignature;
+        }
+        const assignmentEvent: BuildingEliminationTelemetryEvent = {
+            schemaVersion: 2,
+            event: "assignment_summary",
+            tick,
+            eligibleAttackers: attackers.length,
+            assignedAttackers,
+            incompatiblePairs,
+            unreachablePairs,
+            targetCount: targets.length,
+        };
+        const assignmentSignature = JSON.stringify({ ...assignmentEvent, tick: 0 });
+        if (assignmentSignature !== lastAssignmentTelemetrySignature) {
+            telemetrySink(assignmentEvent);
+            lastAssignmentTelemetrySignature = assignmentSignature;
+        }
+        lastOrderAt = tick;
+    };
+    return candidate;
+};
+
 export const assertShortGameBuildingEliminationOutcome = (
     winner: ResearchEpisodeResult["winner"],
     finished: boolean,
@@ -204,7 +508,7 @@ export const assertShortGameBuildingEliminationOutcome = (
 
 const buildGameSettings = (
     mapName: string,
-    candidate: StrongBot,
+    candidate: Bot,
     baseline: ReturnType<BaselineFactory["create"]>,
     candidateSlot: 0 | 1,
 ): CreateOfflineOpts => {
@@ -242,14 +546,22 @@ export const runResearchEpisode = async (
     const startedAt = Date.now();
     const candidateName = `Candidate_${spec.seedBlockIndex}_${spec.candidateSlot}`;
     const baselineName = `Baseline_${spec.seedBlockIndex}_${spec.candidateSlot}`;
-    const candidate = new StrongBot(
-        candidateName,
-        spec.candidateCountry,
-        [],
-        false,
-        new StrongStrategy(buildResearchStrategyOptions(spec.policy), onCandidatePolicyEvent),
-        buildResearchBotOptions(spec.policy),
-    );
+    const candidate = spec.policy.schemaVersion === METHOD_V4_POLICY_SCHEMA_VERSION && spec.policy.preserveBaselineCore
+        ? createExternalBaselineOverlayCandidate(
+            baselineFactory,
+            candidateName,
+            spec.candidateCountry,
+            spec.policy,
+            onCandidatePolicyEvent,
+        )
+        : new StrongBot(
+            candidateName,
+            spec.candidateCountry,
+            [],
+            false,
+            new StrongStrategy(buildResearchStrategyOptions(spec.policy), onCandidatePolicyEvent),
+            buildResearchBotOptions(spec.policy),
+        );
     const baseline = baselineFactory.create(baselineName, spec.baselineCountry);
 
     return withSeededOfflineGame(
