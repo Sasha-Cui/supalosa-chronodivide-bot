@@ -181,14 +181,23 @@ const scoreForWinner = (winner: ResearchEpisodeResult["winner"]): 0 | 0.5 | 1 =>
 
 export const assertShortGameBuildingEliminationOutcome = (
     winner: ResearchEpisodeResult["winner"],
+    finished: boolean,
+    candidateDefeated: boolean,
+    baselineDefeated: boolean,
     candidateBuildings: number,
     baselineBuildings: number,
     episodeId: string,
 ): void => {
-    if (winner === "candidate" && baselineBuildings !== 0) {
+    if (
+        winner === "candidate" &&
+        (!finished || candidateDefeated || !baselineDefeated || baselineBuildings !== 0)
+    ) {
         throw new Error(`Candidate win violates the short-game building-elimination invariant in ${episodeId}`);
     }
-    if (winner === "baseline" && candidateBuildings !== 0) {
+    if (
+        winner === "baseline" &&
+        (!finished || !candidateDefeated || baselineDefeated || candidateBuildings !== 0)
+    ) {
         throw new Error(`Baseline win violates the short-game building-elimination invariant in ${episodeId}`);
     }
 };
@@ -277,6 +286,9 @@ export const runResearchEpisode = async (
             const baselineSnapshot = getPlayerSnapshot(baseline.lastGameApi, baselineName);
             assertShortGameBuildingEliminationOutcome(
                 winner,
+                game.isFinished(),
+                candidateStats.defeated,
+                baselineStats.defeated,
                 candidateSnapshot.buildings,
                 baselineSnapshot.buildings,
                 spec.episodeId,

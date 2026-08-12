@@ -55,6 +55,12 @@ class ValidateMethodV3Stage0Test(unittest.TestCase):
                             "observationMode": "publicApi",
                             "preemptExistingAttacks": True,
                             "sweepWhenNoTargets": True,
+                            "capabilityAwareAttackers": True,
+                            "reachabilityAwareTargets": True,
+                            "stallTicks": 300,
+                            "reassignStalledTargets": True,
+                            "adaptiveAirTargetCount": 2,
+                            "adaptiveNavalTargetCount": 2,
                         },
                     },
                 }
@@ -82,6 +88,16 @@ class ValidateMethodV3Stage0Test(unittest.TestCase):
                     "event": "candidate_policy_event",
                     "match": match,
                     "policyEvent": {"event": "activated"},
+                })
+                events.append({
+                    "event": "candidate_policy_event",
+                    "match": match,
+                    "policyEvent": {
+                        "schemaVersion": 2,
+                        "event": "capability_production",
+                        "requestedStructures": ["GAAIRC", "AMRADR"],
+                        "requestedUnits": ["JUMPJET"],
+                    },
                 })
                 events.extend(
                     {"event": "trace_snapshot", "match": match, "tick": tick}
@@ -115,6 +131,27 @@ class ValidateMethodV3Stage0Test(unittest.TestCase):
         self.assertEqual(gate["matchCount"], 18)
         self.assertEqual(gate["traceSnapshotCount"], 72)
         self.assertEqual(gate["finisherActivationCount"], 18)
+        self.assertEqual(gate["capabilityProductionEventCount"], 18)
+
+    def test_accepts_no_capability_requests_when_no_gap_is_observed(self) -> None:
+        self.events = [
+            row for row in self.events
+            if row.get("policyEvent", {}).get("event") != "capability_production"
+        ]
+        self.write_fixture()
+        gate = MODULE.validate_stage0(self.root, self.run_id, self.job_id)
+        self.assertTrue(gate["passed"])
+        self.assertEqual(gate["capabilityProductionEventCount"], 0)
+
+    def test_rejects_malformed_capability_telemetry_when_emitted(self) -> None:
+        event = next(
+            row for row in self.events
+            if row.get("policyEvent", {}).get("event") == "capability_production"
+        )
+        del event["policyEvent"]["requestedUnits"]
+        self.write_fixture()
+        with self.assertRaisesRegex(ValueError, "capability-production telemetry"):
+            MODULE.validate_stage0(self.root, self.run_id, self.job_id)
 
     def test_rejects_any_game_that_reaches_an_outcome(self) -> None:
         self.summary["results"][0]["finished"] = True

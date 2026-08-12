@@ -15,7 +15,9 @@ import {
 } from "./researchEpisode.js";
 import {
     METHOD_V3_POLICY_SCHEMA_VERSION,
+    METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION,
     parseResearchPolicy,
+    RESEARCH_POLICY_SCHEMA_VERSION,
     ResearchPolicyConfig,
     researchPolicySha256,
 } from "./researchPolicy.js";
@@ -29,6 +31,7 @@ export type ResearchPurpose =
     | "train-smoke"
     | "optimizer-search"
     | "method-v3-mechanism-screen"
+    | "method-v3-draw-to-win-optimizer"
     | "development-qc"
     | "development-evaluation"
     | "development-v2-qc"
@@ -99,7 +102,12 @@ export type StrictPlanContext = {
 const SHA256_PATTERN = /^[0-9a-f]{64}$/;
 const GIT_COMMIT_PATTERN = /^[0-9a-f]{40}$/;
 const IDENTIFIER_PATTERN = /^[A-Za-z0-9._-]+$/;
-const TRAIN_PURPOSES: ResearchPurpose[] = ["train-smoke", "optimizer-search", "method-v3-mechanism-screen"];
+const TRAIN_PURPOSES: ResearchPurpose[] = [
+    "train-smoke",
+    "optimizer-search",
+    "method-v3-mechanism-screen",
+    "method-v3-draw-to-win-optimizer",
+];
 const DEVELOPMENT_PURPOSES: ResearchPurpose[] = [
     "development-qc",
     "development-evaluation",
@@ -242,13 +250,13 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
     const candidateCountry = value.candidateCountry;
     const baselineCountry = value.baselineCountry;
     const countries = new Set<string>(Object.values(Countries));
-    if (purpose === "method-v3-mechanism-screen") {
+    if (purpose === "method-v3-mechanism-screen" || purpose === "method-v3-draw-to-win-optimizer") {
         if (
             typeof candidateCountry !== "string" ||
             !countries.has(candidateCountry) ||
             candidateCountry !== baselineCountry
         ) {
-            throw new Error("Method-v3 mechanism plans require an exact supported-country mirror");
+            throw new Error("Method-v3 plans require an exact supported-country mirror");
         }
     } else if (candidateCountry !== Countries.IRAQ || baselineCountry !== Countries.IRAQ) {
         throw new Error("Research plan v1 requires the prospectively fixed Arabs mirror matchup");
@@ -263,11 +271,19 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
         assertExactKeys(`Policy ${index}`, raw, ["policyId", "policy"]);
         const policyId = expectSha256(raw, "policyId");
         const policy = parseResearchPolicy(raw.policy);
-        if (
-            (purpose === "method-v3-mechanism-screen") !==
-            (policy.schemaVersion === METHOD_V3_POLICY_SCHEMA_VERSION)
-        ) {
-            throw new Error("Method-v3 mechanism plans require only schema-v2 policies; prior plans require schema v1");
+        const expectedPolicySchema =
+            purpose === "method-v3-mechanism-screen"
+                ? METHOD_V3_POLICY_SCHEMA_VERSION
+                : purpose === "method-v3-draw-to-win-optimizer"
+                  ? METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION
+                  : RESEARCH_POLICY_SCHEMA_VERSION;
+        if (policy.schemaVersion !== expectedPolicySchema) {
+            const schemaLabel = expectedPolicySchema === METHOD_V3_POLICY_SCHEMA_VERSION
+                ? "schema-v2 policies"
+                : expectedPolicySchema === METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION
+                  ? "schema-v3 policies"
+                  : "schema-v1 policies";
+            throw new Error(`Research purpose ${purpose} requires only ${schemaLabel}`);
         }
         if (researchPolicySha256(policy) !== policyId) {
             throw new Error(`Policy ${index} policyId does not equal its canonical policy SHA-256`);

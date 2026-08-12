@@ -1,13 +1,27 @@
 import { describe, expect, test } from "vitest";
+import { ObjectType, SideType } from "@chronodivide/game-api";
 import {
     assignAttackersToTargets,
+    assignAttackersToCompatibleTargets,
     BuildingTargetDescriptor,
+    classifyBuildingCapabilityGaps,
+    getBuildingCapabilityProductionPlan,
+    getBuildingCapabilityUnitMissionAction,
     getBuildingTargetWeight,
     isPreemptibleBuildingEliminationMission,
+    meetsBuildingEliminationActivationGate,
+    mergeCurrentAndRememberedBuildingTargets,
+    prioritizeStalledBuildingTargets,
     rankBuildingTargets,
     rankSweepPoints,
     reconcileRememberedBuildingTargets,
     resolveBuildingEliminationOptions,
+    selectAvailableCapabilityStructures,
+    selectCommittedBuildingAttackers,
+    selectCompatibleBuildingTargets,
+    shouldRunBuildingEliminationCapabilityProduction,
+    shouldDirectAttackBuildingTarget,
+    updateBuildingTargetProgress,
 } from "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
 
 const target = (overrides: Partial<BuildingTargetDescriptor>): BuildingTargetDescriptor => ({
@@ -16,6 +30,7 @@ const target = (overrides: Partial<BuildingTargetDescriptor>): BuildingTargetDes
     y: 10,
     name: "GENERIC",
     maxHitPoints: 500,
+    hitPoints: 500,
     constructionYard: false,
     weaponsFactory: false,
     barracks: false,
@@ -70,6 +85,178 @@ describe("building elimination policy", () => {
         expect(assignments).toHaveLength(attackers.length);
     });
 
+    test("capability checks use the same non-reserve force committed to closeout", () => {
+        const eligible = [
+            { id: 1, type: "vehicle", rules: {}, tile: { rx: 1, ry: 0 } },
+            { id: 2, type: "vehicle", rules: {}, tile: { rx: 4, ry: 0 } },
+            { id: 3, type: "vehicle", rules: {}, tile: { rx: 8, ry: 0 } },
+        ] as any[];
+        const committed = selectCommittedBuildingAttackers(eligible, { x: 0, y: 0 }, 1);
+        expect(committed.map(({ id }) => id)).toEqual([3, 2]);
+        expect(eligible.map(({ id }) => id)).toEqual([1, 2, 3]);
+    });
+
+    test("does not strand purpose-built aircraft in the home reserve", () => {
+        const eligible = [
+            { id: 1, type: "vehicle", rules: {}, tile: { rx: 8, ry: 0 } },
+            { id: 2, type: "vehicle", rules: {}, tile: { rx: 4, ry: 0 } },
+            { id: 3, type: ObjectType.Aircraft, rules: {}, tile: { rx: 1, ry: 0 } },
+        ] as any[];
+        const committed = selectCommittedBuildingAttackers(eligible, { x: 0, y: 0 }, 1);
+        expect(committed.map(({ id }) => id)).toEqual([3, 1]);
+    });
+
+    test("compatible assignment never sends an attacker to an invalid target", () => {
+        const attackers = [
+            { id: 1, x: 0, y: 0, side: "land" },
+            { id: 2, x: 9, y: 0, side: "water" },
+            { id: 3, x: 5, y: 0, side: "none" },
+        ];
+        const targets = [
+            { id: "land", x: 0, y: 1 },
+            { id: "water", x: 10, y: 1 },
+        ];
+        const assignments = assignAttackersToCompatibleTargets(
+            attackers,
+            targets,
+            (attacker, candidate) => attacker.side === candidate.id,
+        );
+        expect(assignments.map(({ attacker, target: assigned }) => [attacker.id, assigned.id])).toEqual([
+            [1, "land"],
+            [2, "water"],
+        ]);
+    });
+
+    test("blocked high-priority structures do not prevent reachable closeout work", () => {
+        const attackers = [{ id: 1 }, { id: 2 }];
+        const targets = [{ id: "blocked" }, { id: "reachable" }, { id: "later" }];
+        expect(selectCompatibleBuildingTargets(
+            attackers,
+            targets,
+            2,
+            (_attacker, candidate) => candidate.id !== "blocked",
+        )).toEqual([{ id: "reachable" }, { id: "later" }]);
+    });
+
+    test("moves toward hidden known structures before issuing a direct attack", () => {
+        expect(shouldDirectAttackBuildingTarget(true, false, true)).toBe(false);
+        expect(shouldDirectAttackBuildingTarget(true, true, true)).toBe(true);
+        expect(shouldDirectAttackBuildingTarget(false, true, true)).toBe(false);
+        expect(shouldDirectAttackBuildingTarget(true, true, false)).toBe(false);
+    });
+
+    test("retains hidden remembered buildings when another structure is visible", () => {
+        const remembered = [
+            target({ id: 1, name: "OLD", visible: false }),
+            target({ id: 2, name: "HIDDEN", x: 40, y: 40, visible: false }),
+        ];
+        const current = [target({ id: 1, name: "CURRENT", hitPoints: 200, visible: true })];
+        expect(mergeCurrentAndRememberedBuildingTargets(current, remembered)).toEqual([
+            current[0],
+            remembered[1],
+        ]);
+    });
+
+    test("classifies missing damage separately from missing firing access", () => {
+        const attackers = [{ id: 10 }, { id: 11 }] as any[];
+        const buildings = [{ id: 1 }, { id: 2 }, { id: 3 }] as any[];
+        const gaps = classifyBuildingCapabilityGaps(
+            attackers,
+            buildings,
+            new Set([3]),
+            (attacker, building) => building.id !== 1 && !(attacker.id === 11 && building.id === 2),
+            (_attacker, building) => building.id !== 2,
+        );
+        expect(gaps).toEqual({
+            stalledBuildingIds: [3],
+            incompatibleBuildingIds: [1],
+            unreachableBuildingIds: [2],
+        });
+    });
+
+    test("maps one coordinate-free capability request to side-appropriate finishers", () => {
+        expect(getBuildingCapabilityProductionPlan(SideType.Nod, 4, 2, true)).toEqual({
+            structures: ["NARADR", "NATECH", "NAYARD"],
+            units: [
+                { name: "ZEP", targetCount: 4 },
+                { name: "DRED", targetCount: 2 },
+            ],
+        });
+        expect(getBuildingCapabilityProductionPlan(SideType.GDI, 4, 2, false)).toEqual({
+            structures: ["GAAIRC", "AMRADR"],
+            units: [{ name: "JUMPJET", targetCount: 4 }],
+        });
+        expect(getBuildingCapabilityProductionPlan(SideType.GDI, 0, 2, true)).toEqual({
+            structures: ["GAYARD", "GAAIRC", "AMRADR", "GATECH"],
+            units: [{ name: "CARRIER", targetCount: 2 }],
+        });
+    });
+
+    test("selects the country-available Allied air prerequisite", () => {
+        const planned = ["GAAIRC", "AMRADR", "GATECH"];
+        expect(
+            selectAvailableCapabilityStructures(
+                planned,
+                new Set(["AMRADR", "GATECH"]),
+                new Set(),
+            ),
+        ).toEqual(["AMRADR", "GATECH"]);
+        expect(
+            selectAvailableCapabilityStructures(
+                planned,
+                new Set(["GAAIRC", "GATECH"]),
+                new Set(["GAAIRC"]),
+            ),
+        ).toEqual(["GATECH"]);
+    });
+
+    test("releases produced capability units before refreshing production requests", () => {
+        expect(getBuildingCapabilityUnitMissionAction([41], { JUMPJET: 140 })).toEqual({
+            type: "releaseUnits",
+            unitIds: [41],
+        });
+        expect(getBuildingCapabilityUnitMissionAction([], { JUMPJET: 140 })).toEqual({
+            type: "request",
+            unitNameToPriority: { JUMPJET: 140 },
+        });
+        expect(getBuildingCapabilityUnitMissionAction([], {})).toEqual({ type: "noop" });
+    });
+
+    test("keeps capability production active after the closeout gate has fired", () => {
+        expect(shouldRunBuildingEliminationCapabilityProduction(false, false)).toBe(false);
+        expect(shouldRunBuildingEliminationCapabilityProduction(false, true)).toBe(true);
+        expect(shouldRunBuildingEliminationCapabilityProduction(true, false)).toBe(true);
+    });
+
+    test("progress tracking emits damage and becomes stalled only at the frozen interval", () => {
+        const initial = updateBuildingTargetProgress(undefined, 1000, 9000, 600);
+        expect(initial.damage).toBe(0);
+        expect(initial.state.stalled).toBe(false);
+        const damaged = updateBuildingTargetProgress(initial.state, 800, 9300, 600);
+        expect(damaged).toMatchObject({ previousHitPoints: 1000, damage: 200, becameStalled: false });
+        expect(damaged.state.lastDamageTick).toBe(9300);
+        const waiting = updateBuildingTargetProgress(damaged.state, 800, 9899, 600);
+        expect(waiting.state.stalled).toBe(false);
+        const stalled = updateBuildingTargetProgress(waiting.state, 800, 9900, 600);
+        expect(stalled.state.stalled).toBe(true);
+        expect(stalled.becameStalled).toBe(true);
+        const stillStalled = updateBuildingTargetProgress(stalled.state, 800, 10000, 600);
+        expect(stillStalled.becameStalled).toBe(false);
+    });
+
+    test("stall reassignment brings a stalled surviving structure to the front", () => {
+        const progressing = target({ id: 1, name: "GAPOWR" });
+        const stalled = target({ id: 2, name: "GACNST" });
+        const progress = new Map([
+            [1, { hitPoints: 200, lastObservedTick: 10_000, lastDamageTick: 9_900, stalled: false }],
+            [2, { hitPoints: 400, lastObservedTick: 10_000, lastDamageTick: 9_000, stalled: true }],
+        ]);
+        expect(prioritizeStalledBuildingTargets([progressing, stalled], progress)).toEqual([
+            stalled,
+            progressing,
+        ]);
+    });
+
     test("memory is retained under fog and invalidated after its tile is re-observed empty", () => {
         const hidden = target({ id: 7, x: 20, y: 30, visible: false });
         const retained = reconcileRememberedBuildingTargets(new Map([[7, hidden]]), [], () => false);
@@ -101,6 +288,18 @@ describe("building elimination policy", () => {
         expect(isPreemptibleBuildingEliminationMission("buildingElimination")).toBe(false);
     });
 
+    test("adaptive closeout is gated by the same reserve and advantage conditions", () => {
+        const gate = {
+            minCombatants: 8,
+            reserveCombatants: 2,
+            maxEnemyCombatants: 4,
+            combatantAdvantage: 2,
+        };
+        expect(meetsBuildingEliminationActivationGate(10, 4, gate)).toBe(true);
+        expect(meetsBuildingEliminationActivationGate(9, 4, gate)).toBe(false);
+        expect(meetsBuildingEliminationActivationGate(12, 5, gate)).toBe(false);
+    });
+
     test("configuration resolves to a canonical complete object without undefined overrides", () => {
         const resolved = resolveBuildingEliminationOptions({
             enabled: true,
@@ -128,6 +327,14 @@ describe("building elimination policy", () => {
             "preemptExistingAttacks",
             "sweepWhenNoTargets",
             "sweepRevisitTicks",
+            "capabilityAwareAttackers",
+            "reachabilityAwareTargets",
+            "stallTicks",
+            "reassignStalledTargets",
+            "adaptiveAirTargetCount",
+            "adaptiveNavalTargetCount",
+            "adaptiveProductionPriority",
+            "adaptiveTechPriority",
         ]);
     });
 
@@ -137,5 +344,6 @@ describe("building elimination policy", () => {
         );
         expect(() => resolveBuildingEliminationOptions({ maxTargetGroups: 1.5 })).toThrow("maxTargetGroups");
         expect(() => resolveBuildingEliminationOptions({ minTick: -1 })).toThrow("minTick");
+        expect(() => resolveBuildingEliminationOptions({ stallTicks: 0 })).toThrow("stallTicks");
     });
 });

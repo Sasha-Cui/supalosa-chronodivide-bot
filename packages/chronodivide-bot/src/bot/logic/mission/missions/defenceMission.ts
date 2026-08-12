@@ -88,6 +88,10 @@ export class DefenceMission extends Mission<CombatSquad> {
     public getPriority() {
         return this.priority;
     }
+
+    public override canDonateLockedUnitsTo(requestingMission: Mission<any>): boolean {
+        return requestingMission.getUniqueName() === "buildingElimination";
+    }
 }
 
 const DEFENCE_CHECK_TICKS = 30;

@@ -379,6 +379,14 @@ const parseBuildingEliminationOptions = (): StrongStrategyOptions["buildingElimi
         preemptExistingAttacks: parseOptionalBoolEnv("BUILDING_ELIMINATION_PREEMPT_ATTACKS"),
         sweepWhenNoTargets: parseOptionalBoolEnv("BUILDING_ELIMINATION_SWEEP_ENABLED"),
         sweepRevisitTicks: parseOptionalIntEnv("BUILDING_ELIMINATION_SWEEP_REVISIT_TICKS"),
+        capabilityAwareAttackers: parseOptionalBoolEnv("BUILDING_ELIMINATION_CAPABILITY_AWARE_ATTACKERS"),
+        reachabilityAwareTargets: parseOptionalBoolEnv("BUILDING_ELIMINATION_REACHABILITY_AWARE_TARGETS"),
+        stallTicks: parseOptionalIntEnv("BUILDING_ELIMINATION_STALL_TICKS"),
+        reassignStalledTargets: parseOptionalBoolEnv("BUILDING_ELIMINATION_REASSIGN_STALLED_TARGETS"),
+        adaptiveAirTargetCount: parseOptionalIntEnv("BUILDING_ELIMINATION_ADAPTIVE_AIR_TARGET_COUNT"),
+        adaptiveNavalTargetCount: parseOptionalIntEnv("BUILDING_ELIMINATION_ADAPTIVE_NAVAL_TARGET_COUNT"),
+        adaptiveProductionPriority: parseOptionalIntEnv("BUILDING_ELIMINATION_ADAPTIVE_PRODUCTION_PRIORITY"),
+        adaptiveTechPriority: parseOptionalIntEnv("BUILDING_ELIMINATION_ADAPTIVE_TECH_PRIORITY"),
     };
 };
 

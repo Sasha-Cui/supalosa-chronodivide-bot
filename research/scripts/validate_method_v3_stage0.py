@@ -78,6 +78,12 @@ def validate_stage0(run_root: Path, run_id: str, expected_job_id: str) -> dict[s
         or finisher.get("observationMode") != "publicApi"
         or finisher.get("preemptExistingAttacks") is not True
         or finisher.get("sweepWhenNoTargets") is not True
+        or finisher.get("capabilityAwareAttackers") is not True
+        or finisher.get("reachabilityAwareTargets") is not True
+        or finisher.get("stallTicks") != 300
+        or finisher.get("reassignStalledTargets") is not True
+        or finisher.get("adaptiveAirTargetCount") != 2
+        or finisher.get("adaptiveNavalTargetCount") != 2
     ):
         raise ValueError("Stage-0 did not exercise the sealed method-v3 interfaces")
 
@@ -110,15 +116,34 @@ def validate_stage0(run_root: Path, run_id: str, expected_job_id: str) -> dict[s
         row for row in events
         if row.get("event") == "candidate_policy_event" and row.get("policyEvent", {}).get("event") == "activated"
     ]
+    capability_events = [
+        row for row in events
+        if row.get("event") == "candidate_policy_event"
+        and row.get("policyEvent", {}).get("event") == "capability_production"
+    ]
+    result_matches = {row.get("match") for row in results}
     if (
         event_counts["run_start"] != 1
         or event_counts["run_complete"] != 1
         or event_counts["match_complete"] != 18
         or event_counts["trace_snapshot"] != 72
         or len(activations) != 18
-        or {row.get("match") for row in activations} != {row.get("match") for row in results}
+        or {row.get("match") for row in activations} != result_matches
     ):
         raise ValueError("Stage-0 structured trace or finisher-activation events are incomplete")
+    # Capability production is conditional: a correctly functioning finisher
+    # must not request air or naval technology when its current attackers can
+    # already damage and reach every surviving building.  Validate the sealed
+    # telemetry interface whenever a genuine gap causes it to fire, without
+    # manufacturing a tactical gap in this outcome-free diagnostic.
+    if any(
+        row.get("match") not in result_matches
+        or row.get("policyEvent", {}).get("schemaVersion") != 2
+        or not isinstance(row.get("policyEvent", {}).get("requestedStructures"), list)
+        or not isinstance(row.get("policyEvent", {}).get("requestedUnits"), list)
+        for row in capability_events
+    ):
+        raise ValueError("Stage-0 capability-production telemetry violates the sealed schema")
     return {
         "schemaVersion": 1,
         "status": "PASS_OUTCOME_FREE_METHOD_V3_STAGE0_COUNTRY_INTERFACE",
@@ -133,6 +158,7 @@ def validate_stage0(run_root: Path, run_id: str, expected_job_id: str) -> dict[s
         "maxTicks": 1200,
         "traceSnapshotCount": event_counts["trace_snapshot"],
         "finisherActivationCount": len(activations),
+        "capabilityProductionEventCount": len(capability_events),
         "artifacts": {
             "manifest": {"path": str(manifest_path), "sha256": sha256_file(manifest_path)},
             "events": {"path": str(events_path), "sha256": sha256_file(events_path)},

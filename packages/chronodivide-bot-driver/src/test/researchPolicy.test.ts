@@ -5,6 +5,7 @@ import {
     DEFAULT_RESEARCH_POLICY,
     METHOD_V3_STARTING_POLICY,
     parseResearchPolicy,
+    projectMethodV3PolicyToStage2,
     RESEARCH_POLICY_SEARCH_SPACE,
     researchPolicySha256,
 } from "../training/researchPolicy.js";
@@ -95,6 +96,35 @@ describe("research policy interface", () => {
             preemptExistingAttacks: policy.buildingEliminationPreemptExistingAttacks,
             sweepWhenNoTargets: policy.buildingEliminationSweepWhenNoTargets,
             sweepRevisitTicks: policy.buildingEliminationSweepRevisitTicks,
+            capabilityAwareAttackers: false,
+            reachabilityAwareTargets: false,
+            stallTicks: 900,
+            reassignStalledTargets: false,
+            adaptiveAirTargetCount: 0,
+            adaptiveNavalTargetCount: 0,
+            adaptiveProductionPriority: policy.finisherArtilleryPriority,
+            adaptiveTechPriority: policy.finisherArtilleryTechPriority,
+        });
+    });
+
+    test("projects the frozen stage-one policy into the canonical stage-two interface", () => {
+        const policy = projectMethodV3PolicyToStage2(METHOD_V3_STARTING_POLICY);
+        expect(parseResearchPolicy(policy)).toEqual(policy);
+        expect(researchPolicySha256(policy)).not.toBe(researchPolicySha256(METHOD_V3_STARTING_POLICY));
+        const strategy = buildResearchStrategyOptions({
+            ...policy,
+            buildingEliminationCapabilityAwareAttackers: true,
+            buildingEliminationReachabilityAwareTargets: true,
+            buildingEliminationReassignStalledTargets: true,
+            buildingEliminationAdaptiveAirTargetCount: 4,
+            buildingEliminationAdaptiveNavalTargetCount: 2,
+        });
+        expect(strategy.buildingElimination).toMatchObject({
+            capabilityAwareAttackers: true,
+            reachabilityAwareTargets: true,
+            reassignStalledTargets: true,
+            adaptiveAirTargetCount: 4,
+            adaptiveNavalTargetCount: 2,
         });
     });
 

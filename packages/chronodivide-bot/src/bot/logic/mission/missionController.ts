@@ -29,6 +29,21 @@ export type UnitRequest = {
 };
 type UnitRequestWithMission = { mission: Mission<any> } & UnitRequest;
 
+export const canTransferSpecificUnit = (
+    donatingMission: Mission<any> | undefined,
+    requestingMission: Mission<any>,
+    requestedPriority: number,
+): boolean => {
+    if (!donatingMission) return true;
+    if (
+        donatingMission === requestingMission ||
+        donatingMission.getPriority() > requestedPriority
+    ) {
+        return false;
+    }
+    return !donatingMission.isUnitsLocked() || donatingMission.canDonateLockedUnitsTo(requestingMission);
+};
+
 export class MissionController {
     private missions: Mission<any>[] = [];
 
@@ -139,7 +154,11 @@ export class MissionController {
                     this.logger(`mission ${missionName} requested non-existent unit ${unitId}`);
                     return [];
                 }
-                if (!this.unitIdToMission.has(unitId)) {
+                const donatingMission = this.unitIdToMission.get(unitId);
+                if (canTransferSpecificUnit(donatingMission, requestingMission, request.action.priority)) {
+                    if (donatingMission) {
+                        this.removeUnitFromMission(donatingMission, unitId, context.player.actions);
+                    }
                     this.addUnitToMission(requestingMission, unit, context.player.actions);
                     return [{ unitName: unit?.name, mission: requestingMission.getUniqueName() }];
                 }

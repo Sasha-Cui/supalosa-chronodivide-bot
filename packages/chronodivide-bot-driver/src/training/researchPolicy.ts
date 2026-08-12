@@ -5,6 +5,7 @@ import { StrongStrategyOptions } from "@supalosa/chronodivide-bot/dist/bot/strat
 
 export const RESEARCH_POLICY_SCHEMA_VERSION = 1 as const;
 export const METHOD_V3_POLICY_SCHEMA_VERSION = 2 as const;
+export const METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION = 3 as const;
 
 export const RESEARCH_ATTACK_COMPOSITIONS = [
     "random",
@@ -94,7 +95,17 @@ export type MethodV3PolicyConfig = Omit<ResearchPolicyConfigV1, "schemaVersion">
     buildingEliminationSweepRevisitTicks: number;
 };
 
-export type ResearchPolicyConfig = ResearchPolicyConfigV1 | MethodV3PolicyConfig;
+export type MethodV3Stage2PolicyConfig = Omit<MethodV3PolicyConfig, "schemaVersion"> & {
+    schemaVersion: typeof METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION;
+    buildingEliminationCapabilityAwareAttackers: boolean;
+    buildingEliminationReachabilityAwareTargets: boolean;
+    buildingEliminationStallTicks: number;
+    buildingEliminationReassignStalledTargets: boolean;
+    buildingEliminationAdaptiveAirTargetCount: number;
+    buildingEliminationAdaptiveNavalTargetCount: number;
+};
+
+export type ResearchPolicyConfig = ResearchPolicyConfigV1 | MethodV3PolicyConfig | MethodV3Stage2PolicyConfig;
 
 const POLICY_KEYS_V1: Array<keyof ResearchPolicyConfigV1> = [
     "schemaVersion",
@@ -152,6 +163,17 @@ const POLICY_KEYS_V2: Array<keyof MethodV3PolicyConfig> = [
     "buildingEliminationPreemptExistingAttacks",
     "buildingEliminationSweepWhenNoTargets",
     "buildingEliminationSweepRevisitTicks",
+];
+
+const POLICY_KEYS_V3: Array<keyof MethodV3Stage2PolicyConfig> = [
+    ...(POLICY_KEYS_V2.filter((key) => key !== "schemaVersion") as Array<keyof MethodV3Stage2PolicyConfig>),
+    "schemaVersion",
+    "buildingEliminationCapabilityAwareAttackers",
+    "buildingEliminationReachabilityAwareTargets",
+    "buildingEliminationStallTicks",
+    "buildingEliminationReassignStalledTargets",
+    "buildingEliminationAdaptiveAirTargetCount",
+    "buildingEliminationAdaptiveNavalTargetCount",
 ];
 
 export const DEFAULT_RESEARCH_POLICY: ResearchPolicyConfigV1 = {
@@ -218,6 +240,19 @@ export const METHOD_V3_STARTING_POLICY: MethodV3PolicyConfig = {
     buildingEliminationSweepWhenNoTargets: true,
     buildingEliminationSweepRevisitTicks: 900,
 };
+
+export const projectMethodV3PolicyToStage2 = (
+    policy: MethodV3PolicyConfig,
+): MethodV3Stage2PolicyConfig => ({
+    ...policy,
+    schemaVersion: METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION,
+    buildingEliminationCapabilityAwareAttackers: false,
+    buildingEliminationReachabilityAwareTargets: false,
+    buildingEliminationStallTicks: 900,
+    buildingEliminationReassignStalledTargets: false,
+    buildingEliminationAdaptiveAirTargetCount: 0,
+    buildingEliminationAdaptiveNavalTargetCount: 0,
+});
 
 export const RESEARCH_POLICY_SEARCH_SPACE: {
     [K in keyof Omit<ResearchPolicyConfigV1, "schemaVersion">]: readonly ResearchPolicyConfigV1[K][];
@@ -302,12 +337,21 @@ export const parseResearchPolicy = (value: unknown): ResearchPolicyConfig => {
         throw new Error("Research policy must be an object");
     }
     const schemaVersion = value.schemaVersion;
-    if (schemaVersion !== RESEARCH_POLICY_SCHEMA_VERSION && schemaVersion !== METHOD_V3_POLICY_SCHEMA_VERSION) {
+    if (
+        schemaVersion !== RESEARCH_POLICY_SCHEMA_VERSION &&
+        schemaVersion !== METHOD_V3_POLICY_SCHEMA_VERSION &&
+        schemaVersion !== METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION
+    ) {
         throw new Error(
-            `Research policy schemaVersion must be ${RESEARCH_POLICY_SCHEMA_VERSION} or ${METHOD_V3_POLICY_SCHEMA_VERSION}`,
+            `Research policy schemaVersion must be ${RESEARCH_POLICY_SCHEMA_VERSION}, ${METHOD_V3_POLICY_SCHEMA_VERSION}, or ${METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION}`,
         );
     }
-    const policyKeys = schemaVersion === RESEARCH_POLICY_SCHEMA_VERSION ? POLICY_KEYS_V1 : POLICY_KEYS_V2;
+    const policyKeys =
+        schemaVersion === RESEARCH_POLICY_SCHEMA_VERSION
+            ? POLICY_KEYS_V1
+            : schemaVersion === METHOD_V3_POLICY_SCHEMA_VERSION
+              ? POLICY_KEYS_V2
+              : POLICY_KEYS_V3;
     const actualKeys = Object.keys(value).sort();
     const expectedKeys = [...policyKeys].sort();
     if (actualKeys.length !== expectedKeys.length || actualKeys.some((key, index) => key !== expectedKeys[index])) {
@@ -350,7 +394,7 @@ export const parseResearchPolicy = (value: unknown): ResearchPolicyConfig => {
     if (schemaVersion === RESEARCH_POLICY_SCHEMA_VERSION) {
         return { schemaVersion: RESEARCH_POLICY_SCHEMA_VERSION, ...common };
     }
-    return {
+    const methodV3 = {
         schemaVersion: METHOD_V3_POLICY_SCHEMA_VERSION,
         ...common,
         allInDisbandExistingAttacks: expectBoolean(value, "allInDisbandExistingAttacks"),
@@ -411,11 +455,48 @@ export const parseResearchPolicy = (value: unknown): ResearchPolicyConfig => {
             100_000,
         ),
     };
+    if (schemaVersion === METHOD_V3_POLICY_SCHEMA_VERSION) {
+        return methodV3;
+    }
+    return {
+        ...methodV3,
+        schemaVersion: METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION,
+        buildingEliminationCapabilityAwareAttackers: expectBoolean(
+            value,
+            "buildingEliminationCapabilityAwareAttackers",
+        ),
+        buildingEliminationReachabilityAwareTargets: expectBoolean(
+            value,
+            "buildingEliminationReachabilityAwareTargets",
+        ),
+        buildingEliminationStallTicks: expectNumber(value, "buildingEliminationStallTicks", 1, 100_000),
+        buildingEliminationReassignStalledTargets: expectBoolean(
+            value,
+            "buildingEliminationReassignStalledTargets",
+        ),
+        buildingEliminationAdaptiveAirTargetCount: expectNumber(
+            value,
+            "buildingEliminationAdaptiveAirTargetCount",
+            0,
+            100,
+        ),
+        buildingEliminationAdaptiveNavalTargetCount: expectNumber(
+            value,
+            "buildingEliminationAdaptiveNavalTargetCount",
+            0,
+            100,
+        ),
+    };
 };
 
 const orderedPolicy = (policy: ResearchPolicyConfig): Record<string, unknown> => {
     const result: Record<string, unknown> = {};
-    const keys = policy.schemaVersion === RESEARCH_POLICY_SCHEMA_VERSION ? POLICY_KEYS_V1 : POLICY_KEYS_V2;
+    const keys =
+        policy.schemaVersion === RESEARCH_POLICY_SCHEMA_VERSION
+            ? POLICY_KEYS_V1
+            : policy.schemaVersion === METHOD_V3_POLICY_SCHEMA_VERSION
+              ? POLICY_KEYS_V2
+              : POLICY_KEYS_V3;
     const record = policy as unknown as Record<string, unknown>;
     for (const key of keys) {
         result[key] = record[key];
@@ -430,7 +511,8 @@ export const researchPolicySha256 = (value: unknown): string => {
 
 export const buildResearchStrategyOptions = (value: unknown): StrongStrategyOptions => {
     const policy = parseResearchPolicy(value);
-    const methodV3 = policy.schemaVersion === METHOD_V3_POLICY_SCHEMA_VERSION ? policy : null;
+    const methodV3 = policy.schemaVersion === RESEARCH_POLICY_SCHEMA_VERSION ? null : policy;
+    const stage2 = policy.schemaVersion === METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION ? policy : null;
     return {
         defaultMapProfiles: false,
         base: {
@@ -517,6 +599,14 @@ export const buildResearchStrategyOptions = (value: unknown): StrongStrategyOpti
                 preemptExistingAttacks: methodV3.buildingEliminationPreemptExistingAttacks,
                 sweepWhenNoTargets: methodV3.buildingEliminationSweepWhenNoTargets,
                 sweepRevisitTicks: methodV3.buildingEliminationSweepRevisitTicks,
+                capabilityAwareAttackers: stage2?.buildingEliminationCapabilityAwareAttackers ?? false,
+                reachabilityAwareTargets: stage2?.buildingEliminationReachabilityAwareTargets ?? false,
+                stallTicks: stage2?.buildingEliminationStallTicks ?? 900,
+                reassignStalledTargets: stage2?.buildingEliminationReassignStalledTargets ?? false,
+                adaptiveAirTargetCount: stage2?.buildingEliminationAdaptiveAirTargetCount ?? 0,
+                adaptiveNavalTargetCount: stage2?.buildingEliminationAdaptiveNavalTargetCount ?? 0,
+                adaptiveProductionPriority: methodV3.finisherArtilleryPriority,
+                adaptiveTechPriority: methodV3.finisherArtilleryTechPriority,
             }
             : undefined,
     };
