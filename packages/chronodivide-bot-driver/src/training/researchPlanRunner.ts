@@ -16,6 +16,7 @@ import {
 import {
     METHOD_V3_POLICY_SCHEMA_VERSION,
     METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION,
+    METHOD_V4_POLICY_SCHEMA_VERSION,
     parseResearchPolicy,
     RESEARCH_POLICY_SCHEMA_VERSION,
     ResearchPolicyConfig,
@@ -32,6 +33,7 @@ export type ResearchPurpose =
     | "optimizer-search"
     | "method-v3-mechanism-screen"
     | "method-v3-draw-to-win-optimizer"
+    | "method-v4-lifecycle-screen"
     | "development-qc"
     | "development-evaluation"
     | "development-v2-qc"
@@ -107,6 +109,7 @@ const TRAIN_PURPOSES: ResearchPurpose[] = [
     "optimizer-search",
     "method-v3-mechanism-screen",
     "method-v3-draw-to-win-optimizer",
+    "method-v4-lifecycle-screen",
 ];
 const DEVELOPMENT_PURPOSES: ResearchPurpose[] = [
     "development-qc",
@@ -250,7 +253,11 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
     const candidateCountry = value.candidateCountry;
     const baselineCountry = value.baselineCountry;
     const countries = new Set<string>(Object.values(Countries));
-    if (purpose === "method-v3-mechanism-screen" || purpose === "method-v3-draw-to-win-optimizer") {
+    if (
+        purpose === "method-v3-mechanism-screen" ||
+        purpose === "method-v3-draw-to-win-optimizer" ||
+        purpose === "method-v4-lifecycle-screen"
+    ) {
         if (
             typeof candidateCountry !== "string" ||
             !countries.has(candidateCountry) ||
@@ -276,13 +283,17 @@ export const parseResearchRunPlan = (value: unknown): ResearchRunPlan => {
                 ? METHOD_V3_POLICY_SCHEMA_VERSION
                 : purpose === "method-v3-draw-to-win-optimizer"
                   ? METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION
+                  : purpose === "method-v4-lifecycle-screen"
+                    ? METHOD_V4_POLICY_SCHEMA_VERSION
                   : RESEARCH_POLICY_SCHEMA_VERSION;
         if (policy.schemaVersion !== expectedPolicySchema) {
             const schemaLabel = expectedPolicySchema === METHOD_V3_POLICY_SCHEMA_VERSION
                 ? "schema-v2 policies"
                 : expectedPolicySchema === METHOD_V3_STAGE2_POLICY_SCHEMA_VERSION
                   ? "schema-v3 policies"
-                  : "schema-v1 policies";
+                  : expectedPolicySchema === METHOD_V4_POLICY_SCHEMA_VERSION
+                    ? "schema-v4 policies"
+                    : "schema-v1 policies";
             throw new Error(`Research purpose ${purpose} requires only ${schemaLabel}`);
         }
         if (researchPolicySha256(policy) !== policyId) {
