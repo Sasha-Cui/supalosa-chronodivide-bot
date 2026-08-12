@@ -1,7 +1,42 @@
 # Method-v3 Stage-2 draw-to-win optimizer protocol
 
-Status: **drafted before any method-v3 Stage-2 launch; freeze only after the
-complete Stage-1 technical gate and open-training analyzer are recorded**.
+Status: **frozen on 2026-08-12 before any method-v3 Stage-2 plan generation or
+gameplay**.
+
+## Freeze record
+
+The complete Stage-1 evidence chain passed before this protocol was frozen:
+
+- Stage-1 source commit:
+  `b3fd2b07907e97ec2e43ac1ad48c10f4f00991f0`;
+- Stage-1 array job: `21982846`, with exactly 198 tasks, all `COMPLETED` with
+  exit code `0:0` under Slurm account `pi_jss233`;
+- fail-closed Stage-1 controller job: `22000279`, `COMPLETED` with exit code
+  `0:0` under `pi_jss233`;
+- campaign SHA-256:
+  `68836347713a59209268098f6f5b0145be9a3a1ff20d642f49680454cde9f876`;
+- technical-gate SHA-256:
+  `101fe4f5beb348973caf377ac3c5d389c1d568b6524332284deb4b41780c575a`;
+- independent scheduler-gate SHA-256:
+  `8b04a76716f562b8959456d9e0d66f74d3829a5ecab0c5afc8536ae96837467c`;
+- open-training analysis SHA-256:
+  `c2195ff665a6275854bc3f9c11db55a43eff0239db22cbbdd8f19f8669459b62`;
+- selected Stage-1 arm: `closeout_production`;
+- selected policy SHA-256:
+  `7742dc50c408b8cb6baae3776f2357f1ea41d57382ce9e1f2f76309607bda045`;
+  and
+- selected open-training actual-win and draw probabilities: 42/396
+  (`0.10606060606060606`) and 231/396 (`0.5833333333333334`), respectively.
+
+The prospective endpoint, closeout, optimizer, scheduler-provenance, and fresh
+map compatibility implementation is commit
+`15dda36cc507fb32ba64481992d0d319e473ce49`. The execution revision is the clean
+`main` commit containing this freeze record. Because a file cannot contain the
+hash of the commit that contains that same file without circularity, the exact
+execution commit is attested independently by the all-country Stage-0 gate and
+then copied into every immutable Stage-2 campaign and launch manifest. No
+tracked source change is permitted after that gate without invalidating it and
+requiring a new prospective protocol version and fresh seed domains.
 
 This protocol defines bounded training-only optimization for converting
 favorable positions into literal building-elimination wins against the pinned
