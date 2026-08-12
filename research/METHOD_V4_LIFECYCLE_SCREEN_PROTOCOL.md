@@ -111,8 +111,14 @@ Before the array may launch:
    physical slots, identical participant RNG identities, and identical engine
    seeds;
 5. the generated campaign must bind source/runtime, baseline/runtime, game API,
-   package lock, role, split, source population, Method-v3 finalists, and failure
-   audit hashes.
+   package lock, role, split, source population, Method-v3 finalists, failure
+   audit, and the exact-source equivalence-gate hashes and scheduler job ID.
+
+The first attempted `lifecycle-screen-v1` plan generation produced no campaign
+and launched no games because its exclusive output directory had a missing
+parent. The prospective generator repair creates only missing parents and bumps
+the immutable campaign schema to v2; a new exact-source equivalence job is
+required before the replacement campaign can be frozen.
 
 Any failure blocks the outcome-bearing array and must be repaired prospectively.
 

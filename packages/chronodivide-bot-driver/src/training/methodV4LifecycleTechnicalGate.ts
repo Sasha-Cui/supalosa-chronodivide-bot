@@ -12,6 +12,7 @@ import {
     METHOD_V4_LIFECYCLE_RANKING_RULE,
     METHOD_V4_LIFECYCLE_SHARD_COUNT,
     MethodV4LifecycleCampaign,
+    validateMethodV4EquivalenceGate,
 } from "./methodV4LifecyclePlanGenerator.js";
 import { METHOD_V4_LIFECYCLE_ARM_ORDER } from "./methodV4LifecyclePolicies.js";
 import { validateMethodV3Stage2PolicyTelemetry } from "./methodV3Stage2TechnicalGate.js";
@@ -38,7 +39,7 @@ const requiredArrayJobId = (): string => {
 export const validateMethodV4LifecycleCampaign = (value: unknown): MethodV4LifecycleCampaign => {
     if (
         !isRecord(value) ||
-        value.schemaVersion !== 1 ||
+        value.schemaVersion !== 2 ||
         value.kind !== "method-v4-lifecycle-screen" ||
         value.status !== "FROZEN_OPEN_TRAINING_LITERAL_BUILDING_ELIMINATION_SCREEN" ||
         value.outcomeAccess !== "open-training-only-no-paper-claim" ||
@@ -68,17 +69,32 @@ export const validateMethodV4LifecycleCampaign = (value: unknown): MethodV4Lifec
         typeof value.failureAuditPath !== "string" ||
         typeof value.failureAuditSha256 !== "string" ||
         typeof value.methodV3FinalistsPath !== "string" ||
-        typeof value.methodV3FinalistsSha256 !== "string"
+        typeof value.methodV3FinalistsSha256 !== "string" ||
+        typeof value.equivalenceGatePath !== "string" ||
+        typeof value.equivalenceGateSha256 !== "string" ||
+        typeof value.equivalenceGateSchedulerJobId !== "string"
     ) {
         throw new Error("Method-v4 lifecycle campaign has an invalid frozen schema");
     }
     const campaign = value as unknown as MethodV4LifecycleCampaign;
     const familyIds = campaign.selectedFamilies.map(({ familyId }) => familyId);
+    const equivalenceGate = readJson(campaign.equivalenceGatePath);
+    const control = campaign.arms.find(({ armId }) => armId === "baseline_control");
+    if (!control) throw new Error("Method-v4 lifecycle campaign lacks its frozen baseline control");
+    const equivalenceBinding = validateMethodV4EquivalenceGate(equivalenceGate, {
+        sourceGitCommit: campaign.sourceGitCommit,
+        baselineGitCommit: campaign.baselineGitCommit,
+        baselineRuntimeSha256: campaign.baselineRuntimeSha256,
+        policyId: control.policyId,
+    });
     if (
         sha256File(campaign.failureAuditPath) !== campaign.failureAuditSha256 ||
         sha256File(campaign.methodV3FinalistsPath) !== campaign.methodV3FinalistsSha256 ||
+        sha256File(campaign.equivalenceGatePath) !== campaign.equivalenceGateSha256 ||
         campaign.failureAuditSha256 !== "5d10ba27d3f2527d6a43e9b248d2459990a96ae15220f1f31346b474264d276f" ||
         campaign.methodV3FinalistsSha256 !== "d95ebd5d77fbd0d5dba01009341868bf514bc0690936eb3fba830f2929350284" ||
+        equivalenceBinding.schedulerJobId !== campaign.equivalenceGateSchedulerJobId ||
+        !/^\d+$/.test(campaign.equivalenceGateSchedulerJobId) ||
         new Set(familyIds).size !== METHOD_V4_LIFECYCLE_FAMILY_COUNT ||
         campaign.arms.map(({ armId }) => armId).join(",") !== METHOD_V4_LIFECYCLE_ARM_ORDER.join(",") ||
         new Set(campaign.arms.map(({ policyId }) => policyId)).size !== campaign.arms.length ||

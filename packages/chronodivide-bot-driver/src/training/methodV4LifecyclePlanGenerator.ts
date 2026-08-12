@@ -45,7 +45,7 @@ export const METHOD_V4_LIFECYCLE_RANKING_RULE = [
 ] as const;
 
 export type MethodV4LifecycleCampaign = {
-    schemaVersion: 1;
+    schemaVersion: 2;
     kind: "method-v4-lifecycle-screen";
     status: "FROZEN_OPEN_TRAINING_LITERAL_BUILDING_ELIMINATION_SCREEN";
     generatedAt: string;
@@ -63,6 +63,9 @@ export type MethodV4LifecycleCampaign = {
     failureAuditSha256: string;
     methodV3FinalistsPath: string;
     methodV3FinalistsSha256: string;
+    equivalenceGatePath: string;
+    equivalenceGateSha256: string;
+    equivalenceGateSchedulerJobId: string;
     outcomeAccess: "open-training-only-no-paper-claim";
     actualWinInvariant: string;
     mapProfilesEnabled: false;
@@ -119,6 +122,53 @@ const requiredPath = (name: string): string => {
     return path.resolve(value);
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+    typeof value === "object" && value !== null && !Array.isArray(value);
+
+type MethodV4EquivalenceCommitment = {
+    sourceGitCommit: string;
+    baselineGitCommit: string;
+    baselineRuntimeSha256: string;
+    policyId: string;
+};
+
+export const validateMethodV4EquivalenceGate = (
+    value: unknown,
+    commitment: MethodV4EquivalenceCommitment,
+): { schedulerJobId: string } => {
+    const scheduler = isRecord(value) && isRecord(value.scheduler) ? value.scheduler : null;
+    const baseline = isRecord(value) && isRecord(value.externalBaseline) ? value.externalBaseline : null;
+    const rows = isRecord(value) && Array.isArray(value.rows) ? value.rows : null;
+    if (
+        !isRecord(value) ||
+        value.schemaVersion !== 1 ||
+        value.status !== "PASS_OUTCOME_FREE_METHOD_V4_EXTERNAL_BASELINE_IDENTITY_GATE" ||
+        value.passed !== true ||
+        value.outcomeFree !== true ||
+        value.sourceGitCommit !== commitment.sourceGitCommit ||
+        value.policyId !== commitment.policyId ||
+        value.countryCount !== METHOD_V4_COUNTRIES.length ||
+        value.reciprocalSlotCount !== 2 ||
+        value.gameCount !== METHOD_V4_COUNTRIES.length * 2 * 2 ||
+        value.maxTicks !== 1_200 ||
+        !scheduler ||
+        scheduler.account !== "pi_jss233" ||
+        typeof scheduler.jobId !== "string" ||
+        !/^\d+$/.test(scheduler.jobId) ||
+        !baseline ||
+        baseline.kind !== "external-package" ||
+        baseline.gitCommit !== commitment.baselineGitCommit ||
+        !isRecord(baseline.runtimeTree) ||
+        baseline.runtimeTree.sha256 !== commitment.baselineRuntimeSha256 ||
+        !rows ||
+        rows.length !== METHOD_V4_COUNTRIES.length * 2 ||
+        rows.some((row) => !isRecord(row) || row.equal !== true)
+    ) {
+        throw new Error("Method-v4 lifecycle campaign requires the exact-source passing outcome-free equivalence gate");
+    }
+    return { schedulerJobId: scheduler.jobId };
+};
+
 const main = async (): Promise<void> => {
     const repoRoot = gitRoot();
     const driverRoot = path.join(repoRoot, "packages", "chronodivide-bot-driver");
@@ -132,6 +182,7 @@ const main = async (): Promise<void> => {
     const outRoot = requiredPath("OUT_ROOT");
     const failureAuditPath = requiredPath("FAILURE_AUDIT");
     const methodV3FinalistsPath = requiredPath("METHOD_V3_FINALISTS");
+    const equivalenceGatePath = requiredPath("EQUIVALENCE_GATE");
     if (fs.existsSync(outRoot)) throw new Error(`Refusing to reuse existing OUT_ROOT ${outRoot}`);
 
     const expectedFailureAuditSha256 = "5d10ba27d3f2527d6a43e9b248d2459990a96ae15220f1f31346b474264d276f";
@@ -184,6 +235,17 @@ const main = async (): Promise<void> => {
         throw new Error("Method-v4 plan generation could not bind the clean external baseline");
     }
 
+    const equivalenceGate = JSON.parse(fs.readFileSync(equivalenceGatePath, "utf8")) as unknown;
+    const control = arms.find(({ armId }) => armId === "baseline_control");
+    if (!control) throw new Error("Method-v4 baseline control is unavailable");
+    const equivalenceBinding = validateMethodV4EquivalenceGate(equivalenceGate, {
+        sourceGitCommit: generationManifest.source.gitCommit,
+        baselineGitCommit: generationManifest.software.baseline.gitCommit,
+        baselineRuntimeSha256: generationManifest.software.baseline.runtimeTree.sha256,
+        policyId: control.policyId,
+    });
+
+    fs.mkdirSync(path.dirname(outRoot), { recursive: true, mode: 0o700 });
     fs.mkdirSync(outRoot, { recursive: false, mode: 0o700 });
     const plansRoot = path.join(outRoot, "plans");
     fs.mkdirSync(plansRoot, { mode: 0o700 });
@@ -236,7 +298,7 @@ const main = async (): Promise<void> => {
         }
     }
     const campaign: MethodV4LifecycleCampaign = {
-        schemaVersion: 1,
+        schemaVersion: 2,
         kind: "method-v4-lifecycle-screen",
         status: "FROZEN_OPEN_TRAINING_LITERAL_BUILDING_ELIMINATION_SCREEN",
         generatedAt: new Date().toISOString(),
@@ -254,6 +316,9 @@ const main = async (): Promise<void> => {
         failureAuditSha256: expectedFailureAuditSha256,
         methodV3FinalistsPath,
         methodV3FinalistsSha256: expectedFinalistsSha256,
+        equivalenceGatePath,
+        equivalenceGateSha256: sha256File(equivalenceGatePath),
+        equivalenceGateSchedulerJobId: equivalenceBinding.schedulerJobId,
         outcomeAccess: "open-training-only-no-paper-claim",
         actualWinInvariant: "finished shortGame, Supalosa defeated, candidate alive, zero terminal Supalosa buildings",
         mapProfilesEnabled: false,
