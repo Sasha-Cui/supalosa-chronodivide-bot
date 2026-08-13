@@ -26,24 +26,28 @@ import {
     sha256File,
 } from "./terminalObjectivePlanRunner.js";
 
-export const TERMINAL_OBJECTIVE_ENGINE_SEED_BASE = 3_760_000_000 as const;
+export const TERMINAL_OBJECTIVE_ENGINE_SEED_BASE = 3_770_000_000 as const;
 export const TERMINAL_OBJECTIVE_MAX_TICKS = 24_000 as const;
 export const TERMINAL_OBJECTIVE_FAMILY_COUNT = 10 as const;
 export const TERMINAL_OBJECTIVE_SEED_BLOCKS_PER_FAMILY = 2 as const;
 export const TERMINAL_OBJECTIVE_SUPPORTED_POPULATION_SHA256 =
     "80012d84a9897c90fa54acf7971cdb66551b842cd072f33ecec9f6c6f9b10084" as const;
 export const TERMINAL_OBJECTIVE_CORE_SHA256 =
-    "3ed2f2907f201a9184d931a20d02ac5bb0e473d1db56ece7b739560f3da7ec05" as const;
+    "03238e35095bbf9b74e336599f922ae64a11958d0da5b27859c791401d719f62" as const;
 export const TERMINAL_OBJECTIVE_ADAPTER_SHA256 =
     "a39cdb70571de40f72a3aae251eb1e8610c94b76ca7125790f9e0ee488ad52fc" as const;
 export const TERMINAL_OBJECTIVE_EQUIVALENCE_SHA256 =
-    "60e88d45dd363c2573f912d5329f558116928619ead8f28e2ea585b3e1e3b4f6" as const;
+    "60859701828f2e6cb62ccd7d07ed2cdc3ad45a5c8b79edce3a34aaf053d904be" as const;
 export const TERMINAL_OBJECTIVE_SMOKE_SHA256 =
-    "cc4163c0bff2af394a48115b03f74fc1ad0c6050121e83d810eab5cfd7fcb4cf" as const;
+    "1a4af658ee7e08ae266cf4b16902ce5476d2ab738e12f18748ab17c031554c63" as const;
 export const TERMINAL_OBJECTIVE_REPLACEMENT_FAILURE_AUDIT_SHA256 =
     "ab44c5d7f6064335fbc34532abcc14e7178b97224e375a1fc64b610019f66514" as const;
 export const TERMINAL_OBJECTIVE_REPLACEMENT_PROTOCOL_SHA256 =
     "a3eb5dadf124436587fb3b05511204bac996a056e9ec620d45b7169c50a6a2ef" as const;
+export const TERMINAL_OBJECTIVE_BUILDING_FIRST_FAILURE_AUDIT_SHA256 =
+    "977b8f577a610a968e373de63cca3855a68f07a153c3a6b09c8dae24b5785c9c" as const;
+export const TERMINAL_OBJECTIVE_BUILDING_FIRST_AMENDMENT_SHA256 =
+    "5f2d5477d9d8f22b692fbd479869e7359b0496dbdafd3d48d0df8602f050abc2" as const;
 export const TERMINAL_OBJECTIVE_ONE_SIDED_80_T_CRITICAL_DF9 = 0.8834038596855205 as const;
 
 export const TERMINAL_OBJECTIVE_COUNTRIES = [
@@ -83,7 +87,7 @@ export type TerminalObjectiveFamily = {
 export type TerminalObjectiveCampaign = {
     schemaVersion: 2;
     kind: "terminal-objective-open-development-literal-endpoint";
-    status: "FROZEN_TERMINAL_OBJECTIVE_OPEN_DEVELOPMENT_REPLACEMENT_ENDPOINT_V5";
+    status: "FROZEN_TERMINAL_OBJECTIVE_BUILDING_FIRST_OPEN_DEVELOPMENT_ENDPOINT_V5";
     generatedAt: string;
     sourceGitCommit: string;
     sourceRuntimeSha256: string;
@@ -110,7 +114,13 @@ export type TerminalObjectiveCampaign = {
     replacementFailureAuditSha256: typeof TERMINAL_OBJECTIVE_REPLACEMENT_FAILURE_AUDIT_SHA256;
     replacementProtocolPath: string;
     replacementProtocolSha256: typeof TERMINAL_OBJECTIVE_REPLACEMENT_PROTOCOL_SHA256;
-    priorCampaignReuse: "none_complete_fresh_seed_replacement";
+    buildingFirstReplacesArrayJobId: "22125520";
+    buildingFirstReplacesControllerJobId: "22125521";
+    buildingFirstFailureAuditPath: string;
+    buildingFirstFailureAuditSha256: typeof TERMINAL_OBJECTIVE_BUILDING_FIRST_FAILURE_AUDIT_SHA256;
+    buildingFirstAmendmentPath: string;
+    buildingFirstAmendmentSha256: typeof TERMINAL_OBJECTIVE_BUILDING_FIRST_AMENDMENT_SHA256;
+    priorCampaignReuse: "none_complete_building_first_fresh_seed_replacement";
     outcomeAccess: "open-development-only-no-paper-claim";
     familyCount: number;
     seedBlocksPerFamily: number;
@@ -227,6 +237,8 @@ const main = async (): Promise<void> => {
     const smokeGatePath = requiredPath("TERMINAL_OBJECTIVE_SMOKE_GATE");
     const replacementFailureAuditPath = requiredPath("TERMINAL_OBJECTIVE_REPLACEMENT_FAILURE_AUDIT");
     const replacementProtocolPath = requiredPath("TERMINAL_OBJECTIVE_REPLACEMENT_PROTOCOL");
+    const buildingFirstFailureAuditPath = requiredPath("TERMINAL_OBJECTIVE_BUILDING_FIRST_FAILURE_AUDIT");
+    const buildingFirstAmendmentPath = requiredPath("TERMINAL_OBJECTIVE_BUILDING_FIRST_AMENDMENT");
     const outRoot = requiredPath("OUT_ROOT");
     if (fs.existsSync(outRoot)) throw new Error(`Refusing to reuse OUT_ROOT ${outRoot}`);
     for (const [filePath, digest, label] of [
@@ -235,6 +247,10 @@ const main = async (): Promise<void> => {
         [smokeGatePath, TERMINAL_OBJECTIVE_SMOKE_SHA256, "smoke"],
         [replacementFailureAuditPath, TERMINAL_OBJECTIVE_REPLACEMENT_FAILURE_AUDIT_SHA256, "replacement failure audit"],
         [replacementProtocolPath, TERMINAL_OBJECTIVE_REPLACEMENT_PROTOCOL_SHA256, "replacement protocol"],
+        [buildingFirstFailureAuditPath, TERMINAL_OBJECTIVE_BUILDING_FIRST_FAILURE_AUDIT_SHA256,
+            "building-first failure audit"],
+        [buildingFirstAmendmentPath, TERMINAL_OBJECTIVE_BUILDING_FIRST_AMENDMENT_SHA256,
+            "building-first amendment"],
     ] as const) if (sha256File(filePath) !== digest) throw new Error(`Terminal-objective ${label} commitment drifted`);
     const corePath = path.join(repoRoot, "packages", "chronodivide-bot", "src", "bot", "logic", "objective", "terminalObjectiveDecisionCore.ts");
     const adapterPath = path.join(repoRoot, "packages", "chronodivide-bot", "src", "bot", "logic", "objective", "objectiveMechanicsAdapter.ts");
@@ -244,6 +260,7 @@ const main = async (): Promise<void> => {
     const equivalence = JSON.parse(fs.readFileSync(equivalenceGatePath, "utf8")) as RecordValue;
     const smoke = JSON.parse(fs.readFileSync(smokeGatePath, "utf8")) as RecordValue;
     const replacementFailureAudit = JSON.parse(fs.readFileSync(replacementFailureAuditPath, "utf8")) as RecordValue;
+    const buildingFirstFailureAudit = JSON.parse(fs.readFileSync(buildingFirstFailureAuditPath, "utf8")) as RecordValue;
     if (
         equivalence.status !== "PASS_OUTCOME_FREE_TERMINAL_OBJECTIVE_EXTERNAL_BASELINE_IDENTITY" ||
         equivalence.outcomeFree !== true || equivalence.gameCount !== 36 ||
@@ -253,7 +270,17 @@ const main = async (): Promise<void> => {
         replacementFailureAudit.arrayJobId !== "22119584" || replacementFailureAudit.controllerJobId !== "22119585" ||
         !isRecord(replacementFailureAudit.repair) || replacementFailureAudit.repair.reuseAccepted !== false ||
         replacementFailureAudit.repair.selectiveRerunAllowed !== false ||
-        replacementFailureAudit.repair.restoredRuntimeExactlyMatchesOriginalPlan !== true
+        replacementFailureAudit.repair.restoredRuntimeExactlyMatchesOriginalPlan !== true ||
+        buildingFirstFailureAudit.status !== "INVALIDATED_COMPLETE_CAMPAIGN_BUILDING_FIRST_ENDPOINT_MISMATCH" ||
+        buildingFirstFailureAudit.arrayJobId !== "22125520" ||
+        buildingFirstFailureAudit.controllerJobId !== "22125521" ||
+        !isRecord(buildingFirstFailureAudit.artifacts) ||
+        buildingFirstFailureAudit.artifacts.episodeCompleteEvents !== 0 ||
+        !isRecord(buildingFirstFailureAudit.outcomes) ||
+        buildingFirstFailureAudit.outcomes.outcomeInspected !== false ||
+        !isRecord(buildingFirstFailureAudit.repair) || buildingFirstFailureAudit.repair.reuseAccepted !== false ||
+        buildingFirstFailureAudit.repair.selectiveRerunAllowed !== false ||
+        buildingFirstFailureAudit.repair.rerunOutcomeFreeTechnicalGates !== true
     ) throw new Error("Terminal-objective outcome-free technical gates do not authorize generation");
 
     const supportedPopulation = JSON.parse(fs.readFileSync(supportedPopulationPath, "utf8")) as unknown;
@@ -272,8 +299,8 @@ const main = async (): Promise<void> => {
             seedBlocksPerFamily: TERMINAL_OBJECTIVE_SEED_BLOCKS_PER_FAMILY,
             arms,
             maxTicks: TERMINAL_OBJECTIVE_MAX_TICKS,
-            replacesArrayJobId: "22119584",
-            priorCampaignReuse: "none_complete_fresh_seed_replacement",
+            replacesArrayJobIds: ["22119584", "22125520"],
+            priorCampaignReuse: "none_complete_building_first_fresh_seed_replacement",
         },
         baseline: baselineFactory.descriptor,
         gameSeedBase: TERMINAL_OBJECTIVE_ENGINE_SEED_BASE,
@@ -302,7 +329,7 @@ const main = async (): Promise<void> => {
                     TERMINAL_OBJECTIVE_COUNTRIES.length + countryIndex;
                 const seedBlockIndex = shardIndex;
                 const requestedEngineSeed = derivePairedEngineSeed(TERMINAL_OBJECTIVE_ENGINE_SEED_BASE, seedBlockIndex);
-                const runId = `terminal-replacement-v1-f${familyIndex}-b${familySeedIndex}-c${countryIndex}-${generationManifest.source.gitCommit.slice(0, 10)}`;
+                const runId = `terminal-building-first-v1-f${familyIndex}-b${familySeedIndex}-c${countryIndex}-${generationManifest.source.gitCommit.slice(0, 10)}`;
                 const plan: TerminalObjectiveRunPlan = parseTerminalObjectiveRunPlan({
                     schemaVersion: TERMINAL_OBJECTIVE_PLAN_SCHEMA_VERSION,
                     kind: TERMINAL_OBJECTIVE_PLAN_KIND,
@@ -351,7 +378,7 @@ const main = async (): Promise<void> => {
     const campaign: TerminalObjectiveCampaign = {
         schemaVersion: 2,
         kind: "terminal-objective-open-development-literal-endpoint",
-        status: "FROZEN_TERMINAL_OBJECTIVE_OPEN_DEVELOPMENT_REPLACEMENT_ENDPOINT_V5",
+        status: "FROZEN_TERMINAL_OBJECTIVE_BUILDING_FIRST_OPEN_DEVELOPMENT_ENDPOINT_V5",
         generatedAt: new Date().toISOString(),
         sourceGitCommit: generationManifest.source.gitCommit,
         sourceRuntimeSha256,
@@ -378,7 +405,13 @@ const main = async (): Promise<void> => {
         replacementFailureAuditSha256: TERMINAL_OBJECTIVE_REPLACEMENT_FAILURE_AUDIT_SHA256,
         replacementProtocolPath,
         replacementProtocolSha256: TERMINAL_OBJECTIVE_REPLACEMENT_PROTOCOL_SHA256,
-        priorCampaignReuse: "none_complete_fresh_seed_replacement",
+        buildingFirstReplacesArrayJobId: "22125520",
+        buildingFirstReplacesControllerJobId: "22125521",
+        buildingFirstFailureAuditPath,
+        buildingFirstFailureAuditSha256: TERMINAL_OBJECTIVE_BUILDING_FIRST_FAILURE_AUDIT_SHA256,
+        buildingFirstAmendmentPath,
+        buildingFirstAmendmentSha256: TERMINAL_OBJECTIVE_BUILDING_FIRST_AMENDMENT_SHA256,
+        priorCampaignReuse: "none_complete_building_first_fresh_seed_replacement",
         outcomeAccess: "open-development-only-no-paper-claim",
         familyCount: families.length,
         seedBlocksPerFamily: TERMINAL_OBJECTIVE_SEED_BLOCKS_PER_FAMILY,
