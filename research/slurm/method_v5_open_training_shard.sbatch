@@ -40,12 +40,12 @@ if [[ ! -f "$PLAN_LIST" || ! -f "$CAMPAIGN_ROOT/campaign.json" || "$(wc -l < "$P
     echo "Method-v5 campaign is missing or does not contain 198 plans" >&2
     exit 2
 fi
-METHOD_V5_PLAN=$(sed -n "$((TASK_ID + 1))p" "$PLAN_LIST")
-if [[ -z "$METHOD_V5_PLAN" || ! -f "$METHOD_V5_PLAN" ]]; then
+METHOD_V6_PLAN=$(sed -n "$((TASK_ID + 1))p" "$PLAN_LIST")
+if [[ -z "$METHOD_V6_PLAN" || ! -f "$METHOD_V6_PLAN" ]]; then
     echo "No Method-v5 plan for shard $TASK_ID" >&2
     exit 2
 fi
-case "$(realpath "$METHOD_V5_PLAN")" in
+case "$(realpath "$METHOD_V6_PLAN")" in
     "$(realpath "$CAMPAIGN_ROOT")"/plans/*) ;;
     *) echo "Method-v5 plan escapes the frozen plans directory" >&2; exit 2 ;;
 esac
@@ -80,7 +80,7 @@ mkdir -m 0700 "$JOB_ROOT"
 exec >"$JOB_ROOT/job.stdout.log" 2>"$JOB_ROOT/job.stderr.log"
 
 cd "$DRIVER_ROOT"
-export METHOD_V5_PLAN OUT_DIR
+export METHOD_V6_PLAN OUT_DIR
 export BASELINE_PACKAGE_ROOT="$BASELINE_ROOT"
 export REQUIRE_EXTERNAL_BASELINE=true
 "$NODE_BIN" --es-module-specifier-resolution=node "$RUNNER"

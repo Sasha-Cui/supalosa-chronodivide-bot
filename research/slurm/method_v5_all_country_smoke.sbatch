@@ -18,7 +18,7 @@ unset NODE_OPTIONS
 REPO=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot
 DRIVER="$REPO/packages/chronodivide-bot-driver"
 BASELINE=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/supalosa-chronodivide-bot/packages/chronodivide-bot
-RUN_ROOT=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/method-v5/all-country-smoke-v1/$SLURM_JOB_ID
+RUN_ROOT=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/method-v6/all-country-smoke-v1/$SLURM_JOB_ID
 JOB_LINE=$(/opt/slurm/current/bin/scontrol show job -o "$SLURM_JOB_ID")
 [[ "$JOB_LINE" =~ (^|[[:space:]])Account=([^[:space:]]+) ]] || { echo "Slurm account missing" >&2; exit 2; }
 [[ "${BASH_REMATCH[2]}" == pi_jss233 ]] || { echo "Wrong Slurm account" >&2; exit 2; }

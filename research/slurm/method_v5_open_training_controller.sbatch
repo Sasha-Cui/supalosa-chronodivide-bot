@@ -55,4 +55,4 @@ export OUT_FILE="$CONTROLLER_ROOT/technical-gate.json"
 export TECHNICAL_GATE="$OUT_FILE"
 export OUT_FILE="$CONTROLLER_ROOT/open-training-analysis.json"
 "$NODE_BIN" --es-module-specifier-resolution=node dist/training/methodV5Analyzer.js
-printf '%s\n' "PASS_METHOD_V5_CONTROLLER" >"$CONTROLLER_ROOT/COMPLETE"
+printf '%s\n' "PASS_METHOD_V6_CONTROLLER" >"$CONTROLLER_ROOT/COMPLETE"
