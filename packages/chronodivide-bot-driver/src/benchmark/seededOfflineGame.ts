@@ -30,6 +30,22 @@ let validatedCompatibility: OfflineSeedCompatibility | null = null;
 let activeCreationSeed: number | null = null;
 let activeSessionSeed: number | null = null;
 
+/**
+ * Fail before simulator creation when a package-manager layout has loaded a
+ * byte-identical game-api from a second physical path. Bot uses an instanceof
+ * check, so distinct module identities are not interchangeable.
+ */
+export const assertOfflineAgentRuntimeIdentity = (agents: readonly Bot[]): void => {
+    for (const [index, agent] of agents.entries()) {
+        if (!(agent instanceof Bot)) {
+            throw new Error(
+                `Offline agent ${index} (${String((agent as { name?: unknown }).name ?? "unnamed")}) ` +
+                "does not inherit from the simulator's exact Bot class; consolidate game-api runtime paths",
+            );
+        }
+    }
+};
+
 const resolveGameApiFiles = (): { runtimePath: string; packagePath: string } => {
     const require = createRequire(import.meta.url);
     const runtimePath = require.resolve("@chronodivide/game-api");
@@ -298,6 +314,7 @@ export const withSeededOfflineGame = async <T>(
 ): Promise<T> => {
     assertValidEngineSeed(seed);
     const configuredAgents = opts.agents ?? [];
+    assertOfflineAgentRuntimeIdentity(configuredAgents);
     if (
         botRandomBindings.length !== configuredAgents.length ||
         configuredAgents.some((agent) => !botRandomBindings.some((binding) => binding.agent === agent))
