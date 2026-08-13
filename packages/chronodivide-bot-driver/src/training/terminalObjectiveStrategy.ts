@@ -121,6 +121,8 @@ export type TerminalObjectiveTelemetry = {
     exactEnemyBuildingCount?: number | null;
     eligibleAttackerCount?: number;
     reservedCombatantCount?: number;
+    reservedCombatantIds?: number[];
+    reservedActionCounts?: { idle: number; moving: number; attacking: number; other: number };
     certifiedAttackerCount?: number;
     rejectedAttackerCountsByReason?: Record<string, number>;
     selectedAttackerRulesNames?: string[];
@@ -565,6 +567,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 noProgressTicks,
                 eligible.length,
                 partition.reserved.length,
+                partition.reserved,
             );
             return;
         }
@@ -622,6 +625,12 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 eligibleAttackerCount: eligible.length,
                 reservedCombatantCount: isContinuousOffensePolicy(this.policy)
                     ? partition.reserved.length
+                    : undefined,
+                reservedCombatantIds: isContinuousOffensePolicy(this.policy)
+                    ? partition.reserved.map(({ id }) => id).sort((a, b) => a - b)
+                    : undefined,
+                reservedActionCounts: isContinuousOffensePolicy(this.policy)
+                    ? delegatedActionCounts(partition.reserved, new Set())
                     : undefined,
                 certifiedAttackerCount: selected?.attackers.length ?? 0,
                 rejectedAttackerCountsByReason: countReasons(reasons.filter((reason) => reason !== "certified")),
@@ -799,6 +808,12 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             eligibleAttackerCount: eligible.length,
             reservedCombatantCount: isContinuousOffensePolicy(this.policy)
                 ? partition.reserved.length
+                : undefined,
+            reservedCombatantIds: isContinuousOffensePolicy(this.policy)
+                ? partition.reserved.map(({ id }) => id).sort((a, b) => a - b)
+                : undefined,
+            reservedActionCounts: isContinuousOffensePolicy(this.policy)
+                ? delegatedActionCounts(partition.reserved, new Set())
                 : undefined,
             certifiedAttackerCount: selected.attackers.length,
             rejectedAttackerCountsByReason: countReasons(activeEligible.map((unit) =>
@@ -1026,6 +1041,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         noProgressTicks: number,
         totalEligibleCount: number = eligible.length,
         reservedCombatantCount?: number,
+        reservedCombatants: readonly UnitData[] = [],
     ): void {
         if (eligible.length === 0 || this.searchPoints === null) return;
         const ranked = this.searchPoints.slice().sort((left, right) => {
@@ -1081,6 +1097,12 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             exactEnemyBuildingCount: this.exactEnemyBuildingCount,
             eligibleAttackerCount: totalEligibleCount,
             reservedCombatantCount,
+            reservedCombatantIds: reservedCombatantCount === undefined
+                ? undefined
+                : reservedCombatants.map(({ id }) => id).sort((a, b) => a - b),
+            reservedActionCounts: reservedCombatantCount === undefined
+                ? undefined
+                : delegatedActionCounts(reservedCombatants, new Set()),
             certifiedAttackerCount: 0,
             delegatedActionCounts: delegatedActionCounts(eligible, new Set(assignedIds)),
             assignedCombatantFraction: eligible.length === 0 ? 0 : assignedIds.length / eligible.length,
