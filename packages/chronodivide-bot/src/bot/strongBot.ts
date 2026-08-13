@@ -1,4 +1,13 @@
-import { GameApi, ObjectType, OrderType, StanceType, UnitData, Vector2 } from "@chronodivide/game-api";
+import {
+    ActionsApi,
+    GameApi,
+    ObjectType,
+    OrderType,
+    ProductionApi,
+    StanceType,
+    UnitData,
+    Vector2,
+} from "@chronodivide/game-api";
 import { SupalosaBot } from "./bot.js";
 import { Strategy } from "./strategy/strategy.js";
 import { StrongStrategy } from "./strategy/strongStrategy.js";
@@ -1212,6 +1221,8 @@ const definedOptions = <T extends Record<string, unknown>>(options: T | undefine
 
 export class StrongBot extends SupalosaBot {
     public lastGameApi: GameApi | null = null;
+    public lastPlayerActions: ActionsApi | null = null;
+    public lastPlayerProduction: ProductionApi | null = null;
 
     private forceAttackOptions: Required<ForceAttackOptions>;
     private harassOptions: Required<HarassOptions>;
@@ -1359,6 +1370,8 @@ export class StrongBot extends SupalosaBot {
 
     override onGameStart(game: GameApi): void {
         this.lastGameApi = game;
+        this.lastPlayerActions = this.player.actions;
+        this.lastPlayerProduction = this.player.production;
         if (this.enableDefaultMapProfiles) {
             if (this.isSimple1v1Map(game)) {
                 this.applySimpleInfantryProfile();
