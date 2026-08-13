@@ -25,7 +25,11 @@ import {
 import { createContinuousOffenseExperimentCandidate } from "./continuousOffenseEpisode.js";
 import { TerminalObjectiveTelemetry } from "./terminalObjectiveStrategy.js";
 
-export const CONTINUOUS_OFFENSE_COMPATIBILITY_MAX_TICKS = 2_400 as const;
+// The first gate version stopped at tick 2,400, before the Allied opening had
+// produced a compatible combatant. Tick 5,400 remains before the frozen macro
+// attack gate at 7,200 while allowing every country to materialize its normal
+// opening force; outcomes are still never read.
+export const CONTINUOUS_OFFENSE_COMPATIBILITY_MAX_TICKS = 5_400 as const;
 export const CONTINUOUS_OFFENSE_COMPATIBILITY_ENGINE_SEED_BASE = 4_170_000_000 as const;
 
 type Factory = Awaited<ReturnType<typeof loadBaselineFactory>>;
