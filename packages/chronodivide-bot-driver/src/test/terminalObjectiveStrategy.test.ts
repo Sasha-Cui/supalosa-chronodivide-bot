@@ -3,11 +3,15 @@ import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/util
 import {
     TerminalObjectiveStrategy,
     createTerminalObjectiveCandidate,
+    hasBridgeUncalibratedFriendlyObjectiveMechanic,
     hasBridgeUncalibratedObjectiveMechanic,
+    terminalRaceActivationReason,
 } from "../training/terminalObjectiveStrategy.js";
 import { buildTerminalObjectiveArms } from "../training/terminalObjectivePolicy.js";
+import { buildTerminalRaceArms } from "../training/terminalRacePolicy.js";
 
 const arms = new Map(buildTerminalObjectiveArms().map((arm) => [arm.armId, arm]));
+const terminalRaceArms = new Map(buildTerminalRaceArms().map((arm) => [arm.armId, arm]));
 
 describe("terminal-objective strategy construction", () => {
     it("returns the exact baseline path when disabled", () => {
@@ -87,5 +91,122 @@ describe("terminal-objective strategy construction", () => {
             ...ordinary,
             garrisonUnitCount: 1,
         } as any)).toBe(true);
+    });
+
+    it("does not let role-irrelevant crusher or deploy flags invalidate an ordinary friendly weapon", () => {
+        const ordinaryWeapon = {
+            rules: {
+                name: "ordinary",
+                damage: 100,
+                burst: 1,
+                rof: 30,
+                areaFire: false,
+                ambientDamage: 0,
+                radLevel: 0,
+                spawner: false,
+                limboLaunch: false,
+                suicide: false,
+                neverUse: false,
+            },
+            projectileRules: {
+                isAntiGround: true,
+                shrapnelCount: 0,
+                inaccurate: false,
+                flakScatter: false,
+                arcing: false,
+            },
+            warheadRules: {
+                temporal: false,
+                mindControl: false,
+                ivanBomb: false,
+                cellSpread: 0,
+                verses: new Map([["concrete", 1]]),
+            },
+            maxRange: 5,
+            speed: 100,
+            cooldownTicks: 0,
+        };
+        const target = { rules: { type: 2, isSelectableCombatant: true, armor: "concrete" } };
+        const unit = {
+            id: 1,
+            rules: {
+                crusher: true,
+                deployFire: true,
+                c4: false,
+                ivan: false,
+                spawns: false,
+                engineer: false,
+                teleporter: false,
+                radialFireSegments: 0,
+            },
+            primaryWeapon: ordinaryWeapon,
+            secondaryWeapon: undefined,
+            garrisonUnitCount: 0,
+        };
+        const multipliers = { damageMultiplier: 1, rateOfFireMultiplier: 1, speedMultiplier: 1 };
+        expect(hasBridgeUncalibratedObjectiveMechanic(unit as any)).toBe(true);
+        expect(hasBridgeUncalibratedFriendlyObjectiveMechanic(
+            unit as any,
+            target as any,
+            "ordinary_weapon_role_specific",
+            multipliers,
+            1,
+        )).toBe(false);
+        expect(hasBridgeUncalibratedFriendlyObjectiveMechanic(
+            unit as any,
+            target as any,
+            "all_specials_fail_closed",
+            multipliers,
+            1,
+        )).toBe(true);
+    });
+
+    it("keeps uncalibrated friendly attack mechanics fail-closed", () => {
+        const unit = {
+            rules: {
+                crusher: true,
+                deployFire: true,
+                c4: false,
+                ivan: false,
+                spawns: false,
+                engineer: false,
+                teleporter: false,
+                radialFireSegments: 0,
+            },
+            primaryWeapon: {
+                rules: {
+                    damage: 1,
+                    burst: 1,
+                    rof: 1,
+                    areaFire: true,
+                    neverUse: false,
+                },
+                projectileRules: { isAntiGround: true, arcing: false },
+                warheadRules: { verses: new Map([["concrete", 1]]) },
+            },
+            secondaryWeapon: undefined,
+            garrisonUnitCount: 0,
+        };
+        expect(hasBridgeUncalibratedFriendlyObjectiveMechanic(
+            unit as any,
+            { rules: { type: 2, isSelectableCombatant: true, armor: "concrete" } } as any,
+            "ordinary_weapon_role_specific",
+            { damageMultiplier: 1, rateOfFireMultiplier: 1, speedMultiplier: 1 },
+            1,
+        )).toBe(true);
+    });
+
+    it("activates a building-count trigger only after a real guarded transition", () => {
+        const policy = terminalRaceArms.get("public_terminal_race_trigger")!.policy;
+        expect(terminalRaceActivationReason(policy, 3_599, 2, 10)).toBeNull();
+        expect(terminalRaceActivationReason(policy, 3_600, 2, 3)).toBeNull();
+        expect(terminalRaceActivationReason(policy, 3_600, 2, 10)).toBe("guarded_building_count");
+        expect(terminalRaceActivationReason(policy, 7_200, 10, 10)).toBe("fixed_tick");
+        expect(terminalRaceActivationReason(
+            terminalRaceArms.get("public_terminal_race_late")!.policy,
+            3_600,
+            2,
+            10,
+        )).toBeNull();
     });
 });

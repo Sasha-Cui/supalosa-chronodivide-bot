@@ -28,6 +28,7 @@ import {
     calibrateObjectiveAttackerEnvelope,
     calibrateObjectiveThreatEnvelope,
     calibrateObjectiveUnitMechanics,
+    calibratedWeaponDamageAgainst,
     hasUncalibratedObjectiveMechanic,
     objectiveTargetArmorDivisor,
     objectiveVeterancyMultipliers,
@@ -38,6 +39,12 @@ import {
     TerminalObjectivePolicy,
     validateTerminalObjectivePolicy,
 } from "./terminalObjectivePolicy.js";
+import {
+    TerminalRaceFriendlyCalibrationMode,
+    TerminalRacePolicy,
+    validateTerminalRacePolicy,
+} from "./terminalRacePolicy.js";
+import { publicEnemyUnits } from "./terminalRacePublicState.js";
 
 type Point = { x: number; y: number };
 
@@ -58,6 +65,7 @@ type Logger = (message: string, sayInGame?: boolean) => void;
 type RememberedBuilding = {
     unit: UnitData;
     visible: boolean;
+    exact: boolean;
     lastSeenTick: number;
     lastDamageTick: number;
 };
@@ -65,6 +73,7 @@ type RememberedBuilding = {
 type RememberedThreat = {
     unit: UnitData;
     visible: boolean;
+    exact: boolean;
     lastSeenTick: number;
 };
 
@@ -75,16 +84,23 @@ type SearchPoint = Point & {
     lastOrderedTick: number;
 };
 
+type ObjectiveOverlayPolicy = TerminalObjectivePolicy | TerminalRacePolicy;
+type ObjectiveOverlayMechanism = ObjectiveOverlayPolicy["mechanism"];
+type ObjectiveInformationBoundary =
+    | typeof TERMINAL_OBJECTIVE_INFORMATION_BOUNDARY
+    | TerminalRacePolicy["informationInterface"];
+
 export type TerminalObjectiveTelemetry = {
-    schemaVersion: 1;
+    schemaVersion: 1 | 2;
     event: "decision" | "search_orders" | "memory_invalidated";
-    informationBoundary: typeof TERMINAL_OBJECTIVE_INFORMATION_BOUNDARY;
+    informationBoundary: ObjectiveInformationBoundary;
     tick: number;
-    mechanism: TerminalObjectivePolicy["mechanism"];
+    mechanism: ObjectiveOverlayMechanism;
     decisionKind?: ObjectiveMissionDecision["kind"];
     decisionReason?: string;
     selectedBuildingId?: number | null;
     selectedBuildingVisible?: boolean;
+    selectedBuildingObservedBy?: "vision" | "memory" | "public_complete_state";
     selectedAttackerIds?: number[];
     blockerIds?: number[];
     threatIds?: number[];
@@ -96,6 +112,14 @@ export type TerminalObjectiveTelemetry = {
     searchCoverageFraction?: number;
     searchPointCount?: number;
     invalidatedBuildingIds?: number[];
+    activationReason?: "fixed_tick" | "guarded_building_count";
+    exactEnemyBuildingCount?: number | null;
+    eligibleAttackerCount?: number;
+    certifiedAttackerCount?: number;
+    rejectedAttackerCountsByReason?: Record<string, number>;
+    selectedAttackerRulesNames?: string[];
+    delegatedActionCounts?: { idle: number; moving: number; attacking: number; other: number };
+    assignedCombatantFraction?: number;
 };
 
 type TelemetrySink = (event: TerminalObjectiveTelemetry) => void;
@@ -111,6 +135,34 @@ const snapshotUnit = (unit: UnitData): UnitData => ({
     worldPosition: unit.worldPosition.clone(),
     foundation: { ...unit.foundation },
 });
+
+const isTerminalRacePolicy = (policy: ObjectiveOverlayPolicy): policy is TerminalRacePolicy =>
+    policy.schemaVersion === 2;
+
+const objectiveInformationBoundary = (policy: ObjectiveOverlayPolicy): ObjectiveInformationBoundary =>
+    isTerminalRacePolicy(policy) ? policy.informationInterface : TERMINAL_OBJECTIVE_INFORMATION_BOUNDARY;
+
+const objectiveTelemetrySchemaVersion = (policy: ObjectiveOverlayPolicy): 1 | 2 =>
+    isTerminalRacePolicy(policy) ? 2 : 1;
+
+export const terminalRaceActivationReason = (
+    policy: ObjectiveOverlayPolicy,
+    tick: number,
+    exactEnemyBuildingCount: number | null,
+    maximumPreviouslyObservedExactCount: number,
+): "fixed_tick" | "guarded_building_count" | null => {
+    if (tick >= policy.minTick) return "fixed_tick";
+    if (
+        isTerminalRacePolicy(policy) &&
+        policy.activationMode === "fixed_tick_or_guarded_building_count" &&
+        tick >= policy.activationMinTick &&
+        exactEnemyBuildingCount !== null &&
+        exactEnemyBuildingCount <= policy.activationBuildingCount &&
+        (!policy.requireObservedCountAboveThreshold ||
+            maximumPreviouslyObservedExactCount > policy.activationBuildingCount)
+    ) return "guarded_building_count";
+    return null;
+};
 
 export const resolvedObjectiveSpeedType = (unit: UnitData): SpeedType | null =>
     unit.rules.speedType ??
@@ -129,6 +181,27 @@ export const hasBridgeUncalibratedObjectiveMechanic = (unit: UnitData): boolean 
     [unit.primaryWeapon, unit.secondaryWeapon].some((weapon) =>
         !!weapon?.projectileRules.arcing || !!weapon?.rules.neverUse,
     );
+
+export const hasBridgeUncalibratedFriendlyObjectiveMechanic = (
+    unit: UnitData,
+    target: UnitData,
+    mode: TerminalRaceFriendlyCalibrationMode,
+    multipliers: ReturnType<typeof mechanicsMultipliers>,
+    targetArmorDivisor: number,
+): boolean => {
+    if (mode === "all_specials_fail_closed") return hasBridgeUncalibratedObjectiveMechanic(unit);
+    const uncertifiedAntiGroundWeapon = [unit.primaryWeapon, unit.secondaryWeapon].some((weapon) =>
+        !!weapon?.projectileRules.isAntiGround &&
+        calibratedWeaponDamageAgainst(weapon, target, multipliers, targetArmorDivisor) === null,
+    );
+    return uncertifiedAntiGroundWeapon ||
+        !!unit.rules.c4 || !!unit.rules.ivan || !!unit.rules.spawns || !!unit.rules.engineer ||
+        !!unit.rules.teleporter || !!unit.rules.radialFireSegments ||
+        (unit.garrisonUnitCount ?? 0) > 0 ||
+        [unit.primaryWeapon, unit.secondaryWeapon].some((weapon) =>
+            !!weapon?.projectileRules.arcing || !!weapon?.rules.neverUse,
+        );
+};
 
 const isMobileAntiGroundCombatant = (unit: UnitData): boolean =>
     !!unit.rules.isSelectableCombatant &&
@@ -262,13 +335,26 @@ const bindAttacker = (
     game: GameApi,
     unit: UnitData,
     target: UnitData,
+    policy: ObjectiveOverlayPolicy,
 ): BoundAttacker | null => {
-    if (!isMobileAntiGroundCombatant(unit) || hasBridgeUncalibratedObjectiveMechanic(unit)) return null;
+    if (!isMobileAntiGroundCombatant(unit)) return null;
+    const multipliers = mechanicsMultipliers(game, unit);
+    const targetDivisor = armorDivisor(game, target);
+    const uncalibrated = isTerminalRacePolicy(policy)
+        ? hasBridgeUncalibratedFriendlyObjectiveMechanic(
+            unit,
+            target,
+            policy.friendlyCalibrationMode,
+            multipliers,
+            targetDivisor,
+        )
+        : hasBridgeUncalibratedObjectiveMechanic(unit);
+    if (uncalibrated) return null;
     const mechanics = calibrateObjectiveUnitMechanics(
         unit,
         target,
-        mechanicsMultipliers(game, unit),
-        armorDivisor(game, target),
+        multipliers,
+        targetDivisor,
     );
     if (
         mechanics.targetCalibrationStatus !== "ordinary_direct_weapon" ||
@@ -313,10 +399,66 @@ const projectionFirstVolleyTick = (
     cooldown: number,
     tick: number,
 ): number | null => {
-    const uncertainty = source.visible ? 0 : speed * Math.max(0, tick - source.lastSeenTick);
+    const uncertainty = source.visible || source.exact
+        ? 0
+        : speed * Math.max(0, tick - source.lastSeenTick);
     const travel = Math.max(0, distanceToFoundation(point(source.unit), target) - uncertainty - range);
     if (travel > 0 && speed <= 0) return null;
     return Math.max(Math.ceil(travel / Math.max(speed, Number.EPSILON)), Math.max(0, Math.floor(cooldown)));
+};
+
+const rejectionReason = (
+    game: GameApi,
+    unit: UnitData,
+    target: UnitData,
+    policy: ObjectiveOverlayPolicy,
+): string => {
+    if (!isMobileAntiGroundCombatant(unit)) return "not_mobile_anti_ground_combatant";
+    const multipliers = mechanicsMultipliers(game, unit);
+    const divisor = armorDivisor(game, target);
+    const bridgeUncalibrated = isTerminalRacePolicy(policy)
+        ? hasBridgeUncalibratedFriendlyObjectiveMechanic(
+            unit,
+            target,
+            policy.friendlyCalibrationMode,
+            multipliers,
+            divisor,
+        )
+        : hasBridgeUncalibratedObjectiveMechanic(unit);
+    if (bridgeUncalibrated) return "uncalibrated_friendly_mechanic";
+    const mechanics = calibrateObjectiveUnitMechanics(unit, target, multipliers, divisor);
+    if (mechanics.targetCalibrationStatus !== "ordinary_direct_weapon") return "no_ordinary_building_damage";
+    if (!mechanics.hasFiniteAmmoForInitialShot) return "no_initial_ammunition";
+    if (mechanics.calibratedDamagePerVolley <= 0 || mechanics.calibratedRateOfFireTicks <= 0) {
+        return "nonpositive_calibrated_damage";
+    }
+    return conservativeObjectiveTravelTicks(
+        game,
+        unit,
+        target,
+        mechanics.maximumGroundRangeTiles,
+        mechanics.speedTilesPerTick,
+    ) === null ? "unreachable_firing_perimeter" : "certified";
+};
+
+const countReasons = (reasons: readonly string[]): Record<string, number> =>
+    Object.fromEntries([...new Set(reasons)].sort().map((reason) => [
+        reason,
+        reasons.filter((value) => value === reason).length,
+    ]));
+
+const delegatedActionCounts = (
+    eligible: readonly UnitData[],
+    selectedAttackerIds: ReadonlySet<number>,
+): { idle: number; moving: number; attacking: number; other: number } => {
+    const counts = { idle: 0, moving: 0, attacking: 0, other: 0 };
+    for (const unit of eligible.filter(({ id }) => !selectedAttackerIds.has(id))) {
+        if (unit.attackState !== undefined && unit.attackState !== AttackState.Idle) counts.attacking += 1;
+        else if (unit.isIdle === true) counts.idle += 1;
+        else if (unit.canMove !== false) counts.moving += 1;
+        else counts.other += 1;
+    }
+    return counts;
 };
 
 export class TerminalObjectiveStrategy implements StrategyLike {
@@ -330,11 +472,14 @@ export class TerminalObjectiveStrategy implements StrategyLike {
     private lastProgressTick = 0;
     private lastOrderTick = Number.NEGATIVE_INFINITY;
     private lastTelemetry = new Map<string, { signature: string; tick: number }>();
+    private exactEnemyBuildingCount: number | null = null;
+    private maximumObservedExactEnemyBuildingCount = 0;
+    private activationReason: "fixed_tick" | "guarded_building_count" | null = null;
 
     constructor(
         private inner: StrategyLike,
         private readonly country: Countries,
-        private readonly policy: TerminalObjectivePolicy,
+        private readonly policy: ObjectiveOverlayPolicy,
         private readonly telemetry: TelemetrySink,
     ) {}
 
@@ -350,7 +495,16 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         const tick = game.getCurrentTick();
         this.updateMemory(game, player.name, tick);
         this.updateSearchCoverage(game, player.name, tick);
-        if (tick < this.policy.minTick || tick < this.lastOrderTick + this.policy.orderIntervalTicks) return;
+        this.activationReason = terminalRaceActivationReason(
+            this.policy,
+            tick,
+            this.exactEnemyBuildingCount,
+            this.maximumObservedExactEnemyBuildingCount,
+        );
+        if (
+            this.activationReason === null ||
+            tick < this.lastOrderTick + this.policy.orderIntervalTicks
+        ) return;
         this.lastOrderTick = tick;
 
         const selfUnits = game.getVisibleUnits(player.name, "self")
@@ -374,7 +528,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         }
 
         const candidates = [...this.buildings.values()].map((target) => {
-            const attackers = eligible.map((unit) => bindAttacker(game, unit, target.unit))
+            const attackers = eligible.map((unit) => bindAttacker(game, unit, target.unit, this.policy))
                 .filter((value): value is BoundAttacker => value !== null);
             return {
                 target,
@@ -405,10 +559,14 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             candidates.find(({ target }) => target.unit.id === id),
         ).find((value) => value?.opportunity.directCompletionTicks !== null);
         if (!selected || selected.attackers.length === 0) {
+            const target = selected?.target.unit;
+            const reasons = target
+                ? eligible.map((unit) => rejectionReason(game, unit, target, this.policy))
+                : [];
             this.emit({
-                schemaVersion: 1,
+                schemaVersion: objectiveTelemetrySchemaVersion(this.policy),
                 event: "decision",
-                informationBoundary: TERMINAL_OBJECTIVE_INFORMATION_BOUNDARY,
+                informationBoundary: objectiveInformationBoundary(this.policy),
                 tick,
                 mechanism: this.policy.mechanism,
                 decisionKind: "regroup",
@@ -417,6 +575,13 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 selectedAttackerIds: [],
                 noProgressTicks,
                 searchCoverageFraction: this.searchCoverageFraction(),
+                activationReason: this.activationReason ?? undefined,
+                exactEnemyBuildingCount: this.exactEnemyBuildingCount,
+                eligibleAttackerCount: eligible.length,
+                certifiedAttackerCount: selected?.attackers.length ?? 0,
+                rejectedAttackerCountsByReason: countReasons(reasons.filter((reason) => reason !== "certified")),
+                delegatedActionCounts: delegatedActionCounts(eligible, new Set()),
+                assignedCombatantFraction: 0,
             });
             return;
         }
@@ -455,7 +620,8 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 reason: retained ? "retain_committed_building" : "direct_objective_progress",
             };
         } else {
-            const terminalMechanism = this.policy.mechanism === "terminal_candidate" ||
+            const terminalMechanism = isTerminalRacePolicy(this.policy) ||
+                this.policy.mechanism === "terminal_candidate" ||
                 this.policy.mechanism === "full_sufficient_strike";
             decision = selectObjectiveMission({
                 attackers: selected.attackers.map(({ core }) => core),
@@ -467,12 +633,14 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 threats: bound.threats,
                 baseAssets: bound.baseAssets,
                 assetThreatProjections: bound.assetThreatProjections,
-                terminalEvidence: {
-                    remainingKnownBuildingCount: terminalMechanism ? this.buildings.size : 2,
-                    allPreviouslyKnownAlternativesInvalidated: this.buildings.size === 1,
-                    searchCoverageFraction: this.searchCoverageFraction(),
-                    requiredSearchCoverageFraction: this.policy.requiredSearchCoverageFraction,
-                },
+                terminalEvidence: terminalMechanism
+                    ? this.terminalEvidence()
+                    : {
+                        remainingKnownBuildingCount: 2,
+                        allPreviouslyKnownAlternativesInvalidated: false,
+                        searchCoverageFraction: this.searchCoverageFraction(),
+                        requiredSearchCoverageFraction: this.policy.requiredSearchCoverageFraction,
+                    },
                 noProgressTicks,
                 thresholds,
                 blockerThenBuildingCompletionTicks,
@@ -481,12 +649,14 @@ export class TerminalObjectiveStrategy implements StrategyLike {
 
         let strike = selected.attackers;
         if (
-            this.policy.mechanism === "full_sufficient_strike" &&
+            (isTerminalRacePolicy(this.policy) || this.policy.mechanism === "full_sufficient_strike") &&
             (decision.kind === "building_strike" || decision.kind === "terminal_candidate_strike")
         ) {
             const threatDeadline = Math.min(
                 classification.earliestLethalInterceptTick ?? Number.POSITIVE_INFINITY,
-                classification.earliestBaseDestructionTick ?? Number.POSITIVE_INFINITY,
+                (decision.kind === "terminal_candidate_strike"
+                    ? null
+                    : classification.earliestBaseDestructionTick) ?? Number.POSITIVE_INFINITY,
             );
             const deadline = Number.isFinite(threatDeadline)
                 ? Math.max(0, threatDeadline - thresholds.directCompletionSafetyMarginTicks - 1)
@@ -509,12 +679,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                     threats: bound.threats,
                     baseAssets: bound.baseAssets,
                     assetThreatProjections: bound.assetThreatProjections,
-                    terminalEvidence: {
-                        remainingKnownBuildingCount: this.buildings.size,
-                        allPreviouslyKnownAlternativesInvalidated: this.buildings.size === 1,
-                        searchCoverageFraction: this.searchCoverageFraction(),
-                        requiredSearchCoverageFraction: this.policy.requiredSearchCoverageFraction,
-                    },
+                    terminalEvidence: this.terminalEvidence(),
                     noProgressTicks,
                     thresholds,
                     blockerThenBuildingCompletionTicks: null,
@@ -543,15 +708,20 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             );
         }
         this.emit({
-            schemaVersion: 1,
+            schemaVersion: objectiveTelemetrySchemaVersion(this.policy),
             event: "decision",
-            informationBoundary: TERMINAL_OBJECTIVE_INFORMATION_BOUNDARY,
+            informationBoundary: objectiveInformationBoundary(this.policy),
             tick,
             mechanism: this.policy.mechanism,
             decisionKind: decision.kind,
             decisionReason: decision.reason,
             selectedBuildingId: selected.target.unit.id,
             selectedBuildingVisible: selected.target.visible,
+            selectedBuildingObservedBy: selected.target.visible
+                ? "vision"
+                : selected.target.exact
+                  ? "public_complete_state"
+                  : "memory",
             selectedAttackerIds: strike.map(({ unit }) => unit.id).sort((a, b) => a - b),
             blockerIds: decision.kind === "blocker_clear" ? decision.blockerIds : classification.blockerIds,
             threatIds: decision.kind === "base_defense" || decision.kind === "predecessor_fallback"
@@ -565,6 +735,19 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             earliestBaseDestructionTick: classification.earliestBaseDestructionTick,
             noProgressTicks,
             searchCoverageFraction: this.searchCoverageFraction(),
+            activationReason: this.activationReason ?? undefined,
+            exactEnemyBuildingCount: this.exactEnemyBuildingCount,
+            eligibleAttackerCount: eligible.length,
+            certifiedAttackerCount: selected.attackers.length,
+            rejectedAttackerCountsByReason: countReasons(eligible.map((unit) =>
+                rejectionReason(game, unit, selected.target.unit, this.policy),
+            ).filter((reason) => reason !== "certified")),
+            selectedAttackerRulesNames: strike.map(({ unit }) => unit.rules.name).sort(),
+            delegatedActionCounts: delegatedActionCounts(
+                eligible,
+                new Set(strike.map(({ unit }) => unit.id)),
+            ),
+            assignedCombatantFraction: eligible.length === 0 ? 0 : strike.length / eligible.length,
         });
     }
 
@@ -576,6 +759,25 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             blockerLethalDamageFraction: this.policy.blockerLethalDamageFraction,
             directCompletionSafetyMarginTicks: this.policy.directCompletionSafetyMarginTicks,
             missionLivenessTicks: this.policy.missionLivenessTicks,
+        };
+    }
+
+    private terminalEvidence(): {
+        remainingKnownBuildingCount: number;
+        allPreviouslyKnownAlternativesInvalidated: boolean;
+        searchCoverageFraction: number;
+        requiredSearchCoverageFraction: number;
+    } {
+        const exact = isTerminalRacePolicy(this.policy) &&
+            this.policy.informationInterface === "public_complete_state" &&
+            this.exactEnemyBuildingCount !== null;
+        return {
+            remainingKnownBuildingCount: exact ? this.exactEnemyBuildingCount! : this.buildings.size,
+            allPreviouslyKnownAlternativesInvalidated: exact
+                ? this.exactEnemyBuildingCount === 1
+                : this.buildings.size === 1,
+            searchCoverageFraction: exact ? 1 : this.searchCoverageFraction(),
+            requiredSearchCoverageFraction: this.policy.requiredSearchCoverageFraction,
         };
     }
 
@@ -596,8 +798,11 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         const threats = [...threatUnitsById.values()].map((remembered): ObjectiveThreat => {
             const unit = remembered.unit;
             const envelope = calibrateObjectiveThreatEnvelope(unit, attackUnits, mechanicsMultipliers(game, unit));
-            const hiddenTicks = remembered.visible ? 0 : Math.max(0, tick - remembered.lastSeenTick);
-            const special = !remembered.visible || hasBridgeUncalibratedObjectiveMechanic(unit) ||
+            const hiddenTicks = remembered.visible || remembered.exact
+                ? 0
+                : Math.max(0, tick - remembered.lastSeenTick);
+            const special = (!remembered.visible && !remembered.exact) ||
+                hasBridgeUncalibratedObjectiveMechanic(unit) ||
                 !envelope.ordinaryDirectUpperBoundComplete;
             return {
                 id: unit.id,
@@ -607,7 +812,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 rangeTiles: envelope.maximumObservedAntiGroundRangeTiles + envelope.speedTilesPerTick * hiddenTicks,
                 damagePerVolleyToStrike: envelope.maximumApplicableDamagePerVolley,
                 rateOfFireTicks: Math.max(1, envelope.minimumApplicableRateOfFireTicks),
-                currentlyDamagingStrike: remembered.visible &&
+                currentlyDamagingStrike: (remembered.visible || remembered.exact) &&
                     unit.attackState !== undefined && unit.attackState !== AttackState.Idle &&
                     attackers.some(({ unit: member }) =>
                         distance(point(unit), point(member)) <= envelope.maximumObservedAntiGroundRangeTiles,
@@ -632,7 +837,8 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             const unit = remembered.unit;
             for (const asset of selfBuildings.filter(({ id }) => indispensable.has(id))) {
                 const envelope = calibrateObjectiveThreatEnvelope(unit, [asset], mechanicsMultipliers(game, unit));
-                const special = !remembered.visible || hasBridgeUncalibratedObjectiveMechanic(unit) ||
+                const special = (!remembered.visible && !remembered.exact) ||
+                    hasBridgeUncalibratedObjectiveMechanic(unit) ||
                     !envelope.ordinaryDirectUpperBoundComplete;
                 const firstVolleyTick = projectionFirstVolleyTick(
                     remembered,
@@ -668,14 +874,27 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         if (blockers.length !== blockerIds.length) return null;
         const forceAttackers: ObjectiveForceAttacker[] = attackers.flatMap(({ unit }) => {
             const divisors = new Map(blockers.map((target) => [target.id, armorDivisor(game, target)]));
+            const multipliers = mechanicsMultipliers(game, unit);
+            const friendlyCalibrationMode = isTerminalRacePolicy(this.policy)
+                ? this.policy.friendlyCalibrationMode
+                : null;
             const envelope = calibrateObjectiveAttackerEnvelope(
                 unit,
                 blockers,
-                mechanicsMultipliers(game, unit),
+                multipliers,
                 divisors,
             );
+            const uncalibratedFriendlyMechanic = friendlyCalibrationMode !== null
+                ? blockers.some((target) => hasBridgeUncalibratedFriendlyObjectiveMechanic(
+                    unit,
+                    target,
+                    friendlyCalibrationMode,
+                    multipliers,
+                    divisors.get(target.id) ?? 1,
+                ))
+                : hasBridgeUncalibratedObjectiveMechanic(unit);
             if (
-                hasBridgeUncalibratedObjectiveMechanic(unit) ||
+                uncalibratedFriendlyMechanic ||
                 envelope.uncalibratedTargetIds.length > 0 ||
                 envelope.minimumSelectedDamagePerVolley <= 0 ||
                 envelope.maximumSelectedRateOfFireTicks <= 0
@@ -719,17 +938,21 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         const ids = attackers.map(({ unit }) => unit.id);
         if (ids.length === 0) return;
         if (decision.kind === "building_strike" || decision.kind === "terminal_candidate_strike") {
-            if (target.visible) context.player.actions.orderUnits(ids, OrderType.Attack, target.unit.id);
+            if (target.visible || target.exact) {
+                context.player.actions.orderUnits(ids, OrderType.Attack, target.unit.id);
+            }
             else context.player.actions.orderUnits(ids, OrderType.AttackMove, target.unit.tile.rx, target.unit.tile.ry);
             return;
         }
         if (decision.kind === "blocker_clear") {
-            const blocker = decision.blockerIds.map((id) => threatUnitsById.get(id)).find((value) => value?.visible);
+            const blocker = decision.blockerIds.map((id) => threatUnitsById.get(id))
+                .find((value) => value?.visible || value?.exact);
             if (blocker) context.player.actions.orderUnits(ids, OrderType.Attack, blocker.unit.id);
             return;
         }
         if (decision.kind === "base_defense") {
-            const threat = decision.threatIds.map((id) => threatUnitsById.get(id)).find((value) => value?.visible);
+            const threat = decision.threatIds.map((id) => threatUnitsById.get(id))
+                .find((value) => value?.visible || value?.exact);
             if (threat) context.player.actions.orderUnits(ids, OrderType.Attack, threat.unit.id);
         }
     }
@@ -776,9 +999,9 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             context.player.actions.orderUnits(ids, OrderType.AttackMove, target.x, target.y);
         }
         this.emit({
-            schemaVersion: 1,
+            schemaVersion: objectiveTelemetrySchemaVersion(this.policy),
             event: "search_orders",
-            informationBoundary: TERMINAL_OBJECTIVE_INFORMATION_BOUNDARY,
+            informationBoundary: objectiveInformationBoundary(this.policy),
             tick,
             mechanism: this.policy.mechanism,
             decisionKind: "search",
@@ -790,15 +1013,33 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             noProgressTicks,
             searchCoverageFraction: this.searchCoverageFraction(),
             searchPointCount: ranked.length,
+            activationReason: this.activationReason ?? undefined,
+            exactEnemyBuildingCount: this.exactEnemyBuildingCount,
+            eligibleAttackerCount: eligible.length,
+            certifiedAttackerCount: 0,
+            delegatedActionCounts: delegatedActionCounts(eligible, new Set(assignedIds)),
+            assignedCombatantFraction: eligible.length === 0 ? 0 : assignedIds.length / eligible.length,
         });
     }
 
     private updateMemory(game: GameApi, playerName: string, tick: number): void {
-        const visibleBuildings = game.getVisibleUnits(
-            playerName,
-            "enemy",
-            (rules) => rules.type === ObjectType.Building,
-        ).map((id) => game.getUnitData(id)).filter((unit): unit is UnitData => !!unit);
+        const publicComplete = isTerminalRacePolicy(this.policy) &&
+            this.policy.informationInterface === "public_complete_state";
+        const actuallyVisibleEnemyIds = new Set(game.getVisibleUnits(playerName, "enemy"));
+        const visibleBuildings = publicComplete
+            ? publicEnemyUnits(game, playerName, (unit) => unit.type === ObjectType.Building)
+            : game.getVisibleUnits(
+                playerName,
+                "enemy",
+                (rules) => rules.type === ObjectType.Building,
+            ).map((id) => game.getUnitData(id)).filter((unit): unit is UnitData => !!unit);
+        this.exactEnemyBuildingCount = publicComplete ? visibleBuildings.length : null;
+        if (this.exactEnemyBuildingCount !== null) {
+            this.maximumObservedExactEnemyBuildingCount = Math.max(
+                this.maximumObservedExactEnemyBuildingCount,
+                this.exactEnemyBuildingCount,
+            );
+        }
         const visibleBuildingIds = new Set(visibleBuildings.map(({ id }) => id));
         for (const unit of visibleBuildings) {
             const previous = this.buildings.get(unit.id);
@@ -809,7 +1050,8 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             }
             this.buildings.set(unit.id, {
                 unit: snapshotUnit(unit),
-                visible: true,
+                visible: actuallyVisibleEnemyIds.has(unit.id),
+                exact: publicComplete,
                 lastSeenTick: tick,
                 lastDamageTick: madeProgress ? tick : previous?.lastDamageTick ?? tick,
             });
@@ -817,6 +1059,18 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         const invalidated: number[] = [];
         for (const [id, remembered] of this.buildings) {
             if (visibleBuildingIds.has(id)) continue;
+            if (publicComplete) {
+                this.buildings.delete(id);
+                invalidated.push(id);
+                if (this.committedBuildingId === id) {
+                    this.committedBuildingId = null;
+                    this.committedBuildingMadeProgress = false;
+                    this.committedBlockerClear = false;
+                    this.committedBlockerIds.clear();
+                    this.lastProgressTick = tick;
+                }
+                continue;
+            }
             remembered.visible = false;
             if (entireFoundationVisible(game, playerName, remembered.unit)) {
                 this.buildings.delete(id);
@@ -831,12 +1085,17 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             }
         }
 
-        const visibleThreats = game.getVisibleUnits(playerName, "enemy", (rules) =>
-            !!rules.isSelectableCombatant &&
-            [rules.type].every((type) => type !== ObjectType.Building || rules.isBaseDefense) &&
-            (!!rules.c4 || !!rules.ivan || !!rules.spawns || !!rules.engineer ||
-                !!rules.isBaseDefense || !!rules.isSelectableCombatant),
-        ).map((id) => game.getUnitData(id)).filter((unit): unit is UnitData => !!unit)
+        const visibleThreats = (publicComplete
+            ? publicEnemyUnits(game, playerName, (unit) =>
+                !!unit.rules.isSelectableCombatant &&
+                (unit.type !== ObjectType.Building || !!unit.rules.isBaseDefense),
+            )
+            : game.getVisibleUnits(playerName, "enemy", (rules) =>
+                !!rules.isSelectableCombatant &&
+                [rules.type].every((type) => type !== ObjectType.Building || rules.isBaseDefense) &&
+                (!!rules.c4 || !!rules.ivan || !!rules.spawns || !!rules.engineer ||
+                    !!rules.isBaseDefense || !!rules.isSelectableCombatant),
+            ).map((id) => game.getUnitData(id)).filter((unit): unit is UnitData => !!unit))
             .filter((unit) => [unit.primaryWeapon, unit.secondaryWeapon].some((weapon) =>
                 !!weapon?.projectileRules.isAntiGround,
             ) || hasBridgeUncalibratedObjectiveMechanic(unit));
@@ -847,10 +1106,20 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 previous && unit.hitPoints < previous.unit.hitPoints &&
                 this.committedBlockerIds.has(unit.id)
             ) this.lastProgressTick = tick;
-            this.threats.set(unit.id, { unit: snapshotUnit(unit), visible: true, lastSeenTick: tick });
+            this.threats.set(unit.id, {
+                unit: snapshotUnit(unit),
+                visible: actuallyVisibleEnemyIds.has(unit.id),
+                exact: publicComplete,
+                lastSeenTick: tick,
+            });
         }
         for (const [id, remembered] of this.threats) {
             if (visibleThreatIds.has(id)) continue;
+            if (publicComplete) {
+                this.threats.delete(id);
+                if (this.committedBlockerIds.delete(id)) this.lastProgressTick = tick;
+                continue;
+            }
             remembered.visible = false;
             if (this.uncertaintyRegionFullyObserved(game, playerName, remembered, tick)) {
                 this.threats.delete(id);
@@ -859,9 +1128,9 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         }
         if (invalidated.length > 0) {
             this.emit({
-                schemaVersion: 1,
+                schemaVersion: objectiveTelemetrySchemaVersion(this.policy),
                 event: "memory_invalidated",
-                informationBoundary: TERMINAL_OBJECTIVE_INFORMATION_BOUNDARY,
+                informationBoundary: objectiveInformationBoundary(this.policy),
                 tick,
                 mechanism: this.policy.mechanism,
                 invalidatedBuildingIds: invalidated.sort((a, b) => a - b),
@@ -954,10 +1223,12 @@ export const createTerminalObjectiveCandidate = (
     baselineFactory: BaselineFactory,
     name: string,
     country: Countries,
-    rawPolicy: TerminalObjectivePolicy,
+    rawPolicy: ObjectiveOverlayPolicy,
     telemetry: TelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = validateTerminalObjectivePolicy(rawPolicy);
+    const policy = rawPolicy.schemaVersion === 2
+        ? validateTerminalRacePolicy(rawPolicy as TerminalRacePolicy)
+        : validateTerminalObjectivePolicy(rawPolicy as TerminalObjectivePolicy);
     if (!policy.enabled) return baselineFactory.create(name, country);
     if (!baselineFactory.createDefaultStrategy || !baselineFactory.createWithStrategy) {
         throw new Error("Baseline factory does not expose the terminal-objective strategy interface");
