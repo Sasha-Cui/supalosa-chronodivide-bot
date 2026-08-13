@@ -112,7 +112,7 @@ export type ObjectiveBuildingOpportunity = {
 export type ObjectiveMissionDecision =
     | { kind: "terminal_candidate_strike"; buildingId: number; predictedCompletionTicks: number; reason: "sole_known_building_before_intercept" }
     | { kind: "building_strike"; buildingId: number; predictedCompletionTicks: number; reason: "direct_objective_progress" | "retain_committed_building" }
-    | { kind: "blocker_clear"; buildingId: number; blockerIds: number[]; predictedCompletionTicks: number; reason: "direct_strike_not_survivable" }
+    | { kind: "blocker_clear"; buildingId: number; blockerIds: number[]; predictedCompletionTicks: number | null; reason: "direct_strike_not_survivable" }
     | { kind: "base_defense"; threatIds: number[]; reason: "base_falls_before_objective" }
     | { kind: "regroup"; reason: "no_capable_strike_group" }
     | { kind: "search"; reason: "no_known_building" | "offensive_liveness_deadline" }
@@ -753,6 +753,103 @@ export const selectObjectiveMission = (args: {
             };
         }
         return { kind: "regroup", reason: "no_capable_strike_group" };
+    }
+    return {
+        kind: "building_strike",
+        buildingId: selected.id,
+        predictedCompletionTicks: directCompletionTicks,
+        reason: committed?.id === selected.id && committedBuildingMadeProgress
+            ? "retain_committed_building"
+            : "direct_objective_progress",
+    };
+};
+
+/**
+ * Objective-first scheduler used by the continuous-offense policy.
+ *
+ * Enemy forces are instrumental obstacles, not an alternative terminal goal.
+ * A calibrated force interrupts the building mission only when it can destroy
+ * the strike group before the building falls. Uncalibrated or horizon-limited
+ * threats do not impose a global pause; their observable geometry still
+ * remains available to the predecessor policy for all units outside the strike
+ * detachment. A calibrated blocker is cleared even when its exact clearance
+ * time is unavailable, after which the same building is reconsidered.
+ */
+export const selectContinuousObjectiveMission = (args: {
+    attackers: readonly ObjectiveAttacker[];
+    buildings: readonly ObjectiveBuilding[];
+    selectedBuildingId: number | null;
+    committedBuildingId: number | null;
+    committedBuildingMadeProgress: boolean;
+    threats: readonly ObjectiveThreat[];
+    baseAssets: readonly ObjectiveBaseAsset[];
+    assetThreatProjections: readonly ObjectiveAssetThreatProjection[];
+    terminalEvidence: TerminalEvidence;
+    noProgressTicks: number;
+    thresholds: ObjectiveSchedulerThresholds;
+    blockerThenBuildingCompletionTicks: number | null;
+}): ObjectiveMissionDecision => {
+    const {
+        attackers, buildings, selectedBuildingId, committedBuildingId,
+        committedBuildingMadeProgress, threats, baseAssets,
+        assetThreatProjections, terminalEvidence, noProgressTicks, thresholds,
+        blockerThenBuildingCompletionTicks,
+    } = args;
+    if (buildings.length === 0) {
+        return {
+            kind: "search",
+            reason: noProgressTicks >= thresholds.missionLivenessTicks
+                ? "offensive_liveness_deadline"
+                : "no_known_building",
+        };
+    }
+    if (attackers.length === 0) return { kind: "regroup", reason: "no_capable_strike_group" };
+    const committed = committedBuildingId === null
+        ? null
+        : buildings.find(({ id }) => id === committedBuildingId) ?? null;
+    const selected = committed && committedBuildingMadeProgress &&
+        noProgressTicks < thresholds.missionLivenessTicks
+        ? committed
+        : buildings.find(({ id }) => id === selectedBuildingId) ?? buildings[0];
+    const directCompletionTicks = estimateObjectiveStrikeCompletionTicks(attackers, selected);
+    if (directCompletionTicks === null) return { kind: "regroup", reason: "no_capable_strike_group" };
+    const classification = classifyObjectiveThreats({
+        attackers,
+        building: selected,
+        threats,
+        baseAssets,
+        assetThreatProjections,
+        directCompletionTicks,
+        thresholds,
+    });
+    const directSurvives = classification.earliestLethalInterceptTick === null ||
+        directCompletionTicks + thresholds.directCompletionSafetyMarginTicks <
+            classification.earliestLethalInterceptTick;
+    if (classification.uncalibratedStrikeThreatIds.length > 0) {
+        return {
+            kind: "blocker_clear",
+            buildingId: selected.id,
+            blockerIds: classification.uncalibratedStrikeThreatIds,
+            predictedCompletionTicks: null,
+            reason: "direct_strike_not_survivable",
+        };
+    }
+    if (!directSurvives && classification.blockerIds.length > 0) {
+        return {
+            kind: "blocker_clear",
+            buildingId: selected.id,
+            blockerIds: classification.blockerIds,
+            predictedCompletionTicks: blockerThenBuildingCompletionTicks,
+            reason: "direct_strike_not_survivable",
+        };
+    }
+    if (isObjectiveTerminalEvidenceSufficient(terminalEvidence)) {
+        return {
+            kind: "terminal_candidate_strike",
+            buildingId: selected.id,
+            predictedCompletionTicks: directCompletionTicks,
+            reason: "sole_known_building_before_intercept",
+        };
     }
     return {
         kind: "building_strike",

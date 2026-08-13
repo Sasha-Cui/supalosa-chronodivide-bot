@@ -5,6 +5,7 @@ import {
     ObjectiveBuilding,
     ObjectiveSchedulerThresholds,
     ObjectiveThreat,
+    selectContinuousObjectiveMission,
     selectObjectiveMission,
 } from "@supalosa/chronodivide-bot/dist/bot/logic/objective/terminalObjectiveDecisionCore.js";
 
@@ -136,6 +137,73 @@ describe("terminal objective force-versus-building priority", () => {
             kind: "base_defense",
             threatIds: [tank.id],
             reason: "base_falls_before_objective",
+        });
+    });
+});
+
+describe("continuous objective offense", () => {
+    it("attacks an exposed last building despite 100 uncalibrated tanks outside the route", () => {
+        const tanks = Array.from({ length: 100 }, (_, index): ObjectiveThreat => ({
+            ...threat(100 + index, 1_000, 1_000 + index),
+            speedTilesPerTick: 0,
+            rangeTiles: 0,
+            calibrationStatus: "uncalibrated_special",
+        }));
+        expect(selectContinuousObjectiveMission(terminalArgs(tanks, []))).toMatchObject({
+            kind: "terminal_candidate_strike",
+            buildingId: lastBuilding.id,
+        });
+    });
+
+    it("actively clears an uncalibrated force that intersects the building route", () => {
+        const blocker: ObjectiveThreat = {
+            ...threat(100, 2, 0),
+            calibrationStatus: "uncalibrated_special",
+        };
+        expect(selectContinuousObjectiveMission(terminalArgs([blocker], []))).toEqual({
+            kind: "blocker_clear",
+            buildingId: lastBuilding.id,
+            blockerIds: [blocker.id],
+            predictedCompletionTicks: null,
+            reason: "direct_strike_not_survivable",
+        });
+    });
+
+    it("clears a calibrated route blocker even when exact clearance time is unavailable", () => {
+        const blocker = {
+            ...threat(100, 2, 0),
+            currentlyDamagingStrike: true,
+        };
+        expect(selectContinuousObjectiveMission(terminalArgs([blocker], []))).toEqual({
+            kind: "blocker_clear",
+            buildingId: lastBuilding.id,
+            blockerIds: [blocker.id],
+            predictedCompletionTicks: null,
+            reason: "direct_strike_not_survivable",
+        });
+    });
+
+    it("does not abandon a nonterminal building for a threatened home base", () => {
+        const tank = threat(100, 100, 100);
+        const projection: ObjectiveAssetThreatProjection = {
+            threatId: tank.id,
+            assetId: 500,
+            firstVolleyTick: 1,
+            damagePerVolley: 100,
+            rateOfFireTicks: 1,
+            calibrationStatus: "ordinary_direct_upper_bound",
+        };
+        expect(selectContinuousObjectiveMission({
+            ...terminalArgs([tank], [projection]),
+            terminalEvidence: {
+                remainingKnownBuildingCount: 2,
+                allPreviouslyKnownAlternativesInvalidated: false,
+                searchCoverageFraction: 0.5,
+                requiredSearchCoverageFraction: 0.9,
+            },
+        })).toMatchObject({
+            kind: "building_strike",
+            buildingId: lastBuilding.id,
         });
     });
 });

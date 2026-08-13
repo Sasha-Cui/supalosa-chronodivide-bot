@@ -22,6 +22,7 @@ import {
     estimateObjectiveStrikeCompletionTicks,
     rankObjectiveBuildingOpportunities,
     selectMinimumSufficientObjectiveStrikeGroup,
+    selectContinuousObjectiveMission,
     selectObjectiveMission,
 } from "@supalosa/chronodivide-bot/dist/bot/logic/objective/terminalObjectiveDecisionCore.js";
 import {
@@ -45,6 +46,10 @@ import {
     validateTerminalRacePolicy,
 } from "./terminalRacePolicy.js";
 import { publicEnemyUnits } from "./terminalRacePublicState.js";
+import {
+    ContinuousOffensePolicy,
+    validateContinuousOffensePolicy,
+} from "./continuousOffensePolicy.js";
 
 type Point = { x: number; y: number };
 
@@ -84,7 +89,7 @@ type SearchPoint = Point & {
     lastOrderedTick: number;
 };
 
-type ObjectiveOverlayPolicy = TerminalObjectivePolicy | TerminalRacePolicy;
+type ObjectiveOverlayPolicy = TerminalObjectivePolicy | TerminalRacePolicy | ContinuousOffensePolicy;
 type ObjectiveOverlayMechanism = ObjectiveOverlayPolicy["mechanism"];
 type ObjectiveInformationBoundary =
     | typeof TERMINAL_OBJECTIVE_INFORMATION_BOUNDARY
@@ -115,6 +120,7 @@ export type TerminalObjectiveTelemetry = {
     activationReason?: "fixed_tick" | "guarded_building_count";
     exactEnemyBuildingCount?: number | null;
     eligibleAttackerCount?: number;
+    reservedCombatantCount?: number;
     certifiedAttackerCount?: number;
     rejectedAttackerCountsByReason?: Record<string, number>;
     selectedAttackerRulesNames?: string[];
@@ -129,6 +135,22 @@ const DOGS = new Set(["DOG", "ADOG"]);
 const point = (unit: UnitData): Point => ({ x: unit.tile.rx, y: unit.tile.ry });
 const distance = (left: Point, right: Point): number => Math.hypot(left.x - right.x, left.y - right.y);
 
+export const partitionContinuousOffenseCombatants = (
+    eligible: readonly UnitData[],
+    ownStart: Point,
+    reserveCombatants: number,
+): { active: UnitData[]; reserved: UnitData[] } => {
+    const reserveCount = Math.min(Math.max(0, reserveCombatants), eligible.length);
+    const reserved = eligible.slice().sort((left, right) =>
+        distance(point(left), ownStart) - distance(point(right), ownStart) || left.id - right.id,
+    ).slice(0, reserveCount);
+    const reservedIds = new Set(reserved.map(({ id }) => id));
+    return {
+        active: eligible.filter(({ id }) => !reservedIds.has(id)),
+        reserved,
+    };
+};
+
 const snapshotUnit = (unit: UnitData): UnitData => ({
     ...unit,
     tile: { ...unit.tile },
@@ -139,11 +161,16 @@ const snapshotUnit = (unit: UnitData): UnitData => ({
 const isTerminalRacePolicy = (policy: ObjectiveOverlayPolicy): policy is TerminalRacePolicy =>
     policy.schemaVersion === 2;
 
+const isContinuousOffensePolicy = (policy: ObjectiveOverlayPolicy): policy is ContinuousOffensePolicy =>
+    policy.schemaVersion === 3;
+
 const objectiveInformationBoundary = (policy: ObjectiveOverlayPolicy): ObjectiveInformationBoundary =>
-    isTerminalRacePolicy(policy) ? policy.informationInterface : TERMINAL_OBJECTIVE_INFORMATION_BOUNDARY;
+    isTerminalRacePolicy(policy) || isContinuousOffensePolicy(policy)
+        ? policy.informationInterface
+        : TERMINAL_OBJECTIVE_INFORMATION_BOUNDARY;
 
 const objectiveTelemetrySchemaVersion = (policy: ObjectiveOverlayPolicy): 1 | 2 =>
-    isTerminalRacePolicy(policy) ? 2 : 1;
+    isTerminalRacePolicy(policy) || isContinuousOffensePolicy(policy) ? 2 : 1;
 
 export const terminalRaceActivationReason = (
     policy: ObjectiveOverlayPolicy,
@@ -153,8 +180,8 @@ export const terminalRaceActivationReason = (
 ): "fixed_tick" | "guarded_building_count" | null => {
     if (tick >= policy.minTick) return "fixed_tick";
     if (
-        isTerminalRacePolicy(policy) &&
-        policy.activationMode === "fixed_tick_or_guarded_building_count" &&
+        (isContinuousOffensePolicy(policy) ||
+            isTerminalRacePolicy(policy) && policy.activationMode === "fixed_tick_or_guarded_building_count") &&
         tick >= policy.activationMinTick &&
         exactEnemyBuildingCount !== null &&
         exactEnemyBuildingCount <= policy.activationBuildingCount &&
@@ -340,7 +367,7 @@ const bindAttacker = (
     if (!isMobileAntiGroundCombatant(unit)) return null;
     const multipliers = mechanicsMultipliers(game, unit);
     const targetDivisor = armorDivisor(game, target);
-    const uncalibrated = isTerminalRacePolicy(policy)
+    const uncalibrated = isTerminalRacePolicy(policy) || isContinuousOffensePolicy(policy)
         ? hasBridgeUncalibratedFriendlyObjectiveMechanic(
             unit,
             target,
@@ -416,7 +443,7 @@ const rejectionReason = (
     if (!isMobileAntiGroundCombatant(unit)) return "not_mobile_anti_ground_combatant";
     const multipliers = mechanicsMultipliers(game, unit);
     const divisor = armorDivisor(game, target);
-    const bridgeUncalibrated = isTerminalRacePolicy(policy)
+    const bridgeUncalibrated = isTerminalRacePolicy(policy) || isContinuousOffensePolicy(policy)
         ? hasBridgeUncalibratedFriendlyObjectiveMechanic(
             unit,
             target,
@@ -511,6 +538,14 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             .map((id) => game.getUnitData(id))
             .filter((unit): unit is UnitData => !!unit);
         const eligible = selfUnits.filter(isMobileAntiGroundCombatant);
+        const partition = isContinuousOffensePolicy(this.policy)
+            ? partitionContinuousOffenseCombatants(
+                eligible,
+                game.getPlayerData(player.name).startLocation,
+                this.policy.reserveCombatants,
+            )
+            : { active: eligible, reserved: [] };
+        const activeEligible = partition.active;
         const noProgressTicks = Math.max(0, tick - this.lastProgressTick);
         if (
             this.committedBuildingId !== null &&
@@ -523,12 +558,19 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         }
 
         if (this.buildings.size === 0) {
-            this.issueSearch(context, eligible, tick, noProgressTicks);
+            this.issueSearch(
+                context,
+                activeEligible,
+                tick,
+                noProgressTicks,
+                eligible.length,
+                partition.reserved.length,
+            );
             return;
         }
 
         const candidates = [...this.buildings.values()].map((target) => {
-            const attackers = eligible.map((unit) => bindAttacker(game, unit, target.unit, this.policy))
+            const attackers = activeEligible.map((unit) => bindAttacker(game, unit, target.unit, this.policy))
                 .filter((value): value is BoundAttacker => value !== null);
             return {
                 target,
@@ -561,7 +603,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         if (!selected || selected.attackers.length === 0) {
             const target = selected?.target.unit;
             const reasons = target
-                ? eligible.map((unit) => rejectionReason(game, unit, target, this.policy))
+                ? activeEligible.map((unit) => rejectionReason(game, unit, target, this.policy))
                 : [];
             this.emit({
                 schemaVersion: objectiveTelemetrySchemaVersion(this.policy),
@@ -578,9 +620,12 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 activationReason: this.activationReason ?? undefined,
                 exactEnemyBuildingCount: this.exactEnemyBuildingCount,
                 eligibleAttackerCount: eligible.length,
+                reservedCombatantCount: isContinuousOffensePolicy(this.policy)
+                    ? partition.reserved.length
+                    : undefined,
                 certifiedAttackerCount: selected?.attackers.length ?? 0,
                 rejectedAttackerCountsByReason: countReasons(reasons.filter((reason) => reason !== "certified")),
-                delegatedActionCounts: delegatedActionCounts(eligible, new Set()),
+                delegatedActionCounts: delegatedActionCounts(activeEligible, new Set()),
                 assignedCombatantFraction: 0,
             });
             return;
@@ -620,10 +665,13 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 reason: retained ? "retain_committed_building" : "direct_objective_progress",
             };
         } else {
-            const terminalMechanism = isTerminalRacePolicy(this.policy) ||
+            const terminalMechanism = isTerminalRacePolicy(this.policy) || isContinuousOffensePolicy(this.policy) ||
                 this.policy.mechanism === "terminal_candidate" ||
                 this.policy.mechanism === "full_sufficient_strike";
-            decision = selectObjectiveMission({
+            const decide = isContinuousOffensePolicy(this.policy)
+                ? selectContinuousObjectiveMission
+                : selectObjectiveMission;
+            decision = decide({
                 attackers: selected.attackers.map(({ core }) => core),
                 buildings: [selected.opportunity.building],
                 selectedBuildingId: selected.target.unit.id,
@@ -649,7 +697,8 @@ export class TerminalObjectiveStrategy implements StrategyLike {
 
         let strike = selected.attackers;
         if (
-            (isTerminalRacePolicy(this.policy) || this.policy.mechanism === "full_sufficient_strike") &&
+            (isTerminalRacePolicy(this.policy) || isContinuousOffensePolicy(this.policy) ||
+                this.policy.mechanism === "full_sufficient_strike") &&
             (decision.kind === "building_strike" || decision.kind === "terminal_candidate_strike")
         ) {
             const threatDeadline = Math.min(
@@ -661,7 +710,9 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             const deadline = Number.isFinite(threatDeadline)
                 ? Math.max(0, threatDeadline - thresholds.directCompletionSafetyMarginTicks - 1)
                 : decision.predictedCompletionTicks;
-            const minimum = selectMinimumSufficientObjectiveStrikeGroup({
+            const useFullForce = isContinuousOffensePolicy(this.policy) &&
+                this.policy.strikeGroupMode === "full_compatible_force";
+            const minimum = useFullForce ? null : selectMinimumSufficientObjectiveStrikeGroup({
                 attackers: selected.attackers.map(({ core }) => core),
                 building: selected.opportunity.building,
                 completionDeadlineTicks: deadline,
@@ -669,7 +720,9 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             if (minimum) {
                 const minimumIds = new Set(minimum.attackers.map(({ id }) => id));
                 const proposed = selected.attackers.filter(({ unit }) => minimumIds.has(unit.id));
-                const rechecked = selectObjectiveMission({
+                const rechecked = (isContinuousOffensePolicy(this.policy)
+                    ? selectContinuousObjectiveMission
+                    : selectObjectiveMission)({
                     attackers: proposed.map(({ core }) => core),
                     buildings: [selected.opportunity.building],
                     selectedBuildingId: selected.target.unit.id,
@@ -738,16 +791,19 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             activationReason: this.activationReason ?? undefined,
             exactEnemyBuildingCount: this.exactEnemyBuildingCount,
             eligibleAttackerCount: eligible.length,
+            reservedCombatantCount: isContinuousOffensePolicy(this.policy)
+                ? partition.reserved.length
+                : undefined,
             certifiedAttackerCount: selected.attackers.length,
-            rejectedAttackerCountsByReason: countReasons(eligible.map((unit) =>
+            rejectedAttackerCountsByReason: countReasons(activeEligible.map((unit) =>
                 rejectionReason(game, unit, selected.target.unit, this.policy),
             ).filter((reason) => reason !== "certified")),
             selectedAttackerRulesNames: strike.map(({ unit }) => unit.rules.name).sort(),
             delegatedActionCounts: delegatedActionCounts(
-                eligible,
+                activeEligible,
                 new Set(strike.map(({ unit }) => unit.id)),
             ),
-            assignedCombatantFraction: eligible.length === 0 ? 0 : strike.length / eligible.length,
+            assignedCombatantFraction: activeEligible.length === 0 ? 0 : strike.length / activeEligible.length,
         });
     }
 
@@ -768,7 +824,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         searchCoverageFraction: number;
         requiredSearchCoverageFraction: number;
     } {
-        const exact = isTerminalRacePolicy(this.policy) &&
+        const exact = (isTerminalRacePolicy(this.policy) || isContinuousOffensePolicy(this.policy)) &&
             this.policy.informationInterface === "public_complete_state" &&
             this.exactEnemyBuildingCount !== null;
         return {
@@ -875,7 +931,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         const forceAttackers: ObjectiveForceAttacker[] = attackers.flatMap(({ unit }) => {
             const divisors = new Map(blockers.map((target) => [target.id, armorDivisor(game, target)]));
             const multipliers = mechanicsMultipliers(game, unit);
-            const friendlyCalibrationMode = isTerminalRacePolicy(this.policy)
+            const friendlyCalibrationMode = isTerminalRacePolicy(this.policy) || isContinuousOffensePolicy(this.policy)
                 ? this.policy.friendlyCalibrationMode
                 : null;
             const envelope = calibrateObjectiveAttackerEnvelope(
@@ -962,6 +1018,8 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         eligible: readonly UnitData[],
         tick: number,
         noProgressTicks: number,
+        totalEligibleCount: number = eligible.length,
+        reservedCombatantCount?: number,
     ): void {
         if (eligible.length === 0 || this.searchPoints === null) return;
         const ranked = this.searchPoints.slice().sort((left, right) => {
@@ -1015,7 +1073,8 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             searchPointCount: ranked.length,
             activationReason: this.activationReason ?? undefined,
             exactEnemyBuildingCount: this.exactEnemyBuildingCount,
-            eligibleAttackerCount: eligible.length,
+            eligibleAttackerCount: totalEligibleCount,
+            reservedCombatantCount,
             certifiedAttackerCount: 0,
             delegatedActionCounts: delegatedActionCounts(eligible, new Set(assignedIds)),
             assignedCombatantFraction: eligible.length === 0 ? 0 : assignedIds.length / eligible.length,
@@ -1023,7 +1082,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
     }
 
     private updateMemory(game: GameApi, playerName: string, tick: number): void {
-        const publicComplete = isTerminalRacePolicy(this.policy) &&
+        const publicComplete = (isTerminalRacePolicy(this.policy) || isContinuousOffensePolicy(this.policy)) &&
             this.policy.informationInterface === "public_complete_state";
         const actuallyVisibleEnemyIds = new Set(game.getVisibleUnits(playerName, "enemy"));
         const visibleBuildings = publicComplete
@@ -1226,9 +1285,11 @@ export const createTerminalObjectiveCandidate = (
     rawPolicy: ObjectiveOverlayPolicy,
     telemetry: TelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 2
-        ? validateTerminalRacePolicy(rawPolicy as TerminalRacePolicy)
-        : validateTerminalObjectivePolicy(rawPolicy as TerminalObjectivePolicy);
+    const policy = rawPolicy.schemaVersion === 3
+        ? validateContinuousOffensePolicy(rawPolicy as ContinuousOffensePolicy)
+        : rawPolicy.schemaVersion === 2
+          ? validateTerminalRacePolicy(rawPolicy as TerminalRacePolicy)
+          : validateTerminalObjectivePolicy(rawPolicy as TerminalObjectivePolicy);
     if (!policy.enabled) return baselineFactory.create(name, country);
     if (!baselineFactory.createDefaultStrategy || !baselineFactory.createWithStrategy) {
         throw new Error("Baseline factory does not expose the terminal-objective strategy interface");

@@ -5,10 +5,12 @@ import {
     createTerminalObjectiveCandidate,
     hasBridgeUncalibratedFriendlyObjectiveMechanic,
     hasBridgeUncalibratedObjectiveMechanic,
+    partitionContinuousOffenseCombatants,
     terminalRaceActivationReason,
 } from "../training/terminalObjectiveStrategy.js";
 import { buildTerminalObjectiveArms } from "../training/terminalObjectivePolicy.js";
 import { buildTerminalRaceArms } from "../training/terminalRacePolicy.js";
+import { buildContinuousOffensePolicy } from "../training/continuousOffensePolicy.js";
 
 const arms = new Map(buildTerminalObjectiveArms().map((arm) => [arm.armId, arm]));
 const terminalRaceArms = new Map(buildTerminalRaceArms().map((arm) => [arm.armId, arm]));
@@ -36,6 +38,27 @@ describe("terminal-objective strategy construction", () => {
         expect(factory.create).toHaveBeenCalledOnce();
         expect(factory.createDefaultStrategy).not.toHaveBeenCalled();
         expect(factory.createWithStrategy).not.toHaveBeenCalled();
+    });
+
+    it("constructs the continuous-offense candidate through the shared external strategy bridge", () => {
+        const inner = { onAiUpdate: vi.fn() as any };
+        inner.onAiUpdate.mockReturnValue(inner);
+        const wrapped = { tag: "continuous-offense" };
+        const factory = {
+            descriptor: { kind: "external-package", packageRoot: "/pinned" } as const,
+            create: vi.fn(() => ({ tag: "baseline" })),
+            createDefaultStrategy: vi.fn(() => inner),
+            createWithStrategy: vi.fn(() => wrapped),
+        };
+        const result = createTerminalObjectiveCandidate(
+            factory as any,
+            "candidate",
+            Countries.USA,
+            buildContinuousOffensePolicy(),
+        );
+        expect(result).toBe(wrapped);
+        expect(factory.createDefaultStrategy).toHaveBeenCalledOnce();
+        expect(factory.createWithStrategy).toHaveBeenCalledOnce();
     });
 
     it("always runs the external predecessor before considering an overlay", () => {
@@ -208,5 +231,24 @@ describe("terminal-objective strategy construction", () => {
             2,
             10,
         )).toBeNull();
+    });
+
+    it("runs continuous offense from the early guarded transition or its fixed deadline", () => {
+        const policy = buildContinuousOffensePolicy();
+        expect(terminalRaceActivationReason(policy, 7_199, 4, 10)).toBeNull();
+        expect(terminalRaceActivationReason(policy, 7_200, 4, 5)).toBeNull();
+        expect(terminalRaceActivationReason(policy, 7_200, 4, 10)).toBe("guarded_building_count");
+        expect(terminalRaceActivationReason(policy, 12_600, 20, 20)).toBe("fixed_tick");
+    });
+
+    it("reserves the combatants nearest home and sends the forward force", () => {
+        const unit = (id: number, x: number) => ({ id, tile: { rx: x, ry: 0 } }) as any;
+        const partition = partitionContinuousOffenseCombatants(
+            [unit(4, 20), unit(2, 1), unit(3, 9), unit(1, 1)],
+            { x: 0, y: 0 },
+            2,
+        );
+        expect(partition.reserved.map(({ id }) => id)).toEqual([1, 2]);
+        expect(partition.active.map(({ id }) => id)).toEqual([4, 3]);
     });
 });
