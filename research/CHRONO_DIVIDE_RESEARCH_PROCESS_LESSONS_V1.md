@@ -145,6 +145,28 @@ observable-information hierarchy:
    the base policy, active search, capability production, or bounded home
    defense. Passive waiting is a controller defect, not a tactic.
 
+The force-versus-building choice should therefore be represented as a terminal
+race rather than a fixed target-class preference. For every feasible building
+strike, compare a conservative time-to-destruction certificate against a
+conservative time-to-interception or force-collapse certificate. If the building
+can be eliminated first, commit the compatible strike group to the building
+even when a much larger enemy army survives elsewhere: destroying the final
+building ends the game. If the strike would fail, clear only the minimum
+route-blocking or damage-capable force needed to make it feasible and then
+resume building focus immediately. When opposing armed forces are absent or
+cannot affect the route, every reachable building is free terminal progress and
+must be attacked without a regroup delay.
+
+Continuous offense is an invariant, not an instruction to issue arbitrary
+attack orders. At each closeout decision, every combat-capable unit must be in
+one of a small number of observable roles: building strike, minimum blocker
+clearance, bounded defense, active search, or movement toward a requested
+capability. Repeated regroup or predecessor-fallback decisions without a change
+in target feasibility, local threat, or capability state are order-liveness
+failures. A prospective controller should measure and cap those transitions,
+preempt stale fallback orders, and preserve a committed terminal target until
+the target disappears, becomes unreachable, or the race certificate reverses.
+
 This rule is prospective and was supplied from the game's stated win condition,
 not selected by comparing policy outcomes from the invalid Method-v5 campaign.
 It must be tested causally with at least a distributed-target versus focused-
@@ -280,6 +302,26 @@ must return to permanently open families under a newly frozen protocol version.
 - This note was initially stored outside the tracked checkout to avoid changing
   the revision seen by later array tasks. It became eligible for a `main` commit
   only after the array and dependent controller were cancelled and reconciled.
+
+- The amended terminal-objective open-development campaign on source commit
+  `46309e66fdd086f75da3f85f829ca4f526a270f5` completed all 1,800 launches in
+  Slurm array `22129384`; controller `22129385` passed the literal-endpoint
+  technical gate with zero technical, endpoint, or information-boundary
+  violations. Its immutable analysis artifact has SHA-256
+  `4ed4f15802893bf465bfe6dd93178b7ad9948426b03b3e1141c79ce5b6512129`.
+- The complete open aggregate did not advance. The full sufficient-strike arm
+  produced 69 wins, 223 draws, and 68 losses (score 0.5014), versus 69 wins,
+  225 draws, and 66 losses for the selected prior (score 0.5042). Its paired
+  family-macro effect was -0.0028; the one-sided family-clustered 80% lower
+  score-margin bound was -0.0078. These are development diagnostics, not paper
+  claims.
+- The complete mechanism ledger shows 172,391 regroup and 109,449 predecessor-
+  fallback decisions, compared with 9,398 building strikes, 2,079 blocker
+  clears, and only 222 terminal-candidate strikes. Event counts alone do not
+  establish causality, but they reject the assumption that adding a terminal
+  branch guarantees continuous terminal pressure. The next open-development
+  diagnosis must test command liveness and the terminal-race rule on aggregate
+  telemetry before freezing another policy.
 
 ## Core lesson
 
