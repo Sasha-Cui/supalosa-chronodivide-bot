@@ -26,9 +26,9 @@ import {
     sha256File,
 } from "./methodV5PlanRunner.js";
 
-export const METHOD_V5_ENGINE_SEED_BASE = 3_700_000_000 as const;
+export const METHOD_V5_ENGINE_SEED_BASE = 3_730_000_000 as const;
 export const METHOD_V5_MAX_TICKS = 24_000 as const;
-export const METHOD_V5_FAMILY_COUNT = 22 as const;
+export const METHOD_V5_FAMILY_COUNT = 19 as const;
 export const METHOD_V5_COUNTRIES = [
     Countries.USA,
     Countries.KOREA,
@@ -43,11 +43,11 @@ export const METHOD_V5_COUNTRIES = [
 export const METHOD_V5_SHARD_COUNT = METHOD_V5_FAMILY_COUNT * METHOD_V5_COUNTRIES.length;
 export const METHOD_V5_LAUNCH_COUNT = METHOD_V5_SHARD_COUNT * METHOD_V5_CLOSEOUT_ARM_ORDER.length * 2;
 export const METHOD_V5_SOURCE_CAMPAIGN_SHA256 =
-    "32c3d7c9af5ba95c46447053d7e813dc3f6e9879d58c4f4fedd94ce9d5b25230" as const;
-export const METHOD_V5_TRAINING_POPULATION_SHA256 =
-    "ece688c14d8c02b98754a88f04e42581f4c6c6044d742a7b8d4e0feaa5177fa5" as const;
-export const METHOD_V5_MAP_CATALOG_SHA256 =
-    "8f378ee52a2d8a6d45e5d23a1e521aa6b2e08e9ab174adc8066cce8a1824bd54" as const;
+    "73a4e88ba618281d368c78e2e7c7d667e147e40378fe458ed01f74af8bad1de6" as const;
+export const METHOD_V5_SUPPORTED_POPULATION_SHA256 =
+    "80012d84a9897c90fa54acf7971cdb66551b842cd072f33ecec9f6c6f9b10084" as const;
+export const METHOD_V5_ECONOMIC_START_GATE_SHA256 =
+    "f3d50b207ad6a4aaae48842d8e78e133411d0edd7fc5d37a0d8687f213f38e22" as const;
 
 export const METHOD_V5_RANKING_RULE = [
     "literal candidate wins descending",
@@ -62,7 +62,7 @@ export const METHOD_V5_ADVANCEMENT_RULE = [
     "literal candidate win probability strictly greater than 0.50",
     "literal candidate wins strictly exceed literal baseline wins",
     "candidate wins strictly exceed losses in at least seven of nine countries",
-    "all 3,168 launches are technically clean under endpoint v5",
+    "all 2,736 launches are technically clean under endpoint v5",
 ] as const;
 
 export type MethodV5Family = {
@@ -72,9 +72,9 @@ export type MethodV5Family = {
 };
 
 export type MethodV5Campaign = {
-    schemaVersion: 2;
-    kind: "method-v6-open-training-literal-endpoint";
-    status: "FROZEN_METHOD_V6_OBJECTIVE_DIRECTED_OPEN_TRAINING_ENDPOINT_V5_SCREEN";
+    schemaVersion: 3;
+    kind: "method-v6-supported-open-training-literal-endpoint";
+    status: "FROZEN_METHOD_V6_SUPPORTED_OBJECTIVE_DIRECTED_OPEN_TRAINING_ENDPOINT_V5_SCREEN";
     generatedAt: string;
     sourceGitCommit: string;
     sourceRuntimeSha256: string;
@@ -84,9 +84,16 @@ export type MethodV5Campaign = {
     packageLockSha256: string;
     sourceCampaignPath: string;
     sourceCampaignSha256: typeof METHOD_V5_SOURCE_CAMPAIGN_SHA256;
-    mapCatalogPath: string;
-    mapCatalogSha256: typeof METHOD_V5_MAP_CATALOG_SHA256;
-    sourcePopulationCommitmentSha256: string;
+    supportedPopulationPath: string;
+    supportedPopulationSha256: typeof METHOD_V5_SUPPORTED_POPULATION_SHA256;
+    economicStartGatePath: string;
+    economicStartGateSha256: typeof METHOD_V5_ECONOMIC_START_GATE_SHA256;
+    sourcePopulationCommitmentSha256: typeof METHOD_V5_SUPPORTED_POPULATION_SHA256;
+    outcomeFreePopulationSelection: true;
+    excludedTechnicalFamilyCount: 3;
+    priorCampaignReuse: "none_fresh_complete_rerun";
+    replacesFailedArrayJobId: "22094119";
+    replacesFailedControllerJobId: "22094121";
     endpointVersion: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION;
     endpointSha256: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256;
     outcomeAccess: "open-training-only-no-paper-claim";
@@ -142,47 +149,46 @@ export const buildMethodV5Episodes = (arms: MethodV5CloseoutArm[]): MethodV5Plan
     })));
 
 export const bindMethodV5Families = (
-    sourceCampaign: unknown,
-    mapCatalog: unknown,
+    supportedPopulation: unknown,
     repoRoot: string,
 ): MethodV5Family[] => {
     if (
-        !isRecord(sourceCampaign) ||
-        sourceCampaign.kind !== "method-v4-lifecycle-screen" ||
-        sourceCampaign.sourcePopulationCommitmentSha256 !== METHOD_V5_TRAINING_POPULATION_SHA256 ||
-        !Array.isArray(sourceCampaign.selectedFamilies) ||
-        sourceCampaign.selectedFamilies.length !== METHOD_V5_FAMILY_COUNT ||
-        !isRecord(mapCatalog) ||
-        !Array.isArray(mapCatalog.families)
-    ) throw new Error("Method-v5 source family inputs have an invalid schema");
-    const catalog = new Map<string, RecordValue>();
-    for (const raw of mapCatalog.families) {
-        if (isRecord(raw) && typeof raw.familyId === "string") catalog.set(raw.familyId, raw);
-    }
-    return sourceCampaign.selectedFamilies.map((raw, index): MethodV5Family => {
-        if (!isRecord(raw) || typeof raw.familyId !== "string" || typeof raw.representativeSha256 !== "string") {
-            throw new Error(`Method-v5 source family ${index} is malformed`);
-        }
-        const catalogFamily = catalog.get(raw.familyId);
-        if (!catalogFamily || !Array.isArray(catalogFamily.mapPaths)) {
-            throw new Error(`Method-v5 source family ${raw.familyId} is missing from the catalog`);
-        }
-        const candidates = catalogFamily.mapPaths
-            .filter((item): item is string => typeof item === "string")
-            .filter((item) => item.startsWith("packages/chronodivide-bot-driver/data/"))
-            .filter((item) => {
-                const fullPath = path.join(repoRoot, item);
-                return fs.existsSync(fullPath) && sha256File(fullPath) === raw.representativeSha256;
-            });
-        if (candidates.length !== 1) {
-            throw new Error(`Method-v5 family ${raw.familyId} has ${candidates.length} exact representative maps`);
+        !isRecord(supportedPopulation) || supportedPopulation.schemaVersion !== 1 ||
+        supportedPopulation.status !== "FROZEN_METHOD_V6_OPEN_TRAINING_ECONOMIC_START_SUPPORTED_POPULATION" ||
+        supportedPopulation.authorizedUse !== "generate_complete_replacement_method_v6_open_training_campaign_with_fresh_seeds" ||
+        supportedPopulation.outcomeFree !== true || supportedPopulation.sourceFamilyCount !== 22 ||
+        supportedPopulation.supportedFamilyCount !== METHOD_V5_FAMILY_COUNT ||
+        supportedPopulation.unsupportedFamilyCount !== 3 ||
+        supportedPopulation.sourceOpenCampaignSha256 !== METHOD_V5_SOURCE_CAMPAIGN_SHA256 ||
+        supportedPopulation.economicStartGateSha256 !== METHOD_V5_ECONOMIC_START_GATE_SHA256 ||
+        !Array.isArray(supportedPopulation.forbiddenInputs) ||
+        supportedPopulation.forbiddenInputs.join(",") !== "winner,score,candidateScore,outcomeStatus,policyArmPerformance" ||
+        !Array.isArray(supportedPopulation.supportedFamilies) ||
+        supportedPopulation.supportedFamilies.length !== METHOD_V5_FAMILY_COUNT ||
+        !Array.isArray(supportedPopulation.unsupportedFamilies) ||
+        supportedPopulation.unsupportedFamilies.length !== 3
+    ) throw new Error("Method-v6 supported-population input has an invalid schema");
+    const families = supportedPopulation.supportedFamilies.map((raw, index): MethodV5Family => {
+        if (
+            !isRecord(raw) || typeof raw.familyId !== "string" ||
+            typeof raw.mapName !== "string" || path.basename(raw.mapName) !== raw.mapName ||
+            typeof raw.mapSha256 !== "string" || !/^[0-9a-f]{64}$/.test(raw.mapSha256)
+        ) throw new Error(`Method-v6 supported family ${index} is malformed`);
+        const fullPath = path.join(repoRoot, "packages", "chronodivide-bot-driver", "data", raw.mapName);
+        if (!fs.existsSync(fullPath) || sha256File(fullPath) !== raw.mapSha256) {
+            throw new Error(`Method-v6 supported family ${raw.familyId} lacks its exact committed map`);
         }
         return {
             familyId: raw.familyId,
-            mapName: path.basename(candidates[0]),
-            mapSha256: raw.representativeSha256,
+            mapName: raw.mapName,
+            mapSha256: raw.mapSha256,
         };
     });
+    if (
+        new Set(families.map(({ familyId }) => familyId)).size !== METHOD_V5_FAMILY_COUNT ||
+        new Set(families.map(({ mapSha256 }) => mapSha256)).size !== METHOD_V5_FAMILY_COUNT
+    ) throw new Error("Method-v6 supported families are not unique");
+    return families;
 };
 
 const main = async (): Promise<void> => {
@@ -192,27 +198,29 @@ const main = async (): Promise<void> => {
     if (!process.env.BASELINE_PACKAGE_ROOT || process.env.REQUIRE_EXTERNAL_BASELINE !== "true") {
         throw new Error("Method-v5 generation requires the pinned external baseline environment");
     }
-    const sourceCampaignPath = requiredPath("METHOD_V6_SOURCE_CAMPAIGN");
-    const mapCatalogPath = requiredPath("METHOD_V6_MAP_CATALOG");
+    const supportedPopulationPath = requiredPath("METHOD_V6_SUPPORTED_POPULATION");
     const outRoot = requiredPath("OUT_ROOT");
     if (fs.existsSync(outRoot)) throw new Error(`Refusing to reuse Method-v5 OUT_ROOT ${outRoot}`);
+    if (sha256File(supportedPopulationPath) !== METHOD_V5_SUPPORTED_POPULATION_SHA256) {
+        throw new Error("Method-v6 supported population differs from the frozen commitment");
+    }
+    const supportedPopulation = JSON.parse(fs.readFileSync(supportedPopulationPath, "utf8")) as unknown;
+    const families = bindMethodV5Families(supportedPopulation, repoRoot);
+    if (!isRecord(supportedPopulation)) throw new Error("Method-v6 supported population is malformed");
+    const sourceCampaignPath = path.resolve(String(supportedPopulation.sourceOpenCampaignPath));
+    const economicStartGatePath = path.resolve(String(supportedPopulation.economicStartGatePath));
     if (
         sha256File(sourceCampaignPath) !== METHOD_V5_SOURCE_CAMPAIGN_SHA256 ||
-        sha256File(mapCatalogPath) !== METHOD_V5_MAP_CATALOG_SHA256
-    ) throw new Error("Method-v5 family inputs differ from the frozen commitments");
-    const families = bindMethodV5Families(
-        JSON.parse(fs.readFileSync(sourceCampaignPath, "utf8")),
-        JSON.parse(fs.readFileSync(mapCatalogPath, "utf8")),
-        repoRoot,
-    );
+        sha256File(economicStartGatePath) !== METHOD_V5_ECONOMIC_START_GATE_SHA256
+    ) throw new Error("Method-v6 supported-population evidence chain drifted");
     const arms = buildMethodV5CloseoutArms();
     const baselineFactory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
     const generationManifest = createExperimentManifest({
-        runId: "plan-method-v6-open-training-v1",
+        runId: "plan-method-v6-supported-open-training-v2",
         mixDir: path.join(driverRoot, "data"),
         maps: families.map(({ mapName }) => mapName),
         effectiveConfig: {
-            purpose: "method-v6-objective-directed-open-training-literal-endpoint-v5",
+            purpose: "method-v6-supported-objective-directed-open-training-literal-endpoint-v5",
             outcomeAccess: false,
             countries: METHOD_V5_COUNTRIES,
             reciprocalSlots: [0, 1],
@@ -248,7 +256,7 @@ const main = async (): Promise<void> => {
             const country = METHOD_V5_COUNTRIES[countryIndex];
             const shardIndex = familyIndex * METHOD_V5_COUNTRIES.length + countryIndex;
             const requestedEngineSeed = derivePairedEngineSeed(METHOD_V5_ENGINE_SEED_BASE, shardIndex);
-            const runId = `method-v6-f${familyIndex}-c${countryIndex}-${generationManifest.source.gitCommit.slice(0, 10)}`;
+            const runId = `method-v6-supported-f${familyIndex}-c${countryIndex}-${generationManifest.source.gitCommit.slice(0, 10)}`;
             const plan: MethodV5RunPlan = parseMethodV5RunPlan({
                 schemaVersion: METHOD_V5_PLAN_SCHEMA_VERSION,
                 kind: METHOD_V5_PLAN_KIND,
@@ -259,7 +267,7 @@ const main = async (): Promise<void> => {
                 baselineRuntimeSha256: baseline.runtimeTree.sha256,
                 gameApiRuntimeSha256: generationManifest.software.gameApiRuntimeTree.sha256,
                 packageLockSha256: generationManifest.software.packageLockSha256,
-                sourcePopulationCommitmentSha256: METHOD_V5_TRAINING_POPULATION_SHA256,
+                sourcePopulationCommitmentSha256: METHOD_V5_SUPPORTED_POPULATION_SHA256,
                 endpointVersion: LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION,
                 endpointSha256: LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256,
                 family,
@@ -287,9 +295,9 @@ const main = async (): Promise<void> => {
         }
     }
     const campaign: MethodV5Campaign = {
-        schemaVersion: 2,
-        kind: "method-v6-open-training-literal-endpoint",
-        status: "FROZEN_METHOD_V6_OBJECTIVE_DIRECTED_OPEN_TRAINING_ENDPOINT_V5_SCREEN",
+        schemaVersion: 3,
+        kind: "method-v6-supported-open-training-literal-endpoint",
+        status: "FROZEN_METHOD_V6_SUPPORTED_OBJECTIVE_DIRECTED_OPEN_TRAINING_ENDPOINT_V5_SCREEN",
         generatedAt: new Date().toISOString(),
         sourceGitCommit: generationManifest.source.gitCommit,
         sourceRuntimeSha256,
@@ -299,9 +307,16 @@ const main = async (): Promise<void> => {
         packageLockSha256: generationManifest.software.packageLockSha256,
         sourceCampaignPath,
         sourceCampaignSha256: METHOD_V5_SOURCE_CAMPAIGN_SHA256,
-        mapCatalogPath,
-        mapCatalogSha256: METHOD_V5_MAP_CATALOG_SHA256,
-        sourcePopulationCommitmentSha256: METHOD_V5_TRAINING_POPULATION_SHA256,
+        supportedPopulationPath,
+        supportedPopulationSha256: METHOD_V5_SUPPORTED_POPULATION_SHA256,
+        economicStartGatePath,
+        economicStartGateSha256: METHOD_V5_ECONOMIC_START_GATE_SHA256,
+        sourcePopulationCommitmentSha256: METHOD_V5_SUPPORTED_POPULATION_SHA256,
+        outcomeFreePopulationSelection: true,
+        excludedTechnicalFamilyCount: 3,
+        priorCampaignReuse: "none_fresh_complete_rerun",
+        replacesFailedArrayJobId: "22094119",
+        replacesFailedControllerJobId: "22094121",
         endpointVersion: LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION,
         endpointSha256: LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256,
         outcomeAccess: "open-training-only-no-paper-claim",

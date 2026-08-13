@@ -129,14 +129,18 @@ change the frozen design during a campaign.
 
 ## Population, execution, and advancement
 
-- Use the same committed 22 permanently open families only as a population
-  definition, but generate wholly new Method-v6 plans and exclusive outputs.
+- Use every one of the 19 families that passed the frozen, outcome-free economic
+  start gate across all nine countries and both physical slots. The three
+  excluded families (`mf_mp24du`, `mf_mp25du`, and `mf_mp27du`) cannot establish
+  the required building endpoint reliably and are excluded solely on that
+  technical criterion, before aggregate outcomes were opened.
 - Test all nine countries in matched candidate/baseline country pairs, both
   physical slots, and one common seed per family-country block.
-- Run eight arms, 198 shards, 16 launches per shard, 3,168 games total,
+- Run eight arms, 171 shards, 16 launches per shard, 2,736 games total,
   `shortGame=false`, a 24,000-tick cap, no retry, and only Slurm account
   `pi_jss233`.
-- Do not combine any Method-v5 games with Method-v6.
+- Use a wholly new engine-seed block beginning at 3,730,000,000 and do not reuse
+  any game from failed array 22094119 or combine replacement results with it.
 - Analyze only after every shard and the fail-closed technical controller pass.
 
 Ranking remains: literal wins; win-minus-loss margin; draw rate; worst-country
@@ -160,4 +164,10 @@ Before the full screen:
 5. verify those episodes are either literal outcomes, tick-cap draws, or exact-
    schema nonliteral termination draws, with zero technical failures.
 
-Only after all five gates pass may the new 3,168-game screen launch.
+All five original preflight gates passed. The subsequent 3,168-game campaign
+failed closed because 368 launches on three map families did not establish both
+building endpoints. No aggregate policy result from that campaign is admissible.
+Economic-start gate job 22105916 then tested the original 22-family definition
+using exact external Supalosa controls, all nine countries, and both slots,
+without recording outcome fields. Its frozen result authorizes only the complete
+2,736-game fresh-seed replacement defined above.

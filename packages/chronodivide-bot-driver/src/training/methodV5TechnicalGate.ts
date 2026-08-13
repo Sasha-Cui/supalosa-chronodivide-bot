@@ -7,15 +7,15 @@ import { ApiEventType } from "@chronodivide/game-api";
 import {
     METHOD_V5_ADVANCEMENT_RULE,
     METHOD_V5_COUNTRIES,
+    METHOD_V5_ECONOMIC_START_GATE_SHA256,
     METHOD_V5_ENGINE_SEED_BASE,
     METHOD_V5_FAMILY_COUNT,
     METHOD_V5_LAUNCH_COUNT,
-    METHOD_V5_MAP_CATALOG_SHA256,
     METHOD_V5_MAX_TICKS,
     METHOD_V5_RANKING_RULE,
     METHOD_V5_SHARD_COUNT,
     METHOD_V5_SOURCE_CAMPAIGN_SHA256,
-    METHOD_V5_TRAINING_POPULATION_SHA256,
+    METHOD_V5_SUPPORTED_POPULATION_SHA256,
     MethodV5Campaign,
     buildMethodV5Episodes,
 } from "./methodV5Campaign.js";
@@ -60,12 +60,16 @@ const exactKeys = (value: RecordValue, expected: string[], label: string): void 
 
 export const validateMethodV5Campaign = (value: unknown): MethodV5Campaign => {
     if (
-        !isRecord(value) || value.schemaVersion !== 2 ||
-        value.kind !== "method-v6-open-training-literal-endpoint" ||
-        value.status !== "FROZEN_METHOD_V6_OBJECTIVE_DIRECTED_OPEN_TRAINING_ENDPOINT_V5_SCREEN" ||
+        !isRecord(value) || value.schemaVersion !== 3 ||
+        value.kind !== "method-v6-supported-open-training-literal-endpoint" ||
+        value.status !== "FROZEN_METHOD_V6_SUPPORTED_OBJECTIVE_DIRECTED_OPEN_TRAINING_ENDPOINT_V5_SCREEN" ||
         value.sourceCampaignSha256 !== METHOD_V5_SOURCE_CAMPAIGN_SHA256 ||
-        value.mapCatalogSha256 !== METHOD_V5_MAP_CATALOG_SHA256 ||
-        value.sourcePopulationCommitmentSha256 !== METHOD_V5_TRAINING_POPULATION_SHA256 ||
+        value.supportedPopulationSha256 !== METHOD_V5_SUPPORTED_POPULATION_SHA256 ||
+        value.economicStartGateSha256 !== METHOD_V5_ECONOMIC_START_GATE_SHA256 ||
+        value.sourcePopulationCommitmentSha256 !== METHOD_V5_SUPPORTED_POPULATION_SHA256 ||
+        value.outcomeFreePopulationSelection !== true || value.excludedTechnicalFamilyCount !== 3 ||
+        value.priorCampaignReuse !== "none_fresh_complete_rerun" ||
+        value.replacesFailedArrayJobId !== "22094119" || value.replacesFailedControllerJobId !== "22094121" ||
         value.endpointVersion !== LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION ||
         value.endpointSha256 !== LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256 ||
         value.outcomeAccess !== "open-training-only-no-paper-claim" ||
@@ -81,13 +85,15 @@ export const validateMethodV5Campaign = (value: unknown): MethodV5Campaign => {
         !Array.isArray(value.arms) || !Array.isArray(value.selectedFamilies) || !Array.isArray(value.shards) ||
         value.arms.length !== METHOD_V5_CLOSEOUT_ARM_ORDER.length ||
         value.selectedFamilies.length !== METHOD_V5_FAMILY_COUNT || value.shards.length !== METHOD_V5_SHARD_COUNT ||
-        typeof value.sourceCampaignPath !== "string" || typeof value.mapCatalogPath !== "string"
+        typeof value.sourceCampaignPath !== "string" || typeof value.supportedPopulationPath !== "string" ||
+        typeof value.economicStartGatePath !== "string"
     ) throw new Error("Method-v5 campaign has an invalid frozen schema");
     const campaign = value as unknown as MethodV5Campaign;
     const frozenArms = buildMethodV5CloseoutArms();
     if (
         sha256File(campaign.sourceCampaignPath) !== METHOD_V5_SOURCE_CAMPAIGN_SHA256 ||
-        sha256File(campaign.mapCatalogPath) !== METHOD_V5_MAP_CATALOG_SHA256 ||
+        sha256File(campaign.supportedPopulationPath) !== METHOD_V5_SUPPORTED_POPULATION_SHA256 ||
+        sha256File(campaign.economicStartGatePath) !== METHOD_V5_ECONOMIC_START_GATE_SHA256 ||
         campaign.arms.some((arm, index) => {
             const expected = frozenArms[index];
             return arm.armId !== expected.armId || arm.policyId !== expected.policyId ||

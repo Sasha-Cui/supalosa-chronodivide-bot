@@ -1,19 +1,22 @@
 import { describe, expect, test } from "vitest";
+import { METHOD_V5_SHARD_COUNT } from "../training/methodV5Campaign.js";
 import { parseMethodV5Sacct, validateMethodV5Telemetry } from "../training/methodV5TechnicalGate.js";
 
 describe("Method-v5 fail-closed scheduler gate", () => {
-    const complete = Array.from({ length: 198 }, (_, index) =>
+    const complete = Array.from({ length: METHOD_V5_SHARD_COUNT }, (_, index) =>
         `123_${index}|${900000 + index}|COMPLETED|0:0|pi_jss233`,
     ).join("\n");
 
-    test("accepts exactly 198 clean authorized array tasks", () => {
+    test("accepts exactly the complete supported-population array", () => {
         const tasks = parseMethodV5Sacct(complete, "123");
-        expect(tasks.size).toBe(198);
-        expect(tasks.get(197)?.schedulerJobId).toBe(String(900000 + 197));
+        expect(tasks.size).toBe(METHOD_V5_SHARD_COUNT);
+        expect(tasks.get(METHOD_V5_SHARD_COUNT - 1)?.schedulerJobId).toBe(String(900000 + METHOD_V5_SHARD_COUNT - 1));
     });
 
     test("rejects partial, failed, duplicated, or wrong-account evidence", () => {
-        expect(() => parseMethodV5Sacct(complete.split("\n").slice(0, -1).join("\n"), "123")).toThrow(/197\/198/);
+        expect(() => parseMethodV5Sacct(complete.split("\n").slice(0, -1).join("\n"), "123")).toThrow(
+            new RegExp(`${METHOD_V5_SHARD_COUNT - 1}\\/${METHOD_V5_SHARD_COUNT}`),
+        );
         expect(() => parseMethodV5Sacct(complete.replace("COMPLETED|0:0", "FAILED|1:0"), "123")).toThrow();
         expect(() => parseMethodV5Sacct(complete.replace("pi_jss233", "other"), "123")).toThrow();
         expect(() => parseMethodV5Sacct(`${complete}\n${complete.split("\n")[0]}`, "123")).toThrow();
