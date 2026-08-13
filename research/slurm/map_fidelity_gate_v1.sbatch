@@ -72,8 +72,18 @@ case "$MAP_FIDELITY_PROFILE" in
             exit 2
         fi
         ;;
+    v5expanded)
+        EVIDENCE_BASE=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/map-compatibility-method-v5-expanded-v1
+        CATALOG="$REPO/research/artifacts/method_v5_fresh_map_family_catalog_v1.json"
+        TARGETS="$REPO/research/artifacts/method_v5_role_blind_fidelity_targets_v1.json"
+        EXPECTED_FAMILIES=56
+        if [[ "$MAP_FIDELITY_SCOPE" != "full" ]]; then
+            echo "The Method-v5 expanded profile requires MAP_FIDELITY_SCOPE=full" >&2
+            exit 2
+        fi
+        ;;
     *)
-        echo "MAP_FIDELITY_PROFILE must be original, temperate, or fresh" >&2
+        echo "MAP_FIDELITY_PROFILE must be original, temperate, fresh, or v5expanded" >&2
         exit 2
         ;;
 esac

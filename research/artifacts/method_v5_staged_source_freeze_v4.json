@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 4,
+  "status": "COMPLETE_PROSPECTIVE_METHOD_V5_SOURCE_CAMPAIGN_AND_TECHNICAL_GATES_FROZEN_BEFORE_EXECUTION_METHOD_V4_DID_NOT_ADVANCE",
+  "frozenAt": "2026-08-13T00:26:04Z",
+  "methodV5GamesExecuted": 0,
+  "policyOutcomesInspected": false,
+  "trackedSourceCommitUnaffected": "0440d602f8ef24a2fb08b2556e2225287a075839",
+  "supersedes": "staged-source-freeze-v3.json",
+  "validation": {
+    "typescript": "PASS",
+    "focusedTestFiles": 5,
+    "focusedTests": 23,
+    "focusedTestsPassed": 23,
+    "sbatchSyntax": "PASS"
+  },
+  "campaignDesign": {
+    "openTrainingFamilies": 22,
+    "countries": 9,
+    "reciprocalSlots": 2,
+    "arms": 8,
+    "frozenLaunches": 3168,
+    "maxTicks": 24000,
+    "schedulerAccount": "pi_jss233",
+    "partialEvidenceAccepted": false
+  },
+  "technicalGates": {
+    "literalEndpointVersion": 4,
+    "literalEndpointProtocolSha256": "6f89e216da64eacf70c203dad2ad5953b2ba6df0e74accc28bc7a66aa7050dc9",
+    "baselineEquivalenceCountries": 9,
+    "baselineEquivalenceReciprocalSlots": 2,
+    "baselineEquivalenceGames": 36,
+    "allCountrySmokeCountries": 9,
+    "allCountrySmokeReciprocalSlots": 2,
+    "allCountrySmokeGames": 18,
+    "outcomeInspection": false
+  },
+  "freshMapDesign": {
+    "precompatibilityFamilies": 56,
+    "catalogSha256": "8ecc01bb490f419045298a292ce4935c9e107d0ee1059abe400d9db44427d7b7",
+    "roleBlindTargetsSha256": "6b9ec4b0704db15b7b01bd05839228da005abb192aeda9953f88841aa59f2766"
+  },
+  "files": [
+    { "name": "baselineLoader.ts", "bytes": 6363, "sha256": "6cba9949a8b975f1849a5277c9296f6eb495ae4e1aa655f0470effe1e8ca3dd0" },
+    { "name": "literalBuildingEliminationEndpoint.ts", "bytes": 17234, "sha256": "896cf654ac1c9562ad1c583918d9b2f46399e91ce6f3e7a5718d96d6e1225be6" },
+    { "name": "literalBuildingEliminationEndpoint.test.ts", "bytes": 8239, "sha256": "da70f89f30bd8020cb1a3f34bb8182699e336043c5073bb23a8f0903eeef46b8" },
+    { "name": "methodV5Closeout.ts", "bytes": 37958, "sha256": "ba6973170163b321d7878579d7b5c89c4411dfb10551f5427e1bf28a26842951" },
+    { "name": "methodV5CloseoutPolicy.test.ts", "bytes": 4199, "sha256": "af674a15ca2fa4b6067d7f76a73819f759b18f606bb195c0c362957d48c73adc" },
+    { "name": "methodV5CloseoutPolicies.ts", "bytes": 3243, "sha256": "87e2c972d02df8f8a76c86df4f063c1aebcc553760df0739ad210e82e25158da" },
+    { "name": "methodV5CloseoutPolicies.test.ts", "bytes": 1767, "sha256": "6025424427fd3ddf05b4e0206a97314f60ecbd315305385a650c5586da60b919" },
+    { "name": "methodV5Episode.ts", "bytes": 12847, "sha256": "6298be1e23527c6cb2eeccd406bb8c84f95c55a0ecb78f44de9482f5c67c3b17" },
+    { "name": "methodV5PlanRunner.ts", "bytes": 18283, "sha256": "ca4ec597e16c40f2aef71958cc60fa081e6f509b066996fd4d51e9a081c6d3a1" },
+    { "name": "methodV5Campaign.ts", "bytes": 15296, "sha256": "6696109b58d1595adf15a7ec2f09483ff6140321302c973dba1cc3df171081f0" },
+    { "name": "methodV5Campaign.test.ts", "bytes": 2566, "sha256": "8742951d5d985775e145aa5452746077d8f951512c759726718a910e8c417885" },
+    { "name": "methodV5TechnicalGate.ts", "bytes": 30412, "sha256": "0eb0bba1605c77f3538ab451942c0d484cf371f0ed69bdd5a43c2d20bce25e02" },
+    { "name": "methodV5TechnicalGate.test.ts", "bytes": 2090, "sha256": "202df2310ea30ecfc1ea7b43b208036b27d545441bbda4710acb3aedf59558e0" },
+    { "name": "methodV5Analyzer.ts", "bytes": 12420, "sha256": "e2203a2f625889c845e4f92efa8511e84c23b779af13f19ec9246cbdd616cd55" },
+    { "name": "methodV5BaselineEquivalence.ts", "bytes": 8603, "sha256": "6dd295843752e9cdbe0b1028e0c4fe39839746f72f506839ad311fa7ab8b123f" },
+    { "name": "methodV5AllCountrySmoke.ts", "bytes": 9233, "sha256": "d082aa6a28f6db6de4a810d87922c014dcd34ab6e2bce05c027cbe230b8f5625" },
+    { "name": "method_v5_baseline_equivalence.sbatch", "bytes": 1959, "sha256": "209ce8f516ff6bbc3d02a0cf332d39130508ded5c6b6d49a76e34f97a75828b1" },
+    { "name": "method_v5_all_country_smoke.sbatch", "bytes": 1958, "sha256": "0c155366fba16cacb42bbf2ad48f017fe7d535dcc484a2913b9612041c9d1091" },
+    { "name": "method_v5_open_training_shard.sbatch", "bytes": 3421, "sha256": "0f4108ceba064cf371001ee6b4eb784d14f40306c7417ffdf7bed1fab4db9a29" },
+    { "name": "method_v5_open_training_controller.sbatch", "bytes": 2730, "sha256": "a531a1f84617e11eea831d953df8dc2f59091be12e2f55a3076f5d0253953d75" },
+    { "name": "package.json", "bytes": 4901, "sha256": "980032e2e76c60e2516ab81c7bb7cd2b5a9320b5da2e20a328a563579d243852" },
+    { "name": "METHOD_V5_PROSPECTIVE_PROTOCOL.md", "bytes": 3395, "sha256": "c4fc6dc449c98d58348c7fddefc85f16498ce5952ff76ffacdc2c9111b334e2d" },
+    { "name": "LITERAL_BUILDING_ELIMINATION_ENDPOINT_V4.md", "bytes": 4985, "sha256": "6f89e216da64eacf70c203dad2ad5953b2ba6df0e74accc28bc7a66aa7050dc9" },
+    { "name": "map_fidelity_gate_v1.sbatch", "bytes": 8255, "sha256": "0b9ee9b5593e3e80fb2eca6e40624b5a162624784603e2e5c2243ba3a0288a03" },
+    { "name": "method_v5_fresh_map_family_catalog_v1.json", "bytes": 49805, "sha256": "8ecc01bb490f419045298a292ce4935c9e107d0ee1059abe400d9db44427d7b7" },
+    { "name": "method_v5_role_blind_fidelity_targets_v1.json", "bytes": 17590, "sha256": "6b9ec4b0704db15b7b01bd05839228da005abb192aeda9953f88841aa59f2766" },
+    { "name": "CLOSEOUT_CONTROLLER_IMPLEMENTATION_DESIGN_V1.md", "bytes": 6172, "sha256": "890eeb71bb82e74367c80ca8f00544f470a66357616fe1a8773dd50a57e0f86d" }
+  ]
+}

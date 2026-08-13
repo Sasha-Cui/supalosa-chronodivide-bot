@@ -1,0 +1,1246 @@
+{
+  "schemaVersion": 2,
+  "status": "METHOD_V5_ROLE_BLIND_FRESH_MAP_CATALOG_AWAITING_FULL_COMPATIBILITY_GATE",
+  "outcomeBlind": true,
+  "roleBlind": true,
+  "notPolicyEvidence": true,
+  "sourceManifestSha256": "a3c4769794921e5bad0bef9494656ec7d00219eaa36291bdbeefb39cc214b1ee",
+  "sourcePopulationCommitmentSha256": "0f37bb16a6891b3b7dd49a602c52612a92ae47196aa837aa4fd4457813206870",
+  "familyCount": 56,
+  "families": [
+    {
+      "familyId": "mf_1v1pathofwarupdate1",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_6a2e30f5ddb776e31648a43f6f834260396c3b66.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_afablab1v1rush",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_61ce3f43a828013d5d9bf4c518a0e429bc88989f.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_aliiiiiiiiiiiiiiiii",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_c6c8d0d6008c69928e6316f0ba20eb3f120935e4.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_allgems",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_dd5f9fa2f5d5170f47d35acc5fd8abbcde562043.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_05a624aee350cbdc",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_05a624aee350cbdc4d101bd6ad87ccddf09ad1a2.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_09f37c66d32c7849",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_09f37c66d32c78498e253d93bef687534bd36ecc.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_0d65da8719b4d184",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_0d65da8719b4d1848ad7c12953820be865f3fc58.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_28cfcf99ced03914",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_28cfcf99ced039141ce64d52a5ac178c55d7617f.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_2c798cdc10fd6368",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_2c798cdc10fd63685f41c1cd136d194b872de48d.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_3ddee987d616f983",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_3ddee987d616f983642304058391aae33e6c3e3a.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_409cb03197a4d2f9",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_409cb03197a4d2f944f1531456140f0985fb4fe0.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_63ce372aef6e088f",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_63ce372aef6e088f913781bed511f8f437a7e6ec.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_735fe394d0d1d676",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_735fe394d0d1d6766d4fd9c1883a997555d2a16d.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_75152b84b45a2ed4",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_75152b84b45a2ed41c9bdb57253a08bea50d749d.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_77736ac0c683dc57",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_77736ac0c683dc57cd68144809649a60a0b9a807.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_7c437691b1896658",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_7c437691b189665864fce55cc13ca7d73f13aa27.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_7d478e95c73ff2be",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_7d478e95c73ff2be38c49b08d7a75fb2568fe8e2.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_83212f7cf6d75d5d",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_83212f7cf6d75d5d043c6690adf26d2e077bd35c.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_896a2b439d87e387",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_896a2b439d87e38764bd0badc36139728960f126.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_9702a76ff34c9630",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_9702a76ff34c963054acde092a77c9fd65309514.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_9c823dfac0734b12",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_9c823dfac0734b12efdeddb15508d7498c2cfed4.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_aa745fdb1a3395d1",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_aa745fdb1a3395d125b9918b4013be93b13cc0a4.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_ac5116d8eed6285c",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_ac5116d8eed6285c0089461c661fc20fa17f2e54.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_c02ce6000711238f",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_c02ce6000711238f3f776cb1e706435198b3e4fe.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_c83cd0dce8d15ea6",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_c83cd0dce8d15ea637be5bef33eb89332885ab72.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_cc556f7fe3a508d8",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_cc556f7fe3a508d8446133b67944c7688ef64762.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_f0913915d840ffbb",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_f0913915d840ffbb072f13531080f85a6bf3c872.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_f2db3d9af5d60c40",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_f2db3d9af5d60c40942d4436ac110f31fbbbdc9f.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_f639918b45771a89",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_f639918b45771a89b5c0cb1762e43cf269d20d75.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_f9658329a43cc17a",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_f9658329a43cc17a90ce5f41348895388a367223.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_archive_fcd92c2d37428d10",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_fcd92c2d37428d1010df9d7959fd243810fad8ff.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_bobbob1v1",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_ef92c6f2c2ffe1a77d7eddb68b1afa84c40f2574.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_faceface",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_e92678396fa2f3c2e01d14511c1537d72cbaff26.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_fresh012297743cff723ca90bc036e33b504e1ca2bea6",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_012297743cff723ca90bc036e33b504e1ca2bea6.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_fresh0dd3f9c1a6ecd431664b5f3b8114bd4197fd4d38",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_0dd3f9c1a6ecd431664b5f3b8114bd4197fd4d38.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_fresh1848dfa214772262dea4255737f8414ea6361582",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_1848dfa214772262dea4255737f8414ea6361582.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_fresh266f190627e9340b856282b749f36b13cf3dca27",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_266f190627e9340b856282b749f36b13cf3dca27.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_fresh64ad2c42f1bbe142dd53ed06be3fc01e1ab9abab",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_64ad2c42f1bbe142dd53ed06be3fc01e1ab9abab.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_fresh69f64cf42ae87b914319f384b15c3c5346633ba9",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_69f64cf42ae87b914319f384b15c3c5346633ba9.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_fresh6fe4bf08c11b842b87bbfe7cfd2a5b49f8d95521",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_6fe4bf08c11b842b87bbfe7cfd2a5b49f8d95521.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_fresh9203538a15c50f93024db2edeee605a3e3c3c2a6",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_9203538a15c50f93024db2edeee605a3e3c3c2a6.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_fresh93f84d201eccfc28b23657ed6b682cb934b35ed5",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_93f84d201eccfc28b23657ed6b682cb934b35ed5.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_fresha4a9c3eb2a28e1f092a2f7c51347e52e8678c8e9",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_a4a9c3eb2a28e1f092a2f7c51347e52e8678c8e9.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_fresha5f6b4a086c8151838154a583ba30eaf38cdbb02",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_a5f6b4a086c8151838154a583ba30eaf38cdbb02.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_freshae5951ce5378dc6a7174aaef41ffa2f4084a1e60",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_ae5951ce5378dc6a7174aaef41ffa2f4084a1e60.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_freshb3a2a47dd07310f6a731ac106ffba010c090701e",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_b3a2a47dd07310f6a731ac106ffba010c090701e.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_freshc52cd9ea846181a8878becb2f163278e3122b154",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_c52cd9ea846181a8878becb2f163278e3122b154.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_freshc900f1b9d3c8c4bd193193850c6307ea90ba1ecb",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_c900f1b9d3c8c4bd193193850c6307ea90ba1ecb.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_freshcb92b3c70832b54b55aac5f549c4f8bdb6737d3e",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_cb92b3c70832b54b55aac5f549c4f8bdb6737d3e.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_freshd63c51e7c9743eab52f4dfef2231d29a6d17f4bd",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_d63c51e7c9743eab52f4dfef2231d29a6d17f4bd.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_freshd95c6e132d0dd5848131aeaa8c3cb030d1d03614",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_d95c6e132d0dd5848131aeaa8c3cb030d1d03614.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_freshdae6edad588b62122b9183264896c6bc78779cc4",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_dae6edad588b62122b9183264896c6bc78779cc4.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_freshe2c24f49c0fc814024587bb28105e21d523788f2",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_e2c24f49c0fc814024587bb28105e21d523788f2.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_freshe5d17f302599b590041ca9ab3ae949b18e91654f",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_e5d17f302599b590041ca9ab3ae949b18e91654f.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_freshef79c1707bbfd03e7012e4a734e5d994eb725eb0",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_ef79c1707bbfd03e7012e4a734e5d994eb725eb0.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    },
+    {
+      "familyId": "mf_freshf5ed74d667d40bc1e3bb056cde60edcd1d74a0b4",
+      "mapPaths": [
+        "packages/chronodivide-bot-driver/data/method_v5_fresh_f5ed74d667d40bc1e3bb056cde60edcd1d74a0b4.map"
+      ],
+      "evidenceBasedDevelopmentEligibility": {
+        "eligible": true,
+        "basis": "prospectively frozen outcome-blind byte screen before this engine compatibility gate"
+      }
+    }
+  ],
+  "maps": [
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_6a2e30f5ddb776e31648a43f6f834260396c3b66.map",
+      "familyId": "mf_1v1pathofwarupdate1",
+      "sha256": "ea239ceec2f90880e740a88c8d8cf2e2872c78959b26e54c7621ba38d9cc998c",
+      "bytes": 106128,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "A",
+        "sourceSha1": "6a2e30f5ddb776e31648a43f6f834260396c3b66",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_61ce3f43a828013d5d9bf4c518a0e429bc88989f.map",
+      "familyId": "mf_afablab1v1rush",
+      "sha256": "f60fd10b7dfabdcf48f469e5c675eaa22e8e2031769e642633a2b19b163c36eb",
+      "bytes": 44329,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "B",
+        "sourceSha1": "61ce3f43a828013d5d9bf4c518a0e429bc88989f",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_c6c8d0d6008c69928e6316f0ba20eb3f120935e4.map",
+      "familyId": "mf_aliiiiiiiiiiiiiiiii",
+      "sha256": "5ec5f48fd1c1206ad3a919639ef07399972ad56580f6013b47bda64f2c88341c",
+      "bytes": 169888,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "A",
+        "sourceSha1": "c6c8d0d6008c69928e6316f0ba20eb3f120935e4",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_dd5f9fa2f5d5170f47d35acc5fd8abbcde562043.map",
+      "familyId": "mf_allgems",
+      "sha256": "d7ca997253c8b011b783539fcc51b505035e75467a2000bc61e9b7e3f18ce797",
+      "bytes": 129015,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "B",
+        "sourceSha1": "dd5f9fa2f5d5170f47d35acc5fd8abbcde562043",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_05a624aee350cbdc4d101bd6ad87ccddf09ad1a2.map",
+      "familyId": "mf_archive_05a624aee350cbdc",
+      "sha256": "9d22ef40ad8f69f4b5cd7c96209736c47a164347b8b42243d3e205fcb791cb81",
+      "bytes": 51452,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "C",
+        "sourceSha1": "05a624aee350cbdc4d101bd6ad87ccddf09ad1a2",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_09f37c66d32c78498e253d93bef687534bd36ecc.map",
+      "familyId": "mf_archive_09f37c66d32c7849",
+      "sha256": "a549ec22e07054613215cdd5a50206c65c3cc10affce30c789537ad9c9dd64f6",
+      "bytes": 51287,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "D",
+        "sourceSha1": "09f37c66d32c78498e253d93bef687534bd36ecc",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_0d65da8719b4d1848ad7c12953820be865f3fc58.map",
+      "familyId": "mf_archive_0d65da8719b4d184",
+      "sha256": "66ffb812f63f1e260abdd3aed909a6dabd49db28d22eb2ac5ce3f46f804167db",
+      "bytes": 697133,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "C",
+        "sourceSha1": "0d65da8719b4d1848ad7c12953820be865f3fc58",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_28cfcf99ced039141ce64d52a5ac178c55d7617f.map",
+      "familyId": "mf_archive_28cfcf99ced03914",
+      "sha256": "a677289ff42380a301bad48845a4be9b7bb94ec8dfe13b70c8e3621333ded910",
+      "bytes": 173747,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "C",
+        "sourceSha1": "28cfcf99ced039141ce64d52a5ac178c55d7617f",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_2c798cdc10fd63685f41c1cd136d194b872de48d.map",
+      "familyId": "mf_archive_2c798cdc10fd6368",
+      "sha256": "1e5c3d8da15593087a4bd51b7e8d7b3fae6f4a1d162f4fc11ebc4f38d937e363",
+      "bytes": 47616,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "C",
+        "sourceSha1": "2c798cdc10fd63685f41c1cd136d194b872de48d",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_3ddee987d616f983642304058391aae33e6c3e3a.map",
+      "familyId": "mf_archive_3ddee987d616f983",
+      "sha256": "2e74e232abd275e6a3c79cb651a1a121562efdecc59ceab7128912fe2112a329",
+      "bytes": 52716,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "C",
+        "sourceSha1": "3ddee987d616f983642304058391aae33e6c3e3a",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_409cb03197a4d2f944f1531456140f0985fb4fe0.map",
+      "familyId": "mf_archive_409cb03197a4d2f9",
+      "sha256": "787f58b662c74bc139c79bd4c476ee1772a393e6276d2fc863d1d607f11a7a27",
+      "bytes": 127916,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "D",
+        "sourceSha1": "409cb03197a4d2f944f1531456140f0985fb4fe0",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_63ce372aef6e088f913781bed511f8f437a7e6ec.map",
+      "familyId": "mf_archive_63ce372aef6e088f",
+      "sha256": "d18d4fdfac86aac746d029d0f70d4782df934dc5383c82aa33a862a947f1af36",
+      "bytes": 111310,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "C",
+        "sourceSha1": "63ce372aef6e088f913781bed511f8f437a7e6ec",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_735fe394d0d1d6766d4fd9c1883a997555d2a16d.map",
+      "familyId": "mf_archive_735fe394d0d1d676",
+      "sha256": "3b8e48f6b5013b0f162a8e5b4394c96774e8fb5624ee9f65692a8f4dd168c1b5",
+      "bytes": 132403,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "C",
+        "sourceSha1": "735fe394d0d1d6766d4fd9c1883a997555d2a16d",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_75152b84b45a2ed41c9bdb57253a08bea50d749d.map",
+      "familyId": "mf_archive_75152b84b45a2ed4",
+      "sha256": "86798393f0dc0be1fc38dba080e2fe8957466be73c09ce1e127de647b5ee7077",
+      "bytes": 31545,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "C",
+        "sourceSha1": "75152b84b45a2ed41c9bdb57253a08bea50d749d",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_77736ac0c683dc57cd68144809649a60a0b9a807.map",
+      "familyId": "mf_archive_77736ac0c683dc57",
+      "sha256": "22b1982e3b85c53794e796e3741d63d3fd9468a5ea9b11d880622777ac3c1b11",
+      "bytes": 609292,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "D",
+        "sourceSha1": "77736ac0c683dc57cd68144809649a60a0b9a807",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_7c437691b189665864fce55cc13ca7d73f13aa27.map",
+      "familyId": "mf_archive_7c437691b1896658",
+      "sha256": "d5c98605c3e03019fbcd8486407cb6dd9db4fb9bcdf1bf9c27915c9fdf81a961",
+      "bytes": 691848,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "D",
+        "sourceSha1": "7c437691b189665864fce55cc13ca7d73f13aa27",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_7d478e95c73ff2be38c49b08d7a75fb2568fe8e2.map",
+      "familyId": "mf_archive_7d478e95c73ff2be",
+      "sha256": "d622a93d2fe2762d3eb998f14b8a1bc4d1afdaf8a27feea85e979437c55acdcc",
+      "bytes": 164898,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "C",
+        "sourceSha1": "7d478e95c73ff2be38c49b08d7a75fb2568fe8e2",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_83212f7cf6d75d5d043c6690adf26d2e077bd35c.map",
+      "familyId": "mf_archive_83212f7cf6d75d5d",
+      "sha256": "6908107487c550530f94f80ebf90e721fcfb2fdbddd4e43656bfdbf5c663aa5e",
+      "bytes": 26447,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "D",
+        "sourceSha1": "83212f7cf6d75d5d043c6690adf26d2e077bd35c",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_896a2b439d87e38764bd0badc36139728960f126.map",
+      "familyId": "mf_archive_896a2b439d87e387",
+      "sha256": "d2ce2ff4db65cfcb0f1012160684a7a9b0bf7a79839e17bd89450ebae9bd63c2",
+      "bytes": 164400,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "C",
+        "sourceSha1": "896a2b439d87e38764bd0badc36139728960f126",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_9702a76ff34c963054acde092a77c9fd65309514.map",
+      "familyId": "mf_archive_9702a76ff34c9630",
+      "sha256": "dd404bfdbc2ae5d39553d2a630937244742bc42ead8ffae438192d40f2855792",
+      "bytes": 166273,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "C",
+        "sourceSha1": "9702a76ff34c963054acde092a77c9fd65309514",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_9c823dfac0734b12efdeddb15508d7498c2cfed4.map",
+      "familyId": "mf_archive_9c823dfac0734b12",
+      "sha256": "02c1614b5b0ebe644d6313f007f16ca91baec055948673a368f21d151b74eab0",
+      "bytes": 293718,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "D",
+        "sourceSha1": "9c823dfac0734b12efdeddb15508d7498c2cfed4",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_aa745fdb1a3395d125b9918b4013be93b13cc0a4.map",
+      "familyId": "mf_archive_aa745fdb1a3395d1",
+      "sha256": "0513bf178dc5d4148024e65585b5562bcfaee7e22b00a5f60e3d81bca419d37a",
+      "bytes": 105631,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "C",
+        "sourceSha1": "aa745fdb1a3395d125b9918b4013be93b13cc0a4",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_ac5116d8eed6285c0089461c661fc20fa17f2e54.map",
+      "familyId": "mf_archive_ac5116d8eed6285c",
+      "sha256": "8eebe219839210def5f36ae8c8c6a16d2e6087cb12b76a613b98a1ef3359688c",
+      "bytes": 640335,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "D",
+        "sourceSha1": "ac5116d8eed6285c0089461c661fc20fa17f2e54",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_c02ce6000711238f3f776cb1e706435198b3e4fe.map",
+      "familyId": "mf_archive_c02ce6000711238f",
+      "sha256": "1c759916e63ec284eda3df286c87adb87933b2d2abd6ad3ae8ad1d7110c76a45",
+      "bytes": 185041,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "D",
+        "sourceSha1": "c02ce6000711238f3f776cb1e706435198b3e4fe",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_c83cd0dce8d15ea637be5bef33eb89332885ab72.map",
+      "familyId": "mf_archive_c83cd0dce8d15ea6",
+      "sha256": "77cfb5aed6d74ad9da44ed461d13f9b952025e83bd2adc847e3c741ce90975d9",
+      "bytes": 70775,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "D",
+        "sourceSha1": "c83cd0dce8d15ea637be5bef33eb89332885ab72",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_cc556f7fe3a508d8446133b67944c7688ef64762.map",
+      "familyId": "mf_archive_cc556f7fe3a508d8",
+      "sha256": "4048ee63aa7e1496fc439d2fa690d4938d8e92e13cbeda9a689a4f90cdcc75d9",
+      "bytes": 80569,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "C",
+        "sourceSha1": "cc556f7fe3a508d8446133b67944c7688ef64762",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_f0913915d840ffbb072f13531080f85a6bf3c872.map",
+      "familyId": "mf_archive_f0913915d840ffbb",
+      "sha256": "6ec65207652fbc407e0cf06e872cc89a918a0fdb4bdf15ebecc4eae12d5fc504",
+      "bytes": 78136,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "C",
+        "sourceSha1": "f0913915d840ffbb072f13531080f85a6bf3c872",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_f2db3d9af5d60c40942d4436ac110f31fbbbdc9f.map",
+      "familyId": "mf_archive_f2db3d9af5d60c40",
+      "sha256": "d845f6d6d7e15b11f1b14480e8bf6e9a11c03b3077b6942f8aa200305777575f",
+      "bytes": 157750,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "D",
+        "sourceSha1": "f2db3d9af5d60c40942d4436ac110f31fbbbdc9f",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_f639918b45771a89b5c0cb1762e43cf269d20d75.map",
+      "familyId": "mf_archive_f639918b45771a89",
+      "sha256": "4d184981d6551395ed19277f0d31a3b000accc4d1b6d4ae9672005ba7a62baf2",
+      "bytes": 483432,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "D",
+        "sourceSha1": "f639918b45771a89b5c0cb1762e43cf269d20d75",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_f9658329a43cc17a90ce5f41348895388a367223.map",
+      "familyId": "mf_archive_f9658329a43cc17a",
+      "sha256": "09cd3d4d7811dff249f934b228b728ec36c396277828ad03f20ad7c8461aa7f7",
+      "bytes": 50574,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "D",
+        "sourceSha1": "f9658329a43cc17a90ce5f41348895388a367223",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_fcd92c2d37428d1010df9d7959fd243810fad8ff.map",
+      "familyId": "mf_archive_fcd92c2d37428d10",
+      "sha256": "49cb3d8deba6986aa9ba6a19782f4b90d4abaca81b9a6c64ed836dbcda229792",
+      "bytes": 205213,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "D",
+        "sourceSha1": "fcd92c2d37428d1010df9d7959fd243810fad8ff",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_ef92c6f2c2ffe1a77d7eddb68b1afa84c40f2574.map",
+      "familyId": "mf_bobbob1v1",
+      "sha256": "fb62cad1fed870a6f85d540f15435e939098326a219c5eaefd8a6b046c0bf9be",
+      "bytes": 48902,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "B",
+        "sourceSha1": "ef92c6f2c2ffe1a77d7eddb68b1afa84c40f2574",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_e92678396fa2f3c2e01d14511c1537d72cbaff26.map",
+      "familyId": "mf_faceface",
+      "sha256": "b370ab95a6259552e1fb700f8888fab4b125390a277c732d99c2e6dc7c9ab378",
+      "bytes": 56258,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "B",
+        "sourceSha1": "e92678396fa2f3c2e01d14511c1537d72cbaff26",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_012297743cff723ca90bc036e33b504e1ca2bea6.map",
+      "familyId": "mf_fresh012297743cff723ca90bc036e33b504e1ca2bea6",
+      "sha256": "9d90eba16e90d1125ed6b7851fffdae1ef1b8002ee1c6f0059ec07bca18cb6e0",
+      "bytes": 198696,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "A",
+        "sourceSha1": "012297743cff723ca90bc036e33b504e1ca2bea6",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_0dd3f9c1a6ecd431664b5f3b8114bd4197fd4d38.map",
+      "familyId": "mf_fresh0dd3f9c1a6ecd431664b5f3b8114bd4197fd4d38",
+      "sha256": "49895775ff88db1b764ef8ba2696549d1e3a25ca359299b9351c57096b697329",
+      "bytes": 94762,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "B",
+        "sourceSha1": "0dd3f9c1a6ecd431664b5f3b8114bd4197fd4d38",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_1848dfa214772262dea4255737f8414ea6361582.map",
+      "familyId": "mf_fresh1848dfa214772262dea4255737f8414ea6361582",
+      "sha256": "70dff9b2ae870b0d53559ceaf812fa9412c9c9b4eaaa1d7be7cb55ea529eda1d",
+      "bytes": 46104,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "A",
+        "sourceSha1": "1848dfa214772262dea4255737f8414ea6361582",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_266f190627e9340b856282b749f36b13cf3dca27.map",
+      "familyId": "mf_fresh266f190627e9340b856282b749f36b13cf3dca27",
+      "sha256": "e55153c131f92ce15fa1dc18d24229c584aeee344c6d9ed625e6083d9f3f220c",
+      "bytes": 44507,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "B",
+        "sourceSha1": "266f190627e9340b856282b749f36b13cf3dca27",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_64ad2c42f1bbe142dd53ed06be3fc01e1ab9abab.map",
+      "familyId": "mf_fresh64ad2c42f1bbe142dd53ed06be3fc01e1ab9abab",
+      "sha256": "4eafdd82f98a9d8fbf85bd9f2dbb51cb73aca8253acb2215ae7a1d14e44f814c",
+      "bytes": 10001,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "A",
+        "sourceSha1": "64ad2c42f1bbe142dd53ed06be3fc01e1ab9abab",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_69f64cf42ae87b914319f384b15c3c5346633ba9.map",
+      "familyId": "mf_fresh69f64cf42ae87b914319f384b15c3c5346633ba9",
+      "sha256": "8b446eedbc0bdc9898b7ab9dd827014dad50950cd7842f0cf5fe3aac9ac532e0",
+      "bytes": 157604,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "A",
+        "sourceSha1": "69f64cf42ae87b914319f384b15c3c5346633ba9",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_6fe4bf08c11b842b87bbfe7cfd2a5b49f8d95521.map",
+      "familyId": "mf_fresh6fe4bf08c11b842b87bbfe7cfd2a5b49f8d95521",
+      "sha256": "a3dfb5ef32a05b9ee189fbf1052aaec2485fc75fef9d71b33b8743981739e98c",
+      "bytes": 194706,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "A",
+        "sourceSha1": "6fe4bf08c11b842b87bbfe7cfd2a5b49f8d95521",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_9203538a15c50f93024db2edeee605a3e3c3c2a6.map",
+      "familyId": "mf_fresh9203538a15c50f93024db2edeee605a3e3c3c2a6",
+      "sha256": "78f32e7a52d064c46427a5daa5bd92dcb7f67e8fa212c34d1d09c32cb1a4e18f",
+      "bytes": 719617,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "A",
+        "sourceSha1": "9203538a15c50f93024db2edeee605a3e3c3c2a6",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_93f84d201eccfc28b23657ed6b682cb934b35ed5.map",
+      "familyId": "mf_fresh93f84d201eccfc28b23657ed6b682cb934b35ed5",
+      "sha256": "d84e2ecb237ce3deccb2064635cc901ba0e89bab9a57ab2e7d87bb5a240f58d3",
+      "bytes": 89363,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "A",
+        "sourceSha1": "93f84d201eccfc28b23657ed6b682cb934b35ed5",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_a4a9c3eb2a28e1f092a2f7c51347e52e8678c8e9.map",
+      "familyId": "mf_fresha4a9c3eb2a28e1f092a2f7c51347e52e8678c8e9",
+      "sha256": "4173f87a31dda383c1d77764b8065eee3af3c4460e8330dc63fc1a886d04e7cc",
+      "bytes": 214964,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "A",
+        "sourceSha1": "a4a9c3eb2a28e1f092a2f7c51347e52e8678c8e9",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_a5f6b4a086c8151838154a583ba30eaf38cdbb02.map",
+      "familyId": "mf_fresha5f6b4a086c8151838154a583ba30eaf38cdbb02",
+      "sha256": "c5bead4ece64b9c9501f833b7dc8c677f0d1337e8d7cb81c12de70d1ae90eb99",
+      "bytes": 133279,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "A",
+        "sourceSha1": "a5f6b4a086c8151838154a583ba30eaf38cdbb02",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_ae5951ce5378dc6a7174aaef41ffa2f4084a1e60.map",
+      "familyId": "mf_freshae5951ce5378dc6a7174aaef41ffa2f4084a1e60",
+      "sha256": "c7f202f1c2d3e4050751c3f7adbce42825ac6790dd777b505a8dc6236d222a4c",
+      "bytes": 106076,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "A",
+        "sourceSha1": "ae5951ce5378dc6a7174aaef41ffa2f4084a1e60",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_b3a2a47dd07310f6a731ac106ffba010c090701e.map",
+      "familyId": "mf_freshb3a2a47dd07310f6a731ac106ffba010c090701e",
+      "sha256": "c16b7cbc0fb1903832ff945e38d80101c2c5eded1069ae9c6165daeca3766cb3",
+      "bytes": 317895,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "A",
+        "sourceSha1": "b3a2a47dd07310f6a731ac106ffba010c090701e",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_c52cd9ea846181a8878becb2f163278e3122b154.map",
+      "familyId": "mf_freshc52cd9ea846181a8878becb2f163278e3122b154",
+      "sha256": "503abc2454649cec3b888eae4a1a7de6cbee76b2b39d4d5a2668c4b7f73bb493",
+      "bytes": 472877,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "B",
+        "sourceSha1": "c52cd9ea846181a8878becb2f163278e3122b154",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_c900f1b9d3c8c4bd193193850c6307ea90ba1ecb.map",
+      "familyId": "mf_freshc900f1b9d3c8c4bd193193850c6307ea90ba1ecb",
+      "sha256": "64a070d6abfe342b3fb8833f29e428e636858e7e4b24e8f8601a3422a2ad880c",
+      "bytes": 193497,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "B",
+        "sourceSha1": "c900f1b9d3c8c4bd193193850c6307ea90ba1ecb",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_cb92b3c70832b54b55aac5f549c4f8bdb6737d3e.map",
+      "familyId": "mf_freshcb92b3c70832b54b55aac5f549c4f8bdb6737d3e",
+      "sha256": "bf8ae4ddf89f558bc274fe85da36315385519b1cd079f2cb6e2a0a90140ecfde",
+      "bytes": 257464,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "B",
+        "sourceSha1": "cb92b3c70832b54b55aac5f549c4f8bdb6737d3e",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_d63c51e7c9743eab52f4dfef2231d29a6d17f4bd.map",
+      "familyId": "mf_freshd63c51e7c9743eab52f4dfef2231d29a6d17f4bd",
+      "sha256": "74354efe73a5786342bea0bf5954d0d7c3233381ac10034ec0f9c246f220826d",
+      "bytes": 138309,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "A",
+        "sourceSha1": "d63c51e7c9743eab52f4dfef2231d29a6d17f4bd",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_d95c6e132d0dd5848131aeaa8c3cb030d1d03614.map",
+      "familyId": "mf_freshd95c6e132d0dd5848131aeaa8c3cb030d1d03614",
+      "sha256": "d183bdac3aebaa5476ac30ecb74556b4380b05bd8eeff7f0397994e79a966f1b",
+      "bytes": 129821,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "A",
+        "sourceSha1": "d95c6e132d0dd5848131aeaa8c3cb030d1d03614",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_dae6edad588b62122b9183264896c6bc78779cc4.map",
+      "familyId": "mf_freshdae6edad588b62122b9183264896c6bc78779cc4",
+      "sha256": "0adbab9bbefbeeca2144e7bee2649b0c89d19ecc42296f4956325fdf5f3a6f4c",
+      "bytes": 49863,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "B",
+        "sourceSha1": "dae6edad588b62122b9183264896c6bc78779cc4",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_e2c24f49c0fc814024587bb28105e21d523788f2.map",
+      "familyId": "mf_freshe2c24f49c0fc814024587bb28105e21d523788f2",
+      "sha256": "cb1036dcbaa785be6fc15b1a4be90caf7284abdaee294dc901190cc7fc14137c",
+      "bytes": 203977,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "B",
+        "sourceSha1": "e2c24f49c0fc814024587bb28105e21d523788f2",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_e5d17f302599b590041ca9ab3ae949b18e91654f.map",
+      "familyId": "mf_freshe5d17f302599b590041ca9ab3ae949b18e91654f",
+      "sha256": "e8dca169e3be4c5f98fa05e81374df1f01d7e131fb8d1a21cc91bec463bfaa3b",
+      "bytes": 45345,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "B",
+        "sourceSha1": "e5d17f302599b590041ca9ab3ae949b18e91654f",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_ef79c1707bbfd03e7012e4a734e5d994eb725eb0.map",
+      "familyId": "mf_freshef79c1707bbfd03e7012e4a734e5d994eb725eb0",
+      "sha256": "6a584845ec821932b9cc56a05a8eb990c6fe2d9c080460ecd898bcc6b9b4a33a",
+      "bytes": 119621,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "B",
+        "sourceSha1": "ef79c1707bbfd03e7012e4a734e5d994eb725eb0",
+        "byteScreenStatus": "pass"
+      }
+    },
+    {
+      "path": "packages/chronodivide-bot-driver/data/method_v5_fresh_f5ed74d667d40bc1e3bb056cde60edcd1d74a0b4.map",
+      "familyId": "mf_freshf5ed74d667d40bc1e3bb056cde60edcd1d74a0b4",
+      "sha256": "63e488dea69d8b3a25d439f381ece855f8ab7e276e407e8dc52a3609413434f2",
+      "bytes": 185323,
+      "loadVerification": [],
+      "outcomeBlindSource": {
+        "sourceBlock": "B",
+        "sourceSha1": "f5ed74d667d40bc1e3bb056cde60edcd1d74a0b4",
+        "byteScreenStatus": "pass"
+      }
+    }
+  ]
+}
