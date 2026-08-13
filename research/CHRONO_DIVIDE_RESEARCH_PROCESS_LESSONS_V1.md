@@ -208,6 +208,80 @@ evaluation. Do not repeatedly tune against fresh Development A/B results until a
 positive result appears. If a development gate fails, any further refinement
 must return to permanently open families under a newly frozen protocol version.
 
+### Require intervention exposure before another outcome screen
+
+The complete terminal-race version-1 open-development campaign passed every
+technical gate but did not improve on Supalosa. Its exact control produced 38
+wins, 115 draws, and 27 losses in 180 games; the prespecified selected arm
+produced 36 wins, 114 draws, and 30 losses. The mechanism telemetry explains why
+another parameter-only screen would be wasteful. In the three public-state arms,
+104,737 of 183,932 decisions were `predecessor_fallback` and another 39,684 were
+`regroup`; only 37,821 were building or terminal strikes. The dominant fallback
+reason was an uncalibrated relevant enemy mechanic, not the absence of an enemy
+building or an inactive controller.
+
+This creates a new pre-outcome requirement. A proposed controller must pass an
+outcome-blind intervention-exposure gate on every country before it enters a
+large screen. That gate must establish, from live orders and telemetry rather
+than policy labels, that:
+
+- a compatible reachable combatant can be assigned to each ordinary building
+  target supported by its country;
+- the candidate's issued unit orders measurably differ from the exact baseline
+  in the intended tactical state;
+- an exposed last building receives a direct attack even when an arbitrarily
+  large enemy force exists away from the strike route;
+- a force on the route is attacked only when removing it is necessary for the
+  building mission to remain feasible;
+- units excluded from the building detachment retain active Supalosa orders;
+- the fractions of eligible and capable combatants commanded, delegated,
+  idle, moving, and attacking are all reported; and
+- persistent fallback, regroup, or no-order states fail the gate unless an
+  explicit capability, reachability, or visibility defect explains them.
+
+Passing an information-boundary smoke test is not enough. The previous smoke
+proved that the bridge ran and emitted valid records, but did not prove that it
+controlled enough units or changed the relevant actions. Future preflights must
+test causal command exposure before spending on outcome estimation.
+
+### Make the win condition the controller's lexicographic objective
+
+The controller should minimize time to physical elimination of the opponent's
+remaining buildings. Enemy-force removal is instrumental, never an independent
+terminal objective. The prospective decision order is:
+
+1. If an enemy building can be destroyed by a reachable compatible detachment
+   before route interception destroys that detachment, attack the building.
+2. If it is the last enemy building, ignore threats to our base and enemy forces
+   outside the strike route. Even one building versus one hundred unrelated
+   tanks is a building strike because physical destruction ends the game.
+3. If a force makes the strike route infeasible, clear the minimum blocking
+   force, then immediately resume the same committed building mission.
+4. If no current unit can damage or reach any building, preserve Supalosa's
+   force combat while actively searching or producing the missing capability.
+5. Until a literal endpoint or tick cap, passive regrouping is forbidden when a
+   compatible building strike, blocker-clear action, or active search exists.
+
+This hierarchy must be exercised continuously, not activated only after an
+arbitrary late tick. Activation time, target concentration, force-interruption,
+and safety-certification are distinct causal components and should be ablated
+separately. In particular, a global fail-closed safety certificate must not let
+one difficult-to-model enemy unit veto an otherwise feasible attack. Uncertain
+forces may veto only when their observable position and reach intersect the
+strike route before predicted building destruction; otherwise they are
+irrelevant to that decision.
+
+### Develop the live bot and evaluation bridge together
+
+An evaluation-only order overlay is useful for causal diagnosis, but it can
+hide integration failures and is not by itself the final algorithmic artifact.
+After a mechanism survives open development, the same force-versus-building
+logic must live in the releasable bot's mission controller with deterministic
+configuration and telemetry. The research bridge and the public bot should
+share a pure decision core, while tests verify that both implementations produce
+the same tactical action for the same state. This avoids writing a paper about
+an evaluator-side intervention that users cannot run as the submitted agent.
+
 ## Standard operating procedure
 
 ### Phase 1: freeze and preflight
