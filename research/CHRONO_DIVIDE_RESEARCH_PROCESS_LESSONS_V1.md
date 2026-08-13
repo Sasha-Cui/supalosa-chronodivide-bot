@@ -112,6 +112,68 @@ Terminal building counts, progress timing, reachability, capability requests,
 production completion, search coverage, order refreshes, and home-defense state
 should distinguish these mechanisms.
 
+### Make aggression objective-directed rather than indiscriminate
+
+The literal objective is the opponent's last building, not the destruction of
+every opposing combat unit. A policy can therefore be highly active and still
+make the wrong decision by fighting an irrelevant army, while a policy that
+temporarily attacks a blocking force may be taking the shortest path to the
+objective. The prospective closeout controller must implement the following
+observable-information hierarchy:
+
+1. If a remembered or visible enemy building has a compatible, reachable strike
+   force, select one best finishing target and concentrate that force on it.
+   Do not load-balance attackers across several buildings. Enemy army size alone
+   must not veto a credible last-building strike; this includes the limiting
+   case of one exposed building and an otherwise overwhelming enemy army.
+2. Retain only a bounded defensive reserve. The presence of nearby enemies may
+   change which units are reserved, but it must not pause the whole closeout
+   layer when some units can still execute a feasible building strike.
+3. If no building strike is currently feasible because the target is unknown,
+   unreachable, or cannot be damaged by available units, do not issue futile
+   building orders. Continue Supalosa's ordinary combat policy against forces
+   that block access while the closeout layer searches, remembers targets, and
+   requests the missing movement or damage capability.
+4. Once opposing forces no longer obstruct access, collapse available force on
+   the remaining buildings. Until a physical endpoint or tick cap, every
+   closeout interval must be explainable as target attack, blocker-clearing by
+   the base policy, active search, capability production, or bounded home
+   defense. Passive waiting is a controller defect, not a tactic.
+
+This rule is prospective and was supplied from the game's stated win condition,
+not selected by comparing policy outcomes from the invalid Method-v5 campaign.
+It must be tested causally with at least a distributed-target versus focused-
+target ablation and a global-threat-pause versus bounded-reserve ablation.
+
+The associated telemetry should report target identity, visible versus
+remembered status, compatible and assigned attacker counts, target hit points,
+focus concentration, reserved unit count, home-threat count, reason no strike
+was feasible, time since opponent-building damage, search coverage, and engine
+termination cause. Aggregate diagnostics should include physical win rate,
+nonliteral engine-termination/stalemate rate, time to first and final building
+destruction, time between building-damage events, and the fraction of active
+combatants assigned to the selected building. These quantities distinguish
+productive aggression from order churn.
+
+### Treat engine stalemate as an observed failure mode, not a win
+
+Source inspection after the invalid `mf_hills` shards established that Chrono
+Divide has an internal stalemate detector with a ten-minute no-progress grace
+period. When it fires, the engine can mark both combatants defeated, remove
+ordinary assets, and finish while wall-class buildings remain owned. Endpoint
+v4 correctly refused to call this a literal win, but classified the condition as
+a technical failure because it had no explicit nonliteral-termination state.
+
+The prospective endpoint repair must keep physical, opponent-attributed
+destruction of the final enemy building as the only win. A clean engine finish
+that has defeated at least one combatant but has not established that endpoint
+is recorded separately as a nonliteral termination and scored as a draw under
+the strict endpoint; an engine finish with no defeated combatant and no literal
+endpoint remains a technical failure. This repair prevents routine engine
+semantics from invalidating a whole campaign without laundering stalemate into
+success. The policy goal remains to drive this draw class toward zero through
+continuous, objective-directed progress.
+
 ### Preserve a clean selection boundary
 
 Select and freeze one policy using complete open-training evidence before fresh
