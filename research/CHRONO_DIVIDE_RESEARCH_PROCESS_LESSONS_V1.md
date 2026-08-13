@@ -188,6 +188,11 @@ must return to permanently open families under a newly frozen protocol version.
   with code 2. All failures occurred on open family `mf_hills` and had the same
   technical reason: the engine declared the game finished while both players
   still owned buildings, so endpoint v4 could not assign a literal winner.
+- While classifying those failed shards, their compact summary records exposed
+  shard-level aggregate win, draw, and loss counts. No policy-level ranking or
+  advancement analysis was performed and the values were not used for policy
+  development. Nevertheless, this was partial outcome access contrary to the
+  frozen complete-population rule and independently disqualifies the attempt.
 - Because the full campaign could no longer pass its frozen technical gate, the
   remaining array tasks and blocked controller were cancelled. Existing outputs
   were preserved, no selective outcome-bearing reruns were made, and the failed
