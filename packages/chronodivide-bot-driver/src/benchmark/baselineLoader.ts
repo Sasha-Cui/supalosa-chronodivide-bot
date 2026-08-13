@@ -15,7 +15,9 @@ export type InspectableBaselineBot = SupalosaBot & {
 
 export type BaselineFactory = {
     descriptor: BaselineDescriptor;
+    createDefaultStrategy?(): unknown;
     create(name: string, country: Countries): InspectableBaselineBot;
+    createWithStrategy?(name: string, country: Countries, strategy: unknown): InspectableBaselineBot;
 };
 
 type BotConstructor = typeof SupalosaBot;
@@ -32,6 +34,9 @@ const localFactory = (packageRoot: string): BaselineFactory => ({
     descriptor: {
         kind: "local-shared-package",
         packageRoot,
+    },
+    createDefaultStrategy(): unknown {
+        return new DefaultStrategy();
     },
     create(name: string, country: Countries): InspectableBaselineBot {
         class InspectableLocalBot extends SupalosaBot {
@@ -52,6 +57,32 @@ const localFactory = (packageRoot: string): BaselineFactory => ({
             }
         }
         return new InspectableLocalBot(name, country, [], false, new DefaultStrategy());
+    },
+    createWithStrategy(name: string, country: Countries, strategy: unknown): InspectableBaselineBot {
+        class InspectableLocalBot extends SupalosaBot {
+            public lastGameApi: GameApi | null = null;
+            public lastPlayerActions: any = null;
+            public lastPlayerProduction: any = null;
+
+            override onGameStart(game: GameApi): void {
+                this.lastGameApi = game;
+                this.lastPlayerActions = this.player.actions;
+                this.lastPlayerProduction = this.player.production;
+                super.onGameStart(game);
+            }
+
+            override onGameTick(game: GameApi): void {
+                this.lastGameApi = game;
+                super.onGameTick(game);
+            }
+        }
+        return new InspectableLocalBot(
+            name,
+            country,
+            [],
+            false,
+            strategy as InstanceType<StrategyConstructor>,
+        );
     },
 });
 
@@ -97,6 +128,9 @@ const externalFactory = async (packageRoot: string): Promise<BaselineFactory> =>
             kind: "external-package",
             packageRoot: resolvedRoot,
         },
+        createDefaultStrategy(): unknown {
+            return new ExternalStrategy();
+        },
         create(name: string, country: Countries): InspectableBaselineBot {
             return new InspectableExternalBot(
                 name,
@@ -104,6 +138,15 @@ const externalFactory = async (packageRoot: string): Promise<BaselineFactory> =>
                 [],
                 false,
                 new ExternalStrategy(),
+            ) as InspectableBaselineBot;
+        },
+        createWithStrategy(name: string, country: Countries, strategy: unknown): InspectableBaselineBot {
+            return new InspectableExternalBot(
+                name,
+                country,
+                [],
+                false,
+                strategy as InstanceType<StrategyConstructor>,
             ) as InspectableBaselineBot;
         },
     };
