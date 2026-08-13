@@ -318,10 +318,37 @@ must return to permanently open families under a newly frozen protocol version.
 - The complete mechanism ledger shows 172,391 regroup and 109,449 predecessor-
   fallback decisions, compared with 9,398 building strikes, 2,079 blocker
   clears, and only 222 terminal-candidate strikes. Event counts alone do not
-  establish causality, but they reject the assumption that adding a terminal
-  branch guarantees continuous terminal pressure. The next open-development
-  diagnosis must test command liveness and the terminal-race rule on aggregate
-  telemetry before freezing another policy.
+  establish causality. In particular, a `regroup` or predecessor-fallback label
+  means that the overlay delegated to Supalosa; it does not prove that the
+  underlying units were idle. The labels reject the assumption that adding a
+  terminal branch guarantees continuous terminal pressure, while also showing
+  that future telemetry must measure the actual delegated unit state (idle,
+  moving, or attacking) before diagnosing passivity.
+- A complete-population diagnostic over all 1,800 episodes found that the full
+  arm issued any certified building strike in only 69 of 360 games. Its
+  friendly bridge rejected ordinary combat units whenever their rules also
+  advertised role-irrelevant mechanics such as vehicle crushing or an infantry
+  deploy option. The next open-development screen therefore isolates friendly
+  role-specific calibration from observation and activation changes. This is a
+  causal adapter repair supported by population telemetry, not a response to a
+  hand-picked replay.
+- The next protocol also distinguishes a visibility-and-memory interface from
+  the public complete-state `GameApi` interface already available in the pinned
+  bot environment. Public enumeration is described honestly as a matched-
+  interface environment condition, never as fog-of-war play. It may identify
+  current units and buildings but remains reference-separated from endpoint
+  adjudication and destruction attribution.
+- A state-based endgame trigger requires a transition guard. A map that starts
+  with three buildings is not already in closeout merely because its exact
+  count is at the threshold. Early activation is allowed only after a minimum
+  tick and after the controller has observed the count fall from above the
+  threshold. This avoids confounding endgame recognition with opening strategy.
+- The prospective protocol is frozen in
+  `research/TERMINAL_RACE_OPEN_DEVELOPMENT_PROTOCOL_V1.md`. It compares six
+  prespecified arms on wholly new open seeds and requires a literal-win
+  probability above 0.50 with positive Allied, Soviet, country, and paired
+  evidence before advancement. This strict target reflects the practical
+  objective rather than lowering the criterion after a null result.
 
 ## Core lesson
 
