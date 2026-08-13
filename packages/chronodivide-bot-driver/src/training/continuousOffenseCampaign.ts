@@ -26,7 +26,7 @@ import {
     sha256File,
 } from "./continuousOffensePlanRunner.js";
 
-export const CONTINUOUS_OFFENSE_ENGINE_SEED_BASE = 4_180_000_000 as const;
+export const CONTINUOUS_OFFENSE_ENGINE_SEED_BASE = 4_190_000_000 as const;
 export const CONTINUOUS_OFFENSE_MAX_TICKS = 24_000 as const;
 export const CONTINUOUS_OFFENSE_FAMILY_COUNT = 10 as const;
 export const CONTINUOUS_OFFENSE_SEED_BLOCKS_PER_FAMILY = 1 as const;
@@ -39,9 +39,11 @@ export const CONTINUOUS_OFFENSE_CORE_SHA256 =
 export const CONTINUOUS_OFFENSE_ADAPTER_SHA256 =
     "a39cdb70571de40f72a3aae251eb1e8610c94b76ca7125790f9e0ee488ad52fc" as const;
 export const CONTINUOUS_OFFENSE_PROTOCOL_SHA256 =
-    "425214575ed5fe876d3fdb9a33dae968c2305bbc40d2545bf4586f626d44f9c8" as const;
+    "bf55b709e393bfd78bb6808c151c202774c15b11d43130ad53b49757e92b56d5" as const;
 export const CONTINUOUS_OFFENSE_COMPATIBILITY_SHA256 =
-    "24a17eb494dbcd7bfe2b9c21025d3dea6ae31a324755b54be262233d572aa4b5" as const;
+    "ce3aa19a138e7cb23223f096c166a3c306653bffdd987cd76444ad127328e36e" as const;
+export const CONTINUOUS_OFFENSE_FAILED_V1_RECORD_SHA256 =
+    "fe92954b248fc025c7b0b6bf7a2752dc012dcf71845d62d84fbf56ac043307e7" as const;
 export const CONTINUOUS_OFFENSE_ONE_SIDED_80_T_CRITICAL_DF9 = 0.8834038596855205 as const;
 
 export const CONTINUOUS_OFFENSE_COUNTRIES = [
@@ -81,7 +83,7 @@ export type ContinuousOffenseFamily = {
 export type ContinuousOffenseCampaign = {
     schemaVersion: 1;
     kind: "continuous-offense-open-development-literal-endpoint";
-    status: "FROZEN_CONTINUOUS_OFFENSE_OPEN_DEVELOPMENT_ENDPOINT_V5";
+    status: "FROZEN_CONTINUOUS_OFFENSE_OPEN_DEVELOPMENT_V2_ENDPOINT_V5";
     generatedAt: string;
     sourceGitCommit: string;
     sourceRuntimeSha256: string;
@@ -104,7 +106,10 @@ export type ContinuousOffenseCampaign = {
     protocolSha256: typeof CONTINUOUS_OFFENSE_PROTOCOL_SHA256;
     compatibilityGatePath: string;
     compatibilityGateSha256: typeof CONTINUOUS_OFFENSE_COMPATIBILITY_SHA256;
-    compatibilityJobId: "22145862";
+    compatibilityJobId: "22149196";
+    failedV1RecordPath: string;
+    failedV1RecordSha256: typeof CONTINUOUS_OFFENSE_FAILED_V1_RECORD_SHA256;
+    supersededCampaignJobId: "22148561";
     priorCampaignReuse: "fixed_families_only_fresh_seeds_and_games";
     outcomeAccess: "open-development-only-no-paper-claim";
     familyCount: number;
@@ -202,7 +207,7 @@ export const selectContinuousOffenseFamilies = (
             familyId: raw.familyId,
             mapName: raw.mapName,
             mapSha256: raw.mapSha256,
-            selectionDigest: sha256Text(`continuous-offense-open-development-v1|${raw.familyId}|${raw.mapSha256}`),
+            selectionDigest: sha256Text(`continuous-offense-open-development-v2|${raw.familyId}|${raw.mapSha256}`),
         };
     });
     if (
@@ -223,6 +228,7 @@ const main = async (): Promise<void> => {
     const sourceCampaignPath = requiredPath("CONTINUOUS_OFFENSE_SOURCE_CAMPAIGN");
     const protocolPath = requiredPath("CONTINUOUS_OFFENSE_PROTOCOL");
     const compatibilityGatePath = requiredPath("CONTINUOUS_OFFENSE_COMPATIBILITY_GATE");
+    const failedV1RecordPath = requiredPath("CONTINUOUS_OFFENSE_FAILED_V1_RECORD");
     const outRoot = requiredPath("OUT_ROOT");
     if (fs.existsSync(outRoot)) throw new Error(`Refusing to reuse OUT_ROOT ${outRoot}`);
     for (const [filePath, digest, label] of [
@@ -230,6 +236,7 @@ const main = async (): Promise<void> => {
         [sourceCampaignPath, CONTINUOUS_OFFENSE_SOURCE_CAMPAIGN_SHA256, "source campaign"],
         [protocolPath, CONTINUOUS_OFFENSE_PROTOCOL_SHA256, "protocol"],
         [compatibilityGatePath, CONTINUOUS_OFFENSE_COMPATIBILITY_SHA256, "compatibility"],
+        [failedV1RecordPath, CONTINUOUS_OFFENSE_FAILED_V1_RECORD_SHA256, "failed-v1 record"],
     ] as const) if (sha256File(filePath) !== digest) throw new Error(`Continuous-offense ${label} commitment drifted`);
     const corePath = path.join(
         repoRoot,
@@ -247,9 +254,16 @@ const main = async (): Promise<void> => {
         compatibility.status !== "PASS_OUTCOME_FREE_CONTINUOUS_OFFENSE_COMPATIBILITY_AND_EXPOSURE" ||
         compatibility.outcomeFree !== true || compatibility.gameCount !== 72 ||
         compatibility.countryCount !== 9 || compatibility.reciprocalSlotCount !== 2 ||
-        !isRecord(compatibility.scheduler) || compatibility.scheduler.jobId !== "22145862" ||
+        compatibility.sourceGitCommit !== "6c836ad5dcd7b7e84a2565f0593cfb5c89868f9c" ||
+        !isRecord(compatibility.scheduler) || compatibility.scheduler.jobId !== "22149196" ||
         compatibility.scheduler.account !== "pi_jss233"
     ) throw new Error("Continuous-offense outcome-free technical gates do not authorize generation");
+    const failedV1 = JSON.parse(fs.readFileSync(failedV1RecordPath, "utf8")) as RecordValue;
+    if (
+        failedV1.status !== "INVALID_TECHNICAL_CAMPAIGN_ZERO_COMPLETED_EPISODES" ||
+        failedV1.arrayJobId !== "22148561" || failedV1.schedulerAccount !== "pi_jss233" ||
+        failedV1.completedEpisodeCount !== 0 || failedV1.outcomeBearingGameCount !== 0
+    ) throw new Error("Continuous-offense failed-v1 record is not an exact zero-outcome supersession record");
 
     const supportedPopulation = JSON.parse(fs.readFileSync(supportedPopulationPath, "utf8")) as unknown;
     const sourceCampaign = JSON.parse(fs.readFileSync(sourceCampaignPath, "utf8")) as unknown;
@@ -257,11 +271,11 @@ const main = async (): Promise<void> => {
     const arms = buildContinuousOffenseArms();
     const baselineFactory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
     const generationManifest = createExperimentManifest({
-        runId: "plan-continuous-offense-open-development-v1",
+        runId: "plan-continuous-offense-open-development-v2",
         mixDir: path.join(driverRoot, "data"),
         maps: families.map(({ mapName }) => mapName),
         effectiveConfig: {
-            purpose: "continuous-offense-open-development-literal-endpoint-v5",
+            purpose: "continuous-offense-open-development-v2-literal-endpoint-v5",
             outcomeAccess: false,
             countries: CONTINUOUS_OFFENSE_COUNTRIES,
             reciprocalSlots: [0, 1],
@@ -296,7 +310,7 @@ const main = async (): Promise<void> => {
             const shardIndex = familyIndex * CONTINUOUS_OFFENSE_COUNTRIES.length + countryIndex;
             const seedBlockIndex = shardIndex;
             const requestedEngineSeed = derivePairedEngineSeed(CONTINUOUS_OFFENSE_ENGINE_SEED_BASE, seedBlockIndex);
-            const runId = `continuous-offense-v1-f${familyIndex}-c${countryIndex}-${generationManifest.source.gitCommit.slice(0, 10)}`;
+            const runId = `continuous-offense-v2-f${familyIndex}-c${countryIndex}-${generationManifest.source.gitCommit.slice(0, 10)}`;
             const plan: ContinuousOffenseRunPlan = parseContinuousOffenseRunPlan({
                 schemaVersion: CONTINUOUS_OFFENSE_PLAN_SCHEMA_VERSION,
                 kind: CONTINUOUS_OFFENSE_PLAN_KIND,
@@ -344,7 +358,7 @@ const main = async (): Promise<void> => {
     const campaign: ContinuousOffenseCampaign = {
         schemaVersion: 1,
         kind: "continuous-offense-open-development-literal-endpoint",
-        status: "FROZEN_CONTINUOUS_OFFENSE_OPEN_DEVELOPMENT_ENDPOINT_V5",
+        status: "FROZEN_CONTINUOUS_OFFENSE_OPEN_DEVELOPMENT_V2_ENDPOINT_V5",
         generatedAt: new Date().toISOString(),
         sourceGitCommit: generationManifest.source.gitCommit,
         sourceRuntimeSha256,
@@ -367,7 +381,10 @@ const main = async (): Promise<void> => {
         protocolSha256: CONTINUOUS_OFFENSE_PROTOCOL_SHA256,
         compatibilityGatePath,
         compatibilityGateSha256: CONTINUOUS_OFFENSE_COMPATIBILITY_SHA256,
-        compatibilityJobId: "22145862",
+        compatibilityJobId: "22149196",
+        failedV1RecordPath,
+        failedV1RecordSha256: CONTINUOUS_OFFENSE_FAILED_V1_RECORD_SHA256,
+        supersededCampaignJobId: "22148561",
         priorCampaignReuse: "fixed_families_only_fresh_seeds_and_games",
         outcomeAccess: "open-development-only-no-paper-claim",
         familyCount: families.length,

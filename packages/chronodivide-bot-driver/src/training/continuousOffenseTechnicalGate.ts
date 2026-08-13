@@ -12,6 +12,7 @@ import {
     CONTINUOUS_OFFENSE_ENGINE_SEED_BASE,
     CONTINUOUS_OFFENSE_COMPATIBILITY_SHA256,
     CONTINUOUS_OFFENSE_FAMILY_COUNT,
+    CONTINUOUS_OFFENSE_FAILED_V1_RECORD_SHA256,
     CONTINUOUS_OFFENSE_LAUNCH_COUNT,
     CONTINUOUS_OFFENSE_MAX_TICKS,
     CONTINUOUS_OFFENSE_ONE_SIDED_80_T_CRITICAL_DF9,
@@ -64,7 +65,7 @@ export const validateContinuousOffenseCampaign = (value: unknown): ContinuousOff
     if (
         !isRecord(value) || value.schemaVersion !== 1 ||
         value.kind !== "continuous-offense-open-development-literal-endpoint" ||
-        value.status !== "FROZEN_CONTINUOUS_OFFENSE_OPEN_DEVELOPMENT_ENDPOINT_V5" ||
+        value.status !== "FROZEN_CONTINUOUS_OFFENSE_OPEN_DEVELOPMENT_V2_ENDPOINT_V5" ||
         value.supportedPopulationSha256 !== CONTINUOUS_OFFENSE_SUPPORTED_POPULATION_SHA256 ||
         value.sourcePopulationCommitmentSha256 !== CONTINUOUS_OFFENSE_SUPPORTED_POPULATION_SHA256 ||
         value.sourceCampaignSha256 !== CONTINUOUS_OFFENSE_SOURCE_CAMPAIGN_SHA256 ||
@@ -76,7 +77,9 @@ export const validateContinuousOffenseCampaign = (value: unknown): ContinuousOff
         value.adapterSha256 !== CONTINUOUS_OFFENSE_ADAPTER_SHA256 ||
         value.protocolSha256 !== CONTINUOUS_OFFENSE_PROTOCOL_SHA256 ||
         value.compatibilityGateSha256 !== CONTINUOUS_OFFENSE_COMPATIBILITY_SHA256 ||
-        value.compatibilityJobId !== "22145862" ||
+        value.compatibilityJobId !== "22149196" ||
+        value.failedV1RecordSha256 !== CONTINUOUS_OFFENSE_FAILED_V1_RECORD_SHA256 ||
+        value.supersededCampaignJobId !== "22148561" ||
         value.priorCampaignReuse !== "fixed_families_only_fresh_seeds_and_games" ||
         value.outcomeAccess !== "open-development-only-no-paper-claim" ||
         value.familyCount !== CONTINUOUS_OFFENSE_FAMILY_COUNT ||
@@ -98,7 +101,8 @@ export const validateContinuousOffenseCampaign = (value: unknown): ContinuousOff
         value.arms.length !== CONTINUOUS_OFFENSE_ARM_ORDER.length ||
         value.selectedFamilies.length !== CONTINUOUS_OFFENSE_FAMILY_COUNT || value.shards.length !== CONTINUOUS_OFFENSE_SHARD_COUNT ||
         typeof value.supportedPopulationPath !== "string" || typeof value.sourceCampaignPath !== "string" ||
-        typeof value.protocolPath !== "string" || typeof value.compatibilityGatePath !== "string"
+        typeof value.protocolPath !== "string" || typeof value.compatibilityGatePath !== "string" ||
+        typeof value.failedV1RecordPath !== "string"
     ) throw new Error("Continuous-offense campaign has an invalid frozen schema");
     const campaign = value as unknown as ContinuousOffenseCampaign;
     const frozenArms = buildContinuousOffenseArms();
@@ -107,6 +111,7 @@ export const validateContinuousOffenseCampaign = (value: unknown): ContinuousOff
         sha256File(campaign.sourceCampaignPath) !== CONTINUOUS_OFFENSE_SOURCE_CAMPAIGN_SHA256 ||
         sha256File(campaign.protocolPath) !== CONTINUOUS_OFFENSE_PROTOCOL_SHA256 ||
         sha256File(campaign.compatibilityGatePath) !== CONTINUOUS_OFFENSE_COMPATIBILITY_SHA256 ||
+        sha256File(campaign.failedV1RecordPath) !== CONTINUOUS_OFFENSE_FAILED_V1_RECORD_SHA256 ||
         campaign.arms.some((arm, index) => {
             const expected = frozenArms[index];
             return arm.armId !== expected.armId || arm.policyId !== expected.policyId ||

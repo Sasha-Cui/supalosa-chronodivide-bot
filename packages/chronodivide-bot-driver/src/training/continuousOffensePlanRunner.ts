@@ -236,7 +236,7 @@ export const runContinuousOffensePlanFromEnvironment = async (): Promise<void> =
         mixDir,
         maps: [plan.family.mapName],
         effectiveConfig: {
-            runner: "continuousOffensePlanRunner-v1",
+            runner: "continuousOffensePlanRunner-v2",
             planPath,
             planSha256,
             familyId: plan.family.familyId,

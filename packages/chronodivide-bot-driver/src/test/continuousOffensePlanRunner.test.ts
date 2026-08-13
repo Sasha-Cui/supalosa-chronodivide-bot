@@ -15,12 +15,12 @@ import { derivePairedEngineSeed } from "../benchmark/seededOfflineGame.js";
 
 const base = () => {
     const arms = buildContinuousOffenseArms();
-    const engineSeedBase = 4_180_000_000;
+    const engineSeedBase = 4_190_000_000;
     const seedBlockIndex = 7;
     return {
         schemaVersion: CONTINUOUS_OFFENSE_PLAN_SCHEMA_VERSION,
         kind: CONTINUOUS_OFFENSE_PLAN_KIND,
-        runId: "continuous-v1-f0-c0",
+        runId: "continuous-v2-f0-c0",
         sourceGitCommit: "a".repeat(40),
         sourceRuntimeSha256: "b".repeat(64),
         baselineGitCommit: "c".repeat(40),
