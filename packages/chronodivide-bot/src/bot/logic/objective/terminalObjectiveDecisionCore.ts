@@ -788,12 +788,14 @@ export const selectContinuousObjectiveMission = (args: {
     noProgressTicks: number;
     thresholds: ObjectiveSchedulerThresholds;
     blockerThenBuildingCompletionTicks: number | null;
+    forceEngagementMode?: "all_observed_forces_first" | "route_blockers_only" | "buildings_only";
 }): ObjectiveMissionDecision => {
     const {
         attackers, buildings, selectedBuildingId, committedBuildingId,
         committedBuildingMadeProgress, threats, baseAssets,
         assetThreatProjections, terminalEvidence, noProgressTicks, thresholds,
         blockerThenBuildingCompletionTicks,
+        forceEngagementMode = "route_blockers_only",
     } = args;
     if (buildings.length === 0) {
         return {
@@ -825,6 +827,32 @@ export const selectContinuousObjectiveMission = (args: {
     const directSurvives = classification.earliestLethalInterceptTick === null ||
         directCompletionTicks + thresholds.directCompletionSafetyMarginTicks <
             classification.earliestLethalInterceptTick;
+    if (forceEngagementMode === "all_observed_forces_first" && threats.length > 0) {
+        return {
+            kind: "blocker_clear",
+            buildingId: selected.id,
+            blockerIds: threats.map(({ id }) => id).sort((left, right) => left - right),
+            predictedCompletionTicks: blockerThenBuildingCompletionTicks,
+            reason: "direct_strike_not_survivable",
+        };
+    }
+    if (forceEngagementMode === "buildings_only") {
+        return isObjectiveTerminalEvidenceSufficient(terminalEvidence)
+            ? {
+                kind: "terminal_candidate_strike",
+                buildingId: selected.id,
+                predictedCompletionTicks: directCompletionTicks,
+                reason: "sole_known_building_before_intercept",
+            }
+            : {
+                kind: "building_strike",
+                buildingId: selected.id,
+                predictedCompletionTicks: directCompletionTicks,
+                reason: committed?.id === selected.id && committedBuildingMadeProgress
+                    ? "retain_committed_building"
+                    : "direct_objective_progress",
+            };
+    }
     if (classification.uncalibratedStrikeThreatIds.length > 0) {
         return {
             kind: "blocker_clear",

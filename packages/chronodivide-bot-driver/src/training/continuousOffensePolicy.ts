@@ -11,8 +11,17 @@ export const CONTINUOUS_OFFENSE_STRIKE_GROUP_MODES = [
     "minimum_sufficient_force",
 ] as const;
 
+export const CONTINUOUS_OFFENSE_FORCE_ENGAGEMENT_MODES = [
+    "all_observed_forces_first",
+    "route_blockers_only",
+    "buildings_only",
+] as const;
+
 export type ContinuousOffenseStrikeGroupMode =
     typeof CONTINUOUS_OFFENSE_STRIKE_GROUP_MODES[number];
+
+export type ContinuousOffenseForceEngagementMode =
+    typeof CONTINUOUS_OFFENSE_FORCE_ENGAGEMENT_MODES[number];
 
 export type ContinuousOffensePolicy = {
     schemaVersion: typeof CONTINUOUS_OFFENSE_POLICY_SCHEMA_VERSION;
@@ -27,6 +36,7 @@ export type ContinuousOffensePolicy = {
     orderIntervalTicks: number;
     reserveCombatants: number;
     strikeGroupMode: ContinuousOffenseStrikeGroupMode;
+    forceEngagementMode: ContinuousOffenseForceEngagementMode;
     searchCellSize: number;
     searchRevisitTicks: number;
     maxSearchGroups: number;
@@ -44,7 +54,8 @@ const exactKeys: Array<keyof ContinuousOffensePolicy> = [
     "schemaVersion", "enabled", "mechanism", "informationInterface",
     "friendlyCalibrationMode", "activationBuildingCount", "activationMinTick",
     "requireObservedCountAboveThreshold", "minTick", "orderIntervalTicks",
-    "reserveCombatants", "strikeGroupMode", "searchCellSize", "searchRevisitTicks",
+    "reserveCombatants", "strikeGroupMode", "forceEngagementMode",
+    "searchCellSize", "searchRevisitTicks",
     "maxSearchGroups", "routeCorridorRadius", "interceptHorizonTicks",
     "baseDefenseHorizonTicks", "blockerLethalDamageFraction",
     "directCompletionSafetyMarginTicks", "missionLivenessTicks",
@@ -80,6 +91,9 @@ export const validateContinuousOffensePolicy = (
     ) throw new Error("Continuous-offense friendly calibration is invalid");
     if (!CONTINUOUS_OFFENSE_STRIKE_GROUP_MODES.includes(policy.strikeGroupMode)) {
         throw new Error("Continuous-offense strike-group mode is invalid");
+    }
+    if (!CONTINUOUS_OFFENSE_FORCE_ENGAGEMENT_MODES.includes(policy.forceEngagementMode)) {
+        throw new Error("Continuous-offense force-engagement mode is invalid");
     }
     if (typeof policy.enabled !== "boolean" || typeof policy.requireObservedCountAboveThreshold !== "boolean") {
         throw new Error("Continuous-offense boolean field is invalid");
@@ -136,6 +150,7 @@ export const buildContinuousOffensePolicy = (
     orderIntervalTicks: 12,
     reserveCombatants: 2,
     strikeGroupMode: "full_compatible_force",
+    forceEngagementMode: "route_blockers_only",
     searchCellSize: 12,
     searchRevisitTicks: 600,
     maxSearchGroups: 4,

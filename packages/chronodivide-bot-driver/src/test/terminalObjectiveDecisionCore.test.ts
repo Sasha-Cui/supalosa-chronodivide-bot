@@ -206,4 +206,26 @@ describe("continuous objective offense", () => {
             buildingId: lastBuilding.id,
         });
     });
+
+    it("supports the prespecified fight-all-forces causal ablation", () => {
+        const offRoute = threat(100, 100, 100);
+        expect(selectContinuousObjectiveMission({
+            ...terminalArgs([offRoute], []),
+            forceEngagementMode: "all_observed_forces_first",
+        })).toMatchObject({
+            kind: "blocker_clear",
+            blockerIds: [offRoute.id],
+        });
+    });
+
+    it("supports the prespecified buildings-only causal ablation", () => {
+        const lethalBlocker = { ...threat(100, 2, 0), currentlyDamagingStrike: true };
+        expect(selectContinuousObjectiveMission({
+            ...terminalArgs([lethalBlocker], []),
+            forceEngagementMode: "buildings_only",
+        })).toMatchObject({
+            kind: "terminal_candidate_strike",
+            buildingId: lastBuilding.id,
+        });
+    });
 });

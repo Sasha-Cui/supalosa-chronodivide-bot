@@ -9,6 +9,7 @@ describe("continuous-offense policy", () => {
     it("has a deterministic exact-schema identity", () => {
         const policy = buildContinuousOffensePolicy();
         expect(validateContinuousOffensePolicy(policy)).toEqual(policy);
+        expect(policy.forceEngagementMode).toBe("route_blockers_only");
         expect(continuousOffensePolicySha256(policy)).toMatch(/^[0-9a-f]{64}$/);
         expect(continuousOffensePolicySha256(policy)).toBe(continuousOffensePolicySha256({ ...policy }));
     });

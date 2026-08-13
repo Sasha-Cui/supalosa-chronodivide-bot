@@ -692,6 +692,9 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 noProgressTicks,
                 thresholds,
                 blockerThenBuildingCompletionTicks,
+                forceEngagementMode: isContinuousOffensePolicy(this.policy)
+                    ? this.policy.forceEngagementMode
+                    : undefined,
             });
         }
 
@@ -736,6 +739,9 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                     noProgressTicks,
                     thresholds,
                     blockerThenBuildingCompletionTicks: null,
+                    forceEngagementMode: isContinuousOffensePolicy(this.policy)
+                        ? this.policy.forceEngagementMode
+                        : undefined,
                 });
                 if (rechecked.kind === "building_strike" || rechecked.kind === "terminal_candidate_strike") {
                     strike = proposed;
