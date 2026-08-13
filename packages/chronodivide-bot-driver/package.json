@@ -33,6 +33,12 @@
         "research:finalize-optimizer": "node dist/training/researchOptimizerFinalizer.js --es-module-specifier-resolution=node",
         "research:reduce-stage": "node dist/training/researchStageReducer.js --es-module-specifier-resolution=node",
         "research:run-plan": "node dist/training/researchPlanRunner.js --es-module-specifier-resolution=node",
+        "research:v5-baseline-equivalence": "node dist/training/methodV5BaselineEquivalence.js --es-module-specifier-resolution=node",
+        "research:v5-all-country-smoke": "node dist/training/methodV5AllCountrySmoke.js --es-module-specifier-resolution=node",
+        "research:v5-generate-campaign": "node dist/training/methodV5Campaign.js --es-module-specifier-resolution=node",
+        "research:v5-run-plan": "node dist/training/methodV5PlanRunner.js --es-module-specifier-resolution=node",
+        "research:v5-technical-gate": "node dist/training/methodV5TechnicalGate.js --es-module-specifier-resolution=node",
+        "research:v5-analyze": "node dist/training/methodV5Analyzer.js --es-module-specifier-resolution=node",
         "analyze:training": "node dist/training/analyzeTrainingResults.js --es-module-specifier-resolution=node",
         "test": "vitest"
     },
