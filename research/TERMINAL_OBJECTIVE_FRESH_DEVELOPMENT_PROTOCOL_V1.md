@@ -7,8 +7,8 @@ Frozen: 2026-08-13 UTC
 ## Purpose and authorization boundary
 
 This protocol specifies the single fresh-development evaluation that may follow
-terminal-objective open-development array `22119584` and fail-closed controller
-`22119585`. It authorizes no game unless the controller completes successfully
+the complete building-first terminal-objective open-development campaign. It
+authorizes no game unless that campaign's fail-closed controller completes successfully
 and its frozen analysis status is
 `ADVANCE_TERMINAL_OBJECTIVE_TO_CONFIRMATORY_DESIGN` with every declared check
 true. If that condition fails, this protocol is retired unused; no fresh family
@@ -21,18 +21,21 @@ It cannot establish that the candidate reliably beats Supalosa.
 
 - Candidate: policy arm `full_sufficient_strike`, policy SHA-256
   `438f059f4723242947fefa4e79ef28f22c35a1717ccd361accf8472329db5e95`.
-- Candidate implementation parent: clean `main` commit
-  `8dc89f55f9d914aec03d6cf45dd7b475a7b702c4`.
+- Candidate implementation: the exact clean `main` commit and runtime-tree
+  commitment recorded by the complete passing open campaign. Source may not
+  change between that campaign and fresh-development generation.
 - Exact Supalosa control: policy arm `selected_prior`, policy SHA-256
   `927d424c170f231eee42a83536f51c377553e16f06a1c06dc8eef6918b0cd5b6`.
-- Open-development campaign SHA-256:
-  `bc15d6e83df8d3cdaa03eac92e6dea1ec7477727e54c25ef8ba2e9bc9630509e`.
+- Open-development campaign SHA-256: the exact `campaignSha256` recorded by
+  the single passing open-development analysis. The generator independently
+  hashes and validates that campaign; a separately hard-coded predecessor hash
+  is deliberately not accepted as an alternative chain of authority.
 - Outcome-free external-baseline identity gate SHA-256:
-  `60e88d45dd363c2573f912d5329f558116928619ead8f28e2ea585b3e1e3b4f6`.
+  `60859701828f2e6cb62ccd7d07ed2cdc3ad45a5c8b79edce3a34aaf053d904be`.
 - Outcome-free all-country live-bridge smoke gate SHA-256:
-  `cc4163c0bff2af394a48115b03f74fc1ad0c6050121e83d810eab5cfd7fcb4cf`.
+  `1a4af658ee7e08ae266cf4b16902ce5476d2ab738e12f18748ab17c031554c63`.
 - Exact terminal decision-core SHA-256:
-  `3ed2f2907f201a9184d931a20d02ac5bb0e473d1db56ece7b739560f3da7ec05`.
+  `03238e35095bbf9b74e336599f922ae64a11958d0da5b27859c791401d719f62`.
 - Exact mechanics-adapter SHA-256:
   `a39cdb70571de40f72a3aae251eb1e8610c94b76ca7125790f9e0ee488ad52fc`.
 - Literal building-elimination endpoint: version 5 and its source commitment

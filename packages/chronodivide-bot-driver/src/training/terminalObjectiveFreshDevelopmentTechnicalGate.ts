@@ -11,7 +11,6 @@ import {
     TERMINAL_FRESH_DEVELOPMENT_LAUNCH_COUNT,
     TERMINAL_FRESH_DEVELOPMENT_MAX_TICKS,
     TERMINAL_FRESH_DEVELOPMENT_OPEN_ANALYSIS_STATUS,
-    TERMINAL_FRESH_DEVELOPMENT_OPEN_CAMPAIGN_SHA256,
     TERMINAL_FRESH_DEVELOPMENT_PRIVATE_ROLE_SHA256,
     TERMINAL_FRESH_DEVELOPMENT_PROTOCOL_SHA256,
     TERMINAL_FRESH_DEVELOPMENT_PUBLIC_ROLE_SHA256,
@@ -58,7 +57,8 @@ export const validateTerminalFreshDevelopmentCampaign = (
         value.status !== "FROZEN_TERMINAL_OBJECTIVE_FRESH_DEVELOPMENT_ENDPOINT_V5" ||
         typeof value.sourceGitCommit !== "string" || !/^[0-9a-f]{40}$/.test(value.sourceGitCommit) ||
         typeof value.sourceRuntimeSha256 !== "string" || !/^[0-9a-f]{64}$/.test(value.sourceRuntimeSha256) ||
-        value.sourceOpenCampaignSha256 !== TERMINAL_FRESH_DEVELOPMENT_OPEN_CAMPAIGN_SHA256 ||
+        typeof value.sourceOpenCampaignSha256 !== "string" ||
+        !/^[0-9a-f]{64}$/.test(value.sourceOpenCampaignSha256) ||
         value.protocolSha256 !== TERMINAL_FRESH_DEVELOPMENT_PROTOCOL_SHA256 ||
         value.publicRoleSha256 !== TERMINAL_FRESH_DEVELOPMENT_PUBLIC_ROLE_SHA256 ||
         value.privateRoleSha256 !== TERMINAL_FRESH_DEVELOPMENT_PRIVATE_ROLE_SHA256 ||
@@ -83,7 +83,7 @@ export const validateTerminalFreshDevelopmentCampaign = (
     const campaign = value as unknown as TerminalFreshDevelopmentCampaign;
     if (
         sha256File(campaign.authorizationAnalysisPath) !== campaign.authorizationAnalysisSha256 ||
-        sha256File(campaign.sourceOpenCampaignPath) !== TERMINAL_FRESH_DEVELOPMENT_OPEN_CAMPAIGN_SHA256 ||
+        sha256File(campaign.sourceOpenCampaignPath) !== campaign.sourceOpenCampaignSha256 ||
         sha256File(campaign.protocolPath) !== TERMINAL_FRESH_DEVELOPMENT_PROTOCOL_SHA256 ||
         sha256File(campaign.publicRolePath) !== TERMINAL_FRESH_DEVELOPMENT_PUBLIC_ROLE_SHA256 ||
         sha256File(campaign.privateRolePath) !== TERMINAL_FRESH_DEVELOPMENT_PRIVATE_ROLE_SHA256 ||
@@ -92,7 +92,7 @@ export const validateTerminalFreshDevelopmentCampaign = (
     const authorization = readJson(campaign.authorizationAnalysisPath);
     if (
         !isRecord(authorization) || authorization.status !== TERMINAL_FRESH_DEVELOPMENT_OPEN_ANALYSIS_STATUS ||
-        authorization.advanced !== true || authorization.campaignSha256 !== TERMINAL_FRESH_DEVELOPMENT_OPEN_CAMPAIGN_SHA256 ||
+        authorization.advanced !== true || authorization.campaignSha256 !== campaign.sourceOpenCampaignSha256 ||
         !isRecord(authorization.advancementChecks) || Object.values(authorization.advancementChecks).length !== 6 ||
         !Object.values(authorization.advancementChecks).every((entry) => entry === true)
     ) throw new Error("Fresh-development authorization no longer passes exactly");

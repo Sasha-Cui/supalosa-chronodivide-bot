@@ -23,6 +23,7 @@ import {
     serializeTerminalFreshDevelopmentRunPlan,
     sha256File,
 } from "./terminalObjectiveFreshDevelopmentPlanRunner.js";
+import { validateTerminalObjectiveCampaign } from "./terminalObjectiveTechnicalGate.js";
 
 export const TERMINAL_FRESH_DEVELOPMENT_ENGINE_SEED_BASE = 4_050_000_000 as const;
 export const TERMINAL_FRESH_DEVELOPMENT_MAX_TICKS = 24_000 as const;
@@ -32,10 +33,8 @@ export const TERMINAL_FRESH_DEVELOPMENT_SHARD_COUNT = 360 as const;
 export const TERMINAL_FRESH_DEVELOPMENT_LAUNCH_COUNT = 720 as const;
 export const TERMINAL_FRESH_DEVELOPMENT_OPEN_ANALYSIS_STATUS =
     "ADVANCE_TERMINAL_OBJECTIVE_TO_CONFIRMATORY_DESIGN" as const;
-export const TERMINAL_FRESH_DEVELOPMENT_OPEN_CAMPAIGN_SHA256 =
-    "bc15d6e83df8d3cdaa03eac92e6dea1ec7477727e54c25ef8ba2e9bc9630509e" as const;
 export const TERMINAL_FRESH_DEVELOPMENT_PROTOCOL_SHA256 =
-    "a828f5ff34582eef102a98819b9fadce70c0054feff78354945f5f122f744597" as const;
+    "807dc2ec7a24d39bd2b7b0b0ecc42efab92290da0c62108a031206ea81f7a0b4" as const;
 export const TERMINAL_FRESH_DEVELOPMENT_PUBLIC_ROLE_SHA256 =
     "ab778395def5e69730c7772b0af5e9f767c96d1ea8699ef0e56e644521fc61a8" as const;
 export const TERMINAL_FRESH_DEVELOPMENT_PRIVATE_ROLE_SHA256 =
@@ -83,7 +82,7 @@ export type TerminalFreshDevelopmentCampaign = {
     authorizationAnalysisPath: string;
     authorizationAnalysisSha256: string;
     sourceOpenCampaignPath: string;
-    sourceOpenCampaignSha256: typeof TERMINAL_FRESH_DEVELOPMENT_OPEN_CAMPAIGN_SHA256;
+    sourceOpenCampaignSha256: string;
     protocolPath: string;
     protocolSha256: typeof TERMINAL_FRESH_DEVELOPMENT_PROTOCOL_SHA256;
     publicRolePath: string;
@@ -168,19 +167,25 @@ const main = async (): Promise<void> => {
     const outRoot = requiredPath("OUT_ROOT");
     if (fs.existsSync(outRoot)) throw new Error(`Refusing to reuse OUT_ROOT ${outRoot}`);
     if (
-        sha256File(sourceOpenCampaignPath) !== TERMINAL_FRESH_DEVELOPMENT_OPEN_CAMPAIGN_SHA256 ||
         sha256File(protocolPath) !== TERMINAL_FRESH_DEVELOPMENT_PROTOCOL_SHA256 ||
         sha256File(publicRolePath) !== TERMINAL_FRESH_DEVELOPMENT_PUBLIC_ROLE_SHA256 ||
         sha256File(privateRolePath) !== TERMINAL_FRESH_DEVELOPMENT_PRIVATE_ROLE_SHA256
     ) throw new Error("Fresh-development source or role commitment drifted");
     const authorization = JSON.parse(fs.readFileSync(authorizationAnalysisPath, "utf8")) as RecordValue;
+    const sourceOpenCampaignSha256 = sha256File(sourceOpenCampaignPath);
+    const sourceOpenCampaign = validateTerminalObjectiveCampaign(
+        JSON.parse(fs.readFileSync(sourceOpenCampaignPath, "utf8")),
+    );
     if (
         authorization.status !== TERMINAL_FRESH_DEVELOPMENT_OPEN_ANALYSIS_STATUS || authorization.advanced !== true ||
-        authorization.campaignSha256 !== TERMINAL_FRESH_DEVELOPMENT_OPEN_CAMPAIGN_SHA256 ||
+        authorization.campaignSha256 !== sourceOpenCampaignSha256 ||
         !isRecord(authorization.advancementChecks) ||
         Object.values(authorization.advancementChecks).length !== 6 ||
         !Object.values(authorization.advancementChecks).every((value) => value === true)
     ) throw new Error("Open-development analysis does not authorize fresh development");
+    if (sourceOpenCampaign.sourceGitCommit !== execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim()) {
+        throw new Error("Fresh-development source does not match the passing open campaign");
+    }
     const publicRole = JSON.parse(fs.readFileSync(publicRolePath, "utf8")) as RecordValue;
     if (
         publicRole.status !== "FROZEN_METHOD_V6_FRESH_ROLES_IDENTITIES_PRIVATE" || publicRole.outcomeBlind !== true ||
@@ -278,7 +283,7 @@ const main = async (): Promise<void> => {
         authorizationAnalysisPath,
         authorizationAnalysisSha256: sha256File(authorizationAnalysisPath),
         sourceOpenCampaignPath,
-        sourceOpenCampaignSha256: TERMINAL_FRESH_DEVELOPMENT_OPEN_CAMPAIGN_SHA256,
+        sourceOpenCampaignSha256,
         protocolPath,
         protocolSha256: TERMINAL_FRESH_DEVELOPMENT_PROTOCOL_SHA256,
         publicRolePath,
