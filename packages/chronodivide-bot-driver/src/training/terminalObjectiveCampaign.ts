@@ -26,7 +26,7 @@ import {
     sha256File,
 } from "./terminalObjectivePlanRunner.js";
 
-export const TERMINAL_OBJECTIVE_ENGINE_SEED_BASE = 3_750_000_000 as const;
+export const TERMINAL_OBJECTIVE_ENGINE_SEED_BASE = 3_760_000_000 as const;
 export const TERMINAL_OBJECTIVE_MAX_TICKS = 24_000 as const;
 export const TERMINAL_OBJECTIVE_FAMILY_COUNT = 10 as const;
 export const TERMINAL_OBJECTIVE_SEED_BLOCKS_PER_FAMILY = 2 as const;
@@ -40,6 +40,10 @@ export const TERMINAL_OBJECTIVE_EQUIVALENCE_SHA256 =
     "60e88d45dd363c2573f912d5329f558116928619ead8f28e2ea585b3e1e3b4f6" as const;
 export const TERMINAL_OBJECTIVE_SMOKE_SHA256 =
     "cc4163c0bff2af394a48115b03f74fc1ad0c6050121e83d810eab5cfd7fcb4cf" as const;
+export const TERMINAL_OBJECTIVE_REPLACEMENT_FAILURE_AUDIT_SHA256 =
+    "ab44c5d7f6064335fbc34532abcc14e7178b97224e375a1fc64b610019f66514" as const;
+export const TERMINAL_OBJECTIVE_REPLACEMENT_PROTOCOL_SHA256 =
+    "a3eb5dadf124436587fb3b05511204bac996a056e9ec620d45b7169c50a6a2ef" as const;
 export const TERMINAL_OBJECTIVE_ONE_SIDED_80_T_CRITICAL_DF9 = 0.8834038596855205 as const;
 
 export const TERMINAL_OBJECTIVE_COUNTRIES = [
@@ -77,9 +81,9 @@ export type TerminalObjectiveFamily = {
 };
 
 export type TerminalObjectiveCampaign = {
-    schemaVersion: 1;
+    schemaVersion: 2;
     kind: "terminal-objective-open-development-literal-endpoint";
-    status: "FROZEN_TERMINAL_OBJECTIVE_OPEN_DEVELOPMENT_ENDPOINT_V5";
+    status: "FROZEN_TERMINAL_OBJECTIVE_OPEN_DEVELOPMENT_REPLACEMENT_ENDPOINT_V5";
     generatedAt: string;
     sourceGitCommit: string;
     sourceRuntimeSha256: string;
@@ -100,6 +104,13 @@ export type TerminalObjectiveCampaign = {
     equivalenceGateSha256: typeof TERMINAL_OBJECTIVE_EQUIVALENCE_SHA256;
     smokeGatePath: string;
     smokeGateSha256: typeof TERMINAL_OBJECTIVE_SMOKE_SHA256;
+    replacesArrayJobId: "22119584";
+    replacesControllerJobId: "22119585";
+    replacementFailureAuditPath: string;
+    replacementFailureAuditSha256: typeof TERMINAL_OBJECTIVE_REPLACEMENT_FAILURE_AUDIT_SHA256;
+    replacementProtocolPath: string;
+    replacementProtocolSha256: typeof TERMINAL_OBJECTIVE_REPLACEMENT_PROTOCOL_SHA256;
+    priorCampaignReuse: "none_complete_fresh_seed_replacement";
     outcomeAccess: "open-development-only-no-paper-claim";
     familyCount: number;
     seedBlocksPerFamily: number;
@@ -214,12 +225,16 @@ const main = async (): Promise<void> => {
     const supportedPopulationPath = requiredPath("TERMINAL_OBJECTIVE_SUPPORTED_POPULATION");
     const equivalenceGatePath = requiredPath("TERMINAL_OBJECTIVE_EQUIVALENCE_GATE");
     const smokeGatePath = requiredPath("TERMINAL_OBJECTIVE_SMOKE_GATE");
+    const replacementFailureAuditPath = requiredPath("TERMINAL_OBJECTIVE_REPLACEMENT_FAILURE_AUDIT");
+    const replacementProtocolPath = requiredPath("TERMINAL_OBJECTIVE_REPLACEMENT_PROTOCOL");
     const outRoot = requiredPath("OUT_ROOT");
     if (fs.existsSync(outRoot)) throw new Error(`Refusing to reuse OUT_ROOT ${outRoot}`);
     for (const [filePath, digest, label] of [
         [supportedPopulationPath, TERMINAL_OBJECTIVE_SUPPORTED_POPULATION_SHA256, "population"],
         [equivalenceGatePath, TERMINAL_OBJECTIVE_EQUIVALENCE_SHA256, "equivalence"],
         [smokeGatePath, TERMINAL_OBJECTIVE_SMOKE_SHA256, "smoke"],
+        [replacementFailureAuditPath, TERMINAL_OBJECTIVE_REPLACEMENT_FAILURE_AUDIT_SHA256, "replacement failure audit"],
+        [replacementProtocolPath, TERMINAL_OBJECTIVE_REPLACEMENT_PROTOCOL_SHA256, "replacement protocol"],
     ] as const) if (sha256File(filePath) !== digest) throw new Error(`Terminal-objective ${label} commitment drifted`);
     const corePath = path.join(repoRoot, "packages", "chronodivide-bot", "src", "bot", "logic", "objective", "terminalObjectiveDecisionCore.ts");
     const adapterPath = path.join(repoRoot, "packages", "chronodivide-bot", "src", "bot", "logic", "objective", "objectiveMechanicsAdapter.ts");
@@ -228,11 +243,17 @@ const main = async (): Promise<void> => {
     }
     const equivalence = JSON.parse(fs.readFileSync(equivalenceGatePath, "utf8")) as RecordValue;
     const smoke = JSON.parse(fs.readFileSync(smokeGatePath, "utf8")) as RecordValue;
+    const replacementFailureAudit = JSON.parse(fs.readFileSync(replacementFailureAuditPath, "utf8")) as RecordValue;
     if (
         equivalence.status !== "PASS_OUTCOME_FREE_TERMINAL_OBJECTIVE_EXTERNAL_BASELINE_IDENTITY" ||
         equivalence.outcomeFree !== true || equivalence.gameCount !== 36 ||
         smoke.status !== "PASS_OUTCOME_FREE_TERMINAL_OBJECTIVE_ALL_COUNTRY_LIVE_BRIDGE_SMOKE" ||
-        smoke.outcomeFree !== true || smoke.gameCount !== 18
+        smoke.outcomeFree !== true || smoke.gameCount !== 18 ||
+        replacementFailureAudit.status !== "INVALIDATED_COMPLETE_CAMPAIGN_RUNTIME_COMMITMENT_DRIFT" ||
+        replacementFailureAudit.arrayJobId !== "22119584" || replacementFailureAudit.controllerJobId !== "22119585" ||
+        !isRecord(replacementFailureAudit.repair) || replacementFailureAudit.repair.reuseAccepted !== false ||
+        replacementFailureAudit.repair.selectiveRerunAllowed !== false ||
+        replacementFailureAudit.repair.restoredRuntimeExactlyMatchesOriginalPlan !== true
     ) throw new Error("Terminal-objective outcome-free technical gates do not authorize generation");
 
     const supportedPopulation = JSON.parse(fs.readFileSync(supportedPopulationPath, "utf8")) as unknown;
@@ -240,7 +261,7 @@ const main = async (): Promise<void> => {
     const arms = buildTerminalObjectiveArms();
     const baselineFactory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
     const generationManifest = createExperimentManifest({
-        runId: "plan-terminal-objective-open-development-v1",
+        runId: "plan-terminal-objective-open-development-replacement-v1",
         mixDir: path.join(driverRoot, "data"),
         maps: families.map(({ mapName }) => mapName),
         effectiveConfig: {
@@ -251,6 +272,8 @@ const main = async (): Promise<void> => {
             seedBlocksPerFamily: TERMINAL_OBJECTIVE_SEED_BLOCKS_PER_FAMILY,
             arms,
             maxTicks: TERMINAL_OBJECTIVE_MAX_TICKS,
+            replacesArrayJobId: "22119584",
+            priorCampaignReuse: "none_complete_fresh_seed_replacement",
         },
         baseline: baselineFactory.descriptor,
         gameSeedBase: TERMINAL_OBJECTIVE_ENGINE_SEED_BASE,
@@ -279,7 +302,7 @@ const main = async (): Promise<void> => {
                     TERMINAL_OBJECTIVE_COUNTRIES.length + countryIndex;
                 const seedBlockIndex = shardIndex;
                 const requestedEngineSeed = derivePairedEngineSeed(TERMINAL_OBJECTIVE_ENGINE_SEED_BASE, seedBlockIndex);
-                const runId = `terminal-v1-f${familyIndex}-b${familySeedIndex}-c${countryIndex}-${generationManifest.source.gitCommit.slice(0, 10)}`;
+                const runId = `terminal-replacement-v1-f${familyIndex}-b${familySeedIndex}-c${countryIndex}-${generationManifest.source.gitCommit.slice(0, 10)}`;
                 const plan: TerminalObjectiveRunPlan = parseTerminalObjectiveRunPlan({
                     schemaVersion: TERMINAL_OBJECTIVE_PLAN_SCHEMA_VERSION,
                     kind: TERMINAL_OBJECTIVE_PLAN_KIND,
@@ -326,9 +349,9 @@ const main = async (): Promise<void> => {
         }
     }
     const campaign: TerminalObjectiveCampaign = {
-        schemaVersion: 1,
+        schemaVersion: 2,
         kind: "terminal-objective-open-development-literal-endpoint",
-        status: "FROZEN_TERMINAL_OBJECTIVE_OPEN_DEVELOPMENT_ENDPOINT_V5",
+        status: "FROZEN_TERMINAL_OBJECTIVE_OPEN_DEVELOPMENT_REPLACEMENT_ENDPOINT_V5",
         generatedAt: new Date().toISOString(),
         sourceGitCommit: generationManifest.source.gitCommit,
         sourceRuntimeSha256,
@@ -349,6 +372,13 @@ const main = async (): Promise<void> => {
         equivalenceGateSha256: TERMINAL_OBJECTIVE_EQUIVALENCE_SHA256,
         smokeGatePath,
         smokeGateSha256: TERMINAL_OBJECTIVE_SMOKE_SHA256,
+        replacesArrayJobId: "22119584",
+        replacesControllerJobId: "22119585",
+        replacementFailureAuditPath,
+        replacementFailureAuditSha256: TERMINAL_OBJECTIVE_REPLACEMENT_FAILURE_AUDIT_SHA256,
+        replacementProtocolPath,
+        replacementProtocolSha256: TERMINAL_OBJECTIVE_REPLACEMENT_PROTOCOL_SHA256,
+        priorCampaignReuse: "none_complete_fresh_seed_replacement",
         outcomeAccess: "open-development-only-no-paper-claim",
         familyCount: families.length,
         seedBlocksPerFamily: TERMINAL_OBJECTIVE_SEED_BLOCKS_PER_FAMILY,

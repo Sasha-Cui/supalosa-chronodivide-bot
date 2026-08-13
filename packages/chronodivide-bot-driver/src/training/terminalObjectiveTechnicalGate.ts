@@ -15,6 +15,8 @@ import {
     TERMINAL_OBJECTIVE_LAUNCH_COUNT,
     TERMINAL_OBJECTIVE_MAX_TICKS,
     TERMINAL_OBJECTIVE_ONE_SIDED_80_T_CRITICAL_DF9,
+    TERMINAL_OBJECTIVE_REPLACEMENT_FAILURE_AUDIT_SHA256,
+    TERMINAL_OBJECTIVE_REPLACEMENT_PROTOCOL_SHA256,
     TERMINAL_OBJECTIVE_SEED_BLOCKS_PER_FAMILY,
     TERMINAL_OBJECTIVE_SHARD_COUNT,
     TERMINAL_OBJECTIVE_SMOKE_SHA256,
@@ -64,9 +66,9 @@ const exactKeys = (value: RecordValue, expected: string[], label: string): void 
 
 export const validateTerminalObjectiveCampaign = (value: unknown): TerminalObjectiveCampaign => {
     if (
-        !isRecord(value) || value.schemaVersion !== 1 ||
+        !isRecord(value) || value.schemaVersion !== 2 ||
         value.kind !== "terminal-objective-open-development-literal-endpoint" ||
-        value.status !== "FROZEN_TERMINAL_OBJECTIVE_OPEN_DEVELOPMENT_ENDPOINT_V5" ||
+        value.status !== "FROZEN_TERMINAL_OBJECTIVE_OPEN_DEVELOPMENT_REPLACEMENT_ENDPOINT_V5" ||
         value.supportedPopulationSha256 !== TERMINAL_OBJECTIVE_SUPPORTED_POPULATION_SHA256 ||
         value.sourcePopulationCommitmentSha256 !== TERMINAL_OBJECTIVE_SUPPORTED_POPULATION_SHA256 ||
         value.outcomeFreePopulationSelection !== true ||
@@ -76,6 +78,10 @@ export const validateTerminalObjectiveCampaign = (value: unknown): TerminalObjec
         value.adapterSha256 !== TERMINAL_OBJECTIVE_ADAPTER_SHA256 ||
         value.equivalenceGateSha256 !== TERMINAL_OBJECTIVE_EQUIVALENCE_SHA256 ||
         value.smokeGateSha256 !== TERMINAL_OBJECTIVE_SMOKE_SHA256 ||
+        value.replacesArrayJobId !== "22119584" || value.replacesControllerJobId !== "22119585" ||
+        value.replacementFailureAuditSha256 !== TERMINAL_OBJECTIVE_REPLACEMENT_FAILURE_AUDIT_SHA256 ||
+        value.replacementProtocolSha256 !== TERMINAL_OBJECTIVE_REPLACEMENT_PROTOCOL_SHA256 ||
+        value.priorCampaignReuse !== "none_complete_fresh_seed_replacement" ||
         value.outcomeAccess !== "open-development-only-no-paper-claim" ||
         value.familyCount !== TERMINAL_OBJECTIVE_FAMILY_COUNT ||
         value.seedBlocksPerFamily !== TERMINAL_OBJECTIVE_SEED_BLOCKS_PER_FAMILY ||
@@ -96,7 +102,8 @@ export const validateTerminalObjectiveCampaign = (value: unknown): TerminalObjec
         value.arms.length !== TERMINAL_OBJECTIVE_ARM_ORDER.length ||
         value.selectedFamilies.length !== TERMINAL_OBJECTIVE_FAMILY_COUNT || value.shards.length !== TERMINAL_OBJECTIVE_SHARD_COUNT ||
         typeof value.supportedPopulationPath !== "string" || typeof value.equivalenceGatePath !== "string" ||
-        typeof value.smokeGatePath !== "string"
+        typeof value.smokeGatePath !== "string" || typeof value.replacementFailureAuditPath !== "string" ||
+        typeof value.replacementProtocolPath !== "string"
     ) throw new Error("Terminal-objective campaign has an invalid frozen schema");
     const campaign = value as unknown as TerminalObjectiveCampaign;
     const frozenArms = buildTerminalObjectiveArms();
@@ -104,6 +111,8 @@ export const validateTerminalObjectiveCampaign = (value: unknown): TerminalObjec
         sha256File(campaign.supportedPopulationPath) !== TERMINAL_OBJECTIVE_SUPPORTED_POPULATION_SHA256 ||
         sha256File(campaign.equivalenceGatePath) !== TERMINAL_OBJECTIVE_EQUIVALENCE_SHA256 ||
         sha256File(campaign.smokeGatePath) !== TERMINAL_OBJECTIVE_SMOKE_SHA256 ||
+        sha256File(campaign.replacementFailureAuditPath) !== TERMINAL_OBJECTIVE_REPLACEMENT_FAILURE_AUDIT_SHA256 ||
+        sha256File(campaign.replacementProtocolPath) !== TERMINAL_OBJECTIVE_REPLACEMENT_PROTOCOL_SHA256 ||
         campaign.arms.some((arm, index) => {
             const expected = frozenArms[index];
             return arm.armId !== expected.armId || arm.policyId !== expected.policyId ||
