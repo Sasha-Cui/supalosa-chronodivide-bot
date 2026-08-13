@@ -119,11 +119,11 @@ const main = async (): Promise<void> => {
         rows.push({ country, candidateSlot, requestedEngineSeed, snapshotTicks: [300, 600, 900, 1200], wrapped, unwrapped, equal });
     }
     const manifest = createExperimentManifest({
-        runId: `method-v5-baseline-equivalence-${process.env.SLURM_JOB_ID ?? "local"}`,
+        runId: `method-v6-baseline-equivalence-${process.env.SLURM_JOB_ID ?? "local"}`,
         mixDir: path.join(process.cwd(), "data"),
         maps: [mapName],
         effectiveConfig: {
-            purpose: "method-v5-outcome-free-external-baseline-identity",
+            purpose: "method-v6-outcome-free-external-baseline-identity",
             countries: Object.values(Countries), reciprocalSlots: [0, 1], maxTicks: METHOD_V5_EQUIVALENCE_MAX_TICKS,
             shortGame: false, endpointAdjudication: false, outcomeInspection: false,
         },
@@ -137,7 +137,7 @@ const main = async (): Promise<void> => {
     ) throw new Error("Method-v5 equivalence provenance or coverage failed");
     const output = {
         schemaVersion: 1,
-        status: "PASS_OUTCOME_FREE_METHOD_V5_EXTERNAL_BASELINE_IDENTITY_GATE",
+        status: "PASS_OUTCOME_FREE_METHOD_V6_EXTERNAL_BASELINE_IDENTITY_GATE",
         generatedAt: new Date().toISOString(),
         passed: true,
         outcomeFree: true,

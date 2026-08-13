@@ -60,9 +60,9 @@ const exactKeys = (value: RecordValue, expected: string[], label: string): void 
 
 export const validateMethodV5Campaign = (value: unknown): MethodV5Campaign => {
     if (
-        !isRecord(value) || value.schemaVersion !== 1 ||
-        value.kind !== "method-v5-open-training-literal-endpoint" ||
-        value.status !== "FROZEN_METHOD_V5_OPEN_TRAINING_LITERAL_ENDPOINT_V5_SCREEN" ||
+        !isRecord(value) || value.schemaVersion !== 2 ||
+        value.kind !== "method-v6-open-training-literal-endpoint" ||
+        value.status !== "FROZEN_METHOD_V6_OBJECTIVE_DIRECTED_OPEN_TRAINING_ENDPOINT_V5_SCREEN" ||
         value.sourceCampaignSha256 !== METHOD_V5_SOURCE_CAMPAIGN_SHA256 ||
         value.mapCatalogSha256 !== METHOD_V5_MAP_CATALOG_SHA256 ||
         value.sourcePopulationCommitmentSha256 !== METHOD_V5_TRAINING_POPULATION_SHA256 ||
@@ -131,26 +131,54 @@ export const parseMethodV5Sacct = (raw: string, arrayJobId: string): Map<number,
 };
 
 export const validateMethodV5Telemetry = (value: unknown): MethodV5CloseoutTelemetry => {
-    if (!isRecord(value) || value.schemaVersion !== 1 || typeof value.tick !== "number" || !Number.isSafeInteger(value.tick)) {
+    if (!isRecord(value) || value.schemaVersion !== 2 || typeof value.tick !== "number" || !Number.isSafeInteger(value.tick)) {
         throw new Error("Method-v5 policy telemetry is malformed");
     }
     const schemas: Record<string, string[]> = {
         activated: ["schemaVersion", "event", "tick", "ownEligibleCombatants", "reserveCombatants"],
         memory_invalidated: ["schemaVersion", "event", "tick", "invalidatedCount"],
         orders_paused_for_visible_threat: ["schemaVersion", "event", "tick", "ownEligibleCombatants", "visibleEnemyCombatants", "reserveCombatants"],
-        target_orders: ["schemaVersion", "event", "tick", "attackerCount", "visibleTargetCount", "rememberedTargetCount", "assignedTargetCount"],
-        search_orders: ["schemaVersion", "event", "tick", "attackerCount", "searchPointCount"],
+        target_orders: [
+            "schemaVersion", "event", "tick", "attackerCount", "compatibleAttackerCount",
+            "ownEligibleCombatants", "reservedCombatants", "visibleEnemyCombatants",
+            "visibleTargetCount", "rememberedTargetCount", "assignedTargetCount",
+            "selectedTargetId", "selectedTargetHitPoints", "selectedTargetVisible",
+            "estimatedVolleys", "ticksSinceLastDamage", "targetAssignmentMode",
+        ],
+        no_feasible_strike: [
+            "schemaVersion", "event", "tick", "ownEligibleCombatants", "visibleTargetCount",
+            "rememberedTargetCount", "damageCompatibleAttackerCount",
+            "reachableCompatibleAttackerCount", "reason",
+        ],
+        search_orders: [
+            "schemaVersion", "event", "tick", "attackerCount", "searchPointCount",
+            "reservedCombatants", "visibleEnemyCombatants",
+        ],
         capability_request: ["schemaVersion", "event", "tick", "unitName", "targetCount", "currentCount", "requestedStructure"],
     };
     const expected = typeof value.event === "string" ? schemas[value.event] : undefined;
     if (!expected) throw new Error("Method-v5 policy telemetry event is not allowlisted");
     exactKeys(value, expected, `Method-v5 ${String(value.event)} telemetry`);
     for (const [key, field] of Object.entries(value)) {
-        if (key === "schemaVersion" || key === "event" || key === "unitName" || key === "requestedStructure") continue;
+        if (
+            key === "schemaVersion" || key === "event" || key === "unitName" ||
+            key === "requestedStructure" || key === "reason" || key === "targetAssignmentMode" ||
+            key === "selectedTargetVisible"
+        ) continue;
         if (!Number.isSafeInteger(field) || (field as number) < 0) {
             throw new Error(`Method-v5 ${String(value.event)} telemetry field ${key} is not a nonnegative integer`);
         }
     }
+    if (value.event === "target_orders" && (
+        (value.targetAssignmentMode !== "distributed" && value.targetAssignmentMode !== "focused") ||
+        typeof value.selectedTargetVisible !== "boolean" ||
+        (value.assignedTargetCount as number) < 1 || (value.attackerCount as number) < 1 ||
+        (value.compatibleAttackerCount as number) < (value.attackerCount as number) ||
+        (value.targetAssignmentMode === "focused" && value.assignedTargetCount !== 1)
+    )) throw new Error("Method-v5 target-order telemetry contradicts its assignment mode");
+    if (value.event === "no_feasible_strike" && !new Set([
+        "no_dispatchable_combatants", "no_damage_capability", "no_reachable_capability",
+    ]).has(String(value.reason))) throw new Error("Method-v5 no-strike telemetry has an invalid reason");
     if (value.event === "capability_request") {
         const unitName = value.unitName;
         const allowedStructures = unitName === "JUMPJET"
@@ -179,7 +207,7 @@ export const validateMethodV5Result = (
         "terminalBuildingCounts", "endpointEstablished", "dispositionHistory", "policyTelemetry",
     ], `Method-v5 completion ${expected.episodeId}`);
     if (
-        !isRecord(value) || value.schemaVersion !== 1 || value.episodeId !== expected.episodeId ||
+        !isRecord(value) || value.schemaVersion !== 2 || value.episodeId !== expected.episodeId ||
         value.familyId !== expected.familyId || value.mapName !== expected.mapName || value.mapSha256 !== expected.mapSha256 ||
         value.policyId !== expected.policyId || value.policySha256 !== expected.policyId ||
         value.policyInformationBoundary !== METHOD_V5_INFORMATION_BOUNDARY ||
@@ -257,8 +285,8 @@ export const validateMethodV5Result = (
         (value.outcomeStatus === "simultaneous_draw" &&
             (value.terminalBuildingCounts.candidate !== 0 || value.terminalBuildingCounts.baseline !== 0))
     ) throw new Error(`Method-v5 completion ${expected.episodeId} contradicts its terminal building counts`);
-    const candidateName = `MethodV5Candidate_${expected.seedBlockIndex}_${expected.candidateSlot}`;
-    const baselineName = `MethodV5Baseline_${expected.seedBlockIndex}_${expected.candidateSlot}`;
+    const candidateName = `MethodV6Candidate_${expected.seedBlockIndex}_${expected.candidateSlot}`;
+    const baselineName = `MethodV6Baseline_${expected.seedBlockIndex}_${expected.candidateSlot}`;
     const validatePhysicalRows = (
         rows: unknown,
         attackerName: string,
@@ -349,7 +377,8 @@ const validateShard = (
     if (sha256File(shard.planFile) !== shard.planSha256) throw new Error(`Method-v5 shard ${shard.shardIndex} plan changed`);
     const summary = readJson(summaryPath);
     if (
-        !isRecord(summary) || summary.status !== "COMPLETE_METHOD_V5_OPEN_TRAINING_SHARD" ||
+        !isRecord(summary) || summary.schemaVersion !== 2 ||
+        summary.status !== "COMPLETE_METHOD_V6_OPEN_TRAINING_SHARD" ||
         summary.runId !== shard.runId || summary.planSha256 !== shard.planSha256 ||
         summary.requestedLaunches !== shard.launchedGameCount || summary.accountedLaunches !== shard.launchedGameCount ||
         summary.completed !== shard.launchedGameCount || summary.technicalFailures !== 0 ||
@@ -461,8 +490,8 @@ const main = (): void => {
         throw new Error("Method-v5 gate requires the unchanged clean campaign source on main");
     }
     const output = {
-        schemaVersion: 1,
-        status: "PASSED_METHOD_V5_LITERAL_ENDPOINT_TECHNICAL_GATE_OUTCOMES_NOT_SUMMARIZED",
+        schemaVersion: 2,
+        status: "PASSED_METHOD_V6_LITERAL_ENDPOINT_TECHNICAL_GATE_OUTCOMES_NOT_SUMMARIZED",
         generatedAt: new Date().toISOString(),
         gateSourceGitCommit: gitCommit,
         campaignPath,
@@ -479,7 +508,7 @@ const main = (): void => {
         endpointViolations: 0,
         informationBoundaryViolations: 0,
         outcomeFieldsEmitted: [],
-        authorizedNextPhase: "method-v5-open-training-analysis",
+        authorizedNextPhase: "method-v6-open-training-analysis",
     };
     fs.mkdirSync(path.dirname(outputPath), { recursive: true, mode: 0o700 });
     fs.writeFileSync(outputPath, JSON.stringify(output, null, 2) + "\n", { flag: "wx", mode: 0o600 });

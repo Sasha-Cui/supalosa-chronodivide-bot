@@ -22,8 +22,8 @@ import {
     validateMethodV5CloseoutPolicy,
 } from "./methodV5Closeout.js";
 
-export const METHOD_V5_PLAN_SCHEMA_VERSION = 1 as const;
-export const METHOD_V5_PLAN_KIND = "method-v5-open-training-literal-endpoint" as const;
+export const METHOD_V5_PLAN_SCHEMA_VERSION = 2 as const;
+export const METHOD_V5_PLAN_KIND = "method-v6-open-training-literal-endpoint" as const;
 
 export type MethodV5PlanArm = {
     armId: string;
@@ -221,7 +221,7 @@ export const runMethodV5PlanFromEnvironment = async (): Promise<void> => {
     const repoRoot = gitRoot();
     const driverRoot = path.join(repoRoot, "packages", "chronodivide-bot-driver");
     if (path.resolve(process.cwd()) !== driverRoot) throw new Error(`Method-v5 runner must start in ${driverRoot}`);
-    const planPath = requireEnvPath("METHOD_V5_PLAN");
+    const planPath = requireEnvPath("METHOD_V6_PLAN");
     const outDir = requireEnvPath("OUT_DIR");
     if (fs.existsSync(outDir)) throw new Error(`Refusing to reuse Method-v5 OUT_DIR ${outDir}`);
     if (!process.env.BASELINE_PACKAGE_ROOT || process.env.REQUIRE_EXTERNAL_BASELINE !== "true") {
@@ -348,8 +348,8 @@ export const runMethodV5PlanFromEnvironment = async (): Promise<void> => {
         }
     }
     const summary = {
-        schemaVersion: 1,
-        status: technicalFailures === 0 ? "COMPLETE_METHOD_V5_OPEN_TRAINING_SHARD" : "FAILED_METHOD_V5_TECHNICAL_SHARD",
+        schemaVersion: 2,
+        status: technicalFailures === 0 ? "COMPLETE_METHOD_V6_OPEN_TRAINING_SHARD" : "FAILED_METHOD_V6_TECHNICAL_SHARD",
         generatedAt: new Date().toISOString(),
         runId: plan.runId,
         planSha256,

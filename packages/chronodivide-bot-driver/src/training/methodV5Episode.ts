@@ -31,7 +31,7 @@ import {
     validateMethodV5CloseoutPolicy,
 } from "./methodV5Closeout.js";
 
-export const METHOD_V5_EPISODE_SCHEMA_VERSION = 1 as const;
+export const METHOD_V5_EPISODE_SCHEMA_VERSION = 2 as const;
 
 export type MethodV5EpisodeSpec = {
     schemaVersion: typeof METHOD_V5_EPISODE_SCHEMA_VERSION;
@@ -185,8 +185,8 @@ export const runMethodV5Episode = async (
 ): Promise<MethodV5EpisodeResult> => {
     const spec = validateMethodV5EpisodeSpec(rawSpec);
     const startedAt = Date.now();
-    const candidateName = `MethodV5Candidate_${spec.seedBlockIndex}_${spec.candidateSlot}`;
-    const baselineName = `MethodV5Baseline_${spec.seedBlockIndex}_${spec.candidateSlot}`;
+    const candidateName = `MethodV6Candidate_${spec.seedBlockIndex}_${spec.candidateSlot}`;
+    const baselineName = `MethodV6Baseline_${spec.seedBlockIndex}_${spec.candidateSlot}`;
     const policyTelemetry: MethodV5CloseoutTelemetry[] = [];
     const candidate = createMethodV5Candidate(
         baselineFactory,

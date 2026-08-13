@@ -2,13 +2,13 @@ import { MethodV5CloseoutPolicy, methodV5CloseoutPolicySha256 } from "./methodV5
 
 export const METHOD_V5_CLOSEOUT_ARM_ORDER = [
     "baseline_control",
-    "memory_search",
-    "memory_search_air4",
-    "early_air4",
-    "rapid_air4",
-    "reserve2_air4",
-    "production_priority_high",
-    "aggressive_air4",
+    "distributed_global_pause",
+    "focused_global_pause",
+    "distributed_bounded_reserve",
+    "focused_bounded_reserve",
+    "focused_bounded_air4",
+    "focused_bounded_early_air4",
+    "focused_bounded_aggressive_air4",
 ] as const;
 
 export type MethodV5CloseoutArmId = typeof METHOD_V5_CLOSEOUT_ARM_ORDER[number];
@@ -20,7 +20,7 @@ export type MethodV5CloseoutArm = {
 };
 
 const fullSearch: MethodV5CloseoutPolicy = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     enabled: true,
     minTick: 7_200,
     minCombatants: 8,
@@ -30,6 +30,9 @@ const fullSearch: MethodV5CloseoutPolicy = {
     reserveCombatants: 3,
     orderIntervalTicks: 12,
     maxTargetGroups: 4,
+    targetAssignmentMode: "distributed",
+    threatResponseMode: "global_pause",
+    maxThreatReserveCombatants: 4,
     targetPriority: "production",
     memoryEnabled: true,
     searchEnabled: true,
@@ -57,37 +60,38 @@ const arm = (
 export const buildMethodV5CloseoutArms = (): MethodV5CloseoutArm[] => {
     const arms: MethodV5CloseoutArm[] = [
         arm("baseline_control", { enabled: false }),
-        arm("memory_search", {}),
-        arm("memory_search_air4", {
+        arm("distributed_global_pause", {}),
+        arm("focused_global_pause", {
+            targetAssignmentMode: "focused",
+        }),
+        arm("distributed_bounded_reserve", {
+            threatResponseMode: "bounded_reserve",
+        }),
+        arm("focused_bounded_reserve", {
+            targetAssignmentMode: "focused",
+            threatResponseMode: "bounded_reserve",
+        }),
+        arm("focused_bounded_air4", {
+            targetAssignmentMode: "focused",
+            threatResponseMode: "bounded_reserve",
             adaptiveProductionEnabled: true,
             adaptiveAirTargetCount: 4,
         }),
-        arm("early_air4", {
+        arm("focused_bounded_early_air4", {
             minTick: 5_400,
             minCombatants: 6,
+            targetAssignmentMode: "focused",
+            threatResponseMode: "bounded_reserve",
             adaptiveProductionEnabled: true,
             adaptiveAirTargetCount: 4,
         }),
-        arm("rapid_air4", {
-            orderIntervalTicks: 3,
-            adaptiveProductionEnabled: true,
-            adaptiveAirTargetCount: 4,
-        }),
-        arm("reserve2_air4", {
-            reserveCombatants: 2,
-            adaptiveProductionEnabled: true,
-            adaptiveAirTargetCount: 4,
-        }),
-        arm("production_priority_high", {
-            adaptiveProductionEnabled: true,
-            adaptiveAirTargetCount: 4,
-            adaptiveProductionPriority: 240,
-            adaptiveTechPriority: 220,
-        }),
-        arm("aggressive_air4", {
+        arm("focused_bounded_aggressive_air4", {
             minTick: 5_400,
             minCombatants: 6,
             reserveCombatants: 2,
+            targetAssignmentMode: "focused",
+            threatResponseMode: "bounded_reserve",
+            maxThreatReserveCombatants: 3,
             orderIntervalTicks: 3,
             adaptiveProductionEnabled: true,
             adaptiveAirTargetCount: 4,

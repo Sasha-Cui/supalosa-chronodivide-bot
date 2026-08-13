@@ -18,17 +18,23 @@ describe("Method-v5 prospective closeout arms", () => {
     test("uses an exact baseline control and all-country mobility variants", () => {
         const byId = new Map(buildMethodV5CloseoutArms().map((row) => [row.armId, row]));
         expect(byId.get("baseline_control")?.policy.enabled).toBe(false);
-        expect(byId.get("memory_search")?.policy.adaptiveProductionEnabled).toBe(false);
-        expect(byId.get("memory_search_air4")?.policy.adaptiveAirTargetCount).toBe(4);
-        expect(byId.get("early_air4")?.policy.minTick).toBeLessThan(
-            byId.get("memory_search_air4")?.policy.minTick ?? 0,
+        expect(byId.get("distributed_global_pause")?.policy.adaptiveProductionEnabled).toBe(false);
+        expect(byId.get("focused_global_pause")?.policy.targetAssignmentMode).toBe("focused");
+        expect(byId.get("distributed_bounded_reserve")?.policy.threatResponseMode).toBe("bounded_reserve");
+        expect(byId.get("focused_bounded_reserve")?.policy).toMatchObject({
+            targetAssignmentMode: "focused",
+            threatResponseMode: "bounded_reserve",
+            adaptiveProductionEnabled: false,
+        });
+        expect(byId.get("focused_bounded_air4")?.policy.adaptiveAirTargetCount).toBe(4);
+        expect(byId.get("focused_bounded_early_air4")?.policy.minTick).toBeLessThan(
+            byId.get("focused_bounded_air4")?.policy.minTick ?? 0,
         );
-        expect(byId.get("rapid_air4")?.policy.orderIntervalTicks).toBe(3);
-        expect(byId.get("reserve2_air4")?.policy.reserveCombatants).toBe(2);
-        expect(byId.get("aggressive_air4")?.policy).toMatchObject({
+        expect(byId.get("focused_bounded_aggressive_air4")?.policy).toMatchObject({
             minTick: 5400,
             minCombatants: 6,
             reserveCombatants: 2,
+            maxThreatReserveCombatants: 3,
             orderIntervalTicks: 3,
             adaptiveAirTargetCount: 4,
             adaptiveProductionPriority: 240,

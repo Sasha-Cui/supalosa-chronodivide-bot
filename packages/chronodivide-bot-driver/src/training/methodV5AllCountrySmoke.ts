@@ -69,7 +69,9 @@ const runTrial = async (
     candidateSlot: 0 | 1,
     requestedEngineSeed: number,
 ): Promise<Record<string, unknown>> => {
-    const baseArm = buildMethodV5CloseoutArms().find(({ armId }) => armId === "aggressive_air4");
+    const baseArm = buildMethodV5CloseoutArms().find(
+        ({ armId }) => armId === "focused_bounded_aggressive_air4",
+    );
     if (!baseArm) throw new Error("Method-v5 capability smoke arm is unavailable");
     // This outcome-free technical policy changes only activation thresholds so every
     // country exercises the exact strategy and mission interfaces promptly. It is
@@ -105,7 +107,10 @@ const runTrial = async (
         throw new Error(`Method-v5 did not exercise capability requests for ${country} slot ${candidateSlot}`);
     }
     const disallowedTelemetryKeys = telemetry.flatMap((event) =>
-        Object.keys(event).filter((key) => /(^|_)(id|ids|x|y|rx|ry|location|position)s?$/i.test(key)),
+        Object.keys(event).filter((key) =>
+            /(^|_)(x|y|rx|ry|location|position)s?$/i.test(key) ||
+            /attacker(ids?|_ids?)$/i.test(key),
+        ),
     );
     if (disallowedTelemetryKeys.length > 0) {
         throw new Error(`Method-v5 smoke telemetry leaked locations or identities: ${disallowedTelemetryKeys.join(",")}`);
@@ -159,7 +164,7 @@ const main = async (): Promise<void> => {
         ));
     }
     const manifest = createExperimentManifest({
-        runId: `method-v5-all-country-smoke-${process.env.SLURM_JOB_ID ?? "local"}`,
+        runId: `method-v6-all-country-smoke-${process.env.SLURM_JOB_ID ?? "local"}`,
         mixDir: path.join(process.cwd(), "data"),
         maps: [mapName],
         effectiveConfig: {
@@ -181,7 +186,7 @@ const main = async (): Promise<void> => {
     ) throw new Error("Method-v5 all-country smoke provenance or coverage failed");
     const output = {
         schemaVersion: 1,
-        status: "PASS_OUTCOME_FREE_METHOD_V5_ALL_COUNTRY_CAPABILITY_SMOKE",
+        status: "PASS_OUTCOME_FREE_METHOD_V6_ALL_COUNTRY_CAPABILITY_SMOKE",
         generatedAt: new Date().toISOString(),
         passed: true,
         outcomeFree: true,

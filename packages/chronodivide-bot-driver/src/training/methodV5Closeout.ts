@@ -14,7 +14,7 @@ import {
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { BaselineFactory, InspectableBaselineBot } from "../benchmark/baselineLoader.js";
 
-export const METHOD_V5_CLOSEOUT_POLICY_SCHEMA_VERSION = 1 as const;
+export const METHOD_V5_CLOSEOUT_POLICY_SCHEMA_VERSION = 2 as const;
 export const METHOD_V5_INFORMATION_BOUNDARY =
     "self-visible-enemy-memory-public-map-and-starts-only" as const;
 
@@ -29,6 +29,9 @@ export type MethodV5CloseoutPolicy = {
     reserveCombatants: number;
     orderIntervalTicks: number;
     maxTargetGroups: number;
+    targetAssignmentMode: "distributed" | "focused";
+    threatResponseMode: "global_pause" | "bounded_reserve";
+    maxThreatReserveCombatants: number;
     targetPriority: "production" | "defense" | "nearest";
     memoryEnabled: boolean;
     searchEnabled: boolean;
@@ -47,20 +50,20 @@ export type MethodV5CloseoutPolicy = {
 
 export type MethodV5CloseoutTelemetry =
     | {
-          schemaVersion: 1;
+          schemaVersion: 2;
           event: "activated";
           tick: number;
           ownEligibleCombatants: number;
           reserveCombatants: number;
       }
     | {
-          schemaVersion: 1;
+          schemaVersion: 2;
           event: "memory_invalidated";
           tick: number;
           invalidatedCount: number;
       }
     | {
-          schemaVersion: 1;
+          schemaVersion: 2;
           event: "orders_paused_for_visible_threat";
           tick: number;
           ownEligibleCombatants: number;
@@ -68,23 +71,46 @@ export type MethodV5CloseoutTelemetry =
           reserveCombatants: number;
       }
     | {
-          schemaVersion: 1;
+          schemaVersion: 2;
           event: "target_orders";
           tick: number;
           attackerCount: number;
+          compatibleAttackerCount: number;
+          ownEligibleCombatants: number;
+          reservedCombatants: number;
+          visibleEnemyCombatants: number;
           visibleTargetCount: number;
           rememberedTargetCount: number;
           assignedTargetCount: number;
+          selectedTargetId: number;
+          selectedTargetHitPoints: number;
+          selectedTargetVisible: boolean;
+          estimatedVolleys: number;
+          ticksSinceLastDamage: number;
+          targetAssignmentMode: "distributed" | "focused";
       }
     | {
-          schemaVersion: 1;
+          schemaVersion: 2;
+          event: "no_feasible_strike";
+          tick: number;
+          ownEligibleCombatants: number;
+          visibleTargetCount: number;
+          rememberedTargetCount: number;
+          damageCompatibleAttackerCount: number;
+          reachableCompatibleAttackerCount: number;
+          reason: "no_dispatchable_combatants" | "no_damage_capability" | "no_reachable_capability";
+      }
+    | {
+          schemaVersion: 2;
           event: "search_orders";
           tick: number;
           attackerCount: number;
           searchPointCount: number;
+          reservedCombatants: number;
+          visibleEnemyCombatants: number;
       }
     | {
-          schemaVersion: 1;
+          schemaVersion: 2;
           event: "capability_request";
           tick: number;
           unitName: "JUMPJET" | "ZEP";
@@ -185,7 +211,8 @@ export const validateMethodV5CloseoutPolicy = (
     const expectedKeys = [
         "schemaVersion", "enabled", "minTick", "minCombatants", "homeDefenseRadius", "maxVisibleEnemyCombatants",
         "visibleCombatantAdvantage", "reserveCombatants",
-        "orderIntervalTicks", "maxTargetGroups", "targetPriority", "memoryEnabled",
+        "orderIntervalTicks", "maxTargetGroups", "targetAssignmentMode", "threatResponseMode",
+        "maxThreatReserveCombatants", "targetPriority", "memoryEnabled",
         "searchEnabled", "searchCellSize", "searchRevisitTicks", "directVisibleAttack",
         "preemptBaselineOrders", "capabilityAware", "reachabilityAware", "stallTicks",
         "adaptiveProductionEnabled", "adaptiveAirTargetCount", "adaptiveProductionPriority",
@@ -216,6 +243,7 @@ export const validateMethodV5CloseoutPolicy = (
     requireInteger("reserveCombatants", policy.reserveCombatants, 0, 1_000);
     requireInteger("orderIntervalTicks", policy.orderIntervalTicks, 1, 10_000);
     requireInteger("maxTargetGroups", policy.maxTargetGroups, 1, 64);
+    requireInteger("maxThreatReserveCombatants", policy.maxThreatReserveCombatants, 0, 1_000);
     requireInteger("searchCellSize", policy.searchCellSize, 4, 64);
     requireInteger("searchRevisitTicks", policy.searchRevisitTicks, 0, 100_000);
     requireInteger("stallTicks", policy.stallTicks, 1, 100_000);
@@ -224,6 +252,12 @@ export const validateMethodV5CloseoutPolicy = (
     requireInteger("adaptiveTechPriority", policy.adaptiveTechPriority, 1, 1_000);
     if (!new Set(["production", "defense", "nearest"]).has(policy.targetPriority)) {
         throw new Error(`Invalid Method-v5 target priority: ${policy.targetPriority}`);
+    }
+    if (!new Set(["distributed", "focused"]).has(policy.targetAssignmentMode)) {
+        throw new Error(`Invalid Method-v5 target assignment mode: ${policy.targetAssignmentMode}`);
+    }
+    if (!new Set(["global_pause", "bounded_reserve"]).has(policy.threatResponseMode)) {
+        throw new Error(`Invalid Method-v5 threat response mode: ${policy.threatResponseMode}`);
     }
     return { ...policy };
 };
@@ -260,6 +294,44 @@ export const shouldPauseMethodV5CloseoutForVisibleThreat = (args: {
     args.visibleEnemyCombatants > args.maxVisibleEnemyCombatants ||
     Math.max(0, args.ownEligibleCombatants - args.reserveCombatants) <
         args.visibleEnemyCombatants + args.visibleCombatantAdvantage;
+
+export const methodV5BoundedReserveCombatants = (args: {
+    ownOrderableCombatants: number;
+    baseReserveCombatants: number;
+    visibleEnemyCombatants: number;
+    visibleCombatantAdvantage: number;
+    maxThreatReserveCombatants: number;
+}): number => {
+    if (args.ownOrderableCombatants <= 1) return 0;
+    const threatReserve = Math.min(
+        args.maxThreatReserveCombatants,
+        args.visibleEnemyCombatants + args.visibleCombatantAdvantage,
+    );
+    return Math.min(
+        args.ownOrderableCombatants - 1,
+        Math.max(args.baseReserveCombatants, threatReserve),
+    );
+};
+
+export type MethodV5FocusOpportunity = {
+    targetId: number;
+    visible: boolean;
+    stalled: boolean;
+    estimatedVolleys: number;
+    strategicWeight: number;
+    nearestDistanceSquared: number;
+};
+
+export const rankMethodV5FocusOpportunities = <T extends MethodV5FocusOpportunity>(
+    opportunities: readonly T[],
+): T[] => opportunities.slice().sort((left, right) =>
+    Number(right.visible) - Number(left.visible) ||
+    Number(left.stalled) - Number(right.stalled) ||
+    left.estimatedVolleys - right.estimatedVolleys ||
+    right.strategicWeight - left.strategicWeight ||
+    left.nearestDistanceSquared - right.nearestDistanceSquared ||
+    left.targetId - right.targetId
+);
 
 const isMobileAntiGroundCombatant = (unit: UnitData): boolean =>
     !!unit.rules.isSelectableCombatant &&
@@ -421,6 +493,35 @@ const unitCanDamageRemembered = (unit: UnitData, target: RememberedBuilding): bo
             weapon.rules.damage > 0 &&
             (weapon.warheadRules.verses.get(target.armor) ?? 0) > 0,
     );
+};
+
+const effectiveAntiBuildingVolleyDamage = (
+    unit: UnitData,
+    target: Pick<RememberedBuilding, "armor" | "canC4" | "maxHitPoints">,
+): number => {
+    if ((unit.rules.c4 || unit.rules.ivan) && target.canC4) return Math.max(1, target.maxHitPoints);
+    return Math.max(
+        0,
+        ...[unit.primaryWeapon, unit.secondaryWeapon]
+            .filter((weapon) => !!weapon?.projectileRules.isAntiGround && weapon.rules.damage > 0)
+            .map((weapon) => Math.max(
+                0,
+                Math.round((weapon?.rules.damage ?? 0) * (weapon?.warheadRules.verses.get(target.armor) ?? 0)),
+            )),
+    );
+};
+
+const estimatedVolleys = (
+    target: Pick<RememberedBuilding, "hitPoints" | "armor" | "canC4" | "maxHitPoints">,
+    attackers: readonly UnitData[],
+): number => {
+    const volleyDamage = attackers.reduce(
+        (total, unit) => total + effectiveAntiBuildingVolleyDamage(unit, target),
+        0,
+    );
+    return volleyDamage > 0
+        ? Math.max(1, Math.ceil(Math.max(1, target.hitPoints) / volleyDamage))
+        : Number.MAX_SAFE_INTEGER;
 };
 
 export const methodV5AirUnitForCountry = (country: Countries): "JUMPJET" | "ZEP" =>
@@ -589,7 +690,7 @@ class MethodV5CloseoutStrategy implements StrategyLike {
         if (!this.state.activated && tick >= policy.minTick && eligible.length >= policy.minCombatants) {
             this.state.activated = true;
             this.emit({
-                schemaVersion: 1,
+                schemaVersion: 2,
                 event: "activated",
                 tick,
                 ownEligibleCombatants: eligible.length,
@@ -609,7 +710,7 @@ class MethodV5CloseoutStrategy implements StrategyLike {
             .filter((unit): unit is UnitData => !!unit)
             .filter((unit) => isWithinMethodV5HomeDefenseRadius(unitPoint(unit), start, policy.homeDefenseRadius))
             .length;
-        if (shouldPauseMethodV5CloseoutForVisibleThreat({
+        if (policy.threatResponseMode === "global_pause" && shouldPauseMethodV5CloseoutForVisibleThreat({
             ownEligibleCombatants: eligible.length,
             reserveCombatants: policy.reserveCombatants,
             visibleEnemyCombatants,
@@ -617,7 +718,7 @@ class MethodV5CloseoutStrategy implements StrategyLike {
             visibleCombatantAdvantage: policy.visibleCombatantAdvantage,
         })) {
             this.emit({
-                schemaVersion: 1,
+                schemaVersion: 2,
                 event: "orders_paused_for_visible_threat",
                 tick,
                 ownEligibleCombatants: eligible.length,
@@ -629,6 +730,16 @@ class MethodV5CloseoutStrategy implements StrategyLike {
         const orderable = policy.preemptBaselineOrders
             ? eligible
             : eligible.filter((unit) => unit.isIdle === true);
+        const reservedCombatants = policy.threatResponseMode === "bounded_reserve"
+            ? methodV5BoundedReserveCombatants({
+                  ownOrderableCombatants: orderable.length,
+                  baseReserveCombatants: policy.reserveCombatants,
+                  visibleEnemyCombatants,
+                  visibleCombatantAdvantage: policy.visibleCombatantAdvantage,
+                  maxThreatReserveCombatants: policy.maxThreatReserveCombatants,
+              })
+            : Math.min(orderable.length, policy.reserveCombatants);
+        const dispatchLimit = Math.max(0, orderable.length - reservedCombatants);
         const attackers = orderable
             .slice()
             .sort((left, right) => {
@@ -637,14 +748,22 @@ class MethodV5CloseoutStrategy implements StrategyLike {
                 if (leftMobility !== rightMobility) return rightMobility - leftMobility;
                 return distanceSquared(unitPoint(right), start) - distanceSquared(unitPoint(left), start);
             })
-            .slice(0, Math.max(0, eligible.length - policy.reserveCombatants));
-        if (attackers.length === 0) return;
+            .slice(0, dispatchLimit);
         const visible = game
             .getVisibleUnits(player.name, "enemy", (rules) => rules.type === ObjectType.Building)
             .map((id) => game.getUnitData(id))
             .filter((unit): unit is UnitData => !!unit);
         const visibleById = new Map(visible.map((unit) => [unit.id, unit]));
-        const targets = [...this.memory.values()]
+        const isCompatible = (attacker: UnitData, target: RememberedBuilding, checkReachability: boolean): boolean => {
+            const current = visibleById.get(target.id);
+            if (current && policy.capabilityAware && !weaponCanDamage(attacker, current)) return false;
+            if (!current && policy.capabilityAware && !unitCanDamageRemembered(attacker, target)) return false;
+            return !checkReachability || !policy.reachabilityAware ||
+                (current
+                    ? canReachBuildingPerimeter(game, attacker, current)
+                    : canReachRememberedVicinity(game, attacker, target));
+        };
+        const distributedTargets = [...this.memory.values()]
             .sort((left, right) => {
                 const stalledDifference =
                     Number(tick - right.lastDamageTick >= policy.stallTicks) -
@@ -659,31 +778,78 @@ class MethodV5CloseoutStrategy implements StrategyLike {
                 return nearest(left) - nearest(right) || left.id - right.id;
             })
             .slice(0, policy.maxTargetGroups);
+        const focusedTargets = rankMethodV5FocusOpportunities(
+            [...this.memory.values()].flatMap((target) => {
+                const compatible = orderable.filter((attacker) => isCompatible(attacker, target, true));
+                if (compatible.length === 0) return [];
+                return [{
+                    target,
+                    compatible,
+                    targetId: target.id,
+                    visible: visibleById.has(target.id),
+                    stalled: tick - target.lastDamageTick >= policy.stallTicks,
+                    estimatedVolleys: estimatedVolleys(target, compatible),
+                    strategicWeight: targetWeight(target, policy.targetPriority),
+                    nearestDistanceSquared: compatible.reduce(
+                        (nearest, unit) => Math.min(nearest, distanceSquared(unitPoint(unit), target)),
+                        Number.POSITIVE_INFINITY,
+                    ),
+                }];
+            }),
+        );
+        if (this.memory.size > 0 && attackers.length === 0) {
+            this.emit({
+                schemaVersion: 2,
+                event: "no_feasible_strike",
+                tick,
+                ownEligibleCombatants: eligible.length,
+                visibleTargetCount: visible.length,
+                rememberedTargetCount: this.memory.size,
+                damageCompatibleAttackerCount: 0,
+                reachableCompatibleAttackerCount: 0,
+                reason: "no_dispatchable_combatants",
+            });
+            return;
+        }
+        const targets = policy.targetAssignmentMode === "focused"
+            ? focusedTargets.slice(0, 1).map(({ target }) => target)
+            : distributedTargets;
         if (targets.length > 0) {
-            let assigned = 0;
             const counts = new Map<number, number>();
             const assignments = new Map<number, { target: RememberedBuilding; unitIds: number[] }>();
-            for (const attacker of attackers) {
-                const compatible = targets.filter((target) => {
-                    const current = visibleById.get(target.id);
-                    if (current && policy.capabilityAware && !weaponCanDamage(attacker, current)) return false;
-                    if (!current && policy.capabilityAware && !unitCanDamageRemembered(attacker, target)) return false;
-                    return !policy.reachabilityAware ||
-                        (current
-                            ? canReachBuildingPerimeter(game, attacker, current)
-                            : canReachRememberedVicinity(game, attacker, target));
-                });
-                if (compatible.length === 0) continue;
-                const target = compatible.reduce((best, item) => {
-                    const bestScore = distanceSquared(unitPoint(attacker), best) * (1 + (counts.get(best.id) ?? 0));
-                    const itemScore = distanceSquared(unitPoint(attacker), item) * (1 + (counts.get(item.id) ?? 0));
-                    return itemScore < bestScore ? item : best;
-                }, compatible[0]);
-                counts.set(target.id, (counts.get(target.id) ?? 0) + 1);
-                const assignment = assignments.get(target.id) ?? { target, unitIds: [] };
-                assignment.unitIds.push(attacker.id);
-                assignments.set(target.id, assignment);
-                assigned++;
+            if (policy.targetAssignmentMode === "focused") {
+                const selected = focusedTargets[0];
+                const focusedAttackers = selected.compatible
+                    .slice()
+                    .sort((left, right) =>
+                        effectiveAntiBuildingVolleyDamage(right, selected.target) -
+                            effectiveAntiBuildingVolleyDamage(left, selected.target) ||
+                        distanceSquared(unitPoint(left), selected.target) -
+                            distanceSquared(unitPoint(right), selected.target) ||
+                        left.id - right.id
+                    )
+                    .slice(0, dispatchLimit);
+                if (focusedAttackers.length > 0) {
+                    counts.set(selected.target.id, focusedAttackers.length);
+                    assignments.set(selected.target.id, {
+                        target: selected.target,
+                        unitIds: focusedAttackers.map(({ id }) => id),
+                    });
+                }
+            } else {
+                for (const attacker of attackers) {
+                    const compatible = targets.filter((target) => isCompatible(attacker, target, true));
+                    if (compatible.length === 0) continue;
+                    const target = compatible.reduce((best, item) => {
+                        const bestScore = distanceSquared(unitPoint(attacker), best) * (1 + (counts.get(best.id) ?? 0));
+                        const itemScore = distanceSquared(unitPoint(attacker), item) * (1 + (counts.get(item.id) ?? 0));
+                        return itemScore < bestScore ? item : best;
+                    }, compatible[0]);
+                    counts.set(target.id, (counts.get(target.id) ?? 0) + 1);
+                    const assignment = assignments.get(target.id) ?? { target, unitIds: [] };
+                    assignment.unitIds.push(attacker.id);
+                    assignments.set(target.id, assignment);
+                }
             }
             for (const { target, unitIds } of assignments.values()) {
                 const current = visibleById.get(target.id);
@@ -692,15 +858,48 @@ class MethodV5CloseoutStrategy implements StrategyLike {
                 } else {
                     player.actions.orderUnits(unitIds, OrderType.AttackMove, target.x, target.y);
                 }
+                const compatible = orderable.filter((attacker) => isCompatible(attacker, target, true));
+                this.emit({
+                    schemaVersion: 2,
+                    event: "target_orders",
+                    tick,
+                    attackerCount: unitIds.length,
+                    compatibleAttackerCount: compatible.length,
+                    ownEligibleCombatants: eligible.length,
+                    reservedCombatants,
+                    visibleEnemyCombatants,
+                    visibleTargetCount: visible.length,
+                    rememberedTargetCount: this.memory.size,
+                    assignedTargetCount: counts.size,
+                    selectedTargetId: target.id,
+                    selectedTargetHitPoints: Math.max(0, target.hitPoints),
+                    selectedTargetVisible: visibleById.has(target.id),
+                    estimatedVolleys: estimatedVolleys(target, compatible),
+                    ticksSinceLastDamage: Math.max(0, tick - target.lastDamageTick),
+                    targetAssignmentMode: policy.targetAssignmentMode,
+                });
             }
+            if (assignments.size > 0) return;
+        }
+        if (this.memory.size > 0) {
+            const damageCompatible = orderable.filter((attacker) =>
+                [...this.memory.values()].some((target) => isCompatible(attacker, target, false)),
+            );
+            const reachableCompatible = orderable.filter((attacker) =>
+                [...this.memory.values()].some((target) => isCompatible(attacker, target, true)),
+            );
             this.emit({
-                schemaVersion: 1,
-                event: "target_orders",
+                schemaVersion: 2,
+                event: "no_feasible_strike",
                 tick,
-                attackerCount: assigned,
+                ownEligibleCombatants: eligible.length,
                 visibleTargetCount: visible.length,
                 rememberedTargetCount: this.memory.size,
-                assignedTargetCount: counts.size,
+                damageCompatibleAttackerCount: damageCompatible.length,
+                reachableCompatibleAttackerCount: reachableCompatible.length,
+                reason: damageCompatible.length === 0
+                    ? "no_damage_capability"
+                    : "no_reachable_capability",
             });
             return;
         }
@@ -732,11 +931,13 @@ class MethodV5CloseoutStrategy implements StrategyLike {
             player.actions.orderUnits(unitIds, OrderType.AttackMove, point.x, point.y);
         }
         this.emit({
-            schemaVersion: 1,
+            schemaVersion: 2,
             event: "search_orders",
             tick,
             attackerCount: assigned,
             searchPointCount: points.length,
+            reservedCombatants,
+            visibleEnemyCombatants,
         });
     }
 
@@ -764,7 +965,7 @@ class MethodV5CloseoutStrategy implements StrategyLike {
         }
         if (invalidated.length > 0) {
             this.emit({
-                schemaVersion: 1,
+                schemaVersion: 2,
                 event: "memory_invalidated",
                 tick,
                 invalidatedCount: invalidated.length,
@@ -830,7 +1031,7 @@ class MethodV5CloseoutStrategy implements StrategyLike {
         const currentCount = game.getVisibleUnits(playerName, "self", (rules) => rules.name === unitName).length;
         if (currentCount >= policy.adaptiveAirTargetCount) return;
         this.emit({
-            schemaVersion: 1,
+            schemaVersion: 2,
             event: "capability_request",
             tick,
             unitName,

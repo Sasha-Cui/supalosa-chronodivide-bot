@@ -26,7 +26,7 @@ import {
     sha256File,
 } from "./methodV5PlanRunner.js";
 
-export const METHOD_V5_ENGINE_SEED_BASE = 3_600_000_000 as const;
+export const METHOD_V5_ENGINE_SEED_BASE = 3_700_000_000 as const;
 export const METHOD_V5_MAX_TICKS = 24_000 as const;
 export const METHOD_V5_FAMILY_COUNT = 22 as const;
 export const METHOD_V5_COUNTRIES = [
@@ -72,9 +72,9 @@ export type MethodV5Family = {
 };
 
 export type MethodV5Campaign = {
-    schemaVersion: 1;
-    kind: "method-v5-open-training-literal-endpoint";
-    status: "FROZEN_METHOD_V5_OPEN_TRAINING_LITERAL_ENDPOINT_V5_SCREEN";
+    schemaVersion: 2;
+    kind: "method-v6-open-training-literal-endpoint";
+    status: "FROZEN_METHOD_V6_OBJECTIVE_DIRECTED_OPEN_TRAINING_ENDPOINT_V5_SCREEN";
     generatedAt: string;
     sourceGitCommit: string;
     sourceRuntimeSha256: string;
@@ -192,8 +192,8 @@ const main = async (): Promise<void> => {
     if (!process.env.BASELINE_PACKAGE_ROOT || process.env.REQUIRE_EXTERNAL_BASELINE !== "true") {
         throw new Error("Method-v5 generation requires the pinned external baseline environment");
     }
-    const sourceCampaignPath = requiredPath("METHOD_V5_SOURCE_CAMPAIGN");
-    const mapCatalogPath = requiredPath("METHOD_V5_MAP_CATALOG");
+    const sourceCampaignPath = requiredPath("METHOD_V6_SOURCE_CAMPAIGN");
+    const mapCatalogPath = requiredPath("METHOD_V6_MAP_CATALOG");
     const outRoot = requiredPath("OUT_ROOT");
     if (fs.existsSync(outRoot)) throw new Error(`Refusing to reuse Method-v5 OUT_ROOT ${outRoot}`);
     if (
@@ -208,11 +208,11 @@ const main = async (): Promise<void> => {
     const arms = buildMethodV5CloseoutArms();
     const baselineFactory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
     const generationManifest = createExperimentManifest({
-        runId: "plan-method-v5-open-training-v1",
+        runId: "plan-method-v6-open-training-v1",
         mixDir: path.join(driverRoot, "data"),
         maps: families.map(({ mapName }) => mapName),
         effectiveConfig: {
-            purpose: "method-v5-open-training-literal-endpoint-v4",
+            purpose: "method-v6-objective-directed-open-training-literal-endpoint-v5",
             outcomeAccess: false,
             countries: METHOD_V5_COUNTRIES,
             reciprocalSlots: [0, 1],
@@ -248,7 +248,7 @@ const main = async (): Promise<void> => {
             const country = METHOD_V5_COUNTRIES[countryIndex];
             const shardIndex = familyIndex * METHOD_V5_COUNTRIES.length + countryIndex;
             const requestedEngineSeed = derivePairedEngineSeed(METHOD_V5_ENGINE_SEED_BASE, shardIndex);
-            const runId = `method-v5-f${familyIndex}-c${countryIndex}-${generationManifest.source.gitCommit.slice(0, 10)}`;
+            const runId = `method-v6-f${familyIndex}-c${countryIndex}-${generationManifest.source.gitCommit.slice(0, 10)}`;
             const plan: MethodV5RunPlan = parseMethodV5RunPlan({
                 schemaVersion: METHOD_V5_PLAN_SCHEMA_VERSION,
                 kind: METHOD_V5_PLAN_KIND,
@@ -287,9 +287,9 @@ const main = async (): Promise<void> => {
         }
     }
     const campaign: MethodV5Campaign = {
-        schemaVersion: 1,
-        kind: "method-v5-open-training-literal-endpoint",
-        status: "FROZEN_METHOD_V5_OPEN_TRAINING_LITERAL_ENDPOINT_V5_SCREEN",
+        schemaVersion: 2,
+        kind: "method-v6-open-training-literal-endpoint",
+        status: "FROZEN_METHOD_V6_OBJECTIVE_DIRECTED_OPEN_TRAINING_ENDPOINT_V5_SCREEN",
         generatedAt: new Date().toISOString(),
         sourceGitCommit: generationManifest.source.gitCommit,
         sourceRuntimeSha256,

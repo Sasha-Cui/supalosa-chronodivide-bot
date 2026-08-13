@@ -21,7 +21,7 @@ describe("Method-v5 fail-closed scheduler gate", () => {
 
     test("accepts only exact aggregate capability telemetry", () => {
         expect(validateMethodV5Telemetry({
-            schemaVersion: 1,
+            schemaVersion: 2,
             event: "capability_request",
             tick: 7200,
             unitName: "JUMPJET",
@@ -30,7 +30,7 @@ describe("Method-v5 fail-closed scheduler gate", () => {
             requestedStructure: "GAAIRC",
         }).event).toBe("capability_request");
         expect(() => validateMethodV5Telemetry({
-            schemaVersion: 1,
+            schemaVersion: 2,
             event: "capability_request",
             tick: 7200,
             unitName: "ZEP",
@@ -39,11 +39,32 @@ describe("Method-v5 fail-closed scheduler gate", () => {
             requestedStructure: "GAAIRC",
         })).toThrow(/invalid unit or structure/);
         expect(() => validateMethodV5Telemetry({
-            schemaVersion: 1,
+            schemaVersion: 2,
             event: "search_orders",
             tick: 7200,
             attackerCount: 4,
             searchPointCount: -1,
+            reservedCombatants: 3,
+            visibleEnemyCombatants: 0,
         })).toThrow(/nonnegative integer/);
+        expect(validateMethodV5Telemetry({
+            schemaVersion: 2,
+            event: "target_orders",
+            tick: 7200,
+            attackerCount: 5,
+            compatibleAttackerCount: 6,
+            ownEligibleCombatants: 9,
+            reservedCombatants: 3,
+            visibleEnemyCombatants: 100,
+            visibleTargetCount: 1,
+            rememberedTargetCount: 1,
+            assignedTargetCount: 1,
+            selectedTargetId: 42,
+            selectedTargetHitPoints: 300,
+            selectedTargetVisible: true,
+            estimatedVolleys: 1,
+            ticksSinceLastDamage: 0,
+            targetAssignmentMode: "focused",
+        }).event).toBe("target_orders");
     });
 });

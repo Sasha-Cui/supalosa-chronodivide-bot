@@ -60,6 +60,9 @@ export type MethodV5RankingRow = {
     searchOrderGames: number;
     capabilityRequestGames: number;
     threatPausedGames: number;
+    noFeasibleStrikeGames: number;
+    medianFocusedStrikeConcentration: number | null;
+    medianFocusedEstimatedVolleys: number | null;
     nonliteralTerminationDraws: number;
     drawsWithBaselineBuildingsRemaining: number;
     drawsWithNoCandidateBuildings: number;
@@ -150,6 +153,12 @@ export const rankMethodV5Arms = (campaign: MethodV5Campaign, rawResults: unknown
         const telemetryGames = (event: string): number => rows.filter(({ policyTelemetry }) =>
             policyTelemetry.some((row) => row.event === event),
         ).length;
+        const targetOrders = rows.flatMap(({ policyTelemetry }) => policyTelemetry).filter(
+            (event) => event.event === "target_orders",
+        );
+        const focusedOrders = targetOrders.filter(
+            (event) => event.targetAssignmentMode === "focused",
+        );
         return {
             rank: 0,
             armId,
@@ -169,6 +178,16 @@ export const rankMethodV5Arms = (campaign: MethodV5Campaign, rawResults: unknown
             searchOrderGames: telemetryGames("search_orders"),
             capabilityRequestGames: telemetryGames("capability_request"),
             threatPausedGames: telemetryGames("orders_paused_for_visible_threat"),
+            noFeasibleStrikeGames: telemetryGames("no_feasible_strike"),
+            medianFocusedStrikeConcentration: median(focusedOrders.flatMap((event) =>
+                typeof event.attackerCount === "number" && typeof event.compatibleAttackerCount === "number" &&
+                    event.compatibleAttackerCount > 0
+                    ? [event.attackerCount / event.compatibleAttackerCount]
+                    : [],
+            )),
+            medianFocusedEstimatedVolleys: median(focusedOrders.flatMap((event) =>
+                typeof event.estimatedVolleys === "number" ? [event.estimatedVolleys] : [],
+            )),
             nonliteralTerminationDraws: rows.filter(({ outcomeStatus }) =>
                 outcomeStatus === "engine_nonliteral_termination_draw",
             ).length,
@@ -209,21 +228,21 @@ const main = (): void => {
     const campaign = validateMethodV5Campaign(JSON.parse(fs.readFileSync(campaignPath, "utf8")));
     const gate = JSON.parse(fs.readFileSync(gatePath, "utf8")) as unknown;
     if (
-        !isRecord(gate) || gate.status !== "PASSED_METHOD_V5_LITERAL_ENDPOINT_TECHNICAL_GATE_OUTCOMES_NOT_SUMMARIZED" ||
+        !isRecord(gate) || gate.status !== "PASSED_METHOD_V6_LITERAL_ENDPOINT_TECHNICAL_GATE_OUTCOMES_NOT_SUMMARIZED" ||
         gate.campaignSha256 !== sha256File(campaignPath) || path.resolve(String(gate.resultsRoot)) !== resultsRoot ||
         String(gate.arrayJobId) !== arrayJobId || gate.schedulerAccount !== "pi_jss233" ||
         gate.accountedLaunches !== METHOD_V5_LAUNCH_COUNT || gate.technicalFailures !== 0 ||
         gate.endpointViolations !== 0 || gate.informationBoundaryViolations !== 0 ||
-        gate.authorizedNextPhase !== "method-v5-open-training-analysis" ||
+        gate.authorizedNextPhase !== "method-v6-open-training-analysis" ||
         gate.resultArtifactCommitmentSha256 !== methodV5ResultArtifactCommitmentSha256(campaign, resultsRoot, arrayJobId)
     ) throw new Error("Method-v5 technical gate does not authorize analysis");
     const ranking = rankMethodV5Arms(campaign, loadResults(campaign, resultsRoot, arrayJobId));
     const passing = ranking.filter(({ passesAdvancementRule }) => passesAdvancementRule);
     const output = {
-        schemaVersion: 1,
+        schemaVersion: 2,
         status: passing.length > 0
-            ? "OPEN_TRAINING_METHOD_V5_POSITIVE_LITERAL_SIGNAL_NOT_A_PAPER_CLAIM"
-            : "OPEN_TRAINING_METHOD_V5_NO_ADVANCING_POLICY_NOT_A_PAPER_CLAIM",
+            ? "OPEN_TRAINING_METHOD_V6_POSITIVE_LITERAL_SIGNAL_NOT_A_PAPER_CLAIM"
+            : "OPEN_TRAINING_METHOD_V6_NO_ADVANCING_POLICY_NOT_A_PAPER_CLAIM",
         generatedAt: new Date().toISOString(),
         campaignPath,
         campaignSha256: sha256File(campaignPath),
@@ -240,7 +259,7 @@ const main = (): void => {
         selectedArmId: passing[0]?.armId ?? null,
         authorizedNextPhase: passing.length > 0
             ? "fresh-map-outcome-blind-compatibility-gate"
-            : "prospective-method-v5-open-training-refinement-only",
+            : "prospective-method-v6-open-training-refinement-only",
         limitations: [
             "All outcomes are from opened training families and cannot support a paper claim.",
             "The literal endpoint does not use engine resignation or short-game cleanup.",

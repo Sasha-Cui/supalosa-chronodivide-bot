@@ -3,15 +3,17 @@ import {
     MethodV5CloseoutPolicy,
     methodV5AirStructurePlanForCountry,
     methodV5AirUnitForCountry,
+    methodV5BoundedReserveCombatants,
     methodV5CloseoutPolicySha256,
     isWithinMethodV5HomeDefenseRadius,
+    rankMethodV5FocusOpportunities,
     shouldPauseMethodV5CloseoutForVisibleThreat,
     validateMethodV5CloseoutPolicy,
 } from "../training/methodV5Closeout.js";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 
 const policy: MethodV5CloseoutPolicy = {
-    schemaVersion: 1,
+    schemaVersion: 2,
     enabled: true,
     minTick: 7200,
     minCombatants: 8,
@@ -21,6 +23,9 @@ const policy: MethodV5CloseoutPolicy = {
     reserveCombatants: 4,
     orderIntervalTicks: 12,
     maxTargetGroups: 4,
+    targetAssignmentMode: "focused",
+    threatResponseMode: "bounded_reserve",
+    maxThreatReserveCombatants: 4,
     targetPriority: "production",
     memoryEnabled: true,
     searchEnabled: true,
@@ -101,5 +106,59 @@ describe("Method-v5 closeout policy", () => {
             maxVisibleEnemyCombatants: 999,
             visibleCombatantAdvantage: 0,
         })).toBe(true);
+    });
+
+    test("caps home defense and always leaves a striker when combatants are available", () => {
+        expect(methodV5BoundedReserveCombatants({
+            ownOrderableCombatants: 8,
+            baseReserveCombatants: 2,
+            visibleEnemyCombatants: 100,
+            visibleCombatantAdvantage: 0,
+            maxThreatReserveCombatants: 3,
+        })).toBe(3);
+        expect(methodV5BoundedReserveCombatants({
+            ownOrderableCombatants: 3,
+            baseReserveCombatants: 4,
+            visibleEnemyCombatants: 100,
+            visibleCombatantAdvantage: 0,
+            maxThreatReserveCombatants: 8,
+        })).toBe(2);
+        expect(methodV5BoundedReserveCombatants({
+            ownOrderableCombatants: 1,
+            baseReserveCombatants: 4,
+            visibleEnemyCombatants: 100,
+            visibleCombatantAdvantage: 0,
+            maxThreatReserveCombatants: 8,
+        })).toBe(0);
+    });
+
+    test("ranks a visible low-volley building before army size can affect dispatch", () => {
+        const ranked = rankMethodV5FocusOpportunities([
+            {
+                targetId: 10,
+                visible: false,
+                stalled: false,
+                estimatedVolleys: 1,
+                strategicWeight: 8,
+                nearestDistanceSquared: 1,
+            },
+            {
+                targetId: 11,
+                visible: true,
+                stalled: false,
+                estimatedVolleys: 2,
+                strategicWeight: 3,
+                nearestDistanceSquared: 100,
+            },
+            {
+                targetId: 12,
+                visible: true,
+                stalled: false,
+                estimatedVolleys: 1,
+                strategicWeight: 3,
+                nearestDistanceSquared: 200,
+            },
+        ]);
+        expect(ranked.map(({ targetId }) => targetId)).toEqual([12, 11, 10]);
     });
 });
