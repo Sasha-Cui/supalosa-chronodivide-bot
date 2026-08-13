@@ -129,6 +129,11 @@ observable-information hierarchy:
 2. Retain only a bounded defensive reserve. The presence of nearby enemies may
    change which units are reserved, but it must not pause the whole closeout
    layer when some units can still execute a feasible building strike.
+   Once observable terminal evidence establishes one remaining enemy building,
+   the survival of our own final building must not veto an otherwise feasible
+   strike: the literal endpoint permits surviving mobile units to finish after
+   their own base falls. Base survival and strike survival are different safety
+   questions and must be represented by separate certificates.
 3. If no building strike is currently feasible because the target is unknown,
    unreachable, or cannot be damaged by available units, do not issue futile
    building orders. Continue Supalosa's ordinary combat policy against forces
@@ -234,6 +239,16 @@ must return to permanently open families under a newly frozen protocol version.
    limitations that materially constrain the claim.
 
 ## Immediate application to the current program
+
+- A later pre-execution review of the terminal-objective controller found that
+  its final-building branch still conditioned a feasible strike on the survival
+  of the candidate's own last base. Array `22125520` and controller `22125521`
+  were cancelled after 39 seconds. Forty shards emitted `run_start` and one
+  `launch_counted` event each, but zero episodes completed, zero summaries or
+  completion markers were written, and no outcome was inspected. Their
+  artifacts are preserved but inadmissible. The prospective repair separates
+  strike-route safety from home-base safety and tests the explicit one-
+  building-versus-100-tanks case.
 
 - Method-v4 completed 4,752 technically clean open-training games but no arm met
   its advancement rule. Attack-order reparameterization alone was insufficient.

@@ -87,7 +87,13 @@ export type ObjectiveThreatClassification = {
     existentialBaseThreatIds: number[];
     threatenedBaseAssetIds: number[];
     irrelevantThreatIds: number[];
+    uncalibratedStrikeThreatIds: number[];
+    uncalibratedBaseThreatIds: number[];
     uncalibratedRelevantThreatIds: number[];
+    strikeSafetyCertificateComplete: boolean;
+    strikeSafetyCertificateFailureReason: "uncalibrated_relevant_threat" | "analysis_horizon_exceeded" | null;
+    baseSafetyCertificateComplete: boolean;
+    baseSafetyCertificateFailureReason: "uncalibrated_relevant_threat" | "analysis_horizon_exceeded" | null;
     safetyCertificateComplete: boolean;
     safetyCertificateFailureReason: "uncalibrated_relevant_threat" | "analysis_horizon_exceeded" | null;
     earliestLethalInterceptTick: number | null;
@@ -503,10 +509,10 @@ export const classifyObjectiveThreats = (args: {
     const strikeHitPoints = attackers.reduce((sum, unit) => sum + Math.max(0, unit.hitPoints), 0);
     const sortedThreats = threats.slice().sort((left, right) => left.id - right.id);
     const strikeDamageSources: ObjectiveDamageSource[] = [];
-    const uncalibratedRelevantThreatIds: number[] = [];
+    const uncalibratedStrikeThreatIds: number[] = [];
     const requiredInterceptHorizon = directCompletionTicks + thresholds.directCompletionSafetyMarginTicks;
-    const horizonExceeded = requiredInterceptHorizon > thresholds.interceptHorizonTicks ||
-        requiredInterceptHorizon > thresholds.baseDefenseHorizonTicks;
+    const strikeHorizonExceeded = requiredInterceptHorizon > thresholds.interceptHorizonTicks;
+    const baseHorizonExceeded = requiredInterceptHorizon > thresholds.baseDefenseHorizonTicks;
     const interceptHorizon = Math.min(requiredInterceptHorizon, thresholds.interceptHorizonTicks);
 
     for (const threat of sortedThreats) {
@@ -530,7 +536,7 @@ export const classifyObjectiveThreats = (args: {
             }, null);
         const damagePerVolleyToStrike = Math.max(0, threat.damagePerVolleyToStrike);
         if (engagementTick !== null && threat.calibrationStatus === "uncalibrated_special") {
-            uncalibratedRelevantThreatIds.push(threat.id);
+            uncalibratedStrikeThreatIds.push(threat.id);
             continue;
         }
         if (
@@ -577,8 +583,14 @@ export const classifyObjectiveThreats = (args: {
             firstVolleyTick <= Math.min(requiredInterceptHorizon, thresholds.baseDefenseHorizonTicks),
         )
         .map(({ threatId }) => threatId);
-    uncalibratedRelevantThreatIds.push(...uncalibratedBaseThreatIds);
-    const uniqueUncalibratedRelevantThreatIds = [...new Set(uncalibratedRelevantThreatIds)]
+    const uniqueUncalibratedStrikeThreatIds = [...new Set(uncalibratedStrikeThreatIds)]
+        .sort((left, right) => left - right);
+    const uniqueUncalibratedBaseThreatIds = [...new Set(uncalibratedBaseThreatIds)]
+        .sort((left, right) => left - right);
+    const uniqueUncalibratedRelevantThreatIds = [...new Set([
+        ...uniqueUncalibratedStrikeThreatIds,
+        ...uniqueUncalibratedBaseThreatIds,
+    ])]
         .sort((left, right) => left - right);
     const existentialBaseThreatIds = baseThreat.threatIds;
     const relevantIds = new Set([
@@ -591,11 +603,28 @@ export const classifyObjectiveThreats = (args: {
         existentialBaseThreatIds,
         threatenedBaseAssetIds: baseThreat.assetIds,
         irrelevantThreatIds: sortedThreats.map(({ id }) => id).filter((id) => !relevantIds.has(id)),
+        uncalibratedStrikeThreatIds: uniqueUncalibratedStrikeThreatIds,
+        uncalibratedBaseThreatIds: uniqueUncalibratedBaseThreatIds,
         uncalibratedRelevantThreatIds: uniqueUncalibratedRelevantThreatIds,
-        safetyCertificateComplete: uniqueUncalibratedRelevantThreatIds.length === 0 && !horizonExceeded,
+        strikeSafetyCertificateComplete:
+            uniqueUncalibratedStrikeThreatIds.length === 0 && !strikeHorizonExceeded,
+        strikeSafetyCertificateFailureReason: uniqueUncalibratedStrikeThreatIds.length > 0
+            ? "uncalibrated_relevant_threat"
+            : strikeHorizonExceeded
+              ? "analysis_horizon_exceeded"
+              : null,
+        baseSafetyCertificateComplete:
+            uniqueUncalibratedBaseThreatIds.length === 0 && !baseHorizonExceeded,
+        baseSafetyCertificateFailureReason: uniqueUncalibratedBaseThreatIds.length > 0
+            ? "uncalibrated_relevant_threat"
+            : baseHorizonExceeded
+              ? "analysis_horizon_exceeded"
+              : null,
+        safetyCertificateComplete: uniqueUncalibratedRelevantThreatIds.length === 0 &&
+            !strikeHorizonExceeded && !baseHorizonExceeded,
         safetyCertificateFailureReason: uniqueUncalibratedRelevantThreatIds.length > 0
             ? "uncalibrated_relevant_threat"
-            : horizonExceeded
+            : strikeHorizonExceeded || baseHorizonExceeded
               ? "analysis_horizon_exceeded"
               : null,
         earliestLethalInterceptTick: lethalIntercept?.tick ?? null,
@@ -655,6 +684,40 @@ export const selectObjectiveMission = (args: {
             classification.earliestLethalInterceptTick;
     const terminal = isObjectiveTerminalEvidenceSufficient(terminalEvidence);
 
+    // Destroying the opponent's final building is the literal endpoint. Once
+    // the policy has sufficient terminal evidence, the survival of our own
+    // base is not a prerequisite: surviving mobile units may finish the game
+    // after our final building falls. Only threats to the strike route can
+    // veto a direct terminal attack. If those threats make the direct attack
+    // infeasible, clear the minimum blocking set and immediately resume.
+    if (terminal) {
+        if (!classification.strikeSafetyCertificateComplete) {
+            return {
+                kind: "predecessor_fallback",
+                threatIds: classification.uncalibratedStrikeThreatIds,
+                reason: classification.strikeSafetyCertificateFailureReason ?? "analysis_horizon_exceeded",
+            };
+        }
+        if (directSurvives) {
+            return {
+                kind: "terminal_candidate_strike",
+                buildingId: selected.id,
+                predictedCompletionTicks: directCompletionTicks,
+                reason: "sole_known_building_before_intercept",
+            };
+        }
+        if (classification.blockerIds.length > 0 && blockerThenBuildingCompletionTicks !== null) {
+            return {
+                kind: "blocker_clear",
+                buildingId: selected.id,
+                blockerIds: classification.blockerIds,
+                predictedCompletionTicks: blockerThenBuildingCompletionTicks,
+                reason: "direct_strike_not_survivable",
+            };
+        }
+        return { kind: "regroup", reason: "no_capable_strike_group" };
+    }
+
     if (!classification.safetyCertificateComplete) {
         return {
             kind: "predecessor_fallback",
@@ -663,17 +726,6 @@ export const selectObjectiveMission = (args: {
         };
     }
 
-    const baseSurvivesUntilCompletion = classification.earliestBaseDestructionTick === null ||
-        directCompletionTicks + thresholds.directCompletionSafetyMarginTicks <
-            classification.earliestBaseDestructionTick;
-    if (terminal && directSurvives && baseSurvivesUntilCompletion) {
-        return {
-            kind: "terminal_candidate_strike",
-            buildingId: selected.id,
-            predictedCompletionTicks: directCompletionTicks,
-            reason: "sole_known_building_before_intercept",
-        };
-    }
     if (
         classification.earliestBaseDestructionTick !== null &&
         classification.earliestBaseDestructionTick <=
