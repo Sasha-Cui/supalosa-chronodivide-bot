@@ -3,6 +3,7 @@ import { describe, expect, test } from "vitest";
 import {
     BuildingLedgerRow,
     EndpointEvent,
+    classifyLiteralEndpointCompletion,
     evaluateLiteralBuildingUpdate,
 } from "../training/literalBuildingEliminationEndpoint.js";
 
@@ -44,7 +45,7 @@ const evaluate = (
         establishedBeforeUpdate,
     });
 
-describe("literal building-elimination endpoint v4", () => {
+describe("literal building-elimination endpoint v5", () => {
     test("credits a candidate only when every final baseline building is physically destroyed", () => {
         const candidateBuilding = building(1, combatants.candidate);
         const baselineBuildings = [building(2, combatants.baseline), building(3, combatants.baseline)];
@@ -212,5 +213,69 @@ describe("literal building-elimination endpoint v4", () => {
 
         expect(result.status).toBe("candidate_win");
         expect(result.zeroingDispositions.candidate[0].matchedEvents).toHaveLength(1);
+    });
+
+    test("records a defeated-player engine finish without a literal endpoint as a draw", () => {
+        const evaluation = evaluate(
+            [building(1, combatants.candidate), building(2, combatants.baseline)],
+            [building(1, combatants.candidate), building(2, combatants.baseline)],
+            [],
+        );
+        const result = classifyLiteralEndpointCompletion({
+            evaluation,
+            engine: {
+                finished: true,
+                defeated: { candidate: true, baseline: true },
+            },
+        });
+
+        expect(result.technicalFailure).toBeNull();
+        expect(result.terminal?.status).toBe("engine_nonliteral_termination_draw");
+        expect(result.terminal?.winner).toBe("draw");
+        expect(result.terminal && "defeated" in result.terminal ? result.terminal.defeated : null).toEqual({
+            candidate: true,
+            baseline: true,
+        });
+    });
+
+    test("keeps an unexplained engine finish as a technical failure", () => {
+        const evaluation = evaluate(
+            [building(1, combatants.candidate), building(2, combatants.baseline)],
+            [building(1, combatants.candidate), building(2, combatants.baseline)],
+            [],
+        );
+        const result = classifyLiteralEndpointCompletion({
+            evaluation,
+            engine: {
+                finished: true,
+                defeated: { candidate: false, baseline: false },
+            },
+        });
+
+        expect(result.terminal).toBeNull();
+        expect(result.technicalFailure?.reason).toBe(
+            "engine_finished_without_defeated_combatant_or_literal_endpoint",
+        );
+    });
+
+    test("gives a physical endpoint precedence over engine defeat flags", () => {
+        const candidateBuilding = building(1, combatants.candidate);
+        const baselineBuilding = building(2, combatants.baseline);
+        const evaluation = evaluate(
+            [candidateBuilding, baselineBuilding],
+            [candidateBuilding],
+            [destroyed(2, combatants.candidate)],
+        );
+        const result = classifyLiteralEndpointCompletion({
+            evaluation,
+            engine: {
+                finished: true,
+                defeated: { candidate: false, baseline: true },
+            },
+        });
+
+        expect(result.technicalFailure).toBeNull();
+        expect(result.terminal?.status).toBe("candidate_win");
+        expect(result.terminal && "defeated" in result.terminal).toBe(false);
     });
 });

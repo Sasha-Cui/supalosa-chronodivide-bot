@@ -62,7 +62,7 @@ export const METHOD_V5_ADVANCEMENT_RULE = [
     "literal candidate win probability strictly greater than 0.50",
     "literal candidate wins strictly exceed literal baseline wins",
     "candidate wins strictly exceed losses in at least seven of nine countries",
-    "all 3,168 launches are technically clean under endpoint v4",
+    "all 3,168 launches are technically clean under endpoint v5",
 ] as const;
 
 export type MethodV5Family = {
@@ -74,7 +74,7 @@ export type MethodV5Family = {
 export type MethodV5Campaign = {
     schemaVersion: 1;
     kind: "method-v5-open-training-literal-endpoint";
-    status: "FROZEN_METHOD_V5_OPEN_TRAINING_LITERAL_ENDPOINT_V4_SCREEN";
+    status: "FROZEN_METHOD_V5_OPEN_TRAINING_LITERAL_ENDPOINT_V5_SCREEN";
     generatedAt: string;
     sourceGitCommit: string;
     sourceRuntimeSha256: string;
@@ -289,7 +289,7 @@ const main = async (): Promise<void> => {
     const campaign: MethodV5Campaign = {
         schemaVersion: 1,
         kind: "method-v5-open-training-literal-endpoint",
-        status: "FROZEN_METHOD_V5_OPEN_TRAINING_LITERAL_ENDPOINT_V4_SCREEN",
+        status: "FROZEN_METHOD_V5_OPEN_TRAINING_LITERAL_ENDPOINT_V5_SCREEN",
         generatedAt: new Date().toISOString(),
         sourceGitCommit: generationManifest.source.gitCommit,
         sourceRuntimeSha256,

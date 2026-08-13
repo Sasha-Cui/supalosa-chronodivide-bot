@@ -62,7 +62,7 @@ export const validateMethodV5Campaign = (value: unknown): MethodV5Campaign => {
     if (
         !isRecord(value) || value.schemaVersion !== 1 ||
         value.kind !== "method-v5-open-training-literal-endpoint" ||
-        value.status !== "FROZEN_METHOD_V5_OPEN_TRAINING_LITERAL_ENDPOINT_V4_SCREEN" ||
+        value.status !== "FROZEN_METHOD_V5_OPEN_TRAINING_LITERAL_ENDPOINT_V5_SCREEN" ||
         value.sourceCampaignSha256 !== METHOD_V5_SOURCE_CAMPAIGN_SHA256 ||
         value.mapCatalogSha256 !== METHOD_V5_MAP_CATALOG_SHA256 ||
         value.sourcePopulationCommitmentSha256 !== METHOD_V5_TRAINING_POPULATION_SHA256 ||
@@ -219,7 +219,9 @@ export const validateMethodV5Result = (
         (value.winner === "baseline" && (value.outcomeStatus !== "baseline_win" || terminal.status !== "baseline_win" || terminal.winner !== "baseline")) ||
         (value.winner === "draw" && !(
             (value.outcomeStatus === "tick_cap_draw" && terminal.status === "tick_cap_draw") ||
-            (value.outcomeStatus === "simultaneous_draw" && terminal.status === "simultaneous_draw" && terminal.winner === "draw")
+            (value.outcomeStatus === "simultaneous_draw" && terminal.status === "simultaneous_draw" && terminal.winner === "draw") ||
+            (value.outcomeStatus === "engine_nonliteral_termination_draw" &&
+                terminal.status === "engine_nonliteral_termination_draw" && terminal.winner === "draw")
         ))
     ) throw new Error(`Method-v5 completion ${expected.episodeId} has a contradictory terminal state`);
     if (value.outcomeStatus === "tick_cap_draw") {
@@ -228,6 +230,17 @@ export const validateMethodV5Result = (
         if (terminal.tick !== value.ticks || value.engineFinished !== false) {
             throw new Error(`Method-v5 cap terminal ${expected.episodeId} has an invalid tick or engine state`);
         }
+    } else if (value.outcomeStatus === "engine_nonliteral_termination_draw") {
+        exactKeys(terminal, [
+            "endpointVersion", "endpointSha256", "endpoint", "tick", "status", "winner",
+            "defeated", "evaluation", "engineFinishedSameUpdate",
+        ], `Method-v5 nonliteral terminal ${expected.episodeId}`);
+        if (
+            terminal.endpoint !== LITERAL_BUILDING_ELIMINATION_ENDPOINT ||
+            terminal.tick !== value.ticks || value.engineFinished !== true ||
+            terminal.engineFinishedSameUpdate !== true || !isRecord(terminal.defeated) ||
+            (terminal.defeated.candidate !== true && terminal.defeated.baseline !== true)
+        ) throw new Error(`Method-v5 nonliteral terminal ${expected.episodeId} has invalid engine evidence`);
     } else {
         exactKeys(terminal, [
             "endpointVersion", "endpointSha256", "endpoint", "tick", "status", "winner", "evaluation",

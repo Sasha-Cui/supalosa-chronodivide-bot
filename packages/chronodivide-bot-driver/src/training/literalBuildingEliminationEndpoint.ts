@@ -1,9 +1,9 @@
 import { ApiEvent, ApiEventType, GameApi, ObjectType } from "@chronodivide/game-api";
 import { InspectableBaselineBot } from "../benchmark/baselineLoader.js";
 
-export const LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION = 4 as const;
+export const LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION = 5 as const;
 export const LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256 =
-    "6f89e216da64eacf70c203dad2ad5953b2ba6df0e74accc28bc7a66aa7050dc9" as const;
+    "33c44d7fb8288d0f30902bfd3b689c10f04a790acc3b681e9cf9225d62de82ce" as const;
 export const LITERAL_BUILDING_ELIMINATION_ENDPOINT =
     "opponent-attributed physical destruction of every currently enemy-owned building" as const;
 
@@ -74,7 +74,12 @@ export type EndpointUpdateEvaluation = {
     zeroingDispositions: Record<EndpointSide, BuildingDisposition[]>;
 };
 
-export type LiteralEndpointTerminal = {
+export type EndpointEngineState = {
+    finished: boolean;
+    defeated: EndpointEstablished;
+};
+
+export type LiteralEndpointPhysicalTerminal = {
     endpointVersion: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION;
     endpointSha256: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256;
     endpoint: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT;
@@ -85,11 +90,27 @@ export type LiteralEndpointTerminal = {
     engineFinishedSameUpdate: boolean;
 };
 
+export type LiteralEndpointNonliteralTerminationDraw = {
+    endpointVersion: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION;
+    endpointSha256: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256;
+    endpoint: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT;
+    tick: number;
+    status: "engine_nonliteral_termination_draw";
+    winner: "draw";
+    defeated: EndpointEstablished;
+    evaluation: EndpointUpdateEvaluation;
+    engineFinishedSameUpdate: true;
+};
+
+export type LiteralEndpointTerminal =
+    | LiteralEndpointPhysicalTerminal
+    | LiteralEndpointNonliteralTerminationDraw;
+
 export type LiteralEndpointTechnicalFailure = {
     endpointVersion: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION;
     endpointSha256: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256;
     tick: number;
-    reason: "engine_finished_without_valid_literal_endpoint";
+    reason: "engine_finished_without_defeated_combatant_or_literal_endpoint";
     evaluation: EndpointUpdateEvaluation;
 };
 
@@ -316,6 +337,56 @@ export const snapshotCombatantBuildings = (
         .sort((left, right) => left.id - right.id);
 };
 
+export const classifyLiteralEndpointCompletion = (args: {
+    evaluation: EndpointUpdateEvaluation;
+    engine: EndpointEngineState;
+}): {
+    terminal: LiteralEndpointTerminal | null;
+    technicalFailure: LiteralEndpointTechnicalFailure | null;
+} => {
+    const physicalTerminal: LiteralEndpointPhysicalTerminal | null =
+        args.evaluation.status === "continue"
+            ? null
+            : {
+                  endpointVersion: LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION,
+                  endpointSha256: LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256,
+                  endpoint: LITERAL_BUILDING_ELIMINATION_ENDPOINT,
+                  tick: args.evaluation.tick,
+                  status: args.evaluation.status,
+                  winner: args.evaluation.winner as EndpointSide | "draw",
+                  evaluation: args.evaluation,
+                  engineFinishedSameUpdate: args.engine.finished,
+              };
+    if (physicalTerminal) return { terminal: physicalTerminal, technicalFailure: null };
+    if (!args.engine.finished) return { terminal: null, technicalFailure: null };
+    if (args.engine.defeated.candidate || args.engine.defeated.baseline) {
+        return {
+            terminal: {
+                endpointVersion: LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION,
+                endpointSha256: LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256,
+                endpoint: LITERAL_BUILDING_ELIMINATION_ENDPOINT,
+                tick: args.evaluation.tick,
+                status: "engine_nonliteral_termination_draw",
+                winner: "draw",
+                defeated: { ...args.engine.defeated },
+                evaluation: args.evaluation,
+                engineFinishedSameUpdate: true,
+            },
+            technicalFailure: null,
+        };
+    }
+    return {
+        terminal: null,
+        technicalFailure: {
+            endpointVersion: LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION,
+            endpointSha256: LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256,
+            tick: args.evaluation.tick,
+            reason: "engine_finished_without_defeated_combatant_or_literal_endpoint",
+            evaluation: args.evaluation,
+        },
+    };
+};
+
 export const toEndpointEvent = (event: ApiEvent): EndpointEvent | null => {
     if (event.type === ApiEventType.ObjectDestroy) {
         return {
@@ -359,7 +430,7 @@ export class LiteralBuildingEliminationAdjudicator {
         if (endpointEvent) this.events.push(endpointEvent);
     }
 
-    completeUpdate(game: GameApi, engineFinished: boolean): {
+    completeUpdate(game: GameApi, engine: EndpointEngineState): {
         evaluation: EndpointUpdateEvaluation;
         terminal: LiteralEndpointTerminal | null;
         technicalFailure: LiteralEndpointTechnicalFailure | null;
@@ -377,30 +448,7 @@ export class LiteralBuildingEliminationAdjudicator {
         this.events = [];
         this.established = evaluation.establishedAfterUpdate;
         this.dispositions.push(...evaluation.dispositions);
-        const terminal =
-            evaluation.status === "continue"
-                ? null
-                : {
-                      endpointVersion: LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION,
-                      endpointSha256: LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256,
-                      endpoint: LITERAL_BUILDING_ELIMINATION_ENDPOINT,
-                      tick: evaluation.tick,
-                      status: evaluation.status,
-                      winner: evaluation.winner as EndpointSide | "draw",
-                      evaluation,
-                      engineFinishedSameUpdate: engineFinished,
-                  };
-        const technicalFailure =
-            engineFinished && terminal === null
-                ? {
-                      endpointVersion: LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION,
-                      endpointSha256: LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256,
-                      tick: evaluation.tick,
-                      reason: "engine_finished_without_valid_literal_endpoint" as const,
-                      evaluation,
-                  }
-                : null;
-        return { evaluation, terminal, technicalFailure };
+        return { evaluation, ...classifyLiteralEndpointCompletion({ evaluation, engine }) };
     }
 
     getEstablished(): EndpointEstablished {

@@ -60,6 +60,7 @@ export type MethodV5RankingRow = {
     searchOrderGames: number;
     capabilityRequestGames: number;
     threatPausedGames: number;
+    nonliteralTerminationDraws: number;
     drawsWithBaselineBuildingsRemaining: number;
     drawsWithNoCandidateBuildings: number;
     countryBreakdown: Array<{ country: string } & Breakdown>;
@@ -168,6 +169,9 @@ export const rankMethodV5Arms = (campaign: MethodV5Campaign, rawResults: unknown
             searchOrderGames: telemetryGames("search_orders"),
             capabilityRequestGames: telemetryGames("capability_request"),
             threatPausedGames: telemetryGames("orders_paused_for_visible_threat"),
+            nonliteralTerminationDraws: rows.filter(({ outcomeStatus }) =>
+                outcomeStatus === "engine_nonliteral_termination_draw",
+            ).length,
             drawsWithBaselineBuildingsRemaining: rows.filter(({ winner, terminalBuildingCounts }) =>
                 winner === "draw" && terminalBuildingCounts.baseline > 0,
             ).length,

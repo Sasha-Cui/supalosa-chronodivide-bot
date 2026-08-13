@@ -54,6 +54,7 @@ export type MethodV5OutcomeStatus =
     | "candidate_win"
     | "baseline_win"
     | "simultaneous_draw"
+    | "engine_nonliteral_termination_draw"
     | "tick_cap_draw"
     | "technical_failure";
 
@@ -226,7 +227,19 @@ export const runMethodV5Episode = async (
                 adjudicator.beginUpdate(candidateApi);
                 await game.update();
                 ticks += 1;
-                const completed = adjudicator.completeUpdate(candidateApi, game.isFinished());
+                const playerStats = game.getPlayerStats();
+                const candidateStats = playerStats.find(({ name }) => name === candidateName);
+                const baselineStats = playerStats.find(({ name }) => name === baselineName);
+                if (!candidateStats || !baselineStats) {
+                    throw new Error(`Missing public player statistics for ${spec.episodeId}`);
+                }
+                const completed = adjudicator.completeUpdate(candidateApi, {
+                    finished: game.isFinished(),
+                    defeated: {
+                        candidate: candidateStats.defeated,
+                        baseline: baselineStats.defeated,
+                    },
+                });
                 terminal = completed.terminal;
                 technicalFailure = completed.technicalFailure;
             }
