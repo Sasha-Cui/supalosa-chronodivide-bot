@@ -274,6 +274,12 @@ export const runContinuousOffensePlanFromEnvironment = async (): Promise<void> =
     const policyFiles = [
         path.join(driverRoot, "src", "training", "terminalObjectiveStrategy.ts"),
         path.join(driverRoot, "dist", "training", "terminalObjectiveStrategy.js"),
+        path.join(driverRoot, "src", "training", "continuousOffensePolicy.ts"),
+        path.join(driverRoot, "dist", "training", "continuousOffensePolicy.js"),
+        path.join(driverRoot, "src", "training", "continuousOffenseCandidate.ts"),
+        path.join(driverRoot, "dist", "training", "continuousOffenseCandidate.js"),
+        path.join(driverRoot, "src", "training", "continuousOffenseExperimentPolicy.ts"),
+        path.join(driverRoot, "dist", "training", "continuousOffenseExperimentPolicy.js"),
         path.join(driverRoot, "src", "training", "terminalRacePublicState.ts"),
         path.join(driverRoot, "dist", "training", "terminalRacePublicState.js"),
         path.join(repoRoot, "packages", "chronodivide-bot", "src", "bot", "logic", "objective", "terminalObjectiveDecisionCore.ts"),
