@@ -36,6 +36,7 @@ cd "$REPO"
 }
 JOB_ROOT="$EVIDENCE_ROOT/$SLURM_JOB_ID"
 [[ ! -e "$JOB_ROOT" ]] || { echo "Refusing to reuse $JOB_ROOT" >&2; exit 2; }
+install -d -m 0700 "$EVIDENCE_ROOT"
 mkdir -m 0700 "$JOB_ROOT"
 exec >"$JOB_ROOT/job.stdout.log" 2>"$JOB_ROOT/job.stderr.log"
 cd "$DRIVER"
