@@ -65,7 +65,9 @@ export const validateMissionNativeCloseoutExecutionTelemetry = (
     telemetry: readonly BuildingEliminationTelemetryEvent[],
     country: Countries,
     slot: 0 | 1,
+    options: { engagementAllocationMode?: "singleScreen" | "allBlocker" } = {},
 ): void => {
+    const engagementAllocationMode = options.engagementAllocationMode ?? "singleScreen";
     const heartbeats = telemetry.filter((event): event is ExecutionHeartbeat =>
         event.event === "execution_heartbeat",
     );
@@ -91,13 +93,16 @@ export const validateMissionNativeCloseoutExecutionTelemetry = (
         const destroyedSet = new Set(heartbeat.noLongerAssignedUnitIds);
         if (
             !sameNumbers(combinedIds, heartbeat.assignedAttackerIds) ||
-            heartbeat.assignedAttackerCount <= 0 || heartbeat.buildingAttackerCount <= 0 ||
+            heartbeat.assignedAttackerCount <= 0 ||
+            (engagementAllocationMode === "singleScreen" && heartbeat.buildingAttackerCount <= 0) ||
             heartbeat.assignedAttackerCount !== heartbeat.assignedAttackerIds.length ||
             heartbeat.buildingAttackerCount !== heartbeat.buildingAttackerIds.length ||
             heartbeat.blockerAttackerCount !== heartbeat.blockerAttackerIds.length ||
             heartbeat.buildingAttackerCount + heartbeat.blockerAttackerCount !==
                 heartbeat.assignedAttackerCount ||
-            heartbeat.blockerAttackerCount > 1 ||
+            (engagementAllocationMode === "singleScreen" && heartbeat.blockerAttackerCount > 1) ||
+            (engagementAllocationMode === "allBlocker" && heartbeat.blockerId !== null &&
+                heartbeat.blockerAttackerCount <= 0) ||
             heartbeat.destroyedAssignedUnitIds.some((id) => !destroyedSet.has(id))
         ) {
             throw new Error(`Execution heartbeat allocation drifted for ${country} slot ${slot}`);

@@ -149,4 +149,35 @@ describe("mission-native closeout execution diagnostic", () => {
             0,
         )).toThrow(/allocation drifted/);
     });
+
+    it("validates a phase-pure all-blocker heartbeat only for the V6 allocation mode", () => {
+        const allBlocker = heartbeat({
+            blockerId: 101,
+            blockerName: "E1",
+            routeThreatCount: 8,
+            buildingAttackerIds: [],
+            blockerAttackerIds: [1],
+            buildingAttackerCount: 0,
+            blockerAttackerCount: 1,
+            inRangeBuildingAttackerCount: 0,
+            totalBuildingAttackerHitPoints: 0,
+            totalBlockerAttackerHitPoints: 400,
+            minimumDistanceToFiringPerimeter: null,
+            medianDistanceToFiringPerimeter: null,
+            maximumDistanceToFiringPerimeter: null,
+            directBuildingAttackCommandCount: 0,
+            blockerAttackCommandCount: 1,
+        });
+        expect(() => validateMissionNativeCloseoutExecutionTelemetry(
+            [allBlocker],
+            Countries.USA,
+            0,
+        )).toThrow(/allocation drifted/);
+        expect(() => validateMissionNativeCloseoutExecutionTelemetry(
+            [allBlocker],
+            Countries.USA,
+            0,
+            { engagementAllocationMode: "allBlocker" },
+        )).not.toThrow();
+    });
 });
