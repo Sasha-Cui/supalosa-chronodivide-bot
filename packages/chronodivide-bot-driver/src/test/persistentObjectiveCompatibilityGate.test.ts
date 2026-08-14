@@ -9,7 +9,7 @@ import { PersistentObjectiveCompletionTelemetry } from "../training/persistentOb
 const decision = (
     changes: Partial<PersistentObjectiveCompletionTelemetry> = {},
 ): PersistentObjectiveCompletionTelemetry => ({
-    schemaVersion: 2,
+    schemaVersion: 3,
     event: "objective_completion_decision",
     informationInterface: "public_complete_state",
     tick: 3,
@@ -29,6 +29,9 @@ const decision = (
     buildingDamageSincePreviousDecision: 100,
     blockerDamageSincePreviousDecision: 0,
     routeProgressSincePreviousDecision: 1,
+    estimatedBuildingCompletionTicks: 100,
+    estimatedDetachmentSurvivalTicks: 200,
+    routeThreatCount: 1,
     homeThreatened: false,
     issuedOrder: "attack_building",
     unitDiagnostics: [{
@@ -103,13 +106,15 @@ describe("persistent objective outcome-blind compatibility gate", () => {
         )).toThrow(/Minimum viable detachment/);
     });
 
-    it("accepts a preemptive blocker clear followed by physical building damage", () => {
+    it("accepts a completion-race blocker clear followed by physical building damage", () => {
         const blocker = decision({
             phase: "blocker_clear",
-            reason: "preemptive_route_interception_blocker",
+            reason: "completion_race_route_blocker",
             blockerId: 200,
             blockerRulesName: "E1",
             buildingDamageSincePreviousDecision: 0,
+            estimatedBuildingCompletionTicks: 300,
+            estimatedDetachmentSurvivalTicks: 100,
             issuedOrder: "attack_blocker",
         });
         expect(() => validatePersistentObjectiveCompatibilityExposure(
@@ -161,6 +166,9 @@ describe("persistent objective outcome-blind compatibility gate", () => {
             blockerRulesNameCounts: {},
             selectedUnitDisappearanceTransitions: 0,
             selectedUnitDeselectionTransitions: 0,
+            estimatedBuildingCompletionTicksRange: [100, 100],
+            estimatedDetachmentSurvivalTicksRange: [200, 200],
+            routeThreatCountRange: [1, 1],
             buildingDamageEvents: 1,
             buildingDamage: 100,
             rules: {
