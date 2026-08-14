@@ -27,7 +27,7 @@ import {
 } from "./persistentObjectiveCompletionStrategy.js";
 
 export const PERSISTENT_OBJECTIVE_COMPATIBILITY_MAX_TICKS = 5_400 as const;
-export const PERSISTENT_OBJECTIVE_COMPATIBILITY_ENGINE_SEED_BASE = 4_250_000_000 as const;
+export const PERSISTENT_OBJECTIVE_COMPATIBILITY_ENGINE_SEED_BASE = 4_260_000_000 as const;
 export const PERSISTENT_OBJECTIVE_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT = 4 as const;
 
 type Factory = Awaited<ReturnType<typeof loadBaselineFactory>>;
@@ -392,11 +392,12 @@ const main = async (): Promise<void> => {
         });
         const directDigest = digest({ actions: direct.actions, snapshots: direct.snapshots });
         const disabledDigest = digest({ actions: disabled.actions, snapshots: disabled.snapshots });
+        const validationErrors: string[] = [];
         if (directDigest !== disabledDigest) {
-            throw new Error(`Disabled persistent objective control drifted for ${country} slot ${candidateSlot}`);
+            validationErrors.push(`Disabled persistent objective control drifted for ${country} slot ${candidateSlot}`);
         }
         if (disabled.telemetry.length !== 0) {
-            throw new Error(`Disabled persistent objective control emitted telemetry for ${country} slot ${candidateSlot}`);
+            validationErrors.push(`Disabled persistent objective control emitted telemetry for ${country} slot ${candidateSlot}`);
         }
         const first = await run({
             factory, mapName, country, candidateSlot, requestedEngineSeed, policy: smokePolicy,
@@ -404,15 +405,20 @@ const main = async (): Promise<void> => {
         const repeat = await run({
             factory, mapName, country, candidateSlot, requestedEngineSeed, policy: smokePolicy,
         });
-        validatePersistentObjectiveCompatibilityExposure(first.telemetry, country, candidateSlot);
-        validatePersistentObjectiveCompatibilityExposure(repeat.telemetry, country, candidateSlot);
+        for (const [label, trace] of [["first", first], ["repeat", repeat]] as const) {
+            try {
+                validatePersistentObjectiveCompatibilityExposure(trace.telemetry, country, candidateSlot);
+            } catch (error) {
+                validationErrors.push(`${label}: ${error instanceof Error ? error.message : String(error)}`);
+            }
+        }
         const firstDigest = digest({ actions: first.actions, snapshots: first.snapshots, telemetry: first.telemetry });
         const repeatDigest = digest({ actions: repeat.actions, snapshots: repeat.snapshots, telemetry: repeat.telemetry });
         if (firstDigest !== repeatDigest) {
-            throw new Error(`Persistent objective trace was not deterministic for ${country} slot ${candidateSlot}`);
+            validationErrors.push(`Persistent objective trace was not deterministic for ${country} slot ${candidateSlot}`);
         }
         if (digest(first.actions) === digest(direct.actions)) {
-            throw new Error(`Persistent objective overlay did not change commands for ${country} slot ${candidateSlot}`);
+            validationErrors.push(`Persistent objective overlay did not change commands for ${country} slot ${candidateSlot}`);
         }
         const quitAttempts = {
             direct: direct.quitAttempts,
@@ -421,7 +427,7 @@ const main = async (): Promise<void> => {
             repeat: repeat.quitAttempts,
         };
         if (Object.values(quitAttempts).some(({ candidate, baseline }) => candidate !== 0 || baseline !== 0)) {
-            throw new Error(`Compatibility run attempted resignation for ${country} slot ${candidateSlot}`);
+            validationErrors.push(`Compatibility run attempted resignation for ${country} slot ${candidateSlot}`);
         }
         const diagnostics = first.telemetry.flatMap(({ unitDiagnostics }) => unitDiagnostics);
         rows.push({
@@ -448,6 +454,9 @@ const main = async (): Promise<void> => {
                 diagnostic.hasOrdinaryCompatibleWeapon && diagnostic.hasSpecialSecondaryMechanic,
             ),
             enabledTelemetrySummary: summarizePersistentObjectiveCompatibilityTelemetry(first.telemetry),
+            repeatTelemetrySummary: summarizePersistentObjectiveCompatibilityTelemetry(repeat.telemetry),
+            validationErrors,
+            passed: validationErrors.length === 0,
             quitAttempts,
             outcomeInspected: false,
         });
@@ -474,11 +483,14 @@ const main = async (): Promise<void> => {
         manifest.source.trackedDirty !== false || manifest.software.baseline.kind !== "external-package" ||
         manifest.software.baseline.trackedDirty !== false || rows.length !== 18
     ) throw new Error("Persistent objective compatibility provenance or coverage failed");
+    const passed = rows.every((row) => row.passed === true);
     const output = {
-        schemaVersion: 2,
-        status: "PASS_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V2",
+        schemaVersion: 3,
+        status: passed
+            ? "PASS_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V3"
+            : "FAIL_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V3",
         generatedAt: new Date().toISOString(),
-        passed: true,
+        passed,
         outcomeFree: true,
         sourceGitCommit: manifest.source.gitCommit,
         scheduler: manifest.scheduler,
@@ -499,6 +511,7 @@ const main = async (): Promise<void> => {
         status: output.status,
         gameCount: output.gameCount,
     }));
+    if (!passed) throw new Error("Persistent objective compatibility-v3 failed; preserved diagnostic artifact");
 };
 
 const invoked = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : null;
