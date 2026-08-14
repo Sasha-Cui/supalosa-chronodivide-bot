@@ -3,6 +3,7 @@ import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/util
 import { createMissionNativeCloseoutCandidate } from "../training/missionNativeCloseoutCandidate.js";
 import { buildMissionNativeCloseoutPolicy } from "../training/missionNativeCloseoutPolicy.js";
 import { buildMissionNativeCloseoutPolicyV2 } from "../training/missionNativeCloseoutPolicyV2.js";
+import { buildMissionNativeCloseoutPolicyV3 } from "../training/missionNativeCloseoutPolicyV3.js";
 
 describe("mission-native closeout candidate", () => {
     it("returns the exact external baseline path when disabled", () => {
@@ -64,6 +65,25 @@ describe("mission-native closeout candidate", () => {
             "candidate",
             Countries.USA,
             buildMissionNativeCloseoutPolicyV2(),
+        )).toBe(injected);
+        expect(factory.createWithStrategy).toHaveBeenCalledOnce();
+    });
+
+    it("accepts the frozen bounded-screen v3 policy", () => {
+        const injected = { kind: "injected-v3" } as any;
+        let inner: any;
+        inner = { onAiUpdate: vi.fn(() => inner) };
+        const factory = {
+            descriptor: { kind: "external-package", packageRoot: "/baseline" },
+            create: vi.fn(),
+            createDefaultStrategy: vi.fn(() => inner),
+            createWithStrategy: vi.fn(() => injected),
+        } as any;
+        expect(createMissionNativeCloseoutCandidate(
+            factory,
+            "candidate",
+            Countries.USA,
+            buildMissionNativeCloseoutPolicyV3(),
         )).toBe(injected);
         expect(factory.createWithStrategy).toHaveBeenCalledOnce();
     });

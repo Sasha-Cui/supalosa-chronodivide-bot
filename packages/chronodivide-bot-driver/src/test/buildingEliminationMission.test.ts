@@ -3,6 +3,7 @@ import { AttackState, FactoryType, ObjectType, SideType, SpeedType } from "@chro
 import {
     assignAttackersToTargets,
     assignAttackersToCompatibleTargets,
+    allocateBuildingEliminationEngagement,
     BuildingTargetDescriptor,
     classifyBuildingCapabilityGaps,
     chooseBuildingEliminationEngagement,
@@ -449,6 +450,61 @@ describe("building elimination policy", () => {
         );
     });
 
+    test("keeps at least half of a threatened force on the building objective", () => {
+        const attackers = Array.from({ length: 6 }, (_, index) => combatant(index + 1, 0)) as any[];
+        const allocation = allocateBuildingEliminationEngagement(
+            attackers,
+            buildingUnit(200, 20) as any,
+            combatant(100, 5) as any,
+            "boundedScreen",
+        );
+        expect(allocation.buildingAttackers).toHaveLength(3);
+        expect(allocation.blockerAttackers).toHaveLength(3);
+        expect(new Set([
+            ...allocation.buildingAttackers.map(({ id }) => id),
+            ...allocation.blockerAttackers.map(({ id }) => id),
+        ])).toEqual(new Set(attackers.map(({ id }) => id)));
+    });
+
+    test("never diverts an in-range building attacker to the blocker screen", () => {
+        const inRange = [combatant(1, 19), combatant(2, 19)];
+        const allocation = allocateBuildingEliminationEngagement(
+            [...inRange, combatant(3, 0), combatant(4, 0)] as any[],
+            buildingUnit(200, 20) as any,
+            combatant(100, 5) as any,
+            "boundedScreen",
+        );
+        expect(allocation.inRangeBuildingAttackerCount).toBe(2);
+        expect(allocation.buildingAttackers.map(({ id }) => id)).toEqual(expect.arrayContaining([1, 2]));
+        expect(allocation.blockerAttackers.map(({ id }) => id)).not.toContain(1);
+        expect(allocation.blockerAttackers.map(({ id }) => id)).not.toContain(2);
+    });
+
+    test("a single attacker continues toward the building despite a blocker", () => {
+        const allocation = allocateBuildingEliminationEngagement(
+            [combatant(1, 0)] as any[],
+            buildingUnit(200, 20) as any,
+            combatant(100, 5) as any,
+            "boundedScreen",
+        );
+        expect(allocation.buildingAttackers.map(({ id }) => id)).toEqual([1]);
+        expect(allocation.blockerAttackers).toEqual([]);
+    });
+
+    test("does not assign an attacker that cannot damage the blocker to screening", () => {
+        const blocker = combatant(100, 5) as any;
+        blocker.rules = { ...blocker.rules, armor: 9 };
+        const attackers = [combatant(1, 0), combatant(2, 0)] as any[];
+        const allocation = allocateBuildingEliminationEngagement(
+            attackers,
+            buildingUnit(200, 20) as any,
+            blocker,
+            "boundedScreen",
+        );
+        expect(allocation.buildingAttackers).toEqual(attackers);
+        expect(allocation.blockerAttackers).toEqual([]);
+    });
+
     test("configuration resolves to a canonical complete object without undefined overrides", () => {
         const resolved = resolveBuildingEliminationOptions({
             enabled: true,
@@ -487,6 +543,7 @@ describe("building elimination policy", () => {
             "activationMode",
             "maxEnemyBuildings",
             "engagementMode",
+            "engagementAllocationMode",
             "routeCorridorRadius",
         ]);
     });
@@ -505,6 +562,9 @@ describe("building elimination policy", () => {
         );
         expect(() => resolveBuildingEliminationOptions({ engagementMode: "unknown" as any })).toThrow(
             "engagement mode",
+        );
+        expect(() => resolveBuildingEliminationOptions({ engagementAllocationMode: "unknown" as any })).toThrow(
+            "allocation mode",
         );
     });
 });

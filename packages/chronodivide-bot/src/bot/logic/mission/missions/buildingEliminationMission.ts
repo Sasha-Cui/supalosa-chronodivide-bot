@@ -31,6 +31,7 @@ export type BuildingEliminationObservationMode = "publicApi" | "visibleOnly";
 export type BuildingEliminationTargetPriority = "production" | "defense" | "nearest";
 export type BuildingEliminationActivationMode = "forceAdvantage" | "lowBuilding";
 export type BuildingEliminationEngagementMode = "directBuilding" | "completionRace";
+export type BuildingEliminationEngagementAllocationMode = "allBlocker" | "boundedScreen";
 
 export type BuildingEliminationOptions = {
     enabled?: boolean;
@@ -58,6 +59,7 @@ export type BuildingEliminationOptions = {
     activationMode?: BuildingEliminationActivationMode;
     maxEnemyBuildings?: number;
     engagementMode?: BuildingEliminationEngagementMode;
+    engagementAllocationMode?: BuildingEliminationEngagementAllocationMode;
     routeCorridorRadius?: number;
 };
 
@@ -177,6 +179,19 @@ export type BuildingEliminationTelemetryEvent =
           estimatedBuildingCompletionTicks: number | null;
           estimatedForceSurvivalTicks: number | null;
           earliestRouteThreatInterceptTicks: number | null;
+      }
+    | {
+          schemaVersion: 4;
+          event: "engagement_allocation";
+          tick: number;
+          targetId: number;
+          targetName: string;
+          blockerId: number | null;
+          blockerName: string | null;
+          assignedAttackerCount: number;
+          buildingAttackerCount: number;
+          blockerAttackerCount: number;
+          inRangeBuildingAttackerCount: number;
       };
 
 export type BuildingEliminationTelemetrySink = (event: BuildingEliminationTelemetryEvent) => void;
@@ -212,6 +227,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     activationMode: "forceAdvantage",
     maxEnemyBuildings: 1_000,
     engagementMode: "directBuilding",
+    engagementAllocationMode: "allBlocker",
     routeCorridorRadius: 8,
 };
 
@@ -256,6 +272,12 @@ export const resolveBuildingEliminationOptions = (
     if (!new Set<BuildingEliminationEngagementMode>(["directBuilding", "completionRace"])
         .has(resolved.engagementMode)) {
         throw new Error(`Invalid building-elimination engagement mode: ${resolved.engagementMode}`);
+    }
+    if (!new Set<BuildingEliminationEngagementAllocationMode>(["allBlocker", "boundedScreen"])
+        .has(resolved.engagementAllocationMode)) {
+        throw new Error(
+            `Invalid building-elimination engagement allocation mode: ${resolved.engagementAllocationMode}`,
+        );
     }
     return resolved;
 };
@@ -654,6 +676,67 @@ export const chooseBuildingEliminationEngagement = (
     };
 };
 
+export type BuildingEliminationEngagementAllocation = {
+    buildingAttackers: UnitData[];
+    blockerAttackers: UnitData[];
+    inRangeBuildingAttackerCount: number;
+};
+
+export const allocateBuildingEliminationEngagement = (
+    attackers: UnitData[],
+    target: UnitData,
+    blocker: UnitData | null,
+    mode: BuildingEliminationEngagementAllocationMode,
+): BuildingEliminationEngagementAllocation => {
+    if (blocker === null) {
+        return {
+            buildingAttackers: attackers.slice(),
+            blockerAttackers: [],
+            inRangeBuildingAttackerCount: attackers.filter((attacker) =>
+                tileDistanceToFoundation(attacker.tile.rx, attacker.tile.ry, target) <=
+                    maximumDamageRangeAgainst(attacker, target),
+            ).length,
+        };
+    }
+    if (mode === "allBlocker") {
+        const blockerAttackers = attackers.filter((attacker) => unitDamagePerTickAgainst(attacker, blocker) > 0);
+        const blockerIds = new Set(blockerAttackers.map(({ id }) => id));
+        return {
+            buildingAttackers: attackers.filter(({ id }) => !blockerIds.has(id)),
+            blockerAttackers,
+            inRangeBuildingAttackerCount: 0,
+        };
+    }
+
+    const inRangeIds = new Set(attackers.filter((attacker) =>
+        tileDistanceToFoundation(attacker.tile.rx, attacker.tile.ry, target) <=
+            maximumDamageRangeAgainst(attacker, target),
+    ).map(({ id }) => id));
+    const maximumBlockerAttackers = Math.min(
+        Math.floor(attackers.length / 2),
+        attackers.length - Math.max(1, inRangeIds.size),
+    );
+    const blockerAttackers = attackers
+        .filter(({ id }) => !inRangeIds.has(id))
+        .filter((attacker) => unitDamagePerTickAgainst(attacker, blocker) > 0)
+        .sort((left, right) => {
+            const leftBlockerDamage = unitDamagePerTickAgainst(left, blocker);
+            const rightBlockerDamage = unitDamagePerTickAgainst(right, blocker);
+            const leftBuildingDamage = unitDamagePerTickAgainst(left, target);
+            const rightBuildingDamage = unitDamagePerTickAgainst(right, target);
+            const leftComparative = leftBlockerDamage / Math.max(Number.EPSILON, leftBuildingDamage);
+            const rightComparative = rightBlockerDamage / Math.max(Number.EPSILON, rightBuildingDamage);
+            return rightComparative - leftComparative || rightBlockerDamage - leftBlockerDamage || left.id - right.id;
+        })
+        .slice(0, Math.max(0, maximumBlockerAttackers));
+    const blockerIds = new Set(blockerAttackers.map(({ id }) => id));
+    return {
+        buildingAttackers: attackers.filter(({ id }) => !blockerIds.has(id)),
+        blockerAttackers,
+        inRangeBuildingAttackerCount: inRangeIds.size,
+    };
+};
+
 export const assignAttackersToCompatibleTargets = <T extends PointDescriptor, U extends PointDescriptor>(
     attackers: T[],
     targets: U[],
@@ -1028,6 +1111,8 @@ class BuildingEliminationMission extends Mission {
     private lastAssignmentTelemetryAt = Number.NEGATIVE_INFINITY;
     private lastEngagementTelemetrySignature = "";
     private lastEngagementTelemetryAt = Number.NEGATIVE_INFINITY;
+    private lastAllocationTelemetrySignature = "";
+    private lastAllocationTelemetryAt = Number.NEGATIVE_INFINITY;
     private committedTargetId: number | null = null;
     private targetProgress = new Map<number, BuildingTargetProgressState>();
     private progressTelemetry = new Map<number, { hitPoints: number; lastEmittedTick: number }>();
@@ -1239,6 +1324,7 @@ class BuildingEliminationMission extends Mission {
                 ? undefined
                 : currentTargetById.get(primaryTarget.id);
             let blocker: UnitData | null = null;
+            const blockerAttackerIds = new Set<number>();
             if (this.options.engagementMode === "completionRace" && currentPrimaryTarget) {
                 const assignedUnits = assignments.map(({ attacker }) => attacker);
                 const enemyForces = getEnemyUnits(
@@ -1272,6 +1358,26 @@ class BuildingEliminationMission extends Mission {
                     estimatedForceSurvivalTicks: finiteOrNull(decision.estimatedForceSurvivalTicks),
                     earliestRouteThreatInterceptTicks: finiteOrNull(decision.earliestRouteThreatInterceptTicks),
                 });
+                const allocation = allocateBuildingEliminationEngagement(
+                    assignedUnits,
+                    currentPrimaryTarget,
+                    blocker,
+                    this.options.engagementAllocationMode,
+                );
+                for (const { id } of allocation.blockerAttackers) blockerAttackerIds.add(id);
+                this.emitAllocationTelemetry({
+                    schemaVersion: 4,
+                    event: "engagement_allocation",
+                    tick: context.game.getCurrentTick(),
+                    targetId: currentPrimaryTarget.id,
+                    targetName: currentPrimaryTarget.rules.name,
+                    blockerId: blocker?.id ?? null,
+                    blockerName: blocker?.rules.name ?? null,
+                    assignedAttackerCount: assignedUnits.length,
+                    buildingAttackerCount: allocation.buildingAttackers.length,
+                    blockerAttackerCount: allocation.blockerAttackers.length,
+                    inRangeBuildingAttackerCount: allocation.inRangeBuildingAttackerCount,
+                });
             } else if (this.options.engagementMode === "completionRace") {
                 this.emitEngagementTelemetry({
                     schemaVersion: 3,
@@ -1295,7 +1401,7 @@ class BuildingEliminationMission extends Mission {
             for (const { attacker, target } of assignments) {
                 const currentTarget = target.id === undefined ? undefined : currentTargetById.get(target.id);
                 const action =
-                    blocker && unitDamagePerTickAgainst(attacker, blocker) > 0
+                    blocker && blockerAttackerIds.has(attacker.id)
                         ? manageAttackMicro(attacker, blocker)
                         : currentTarget && shouldDirectAttackBuildingTarget(
                         this.options.directVisibleAttack,
@@ -1438,6 +1544,19 @@ class BuildingEliminationMission extends Mission {
         ) return;
         this.lastEngagementTelemetrySignature = signature;
         this.lastEngagementTelemetryAt = event.tick;
+        this.telemetrySink(event);
+    }
+
+    private emitAllocationTelemetry(
+        event: Extract<BuildingEliminationTelemetryEvent, { event: "engagement_allocation" }>,
+    ): void {
+        const signature = JSON.stringify({ ...event, tick: 0 });
+        if (
+            signature === this.lastAllocationTelemetrySignature &&
+            event.tick < this.lastAllocationTelemetryAt + TELEMETRY_HEARTBEAT_TICKS
+        ) return;
+        this.lastAllocationTelemetrySignature = signature;
+        this.lastAllocationTelemetryAt = event.tick;
         this.telemetrySink(event);
     }
 
