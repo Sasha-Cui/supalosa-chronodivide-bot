@@ -394,6 +394,15 @@ export class MissionController {
         return this.requestedUnitTypes;
     }
 
+    /**
+     * Returns the current mission name for a unit without exposing mutable
+     * mission-controller state. The assignment map is refreshed at the start
+     * of every AI update before strategies and mission factories run.
+     */
+    public getAssignedMissionName(unitId: number): string | null {
+        return this.unitIdToMission.get(unitId)?.getUniqueName() ?? null;
+    }
+
     private addUnitToMission(mission: Mission<any>, unit: GameObjectData, actionsApi: ActionsApi) {
         mission.addUnit(unit.id);
         this.unitIdToMission.set(unit.id, mission);

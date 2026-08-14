@@ -30,7 +30,8 @@ import { BUILDING_NAME_TO_RULES, getDefaultPlacementLocation } from "../../build
 export type BuildingEliminationObservationMode = "publicApi" | "visibleOnly";
 export type BuildingEliminationTargetPriority = "production" | "reinforcement" | "defense" | "nearest";
 export type BuildingEliminationActivationMode = "forceAdvantage" | "lowBuilding" |
-    "objectiveRace" | "objectiveClearance" | "objectiveRouteClearance";
+    "objectiveRace" | "objectiveClearance" | "objectiveRouteClearance" |
+    "objectiveTransferableRouteClearance";
 export type BuildingEliminationEngagementMode = "directBuilding" | "completionRace";
 export type BuildingEliminationEngagementAllocationMode = "allBlocker" | "boundedScreen" | "singleScreen";
 
@@ -101,7 +102,8 @@ export type BuildingEliminationTelemetryEvent =
           event: "activation_blocked";
           tick: number;
           reason: "insufficient_own_combatants" | "enemy_combatant_limit" | "insufficient_advantage" |
-              "no_viable_building_race" | "no_viable_objective_clearance" | "no_viable_route_clearance";
+              "no_viable_building_race" | "no_viable_objective_clearance" | "no_viable_route_clearance" |
+              "no_viable_transferable_route_clearance";
           ownCombatants: number;
           enemyCombatants: number;
           reservedCombatants: number;
@@ -245,7 +247,7 @@ export type BuildingEliminationTelemetryEvent =
           vanguardCombatants: number;
       }
     | {
-          schemaVersion: 7;
+          schemaVersion: 7 | 8;
           event: "activation_evaluation";
           tick: number;
           phase: "no_target" | "building_ready" | "blocker_ready" | "blocked";
@@ -254,6 +256,8 @@ export type BuildingEliminationTelemetryEvent =
           blockerId: number | null;
           blockerName: string | null;
           compatibleAttackerCount: number;
+          totalCompatibleAttackerCount?: number;
+          transferCertifiedAttackerCount?: number;
           routeThreatCount: number;
           estimatedBuildingCompletionTicks: number | null;
           estimatedForceSurvivalTicks: number | null;
@@ -338,6 +342,7 @@ export const resolveBuildingEliminationOptions = (
     }
     if (!new Set<BuildingEliminationActivationMode>([
         "forceAdvantage", "lowBuilding", "objectiveRace", "objectiveClearance", "objectiveRouteClearance",
+        "objectiveTransferableRouteClearance",
     ])
         .has(resolved.activationMode)) {
         throw new Error(`Invalid building-elimination activation mode: ${resolved.activationMode}`);
@@ -1178,6 +1183,17 @@ export const rankSweepPoints = (
 export const isPreemptibleBuildingEliminationMission = (name: string): boolean =>
     name.startsWith("attack_") || name.startsWith("retreat-from-attack") || name === "allInAttack";
 
+export const isTransferCertifiedBuildingEliminationMission = (name: string | null): boolean =>
+    name === null || name === BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME ||
+    isPreemptibleBuildingEliminationMission(name);
+
+export const selectTransferCertifiedBuildingEliminationAttackers = (
+    eligibleAttackers: UnitData[],
+    missionNameForUnit: (unitId: number) => string | null,
+): UnitData[] => eligibleAttackers.filter(({ id }) =>
+    isTransferCertifiedBuildingEliminationMission(missionNameForUnit(id)),
+);
+
 const getEnemyUnits = (
     context: SupabotContext,
     observationMode: BuildingEliminationObservationMode,
@@ -1283,7 +1299,8 @@ const isBuildingEliminationCloseoutState = (
     ).length;
     if (
         options.activationMode === "lowBuilding" || options.activationMode === "objectiveRace" ||
-        options.activationMode === "objectiveClearance" || options.activationMode === "objectiveRouteClearance"
+        options.activationMode === "objectiveClearance" || options.activationMode === "objectiveRouteClearance" ||
+        options.activationMode === "objectiveTransferableRouteClearance"
     ) {
         return meetsLowBuildingEliminationActivationGate(
             ownCombatantCount,
@@ -2285,13 +2302,20 @@ export class BuildingEliminationMissionFactory {
         if (
             this.options.activationMode === "objectiveRace" ||
             this.options.activationMode === "objectiveClearance" ||
-            this.options.activationMode === "objectiveRouteClearance"
+            this.options.activationMode === "objectiveRouteClearance" ||
+            this.options.activationMode === "objectiveTransferableRouteClearance"
         ) {
-            const committedAttackers = selectCommittedBuildingAttackers(
+            const totalCommittedAttackers = selectCommittedBuildingAttackers(
                 ownCombatants,
                 context.game.getPlayerData(context.player.name).startLocation,
                 this.options.reserveCombatants,
             );
+            const committedAttackers = this.options.activationMode === "objectiveTransferableRouteClearance"
+                ? selectTransferCertifiedBuildingEliminationAttackers(
+                    totalCommittedAttackers,
+                    (unitId) => missionController.getAssignedMissionName(unitId),
+                )
+                : totalCommittedAttackers;
             const visibleEnemyIds = new Set(context.game.getVisibleUnits(context.player.name, "enemy"));
             const rankedTargets = rankBuildingTargets(
                 enemyBuildings.map((building) => toTargetDescriptor(
@@ -2319,6 +2343,9 @@ export class BuildingEliminationMissionFactory {
             const compatibleAttackers = target && descriptor
                 ? committedAttackers.filter((attacker) => pairIsCompatible(attacker, descriptor))
                 : [];
+            const totalCompatibleAttackerCount = target && descriptor
+                ? totalCommittedAttackers.filter((attacker) => pairIsCompatible(attacker, descriptor)).length
+                : 0;
             const enemyForces = getEnemyUnits(
                 context,
                 this.options.observationMode,
@@ -2337,7 +2364,8 @@ export class BuildingEliminationMissionFactory {
             const blockerReady = decision !== null && decision.blocker !== null && (
                 this.options.activationMode === "objectiveClearance"
                     ? decision.estimatedBlockerRemovalTicks <= decision.estimatedForceSurvivalTicks
-                    : this.options.activationMode === "objectiveRouteClearance" &&
+                    : (this.options.activationMode === "objectiveRouteClearance" ||
+                        this.options.activationMode === "objectiveTransferableRouteClearance") &&
                         decision.estimatedRouteClearanceTicks <= decision.estimatedForceSurvivalTicks
             );
             const activationPhase = !target || compatibleAttackers.length === 0 || decision === null
@@ -2352,13 +2380,17 @@ export class BuildingEliminationMissionFactory {
                 activationPhase,
                 target ?? null,
                 compatibleAttackers.length,
+                totalCompatibleAttackerCount,
+                this.options.activationMode === "objectiveTransferableRouteClearance",
                 decision,
             );
             if (!buildingReady && !blockerReady) {
                 this.emitBlockedTelemetry(
                     context,
-                    this.options.activationMode === "objectiveRouteClearance"
-                        ? "no_viable_route_clearance"
+                    this.options.activationMode === "objectiveTransferableRouteClearance"
+                        ? "no_viable_transferable_route_clearance"
+                        : this.options.activationMode === "objectiveRouteClearance"
+                            ? "no_viable_route_clearance"
                         : this.options.activationMode === "objectiveClearance"
                             ? "no_viable_objective_clearance"
                             : "no_viable_building_race",
@@ -2404,12 +2436,14 @@ export class BuildingEliminationMissionFactory {
         phase: Extract<BuildingEliminationTelemetryEvent, { event: "activation_evaluation" }>["phase"],
         target: UnitData | null,
         compatibleAttackerCount: number,
+        totalCompatibleAttackerCount: number,
+        transferCertified: boolean,
         decision: BuildingEliminationEngagementDecision | null,
     ): void {
         const finiteOrNull = (value: number | undefined): number | null =>
             value !== undefined && Number.isFinite(value) ? value : null;
         const event: Extract<BuildingEliminationTelemetryEvent, { event: "activation_evaluation" }> = {
-            schemaVersion: 7,
+            schemaVersion: transferCertified ? 8 : 7,
             event: "activation_evaluation",
             tick: context.game.getCurrentTick(),
             phase,
@@ -2418,6 +2452,10 @@ export class BuildingEliminationMissionFactory {
             blockerId: decision?.blocker?.id ?? null,
             blockerName: decision?.blocker?.rules.name ?? null,
             compatibleAttackerCount,
+            ...(transferCertified ? {
+                totalCompatibleAttackerCount,
+                transferCertifiedAttackerCount: compatibleAttackerCount,
+            } : {}),
             routeThreatCount: decision?.routeThreatCount ?? 0,
             estimatedBuildingCompletionTicks: finiteOrNull(decision?.estimatedBuildingCompletionTicks),
             estimatedForceSurvivalTicks: finiteOrNull(decision?.estimatedForceSurvivalTicks),

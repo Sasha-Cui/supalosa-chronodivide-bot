@@ -12,6 +12,7 @@ import {
     getBuildingCapabilityUnitMissionAction,
     getBuildingTargetWeight,
     isPreemptibleBuildingEliminationMission,
+    isTransferCertifiedBuildingEliminationMission,
     meetsBuildingEliminationActivationGate,
     meetsLowBuildingEliminationActivationGate,
     meetsObjectiveClearanceBuildingEliminationActivationGate,
@@ -27,6 +28,7 @@ import {
     selectBuildingEliminationReadinessReserveCandidates,
     selectCommittedBuildingAttackers,
     selectCompatibleBuildingTargets,
+    selectTransferCertifiedBuildingEliminationAttackers,
     shouldRunBuildingEliminationCapabilityProduction,
     shouldDirectAttackBuildingTarget,
     summarizeBuildingExecutionDistances,
@@ -405,6 +407,25 @@ describe("building elimination policy", () => {
         expect(isPreemptibleBuildingEliminationMission("allInAttack")).toBe(true);
         expect(isPreemptibleBuildingEliminationMission("defence_12")).toBe(false);
         expect(isPreemptibleBuildingEliminationMission("buildingElimination")).toBe(false);
+    });
+
+    test("transfer certification matches the units the takeover can command", () => {
+        const missionByUnit = new Map<number, string | null>([
+            [1, null],
+            [2, "buildingEliminationReadinessReserve"],
+            [3, "attack_12"],
+            [4, "retreat-from-attack_12"],
+            [5, "allInAttack"],
+            [6, "defence_12"],
+            [7, "scout_12"],
+        ]);
+        const eligible = [...missionByUnit.keys()].map((id) => combatant(id, id)) as any[];
+        expect(selectTransferCertifiedBuildingEliminationAttackers(
+            eligible,
+            (id) => missionByUnit.get(id) ?? null,
+        ).map(({ id }) => id)).toEqual([1, 2, 3, 4, 5]);
+        expect(isTransferCertifiedBuildingEliminationMission("defence_12")).toBe(false);
+        expect(isTransferCertifiedBuildingEliminationMission("scout_12")).toBe(false);
     });
 
     test("adaptive closeout is gated by the same reserve and advantage conditions", () => {
