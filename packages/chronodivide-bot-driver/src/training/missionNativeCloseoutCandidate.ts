@@ -52,12 +52,16 @@ import {
     MissionNativeCloseoutPolicyV12,
     validateMissionNativeCloseoutPolicyV12,
 } from "./missionNativeCloseoutPolicyV12.js";
+import {
+    MissionNativeCloseoutPolicyV13,
+    validateMissionNativeCloseoutPolicyV13,
+} from "./missionNativeCloseoutPolicyV13.js";
 
 type MissionNativePolicy = MissionNativeCloseoutPolicy | MissionNativeCloseoutPolicyV2 |
     MissionNativeCloseoutPolicyV3 | MissionNativeCloseoutPolicyV4 | MissionNativeCloseoutPolicyV5 |
     MissionNativeCloseoutPolicyV6 | MissionNativeCloseoutPolicyV7 | MissionNativeCloseoutPolicyV8 |
     MissionNativeCloseoutPolicyV9 | MissionNativeCloseoutPolicyV10 | MissionNativeCloseoutPolicyV11 |
-    MissionNativeCloseoutPolicyV12;
+    MissionNativeCloseoutPolicyV12 | MissionNativeCloseoutPolicyV13;
 
 type StrategyLike = {
     onAiUpdate(context: any, missionController: any, logger: any): StrategyLike;
@@ -103,6 +107,9 @@ class MissionNativeCloseoutStrategy implements StrategyLike {
                 : false,
             routeCorridorRadius: "routeCorridorRadius" in policy ? policy.routeCorridorRadius : 8,
             readinessReserve: "readinessReserve" in policy ? policy.readinessReserve : false,
+            readinessReserveScope: "readinessReserveScope" in policy
+                ? policy.readinessReserveScope
+                : "reinforcements",
         }, telemetrySink);
     }
 
@@ -121,9 +128,11 @@ export const createMissionNativeCloseoutCandidate = (
     rawPolicy: MissionNativePolicy,
     telemetrySink: BuildingEliminationTelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 12
-        ? validateMissionNativeCloseoutPolicyV12(rawPolicy)
-        : rawPolicy.schemaVersion === 11
+    const policy = rawPolicy.schemaVersion === 13
+        ? validateMissionNativeCloseoutPolicyV13(rawPolicy)
+        : rawPolicy.schemaVersion === 12
+            ? validateMissionNativeCloseoutPolicyV12(rawPolicy)
+            : rawPolicy.schemaVersion === 11
             ? validateMissionNativeCloseoutPolicyV11(rawPolicy)
             : rawPolicy.schemaVersion === 10
             ? validateMissionNativeCloseoutPolicyV10(rawPolicy)

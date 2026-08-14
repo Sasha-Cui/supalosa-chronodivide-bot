@@ -29,6 +29,7 @@ import {
     selectBuildingEliminationReadinessReserveCandidates,
     selectCommittedBuildingAttackers,
     selectCompatibleBuildingTargets,
+    selectStagedBuildingEliminationAttackers,
     selectTransferCertifiedBuildingEliminationAttackers,
     shouldRunBuildingEliminationCapabilityProduction,
     shouldDirectAttackBuildingTarget,
@@ -429,6 +430,24 @@ describe("building elimination policy", () => {
         expect(isTransferCertifiedBuildingEliminationMission("scout_12")).toBe(false);
     });
 
+    test("staged readiness counts only units already owned by assembly", () => {
+        const missionByUnit = new Map<number, string | null>([
+            [1, null],
+            [2, "buildingEliminationReadinessReserve"],
+            [3, "attack_12"],
+            [4, "buildingEliminationReadinessReserve"],
+        ]);
+        const eligible = [...missionByUnit.keys()].map((id) => combatant(id, id)) as any[];
+        expect(selectStagedBuildingEliminationAttackers(
+            eligible,
+            (id) => missionByUnit.get(id) ?? null,
+        ).map(({ id }) => id)).toEqual([2, 4]);
+        expect(selectBuildingEliminationReadinessReserveCandidates(
+            eligible,
+            new Set(),
+        ).map(({ id }) => id)).toEqual([1, 2, 3, 4]);
+    });
+
     test("mission ownership supports native and pinned legacy controllers", () => {
         const native = {
             getAssignedMissionName: (id: number) => id === 1 ? "attack_12" : null,
@@ -800,6 +819,7 @@ describe("building elimination policy", () => {
             "commitRouteBlocker",
             "routeCorridorRadius",
             "readinessReserve",
+            "readinessReserveScope",
         ]);
     });
 
@@ -823,6 +843,9 @@ describe("building elimination policy", () => {
         );
         expect(() => resolveBuildingEliminationOptions({ readinessReserve: "yes" as any })).toThrow(
             "readiness reserve",
+        );
+        expect(() => resolveBuildingEliminationOptions({ readinessReserveScope: "unknown" as any })).toThrow(
+            "readiness reserve scope",
         );
     });
 });

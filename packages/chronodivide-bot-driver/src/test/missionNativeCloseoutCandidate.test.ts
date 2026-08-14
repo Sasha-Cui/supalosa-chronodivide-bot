@@ -7,6 +7,7 @@ import { buildMissionNativeCloseoutPolicyV3 } from "../training/missionNativeClo
 import { buildMissionNativeCloseoutPolicyV4 } from "../training/missionNativeCloseoutPolicyV4.js";
 import { buildMissionNativeCloseoutPolicyV5 } from "../training/missionNativeCloseoutPolicyV5.js";
 import { buildMissionNativeCloseoutPolicyV12 } from "../training/missionNativeCloseoutPolicyV12.js";
+import { buildMissionNativeCloseoutPolicyV13 } from "../training/missionNativeCloseoutPolicyV13.js";
 
 describe("mission-native closeout candidate", () => {
     it("returns the exact external baseline path when disabled", () => {
@@ -144,6 +145,25 @@ describe("mission-native closeout candidate", () => {
             "candidate",
             Countries.USA,
             buildMissionNativeCloseoutPolicyV12(),
+        )).toBe(injected);
+        expect(factory.createWithStrategy).toHaveBeenCalledOnce();
+    });
+
+    it("accepts the frozen mission-owned-assembly v13 policy", () => {
+        const injected = { kind: "injected-v13" } as any;
+        let inner: any;
+        inner = { onAiUpdate: vi.fn(() => inner) };
+        const factory = {
+            descriptor: { kind: "external-package", packageRoot: "/baseline" },
+            create: vi.fn(),
+            createDefaultStrategy: vi.fn(() => inner),
+            createWithStrategy: vi.fn(() => injected),
+        } as any;
+        expect(createMissionNativeCloseoutCandidate(
+            factory,
+            "candidate",
+            Countries.USA,
+            buildMissionNativeCloseoutPolicyV13(),
         )).toBe(injected);
         expect(factory.createWithStrategy).toHaveBeenCalledOnce();
     });
