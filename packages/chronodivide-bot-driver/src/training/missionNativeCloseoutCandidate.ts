@@ -104,6 +104,10 @@ import {
     MissionNativeCloseoutPolicyV25,
     validateMissionNativeCloseoutPolicyV25,
 } from "./missionNativeCloseoutPolicyV25.js";
+import {
+    MissionNativeCloseoutPolicyV26,
+    validateMissionNativeCloseoutPolicyV26,
+} from "./missionNativeCloseoutPolicyV26.js";
 
 type MissionNativePolicy = MissionNativeCloseoutPolicy | MissionNativeCloseoutPolicyV2 |
     MissionNativeCloseoutPolicyV3 | MissionNativeCloseoutPolicyV4 | MissionNativeCloseoutPolicyV5 |
@@ -113,7 +117,7 @@ type MissionNativePolicy = MissionNativeCloseoutPolicy | MissionNativeCloseoutPo
     MissionNativeCloseoutPolicyV15 | MissionNativeCloseoutPolicyV16 | MissionNativeCloseoutPolicyV17 |
     MissionNativeCloseoutPolicyV18 | MissionNativeCloseoutPolicyV19 | MissionNativeCloseoutPolicyV20 |
     MissionNativeCloseoutPolicyV21 | MissionNativeCloseoutPolicyV22 | MissionNativeCloseoutPolicyV23 |
-    MissionNativeCloseoutPolicyV24 | MissionNativeCloseoutPolicyV25;
+    MissionNativeCloseoutPolicyV24 | MissionNativeCloseoutPolicyV25 | MissionNativeCloseoutPolicyV26;
 
 type StrategyLike = {
     onAiUpdate(context: any, missionController: any, logger: any): StrategyLike;
@@ -183,6 +187,14 @@ class MissionNativeCloseoutStrategy implements StrategyLike {
                 "requireGroundAssaultCapabilityForActivation" in policy
                     ? policy.requireGroundAssaultCapabilityForActivation
                     : false,
+            queueAwareGroundAssaultTargets:
+                "queueAwareGroundAssaultTargets" in policy
+                    ? policy.queueAwareGroundAssaultTargets
+                    : false,
+            positiveProgressBlockerLaunch:
+                "positiveProgressBlockerLaunch" in policy
+                    ? policy.positiveProgressBlockerLaunch
+                    : false,
             adaptiveGroundAssaultInfrastructurePriority:
                 "adaptiveGroundAssaultInfrastructurePriority" in policy
                     ? policy.adaptiveGroundAssaultInfrastructurePriority
@@ -224,7 +236,9 @@ export const createMissionNativeCloseoutCandidate = (
     rawPolicy: MissionNativePolicy,
     telemetrySink: BuildingEliminationTelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 25
+    const policy = rawPolicy.schemaVersion === 26
+        ? validateMissionNativeCloseoutPolicyV26(rawPolicy)
+        : rawPolicy.schemaVersion === 25
         ? validateMissionNativeCloseoutPolicyV25(rawPolicy)
         : rawPolicy.schemaVersion === 24
         ? validateMissionNativeCloseoutPolicyV24(rawPolicy)
