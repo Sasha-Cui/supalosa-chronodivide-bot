@@ -930,6 +930,8 @@ describe("building elimination policy", () => {
             "positiveProgressBlockerLaunch",
             "persistentCloseoutActivationScope",
             "requireTransferredGroundAssaultCapabilityForActivation",
+            "objectiveFeasibilityOverridesGroundAssaultCapability",
+            "preterminalRequiresRouteFeasibleLaunch",
             "adaptiveGroundAssaultInfrastructurePriority",
             "adaptiveProductionPriority",
             "adaptiveTechPriority",
