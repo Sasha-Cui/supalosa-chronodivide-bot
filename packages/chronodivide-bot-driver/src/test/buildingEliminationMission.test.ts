@@ -14,7 +14,9 @@ import {
     getBuildingCapabilityProductionPlan,
     getBuildingCapabilityUnitMissionAction,
     getBuildingEliminationAssaultProductionAction,
+    getBuildingEliminationAssaultProductionRequests,
     getBuildingEliminationGroundAssaultUnitName,
+    getBuildingEliminationGroundAssaultScreenUnitName,
     getBuildingEliminationGroundAssaultStructureName,
     getBuildingTargetWeight,
     getAssignedBuildingEliminationMissionName,
@@ -911,6 +913,7 @@ describe("building elimination policy", () => {
             "adaptiveGroundAssaultInfrastructure",
             "adaptiveGroundAssaultProductionReservation",
             "adaptiveGroundAssaultProductionScopeLatch",
+            "adaptiveGroundAssaultScreenTargetCount",
             "adaptiveGroundAssaultInfrastructurePriority",
             "adaptiveProductionPriority",
             "adaptiveTechPriority",
@@ -942,6 +945,9 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({
             adaptiveGroundAssaultInfrastructurePriority: 0,
         })).toThrow("adaptiveGroundAssaultInfrastructurePriority");
+        expect(() => resolveBuildingEliminationOptions({
+            adaptiveGroundAssaultScreenTargetCount: -1,
+        })).toThrow("adaptiveGroundAssaultScreenTargetCount");
         expect(() => resolveBuildingEliminationOptions({ activationMode: "unknown" as any })).toThrow(
             "activation mode",
         );
@@ -1015,5 +1021,19 @@ describe("building elimination policy", () => {
         expect(selectBuildingEliminationReadinessDefense(
             [staged], [factory], [nearFactory], 0,
         )).toBeNull();
+    });
+
+    test("screen production starts only after the first side-correct main tank", () => {
+        expect(getBuildingEliminationGroundAssaultScreenUnitName(SideType.GDI)).toBe("E1");
+        expect(getBuildingEliminationGroundAssaultScreenUnitName(SideType.Nod)).toBe("E2");
+        expect(getBuildingEliminationAssaultProductionRequests(
+            "HTNK", 0, 4, "E2", 0, 4, 140,
+        )).toEqual({ HTNK: 140 });
+        expect(getBuildingEliminationAssaultProductionRequests(
+            "HTNK", 1, 4, "E2", 2, 4, 140,
+        )).toEqual({ HTNK: 140, E2: 140 });
+        expect(getBuildingEliminationAssaultProductionRequests(
+            "HTNK", 1, 4, "E2", 4, 4, 140,
+        )).toEqual({ HTNK: 140 });
     });
 });

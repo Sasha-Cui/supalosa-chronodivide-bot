@@ -63,6 +63,7 @@ export type BuildingEliminationOptions = {
     adaptiveGroundAssaultInfrastructure?: boolean;
     adaptiveGroundAssaultProductionReservation?: boolean;
     adaptiveGroundAssaultProductionScopeLatch?: boolean;
+    adaptiveGroundAssaultScreenTargetCount?: number;
     adaptiveGroundAssaultInfrastructurePriority?: number;
     adaptiveProductionPriority?: number;
     adaptiveTechPriority?: number;
@@ -345,6 +346,17 @@ export type BuildingEliminationTelemetryEvent =
           stagedAttackerCount: number;
       }
     | {
+          schemaVersion: 17;
+          event: "assault_screen_production";
+          tick: number;
+          side: SideType.Nod | SideType.GDI;
+          unitName: "E1" | "E2";
+          targetCount: number;
+          currentCount: number;
+          mainTankPresent: boolean;
+          requested: boolean;
+      }
+    | {
           schemaVersion: 10;
           event: "launch_handoff";
           tick: number;
@@ -387,6 +399,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     adaptiveGroundAssaultInfrastructure: false,
     adaptiveGroundAssaultProductionReservation: false,
     adaptiveGroundAssaultProductionScopeLatch: false,
+    adaptiveGroundAssaultScreenTargetCount: 0,
     adaptiveGroundAssaultInfrastructurePriority: 130,
     adaptiveProductionPriority: 140,
     adaptiveTechPriority: 130,
@@ -427,6 +440,7 @@ export const resolveBuildingEliminationOptions = (
     requireIntegerInRange("adaptiveAirTargetCount", resolved.adaptiveAirTargetCount, 0, 100);
     requireIntegerInRange("adaptiveNavalTargetCount", resolved.adaptiveNavalTargetCount, 0, 100);
     requireIntegerInRange("adaptiveGroundAssaultTargetCount", resolved.adaptiveGroundAssaultTargetCount, 0, 100);
+    requireIntegerInRange("adaptiveGroundAssaultScreenTargetCount", resolved.adaptiveGroundAssaultScreenTargetCount, 0, 100);
     requireIntegerInRange(
         "adaptiveGroundAssaultInfrastructurePriority",
         resolved.adaptiveGroundAssaultInfrastructurePriority,
@@ -2254,6 +2268,25 @@ export const getBuildingEliminationGroundAssaultStructureName = (
     side: SideType.Nod | SideType.GDI,
 ): "NAWEAP" | "GAWEAP" => side === SideType.Nod ? "NAWEAP" : "GAWEAP";
 
+export const getBuildingEliminationGroundAssaultScreenUnitName = (
+    side: SideType.Nod | SideType.GDI,
+): "E2" | "E1" => side === SideType.Nod ? "E2" : "E1";
+
+export const getBuildingEliminationAssaultProductionRequests = (
+    unitName: "HTNK" | "MTNK",
+    currentCount: number,
+    targetCount: number,
+    screenUnitName: "E1" | "E2",
+    currentScreenCount: number,
+    screenTargetCount: number,
+    priority: number,
+): Record<string, number> => ({
+    ...(currentCount < targetCount ? { [unitName]: priority } : {}),
+    ...(currentCount >= 1 && currentScreenCount < screenTargetCount
+        ? { [screenUnitName]: priority }
+        : {}),
+});
+
 export type BuildingEliminationProductionReservationQueueItem = {
     queue: QueueType;
     name: string;
@@ -2388,6 +2421,8 @@ class BuildingEliminationAssaultBuildMission extends Mission {
 class BuildingEliminationAssaultProductionMission extends Mission {
     private lastTelemetrySignature = "";
     private lastTelemetryAt = Number.NEGATIVE_INFINITY;
+    private lastScreenTelemetrySignature = "";
+    private lastScreenTelemetryAt = Number.NEGATIVE_INFINITY;
 
     constructor(
         private options: Required<BuildingEliminationOptions>,
@@ -2408,6 +2443,8 @@ class BuildingEliminationAssaultProductionMission extends Mission {
         )) return noop();
         const unitName = getBuildingEliminationGroundAssaultUnitName(side);
         const currentCount = countOwnVisibleUnits(context, unitName);
+        const screenUnitName = getBuildingEliminationGroundAssaultScreenUnitName(side);
+        const currentScreenCount = countOwnVisibleUnits(context, screenUnitName);
         const requested = currentCount < this.options.adaptiveGroundAssaultTargetCount;
         const available = context.player.production.getAvailableObjects(QueueType.Vehicles)
             .some(({ name }) => name === unitName);
@@ -2423,13 +2460,26 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             vehicleQueue.status,
             vehicleQueue.items.map(({ rules, quantity }) => ({ name: rules.name, quantity })),
         );
-        return getBuildingEliminationAssaultProductionAction(
-            [],
+        const screenRequested = currentCount >= 1 &&
+            currentScreenCount < this.options.adaptiveGroundAssaultScreenTargetCount;
+        this.emitScreenTelemetry(
+            context.game.getCurrentTick(),
+            side,
+            screenUnitName,
+            currentScreenCount,
+            currentCount >= 1,
+            screenRequested,
+        );
+        const requests = getBuildingEliminationAssaultProductionRequests(
             unitName,
             currentCount,
             this.options.adaptiveGroundAssaultTargetCount,
+            screenUnitName,
+            currentScreenCount,
+            this.options.adaptiveGroundAssaultScreenTargetCount,
             this.options.adaptiveProductionPriority,
         );
+        return Object.keys(requests).length > 0 ? requestUnits(requests) : noop();
     }
 
     getGlobalDebugText(): string | undefined {
@@ -2475,6 +2525,34 @@ class BuildingEliminationAssaultProductionMission extends Mission {
         }
         this.lastTelemetrySignature = signature;
         this.lastTelemetryAt = tick;
+        this.telemetrySink(event);
+    }
+
+    private emitScreenTelemetry(
+        tick: number,
+        side: SideType.Nod | SideType.GDI,
+        unitName: "E1" | "E2",
+        currentCount: number,
+        mainTankPresent: boolean,
+        requested: boolean,
+    ): void {
+        if (this.options.adaptiveGroundAssaultScreenTargetCount <= 0) return;
+        const event: Extract<BuildingEliminationTelemetryEvent, { event: "assault_screen_production" }> = {
+            schemaVersion: 17,
+            event: "assault_screen_production",
+            tick,
+            side,
+            unitName,
+            targetCount: this.options.adaptiveGroundAssaultScreenTargetCount,
+            currentCount,
+            mainTankPresent,
+            requested,
+        };
+        const signature = JSON.stringify({ ...event, tick: 0 });
+        if (signature === this.lastScreenTelemetrySignature &&
+            tick < this.lastScreenTelemetryAt + TELEMETRY_HEARTBEAT_TICKS) return;
+        this.lastScreenTelemetrySignature = signature;
+        this.lastScreenTelemetryAt = tick;
         this.telemetrySink(event);
     }
 }
@@ -3225,7 +3303,10 @@ export class BuildingEliminationMissionFactory {
         const currentTankCount = countOwnVisibleUnits(context, unitName);
         if (currentTankCount >= this.options.adaptiveGroundAssaultTargetCount) return;
 
-        const retainedNames = new Set([structureName, unitName]);
+        const retainedNames = new Set<string>([structureName, unitName]);
+        if (currentTankCount >= 1 && this.options.adaptiveGroundAssaultScreenTargetCount > 0) {
+            retainedNames.add(getBuildingEliminationGroundAssaultScreenUnitName(side));
+        }
         const queueTypes = [
             QueueType.Structures,
             QueueType.Armory,
