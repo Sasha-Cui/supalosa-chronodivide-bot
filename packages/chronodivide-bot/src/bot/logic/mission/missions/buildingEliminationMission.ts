@@ -3368,7 +3368,7 @@ export class BuildingEliminationMissionFactory {
             const blockerReady = capabilityReady && (
                 conventionalBlockerReady || progressiveBlockerReady || attritionalBlockerReady
             );
-            if (progressiveBlockerReady && target && decision?.blocker) {
+            if (capabilityReady && progressiveBlockerReady && target && decision?.blocker) {
                 this.telemetrySink({
                     schemaVersion: 18,
                     event: "progressive_blocker_launch",
@@ -3385,7 +3385,7 @@ export class BuildingEliminationMissionFactory {
                     estimatedForceSurvivalTicks: decision.estimatedForceSurvivalTicks,
                 });
             }
-            if (attritionalBlockerReady && target && decision?.blocker) {
+            if (capabilityReady && attritionalBlockerReady && target && decision?.blocker) {
                 this.telemetrySink({
                     schemaVersion: 20,
                     event: "attritional_blocker_launch",
