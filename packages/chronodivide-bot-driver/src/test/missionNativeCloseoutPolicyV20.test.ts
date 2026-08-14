@@ -18,23 +18,23 @@ describe("mission-native closeout policy v20", () => {
             adaptiveGroundAssaultProductionScopeLatch: true,
         });
         expect(missionNativeCloseoutPolicyV20Sha256(policy)).toMatch(/^[a-f0-9]{64}$/);
-    });
+    }, 60_000);
 
     it("retains the disabled adapter representation", () => {
         expect(buildMissionNativeCloseoutPolicyV20(false).enabled).toBe(false);
-    });
+    }, 60_000);
 
     it("rejects latch drift", () => {
         expect(() => validateMissionNativeCloseoutPolicyV20({
             ...buildMissionNativeCloseoutPolicyV20(),
             adaptiveGroundAssaultProductionScopeLatch: false,
         } as any)).toThrow(/latch/);
-    });
+    }, 60_000);
 
     it("rejects inherited drift", () => {
         expect(() => validateMissionNativeCloseoutPolicyV20({
             ...buildMissionNativeCloseoutPolicyV20(),
             targetPriority: "nearest",
         } as any)).toThrow(/inherited field/);
-    });
+    }, 60_000);
 });

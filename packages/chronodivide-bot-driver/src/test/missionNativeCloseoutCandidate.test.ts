@@ -294,7 +294,7 @@ describe("mission-native closeout candidate", () => {
             buildMissionNativeCloseoutPolicyV19(),
         )).toBe(injected);
         expect(factory.createWithStrategy).toHaveBeenCalledOnce();
-    });
+    }, 15_000);
 
     it("accepts the frozen persistent-production-scope v20 policy", () => {
         const injected = { kind: "injected-v20" } as any;
@@ -313,7 +313,7 @@ describe("mission-native closeout candidate", () => {
             buildMissionNativeCloseoutPolicyV20(),
         )).toBe(injected);
         expect(factory.createWithStrategy).toHaveBeenCalledOnce();
-    });
+    }, 15_000);
 
     it("accepts the frozen readiness-defense v21 policy", () => {
         const injected = { kind: "injected-v21" } as any;

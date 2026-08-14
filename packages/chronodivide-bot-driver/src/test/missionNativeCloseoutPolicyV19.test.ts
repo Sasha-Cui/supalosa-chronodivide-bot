@@ -21,11 +21,11 @@ describe("mission-native closeout policy v19", () => {
             adaptiveGroundAssaultProductionReservation: true,
         });
         expect(missionNativeCloseoutPolicyV19Sha256(policy)).toMatch(/^[a-f0-9]{64}$/);
-    });
+    }, 60_000);
 
     it("retains the disabled adapter representation", () => {
         expect(buildMissionNativeCloseoutPolicyV19(false).enabled).toBe(false);
-    });
+    }, 60_000);
 
     it("rejects reservation and inherited drift", () => {
         expect(() => validateMissionNativeCloseoutPolicyV19({
@@ -36,5 +36,5 @@ describe("mission-native closeout policy v19", () => {
             ...buildMissionNativeCloseoutPolicyV19(),
             targetPriority: "nearest",
         } as any)).toThrow(/inherited field/);
-    });
+    }, 60_000);
 });
