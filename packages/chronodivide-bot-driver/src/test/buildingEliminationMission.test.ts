@@ -1,5 +1,5 @@
 import { describe, expect, test, vi } from "vitest";
-import { AttackState, FactoryType, ObjectType, SideType, SpeedType } from "@chronodivide/game-api";
+import { AttackState, FactoryType, ObjectType, QueueType, SideType, SpeedType } from "@chronodivide/game-api";
 import {
     assignAttackersToTargets,
     assignAttackersToCompatibleTargets,
@@ -27,6 +27,7 @@ import {
     meetsObjectiveRouteClearanceBuildingEliminationActivationGate,
     mergeCurrentAndRememberedBuildingTargets,
     prioritizeStalledBuildingTargets,
+    planBuildingEliminationProductionReservation,
     rankBuildingTargets,
     rankSweepPoints,
     reconcileRememberedBuildingTargets,
@@ -906,6 +907,7 @@ describe("building elimination policy", () => {
             "adaptiveNavalTargetCount",
             "adaptiveGroundAssaultTargetCount",
             "adaptiveGroundAssaultInfrastructure",
+            "adaptiveGroundAssaultProductionReservation",
             "adaptiveGroundAssaultInfrastructurePriority",
             "adaptiveProductionPriority",
             "adaptiveTechPriority",
@@ -951,5 +953,28 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({ contactOnlyBlockerClearance: "yes" as any })).toThrow(
             "contact-only blocker clearance",
         );
+        expect(() => resolveBuildingEliminationOptions({
+            adaptiveGroundAssaultProductionReservation: "yes" as any,
+        })).toThrow("production reservation");
+    });
+
+    test("terminal production reservation retains only the side-correct factory and tank", () => {
+        const plan = planBuildingEliminationProductionReservation(
+            ["E1", "GAWEAP", "MTNK", "HARV", "GAPOWR"],
+            [
+                { queue: QueueType.Infantry, name: "E1", quantity: 2 },
+                { queue: QueueType.Structures, name: "GAWEAP", quantity: 1 },
+                { queue: QueueType.Vehicles, name: "HARV", quantity: 1 },
+                { queue: QueueType.Vehicles, name: "MTNK", quantity: 1 },
+            ],
+            new Set(["GAWEAP", "MTNK"]),
+        );
+        expect(plan).toEqual({
+            removedRequestNames: ["E1", "GAPOWR", "HARV"],
+            canceledQueueItems: [
+                { queue: QueueType.Infantry, name: "E1", quantity: 2 },
+                { queue: QueueType.Vehicles, name: "HARV", quantity: 1 },
+            ],
+        });
     });
 });

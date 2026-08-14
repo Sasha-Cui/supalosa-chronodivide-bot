@@ -61,6 +61,7 @@ export type BuildingEliminationOptions = {
     adaptiveNavalTargetCount?: number;
     adaptiveGroundAssaultTargetCount?: number;
     adaptiveGroundAssaultInfrastructure?: boolean;
+    adaptiveGroundAssaultProductionReservation?: boolean;
     adaptiveGroundAssaultInfrastructurePriority?: number;
     adaptiveProductionPriority?: number;
     adaptiveTechPriority?: number;
@@ -320,6 +321,17 @@ export type BuildingEliminationTelemetryEvent =
           requested: boolean;
       }
     | {
+          schemaVersion: 15;
+          event: "assault_production_reservation";
+          tick: number;
+          side: SideType.Nod | SideType.GDI;
+          currentTankCount: number;
+          targetTankCount: number;
+          retainedNames: string[];
+          removedRequestNames: string[];
+          canceledQueueItems: Array<{ queue: QueueType; name: string; quantity: number }>;
+      }
+    | {
           schemaVersion: 10;
           event: "launch_handoff";
           tick: number;
@@ -360,6 +372,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     adaptiveNavalTargetCount: 0,
     adaptiveGroundAssaultTargetCount: 0,
     adaptiveGroundAssaultInfrastructure: false,
+    adaptiveGroundAssaultProductionReservation: false,
     adaptiveGroundAssaultInfrastructurePriority: 130,
     adaptiveProductionPriority: 140,
     adaptiveTechPriority: 130,
@@ -449,6 +462,12 @@ export const resolveBuildingEliminationOptions = (
     if (typeof resolved.adaptiveGroundAssaultInfrastructure !== "boolean") {
         throw new Error(
             `Invalid building-elimination ground-assault infrastructure: ${resolved.adaptiveGroundAssaultInfrastructure}`,
+        );
+    }
+    if (typeof resolved.adaptiveGroundAssaultProductionReservation !== "boolean") {
+        throw new Error(
+            "Invalid building-elimination ground-assault production reservation: " +
+            `${resolved.adaptiveGroundAssaultProductionReservation}`,
         );
     }
     return resolved;
@@ -2207,6 +2226,39 @@ export const getBuildingEliminationGroundAssaultStructureName = (
     side: SideType.Nod | SideType.GDI,
 ): "NAWEAP" | "GAWEAP" => side === SideType.Nod ? "NAWEAP" : "GAWEAP";
 
+export type BuildingEliminationProductionReservationQueueItem = {
+    queue: QueueType;
+    name: string;
+    quantity: number;
+};
+
+export type BuildingEliminationProductionReservationPlan = {
+    removedRequestNames: string[];
+    canceledQueueItems: BuildingEliminationProductionReservationQueueItem[];
+};
+
+/**
+ * Produces the deterministic, public-interface-only mutation plan used by the
+ * terminal production reservation. Keeping selection pure makes it possible
+ * to verify that side-specific factory/tank requests are never removed while
+ * every unrelated production claim is suppressed.
+ */
+export const planBuildingEliminationProductionReservation = (
+    requestedNames: Iterable<string>,
+    queueItems: readonly BuildingEliminationProductionReservationQueueItem[],
+    retainedNames: ReadonlySet<string>,
+): BuildingEliminationProductionReservationPlan => ({
+    removedRequestNames: [...requestedNames]
+        .filter((name) => !retainedNames.has(name))
+        .sort((left, right) => left.localeCompare(right)),
+    canceledQueueItems: queueItems
+        .filter(({ name }) => !retainedNames.has(name))
+        .map((item) => ({ ...item }))
+        .sort((left, right) =>
+            left.queue - right.queue || left.name.localeCompare(right.name) || left.quantity - right.quantity,
+        ),
+});
+
 export const getBuildingEliminationAssaultProductionAction = (
     assignedUnitIds: number[],
     unitName: "HTNK" | "MTNK",
@@ -2637,6 +2689,8 @@ export class BuildingEliminationMissionFactory {
     private lastBlockedTelemetryAt = Number.NEGATIVE_INFINITY;
     private lastActivationEvaluationSignature = "";
     private lastActivationEvaluationAt = Number.NEGATIVE_INFINITY;
+    private lastProductionReservationTelemetrySignature = "";
+    private lastProductionReservationTelemetryAt = Number.NEGATIVE_INFINITY;
     private stalledBuildingIds = new Set<number>();
     private capabilityGapCache: BuildingCapabilityGapCache;
     private closeoutLatch: BuildingEliminationCloseoutLatch = { activated: false };
@@ -2663,6 +2717,7 @@ export class BuildingEliminationMissionFactory {
             return;
         }
         this.maybeCreateCapabilityMissions(missionController, logger);
+        this.applyGroundAssaultProductionReservation(context, missionController);
         const existing = missionController
             .getMissions()
             .find((mission) => mission.getUniqueName() === BUILDING_ELIMINATION_MISSION_NAME);
@@ -3050,6 +3105,83 @@ export class BuildingEliminationMissionFactory {
                 ),
             );
         }
+    }
+
+    private applyGroundAssaultProductionReservation(
+        context: SupabotContext,
+        missionController: MissionController,
+    ): void {
+        if (!this.options.adaptiveGroundAssaultProductionReservation) return;
+        const side = getPlayerSide(context);
+        if (side === null) return;
+        if (!shouldRunBuildingEliminationCapabilityProduction(
+            this.closeoutLatch.activated,
+            isBuildingEliminationCloseoutState(context, this.options),
+        )) return;
+
+        const unitName = getBuildingEliminationGroundAssaultUnitName(side);
+        const structureName = getBuildingEliminationGroundAssaultStructureName(side);
+        const currentTankCount = countOwnVisibleUnits(context, unitName);
+        if (currentTankCount >= this.options.adaptiveGroundAssaultTargetCount) return;
+
+        const retainedNames = new Set([structureName, unitName]);
+        const queueTypes = [
+            QueueType.Structures,
+            QueueType.Armory,
+            QueueType.Infantry,
+            QueueType.Vehicles,
+            QueueType.Aircrafts,
+            QueueType.Ships,
+        ];
+        const queueItems = queueTypes.flatMap((queue) =>
+            context.player.production.getQueueData(queue).items.map(({ rules, quantity }) => ({
+                queue,
+                name: rules.name,
+                quantity,
+            })),
+        );
+        const requestedUnitTypes = missionController.getRequestedUnitTypes();
+        const plan = planBuildingEliminationProductionReservation(
+            requestedUnitTypes.keys(),
+            queueItems,
+            retainedNames,
+        );
+        plan.removedRequestNames.forEach((name) => requestedUnitTypes.delete(name));
+        for (const item of plan.canceledQueueItems) {
+            const queued = context.player.production.getQueueData(item.queue).items.find(
+                ({ rules }) => rules.name === item.name,
+            );
+            if (!queued) continue;
+            context.player.actions.unqueueFromProduction(
+                item.queue,
+                queued.rules.name,
+                queued.rules.type,
+                item.quantity,
+            );
+        }
+
+        const event: Extract<
+            BuildingEliminationTelemetryEvent,
+            { event: "assault_production_reservation" }
+        > = {
+            schemaVersion: 15,
+            event: "assault_production_reservation",
+            tick: context.game.getCurrentTick(),
+            side,
+            currentTankCount,
+            targetTankCount: this.options.adaptiveGroundAssaultTargetCount,
+            retainedNames: [...retainedNames].sort((left, right) => left.localeCompare(right)),
+            removedRequestNames: plan.removedRequestNames,
+            canceledQueueItems: plan.canceledQueueItems,
+        };
+        const signature = JSON.stringify({ ...event, tick: 0 });
+        if (
+            signature === this.lastProductionReservationTelemetrySignature &&
+            event.tick < this.lastProductionReservationTelemetryAt + TELEMETRY_HEARTBEAT_TICKS
+        ) return;
+        this.lastProductionReservationTelemetrySignature = signature;
+        this.lastProductionReservationTelemetryAt = event.tick;
+        this.telemetrySink(event);
     }
 
     private emitBlockedTelemetry(
