@@ -63,6 +63,7 @@ const validTelemetry = (): BuildingEliminationTelemetryEvent[] => [
         estimatedBuildingCompletionTicks: 100,
         estimatedForceSurvivalTicks: 5,
         estimatedBlockerRemovalTicks: 10,
+        estimatedRouteClearanceTicks: 80,
     },
     {
         schemaVersion: 6,
@@ -105,6 +106,7 @@ const validTelemetry = (): BuildingEliminationTelemetryEvent[] => [
         estimatedBuildingCompletionTicks: 100,
         estimatedForceSurvivalTicks: 50,
         estimatedBlockerRemovalTicks: 10,
+        estimatedRouteClearanceTicks: 40,
     },
     {
         schemaVersion: 6,

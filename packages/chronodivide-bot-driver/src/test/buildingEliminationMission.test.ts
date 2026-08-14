@@ -16,6 +16,7 @@ import {
     meetsLowBuildingEliminationActivationGate,
     meetsObjectiveClearanceBuildingEliminationActivationGate,
     meetsObjectiveRaceBuildingEliminationActivationGate,
+    meetsObjectiveRouteClearanceBuildingEliminationActivationGate,
     mergeCurrentAndRememberedBuildingTargets,
     prioritizeStalledBuildingTargets,
     rankBuildingTargets,
@@ -487,6 +488,50 @@ describe("building elimination policy", () => {
             decision.estimatedForceSurvivalTicks,
         );
         expect(meetsObjectiveClearanceBuildingEliminationActivationGate(
+            attackers,
+            fortifiedBuilding,
+            threats,
+            8,
+        )).toBe(true);
+    });
+
+    test("route-clearance takeover rejects a force that can remove only the first blocker", () => {
+        const attackers = Array.from({ length: 25 }, (_, index) =>
+            combatant(index + 1, 0, index % 2, 500, 100, 1, 30),
+        ) as any[];
+        const threats = Array.from({ length: 100 }, (_, index) =>
+            combatant(100 + index, 5 + index % 3, index % 2, 500, 100, 5, 30),
+        ) as any[];
+        const fortifiedBuilding = buildingUnit(300, 20, 100_000) as any;
+        const decision = chooseBuildingEliminationEngagement(attackers, fortifiedBuilding, threats, 8);
+        expect(decision.estimatedBlockerRemovalTicks).toBeLessThanOrEqual(
+            decision.estimatedForceSurvivalTicks,
+        );
+        expect(decision.estimatedRouteClearanceTicks).toBeGreaterThan(
+            decision.estimatedForceSurvivalTicks,
+        );
+        expect(meetsObjectiveRouteClearanceBuildingEliminationActivationGate(
+            attackers,
+            fortifiedBuilding,
+            threats,
+            8,
+        )).toBe(false);
+    });
+
+    test("route-clearance takeover launches when the full threat set can be removed before destruction", () => {
+        const attackers = Array.from({ length: 25 }, (_, index) =>
+            combatant(index + 1, 0, index % 2, 500, 100, 1, 30),
+        ) as any[];
+        const threats = Array.from({ length: 5 }, (_, index) =>
+            combatant(100 + index, 5 + index % 3, index % 2, 500, 100, 5, 30),
+        ) as any[];
+        const fortifiedBuilding = buildingUnit(300, 20, 100_000) as any;
+        const decision = chooseBuildingEliminationEngagement(attackers, fortifiedBuilding, threats, 8);
+        expect(decision.blocker).not.toBeNull();
+        expect(decision.estimatedRouteClearanceTicks).toBeLessThanOrEqual(
+            decision.estimatedForceSurvivalTicks,
+        );
+        expect(meetsObjectiveRouteClearanceBuildingEliminationActivationGate(
             attackers,
             fortifiedBuilding,
             threats,
