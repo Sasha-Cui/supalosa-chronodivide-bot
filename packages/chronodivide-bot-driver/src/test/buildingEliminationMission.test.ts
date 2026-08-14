@@ -24,6 +24,7 @@ import {
     isPreemptibleBuildingEliminationMission,
     isTransferCertifiedBuildingEliminationMission,
     meetsBuildingEliminationActivationGate,
+    meetsGroundAssaultCapabilityActivationGate,
     meetsProgressiveBuildingEliminationBlockerLaunchGate,
     meetsLowBuildingEliminationActivationGate,
     meetsObjectiveClearanceBuildingEliminationActivationGate,
@@ -39,6 +40,7 @@ import {
     selectAvailableCapabilityStructures,
     selectBuildingEliminationReadinessReserveCandidates,
     selectBuildingEliminationReadinessDefense,
+    selectBuildingEliminationRouteThreatCandidates,
     selectCommittedBuildingAttackers,
     selectCompatibleBuildingTargets,
     selectStagedBuildingEliminationAttackers,
@@ -919,6 +921,7 @@ describe("building elimination policy", () => {
             "adaptiveGroundAssaultScreenFactoryTrigger",
             "adaptiveGroundAssaultReadinessForceOwnership",
             "progressiveRouteBlockerLaunch",
+            "requireGroundAssaultCapabilityForActivation",
             "adaptiveGroundAssaultInfrastructurePriority",
             "adaptiveProductionPriority",
             "adaptiveTechPriority",
@@ -986,6 +989,9 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({
             progressiveRouteBlockerLaunch: "yes" as any,
         })).toThrow("progressive route-blocker launch");
+        expect(() => resolveBuildingEliminationOptions({
+            requireGroundAssaultCapabilityForActivation: "yes" as any,
+        })).toThrow("activation capability");
     });
 
     test("terminal production reservation retains only the side-correct factory and tank", () => {
@@ -1081,5 +1087,37 @@ describe("building elimination policy", () => {
         expect(meetsProgressiveBuildingEliminationBlockerLaunchGate(true, 1, 0, 2, 30)).toBe(false);
         expect(meetsProgressiveBuildingEliminationBlockerLaunchGate(true, 1, 1, 31, 30)).toBe(false);
         expect(meetsProgressiveBuildingEliminationBlockerLaunchGate(false, 1, 1, 2, 30)).toBe(false);
+    });
+
+    test("V25 rejects infantry-only activation until the readiness force owns combined arms", () => {
+        expect(meetsGroundAssaultCapabilityActivationGate(true, 0, 10)).toBe(false);
+        expect(meetsGroundAssaultCapabilityActivationGate(true, 1, 0)).toBe(false);
+        expect(meetsGroundAssaultCapabilityActivationGate(true, 1, 1)).toBe(true);
+        expect(meetsGroundAssaultCapabilityActivationGate(false, 0, 0)).toBe(true);
+    });
+
+    test("V25 treats an armed defensive building as a route threat but ignores harmless structures", () => {
+        const attacker = combatant(1, 0, 0, 100, 10, 1, 30) as any;
+        const armed = {
+            ...buildingUnit(100, 5, 100),
+            primaryWeapon: ordinaryWeapon(500, 5, 1),
+        } as any;
+        const harmless = buildingUnit(101, 6, 100) as any;
+        const candidates = selectBuildingEliminationRouteThreatCandidates(
+            [harmless, armed],
+            [attacker],
+        );
+        expect(candidates).toEqual([armed]);
+        expect(chooseBuildingEliminationEngagement(
+            [attacker],
+            buildingUnit(200, 20, 1_000) as any,
+            candidates,
+            8,
+        )).toMatchObject({
+            blocker: armed,
+            reason: "route_interception_wins",
+            routeThreatCount: 1,
+            staticRouteThreatCount: 1,
+        });
     });
 });
