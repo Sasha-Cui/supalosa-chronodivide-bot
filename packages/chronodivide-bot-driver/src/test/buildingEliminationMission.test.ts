@@ -932,6 +932,7 @@ describe("building elimination policy", () => {
             "requireTransferredGroundAssaultCapabilityForActivation",
             "objectiveFeasibilityOverridesGroundAssaultCapability",
             "preterminalRequiresRouteFeasibleLaunch",
+            "preterminalObjectiveFeasibilityRequiresTransferredCapability",
             "adaptiveGroundAssaultInfrastructurePriority",
             "adaptiveProductionPriority",
             "adaptiveTechPriority",

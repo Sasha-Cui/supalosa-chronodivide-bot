@@ -37,6 +37,7 @@ const arbitrate = (overrides: Partial<Parameters<typeof arbitrateBuildingElimina
         positiveProgressBlockerLaunch: true,
         objectiveFeasibilityOverridesGroundAssaultCapability: true,
         preterminalRequiresRouteFeasibleLaunch: true,
+        preterminalObjectiveFeasibilityRequiresTransferredCapability: false,
         ...overrides,
     });
 
@@ -106,6 +107,80 @@ describe("mission-native closeout activation arbitration", () => {
             transferredCapabilityReady: true,
             compositionReady: false,
             blockerReady: false,
+        });
+    });
+
+    it("keeps a preterminal direct infantry wave under predecessor control", () => {
+        const result = arbitrate({
+            decision: decision({ blocker: null, reason: "building_completion_race" }),
+            assaultTankCount: 0,
+            assaultScreenCount: 8,
+            preterminalObjectiveFeasibilityRequiresTransferredCapability: true,
+        });
+        expect(result).toMatchObject({
+            directObjectiveFeasible: true,
+            compositionReady: false,
+            objectiveFeasibilityBypassesComposition: false,
+            buildingReady: false,
+        });
+    });
+
+    it("keeps a preterminal complete-route infantry wave under predecessor control", () => {
+        const result = arbitrate({
+            decision: decision({ estimatedRouteClearanceTicks: 80 }),
+            assaultTankCount: 0,
+            assaultScreenCount: 8,
+            preterminalObjectiveFeasibilityRequiresTransferredCapability: true,
+        });
+        expect(result).toMatchObject({
+            completeRouteFeasible: true,
+            compositionReady: false,
+            objectiveFeasibilityBypassesComposition: false,
+            blockerReady: false,
+        });
+    });
+
+    it("launches a preterminal objective on the actual transferred combined-arms set", () => {
+        const result = arbitrate({
+            decision: decision({ blocker: null, reason: "building_completion_race" }),
+            readinessTankCount: 0,
+            readinessScreenCount: 0,
+            assaultTankCount: 1,
+            assaultScreenCount: 3,
+            preterminalObjectiveFeasibilityRequiresTransferredCapability: true,
+        });
+        expect(result).toMatchObject({
+            directObjectiveFeasible: true,
+            compositionReady: true,
+            objectiveFeasibilityBypassesComposition: false,
+            buildingReady: true,
+        });
+    });
+
+    it("preserves the literal-objective override for a final building", () => {
+        const direct = arbitrate({
+            decision: decision({ blocker: null, reason: "building_completion_race" }),
+            enemyBuildingCount: 1,
+            assaultTankCount: 0,
+            assaultScreenCount: 8,
+            preterminalObjectiveFeasibilityRequiresTransferredCapability: true,
+        });
+        const route = arbitrate({
+            decision: decision({ estimatedRouteClearanceTicks: 80 }),
+            enemyBuildingCount: 1,
+            assaultTankCount: 0,
+            assaultScreenCount: 8,
+            preterminalObjectiveFeasibilityRequiresTransferredCapability: true,
+        });
+        expect(direct).toMatchObject({
+            compositionReady: false,
+            objectiveFeasibilityBypassesComposition: true,
+            buildingReady: true,
+        });
+        expect(route).toMatchObject({
+            compositionReady: false,
+            objectiveFeasibilityBypassesComposition: true,
+            blockerReady: true,
         });
     });
 });
