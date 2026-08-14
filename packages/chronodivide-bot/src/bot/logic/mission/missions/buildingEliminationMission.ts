@@ -68,6 +68,8 @@ export type BuildingEliminationOptions = {
     adaptiveGroundAssaultReadinessForceOwnership?: boolean;
     progressiveRouteBlockerLaunch?: boolean;
     requireGroundAssaultCapabilityForActivation?: boolean;
+    queueAwareGroundAssaultTargets?: boolean;
+    positiveProgressBlockerLaunch?: boolean;
     adaptiveGroundAssaultInfrastructurePriority?: number;
     adaptiveProductionPriority?: number;
     adaptiveTechPriority?: number;
@@ -295,6 +297,8 @@ export type BuildingEliminationTelemetryEvent =
           credits?: number;
           vehicleQueueStatus?: number;
           vehicleQueueItems?: Array<{ name: string; quantity: number }>;
+          queuedCount?: number;
+          queueAwareTargeting?: boolean;
       }
     | {
           schemaVersion: 12;
@@ -363,6 +367,8 @@ export type BuildingEliminationTelemetryEvent =
           factoryTriggerActive?: boolean;
           readinessOwned?: boolean;
           readinessTankCount?: number;
+          queuedCount?: number;
+          queueAwareTargeting?: boolean;
       }
     | {
           schemaVersion: 18;
@@ -383,7 +389,8 @@ export type BuildingEliminationTelemetryEvent =
           schemaVersion: 19;
           event: "assault_capability_launch";
           tick: number;
-          launchMode: "direct_building" | "progressive_blocker" | "conventional_blocker";
+          launchMode: "direct_building" | "progressive_blocker" | "conventional_blocker" |
+              "attritional_blocker";
           targetId: number;
           targetName: string;
           blockerId: number | null;
@@ -396,6 +403,23 @@ export type BuildingEliminationTelemetryEvent =
           estimatedBuildingCompletionTicks: number | null;
           estimatedBlockerRemovalTicks: number | null;
           estimatedForceSurvivalTicks: number | null;
+      }
+    | {
+          schemaVersion: 20;
+          event: "attritional_blocker_launch";
+          tick: number;
+          targetId: number;
+          targetName: string;
+          blockerId: number;
+          blockerName: string;
+          blockerIsStatic: boolean;
+          compatibleAttackerCount: number;
+          readinessTankCount: number;
+          readinessScreenCount: number;
+          estimatedBlockerApproachTicks: number;
+          estimatedBlockerRemovalTicks: number;
+          estimatedRouteClearanceTicks: number | null;
+          estimatedForceSurvivalTicks: number;
       }
     | {
           schemaVersion: 10;
@@ -445,6 +469,8 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     adaptiveGroundAssaultReadinessForceOwnership: false,
     progressiveRouteBlockerLaunch: false,
     requireGroundAssaultCapabilityForActivation: false,
+    queueAwareGroundAssaultTargets: false,
+    positiveProgressBlockerLaunch: false,
     adaptiveGroundAssaultInfrastructurePriority: 130,
     adaptiveProductionPriority: 140,
     adaptiveTechPriority: 130,
@@ -572,6 +598,16 @@ export const resolveBuildingEliminationOptions = (
         throw new Error(
             "Invalid building-elimination ground-assault activation capability: " +
             `${resolved.requireGroundAssaultCapabilityForActivation}`,
+        );
+    }
+    if (typeof resolved.queueAwareGroundAssaultTargets !== "boolean") {
+        throw new Error(
+            `Invalid building-elimination queue-aware ground-assault targets: ${resolved.queueAwareGroundAssaultTargets}`,
+        );
+    }
+    if (typeof resolved.positiveProgressBlockerLaunch !== "boolean") {
+        throw new Error(
+            `Invalid building-elimination positive-progress blocker launch: ${resolved.positiveProgressBlockerLaunch}`,
         );
     }
     return resolved;
@@ -887,6 +923,7 @@ export type BuildingEliminationEngagementDecision = {
     estimatedBuildingCompletionTicks: number;
     estimatedForceSurvivalTicks: number;
     earliestRouteThreatInterceptTicks: number;
+    estimatedBlockerApproachTicks: number;
     estimatedBlockerRemovalTicks: number;
     estimatedRouteClearanceTicks: number;
 };
@@ -1014,6 +1051,7 @@ export const chooseBuildingEliminationEngagement = (
         estimatedBuildingCompletionTicks,
         estimatedForceSurvivalTicks,
         earliestRouteThreatInterceptTicks,
+        estimatedBlockerApproachTicks: blockerApproachTicks,
         estimatedBlockerRemovalTicks,
         estimatedRouteClearanceTicks,
     };
@@ -1025,6 +1063,7 @@ export const chooseBuildingEliminationEngagement = (
         estimatedBuildingCompletionTicks,
         estimatedForceSurvivalTicks,
         earliestRouteThreatInterceptTicks,
+        estimatedBlockerApproachTicks: blockerApproachTicks,
         estimatedBlockerRemovalTicks,
         estimatedRouteClearanceTicks,
     };
@@ -1036,6 +1075,7 @@ export const chooseBuildingEliminationEngagement = (
         estimatedBuildingCompletionTicks,
         estimatedForceSurvivalTicks,
         earliestRouteThreatInterceptTicks,
+        estimatedBlockerApproachTicks: blockerApproachTicks,
         estimatedBlockerRemovalTicks,
         estimatedRouteClearanceTicks,
     };
@@ -1047,6 +1087,7 @@ export const chooseBuildingEliminationEngagement = (
         estimatedBuildingCompletionTicks,
         estimatedForceSurvivalTicks,
         earliestRouteThreatInterceptTicks,
+        estimatedBlockerApproachTicks: blockerApproachTicks,
         estimatedBlockerRemovalTicks,
         estimatedRouteClearanceTicks,
     };
@@ -1665,6 +1706,20 @@ export const meetsProgressiveBuildingEliminationBlockerLaunchGate = (
     Number.isFinite(estimatedBlockerRemovalTicks) && estimatedBlockerRemovalTicks >= 0 &&
     Number.isFinite(estimatedForceSurvivalTicks) && estimatedForceSurvivalTicks >= 0 &&
     estimatedBlockerRemovalTicks <= estimatedForceSurvivalTicks;
+
+export const meetsPositiveProgressBuildingEliminationBlockerLaunchGate = (
+    enabled: boolean,
+    readinessTankCount: number,
+    readinessScreenCount: number,
+    estimatedBlockerApproachTicks: number,
+    estimatedBlockerRemovalTicks: number,
+    estimatedForceSurvivalTicks: number,
+): boolean => enabled && readinessTankCount >= 1 && readinessScreenCount >= 1 &&
+    Number.isFinite(estimatedBlockerApproachTicks) && estimatedBlockerApproachTicks >= 0 &&
+    Number.isFinite(estimatedBlockerRemovalTicks) &&
+    estimatedBlockerRemovalTicks > estimatedBlockerApproachTicks &&
+    Number.isFinite(estimatedForceSurvivalTicks) &&
+    estimatedForceSurvivalTicks > estimatedBlockerApproachTicks;
 
 type BuildingEliminationCloseoutLatch = {
     activated: boolean;
@@ -2395,12 +2450,28 @@ export const getBuildingEliminationAssaultProductionRequests = (
     screenTargetCount: number,
     priority: number,
     screenTriggerActive = currentCount >= 1,
+    queuedUnitCount = 0,
+    queuedScreenCount = 0,
 ): Record<string, number> => ({
-    ...(currentCount < targetCount ? { [unitName]: priority } : {}),
-    ...(screenTriggerActive && currentScreenCount < screenTargetCount
+    ...(currentCount + queuedUnitCount < targetCount ? { [unitName]: priority } : {}),
+    ...(screenTriggerActive && currentScreenCount + queuedScreenCount < screenTargetCount
         ? { [screenUnitName]: priority }
         : {}),
 });
+
+export const getSaturatedGroundAssaultRequestNames = (
+    unitName: "HTNK" | "MTNK",
+    currentCount: number,
+    queuedUnitCount: number,
+    targetCount: number,
+    screenUnitName: "E1" | "E2",
+    currentScreenCount: number,
+    queuedScreenCount: number,
+    screenTargetCount: number,
+): string[] => [
+    ...(currentCount + queuedUnitCount >= targetCount ? [unitName] : []),
+    ...(currentScreenCount + queuedScreenCount >= screenTargetCount ? [screenUnitName] : []),
+].sort((left, right) => left.localeCompare(right));
 
 export type BuildingEliminationProductionReservationQueueItem = {
     queue: QueueType;
@@ -2566,10 +2637,17 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             ? this.closeoutLatch.readinessScreenCount
             : countOwnVisibleUnits(context, screenUnitName);
         const screenTriggerActive = factoryTriggeredScreen ? factoryCount >= 1 : currentCount >= 1;
-        const requested = currentCount < this.options.adaptiveGroundAssaultTargetCount;
         const available = context.player.production.getAvailableObjects(QueueType.Vehicles)
             .some(({ name }) => name === unitName);
         const vehicleQueue = context.player.production.getQueueData(QueueType.Vehicles);
+        const infantryQueue = context.player.production.getQueueData(QueueType.Infantry);
+        const queuedUnitCount = this.options.queueAwareGroundAssaultTargets
+            ? vehicleQueue.items.find(({ rules }) => rules.name === unitName)?.quantity ?? 0
+            : 0;
+        const queuedScreenCount = this.options.queueAwareGroundAssaultTargets
+            ? infantryQueue.items.find(({ rules }) => rules.name === screenUnitName)?.quantity ?? 0
+            : 0;
+        const requested = currentCount + queuedUnitCount < this.options.adaptiveGroundAssaultTargetCount;
         this.emitTelemetry(
             context.game.getCurrentTick(),
             side,
@@ -2580,9 +2658,11 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             context.game.getPlayerData(context.player.name).credits,
             vehicleQueue.status,
             vehicleQueue.items.map(({ rules, quantity }) => ({ name: rules.name, quantity })),
+            queuedUnitCount,
+            this.options.queueAwareGroundAssaultTargets,
         );
         const screenRequested = screenTriggerActive &&
-            currentScreenCount < this.options.adaptiveGroundAssaultScreenTargetCount;
+            currentScreenCount + queuedScreenCount < this.options.adaptiveGroundAssaultScreenTargetCount;
         this.emitScreenTelemetry(
             context.game.getCurrentTick(),
             side,
@@ -2596,6 +2676,8 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             this.options.adaptiveGroundAssaultReadinessForceOwnership
                 ? this.closeoutLatch.readinessTankCount
                 : undefined,
+            this.options.queueAwareGroundAssaultTargets ? queuedScreenCount : undefined,
+            this.options.queueAwareGroundAssaultTargets ? true : undefined,
         );
         const requests = getBuildingEliminationAssaultProductionRequests(
             unitName,
@@ -2606,6 +2688,8 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             this.options.adaptiveGroundAssaultScreenTargetCount,
             this.options.adaptiveProductionPriority,
             screenTriggerActive,
+            queuedUnitCount,
+            queuedScreenCount,
         );
         return Object.keys(requests).length > 0 ? requestUnits(requests) : noop();
     }
@@ -2632,6 +2716,8 @@ class BuildingEliminationAssaultProductionMission extends Mission {
         credits: number,
         vehicleQueueStatus: number,
         vehicleQueueItems: Array<{ name: string; quantity: number }>,
+        queuedCount: number,
+        queueAwareTargeting: boolean,
     ): void {
         const event: Extract<BuildingEliminationTelemetryEvent, { event: "assault_production" }> = {
             schemaVersion: 14,
@@ -2646,6 +2732,7 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             credits,
             vehicleQueueStatus,
             vehicleQueueItems,
+            ...(queueAwareTargeting ? { queuedCount, queueAwareTargeting } : {}),
         };
         const signature = JSON.stringify({ ...event, tick: 0 });
         if (signature === this.lastTelemetrySignature && tick < this.lastTelemetryAt + TELEMETRY_HEARTBEAT_TICKS) {
@@ -2667,6 +2754,8 @@ class BuildingEliminationAssaultProductionMission extends Mission {
         factoryTriggerActive?: boolean,
         readinessOwned?: boolean,
         readinessTankCount?: number,
+        queuedCount?: number,
+        queueAwareTargeting?: boolean,
     ): void {
         if (this.options.adaptiveGroundAssaultScreenTargetCount <= 0) return;
         const event: Extract<BuildingEliminationTelemetryEvent, { event: "assault_screen_production" }> = {
@@ -2683,6 +2772,8 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             ...(factoryTriggerActive === undefined ? {} : { factoryTriggerActive }),
             ...(readinessOwned === undefined ? {} : { readinessOwned }),
             ...(readinessTankCount === undefined ? {} : { readinessTankCount }),
+            ...(queuedCount === undefined ? {} : { queuedCount }),
+            ...(queueAwareTargeting === undefined ? {} : { queueAwareTargeting }),
         };
         const signature = JSON.stringify({ ...event, tick: 0 });
         if (signature === this.lastScreenTelemetrySignature &&
@@ -3195,7 +3286,19 @@ export class BuildingEliminationMissionFactory {
                     decision.estimatedBlockerRemovalTicks,
                     decision.estimatedForceSurvivalTicks,
                 );
-            const blockerReady = capabilityReady && (conventionalBlockerReady || progressiveBlockerReady);
+            const attritionalBlockerReady = decision !== null && decision.blocker !== null &&
+                !conventionalBlockerReady && !progressiveBlockerReady &&
+                meetsPositiveProgressBuildingEliminationBlockerLaunchGate(
+                    this.options.positiveProgressBlockerLaunch,
+                    this.closeoutLatch.readinessTankCount,
+                    this.closeoutLatch.readinessScreenCount,
+                    decision.estimatedBlockerApproachTicks,
+                    decision.estimatedBlockerRemovalTicks,
+                    decision.estimatedForceSurvivalTicks,
+                );
+            const blockerReady = capabilityReady && (
+                conventionalBlockerReady || progressiveBlockerReady || attritionalBlockerReady
+            );
             if (progressiveBlockerReady && target && decision?.blocker) {
                 this.telemetrySink({
                     schemaVersion: 18,
@@ -3210,6 +3313,27 @@ export class BuildingEliminationMissionFactory {
                     readinessScreenCount: this.closeoutLatch.readinessScreenCount,
                     estimatedBlockerRemovalTicks: decision.estimatedBlockerRemovalTicks,
                     estimatedRouteClearanceTicks: decision.estimatedRouteClearanceTicks,
+                    estimatedForceSurvivalTicks: decision.estimatedForceSurvivalTicks,
+                });
+            }
+            if (attritionalBlockerReady && target && decision?.blocker) {
+                this.telemetrySink({
+                    schemaVersion: 20,
+                    event: "attritional_blocker_launch",
+                    tick: context.game.getCurrentTick(),
+                    targetId: target.id,
+                    targetName: target.rules.name,
+                    blockerId: decision.blocker.id,
+                    blockerName: decision.blocker.rules.name,
+                    blockerIsStatic: decision.blocker.rules.type === ObjectType.Building,
+                    compatibleAttackerCount: compatibleAttackers.length,
+                    readinessTankCount: this.closeoutLatch.readinessTankCount,
+                    readinessScreenCount: this.closeoutLatch.readinessScreenCount,
+                    estimatedBlockerApproachTicks: decision.estimatedBlockerApproachTicks,
+                    estimatedBlockerRemovalTicks: decision.estimatedBlockerRemovalTicks,
+                    estimatedRouteClearanceTicks: Number.isFinite(decision.estimatedRouteClearanceTicks)
+                        ? decision.estimatedRouteClearanceTicks
+                        : null,
                     estimatedForceSurvivalTicks: decision.estimatedForceSurvivalTicks,
                 });
             }
@@ -3233,6 +3357,8 @@ export class BuildingEliminationMissionFactory {
                         ? "direct_building"
                         : progressiveBlockerReady
                             ? "progressive_blocker"
+                            : attritionalBlockerReady
+                                ? "attritional_blocker"
                             : "conventional_blocker",
                     targetId: target.id,
                     targetName: target.rules.name,
@@ -3524,7 +3650,8 @@ export class BuildingEliminationMissionFactory {
                 ? this.closeoutLatch.readinessScreenCount
                 : countOwnVisibleUnits(context, getBuildingEliminationGroundAssaultScreenUnitName(side))) <
                     this.options.adaptiveGroundAssaultScreenTargetCount;
-        if (currentTankCount >= this.options.adaptiveGroundAssaultTargetCount &&
+        if (!this.options.queueAwareGroundAssaultTargets &&
+            currentTankCount >= this.options.adaptiveGroundAssaultTargetCount &&
             (!factoryTriggeredScreen || !needsScreen)) return;
 
         const retainedNames = new Set<string>([structureName, unitName]);
@@ -3547,6 +3674,25 @@ export class BuildingEliminationMissionFactory {
             })),
         );
         const requestedUnitTypes = missionController.getRequestedUnitTypes();
+        if (this.options.queueAwareGroundAssaultTargets) {
+            const screenUnitName = getBuildingEliminationGroundAssaultScreenUnitName(side);
+            const queuedTankCount = queueItems
+                .find(({ queue, name }) => queue === QueueType.Vehicles && name === unitName)?.quantity ?? 0;
+            const queuedScreenCount = queueItems
+                .find(({ queue, name }) => queue === QueueType.Infantry && name === screenUnitName)?.quantity ?? 0;
+            getSaturatedGroundAssaultRequestNames(
+                unitName,
+                currentTankCount,
+                queuedTankCount,
+                this.options.adaptiveGroundAssaultTargetCount,
+                screenUnitName,
+                factoryTriggeredScreen
+                    ? this.closeoutLatch.readinessScreenCount
+                    : countOwnVisibleUnits(context, screenUnitName),
+                queuedScreenCount,
+                this.options.adaptiveGroundAssaultScreenTargetCount,
+            ).forEach((name) => requestedUnitTypes.delete(name));
+        }
         const plan = planBuildingEliminationProductionReservation(
             requestedUnitTypes.keys(),
             queueItems,

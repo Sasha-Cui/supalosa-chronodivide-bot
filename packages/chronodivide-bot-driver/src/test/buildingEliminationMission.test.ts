@@ -19,12 +19,14 @@ import {
     getBuildingEliminationGroundAssaultScreenUnitName,
     getBuildingEliminationGroundAssaultStructureName,
     getBuildingEliminationReadinessMissionName,
+    getSaturatedGroundAssaultRequestNames,
     getBuildingTargetWeight,
     getAssignedBuildingEliminationMissionName,
     isPreemptibleBuildingEliminationMission,
     isTransferCertifiedBuildingEliminationMission,
     meetsBuildingEliminationActivationGate,
     meetsGroundAssaultCapabilityActivationGate,
+    meetsPositiveProgressBuildingEliminationBlockerLaunchGate,
     meetsProgressiveBuildingEliminationBlockerLaunchGate,
     meetsLowBuildingEliminationActivationGate,
     meetsObjectiveClearanceBuildingEliminationActivationGate,
@@ -922,6 +924,8 @@ describe("building elimination policy", () => {
             "adaptiveGroundAssaultReadinessForceOwnership",
             "progressiveRouteBlockerLaunch",
             "requireGroundAssaultCapabilityForActivation",
+            "queueAwareGroundAssaultTargets",
+            "positiveProgressBlockerLaunch",
             "adaptiveGroundAssaultInfrastructurePriority",
             "adaptiveProductionPriority",
             "adaptiveTechPriority",
@@ -992,6 +996,12 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({
             requireGroundAssaultCapabilityForActivation: "yes" as any,
         })).toThrow("activation capability");
+        expect(() => resolveBuildingEliminationOptions({
+            queueAwareGroundAssaultTargets: "yes" as any,
+        })).toThrow("queue-aware");
+        expect(() => resolveBuildingEliminationOptions({
+            positiveProgressBlockerLaunch: "yes" as any,
+        })).toThrow("positive-progress");
     });
 
     test("terminal production reservation retains only the side-correct factory and tank", () => {
@@ -1069,6 +1079,18 @@ describe("building elimination policy", () => {
         )).toEqual({ MTNK: 140 });
     });
 
+    test("queue-aware targets do not refresh already-covered tank and screen requests", () => {
+        expect(getBuildingEliminationAssaultProductionRequests(
+            "HTNK", 0, 4, "E2", 3, 4, 140, true, 1, 1,
+        )).toEqual({ HTNK: 140 });
+        expect(getBuildingEliminationAssaultProductionRequests(
+            "HTNK", 3, 4, "E2", 3, 4, 140, true, 1, 1,
+        )).toEqual({});
+        expect(getSaturatedGroundAssaultRequestNames(
+            "HTNK", 3, 1, 4, "E2", 3, 1, 4,
+        )).toEqual(["E2", "HTNK"]);
+    });
+
     test("V24 uses a distinct force-owning readiness mission", () => {
         expect(getBuildingEliminationReadinessMissionName(false)).toBe(
             "buildingEliminationReadinessReserve",
@@ -1119,5 +1141,23 @@ describe("building elimination policy", () => {
             routeThreatCount: 1,
             staticRouteThreatCount: 1,
         });
+    });
+
+    test("V26 launches only when a combined-arms wave can reach and damage the relevant blocker", () => {
+        expect(meetsPositiveProgressBuildingEliminationBlockerLaunchGate(
+            true, 1, 1, 20, 80, 30,
+        )).toBe(true);
+        expect(meetsPositiveProgressBuildingEliminationBlockerLaunchGate(
+            true, 1, 1, 30, 80, 30,
+        )).toBe(false);
+        expect(meetsPositiveProgressBuildingEliminationBlockerLaunchGate(
+            true, 0, 4, 20, 80, 30,
+        )).toBe(false);
+        expect(meetsPositiveProgressBuildingEliminationBlockerLaunchGate(
+            true, 1, 1, 20, Number.POSITIVE_INFINITY, 30,
+        )).toBe(false);
+        expect(meetsPositiveProgressBuildingEliminationBlockerLaunchGate(
+            false, 1, 1, 20, 80, 30,
+        )).toBe(false);
     });
 });
