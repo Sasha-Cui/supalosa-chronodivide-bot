@@ -11,6 +11,7 @@ import {
     getBuildingCapabilityProductionPlan,
     getBuildingCapabilityUnitMissionAction,
     getBuildingTargetWeight,
+    getAssignedBuildingEliminationMissionName,
     isPreemptibleBuildingEliminationMission,
     isTransferCertifiedBuildingEliminationMission,
     meetsBuildingEliminationActivationGate,
@@ -426,6 +427,26 @@ describe("building elimination policy", () => {
         ).map(({ id }) => id)).toEqual([1, 2, 3, 4, 5]);
         expect(isTransferCertifiedBuildingEliminationMission("defence_12")).toBe(false);
         expect(isTransferCertifiedBuildingEliminationMission("scout_12")).toBe(false);
+    });
+
+    test("mission ownership supports native and pinned legacy controllers", () => {
+        const native = {
+            getAssignedMissionName: (id: number) => id === 1 ? "attack_12" : null,
+            getMissions: () => [],
+        };
+        expect(getAssignedBuildingEliminationMissionName(native, 1)).toBe("attack_12");
+        expect(getAssignedBuildingEliminationMissionName(native, 2)).toBeNull();
+
+        const mission = (name: string, unitIds: number[]) => ({
+            getUniqueName: () => name,
+            getUnitIds: () => unitIds,
+        });
+        const legacy = { getMissions: () => [mission("attack_12", [1, 2])] };
+        expect(getAssignedBuildingEliminationMissionName(legacy, 1)).toBe("attack_12");
+        expect(getAssignedBuildingEliminationMissionName(legacy, 3)).toBeNull();
+        expect(() => getAssignedBuildingEliminationMissionName({
+            getMissions: () => [mission("attack_12", [1]), mission("defence_12", [1])],
+        }, 1)).toThrow(/multiple missions/);
     });
 
     test("adaptive closeout is gated by the same reserve and advantage conditions", () => {

@@ -1187,6 +1187,30 @@ export const isTransferCertifiedBuildingEliminationMission = (name: string | nul
     name === null || name === BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME ||
     isPreemptibleBuildingEliminationMission(name);
 
+export type BuildingEliminationMissionOwnershipView = {
+    getAssignedMissionName?: (unitId: number) => string | null;
+    getMissions: () => Array<{
+        getUniqueName: () => string;
+        getUnitIds: () => number[];
+    }>;
+};
+
+export const getAssignedBuildingEliminationMissionName = (
+    missionController: BuildingEliminationMissionOwnershipView,
+    unitId: number,
+): string | null => {
+    if (typeof missionController.getAssignedMissionName === "function") {
+        return missionController.getAssignedMissionName(unitId);
+    }
+    const owners = missionController.getMissions().filter((mission) =>
+        mission.getUnitIds().includes(unitId),
+    );
+    if (owners.length > 1) {
+        throw new Error(`Unit ${unitId} is claimed by multiple missions`);
+    }
+    return owners[0]?.getUniqueName() ?? null;
+};
+
 export const selectTransferCertifiedBuildingEliminationAttackers = (
     eligibleAttackers: UnitData[],
     missionNameForUnit: (unitId: number) => string | null,
@@ -2313,7 +2337,7 @@ export class BuildingEliminationMissionFactory {
             const committedAttackers = this.options.activationMode === "objectiveTransferableRouteClearance"
                 ? selectTransferCertifiedBuildingEliminationAttackers(
                     totalCommittedAttackers,
-                    (unitId) => missionController.getAssignedMissionName(unitId),
+                    (unitId) => getAssignedBuildingEliminationMissionName(missionController, unitId),
                 )
                 : totalCommittedAttackers;
             const visibleEnemyIds = new Set(context.game.getVisibleUnits(context.player.name, "enemy"));
