@@ -66,6 +66,41 @@ describe("persistent objective outcome-blind compatibility gate", () => {
         )).toThrow(/locked mission/);
     });
 
+    it("accepts one selected combatant from three compatible locked offensive combatants", () => {
+        const base = decision().unitDiagnostics[0];
+        const row = decision({
+            selectedAttackerIds: [1],
+            unitDiagnostics: [1, 2, 3].map((id) => ({
+                ...base,
+                id,
+                missionName: "attack_1.1",
+                missionLocked: true,
+                selected: id === 1,
+            })),
+        });
+        expect(() => validatePersistentObjectiveCompatibilityExposure(
+            [row], Countries.USA, 0,
+        )).not.toThrow();
+    });
+
+    it("rejects taking more than one third of a compatible locked offensive mission", () => {
+        const base = decision().unitDiagnostics[0];
+        const row = decision({
+            selectedAttackerIds: [1, 2],
+            selectedAttackerRulesNames: ["MTNK", "MTNK"],
+            unitDiagnostics: [1, 2, 3].map((id) => ({
+                ...base,
+                id,
+                missionName: "attack_1.1",
+                missionLocked: true,
+                selected: id !== 3,
+            })),
+        });
+        expect(() => validatePersistentObjectiveCompatibilityExposure(
+            [row], Countries.USA, 0,
+        )).toThrow(/fraction exceeded/);
+    });
+
     it("rejects a policy label without a next-cycle movement or attack response", () => {
         const row = decision({
             unitDiagnostics: [{ ...decision().unitDiagnostics[0], currentAction: "idle" }],
@@ -96,6 +131,9 @@ describe("persistent objective outcome-blind compatibility gate", () => {
                     compatibleObservations: 1,
                     selectedObservations: 1,
                     selectedActionCounts: { moving: 1 },
+                    missionNameCounts: {},
+                    selectedMissionNameCounts: {},
+                    lockedMissionNameCounts: {},
                 },
             },
         });
