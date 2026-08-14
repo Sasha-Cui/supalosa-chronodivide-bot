@@ -43,6 +43,10 @@ import {
     PersistentObjectiveCompletionPolicyV8,
     validatePersistentObjectiveCompletionPolicyV8,
 } from "./persistentObjectiveCompletionPolicyV8.js";
+import {
+    PersistentObjectiveCompletionPolicyV9,
+    validatePersistentObjectiveCompletionPolicyV9,
+} from "./persistentObjectiveCompletionPolicyV9.js";
 
 type PersistentObjectivePolicy = PersistentObjectiveCompletionPolicy |
     PersistentObjectiveCompletionPolicyV2 |
@@ -51,7 +55,8 @@ type PersistentObjectivePolicy = PersistentObjectiveCompletionPolicy |
     PersistentObjectiveCompletionPolicyV5 |
     PersistentObjectiveCompletionPolicyV6 |
     PersistentObjectiveCompletionPolicyV7 |
-    PersistentObjectiveCompletionPolicyV8;
+    PersistentObjectiveCompletionPolicyV8 |
+    PersistentObjectiveCompletionPolicyV9;
 
 type Point = { x: number; y: number };
 type Logger = (message: string, sayInGame?: boolean) => void;
@@ -308,7 +313,7 @@ const isLeaseSourceEligible = (
         policy.schemaVersion === 6 || policy.schemaVersion === 7 ||
         policy.schemaVersion === 8 || policy.schemaVersion === 9 ||
         policy.schemaVersion === 10 || policy.schemaVersion === 11 ||
-        policy.schemaVersion === 12
+        policy.schemaVersion === 12 || policy.schemaVersion === 13
     ) {
         return !assignment || isObjectiveOffensiveMissionName(assignment.missionName);
     }
@@ -561,7 +566,8 @@ const completeMissionOpportunity = (
     mine: readonly UnitData[],
     forces: readonly UnitData[],
     target: UnitData,
-    policy: PersistentObjectiveCompletionPolicyV7 | PersistentObjectiveCompletionPolicyV8,
+    policy: PersistentObjectiveCompletionPolicyV7 | PersistentObjectiveCompletionPolicyV8 |
+        PersistentObjectiveCompletionPolicyV9,
     assignments: ReadonlyMap<number, ObjectiveMissionAssignment>,
     protectedHomeIds: ReadonlySet<number>,
     ownStart: Point,
@@ -722,7 +728,11 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
             this.temporarilyAvoidedTargetId = null;
         }
         if (!target) {
-            if ((this.policy.schemaVersion === 11 || this.policy.schemaVersion === 12) && !terminal) {
+            if (
+                (this.policy.schemaVersion === 11 || this.policy.schemaVersion === 12 ||
+                    this.policy.schemaVersion === 13) &&
+                !terminal
+            ) {
                 const policy = this.policy;
                 const protectedForRanking = new Set(homeThreatenedBuildings.flatMap((building) => mine
                     .filter((unit) => distance(point(unit), point(building)) <= policy.homeReserveRadius)
@@ -746,7 +756,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
                             Number(left.target.rules.factory !== FactoryType.None) ||
                         left.target.id - right.target.id,
                     );
-                const preferred = policy.schemaVersion === 12
+                const preferred = policy.schemaVersion === 12 || policy.schemaVersion === 13
                     ? opportunities.find(({ target: candidate }) =>
                         candidate.id !== this.temporarilyAvoidedTargetId,
                     ) ?? opportunities[0]
@@ -904,7 +914,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
         }
         if (
             this.policy.schemaVersion === 10 || this.policy.schemaVersion === 11 ||
-            this.policy.schemaVersion === 12
+            this.policy.schemaVersion === 12 || this.policy.schemaVersion === 13
         ) {
             const buildingInRange = selected.some((unit) => {
                 const compatibility = objectiveUnitCompatibility(game, unit, target!);
@@ -1017,7 +1027,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
 
         if (!terminal && tick - this.leaseStartedTick >= this.policy.maximumLeaseTicks) {
             if (
-                this.policy.schemaVersion === 12 &&
+                (this.policy.schemaVersion === 12 || this.policy.schemaVersion === 13) &&
                 this.lastBuildingDamageTick > this.leaseStartedTick
             ) {
                 this.leaseStartedTick = tick;
@@ -1066,7 +1076,8 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
             this.policy.schemaVersion === 9 ||
             this.policy.schemaVersion === 10 ||
             this.policy.schemaVersion === 11 ||
-            this.policy.schemaVersion === 12
+            this.policy.schemaVersion === 12 ||
+            this.policy.schemaVersion === 13
         ) {
             const policy = this.policy;
             const byMission = new Map<string, UnitData[]>();
@@ -1102,7 +1113,8 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
             this.policy.schemaVersion === 8 || this.policy.schemaVersion === 9 ||
             this.policy.schemaVersion === 10 ||
             this.policy.schemaVersion === 11 ||
-            this.policy.schemaVersion === 12
+            this.policy.schemaVersion === 12 ||
+            this.policy.schemaVersion === 13
             ? Math.min(
                 this.policy.ordinaryReserveCombatants,
                 Math.max(0, eligible.length - this.policy.minimumAssaultCombatants),
@@ -1116,7 +1128,8 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
             this.policy.schemaVersion === 8 || this.policy.schemaVersion === 9 ||
             this.policy.schemaVersion === 10 ||
             this.policy.schemaVersion === 11 ||
-            this.policy.schemaVersion === 12
+            this.policy.schemaVersion === 12 ||
+            this.policy.schemaVersion === 13
             ? Math.ceil(compatible.length * this.policy.maximumAssaultFraction)
             : Math.floor(compatible.length * this.policy.maximumAssaultFraction);
         const maximumByFraction = Math.max(
@@ -1125,7 +1138,8 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
             this.policy.schemaVersion === 8 || this.policy.schemaVersion === 9 ||
             this.policy.schemaVersion === 10 ||
             this.policy.schemaVersion === 11 ||
-            this.policy.schemaVersion === 12
+            this.policy.schemaVersion === 12 ||
+            this.policy.schemaVersion === 13
                 ? Math.min(eligible.length - reserveCount, Math.max(
                     this.policy.minimumAssaultCombatants,
                     fractionalMaximum,
@@ -1168,7 +1182,11 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
         this.committedBlockerId = null;
         this.committedBlockerHitPoints = null;
         this.committedBlockerReason = null;
-        if (rotateTarget && this.policy.schemaVersion === 12 && this.committedTargetId !== null) {
+        if (
+            rotateTarget &&
+            (this.policy.schemaVersion === 12 || this.policy.schemaVersion === 13) &&
+            this.committedTargetId !== null
+        ) {
             this.temporarilyAvoidedTargetId = this.committedTargetId;
             this.committedTargetId = null;
             this.committedTargetHitPoints = null;
@@ -1285,11 +1303,13 @@ export const createPersistentObjectiveCompletionCandidate = (
     rawPolicy: PersistentObjectivePolicy,
     telemetry: TelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 12
-        ? validatePersistentObjectiveCompletionPolicyV8(rawPolicy as PersistentObjectiveCompletionPolicyV8)
-        : rawPolicy.schemaVersion === 11
-            ? validatePersistentObjectiveCompletionPolicyV7(rawPolicy as PersistentObjectiveCompletionPolicyV7)
-            : rawPolicy.schemaVersion === 10
+    const policy = rawPolicy.schemaVersion === 13
+        ? validatePersistentObjectiveCompletionPolicyV9(rawPolicy as PersistentObjectiveCompletionPolicyV9)
+        : rawPolicy.schemaVersion === 12
+            ? validatePersistentObjectiveCompletionPolicyV8(rawPolicy as PersistentObjectiveCompletionPolicyV8)
+            : rawPolicy.schemaVersion === 11
+                ? validatePersistentObjectiveCompletionPolicyV7(rawPolicy as PersistentObjectiveCompletionPolicyV7)
+                : rawPolicy.schemaVersion === 10
                 ? validatePersistentObjectiveCompletionPolicyV6(rawPolicy as PersistentObjectiveCompletionPolicyV6)
                 : rawPolicy.schemaVersion === 9
                     ? validatePersistentObjectiveCompletionPolicyV5(rawPolicy as PersistentObjectiveCompletionPolicyV5)

@@ -17,6 +17,7 @@ import { buildPersistentObjectiveCompletionPolicyV5 } from "../training/persiste
 import { buildPersistentObjectiveCompletionPolicyV6 } from "../training/persistentObjectiveCompletionPolicyV6.js";
 import { buildPersistentObjectiveCompletionPolicyV7 } from "../training/persistentObjectiveCompletionPolicyV7.js";
 import { buildPersistentObjectiveCompletionPolicyV8 } from "../training/persistentObjectiveCompletionPolicyV8.js";
+import { buildPersistentObjectiveCompletionPolicyV9 } from "../training/persistentObjectiveCompletionPolicyV9.js";
 
 const ordinaryWeapon = (special = false) => ({
     rules: {
@@ -252,6 +253,56 @@ describe("persistent objective-completion strategy", () => {
         expect(orders).toHaveLength(1);
         expect(orders[0][0]).toHaveLength(3);
         expect([...orders[0][0]].sort((left, right) => left - right)).toEqual([1, 2, 3]);
+    });
+
+    it("commits the full compatible offensive force while preserving locked defense", () => {
+        const tick = { value: 3 };
+        const offensive = Array.from({ length: 12 }, (_, index) => combatant(index + 1, index));
+        const defensive = Array.from({ length: 3 }, (_, index) => combatant(20 + index, 20 + index));
+        const units = [
+            ...offensive,
+            ...defensive,
+            building(50, 0, "candidate"),
+            building(100, 20, "enemy"),
+            building(101, 25, "enemy"),
+        ];
+        const game = mockGame(units, tick);
+        const orders: any[][] = [];
+        const telemetry: any[] = [];
+        let inner: any;
+        inner = { onAiUpdate: () => inner };
+        const strategy = new PersistentObjectiveCompletionStrategy(
+            inner,
+            Countries.USA,
+            buildPersistentObjectiveCompletionPolicyV9({
+                terminalMinTick: 0,
+                assaultMinTick: 0,
+                minimumOwnBuildingsForAssault: 1,
+                homeThreatRadius: 0,
+                homeReserveRadius: 0,
+            }),
+            (event) => telemetry.push(event),
+        );
+        const mission = (name: string, ids: number[]) => ({
+            getUnitIds: () => ids,
+            getUniqueName: () => name,
+            isUnitsLocked: () => true,
+            getPriority: () => 100,
+        });
+        strategy.onAiUpdate({
+            game,
+            player: { name: "candidate", actions: { orderUnits: (...args: any[]) => orders.push(args) } },
+        } as any, {
+            getMissions: () => [
+                mission("attack_0.0", offensive.map(({ id }) => id)),
+                mission("globalDefence.0.0", defensive.map(({ id }) => id)),
+            ],
+        }, vi.fn());
+        expect(telemetry[telemetry.length - 1]?.phase).toBe("building_strike");
+        expect(orders).toHaveLength(1);
+        expect([...orders[0][0]].sort((left, right) => left - right)).toEqual(
+            offensive.map(({ id }) => id),
+        );
     });
 
     it("preemptively clears a damage-capable route threat while ignoring an off-route army", () => {
