@@ -11,6 +11,7 @@ import {
 import { buildPersistentObjectiveCompletionPolicy } from "../training/persistentObjectiveCompletionPolicy.js";
 import { buildPersistentObjectiveCompletionPolicyV2 } from "../training/persistentObjectiveCompletionPolicyV2.js";
 import { buildPersistentObjectiveCompletionPolicyV3 } from "../training/persistentObjectiveCompletionPolicyV3.js";
+import { buildPersistentObjectiveCompletionPolicyV4 } from "../training/persistentObjectiveCompletionPolicyV4.js";
 
 const ordinaryWeapon = (special = false) => ({
     rules: {
@@ -246,6 +247,77 @@ describe("persistent objective-completion strategy", () => {
         expect(orders).toHaveLength(1);
         expect(orders[0][0]).toHaveLength(3);
         expect([...orders[0][0]].sort((left, right) => left - right)).toEqual([1, 2, 3]);
+    });
+
+    it("preemptively clears a damage-capable route threat while ignoring an off-route army", () => {
+        const tick = { value: 0 };
+        const routeBlocker = combatant(200, 15, 0, "enemy");
+        const units = [
+            combatant(1, 0),
+            building(10, 0, "candidate"),
+            building(100, 20, "enemy"),
+            building(101, 25, "enemy"),
+            routeBlocker,
+            ...Array.from({ length: 100 }, (_, index) => combatant(300 + index, 10, 100 + index, "enemy")),
+        ];
+        const game = mockGame(units, tick);
+        const orders: any[][] = [];
+        let inner: any;
+        inner = { onAiUpdate: () => inner };
+        const strategy = new PersistentObjectiveCompletionStrategy(
+            inner,
+            Countries.USA,
+            buildPersistentObjectiveCompletionPolicyV4({
+                terminalMinTick: 0,
+                assaultMinTick: 0,
+                assaultBuildingCount: 100,
+                minimumOwnBuildingsForAssault: 1,
+                homeThreatRadius: 0,
+                homeReserveRadius: 0,
+            }),
+            () => undefined,
+        );
+        strategy.onAiUpdate({
+            game,
+            player: { name: "candidate", actions: { orderUnits: (...args: any[]) => orders.push(args) } },
+        } as any, { getMissions: () => [] }, vi.fn());
+        expect(orders).toHaveLength(1);
+        expect(orders[0][2]).toBe(routeBlocker.id);
+    });
+
+    it("attacks a building already in range instead of a route threat", () => {
+        const tick = { value: 0 };
+        const routeBlocker = combatant(200, 18, 0, "enemy");
+        const units = [
+            combatant(1, 16),
+            building(10, 0, "candidate"),
+            building(100, 20, "enemy"),
+            building(101, 25, "enemy"),
+            routeBlocker,
+        ];
+        const game = mockGame(units, tick);
+        const orders: any[][] = [];
+        let inner: any;
+        inner = { onAiUpdate: () => inner };
+        const strategy = new PersistentObjectiveCompletionStrategy(
+            inner,
+            Countries.USA,
+            buildPersistentObjectiveCompletionPolicyV4({
+                terminalMinTick: 0,
+                assaultMinTick: 0,
+                assaultBuildingCount: 100,
+                minimumOwnBuildingsForAssault: 1,
+                homeThreatRadius: 0,
+                homeReserveRadius: 0,
+            }),
+            () => undefined,
+        );
+        strategy.onAiUpdate({
+            game,
+            player: { name: "candidate", actions: { orderUnits: (...args: any[]) => orders.push(args) } },
+        } as any, { getMissions: () => [] }, vi.fn());
+        expect(orders).toHaveLength(1);
+        expect(orders[0][2]).toBe(100);
     });
 
     it("reasserts the final-building order after Supalosa every three ticks and ignores off-route forces", () => {

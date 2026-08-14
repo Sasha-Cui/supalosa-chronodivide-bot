@@ -23,10 +23,15 @@ import {
     PersistentObjectiveCompletionPolicyV3,
     validatePersistentObjectiveCompletionPolicyV3,
 } from "./persistentObjectiveCompletionPolicyV3.js";
+import {
+    PersistentObjectiveCompletionPolicyV4,
+    validatePersistentObjectiveCompletionPolicyV4,
+} from "./persistentObjectiveCompletionPolicyV4.js";
 
 type PersistentObjectivePolicy = PersistentObjectiveCompletionPolicy |
     PersistentObjectiveCompletionPolicyV2 |
-    PersistentObjectiveCompletionPolicyV3;
+    PersistentObjectiveCompletionPolicyV3 |
+    PersistentObjectiveCompletionPolicyV4;
 
 type Point = { x: number; y: number };
 type Logger = (message: string, sayInGame?: boolean) => void;
@@ -75,7 +80,7 @@ export type ObjectiveUnitDiagnostic = {
 };
 
 export type PersistentObjectiveCompletionTelemetry = {
-    schemaVersion: 1;
+    schemaVersion: 2;
     event: "objective_completion_decision";
     informationInterface: "public_complete_state";
     tick: number;
@@ -89,6 +94,7 @@ export type PersistentObjectiveCompletionTelemetry = {
     targetArmor: string;
     targetHitPoints: number | null;
     blockerId: number | null;
+    blockerRulesName: string | null;
     selectedAttackerIds: number[];
     selectedAttackerRulesNames: string[];
     buildingDamageSincePreviousDecision: number;
@@ -274,7 +280,7 @@ const isLeaseSourceEligible = (
     assignment: ObjectiveMissionAssignment | undefined,
     policy: PersistentObjectivePolicy,
 ): boolean => {
-    if (policy.schemaVersion === 6 || policy.schemaVersion === 7) {
+    if (policy.schemaVersion === 6 || policy.schemaVersion === 7 || policy.schemaVersion === 8) {
         return !assignment || isObjectiveOffensiveMissionName(assignment.missionName);
     }
     if (assignment?.locked) return false;
@@ -344,11 +350,25 @@ const routeBlockers = (
     );
 };
 
+const unitCanDamageTarget = (attacker: UnitData, target: UnitData): boolean =>
+    [attacker.primaryWeapon, attacker.secondaryWeapon].some((weapon) =>
+        weaponCanDamageObjectiveBuilding(weapon, target),
+    );
+
+const isDamageCapableRouteThreat = (
+    game: GameApi,
+    blocker: UnitData,
+    attackers: readonly UnitData[],
+): boolean => attackers.some((attacker) => unitCanDamageTarget(blocker, attacker)) &&
+    attackers.some((attacker) => objectiveUnitCompatibility(game, attacker, blocker).compatible);
+
 export class PersistentObjectiveCompletionStrategy implements StrategyLike {
     private committedTargetId: number | null = null;
     private committedTargetHitPoints: number | null = null;
     private committedBlockerId: number | null = null;
     private committedBlockerHitPoints: number | null = null;
+    private committedBlockerReason: "preemptive_route_interception_blocker" |
+        "minimum_route_blocker_after_stall" | null = null;
     private leasedIds = new Set<number>();
     private leaseStartedTick = 0;
     private lastBuildingDamageTick = 0;
@@ -492,6 +512,22 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
             this.lastRouteProgressTick,
             this.leaseStartedTick,
         );
+        if (this.policy.schemaVersion === 8 && this.committedBlockerId === null) {
+            const buildingInRange = selected.some((unit) => {
+                const compatibility = objectiveUnitCompatibility(game, unit, target!);
+                return distanceToFoundation(point(unit), target!) <= compatibility.maximumRange;
+            });
+            if (!buildingInRange) {
+                const blocker = routeBlockers(forces, selected, target, this.policy.routeCorridorRadius)
+                    .find((candidate) => isDamageCapableRouteThreat(game, candidate, selected)) ?? null;
+                if (blocker) {
+                    this.committedBlockerId = blocker.id;
+                    this.committedBlockerHitPoints = blocker.hitPoints;
+                    this.committedBlockerReason = "preemptive_route_interception_blocker";
+                    this.lastBlockerDamageTick = tick;
+                }
+            }
+        }
         if (
             this.committedBlockerId === null &&
             tick - buildingProgressTick >= this.policy.buildingNoProgressDeadlineTicks
@@ -503,6 +539,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
             if (blocker) {
                 this.committedBlockerId = blocker.id;
                 this.committedBlockerHitPoints = blocker.hitPoints;
+                this.committedBlockerReason = "minimum_route_blocker_after_stall";
                 this.lastBlockerDamageTick = tick;
             } else if (!terminal) {
                 this.enterFallback(tick);
@@ -522,6 +559,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
         if (this.committedBlockerId !== null && !blocker) {
             this.committedBlockerId = null;
             this.committedBlockerHitPoints = null;
+            this.committedBlockerReason = null;
             this.lastBuildingDamageTick = tick;
             this.lastRouteProgressTick = tick;
         }
@@ -546,6 +584,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
                 // enemy-force sweep; retry the building with the full force.
                 this.committedBlockerId = null;
                 this.committedBlockerHitPoints = null;
+                this.committedBlockerReason = null;
                 blocker = null;
                 this.lastBuildingDamageTick = tick;
                 this.lastRouteProgressTick = tick;
@@ -567,7 +606,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
         else context.player.actions.orderUnits(ids, OrderType.Attack, target.id);
         this.emit(this.makeTelemetry({
             tick, phase: blocker ? "blocker_clear" : "building_strike",
-            reason: blocker ? "minimum_route_blocker_after_stall" : terminal
+            reason: blocker ? this.committedBlockerReason ?? "minimum_route_blocker_after_stall" : terminal
                 ? "terminal_building_overrides_off_route_forces"
                 : "persistent_additive_building_pressure",
             buildings, ownBuildings, terminal, target, blocker, selected, assignments,
@@ -588,7 +627,11 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
             !protectedHomeIds.has(unit.id) &&
             isLeaseSourceEligible(unit, assignments.get(unit.id), this.policy),
         );
-        if (this.policy.schemaVersion === 6 || this.policy.schemaVersion === 7) {
+        if (
+            this.policy.schemaVersion === 6 ||
+            this.policy.schemaVersion === 7 ||
+            this.policy.schemaVersion === 8
+        ) {
             const policy = this.policy;
             const byMission = new Map<string, UnitData[]>();
             for (const unit of eligible) {
@@ -599,12 +642,12 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
                 byMission.set(assignment.missionName, group);
             }
             const lockedAllowed = [...byMission.entries()].flatMap(([, group]) => {
-                const fractionalLimit = policy.schemaVersion === 7
-                    ? Math.ceil(group.length * policy.maximumLockedOffensiveFraction)
-                    : Math.floor(group.length * policy.maximumLockedOffensiveFraction);
-                const missionLimit = policy.schemaVersion === 7
-                    ? Math.min(group.length, Math.max(policy.minimumLockedOffensiveDetachment, fractionalLimit))
-                    : fractionalLimit;
+                const fractionalLimit = policy.schemaVersion === 6
+                    ? Math.floor(group.length * policy.maximumLockedOffensiveFraction)
+                    : Math.ceil(group.length * policy.maximumLockedOffensiveFraction);
+                const missionLimit = policy.schemaVersion === 6
+                    ? fractionalLimit
+                    : Math.min(group.length, Math.max(policy.minimumLockedOffensiveDetachment, fractionalLimit));
                 return group.slice().sort((left, right) =>
                     distanceToFoundation(point(left), target) - distanceToFoundation(point(right), target) ||
                     left.id - right.id,
@@ -619,7 +662,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
                 return assignment?.locked !== true || lockedAllowedIds.has(unit.id);
             });
         }
-        const reserveCount = this.policy.schemaVersion === 7
+        const reserveCount = this.policy.schemaVersion === 7 || this.policy.schemaVersion === 8
             ? Math.min(
                 this.policy.ordinaryReserveCombatants,
                 Math.max(0, eligible.length - this.policy.minimumAssaultCombatants),
@@ -629,12 +672,12 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
             distance(point(left), ownStart) - distance(point(right), ownStart) || left.id - right.id,
         ).slice(0, reserveCount);
         const reservedIds = new Set(reserved.map(({ id }) => id));
-        const fractionalMaximum = this.policy.schemaVersion === 7
+        const fractionalMaximum = this.policy.schemaVersion === 7 || this.policy.schemaVersion === 8
             ? Math.ceil(compatible.length * this.policy.maximumAssaultFraction)
             : Math.floor(compatible.length * this.policy.maximumAssaultFraction);
         const maximumByFraction = Math.max(
             1,
-            this.policy.schemaVersion === 7
+            this.policy.schemaVersion === 7 || this.policy.schemaVersion === 8
                 ? Math.min(eligible.length - reserveCount, Math.max(
                     this.policy.minimumAssaultCombatants,
                     fractionalMaximum,
@@ -663,6 +706,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
         this.committedTargetHitPoints = target.hitPoints;
         this.committedBlockerId = null;
         this.committedBlockerHitPoints = null;
+        this.committedBlockerReason = null;
         this.leasedIds.clear();
         this.leaseStartedTick = tick;
         this.lastBuildingDamageTick = tick;
@@ -675,6 +719,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
         this.leasedIds.clear();
         this.committedBlockerId = null;
         this.committedBlockerHitPoints = null;
+        this.committedBlockerReason = null;
         this.fallbackUntilTick = tick + this.policy.fallbackCooldownTicks;
     }
 
@@ -683,6 +728,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
         this.committedTargetHitPoints = null;
         this.committedBlockerId = null;
         this.committedBlockerHitPoints = null;
+        this.committedBlockerReason = null;
         this.leasedIds.clear();
         this.bestRouteDistance = Number.POSITIVE_INFINITY;
     }
@@ -733,7 +779,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
                 };
             }).sort((left, right) => left.id - right.id);
         return {
-            schemaVersion: 1,
+            schemaVersion: 2,
             event: "objective_completion_decision",
             informationInterface: "public_complete_state",
             tick: args.tick,
@@ -747,6 +793,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
             targetArmor: targetArmorName(args.target),
             targetHitPoints: args.target?.hitPoints ?? null,
             blockerId: args.blocker?.id ?? null,
+            blockerRulesName: args.blocker?.rules.name ?? null,
             selectedAttackerIds: args.selected.map(({ id }) => id).sort((left, right) => left - right),
             selectedAttackerRulesNames: args.selected.map(({ rules }) => rules.name).sort(),
             buildingDamageSincePreviousDecision: args.buildingDamage,
@@ -776,11 +823,13 @@ export const createPersistentObjectiveCompletionCandidate = (
     rawPolicy: PersistentObjectivePolicy,
     telemetry: TelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 7
-        ? validatePersistentObjectiveCompletionPolicyV3(rawPolicy as PersistentObjectiveCompletionPolicyV3)
-        : rawPolicy.schemaVersion === 6
-            ? validatePersistentObjectiveCompletionPolicyV2(rawPolicy as PersistentObjectiveCompletionPolicyV2)
-            : validatePersistentObjectiveCompletionPolicy(rawPolicy);
+    const policy = rawPolicy.schemaVersion === 8
+        ? validatePersistentObjectiveCompletionPolicyV4(rawPolicy as PersistentObjectiveCompletionPolicyV4)
+        : rawPolicy.schemaVersion === 7
+            ? validatePersistentObjectiveCompletionPolicyV3(rawPolicy as PersistentObjectiveCompletionPolicyV3)
+            : rawPolicy.schemaVersion === 6
+                ? validatePersistentObjectiveCompletionPolicyV2(rawPolicy as PersistentObjectiveCompletionPolicyV2)
+                : validatePersistentObjectiveCompletionPolicy(rawPolicy);
     if (!policy.enabled) return baselineFactory.create(name, country);
     if (!baselineFactory.createDefaultStrategy || !baselineFactory.createWithStrategy) {
         throw new Error("Baseline factory does not expose the persistent objective strategy interface");
