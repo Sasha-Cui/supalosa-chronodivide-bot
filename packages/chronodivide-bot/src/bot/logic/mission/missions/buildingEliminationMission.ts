@@ -72,6 +72,8 @@ export type BuildingEliminationOptions = {
     positiveProgressBlockerLaunch?: boolean;
     persistentCloseoutActivationScope?: boolean;
     requireTransferredGroundAssaultCapabilityForActivation?: boolean;
+    objectiveFeasibilityOverridesGroundAssaultCapability?: boolean;
+    preterminalRequiresRouteFeasibleLaunch?: boolean;
     adaptiveGroundAssaultInfrastructurePriority?: number;
     adaptiveProductionPriority?: number;
     adaptiveTechPriority?: number;
@@ -349,6 +351,38 @@ export type BuildingEliminationTelemetryEvent =
           estimatedRouteClearanceTicks: number | null;
       }
     | {
+          schemaVersion: 22;
+          event: "activation_evaluation";
+          tick: number;
+          phase: "no_target" | "building_ready" | "blocker_ready" | "blocked";
+          targetId: number | null;
+          targetName: string | null;
+          blockerId: number | null;
+          blockerName: string | null;
+          compatibleAttackerCount: number;
+          totalCompatibleAttackerCount: number;
+          transferCertifiedAttackerCount: number;
+          stagedCompatibleAttackerCount: number;
+          vanguardCompatibleAttackerCount: number;
+          assaultTankCount: number;
+          assaultScreenCount: number;
+          readinessTankCount: number;
+          readinessScreenCount: number;
+          transferredCapabilityReady: boolean;
+          compositionReady: boolean;
+          enemyBuildingCount: number;
+          activationScopeLatched: boolean;
+          directObjectiveFeasible: boolean;
+          completeRouteFeasible: boolean;
+          partialBlockerLaunchPermitted: boolean;
+          activePredecessorCompatibleAttackerCount: number;
+          routeThreatCount: number;
+          estimatedBuildingCompletionTicks: number | null;
+          estimatedForceSurvivalTicks: number | null;
+          estimatedBlockerRemovalTicks: number | null;
+          estimatedRouteClearanceTicks: number | null;
+      }
+    | {
           schemaVersion: 13;
           event: "assault_infrastructure";
           tick: number;
@@ -500,6 +534,8 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     positiveProgressBlockerLaunch: false,
     persistentCloseoutActivationScope: false,
     requireTransferredGroundAssaultCapabilityForActivation: false,
+    objectiveFeasibilityOverridesGroundAssaultCapability: false,
+    preterminalRequiresRouteFeasibleLaunch: false,
     adaptiveGroundAssaultInfrastructurePriority: 130,
     adaptiveProductionPriority: 140,
     adaptiveTechPriority: 130,
@@ -648,6 +684,18 @@ export const resolveBuildingEliminationOptions = (
         throw new Error(
             "Invalid building-elimination transferred activation capability: " +
             `${resolved.requireTransferredGroundAssaultCapabilityForActivation}`,
+        );
+    }
+    if (typeof resolved.objectiveFeasibilityOverridesGroundAssaultCapability !== "boolean") {
+        throw new Error(
+            "Invalid building-elimination objective-feasibility capability override: " +
+            `${resolved.objectiveFeasibilityOverridesGroundAssaultCapability}`,
+        );
+    }
+    if (typeof resolved.preterminalRequiresRouteFeasibleLaunch !== "boolean") {
+        throw new Error(
+            "Invalid building-elimination preterminal route-feasible launch requirement: " +
+            `${resolved.preterminalRequiresRouteFeasibleLaunch}`,
         );
     }
     return resolved;
@@ -1774,6 +1822,113 @@ export const meetsPositiveProgressBuildingEliminationBlockerLaunchGate = (
     estimatedBlockerRemovalTicks > estimatedBlockerApproachTicks &&
     Number.isFinite(estimatedForceSurvivalTicks) &&
     estimatedForceSurvivalTicks > estimatedBlockerApproachTicks;
+
+export type BuildingEliminationActivationArbitration = {
+    transferredCapabilityReady: boolean;
+    compositionReady: boolean;
+    directObjectiveFeasible: boolean;
+    completeRouteFeasible: boolean;
+    partialBlockerLaunchPermitted: boolean;
+    conventionalBlockerReady: boolean;
+    progressiveBlockerReady: boolean;
+    attritionalBlockerReady: boolean;
+    buildingReady: boolean;
+    blockerReady: boolean;
+};
+
+export const arbitrateBuildingEliminationActivation = (args: {
+    activationMode: BuildingEliminationActivationMode;
+    decision: BuildingEliminationEngagementDecision | null;
+    enemyBuildingCount: number;
+    readinessTankCount: number;
+    readinessScreenCount: number;
+    assaultTankCount: number;
+    assaultScreenCount: number;
+    requireGroundAssaultCapabilityForActivation: boolean;
+    requireTransferredGroundAssaultCapabilityForActivation: boolean;
+    progressiveRouteBlockerLaunch: boolean;
+    positiveProgressBlockerLaunch: boolean;
+    objectiveFeasibilityOverridesGroundAssaultCapability: boolean;
+    preterminalRequiresRouteFeasibleLaunch: boolean;
+}): BuildingEliminationActivationArbitration => {
+    const { decision } = args;
+    const hasBlocker = decision?.blocker !== null && decision?.blocker !== undefined;
+    const directObjectiveFeasible = decision !== null && !hasBlocker;
+    const completeRouteFeasible = !!decision && hasBlocker &&
+        Number.isFinite(decision.estimatedRouteClearanceTicks) &&
+        Number.isFinite(decision.estimatedForceSurvivalTicks) &&
+        decision.estimatedRouteClearanceTicks <= decision.estimatedForceSurvivalTicks;
+    const transferredCapabilityReady = meetsTransferredGroundAssaultCapabilityActivationGate(
+        args.requireTransferredGroundAssaultCapabilityForActivation,
+        args.assaultTankCount,
+        args.assaultScreenCount,
+    );
+    const launchTankCount = args.objectiveFeasibilityOverridesGroundAssaultCapability
+        ? args.assaultTankCount
+        : args.readinessTankCount;
+    const launchScreenCount = args.objectiveFeasibilityOverridesGroundAssaultCapability
+        ? args.assaultScreenCount
+        : args.readinessScreenCount;
+    const compositionReady = meetsGroundAssaultCapabilityActivationGate(
+        args.requireGroundAssaultCapabilityForActivation,
+        launchTankCount,
+        launchScreenCount,
+    ) && transferredCapabilityReady;
+    const conventionalPolicyReady = !!decision && hasBlocker && (
+        args.activationMode === "objectiveClearance" ||
+        args.activationMode === "objectiveStagedBlockerClearance"
+            ? decision.estimatedBlockerRemovalTicks <= decision.estimatedForceSurvivalTicks
+            : (args.activationMode === "objectiveRouteClearance" ||
+                args.activationMode === "objectiveTransferableRouteClearance" ||
+                args.activationMode === "objectiveStagedRouteClearance" ||
+                args.activationMode === "objectiveVanguardRouteClearance") &&
+                decision.estimatedRouteClearanceTicks <= decision.estimatedForceSurvivalTicks
+    );
+    const conventionalBlockerReady = args.objectiveFeasibilityOverridesGroundAssaultCapability
+        ? completeRouteFeasible
+        : conventionalPolicyReady;
+    const progressiveBlockerReady = !!decision && hasBlocker &&
+        meetsProgressiveBuildingEliminationBlockerLaunchGate(
+            args.progressiveRouteBlockerLaunch,
+            launchTankCount,
+            launchScreenCount,
+            decision.estimatedBlockerRemovalTicks,
+            decision.estimatedForceSurvivalTicks,
+        );
+    const attritionalBlockerReady = !!decision && hasBlocker &&
+        !conventionalBlockerReady && !progressiveBlockerReady &&
+        meetsPositiveProgressBuildingEliminationBlockerLaunchGate(
+            args.positiveProgressBlockerLaunch,
+            launchTankCount,
+            launchScreenCount,
+            decision.estimatedBlockerApproachTicks,
+            decision.estimatedBlockerRemovalTicks,
+            decision.estimatedForceSurvivalTicks,
+        );
+    const partialBlockerLaunchPermitted =
+        !args.preterminalRequiresRouteFeasibleLaunch || args.enemyBuildingCount === 1;
+    const objectiveFeasibilityBypassesComposition =
+        args.objectiveFeasibilityOverridesGroundAssaultCapability;
+    const buildingReady = directObjectiveFeasible &&
+        (objectiveFeasibilityBypassesComposition || compositionReady);
+    const blockerReady = hasBlocker && (
+        conventionalBlockerReady && (objectiveFeasibilityBypassesComposition || compositionReady) ||
+        partialBlockerLaunchPermitted && compositionReady &&
+            (progressiveBlockerReady || attritionalBlockerReady)
+    );
+    return {
+        transferredCapabilityReady,
+        compositionReady,
+        directObjectiveFeasible,
+        completeRouteFeasible,
+        partialBlockerLaunchPermitted,
+        conventionalBlockerReady,
+        progressiveBlockerReady,
+        attritionalBlockerReady,
+        buildingReady,
+        blockerReady,
+    };
+};
 
 type BuildingEliminationCloseoutLatch = {
     activated: boolean;
@@ -3304,17 +3459,16 @@ export class BuildingEliminationMissionFactory {
                     getAssignedBuildingEliminationMissionName(missionController, attacker.id),
                 ),
             ).length;
+            const activePredecessorCompatibleAttackerCount = compatibleAttackers.filter((attacker) => {
+                const missionName = getAssignedBuildingEliminationMissionName(missionController, attacker.id);
+                return missionName !== null && isPreemptibleBuildingEliminationMission(missionName);
+            }).length;
             const assaultTankCount = compatibleAttackers.filter(({ rules }) =>
                 rules.name === "HTNK" || rules.name === "MTNK",
             ).length;
             const assaultScreenCount = compatibleAttackers.filter(({ rules }) =>
                 rules.name === "E1" || rules.name === "E2",
             ).length;
-            const transferredCapabilityReady = meetsTransferredGroundAssaultCapabilityActivationGate(
-                this.options.requireTransferredGroundAssaultCapabilityForActivation,
-                assaultTankCount,
-                assaultScreenCount,
-            );
             if (this.options.activationMode === "objectiveVanguardRouteClearance") {
                 certifiedLaunchUnitIds = compatibleAttackers.map(({ id }) => id).sort((left, right) => left - right);
             }
@@ -3330,45 +3484,41 @@ export class BuildingEliminationMissionFactory {
                     this.options.routeCorridorRadius,
                 )
                 : null;
-            const capabilityReady = meetsGroundAssaultCapabilityActivationGate(
-                this.options.requireGroundAssaultCapabilityForActivation,
-                this.closeoutLatch.readinessTankCount,
-                this.closeoutLatch.readinessScreenCount,
-            ) && transferredCapabilityReady;
-            const buildingReady = decision?.blocker === null && capabilityReady;
-            const conventionalBlockerReady = decision !== null && decision.blocker !== null && (
-                this.options.activationMode === "objectiveClearance"
-                    ? decision.estimatedBlockerRemovalTicks <= decision.estimatedForceSurvivalTicks
-                    : this.options.activationMode === "objectiveStagedBlockerClearance"
-                        ? decision.estimatedBlockerRemovalTicks <= decision.estimatedForceSurvivalTicks
-                    : (this.options.activationMode === "objectiveRouteClearance" ||
-                        this.options.activationMode === "objectiveTransferableRouteClearance" ||
-                        this.options.activationMode === "objectiveStagedRouteClearance" ||
-                        this.options.activationMode === "objectiveVanguardRouteClearance") &&
-                        decision.estimatedRouteClearanceTicks <= decision.estimatedForceSurvivalTicks
-            );
-            const progressiveBlockerReady = decision !== null && decision.blocker !== null &&
-                meetsProgressiveBuildingEliminationBlockerLaunchGate(
-                    this.options.progressiveRouteBlockerLaunch,
-                    this.closeoutLatch.readinessTankCount,
-                    this.closeoutLatch.readinessScreenCount,
-                    decision.estimatedBlockerRemovalTicks,
-                    decision.estimatedForceSurvivalTicks,
-                );
-            const attritionalBlockerReady = decision !== null && decision.blocker !== null &&
-                !conventionalBlockerReady && !progressiveBlockerReady &&
-                meetsPositiveProgressBuildingEliminationBlockerLaunchGate(
-                    this.options.positiveProgressBlockerLaunch,
-                    this.closeoutLatch.readinessTankCount,
-                    this.closeoutLatch.readinessScreenCount,
-                    decision.estimatedBlockerApproachTicks,
-                    decision.estimatedBlockerRemovalTicks,
-                    decision.estimatedForceSurvivalTicks,
-                );
-            const blockerReady = capabilityReady && (
-                conventionalBlockerReady || progressiveBlockerReady || attritionalBlockerReady
-            );
-            if (capabilityReady && progressiveBlockerReady && target && decision?.blocker) {
+            const arbitration = arbitrateBuildingEliminationActivation({
+                activationMode: this.options.activationMode,
+                decision,
+                enemyBuildingCount,
+                readinessTankCount: this.closeoutLatch.readinessTankCount,
+                readinessScreenCount: this.closeoutLatch.readinessScreenCount,
+                assaultTankCount,
+                assaultScreenCount,
+                requireGroundAssaultCapabilityForActivation:
+                    this.options.requireGroundAssaultCapabilityForActivation,
+                requireTransferredGroundAssaultCapabilityForActivation:
+                    this.options.requireTransferredGroundAssaultCapabilityForActivation,
+                progressiveRouteBlockerLaunch: this.options.progressiveRouteBlockerLaunch,
+                positiveProgressBlockerLaunch: this.options.positiveProgressBlockerLaunch,
+                objectiveFeasibilityOverridesGroundAssaultCapability:
+                    this.options.objectiveFeasibilityOverridesGroundAssaultCapability,
+                preterminalRequiresRouteFeasibleLaunch:
+                    this.options.preterminalRequiresRouteFeasibleLaunch,
+            });
+            const {
+                transferredCapabilityReady,
+                compositionReady,
+                directObjectiveFeasible,
+                completeRouteFeasible,
+                partialBlockerLaunchPermitted,
+                conventionalBlockerReady,
+                progressiveBlockerReady,
+                attritionalBlockerReady,
+                buildingReady,
+                blockerReady,
+            } = arbitration;
+            if (
+                blockerReady && !conventionalBlockerReady && partialBlockerLaunchPermitted &&
+                progressiveBlockerReady && target && decision?.blocker
+            ) {
                 this.telemetrySink({
                     schemaVersion: 18,
                     event: "progressive_blocker_launch",
@@ -3385,7 +3535,10 @@ export class BuildingEliminationMissionFactory {
                     estimatedForceSurvivalTicks: decision.estimatedForceSurvivalTicks,
                 });
             }
-            if (capabilityReady && attritionalBlockerReady && target && decision?.blocker) {
+            if (
+                blockerReady && !conventionalBlockerReady && partialBlockerLaunchPermitted &&
+                attritionalBlockerReady && target && decision?.blocker
+            ) {
                 this.telemetrySink({
                     schemaVersion: 20,
                     event: "attritional_blocker_launch",
@@ -3424,11 +3577,11 @@ export class BuildingEliminationMissionFactory {
                     tick: context.game.getCurrentTick(),
                     launchMode: buildingReady
                         ? "direct_building"
-                        : progressiveBlockerReady
-                            ? "progressive_blocker"
-                            : attritionalBlockerReady
-                                ? "attritional_blocker"
-                            : "conventional_blocker",
+                        : conventionalBlockerReady
+                            ? "conventional_blocker"
+                            : progressiveBlockerReady
+                                ? "progressive_blocker"
+                                : "attritional_blocker",
                     targetId: target.id,
                     targetName: target.rules.name,
                     blockerId: decision.blocker?.id ?? null,
@@ -3456,9 +3609,16 @@ export class BuildingEliminationMissionFactory {
                 stagedCompatibleAttackerCount,
                 assaultTankCount,
                 assaultScreenCount,
+                this.closeoutLatch.readinessTankCount,
+                this.closeoutLatch.readinessScreenCount,
                 transferredCapabilityReady,
+                compositionReady,
                 enemyBuildingCount,
                 activationScopeLatched,
+                directObjectiveFeasible,
+                completeRouteFeasible,
+                partialBlockerLaunchPermitted,
+                activePredecessorCompatibleAttackerCount,
                 decision,
             );
             if (!buildingReady && !blockerReady) {
@@ -3534,9 +3694,16 @@ export class BuildingEliminationMissionFactory {
         stagedCompatibleAttackerCount: number,
         assaultTankCount: number,
         assaultScreenCount: number,
+        readinessTankCount: number,
+        readinessScreenCount: number,
         transferredCapabilityReady: boolean,
+        compositionReady: boolean,
         enemyBuildingCount: number,
         activationScopeLatched: boolean,
+        directObjectiveFeasible: boolean,
+        completeRouteFeasible: boolean,
+        partialBlockerLaunchPermitted: boolean,
+        activePredecessorCompatibleAttackerCount: number,
         decision: BuildingEliminationEngagementDecision | null,
     ): void {
         const finiteOrNull = (value: number | undefined): number | null =>
@@ -3562,7 +3729,31 @@ export class BuildingEliminationMissionFactory {
             estimatedRouteClearanceTicks: finiteOrNull(decision?.estimatedRouteClearanceTicks),
         };
         const event: Extract<BuildingEliminationTelemetryEvent, { event: "activation_evaluation" }> =
-            vanguardCertified && this.options.requireTransferredGroundAssaultCapabilityForActivation
+            vanguardCertified && (
+                this.options.objectiveFeasibilityOverridesGroundAssaultCapability ||
+                this.options.preterminalRequiresRouteFeasibleLaunch
+            )
+                ? {
+                    ...common,
+                    schemaVersion: 22,
+                    totalCompatibleAttackerCount,
+                    transferCertifiedAttackerCount: compatibleAttackerCount,
+                    stagedCompatibleAttackerCount,
+                    vanguardCompatibleAttackerCount: compatibleAttackerCount - stagedCompatibleAttackerCount,
+                    assaultTankCount,
+                    assaultScreenCount,
+                    readinessTankCount,
+                    readinessScreenCount,
+                    transferredCapabilityReady,
+                    compositionReady,
+                    enemyBuildingCount,
+                    activationScopeLatched,
+                    directObjectiveFeasible,
+                    completeRouteFeasible,
+                    partialBlockerLaunchPermitted,
+                    activePredecessorCompatibleAttackerCount,
+                }
+                : vanguardCertified && this.options.requireTransferredGroundAssaultCapabilityForActivation
                 ? {
                     ...common,
                     schemaVersion: 21,
