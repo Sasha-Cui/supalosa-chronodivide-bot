@@ -37,6 +37,13 @@ const eventsOf = <T extends BuildingEliminationTelemetryEvent["event"]>(
 ): Array<Extract<BuildingEliminationTelemetryEvent, { event: T }>> => telemetry.filter(
     (value): value is Extract<BuildingEliminationTelemetryEvent, { event: T }> => value.event === event,
 );
+const alliedCountries = new Set<Countries>([
+    Countries.USA,
+    Countries.KOREA,
+    Countries.FRANCE,
+    Countries.GERMANY,
+    Countries.GREAT_BRITAIN,
+]);
 const expectedNames = (country: Countries): {
     tank: "MTNK" | "HTNK";
     screen: "E1" | "E2";
@@ -44,7 +51,7 @@ const expectedNames = (country: Countries): {
     retained: string[];
     retainedWithScreen: string[];
 } =>
-    country === Countries.USA
+    alliedCountries.has(country)
         ? {
             tank: "MTNK", screen: "E1", factory: "GAWEAP",
             retained: ["GAWEAP", "MTNK"], retainedWithScreen: ["E1", "GAWEAP", "MTNK"],

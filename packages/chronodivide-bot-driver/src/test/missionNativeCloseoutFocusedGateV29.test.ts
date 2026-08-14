@@ -196,6 +196,27 @@ const terminalDirectInfantryLaunch = (): BuildingEliminationTelemetryEvent[] => 
         : event),
 ];
 
+const sovietDirectLaunch = (): BuildingEliminationTelemetryEvent[] => directLaunch().map((event) => {
+    if (event.event === "assault_infrastructure") {
+        return { ...event, side: SideType.Nod, structureName: "NAWEAP" };
+    }
+    if (event.event === "assault_screen_production") {
+        return { ...event, side: SideType.Nod, unitName: "E2" };
+    }
+    if (event.event === "assault_production_reservation") {
+        return { ...event, side: SideType.Nod, retainedNames: ["E2", "HTNK", "NAWEAP"] };
+    }
+    if (event.event === "assault_production") {
+        return {
+            ...event,
+            side: SideType.Nod,
+            unitName: "HTNK",
+            vehicleQueueItems: [{ name: "HTNK", quantity: 1 }],
+        };
+    }
+    return event;
+});
+
 describe("mission-native closeout focused gate v29", () => {
     it("keeps every focused seed inside the engine uint32 domain", () => {
         for (const index of MISSION_NATIVE_CLOSEOUT_FOCUSED_GATE_V29_COUNTRIES.keys()) {
@@ -211,6 +232,18 @@ describe("mission-native closeout focused gate v29", () => {
     it("accepts a composition-certified direct launch despite zero readiness ownership", () => {
         expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
             directLaunch(), Countries.USA,
+        )).not.toThrow();
+    });
+
+    it("uses Allied force expectations for a non-American Allied country", () => {
+        expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
+            directLaunch(), Countries.FRANCE,
+        )).not.toThrow();
+    });
+
+    it("uses Soviet force expectations for a non-African Soviet country", () => {
+        expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
+            sovietDirectLaunch(), Countries.CUBA,
         )).not.toThrow();
     });
 
