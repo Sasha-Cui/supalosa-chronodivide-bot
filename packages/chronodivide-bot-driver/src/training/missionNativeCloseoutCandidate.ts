@@ -88,6 +88,10 @@ import {
     MissionNativeCloseoutPolicyV21,
     validateMissionNativeCloseoutPolicyV21,
 } from "./missionNativeCloseoutPolicyV21.js";
+import {
+    MissionNativeCloseoutPolicyV22,
+    validateMissionNativeCloseoutPolicyV22,
+} from "./missionNativeCloseoutPolicyV22.js";
 
 type MissionNativePolicy = MissionNativeCloseoutPolicy | MissionNativeCloseoutPolicyV2 |
     MissionNativeCloseoutPolicyV3 | MissionNativeCloseoutPolicyV4 | MissionNativeCloseoutPolicyV5 |
@@ -96,7 +100,7 @@ type MissionNativePolicy = MissionNativeCloseoutPolicy | MissionNativeCloseoutPo
     MissionNativeCloseoutPolicyV12 | MissionNativeCloseoutPolicyV13 | MissionNativeCloseoutPolicyV14 |
     MissionNativeCloseoutPolicyV15 | MissionNativeCloseoutPolicyV16 | MissionNativeCloseoutPolicyV17 |
     MissionNativeCloseoutPolicyV18 | MissionNativeCloseoutPolicyV19 | MissionNativeCloseoutPolicyV20 |
-    MissionNativeCloseoutPolicyV21;
+    MissionNativeCloseoutPolicyV21 | MissionNativeCloseoutPolicyV22;
 
 type StrategyLike = {
     onAiUpdate(context: any, missionController: any, logger: any): StrategyLike;
@@ -146,6 +150,10 @@ class MissionNativeCloseoutStrategy implements StrategyLike {
                 "adaptiveGroundAssaultProductionScopeLatch" in policy
                     ? policy.adaptiveGroundAssaultProductionScopeLatch
                     : false,
+            adaptiveGroundAssaultScreenTargetCount:
+                "adaptiveGroundAssaultScreenTargetCount" in policy
+                    ? policy.adaptiveGroundAssaultScreenTargetCount
+                    : 0,
             adaptiveGroundAssaultInfrastructurePriority:
                 "adaptiveGroundAssaultInfrastructurePriority" in policy
                     ? policy.adaptiveGroundAssaultInfrastructurePriority
@@ -187,7 +195,9 @@ export const createMissionNativeCloseoutCandidate = (
     rawPolicy: MissionNativePolicy,
     telemetrySink: BuildingEliminationTelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 21
+    const policy = rawPolicy.schemaVersion === 22
+        ? validateMissionNativeCloseoutPolicyV22(rawPolicy)
+        : rawPolicy.schemaVersion === 21
         ? validateMissionNativeCloseoutPolicyV21(rawPolicy)
         : rawPolicy.schemaVersion === 20
         ? validateMissionNativeCloseoutPolicyV20(rawPolicy)
