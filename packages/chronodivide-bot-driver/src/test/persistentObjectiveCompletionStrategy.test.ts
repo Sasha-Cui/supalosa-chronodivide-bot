@@ -15,6 +15,7 @@ import { buildPersistentObjectiveCompletionPolicyV3 } from "../training/persiste
 import { buildPersistentObjectiveCompletionPolicyV4 } from "../training/persistentObjectiveCompletionPolicyV4.js";
 import { buildPersistentObjectiveCompletionPolicyV5 } from "../training/persistentObjectiveCompletionPolicyV5.js";
 import { buildPersistentObjectiveCompletionPolicyV6 } from "../training/persistentObjectiveCompletionPolicyV6.js";
+import { buildPersistentObjectiveCompletionPolicyV7 } from "../training/persistentObjectiveCompletionPolicyV7.js";
 
 const ordinaryWeapon = (special = false) => ({
     rules: {
@@ -434,6 +435,58 @@ describe("persistent objective-completion strategy", () => {
         } as any, { getMissions: () => [] }, vi.fn());
         expect(orders).toHaveLength(1);
         expect(orders[0][2]).toBe(target.id);
+    });
+
+    it("selects the lower complete-mission-cost building instead of an equally distant blocked building", () => {
+        const tick = { value: 0 };
+        const blockedTarget = building(100, 20, "enemy");
+        const accessibleTarget = building(101, -20, "enemy");
+        const routeBlocker = {
+            ...combatant(200, 15, 0, "enemy"),
+            hitPoints: 5_000,
+            maxHitPoints: 5_000,
+            primaryWeapon: {
+                ...ordinaryWeapon(),
+                rules: { ...ordinaryWeapon().rules, damage: 1_000, rof: 1 },
+            },
+        };
+        const units = [
+            combatant(1, 0), combatant(2, 1), combatant(3, 2),
+            building(10, 0, "candidate"),
+            blockedTarget,
+            accessibleTarget,
+            routeBlocker,
+        ];
+        const game = mockGame(units, tick);
+        (game.map as any).getTilesInRect = (rect: any) => [{
+            id: 999,
+            rx: rect.x + Math.floor(rect.width / 2),
+            ry: rect.y + Math.floor(rect.height / 2),
+            onBridgeLandType: false,
+        }];
+        const orders: any[][] = [];
+        let inner: any;
+        inner = { onAiUpdate: () => inner };
+        const strategy = new PersistentObjectiveCompletionStrategy(
+            inner,
+            Countries.USA,
+            buildPersistentObjectiveCompletionPolicyV7({
+                terminalMinTick: 0,
+                assaultMinTick: 0,
+                assaultBuildingCount: 100,
+                ordinaryReserveCombatants: 0,
+                minimumOwnBuildingsForAssault: 1,
+                homeThreatRadius: 0,
+                homeReserveRadius: 0,
+            }),
+            () => undefined,
+        );
+        strategy.onAiUpdate({
+            game,
+            player: { name: "candidate", actions: { orderUnits: (...args: any[]) => orders.push(args) } },
+        } as any, { getMissions: () => [] }, vi.fn());
+        expect(orders).toHaveLength(1);
+        expect(orders[0][2]).toBe(accessibleTarget.id);
     });
 
     it("reasserts the final-building order after Supalosa every three ticks and ignores off-route forces", () => {
