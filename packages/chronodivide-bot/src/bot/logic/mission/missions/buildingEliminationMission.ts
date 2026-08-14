@@ -31,7 +31,8 @@ export type BuildingEliminationObservationMode = "publicApi" | "visibleOnly";
 export type BuildingEliminationTargetPriority = "production" | "reinforcement" | "defense" | "nearest";
 export type BuildingEliminationActivationMode = "forceAdvantage" | "lowBuilding" |
     "objectiveRace" | "objectiveClearance" | "objectiveRouteClearance" |
-    "objectiveTransferableRouteClearance" | "objectiveStagedRouteClearance";
+    "objectiveTransferableRouteClearance" | "objectiveStagedRouteClearance" |
+    "objectiveStagedBlockerClearance";
 export type BuildingEliminationReadinessReserveScope = "reinforcements" | "fullForce";
 export type BuildingEliminationEngagementMode = "directBuilding" | "completionRace";
 export type BuildingEliminationEngagementAllocationMode = "allBlocker" | "boundedScreen" | "singleScreen";
@@ -105,7 +106,8 @@ export type BuildingEliminationTelemetryEvent =
           tick: number;
           reason: "insufficient_own_combatants" | "enemy_combatant_limit" | "insufficient_advantage" |
               "no_viable_building_race" | "no_viable_objective_clearance" | "no_viable_route_clearance" |
-              "no_viable_transferable_route_clearance" | "no_viable_staged_route_clearance";
+              "no_viable_transferable_route_clearance" | "no_viable_staged_route_clearance" |
+              "no_viable_staged_blocker_clearance";
           ownCombatants: number;
           enemyCombatants: number;
           reservedCombatants: number;
@@ -266,6 +268,15 @@ export type BuildingEliminationTelemetryEvent =
           estimatedForceSurvivalTicks: number | null;
           estimatedBlockerRemovalTicks: number | null;
           estimatedRouteClearanceTicks: number | null;
+      }
+    | {
+          schemaVersion: 10;
+          event: "launch_handoff";
+          tick: number;
+          expectedStagedUnitIds: number[];
+          assignedExpectedUnitIds: number[];
+          destroyedExpectedUnitIds: number[];
+          aliveUnassignedExpectedUnitIds: number[];
       };
 
 export type BuildingEliminationTelemetrySink = (event: BuildingEliminationTelemetryEvent) => void;
@@ -347,6 +358,7 @@ export const resolveBuildingEliminationOptions = (
     if (!new Set<BuildingEliminationActivationMode>([
         "forceAdvantage", "lowBuilding", "objectiveRace", "objectiveClearance", "objectiveRouteClearance",
         "objectiveTransferableRouteClearance", "objectiveStagedRouteClearance",
+        "objectiveStagedBlockerClearance",
     ])
         .has(resolved.activationMode)) {
         throw new Error(`Invalid building-elimination activation mode: ${resolved.activationMode}`);
@@ -1233,6 +1245,26 @@ export const selectStagedBuildingEliminationAttackers = (
     missionNameForUnit(id) === BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
 );
 
+export const classifyBuildingEliminationLaunchHandoff = (
+    expectedStagedUnitIds: number[],
+    assignedUnitIds: number[],
+    unitIsAlive: (unitId: number) => boolean,
+): Omit<Extract<BuildingEliminationTelemetryEvent, { event: "launch_handoff" }>,
+    "schemaVersion" | "event" | "tick"> => {
+    const expected = [...new Set(expectedStagedUnitIds)].sort((left, right) => left - right);
+    const assigned = new Set(assignedUnitIds);
+    const assignedExpectedUnitIds = expected.filter((id) => assigned.has(id));
+    const missing = expected.filter((id) => !assigned.has(id));
+    const destroyedExpectedUnitIds = missing.filter((id) => !unitIsAlive(id));
+    const destroyed = new Set(destroyedExpectedUnitIds);
+    return {
+        expectedStagedUnitIds: expected,
+        assignedExpectedUnitIds,
+        destroyedExpectedUnitIds,
+        aliveUnassignedExpectedUnitIds: missing.filter((id) => !destroyed.has(id)),
+    };
+};
+
 const getEnemyUnits = (
     context: SupabotContext,
     observationMode: BuildingEliminationObservationMode,
@@ -1340,7 +1372,8 @@ const isBuildingEliminationCloseoutState = (
         options.activationMode === "lowBuilding" || options.activationMode === "objectiveRace" ||
         options.activationMode === "objectiveClearance" || options.activationMode === "objectiveRouteClearance" ||
         options.activationMode === "objectiveTransferableRouteClearance" ||
-        options.activationMode === "objectiveStagedRouteClearance"
+        options.activationMode === "objectiveStagedRouteClearance" ||
+        options.activationMode === "objectiveStagedBlockerClearance"
     ) {
         return meetsLowBuildingEliminationActivationGate(
             ownCombatantCount,
@@ -1387,12 +1420,14 @@ class BuildingEliminationMission extends Mission {
     private committedRouteBlocker: { targetId: number; blockerId: number } | null = null;
     private targetProgress = new Map<number, BuildingTargetProgressState>();
     private progressTelemetry = new Map<number, { hitPoints: number; lastEmittedTick: number }>();
+    private launchHandoffEmitted = false;
 
     constructor(
         private options: Required<BuildingEliminationOptions>,
         logger: DebugLogger,
         private telemetrySink: BuildingEliminationTelemetrySink,
         private stalledBuildingIds: Set<number>,
+        private expectedStagedUnitIds: number[] = [],
     ) {
         super(BUILDING_ELIMINATION_MISSION_NAME, logger);
     }
@@ -1400,6 +1435,7 @@ class BuildingEliminationMission extends Mission {
     _onAiUpdate(context: MissionContext): MissionAction {
         const eligibleAttackers = this.selectCommittedAttackers(context);
         this.updateRememberedBuildings(context);
+        this.maybeEmitLaunchHandoff(context);
         if (
             this.getUnitIds().length > 0 &&
             context.game.getCurrentTick() >= this.lastOrderAt + this.options.orderIntervalTicks
@@ -1418,6 +1454,23 @@ class BuildingEliminationMission extends Mission {
 
     getPriority(): number {
         return BUILDING_ELIMINATION_PRIORITY;
+    }
+
+    private maybeEmitLaunchHandoff(context: MissionContext): void {
+        if (this.launchHandoffEmitted || this.expectedStagedUnitIds.length === 0 || this.getUnitIds().length === 0) {
+            return;
+        }
+        this.telemetrySink({
+            schemaVersion: 10,
+            event: "launch_handoff",
+            tick: context.game.getCurrentTick(),
+            ...classifyBuildingEliminationLaunchHandoff(
+                this.expectedStagedUnitIds,
+                this.getUnitIds(),
+                (id) => !!context.game.getGameObjectData(id),
+            ),
+        });
+        this.launchHandoffEmitted = true;
     }
 
     private selectCommittedAttackers(context: SupabotContext): UnitData[] {
@@ -2344,14 +2397,18 @@ export class BuildingEliminationMissionFactory {
             this.options.activationMode === "objectiveClearance" ||
             this.options.activationMode === "objectiveRouteClearance" ||
             this.options.activationMode === "objectiveTransferableRouteClearance" ||
-            this.options.activationMode === "objectiveStagedRouteClearance"
+            this.options.activationMode === "objectiveStagedRouteClearance" ||
+            this.options.activationMode === "objectiveStagedBlockerClearance"
         ) {
             const totalCommittedAttackers = selectCommittedBuildingAttackers(
                 ownCombatants,
                 context.game.getPlayerData(context.player.name).startLocation,
                 this.options.reserveCombatants,
             );
-            const committedAttackers = this.options.activationMode === "objectiveStagedRouteClearance"
+            const committedAttackers = (
+                this.options.activationMode === "objectiveStagedRouteClearance" ||
+                this.options.activationMode === "objectiveStagedBlockerClearance"
+            )
                 ? selectStagedBuildingEliminationAttackers(
                     totalCommittedAttackers,
                     (unitId) => getAssignedBuildingEliminationMissionName(missionController, unitId),
@@ -2410,6 +2467,8 @@ export class BuildingEliminationMissionFactory {
             const blockerReady = decision !== null && decision.blocker !== null && (
                 this.options.activationMode === "objectiveClearance"
                     ? decision.estimatedBlockerRemovalTicks <= decision.estimatedForceSurvivalTicks
+                    : this.options.activationMode === "objectiveStagedBlockerClearance"
+                        ? decision.estimatedBlockerRemovalTicks <= decision.estimatedForceSurvivalTicks
                     : (this.options.activationMode === "objectiveRouteClearance" ||
                         this.options.activationMode === "objectiveTransferableRouteClearance" ||
                         this.options.activationMode === "objectiveStagedRouteClearance") &&
@@ -2429,14 +2488,17 @@ export class BuildingEliminationMissionFactory {
                 compatibleAttackers.length,
                 totalCompatibleAttackerCount,
                 this.options.activationMode === "objectiveTransferableRouteClearance",
-                this.options.activationMode === "objectiveStagedRouteClearance",
+                this.options.activationMode === "objectiveStagedRouteClearance" ||
+                    this.options.activationMode === "objectiveStagedBlockerClearance",
                 decision,
             );
             if (!buildingReady && !blockerReady) {
                 this.emitBlockedTelemetry(
                     context,
-                    this.options.activationMode === "objectiveStagedRouteClearance"
-                        ? "no_viable_staged_route_clearance"
+                    this.options.activationMode === "objectiveStagedBlockerClearance"
+                        ? "no_viable_staged_blocker_clearance"
+                        : this.options.activationMode === "objectiveStagedRouteClearance"
+                            ? "no_viable_staged_route_clearance"
                         : this.options.activationMode === "objectiveTransferableRouteClearance"
                             ? "no_viable_transferable_route_clearance"
                         : this.options.activationMode === "objectiveRouteClearance"
@@ -2457,6 +2519,11 @@ export class BuildingEliminationMissionFactory {
             }
         }
 
+        const expectedStagedUnitIds = this.options.activationMode === "objectiveStagedBlockerClearance"
+            ? missionController.getMissions().find((mission) =>
+                mission.getUniqueName() === BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
+            )?.getUnitIds().slice().sort((left, right) => left - right) ?? []
+            : [];
         this.releaseReadinessReserve(context, missionController, ownCombatants);
         const preemptedMissions = this.preemptAttacks(missionController);
         this.closeoutLatch.activated = true;
@@ -2476,6 +2543,7 @@ export class BuildingEliminationMissionFactory {
                 logger,
                 this.telemetrySink,
                 this.stalledBuildingIds,
+                expectedStagedUnitIds,
             ),
         );
         this.lastBlockedTelemetrySignature = "";

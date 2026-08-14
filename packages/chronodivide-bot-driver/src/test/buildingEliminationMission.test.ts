@@ -6,6 +6,7 @@ import {
     allocateBuildingEliminationEngagement,
     BuildingTargetDescriptor,
     classifyBuildingCapabilityGaps,
+    classifyBuildingEliminationLaunchHandoff,
     chooseBuildingEliminationEngagement,
     deferStalledBuildingTargets,
     getBuildingCapabilityProductionPlan,
@@ -446,6 +447,19 @@ describe("building elimination policy", () => {
             eligible,
             new Set(),
         ).map(({ id }) => id)).toEqual([1, 2, 3, 4]);
+    });
+
+    test("launch handoff partitions staged identifiers without hiding live ownership loss", () => {
+        expect(classifyBuildingEliminationLaunchHandoff(
+            [4, 3, 2, 1, 4],
+            [1, 3, 9],
+            (id) => id !== 2,
+        )).toEqual({
+            expectedStagedUnitIds: [1, 2, 3, 4],
+            assignedExpectedUnitIds: [1, 3],
+            destroyedExpectedUnitIds: [2],
+            aliveUnassignedExpectedUnitIds: [4],
+        });
     });
 
     test("mission ownership supports native and pinned legacy controllers", () => {
