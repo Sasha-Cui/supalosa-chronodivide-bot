@@ -29,7 +29,7 @@ export const MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_MAX_TICKS = 5_400 as const;
 export const MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_ENGINE_SEED_BASE = 4_000_000_000 as const;
 export const MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT = 4 as const;
 
-type Factory = Awaited<ReturnType<typeof loadBaselineFactory>>;
+export type MissionNativeCloseoutFactory = Awaited<ReturnType<typeof loadBaselineFactory>>;
 type ActionTraceRow = { tick: number; args: unknown[] };
 type Snapshot = {
     tick: number;
@@ -37,7 +37,7 @@ type Snapshot = {
     units: Array<{ id: number; name: string; x: number; y: number; hitPoints: number }>;
     queues: Array<{ queue: number; payload: unknown }>;
 };
-type RunTrace = {
+export type MissionNativeCloseoutRunTrace = {
     actions: ActionTraceRow[];
     snapshots: Snapshot[];
     quitAttempts: { candidate: number; baseline: number };
@@ -127,14 +127,14 @@ const settings = (
     agents: candidateSlot === 0 ? [candidate, baseline] : [baseline, candidate],
 });
 
-const run = async (args: {
-    factory: Factory;
+export const runMissionNativeCloseoutTrace = async (args: {
+    factory: MissionNativeCloseoutFactory;
     mapName: string;
     country: Countries;
     candidateSlot: 0 | 1;
     requestedEngineSeed: number;
     policy: MissionNativeCloseoutPolicyV5 | null;
-}): Promise<RunTrace> => {
+}): Promise<MissionNativeCloseoutRunTrace> => {
     const { factory, mapName, country, candidateSlot, requestedEngineSeed, policy } = args;
     const telemetry: BuildingEliminationTelemetryEvent[] = [];
     const candidate = policy === null
@@ -387,10 +387,10 @@ const main = async (): Promise<void> => {
             MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_ENGINE_SEED_BASE,
             index++,
         );
-        const direct = await run({
+        const direct = await runMissionNativeCloseoutTrace({
             factory, mapName, country, candidateSlot, requestedEngineSeed, policy: null,
         });
-        const disabled = await run({
+        const disabled = await runMissionNativeCloseoutTrace({
             factory, mapName, country, candidateSlot, requestedEngineSeed, policy: disabledPolicy,
         });
         const directDigest = digest({ actions: direct.actions, snapshots: direct.snapshots });
@@ -402,10 +402,10 @@ const main = async (): Promise<void> => {
         if (disabled.telemetry.length !== 0) {
             validationErrors.push(`Disabled mission-native adapter emitted telemetry for ${country} slot ${candidateSlot}`);
         }
-        const first = await run({
+        const first = await runMissionNativeCloseoutTrace({
             factory, mapName, country, candidateSlot, requestedEngineSeed, policy: enabledPolicy,
         });
-        const repeat = await run({
+        const repeat = await runMissionNativeCloseoutTrace({
             factory, mapName, country, candidateSlot, requestedEngineSeed, policy: enabledPolicy,
         });
         for (const [label, trace] of [["first", first], ["repeat", repeat]] as const) {
