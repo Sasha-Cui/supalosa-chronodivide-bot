@@ -10,6 +10,7 @@ import {
 } from "../training/persistentObjectiveCompletionStrategy.js";
 import { buildPersistentObjectiveCompletionPolicy } from "../training/persistentObjectiveCompletionPolicy.js";
 import { buildPersistentObjectiveCompletionPolicyV2 } from "../training/persistentObjectiveCompletionPolicyV2.js";
+import { buildPersistentObjectiveCompletionPolicyV3 } from "../training/persistentObjectiveCompletionPolicyV3.js";
 
 const ordinaryWeapon = (special = false) => ({
     rules: {
@@ -199,6 +200,52 @@ describe("persistent objective-completion strategy", () => {
         expect(orders[0][0]).toHaveLength(1);
         expect([1, 2, 3]).toContain(orders[0][0][0]);
         expect(orders[0][0]).not.toEqual(expect.arrayContaining([4, 5, 6]));
+    });
+
+    it("preserves a three-unit objective package before applying the ordinary reserve", () => {
+        const tick = { value: 0 };
+        const units = [
+            combatant(1, 0), combatant(2, 1), combatant(3, 2),
+            combatant(4, 3), combatant(5, 4), combatant(6, 5),
+            building(10, 0, "candidate"),
+            building(100, 20, "enemy"),
+            building(101, 25, "enemy"),
+        ];
+        const game = mockGame(units, tick);
+        const orders: any[][] = [];
+        let inner: any;
+        inner = { onAiUpdate: () => inner };
+        const strategy = new PersistentObjectiveCompletionStrategy(
+            inner,
+            Countries.USA,
+            buildPersistentObjectiveCompletionPolicyV3({
+                terminalMinTick: 0,
+                assaultMinTick: 0,
+                assaultBuildingCount: 100,
+                minimumOwnBuildingsForAssault: 1,
+                homeThreatRadius: 0,
+                homeReserveRadius: 0,
+            }),
+            () => undefined,
+        );
+        const mission = (name: string, ids: number[]) => ({
+            getUnitIds: () => ids,
+            getUniqueName: () => name,
+            isUnitsLocked: () => true,
+            getPriority: () => 100,
+        });
+        strategy.onAiUpdate({
+            game,
+            player: { name: "candidate", actions: { orderUnits: (...args: any[]) => orders.push(args) } },
+        } as any, {
+            getMissions: () => [
+                mission("attack_0.0", [1, 2, 3]),
+                mission("globalDefence.0.0", [4, 5, 6]),
+            ],
+        }, vi.fn());
+        expect(orders).toHaveLength(1);
+        expect(orders[0][0]).toHaveLength(3);
+        expect([...orders[0][0]].sort((left, right) => left - right)).toEqual([1, 2, 3]);
     });
 
     it("reasserts the final-building order after Supalosa every three ticks and ignores off-route forces", () => {

@@ -19,8 +19,14 @@ import {
     PersistentObjectiveCompletionPolicyV2,
     validatePersistentObjectiveCompletionPolicyV2,
 } from "./persistentObjectiveCompletionPolicyV2.js";
+import {
+    PersistentObjectiveCompletionPolicyV3,
+    validatePersistentObjectiveCompletionPolicyV3,
+} from "./persistentObjectiveCompletionPolicyV3.js";
 
-type PersistentObjectivePolicy = PersistentObjectiveCompletionPolicy | PersistentObjectiveCompletionPolicyV2;
+type PersistentObjectivePolicy = PersistentObjectiveCompletionPolicy |
+    PersistentObjectiveCompletionPolicyV2 |
+    PersistentObjectiveCompletionPolicyV3;
 
 type Point = { x: number; y: number };
 type Logger = (message: string, sayInGame?: boolean) => void;
@@ -268,7 +274,7 @@ const isLeaseSourceEligible = (
     assignment: ObjectiveMissionAssignment | undefined,
     policy: PersistentObjectivePolicy,
 ): boolean => {
-    if (policy.schemaVersion === 6) {
+    if (policy.schemaVersion === 6 || policy.schemaVersion === 7) {
         return !assignment || isObjectiveOffensiveMissionName(assignment.missionName);
     }
     if (assignment?.locked) return false;
@@ -582,7 +588,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
             !protectedHomeIds.has(unit.id) &&
             isLeaseSourceEligible(unit, assignments.get(unit.id), this.policy),
         );
-        if (this.policy.schemaVersion === 6) {
+        if (this.policy.schemaVersion === 6 || this.policy.schemaVersion === 7) {
             const policy = this.policy;
             const byMission = new Map<string, UnitData[]>();
             for (const unit of eligible) {
@@ -593,7 +599,12 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
                 byMission.set(assignment.missionName, group);
             }
             const lockedAllowed = [...byMission.entries()].flatMap(([, group]) => {
-                const missionLimit = Math.floor(group.length * policy.maximumLockedOffensiveFraction);
+                const fractionalLimit = policy.schemaVersion === 7
+                    ? Math.ceil(group.length * policy.maximumLockedOffensiveFraction)
+                    : Math.floor(group.length * policy.maximumLockedOffensiveFraction);
+                const missionLimit = policy.schemaVersion === 7
+                    ? Math.min(group.length, Math.max(policy.minimumLockedOffensiveDetachment, fractionalLimit))
+                    : fractionalLimit;
                 return group.slice().sort((left, right) =>
                     distanceToFoundation(point(left), target) - distanceToFoundation(point(right), target) ||
                     left.id - right.id,
@@ -608,11 +619,28 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
                 return assignment?.locked !== true || lockedAllowedIds.has(unit.id);
             });
         }
+        const reserveCount = this.policy.schemaVersion === 7
+            ? Math.min(
+                this.policy.ordinaryReserveCombatants,
+                Math.max(0, eligible.length - this.policy.minimumAssaultCombatants),
+            )
+            : Math.min(this.policy.ordinaryReserveCombatants, eligible.length);
         const reserved = eligible.slice().sort((left, right) =>
             distance(point(left), ownStart) - distance(point(right), ownStart) || left.id - right.id,
-        ).slice(0, Math.min(this.policy.ordinaryReserveCombatants, eligible.length));
+        ).slice(0, reserveCount);
         const reservedIds = new Set(reserved.map(({ id }) => id));
-        const maximumByFraction = Math.max(1, Math.floor(compatible.length * this.policy.maximumAssaultFraction));
+        const fractionalMaximum = this.policy.schemaVersion === 7
+            ? Math.ceil(compatible.length * this.policy.maximumAssaultFraction)
+            : Math.floor(compatible.length * this.policy.maximumAssaultFraction);
+        const maximumByFraction = Math.max(
+            1,
+            this.policy.schemaVersion === 7
+                ? Math.min(eligible.length - reserveCount, Math.max(
+                    this.policy.minimumAssaultCombatants,
+                    fractionalMaximum,
+                ))
+                : fractionalMaximum,
+        );
         const maximum = Math.min(this.policy.maximumAssaultCombatants, maximumByFraction);
         const previous = eligible.filter(({ id }) => this.leasedIds.has(id) && !reservedIds.has(id));
         const previousIds = new Set(previous.map(({ id }) => id));
@@ -748,9 +776,11 @@ export const createPersistentObjectiveCompletionCandidate = (
     rawPolicy: PersistentObjectivePolicy,
     telemetry: TelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 6
-        ? validatePersistentObjectiveCompletionPolicyV2(rawPolicy as PersistentObjectiveCompletionPolicyV2)
-        : validatePersistentObjectiveCompletionPolicy(rawPolicy);
+    const policy = rawPolicy.schemaVersion === 7
+        ? validatePersistentObjectiveCompletionPolicyV3(rawPolicy as PersistentObjectiveCompletionPolicyV3)
+        : rawPolicy.schemaVersion === 6
+            ? validatePersistentObjectiveCompletionPolicyV2(rawPolicy as PersistentObjectiveCompletionPolicyV2)
+            : validatePersistentObjectiveCompletionPolicy(rawPolicy);
     if (!policy.enabled) return baselineFactory.create(name, country);
     if (!baselineFactory.createDefaultStrategy || !baselineFactory.createWithStrategy) {
         throw new Error("Baseline factory does not expose the persistent objective strategy interface");
