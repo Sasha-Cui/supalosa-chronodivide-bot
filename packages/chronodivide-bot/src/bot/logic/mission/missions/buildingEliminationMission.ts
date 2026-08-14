@@ -74,6 +74,7 @@ export type BuildingEliminationOptions = {
     routeCorridorRadius?: number;
     readinessReserve?: boolean;
     readinessReserveScope?: BuildingEliminationReadinessReserveScope;
+    readinessReserveDefenseRadius?: number;
     contactOnlyBlockerClearance?: boolean;
 };
 
@@ -333,6 +334,17 @@ export type BuildingEliminationTelemetryEvent =
           canceledQueueItems: Array<{ queue: QueueType; name: string; quantity: number }>;
       }
     | {
+          schemaVersion: 16;
+          event: "readiness_defense";
+          tick: number;
+          threatId: number;
+          threatName: string;
+          protectedId: number;
+          protectedName: string;
+          distance: number;
+          stagedAttackerCount: number;
+      }
+    | {
           schemaVersion: 10;
           event: "launch_handoff";
           tick: number;
@@ -386,6 +398,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     routeCorridorRadius: 8,
     readinessReserve: false,
     readinessReserveScope: "reinforcements",
+    readinessReserveDefenseRadius: 0,
     contactOnlyBlockerClearance: false,
 };
 
@@ -424,6 +437,7 @@ export const resolveBuildingEliminationOptions = (
     requireIntegerInRange("adaptiveTechPriority", resolved.adaptiveTechPriority, 1, 1_000);
     requireIntegerInRange("maxEnemyBuildings", resolved.maxEnemyBuildings, 1, 1_000);
     requireIntegerInRange("routeCorridorRadius", resolved.routeCorridorRadius, 1, 64);
+    requireIntegerInRange("readinessReserveDefenseRadius", resolved.readinessReserveDefenseRadius, 0, 64);
     if (!new Set<BuildingEliminationTargetPriority>(["production", "reinforcement", "defense", "nearest"])
         .has(resolved.targetPriority)) {
         throw new Error(`Invalid building-elimination target priority: ${resolved.targetPriority}`);
@@ -2609,6 +2623,36 @@ class BuildingEliminationCapabilityUnitMission extends Mission {
     }
 }
 
+export type BuildingEliminationReadinessDefenseDecision = {
+    threat: UnitData;
+    protectedObject: UnitData;
+    distanceSquared: number;
+};
+
+export const selectBuildingEliminationReadinessDefense = (
+    stagedCombatants: readonly UnitData[],
+    protectedStructures: readonly UnitData[],
+    visibleThreats: readonly UnitData[],
+    radius: number,
+): BuildingEliminationReadinessDefenseDecision | null => {
+    if (radius <= 0 || stagedCombatants.length === 0) return null;
+    const protectedObjects = [...stagedCombatants, ...protectedStructures];
+    const candidates = visibleThreats.flatMap((threat) => protectedObjects.map((protectedObject) => ({
+        threat,
+        protectedObject,
+        distanceSquared: distanceSquared(
+            { x: threat.tile.rx, y: threat.tile.ry },
+            { x: protectedObject.tile.rx, y: protectedObject.tile.ry },
+        ),
+    }))).filter(({ distanceSquared: distance }) => distance <= radius * radius);
+    candidates.sort((left, right) =>
+        left.distanceSquared - right.distanceSquared ||
+        left.threat.id - right.threat.id ||
+        left.protectedObject.id - right.protectedObject.id,
+    );
+    return candidates[0] ?? null;
+};
+
 class BuildingEliminationReadinessReserveMission extends Mission {
     private lastOrderAt = Number.NEGATIVE_INFINITY;
     private lastTelemetryAt = Number.NEGATIVE_INFINITY;
@@ -2633,16 +2677,54 @@ class BuildingEliminationReadinessReserveMission extends Mission {
         const tick = context.game.getCurrentTick();
         if (tick >= this.lastOrderAt + this.options.orderIntervalTicks) {
             const start = context.game.getPlayerData(context.player.name).startLocation;
-            for (const unit of stagedCombatants) {
-                if (distanceSquared(
-                    { x: unit.tile.rx, y: unit.tile.ry },
-                    { x: start.x, y: start.y },
-                ) > 16) {
-                    context.actionBatcher.push(BatchableAction.toPoint(
+            const visibleThreats = context.game.getVisibleUnits(context.player.name, "enemy")
+                .map((id) => context.game.getUnitData(id))
+                .filter((unit): unit is UnitData => !!unit && unit.rules.isSelectableCombatant &&
+                    !unit.rules.harvester && unit.rules.type !== ObjectType.Building);
+            const side = getPlayerSide(context);
+            const protectedStructures = side === null ? [] : context.game
+                .getVisibleUnits(context.player.name, "self", (rules) =>
+                    rules.name === getBuildingEliminationGroundAssaultStructureName(side),
+                )
+                .map((id) => context.game.getUnitData(id))
+                .filter((unit): unit is UnitData => !!unit);
+            const defense = selectBuildingEliminationReadinessDefense(
+                stagedCombatants,
+                protectedStructures,
+                visibleThreats,
+                this.options.readinessReserveDefenseRadius,
+            );
+            if (defense) {
+                for (const unit of stagedCombatants) {
+                    context.actionBatcher.push(BatchableAction.toTargetId(
                         unit.id,
-                        OrderType.Move,
-                        new Vector2(start.x, start.y),
+                        OrderType.Attack,
+                        defense.threat.id,
                     ));
+                }
+                this.telemetrySink({
+                    schemaVersion: 16,
+                    event: "readiness_defense",
+                    tick,
+                    threatId: defense.threat.id,
+                    threatName: defense.threat.rules.name,
+                    protectedId: defense.protectedObject.id,
+                    protectedName: defense.protectedObject.rules.name,
+                    distance: Math.sqrt(defense.distanceSquared),
+                    stagedAttackerCount: stagedCombatants.length,
+                });
+            } else {
+                for (const unit of stagedCombatants) {
+                    if (distanceSquared(
+                        { x: unit.tile.rx, y: unit.tile.ry },
+                        { x: start.x, y: start.y },
+                    ) > 16) {
+                        context.actionBatcher.push(BatchableAction.toPoint(
+                            unit.id,
+                            OrderType.Move,
+                            new Vector2(start.x, start.y),
+                        ));
+                    }
                 }
             }
             this.lastOrderAt = tick;

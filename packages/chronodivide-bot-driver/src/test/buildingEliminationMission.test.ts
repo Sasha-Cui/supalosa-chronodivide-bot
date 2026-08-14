@@ -34,6 +34,7 @@ import {
     resolveBuildingEliminationOptions,
     selectAvailableCapabilityStructures,
     selectBuildingEliminationReadinessReserveCandidates,
+    selectBuildingEliminationReadinessDefense,
     selectCommittedBuildingAttackers,
     selectCompatibleBuildingTargets,
     selectStagedBuildingEliminationAttackers,
@@ -921,6 +922,7 @@ describe("building elimination policy", () => {
             "routeCorridorRadius",
             "readinessReserve",
             "readinessReserveScope",
+            "readinessReserveDefenseRadius",
             "contactOnlyBlockerClearance",
         ]);
     });
@@ -934,6 +936,9 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({ stallTicks: 0 })).toThrow("stallTicks");
         expect(() => resolveBuildingEliminationOptions({ maxEnemyBuildings: 0 })).toThrow("maxEnemyBuildings");
         expect(() => resolveBuildingEliminationOptions({ routeCorridorRadius: 0 })).toThrow("routeCorridorRadius");
+        expect(() => resolveBuildingEliminationOptions({ readinessReserveDefenseRadius: -1 })).toThrow(
+            "readinessReserveDefenseRadius",
+        );
         expect(() => resolveBuildingEliminationOptions({
             adaptiveGroundAssaultInfrastructurePriority: 0,
         })).toThrow("adaptiveGroundAssaultInfrastructurePriority");
@@ -988,5 +993,27 @@ describe("building elimination policy", () => {
         expect(updateBuildingEliminationProductionScopeLatch(false, true, true)).toBe(true);
         expect(updateBuildingEliminationProductionScopeLatch(true, false, true)).toBe(true);
         expect(updateBuildingEliminationProductionScopeLatch(false, true, false)).toBe(false);
+    });
+
+    test("readiness defense chooses the nearest visible threat to reserve infrastructure", () => {
+        const staged = combatant(1, 0) as any;
+        staged.tile = { rx: 0, ry: 0 };
+        const factory = buildingUnit(2, 20) as any;
+        factory.tile = { rx: 10, ry: 10 };
+        const nearFactory = combatant(20, 0) as any;
+        nearFactory.tile = { rx: 12, ry: 10 };
+        const farThreat = combatant(10, 0) as any;
+        farThreat.tile = { rx: 20, ry: 20 };
+        const selected = selectBuildingEliminationReadinessDefense(
+            [staged],
+            [factory],
+            [farThreat, nearFactory],
+            12,
+        );
+        expect(selected?.threat.id).toBe(20);
+        expect(selected?.protectedObject.id).toBe(2);
+        expect(selectBuildingEliminationReadinessDefense(
+            [staged], [factory], [nearFactory], 0,
+        )).toBeNull();
     });
 });
