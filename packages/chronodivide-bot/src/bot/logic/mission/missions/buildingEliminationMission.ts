@@ -32,7 +32,7 @@ export type BuildingEliminationTargetPriority = "production" | "reinforcement" |
 export type BuildingEliminationActivationMode = "forceAdvantage" | "lowBuilding" |
     "objectiveRace" | "objectiveClearance" | "objectiveRouteClearance" |
     "objectiveTransferableRouteClearance" | "objectiveStagedRouteClearance" |
-    "objectiveStagedBlockerClearance";
+    "objectiveStagedBlockerClearance" | "objectiveVanguardRouteClearance";
 export type BuildingEliminationReadinessReserveScope = "reinforcements" | "fullForce";
 export type BuildingEliminationEngagementMode = "directBuilding" | "completionRace";
 export type BuildingEliminationEngagementAllocationMode = "allBlocker" | "boundedScreen" | "singleScreen";
@@ -59,6 +59,7 @@ export type BuildingEliminationOptions = {
     retargetStalledBuildings?: boolean;
     adaptiveAirTargetCount?: number;
     adaptiveNavalTargetCount?: number;
+    adaptiveGroundAssaultTargetCount?: number;
     adaptiveProductionPriority?: number;
     adaptiveTechPriority?: number;
     activationMode?: BuildingEliminationActivationMode;
@@ -108,7 +109,7 @@ export type BuildingEliminationTelemetryEvent =
           reason: "insufficient_own_combatants" | "enemy_combatant_limit" | "insufficient_advantage" |
               "no_viable_building_race" | "no_viable_objective_clearance" | "no_viable_route_clearance" |
               "no_viable_transferable_route_clearance" | "no_viable_staged_route_clearance" |
-              "no_viable_staged_blocker_clearance";
+              "no_viable_staged_blocker_clearance" | "no_viable_vanguard_route_clearance";
           ownCombatants: number;
           enemyCombatants: number;
           reservedCombatants: number;
@@ -272,6 +273,37 @@ export type BuildingEliminationTelemetryEvent =
           estimatedRouteClearanceTicks: number | null;
       }
     | {
+          schemaVersion: 11;
+          event: "assault_production";
+          tick: number;
+          side: SideType.Nod | SideType.GDI;
+          unitName: "HTNK" | "MTNK";
+          targetCount: number;
+          currentCount: number;
+          requested: boolean;
+      }
+    | {
+          schemaVersion: 12;
+          event: "activation_evaluation";
+          tick: number;
+          phase: "no_target" | "building_ready" | "blocker_ready" | "blocked";
+          targetId: number | null;
+          targetName: string | null;
+          blockerId: number | null;
+          blockerName: string | null;
+          compatibleAttackerCount: number;
+          totalCompatibleAttackerCount: number;
+          transferCertifiedAttackerCount: number;
+          stagedCompatibleAttackerCount: number;
+          vanguardCompatibleAttackerCount: number;
+          assaultTankCount: number;
+          routeThreatCount: number;
+          estimatedBuildingCompletionTicks: number | null;
+          estimatedForceSurvivalTicks: number | null;
+          estimatedBlockerRemovalTicks: number | null;
+          estimatedRouteClearanceTicks: number | null;
+      }
+    | {
           schemaVersion: 10;
           event: "launch_handoff";
           tick: number;
@@ -310,6 +342,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     retargetStalledBuildings: false,
     adaptiveAirTargetCount: 0,
     adaptiveNavalTargetCount: 0,
+    adaptiveGroundAssaultTargetCount: 0,
     adaptiveProductionPriority: 140,
     adaptiveTechPriority: 130,
     activationMode: "forceAdvantage",
@@ -347,6 +380,7 @@ export const resolveBuildingEliminationOptions = (
     requireIntegerInRange("stallTicks", resolved.stallTicks, 1, 100_000);
     requireIntegerInRange("adaptiveAirTargetCount", resolved.adaptiveAirTargetCount, 0, 100);
     requireIntegerInRange("adaptiveNavalTargetCount", resolved.adaptiveNavalTargetCount, 0, 100);
+    requireIntegerInRange("adaptiveGroundAssaultTargetCount", resolved.adaptiveGroundAssaultTargetCount, 0, 100);
     requireIntegerInRange("adaptiveProductionPriority", resolved.adaptiveProductionPriority, 1, 1_000);
     requireIntegerInRange("adaptiveTechPriority", resolved.adaptiveTechPriority, 1, 1_000);
     requireIntegerInRange("maxEnemyBuildings", resolved.maxEnemyBuildings, 1, 1_000);
@@ -361,7 +395,7 @@ export const resolveBuildingEliminationOptions = (
     if (!new Set<BuildingEliminationActivationMode>([
         "forceAdvantage", "lowBuilding", "objectiveRace", "objectiveClearance", "objectiveRouteClearance",
         "objectiveTransferableRouteClearance", "objectiveStagedRouteClearance",
-        "objectiveStagedBlockerClearance",
+        "objectiveStagedBlockerClearance", "objectiveVanguardRouteClearance",
     ])
         .has(resolved.activationMode)) {
         throw new Error(`Invalid building-elimination activation mode: ${resolved.activationMode}`);
@@ -394,6 +428,7 @@ export const resolveBuildingEliminationOptions = (
 const BUILDING_ELIMINATION_MISSION_NAME = "buildingElimination";
 const BUILDING_ELIMINATION_CAPABILITY_BUILD_MISSION_NAME = "buildingEliminationCapabilityBuild";
 const BUILDING_ELIMINATION_CAPABILITY_UNIT_MISSION_NAME = "buildingEliminationCapabilityUnits";
+const BUILDING_ELIMINATION_ASSAULT_PRODUCTION_MISSION_NAME = "buildingEliminationAssaultProduction";
 const BUILDING_ELIMINATION_PRIORITY = 300;
 const BUILDING_ELIMINATION_READINESS_RESERVE_PRIORITY = 290;
 const BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME = "buildingEliminationReadinessReserve";
@@ -1390,7 +1425,8 @@ const isBuildingEliminationCloseoutState = (
         options.activationMode === "objectiveClearance" || options.activationMode === "objectiveRouteClearance" ||
         options.activationMode === "objectiveTransferableRouteClearance" ||
         options.activationMode === "objectiveStagedRouteClearance" ||
-        options.activationMode === "objectiveStagedBlockerClearance"
+        options.activationMode === "objectiveStagedBlockerClearance" ||
+        options.activationMode === "objectiveVanguardRouteClearance"
     ) {
         return meetsLowBuildingEliminationActivationGate(
             ownCombatantCount,
@@ -2115,6 +2151,94 @@ const getPlayerSide = (context: SupabotContext): SideType.Nod | SideType.GDI | n
 const countOwnVisibleUnits = (context: SupabotContext, name: string): number =>
     context.game.getVisibleUnits(context.player.name, "self", (rules) => rules.name === name).length;
 
+export const getBuildingEliminationGroundAssaultUnitName = (
+    side: SideType.Nod | SideType.GDI,
+): "HTNK" | "MTNK" => side === SideType.Nod ? "HTNK" : "MTNK";
+
+export const getBuildingEliminationAssaultProductionAction = (
+    assignedUnitIds: number[],
+    unitName: "HTNK" | "MTNK",
+    currentCount: number,
+    targetCount: number,
+    priority: number,
+): MissionAction => {
+    if (assignedUnitIds.length > 0) return releaseUnits(assignedUnitIds);
+    return currentCount < targetCount ? requestUnits({ [unitName]: priority }) : noop();
+};
+
+class BuildingEliminationAssaultProductionMission extends Mission {
+    private lastTelemetrySignature = "";
+    private lastTelemetryAt = Number.NEGATIVE_INFINITY;
+
+    constructor(
+        private options: Required<BuildingEliminationOptions>,
+        private closeoutLatch: BuildingEliminationCloseoutLatch,
+        logger: DebugLogger,
+        private telemetrySink: BuildingEliminationTelemetrySink,
+    ) {
+        super(BUILDING_ELIMINATION_ASSAULT_PRODUCTION_MISSION_NAME, logger);
+    }
+
+    _onAiUpdate(context: MissionContext): MissionAction {
+        if (this.getUnitIds().length > 0) return releaseUnits(this.getUnitIds());
+        const side = getPlayerSide(context);
+        if (side === null || context.game.getCurrentTick() < this.options.minTick) return noop();
+        if (!shouldRunBuildingEliminationCapabilityProduction(
+            this.closeoutLatch.activated,
+            isBuildingEliminationCloseoutState(context, this.options),
+        )) return noop();
+        const unitName = getBuildingEliminationGroundAssaultUnitName(side);
+        const currentCount = countOwnVisibleUnits(context, unitName);
+        const requested = currentCount < this.options.adaptiveGroundAssaultTargetCount;
+        this.emitTelemetry(context.game.getCurrentTick(), side, unitName, currentCount, requested);
+        return getBuildingEliminationAssaultProductionAction(
+            [],
+            unitName,
+            currentCount,
+            this.options.adaptiveGroundAssaultTargetCount,
+            this.options.adaptiveProductionPriority,
+        );
+    }
+
+    getGlobalDebugText(): string | undefined {
+        return "finish assault production";
+    }
+
+    getPriority(): number {
+        return 0;
+    }
+
+    isUnitsLocked(): boolean {
+        return false;
+    }
+
+    private emitTelemetry(
+        tick: number,
+        side: SideType.Nod | SideType.GDI,
+        unitName: "HTNK" | "MTNK",
+        currentCount: number,
+        requested: boolean,
+    ): void {
+        const event: Extract<BuildingEliminationTelemetryEvent, { event: "assault_production" }> = {
+            schemaVersion: 11,
+            event: "assault_production",
+            tick,
+            side,
+            unitName,
+            targetCount: this.options.adaptiveGroundAssaultTargetCount,
+            currentCount,
+            requested,
+        };
+        const signature = JSON.stringify({ ...event, tick: 0 });
+        if (signature === this.lastTelemetrySignature && tick < this.lastTelemetryAt + TELEMETRY_HEARTBEAT_TICKS) {
+            return;
+        }
+        this.lastTelemetrySignature = signature;
+        this.lastTelemetryAt = tick;
+        this.telemetrySink(event);
+    }
+}
+
 class BuildingEliminationCapabilityBuildMission extends Mission {
     constructor(
         private options: Required<BuildingEliminationOptions>,
@@ -2403,6 +2527,7 @@ export class BuildingEliminationMissionFactory {
             return;
         }
         const enemyCombatantCount = getEnemyCombatantCount(context, this.options.observationMode);
+        let certifiedLaunchUnitIds: number[] = [];
         if (this.options.activationMode === "forceAdvantage" && enemyCombatantCount > this.options.maxEnemyCombatants) {
             this.emitBlockedTelemetry(context, "enemy_combatant_limit", ownCombatants.length, enemyCombatantCount);
             return;
@@ -2421,7 +2546,8 @@ export class BuildingEliminationMissionFactory {
             this.options.activationMode === "objectiveRouteClearance" ||
             this.options.activationMode === "objectiveTransferableRouteClearance" ||
             this.options.activationMode === "objectiveStagedRouteClearance" ||
-            this.options.activationMode === "objectiveStagedBlockerClearance"
+            this.options.activationMode === "objectiveStagedBlockerClearance" ||
+            this.options.activationMode === "objectiveVanguardRouteClearance"
         ) {
             const totalCommittedAttackers = selectCommittedBuildingAttackers(
                 ownCombatants,
@@ -2436,7 +2562,8 @@ export class BuildingEliminationMissionFactory {
                     totalCommittedAttackers,
                     (unitId) => getAssignedBuildingEliminationMissionName(missionController, unitId),
                 )
-                : this.options.activationMode === "objectiveTransferableRouteClearance"
+                : this.options.activationMode === "objectiveTransferableRouteClearance" ||
+                    this.options.activationMode === "objectiveVanguardRouteClearance"
                     ? selectTransferCertifiedBuildingEliminationAttackers(
                         totalCommittedAttackers,
                         (unitId) => getAssignedBuildingEliminationMissionName(missionController, unitId),
@@ -2472,6 +2599,16 @@ export class BuildingEliminationMissionFactory {
             const totalCompatibleAttackerCount = target && descriptor
                 ? totalCommittedAttackers.filter((attacker) => pairIsCompatible(attacker, descriptor)).length
                 : 0;
+            const stagedCompatibleAttackerCount = compatibleAttackers.filter((attacker) =>
+                getAssignedBuildingEliminationMissionName(missionController, attacker.id) ===
+                    BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
+            ).length;
+            const assaultTankCount = compatibleAttackers.filter(({ rules }) =>
+                rules.name === "HTNK" || rules.name === "MTNK",
+            ).length;
+            if (this.options.activationMode === "objectiveVanguardRouteClearance") {
+                certifiedLaunchUnitIds = compatibleAttackers.map(({ id }) => id).sort((left, right) => left - right);
+            }
             const enemyForces = getEnemyUnits(
                 context,
                 this.options.observationMode,
@@ -2494,7 +2631,8 @@ export class BuildingEliminationMissionFactory {
                         ? decision.estimatedBlockerRemovalTicks <= decision.estimatedForceSurvivalTicks
                     : (this.options.activationMode === "objectiveRouteClearance" ||
                         this.options.activationMode === "objectiveTransferableRouteClearance" ||
-                        this.options.activationMode === "objectiveStagedRouteClearance") &&
+                        this.options.activationMode === "objectiveStagedRouteClearance" ||
+                        this.options.activationMode === "objectiveVanguardRouteClearance") &&
                         decision.estimatedRouteClearanceTicks <= decision.estimatedForceSurvivalTicks
             );
             const activationPhase = !target || compatibleAttackers.length === 0 || decision === null
@@ -2513,6 +2651,9 @@ export class BuildingEliminationMissionFactory {
                 this.options.activationMode === "objectiveTransferableRouteClearance",
                 this.options.activationMode === "objectiveStagedRouteClearance" ||
                     this.options.activationMode === "objectiveStagedBlockerClearance",
+                this.options.activationMode === "objectiveVanguardRouteClearance",
+                stagedCompatibleAttackerCount,
+                assaultTankCount,
                 decision,
             );
             if (!buildingReady && !blockerReady) {
@@ -2520,6 +2661,8 @@ export class BuildingEliminationMissionFactory {
                     context,
                     this.options.activationMode === "objectiveStagedBlockerClearance"
                         ? "no_viable_staged_blocker_clearance"
+                        : this.options.activationMode === "objectiveVanguardRouteClearance"
+                            ? "no_viable_vanguard_route_clearance"
                         : this.options.activationMode === "objectiveStagedRouteClearance"
                             ? "no_viable_staged_route_clearance"
                         : this.options.activationMode === "objectiveTransferableRouteClearance"
@@ -2542,7 +2685,9 @@ export class BuildingEliminationMissionFactory {
             }
         }
 
-        const expectedStagedUnitIds = this.options.activationMode === "objectiveStagedBlockerClearance"
+        const expectedStagedUnitIds = this.options.activationMode === "objectiveVanguardRouteClearance"
+            ? certifiedLaunchUnitIds
+            : this.options.activationMode === "objectiveStagedBlockerClearance"
             ? missionController.getMissions().find((mission) =>
                 mission.getUniqueName() === BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
             )?.getUnitIds().slice().sort((left, right) => left - right) ?? []
@@ -2580,13 +2725,15 @@ export class BuildingEliminationMissionFactory {
         totalCompatibleAttackerCount: number,
         transferCertified: boolean,
         stagedCertified: boolean,
+        vanguardCertified: boolean,
+        stagedCompatibleAttackerCount: number,
+        assaultTankCount: number,
         decision: BuildingEliminationEngagementDecision | null,
     ): void {
         const finiteOrNull = (value: number | undefined): number | null =>
             value !== undefined && Number.isFinite(value) ? value : null;
-        const event: Extract<BuildingEliminationTelemetryEvent, { event: "activation_evaluation" }> = {
-            schemaVersion: stagedCertified ? 9 : transferCertified ? 8 : 7,
-            event: "activation_evaluation",
+        const common = {
+            event: "activation_evaluation" as const,
             tick: context.game.getCurrentTick(),
             phase,
             targetId: target?.id ?? null,
@@ -2605,6 +2752,26 @@ export class BuildingEliminationMissionFactory {
             estimatedBlockerRemovalTicks: finiteOrNull(decision?.estimatedBlockerRemovalTicks),
             estimatedRouteClearanceTicks: finiteOrNull(decision?.estimatedRouteClearanceTicks),
         };
+        const event: Extract<BuildingEliminationTelemetryEvent, { event: "activation_evaluation" }> =
+            vanguardCertified
+                ? {
+                    ...common,
+                    schemaVersion: 12,
+                    totalCompatibleAttackerCount,
+                    transferCertifiedAttackerCount: compatibleAttackerCount,
+                    stagedCompatibleAttackerCount,
+                    vanguardCompatibleAttackerCount: compatibleAttackerCount - stagedCompatibleAttackerCount,
+                    assaultTankCount,
+                }
+                : {
+                    ...common,
+                    schemaVersion: stagedCertified ? 9 : transferCertified ? 8 : 7,
+                    ...(transferCertified || stagedCertified ? {
+                        totalCompatibleAttackerCount,
+                        transferCertifiedAttackerCount: compatibleAttackerCount,
+                    } : {}),
+                    ...(stagedCertified ? { stagedCompatibleAttackerCount: compatibleAttackerCount } : {}),
+                };
         const signature = JSON.stringify({ ...event, tick: 0 });
         const ready = phase === "building_ready" || phase === "blocker_ready";
         if (
@@ -2673,9 +2840,12 @@ export class BuildingEliminationMissionFactory {
     }
 
     private maybeCreateCapabilityMissions(missionController: MissionController, logger: DebugLogger): void {
-        if (this.options.adaptiveAirTargetCount <= 0 && this.options.adaptiveNavalTargetCount <= 0) return;
+        const needsCapabilityProduction = this.options.adaptiveAirTargetCount > 0 ||
+            this.options.adaptiveNavalTargetCount > 0;
+        const needsAssaultProduction = this.options.adaptiveGroundAssaultTargetCount > 0;
+        if (!needsCapabilityProduction && !needsAssaultProduction) return;
         const names = new Set(missionController.getMissions().map((mission) => mission.getUniqueName()));
-        if (!names.has(BUILDING_ELIMINATION_CAPABILITY_BUILD_MISSION_NAME)) {
+        if (needsCapabilityProduction && !names.has(BUILDING_ELIMINATION_CAPABILITY_BUILD_MISSION_NAME)) {
             missionController.addMission(
                 new BuildingEliminationCapabilityBuildMission(
                     this.options,
@@ -2685,11 +2855,21 @@ export class BuildingEliminationMissionFactory {
                 ),
             );
         }
-        if (!names.has(BUILDING_ELIMINATION_CAPABILITY_UNIT_MISSION_NAME)) {
+        if (needsCapabilityProduction && !names.has(BUILDING_ELIMINATION_CAPABILITY_UNIT_MISSION_NAME)) {
             missionController.addMission(
                 new BuildingEliminationCapabilityUnitMission(
                     this.options,
                     this.capabilityGapCache,
+                    this.closeoutLatch,
+                    logger,
+                    this.telemetrySink,
+                ),
+            );
+        }
+        if (needsAssaultProduction && !names.has(BUILDING_ELIMINATION_ASSAULT_PRODUCTION_MISSION_NAME)) {
+            missionController.addMission(
+                new BuildingEliminationAssaultProductionMission(
+                    this.options,
                     this.closeoutLatch,
                     logger,
                     this.telemetrySink,
