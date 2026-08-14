@@ -1,0 +1,74 @@
+import { describe, expect, it } from "vitest";
+import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
+import { validatePersistentObjectiveCompatibilityExposure } from "../training/persistentObjectiveCompatibilityGate.js";
+import { PersistentObjectiveCompletionTelemetry } from "../training/persistentObjectiveCompletionStrategy.js";
+
+const decision = (
+    changes: Partial<PersistentObjectiveCompletionTelemetry> = {},
+): PersistentObjectiveCompletionTelemetry => ({
+    schemaVersion: 1,
+    event: "objective_completion_decision",
+    informationInterface: "public_complete_state",
+    tick: 3,
+    phase: "building_strike",
+    reason: "persistent_additive_building_pressure",
+    exactEnemyBuildingCount: 3,
+    ownBuildingCount: 4,
+    terminal: false,
+    targetId: 100,
+    targetRulesName: "GACNST",
+    targetArmor: "8",
+    targetHitPoints: 1_000,
+    blockerId: null,
+    selectedAttackerIds: [1],
+    selectedAttackerRulesNames: ["MTNK"],
+    buildingDamageSincePreviousDecision: 0,
+    blockerDamageSincePreviousDecision: 0,
+    routeProgressSincePreviousDecision: 1,
+    homeThreatened: false,
+    issuedOrder: "attack_building",
+    unitDiagnostics: [{
+        id: 1,
+        rulesName: "MTNK",
+        compatible: true,
+        rejectionReason: null,
+        currentAction: "moving",
+        missionName: null,
+        missionLocked: null,
+        hasOrdinaryCompatibleWeapon: true,
+        hasSpecialSecondaryMechanic: false,
+        reachable: true,
+        selected: true,
+    }],
+    ...changes,
+});
+
+describe("persistent objective outcome-blind compatibility gate", () => {
+    it("accepts an actionable compatible multi-building trace", () => {
+        expect(() => validatePersistentObjectiveCompatibilityExposure(
+            [decision()], Countries.USA, 0,
+        )).not.toThrow();
+    });
+
+    it("rejects commandeering a locked mission above the terminal state", () => {
+        const row = decision({
+            unitDiagnostics: [{
+                ...decision().unitDiagnostics[0],
+                missionName: "globalDefence.1.1",
+                missionLocked: true,
+            }],
+        });
+        expect(() => validatePersistentObjectiveCompatibilityExposure(
+            [row], Countries.USA, 0,
+        )).toThrow(/locked mission/);
+    });
+
+    it("rejects a policy label without a next-cycle movement or attack response", () => {
+        const row = decision({
+            unitDiagnostics: [{ ...decision().unitDiagnostics[0], currentAction: "idle" }],
+        });
+        expect(() => validatePersistentObjectiveCompatibilityExposure(
+            [row], Countries.USA, 0,
+        )).toThrow(/command response/);
+    });
+});
