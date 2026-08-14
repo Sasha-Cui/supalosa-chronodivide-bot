@@ -12,7 +12,7 @@ import {
     PROGRESS_CERTIFIED_ENGINE_SEED_BASE,
     PROGRESS_CERTIFIED_COMPATIBILITY_SHA256,
     PROGRESS_CERTIFIED_FAMILY_COUNT,
-    PROGRESS_CERTIFIED_FAILED_COMPATIBILITY_RECORD_SHA256,
+    PROGRESS_CERTIFIED_INVALIDATED_V1_RECORD_SHA256,
     PROGRESS_CERTIFIED_LAUNCH_COUNT,
     PROGRESS_CERTIFIED_MAX_TICKS,
     PROGRESS_CERTIFIED_ONE_SIDED_80_T_CRITICAL_DF9,
@@ -63,9 +63,9 @@ const exactKeys = (value: RecordValue, expected: string[], label: string): void 
 
 export const validateProgressCertifiedCampaign = (value: unknown): ProgressCertifiedCampaign => {
     if (
-        !isRecord(value) || value.schemaVersion !== 1 ||
+        !isRecord(value) || value.schemaVersion !== 2 ||
         value.kind !== "progress-certified-open-development-literal-endpoint" ||
-        value.status !== "FROZEN_PROGRESS_CERTIFIED_OPEN_DEVELOPMENT_V1_ENDPOINT_V5" ||
+        value.status !== "FROZEN_PROGRESS_CERTIFIED_OPEN_DEVELOPMENT_V2_ENDPOINT_V5" ||
         value.supportedPopulationSha256 !== PROGRESS_CERTIFIED_SUPPORTED_POPULATION_SHA256 ||
         value.sourcePopulationCommitmentSha256 !== PROGRESS_CERTIFIED_SUPPORTED_POPULATION_SHA256 ||
         value.sourceCampaignSha256 !== PROGRESS_CERTIFIED_SOURCE_CAMPAIGN_SHA256 ||
@@ -78,10 +78,11 @@ export const validateProgressCertifiedCampaign = (value: unknown): ProgressCerti
         value.adapterSha256 !== PROGRESS_CERTIFIED_ADAPTER_SHA256 ||
         value.protocolSha256 !== PROGRESS_CERTIFIED_PROTOCOL_SHA256 ||
         value.compatibilityGateSha256 !== PROGRESS_CERTIFIED_COMPATIBILITY_SHA256 ||
-        value.compatibilityJobId !== "22159661" ||
-        value.failedCompatibilityRecordSha256 !== PROGRESS_CERTIFIED_FAILED_COMPATIBILITY_RECORD_SHA256 ||
-        value.supersededCompatibilityJobId !== "22159510" ||
-        value.priorCampaignReuse !== "fixed_families_only_fresh_seeds_and_games" ||
+        value.compatibilityJobId !== "22169937" ||
+        value.invalidatedV1RecordSha256 !== PROGRESS_CERTIFIED_INVALIDATED_V1_RECORD_SHA256 ||
+        value.invalidatedV1ArrayJobId !== "22160669" ||
+        value.invalidatedV1ControllerJobId !== "22160670" ||
+        value.priorCampaignReuse !== "families_only_v1_outcomes_excluded_fresh_seeds_and_games" ||
         value.outcomeAccess !== "open-development-only-no-paper-claim" ||
         value.familyCount !== PROGRESS_CERTIFIED_FAMILY_COUNT ||
         value.seedBlocksPerFamily !== PROGRESS_CERTIFIED_SEED_BLOCKS_PER_FAMILY ||
@@ -103,7 +104,7 @@ export const validateProgressCertifiedCampaign = (value: unknown): ProgressCerti
         value.selectedFamilies.length !== PROGRESS_CERTIFIED_FAMILY_COUNT || value.shards.length !== PROGRESS_CERTIFIED_SHARD_COUNT ||
         typeof value.supportedPopulationPath !== "string" || typeof value.sourceCampaignPath !== "string" ||
         typeof value.protocolPath !== "string" || typeof value.compatibilityGatePath !== "string" ||
-        typeof value.failedCompatibilityRecordPath !== "string"
+        typeof value.invalidatedV1RecordPath !== "string"
     ) throw new Error("Progress-certified campaign has an invalid frozen schema");
     const campaign = value as unknown as ProgressCertifiedCampaign;
     const frozenArms = buildProgressCertifiedArms();
@@ -112,8 +113,7 @@ export const validateProgressCertifiedCampaign = (value: unknown): ProgressCerti
         sha256File(campaign.sourceCampaignPath) !== PROGRESS_CERTIFIED_SOURCE_CAMPAIGN_SHA256 ||
         sha256File(campaign.protocolPath) !== PROGRESS_CERTIFIED_PROTOCOL_SHA256 ||
         sha256File(campaign.compatibilityGatePath) !== PROGRESS_CERTIFIED_COMPATIBILITY_SHA256 ||
-        sha256File(campaign.failedCompatibilityRecordPath) !==
-            PROGRESS_CERTIFIED_FAILED_COMPATIBILITY_RECORD_SHA256 ||
+        sha256File(campaign.invalidatedV1RecordPath) !== PROGRESS_CERTIFIED_INVALIDATED_V1_RECORD_SHA256 ||
         campaign.arms.some((arm, index) => {
             const expected = frozenArms[index];
             return arm.armId !== expected.armId || arm.policyId !== expected.policyId ||

@@ -3,9 +3,28 @@ import {
     parseProgressCertifiedSacct,
     validateProgressCertifiedTelemetry,
 } from "../training/progressCertifiedTechnicalGate.js";
-import { PROGRESS_CERTIFIED_SHARD_COUNT } from "../training/progressCertifiedCampaign.js";
+import {
+    PROGRESS_CERTIFIED_COMPATIBILITY_SHA256,
+    PROGRESS_CERTIFIED_ENGINE_SEED_BASE,
+    PROGRESS_CERTIFIED_INVALIDATED_V1_RECORD_SHA256,
+    PROGRESS_CERTIFIED_PROTOCOL_SHA256,
+    PROGRESS_CERTIFIED_SHARD_COUNT,
+} from "../training/progressCertifiedCampaign.js";
 
 describe("progress-certified technical gate", () => {
+    it("freezes the fresh v2 evidence boundary", () => {
+        expect(PROGRESS_CERTIFIED_ENGINE_SEED_BASE).toBe(4_230_000_000);
+        expect(PROGRESS_CERTIFIED_PROTOCOL_SHA256).toBe(
+            "8eaa60b69becae5bf4afc6399bdad81fa0c81e8b6e7897a738fec4ea83081f96",
+        );
+        expect(PROGRESS_CERTIFIED_COMPATIBILITY_SHA256).toBe(
+            "218d3d92790ecbbf432af3f9a6d9be7d5816b8d1675dfe798937433a085162c6",
+        );
+        expect(PROGRESS_CERTIFIED_INVALIDATED_V1_RECORD_SHA256).toBe(
+            "c9fb77520d58a1a2f1b1dc7ed7980a0cb5e34721817a2f0c63b587dbdd6860b2",
+        );
+    });
+
     it("accepts exactly 90 clean pi_jss233 scheduler tasks", () => {
         const rows = Array.from({ length: PROGRESS_CERTIFIED_SHARD_COUNT }, (_, index) =>
             `123_${index}|${9000 + index}|COMPLETED|0:0|pi_jss233`,

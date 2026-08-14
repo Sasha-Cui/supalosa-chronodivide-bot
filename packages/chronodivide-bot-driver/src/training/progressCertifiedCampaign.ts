@@ -26,7 +26,7 @@ import {
     sha256File,
 } from "./progressCertifiedPlanRunner.js";
 
-export const PROGRESS_CERTIFIED_ENGINE_SEED_BASE = 4_220_000_000 as const;
+export const PROGRESS_CERTIFIED_ENGINE_SEED_BASE = 4_230_000_000 as const;
 export const PROGRESS_CERTIFIED_MAX_TICKS = 24_000 as const;
 export const PROGRESS_CERTIFIED_FAMILY_COUNT = 10 as const;
 export const PROGRESS_CERTIFIED_SEED_BLOCKS_PER_FAMILY = 1 as const;
@@ -39,11 +39,11 @@ export const PROGRESS_CERTIFIED_CORE_SHA256 =
 export const PROGRESS_CERTIFIED_ADAPTER_SHA256 =
     "a39cdb70571de40f72a3aae251eb1e8610c94b76ca7125790f9e0ee488ad52fc" as const;
 export const PROGRESS_CERTIFIED_PROTOCOL_SHA256 =
-    "8ac5f723f83e06e30695ef9f15670c5f985b377ddcfc6b4f75da36aaec0f384e" as const;
+    "8eaa60b69becae5bf4afc6399bdad81fa0c81e8b6e7897a738fec4ea83081f96" as const;
 export const PROGRESS_CERTIFIED_COMPATIBILITY_SHA256 =
-    "7548913b88f880e4560469d8ea578fb6f1b2473bfa718e2628e9be7ffff86bcb" as const;
-export const PROGRESS_CERTIFIED_FAILED_COMPATIBILITY_RECORD_SHA256 =
-    "d7bc43868d282e95fb9e31087944fdf47621b564f138eae1d78f6e0ac09cb17f" as const;
+    "218d3d92790ecbbf432af3f9a6d9be7d5816b8d1675dfe798937433a085162c6" as const;
+export const PROGRESS_CERTIFIED_INVALIDATED_V1_RECORD_SHA256 =
+    "c9fb77520d58a1a2f1b1dc7ed7980a0cb5e34721817a2f0c63b587dbdd6860b2" as const;
 export const PROGRESS_CERTIFIED_ONE_SIDED_80_T_CRITICAL_DF9 = 0.8834038596855205 as const;
 
 export const PROGRESS_CERTIFIED_COUNTRIES = [
@@ -81,9 +81,9 @@ export type ProgressCertifiedFamily = {
 };
 
 export type ProgressCertifiedCampaign = {
-    schemaVersion: 1;
+    schemaVersion: 2;
     kind: "progress-certified-open-development-literal-endpoint";
-    status: "FROZEN_PROGRESS_CERTIFIED_OPEN_DEVELOPMENT_V1_ENDPOINT_V5";
+    status: "FROZEN_PROGRESS_CERTIFIED_OPEN_DEVELOPMENT_V2_ENDPOINT_V5";
     generatedAt: string;
     sourceGitCommit: string;
     sourceRuntimeSha256: string;
@@ -107,11 +107,12 @@ export type ProgressCertifiedCampaign = {
     protocolSha256: typeof PROGRESS_CERTIFIED_PROTOCOL_SHA256;
     compatibilityGatePath: string;
     compatibilityGateSha256: typeof PROGRESS_CERTIFIED_COMPATIBILITY_SHA256;
-    compatibilityJobId: "22159661";
-    failedCompatibilityRecordPath: string;
-    failedCompatibilityRecordSha256: typeof PROGRESS_CERTIFIED_FAILED_COMPATIBILITY_RECORD_SHA256;
-    supersededCompatibilityJobId: "22159510";
-    priorCampaignReuse: "fixed_families_only_fresh_seeds_and_games";
+    compatibilityJobId: "22169937";
+    invalidatedV1RecordPath: string;
+    invalidatedV1RecordSha256: typeof PROGRESS_CERTIFIED_INVALIDATED_V1_RECORD_SHA256;
+    invalidatedV1ArrayJobId: "22160669";
+    invalidatedV1ControllerJobId: "22160670";
+    priorCampaignReuse: "families_only_v1_outcomes_excluded_fresh_seeds_and_games";
     outcomeAccess: "open-development-only-no-paper-claim";
     familyCount: number;
     seedBlocksPerFamily: number;
@@ -208,7 +209,7 @@ export const selectProgressCertifiedFamilies = (
             familyId: raw.familyId,
             mapName: raw.mapName,
             mapSha256: raw.mapSha256,
-            selectionDigest: sha256Text(`progress-certified-open-development-v1|${raw.familyId}|${raw.mapSha256}`),
+            selectionDigest: sha256Text(`progress-certified-open-development-v2|${raw.familyId}|${raw.mapSha256}`),
         };
     });
     if (
@@ -229,7 +230,7 @@ const main = async (): Promise<void> => {
     const sourceCampaignPath = requiredPath("PROGRESS_CERTIFIED_SOURCE_CAMPAIGN");
     const protocolPath = requiredPath("PROGRESS_CERTIFIED_PROTOCOL");
     const compatibilityGatePath = requiredPath("PROGRESS_CERTIFIED_COMPATIBILITY_GATE");
-    const failedCompatibilityRecordPath = requiredPath("PROGRESS_CERTIFIED_FAILED_COMPATIBILITY_RECORD");
+    const invalidatedV1RecordPath = requiredPath("PROGRESS_CERTIFIED_INVALIDATED_V1_RECORD");
     const outRoot = requiredPath("OUT_ROOT");
     if (fs.existsSync(outRoot)) throw new Error(`Refusing to reuse OUT_ROOT ${outRoot}`);
     for (const [filePath, digest, label] of [
@@ -238,9 +239,9 @@ const main = async (): Promise<void> => {
         [protocolPath, PROGRESS_CERTIFIED_PROTOCOL_SHA256, "protocol"],
         [compatibilityGatePath, PROGRESS_CERTIFIED_COMPATIBILITY_SHA256, "compatibility"],
         [
-            failedCompatibilityRecordPath,
-            PROGRESS_CERTIFIED_FAILED_COMPATIBILITY_RECORD_SHA256,
-            "failed-compatibility record",
+            invalidatedV1RecordPath,
+            PROGRESS_CERTIFIED_INVALIDATED_V1_RECORD_SHA256,
+            "invalidated-v1 record",
         ],
     ] as const) if (sha256File(filePath) !== digest) throw new Error(`Progress-certified ${label} commitment drifted`);
     const corePath = path.join(
@@ -259,20 +260,22 @@ const main = async (): Promise<void> => {
         compatibility.status !== "PASS_OUTCOME_FREE_PROGRESS_CERTIFIED_COMPATIBILITY" ||
         compatibility.outcomeFree !== true || compatibility.gameCount !== 72 ||
         compatibility.countryCount !== 9 || compatibility.reciprocalSlotCount !== 2 ||
-        compatibility.sourceGitCommit !== "f9bc85ff18d79183a3a2ad3872bc3a44b400f7eb" ||
-        !isRecord(compatibility.scheduler) || compatibility.scheduler.jobId !== "22159661" ||
+        compatibility.sourceGitCommit !== "7f61b9f7958f5cd20a1b002548a49f65973bf913" ||
+        !isRecord(compatibility.scheduler) || compatibility.scheduler.jobId !== "22169937" ||
         compatibility.scheduler.account !== "pi_jss233"
     ) throw new Error("Progress-certified outcome-free technical gates do not authorize generation");
-    const failedCompatibility = JSON.parse(
-        fs.readFileSync(failedCompatibilityRecordPath, "utf8"),
+    const invalidatedV1 = JSON.parse(
+        fs.readFileSync(invalidatedV1RecordPath, "utf8"),
     ) as RecordValue;
     if (
-        failedCompatibility.status !== "INVALIDATED_OUTCOME_FREE_COMPATIBILITY_SOURCE_REVISION_CHANGED" ||
-        failedCompatibility.jobId !== "22159510" ||
-        failedCompatibility.schedulerAccount !== "pi_jss233" ||
-        failedCompatibility.outcomeBearingGameCount !== 0 ||
-        failedCompatibility.outcomeInspected !== false
-    ) throw new Error("Progress-certified failed-compatibility record is not an exact zero-outcome supersession record");
+        invalidatedV1.status !== "INVALIDATED_PROGRESS_CERTIFIED_CONTROLLER_FALSE_TELEMETRY_INVARIANT" ||
+        invalidatedV1.arrayJobId !== "22160669" || invalidatedV1.arrayCompletedCleanly !== 90 ||
+        invalidatedV1.arrayFailed !== 0 || invalidatedV1.outcomeBearingGameCount !== 1_080 ||
+        invalidatedV1.outcomeBearingGamesRerun !== 0 ||
+        invalidatedV1.controllerJobId !== "22160670" || invalidatedV1.controllerState !== "FAILED" ||
+        invalidatedV1.controllerExitCode !== "1:0" || invalidatedV1.scheduledAnalyzerInvoked !== false ||
+        invalidatedV1.outcomeSummaryProduced !== false || invalidatedV1.humanOutcomeInspection !== false
+    ) throw new Error("Progress-certified invalidated-v1 record is not an exact sealed-campaign supersession record");
 
     const supportedPopulation = JSON.parse(fs.readFileSync(supportedPopulationPath, "utf8")) as unknown;
     const sourceCampaign = JSON.parse(fs.readFileSync(sourceCampaignPath, "utf8")) as unknown;
@@ -280,11 +283,11 @@ const main = async (): Promise<void> => {
     const arms = buildProgressCertifiedArms();
     const baselineFactory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
     const generationManifest = createExperimentManifest({
-        runId: "plan-progress-certified-open-development-v1",
+        runId: "plan-progress-certified-open-development-v2",
         mixDir: path.join(driverRoot, "data"),
         maps: families.map(({ mapName }) => mapName),
         effectiveConfig: {
-            purpose: "progress-certified-open-development-v1-literal-endpoint-v5",
+            purpose: "progress-certified-open-development-v2-literal-endpoint-v5",
             outcomeAccess: false,
             countries: PROGRESS_CERTIFIED_COUNTRIES,
             reciprocalSlots: [0, 1],
@@ -292,7 +295,7 @@ const main = async (): Promise<void> => {
             arms,
             maxTicks: PROGRESS_CERTIFIED_MAX_TICKS,
             sourceCampaignSha256: PROGRESS_CERTIFIED_SOURCE_CAMPAIGN_SHA256,
-            priorCampaignReuse: "fixed_families_only_fresh_seeds_and_games",
+            priorCampaignReuse: "families_only_v1_outcomes_excluded_fresh_seeds_and_games",
         },
         baseline: baselineFactory.descriptor,
         gameSeedBase: PROGRESS_CERTIFIED_ENGINE_SEED_BASE,
@@ -319,7 +322,7 @@ const main = async (): Promise<void> => {
             const shardIndex = familyIndex * PROGRESS_CERTIFIED_COUNTRIES.length + countryIndex;
             const seedBlockIndex = shardIndex;
             const requestedEngineSeed = derivePairedEngineSeed(PROGRESS_CERTIFIED_ENGINE_SEED_BASE, seedBlockIndex);
-            const runId = `progress-certified-v1-f${familyIndex}-c${countryIndex}-${generationManifest.source.gitCommit.slice(0, 10)}`;
+            const runId = `progress-certified-v2-f${familyIndex}-c${countryIndex}-${generationManifest.source.gitCommit.slice(0, 10)}`;
             const plan: ProgressCertifiedRunPlan = parseProgressCertifiedRunPlan({
                 schemaVersion: PROGRESS_CERTIFIED_PLAN_SCHEMA_VERSION,
                 kind: PROGRESS_CERTIFIED_PLAN_KIND,
@@ -365,9 +368,9 @@ const main = async (): Promise<void> => {
         }
     }
     const campaign: ProgressCertifiedCampaign = {
-        schemaVersion: 1,
+        schemaVersion: 2,
         kind: "progress-certified-open-development-literal-endpoint",
-        status: "FROZEN_PROGRESS_CERTIFIED_OPEN_DEVELOPMENT_V1_ENDPOINT_V5",
+        status: "FROZEN_PROGRESS_CERTIFIED_OPEN_DEVELOPMENT_V2_ENDPOINT_V5",
         generatedAt: new Date().toISOString(),
         sourceGitCommit: generationManifest.source.gitCommit,
         sourceRuntimeSha256,
@@ -391,11 +394,12 @@ const main = async (): Promise<void> => {
         protocolSha256: PROGRESS_CERTIFIED_PROTOCOL_SHA256,
         compatibilityGatePath,
         compatibilityGateSha256: PROGRESS_CERTIFIED_COMPATIBILITY_SHA256,
-        compatibilityJobId: "22159661",
-        failedCompatibilityRecordPath,
-        failedCompatibilityRecordSha256: PROGRESS_CERTIFIED_FAILED_COMPATIBILITY_RECORD_SHA256,
-        supersededCompatibilityJobId: "22159510",
-        priorCampaignReuse: "fixed_families_only_fresh_seeds_and_games",
+        compatibilityJobId: "22169937",
+        invalidatedV1RecordPath,
+        invalidatedV1RecordSha256: PROGRESS_CERTIFIED_INVALIDATED_V1_RECORD_SHA256,
+        invalidatedV1ArrayJobId: "22160669",
+        invalidatedV1ControllerJobId: "22160670",
+        priorCampaignReuse: "families_only_v1_outcomes_excluded_fresh_seeds_and_games",
         outcomeAccess: "open-development-only-no-paper-claim",
         familyCount: families.length,
         seedBlocksPerFamily: PROGRESS_CERTIFIED_SEED_BLOCKS_PER_FAMILY,
