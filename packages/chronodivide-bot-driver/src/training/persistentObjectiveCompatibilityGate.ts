@@ -17,10 +17,10 @@ import { derivePairedEngineSeed, withSeededOfflineGame } from "../benchmark/seed
 import { METHOD_V5_EQUIVALENCE_MAP_SHA256 } from "./methodV5BaselineEquivalence.js";
 import { sha256File } from "./methodV5PlanRunner.js";
 import {
-    PersistentObjectiveCompletionPolicyV6,
-    buildPersistentObjectiveCompletionPolicyV6,
-    persistentObjectiveCompletionPolicyV6Sha256,
-} from "./persistentObjectiveCompletionPolicyV6.js";
+    PersistentObjectiveCompletionPolicyV7,
+    buildPersistentObjectiveCompletionPolicyV7,
+    persistentObjectiveCompletionPolicyV7Sha256,
+} from "./persistentObjectiveCompletionPolicyV7.js";
 import {
     PersistentObjectiveCompletionTelemetry,
     createPersistentObjectiveCompletionCandidate,
@@ -28,7 +28,7 @@ import {
 } from "./persistentObjectiveCompletionStrategy.js";
 
 export const PERSISTENT_OBJECTIVE_COMPATIBILITY_MAX_TICKS = 5_400 as const;
-export const PERSISTENT_OBJECTIVE_COMPATIBILITY_ENGINE_SEED_BASE = 3_910_000_000 as const;
+export const PERSISTENT_OBJECTIVE_COMPATIBILITY_ENGINE_SEED_BASE = 3_920_000_000 as const;
 export const PERSISTENT_OBJECTIVE_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT = 4 as const;
 
 type Factory = Awaited<ReturnType<typeof loadBaselineFactory>>;
@@ -135,7 +135,7 @@ const run = async (args: {
     country: Countries;
     candidateSlot: 0 | 1;
     requestedEngineSeed: number;
-    policy: PersistentObjectiveCompletionPolicyV6 | null;
+    policy: PersistentObjectiveCompletionPolicyV7 | null;
 }): Promise<RunTrace> => {
     const { factory, mapName, country, candidateSlot, requestedEngineSeed, policy } = args;
     const telemetry: PersistentObjectiveCompletionTelemetry[] = [];
@@ -496,8 +496,8 @@ const main = async (): Promise<void> => {
         throw new Error("Persistent objective compatibility map bytes drifted");
     }
     const factory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
-    const disabledPolicy = buildPersistentObjectiveCompletionPolicyV6({ enabled: false });
-    const smokePolicy = buildPersistentObjectiveCompletionPolicyV6({
+    const disabledPolicy = buildPersistentObjectiveCompletionPolicyV7({ enabled: false });
+    const smokePolicy = buildPersistentObjectiveCompletionPolicyV7({
         terminalMinTick: 0,
         assaultMinTick: 0,
         assaultBuildingCount: 100,
@@ -572,6 +572,9 @@ const main = async (): Promise<void> => {
             enabledChangedCommands: true,
             enabledTelemetryCount: first.telemetry.length,
             enabledPhases: [...new Set(first.telemetry.map(({ phase }) => phase))].sort(),
+            enabledTargetRulesNames: [...new Set(first.telemetry.flatMap(({ targetRulesName }) =>
+                targetRulesName ? [targetRulesName] : [],
+            ))].sort(),
             enabledRulesNames: [...new Set(diagnostics.map(({ rulesName }) => rulesName))].sort(),
             enabledRejectionReasons: [...new Set(diagnostics.flatMap(({ rejectionReason }) =>
                 rejectionReason ? [rejectionReason] : [],
@@ -604,8 +607,8 @@ const main = async (): Promise<void> => {
         maps: [mapName],
         effectiveConfig: {
             purpose: "outcome-free-persistent-objective-equivalence-determinism-and-command-exposure",
-            disabledPolicyId: persistentObjectiveCompletionPolicyV6Sha256(disabledPolicy),
-            smokePolicyId: persistentObjectiveCompletionPolicyV6Sha256(smokePolicy),
+            disabledPolicyId: persistentObjectiveCompletionPolicyV7Sha256(disabledPolicy),
+            smokePolicyId: persistentObjectiveCompletionPolicyV7Sha256(smokePolicy),
             countries: Object.values(Countries),
             reciprocalSlots: [0, 1],
             runsPerCountrySlot: PERSISTENT_OBJECTIVE_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT,
@@ -627,20 +630,28 @@ const main = async (): Promise<void> => {
     if (!rows.some((row) => row.enabledCompletionRaceBypassObserved === true)) {
         globalValidationErrors.push("No live completion-race building bypass exposure was observed");
     }
+    const targetRulesNames = new Set(rows.flatMap((row) =>
+        Array.isArray(row.enabledTargetRulesNames)
+            ? row.enabledTargetRulesNames.filter((name): name is string => typeof name === "string")
+            : [],
+    ));
+    if (targetRulesNames.size < 2) {
+        globalValidationErrors.push("Complete-mission target ranking exercised fewer than two building types");
+    }
     const passed = rows.every((row) => row.passed === true) && globalValidationErrors.length === 0;
     const output = {
-        schemaVersion: 8,
+        schemaVersion: 9,
         status: passed
-            ? "PASS_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V8"
-            : "FAIL_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V8",
+            ? "PASS_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V9"
+            : "FAIL_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V9",
         generatedAt: new Date().toISOString(),
         passed,
         outcomeFree: true,
         sourceGitCommit: manifest.source.gitCommit,
         scheduler: manifest.scheduler,
         externalBaseline: manifest.software.baseline,
-        disabledPolicyId: persistentObjectiveCompletionPolicyV6Sha256(disabledPolicy),
-        smokePolicyId: persistentObjectiveCompletionPolicyV6Sha256(smokePolicy),
+        disabledPolicyId: persistentObjectiveCompletionPolicyV7Sha256(disabledPolicy),
+        smokePolicyId: persistentObjectiveCompletionPolicyV7Sha256(smokePolicy),
         countryCount: Object.values(Countries).length,
         reciprocalSlotCount: 2,
         gameCount: rows.length * PERSISTENT_OBJECTIVE_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT,
@@ -656,7 +667,7 @@ const main = async (): Promise<void> => {
         status: output.status,
         gameCount: output.gameCount,
     }));
-    if (!passed) throw new Error("Persistent objective compatibility-v8 failed; preserved diagnostic artifact");
+    if (!passed) throw new Error("Persistent objective compatibility-v9 failed; preserved diagnostic artifact");
 };
 
 const invoked = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : null;
