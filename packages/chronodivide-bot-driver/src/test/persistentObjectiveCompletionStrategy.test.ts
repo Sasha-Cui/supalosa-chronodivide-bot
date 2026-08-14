@@ -4,6 +4,7 @@ import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/util
 import {
     PersistentObjectiveCompletionStrategy,
     isObjectiveOffensiveMissionName,
+    objectiveRaceFavorsBuilding,
     objectiveMissionAssignments,
     objectiveUnitCompatibility,
     weaponCanDamageObjectiveBuilding,
@@ -12,6 +13,7 @@ import { buildPersistentObjectiveCompletionPolicy } from "../training/persistent
 import { buildPersistentObjectiveCompletionPolicyV2 } from "../training/persistentObjectiveCompletionPolicyV2.js";
 import { buildPersistentObjectiveCompletionPolicyV3 } from "../training/persistentObjectiveCompletionPolicyV3.js";
 import { buildPersistentObjectiveCompletionPolicyV4 } from "../training/persistentObjectiveCompletionPolicyV4.js";
+import { buildPersistentObjectiveCompletionPolicyV5 } from "../training/persistentObjectiveCompletionPolicyV5.js";
 
 const ordinaryWeapon = (special = false) => ({
     rules: {
@@ -318,6 +320,83 @@ describe("persistent objective-completion strategy", () => {
         } as any, { getMissions: () => [] }, vi.fn());
         expect(orders).toHaveLength(1);
         expect(orders[0][2]).toBe(100);
+    });
+
+    it("compares building completion directly against detachment survival", () => {
+        expect(objectiveRaceFavorsBuilding(100, 100)).toBe(true);
+        expect(objectiveRaceFavorsBuilding(100, 99)).toBe(false);
+        expect(objectiveRaceFavorsBuilding(100, Number.POSITIVE_INFINITY)).toBe(true);
+        expect(objectiveRaceFavorsBuilding(Number.POSITIVE_INFINITY, 100)).toBe(false);
+    });
+
+    it("bypasses a route threat when the selected package can finish the building first", () => {
+        const tick = { value: 0 };
+        const routeBlocker = combatant(200, 15, 0, "enemy");
+        const units = [
+            combatant(1, 0), combatant(2, 1), combatant(3, 2),
+            building(10, 0, "candidate"),
+            building(100, 20, "enemy"),
+            building(101, 25, "enemy"),
+            routeBlocker,
+        ];
+        const game = mockGame(units, tick);
+        const orders: any[][] = [];
+        let inner: any;
+        inner = { onAiUpdate: () => inner };
+        const strategy = new PersistentObjectiveCompletionStrategy(
+            inner,
+            Countries.USA,
+            buildPersistentObjectiveCompletionPolicyV5({
+                terminalMinTick: 0,
+                assaultMinTick: 0,
+                assaultBuildingCount: 100,
+                minimumOwnBuildingsForAssault: 1,
+                homeThreatRadius: 0,
+                homeReserveRadius: 0,
+            }),
+            () => undefined,
+        );
+        strategy.onAiUpdate({
+            game,
+            player: { name: "candidate", actions: { orderUnits: (...args: any[]) => orders.push(args) } },
+        } as any, { getMissions: () => [] }, vi.fn());
+        expect(orders).toHaveLength(1);
+        expect(orders[0][2]).toBe(100);
+    });
+
+    it("clears one removable route threat when interception wins the completion race", () => {
+        const tick = { value: 0 };
+        const routeBlocker = combatant(200, 15, 0, "enemy");
+        const units = [
+            combatant(1, 0),
+            building(10, 0, "candidate"),
+            building(100, 20, "enemy"),
+            building(101, 25, "enemy"),
+            routeBlocker,
+        ];
+        const game = mockGame(units, tick);
+        const orders: any[][] = [];
+        let inner: any;
+        inner = { onAiUpdate: () => inner };
+        const strategy = new PersistentObjectiveCompletionStrategy(
+            inner,
+            Countries.USA,
+            buildPersistentObjectiveCompletionPolicyV5({
+                terminalMinTick: 0,
+                assaultMinTick: 0,
+                assaultBuildingCount: 100,
+                minimumOwnBuildingsForAssault: 1,
+                homeThreatRadius: 0,
+                homeReserveRadius: 0,
+            }),
+            () => undefined,
+        );
+        strategy.onAiUpdate({
+            game,
+            player: { name: "candidate", actions: { orderUnits: (...args: any[]) => orders.push(args) } },
+        } as any, { getMissions: () => [] }, vi.fn());
+        expect(orders).toHaveLength(1);
+        expect(orders[0][2]).toBe(routeBlocker.id);
     });
 
     it("reasserts the final-building order after Supalosa every three ticks and ignores off-route forces", () => {
