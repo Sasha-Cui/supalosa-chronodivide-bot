@@ -69,6 +69,7 @@ export type BuildingEliminationOptions = {
     routeCorridorRadius?: number;
     readinessReserve?: boolean;
     readinessReserveScope?: BuildingEliminationReadinessReserveScope;
+    contactOnlyBlockerClearance?: boolean;
 };
 
 export type BuildingTargetDescriptor = {
@@ -178,7 +179,8 @@ export type BuildingEliminationTelemetryEvent =
           tick: number;
           phase: "building_strike" | "blocker_clear" | "no_compatible_target";
           reason: "direct_building" | "building_in_range" | "building_completion_race" |
-              "no_route_threat" | "route_interception_wins" | "no_compatible_target";
+              "no_route_threat" | "route_interception_wins" | "objective_advance" |
+              "no_compatible_target";
           targetId: number | null;
           targetName: string | null;
           targetHitPoints: number | null;
@@ -318,6 +320,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     routeCorridorRadius: 8,
     readinessReserve: false,
     readinessReserveScope: "reinforcements",
+    contactOnlyBlockerClearance: false,
 };
 
 const requireIntegerInRange = (name: string, value: number, minimum: number, maximum: number): void => {
@@ -379,6 +382,11 @@ export const resolveBuildingEliminationOptions = (
     if (!new Set<BuildingEliminationReadinessReserveScope>(["reinforcements", "fullForce"])
         .has(resolved.readinessReserveScope)) {
         throw new Error(`Invalid building-elimination readiness reserve scope: ${resolved.readinessReserveScope}`);
+    }
+    if (typeof resolved.contactOnlyBlockerClearance !== "boolean") {
+        throw new Error(
+            `Invalid building-elimination contact-only blocker clearance: ${resolved.contactOnlyBlockerClearance}`,
+        );
     }
     return resolved;
 };
@@ -667,7 +675,7 @@ const piecewiseForceSurvivalTicks = (
 export type BuildingEliminationEngagementDecision = {
     blocker: UnitData | null;
     reason: "building_in_range" | "building_completion_race" |
-        "no_route_threat" | "route_interception_wins";
+        "no_route_threat" | "route_interception_wins" | "objective_advance";
     routeThreatCount: number;
     estimatedBuildingCompletionTicks: number;
     estimatedForceSurvivalTicks: number;
@@ -675,6 +683,15 @@ export type BuildingEliminationEngagementDecision = {
     estimatedBlockerRemovalTicks: number;
     estimatedRouteClearanceTicks: number;
 };
+
+export const applyContactTriggeredBuildingAdvance = (
+    decision: BuildingEliminationEngagementDecision,
+    preserveCommittedBlocker: boolean,
+): BuildingEliminationEngagementDecision =>
+    decision.blocker !== null && decision.earliestRouteThreatInterceptTicks > 0 &&
+    !preserveCommittedBlocker
+        ? { ...decision, blocker: null, reason: "objective_advance" }
+        : decision;
 
 export const chooseBuildingEliminationEngagement = (
     attackers: UnitData[],
@@ -1662,7 +1679,7 @@ class BuildingEliminationMission extends Mission {
                     this.options.observationMode,
                     (unit) => unit.rules.type !== ObjectType.Building && !!unit.rules.isSelectableCombatant,
                 );
-                const decision = chooseBuildingEliminationEngagement(
+                const predictedDecision = chooseBuildingEliminationEngagement(
                     assignedUnits,
                     currentPrimaryTarget,
                     enemyForces,
@@ -1672,6 +1689,12 @@ class BuildingEliminationMission extends Mission {
                         ? this.committedRouteBlocker.blockerId
                         : null,
                 );
+                const preserveCommittedBlocker = this.options.commitRouteBlocker &&
+                    this.committedRouteBlocker?.targetId === currentPrimaryTarget.id &&
+                    predictedDecision.blocker?.id === this.committedRouteBlocker.blockerId;
+                const decision = this.options.contactOnlyBlockerClearance
+                    ? applyContactTriggeredBuildingAdvance(predictedDecision, preserveCommittedBlocker)
+                    : predictedDecision;
                 blocker = decision.blocker;
                 this.committedRouteBlocker = this.options.commitRouteBlocker && blocker
                     ? { targetId: currentPrimaryTarget.id, blockerId: blocker.id }

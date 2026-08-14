@@ -4,6 +4,7 @@ import {
     assignAttackersToTargets,
     assignAttackersToCompatibleTargets,
     allocateBuildingEliminationEngagement,
+    applyContactTriggeredBuildingAdvance,
     BuildingTargetDescriptor,
     classifyBuildingCapabilityGaps,
     classifyBuildingEliminationLaunchHandoff,
@@ -697,6 +698,29 @@ describe("building elimination policy", () => {
         )).toMatchObject({ blocker: first, reason: "route_interception_wins", routeThreatCount: 1 });
     });
 
+    test("advances toward the building until a predicted blocker reaches contact", () => {
+        const blocker = combatant(100, 5, 0, 100, 500, 1, 1) as any;
+        const predicted = chooseBuildingEliminationEngagement(
+            [combatant(1, 0, 0, 100, 10, 1, 1)] as any[],
+            buildingUnit(200, 20, 1_000) as any,
+            [blocker],
+            8,
+        );
+        expect(predicted).toMatchObject({ blocker, reason: "route_interception_wins" });
+        expect(predicted.earliestRouteThreatInterceptTicks).toBeGreaterThan(0);
+        expect(applyContactTriggeredBuildingAdvance(predicted, false)).toMatchObject({
+            blocker: null,
+            reason: "objective_advance",
+        });
+        expect(applyContactTriggeredBuildingAdvance(predicted, true)).toBe(predicted);
+
+        const contact = {
+            ...predicted,
+            earliestRouteThreatInterceptTicks: 0,
+        };
+        expect(applyContactTriggeredBuildingAdvance(contact, false)).toBe(contact);
+    });
+
     test("races a finishable building when completion precedes force destruction", () => {
         const decision = chooseBuildingEliminationEngagement(
             [combatant(1, 0, 0, 500, 100, 1, 1)] as any[],
@@ -834,6 +858,7 @@ describe("building elimination policy", () => {
             "routeCorridorRadius",
             "readinessReserve",
             "readinessReserveScope",
+            "contactOnlyBlockerClearance",
         ]);
     });
 
@@ -860,6 +885,9 @@ describe("building elimination policy", () => {
         );
         expect(() => resolveBuildingEliminationOptions({ readinessReserveScope: "unknown" as any })).toThrow(
             "readiness reserve scope",
+        );
+        expect(() => resolveBuildingEliminationOptions({ contactOnlyBlockerClearance: "yes" as any })).toThrow(
+            "contact-only blocker clearance",
         );
     });
 });
