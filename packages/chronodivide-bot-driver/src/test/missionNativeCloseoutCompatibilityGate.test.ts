@@ -150,8 +150,8 @@ describe("mission-native closeout outcome-blind gate", () => {
         Object.assign(allocation, {
             blockerId: 400,
             blockerName: "HTNK",
-            buildingAttackerCount: 2,
-            blockerAttackerCount: 2,
+            buildingAttackerCount: 3,
+            blockerAttackerCount: 1,
         });
         events.push({
             ...decision,
@@ -163,7 +163,7 @@ describe("mission-native closeout outcome-blind gate", () => {
         expect(() => validateMissionNativeCloseoutExposure(events, Countries.USA, 0)).not.toThrow();
     });
 
-    it("rejects an allocation that diverts more than half the assault force", () => {
+    it("rejects an allocation that diverts more than one attacker", () => {
         const events = trace();
         const allocation = events.find((event) => event.event === "engagement_allocation") as Extract<
             BuildingEliminationTelemetryEvent,
@@ -176,7 +176,7 @@ describe("mission-native closeout outcome-blind gate", () => {
             blockerAttackerCount: 3,
         });
         expect(() => validateMissionNativeCloseoutExposure(events, Countries.USA, 0)).toThrow(
-            /bounded-screen allocation/,
+            /single-screen allocation/,
         );
     });
 });
