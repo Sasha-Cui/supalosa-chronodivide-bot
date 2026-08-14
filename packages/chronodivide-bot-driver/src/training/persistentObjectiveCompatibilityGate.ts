@@ -17,10 +17,10 @@ import { derivePairedEngineSeed, withSeededOfflineGame } from "../benchmark/seed
 import { METHOD_V5_EQUIVALENCE_MAP_SHA256 } from "./methodV5BaselineEquivalence.js";
 import { sha256File } from "./methodV5PlanRunner.js";
 import {
-    PersistentObjectiveCompletionPolicyV7,
-    buildPersistentObjectiveCompletionPolicyV7,
-    persistentObjectiveCompletionPolicyV7Sha256,
-} from "./persistentObjectiveCompletionPolicyV7.js";
+    PersistentObjectiveCompletionPolicyV8,
+    buildPersistentObjectiveCompletionPolicyV8,
+    persistentObjectiveCompletionPolicyV8Sha256,
+} from "./persistentObjectiveCompletionPolicyV8.js";
 import {
     PersistentObjectiveCompletionTelemetry,
     createPersistentObjectiveCompletionCandidate,
@@ -28,7 +28,7 @@ import {
 } from "./persistentObjectiveCompletionStrategy.js";
 
 export const PERSISTENT_OBJECTIVE_COMPATIBILITY_MAX_TICKS = 5_400 as const;
-export const PERSISTENT_OBJECTIVE_COMPATIBILITY_ENGINE_SEED_BASE = 3_920_000_000 as const;
+export const PERSISTENT_OBJECTIVE_COMPATIBILITY_ENGINE_SEED_BASE = 3_930_000_000 as const;
 export const PERSISTENT_OBJECTIVE_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT = 4 as const;
 
 type Factory = Awaited<ReturnType<typeof loadBaselineFactory>>;
@@ -135,7 +135,7 @@ const run = async (args: {
     country: Countries;
     candidateSlot: 0 | 1;
     requestedEngineSeed: number;
-    policy: PersistentObjectiveCompletionPolicyV7 | null;
+    policy: PersistentObjectiveCompletionPolicyV8 | null;
 }): Promise<RunTrace> => {
     const { factory, mapName, country, candidateSlot, requestedEngineSeed, policy } = args;
     const telemetry: PersistentObjectiveCompletionTelemetry[] = [];
@@ -496,15 +496,14 @@ const main = async (): Promise<void> => {
         throw new Error("Persistent objective compatibility map bytes drifted");
     }
     const factory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
-    const disabledPolicy = buildPersistentObjectiveCompletionPolicyV7({ enabled: false });
-    const smokePolicy = buildPersistentObjectiveCompletionPolicyV7({
+    const disabledPolicy = buildPersistentObjectiveCompletionPolicyV8({ enabled: false });
+    const smokePolicy = buildPersistentObjectiveCompletionPolicyV8({
         terminalMinTick: 0,
         assaultMinTick: 0,
         assaultBuildingCount: 100,
         minimumOwnBuildingsForAssault: 1,
         homeThreatRadius: 0,
         homeReserveRadius: 0,
-        maximumLeaseTicks: 20_000,
     });
     const rows: Array<Record<string, unknown>> = [];
     await cdapi.init(path.join(process.cwd(), "data"));
@@ -572,6 +571,9 @@ const main = async (): Promise<void> => {
             enabledChangedCommands: true,
             enabledTelemetryCount: first.telemetry.length,
             enabledPhases: [...new Set(first.telemetry.map(({ phase }) => phase))].sort(),
+            enabledTargetIds: [...new Set(first.telemetry.flatMap(({ targetId }) =>
+                targetId === null ? [] : [targetId],
+            ))].sort((left, right) => left - right),
             enabledTargetRulesNames: [...new Set(first.telemetry.flatMap(({ targetRulesName }) =>
                 targetRulesName ? [targetRulesName] : [],
             ))].sort(),
@@ -607,8 +609,8 @@ const main = async (): Promise<void> => {
         maps: [mapName],
         effectiveConfig: {
             purpose: "outcome-free-persistent-objective-equivalence-determinism-and-command-exposure",
-            disabledPolicyId: persistentObjectiveCompletionPolicyV7Sha256(disabledPolicy),
-            smokePolicyId: persistentObjectiveCompletionPolicyV7Sha256(smokePolicy),
+            disabledPolicyId: persistentObjectiveCompletionPolicyV8Sha256(disabledPolicy),
+            smokePolicyId: persistentObjectiveCompletionPolicyV8Sha256(smokePolicy),
             countries: Object.values(Countries),
             reciprocalSlots: [0, 1],
             runsPerCountrySlot: PERSISTENT_OBJECTIVE_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT,
@@ -638,20 +640,23 @@ const main = async (): Promise<void> => {
     if (targetRulesNames.size < 2) {
         globalValidationErrors.push("Complete-mission target ranking exercised fewer than two building types");
     }
+    if (!rows.some((row) => Array.isArray(row.enabledTargetIds) && row.enabledTargetIds.length >= 2)) {
+        globalValidationErrors.push("No live bounded target rotation was observed");
+    }
     const passed = rows.every((row) => row.passed === true) && globalValidationErrors.length === 0;
     const output = {
-        schemaVersion: 9,
+        schemaVersion: 10,
         status: passed
-            ? "PASS_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V9"
-            : "FAIL_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V9",
+            ? "PASS_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V10"
+            : "FAIL_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V10",
         generatedAt: new Date().toISOString(),
         passed,
         outcomeFree: true,
         sourceGitCommit: manifest.source.gitCommit,
         scheduler: manifest.scheduler,
         externalBaseline: manifest.software.baseline,
-        disabledPolicyId: persistentObjectiveCompletionPolicyV7Sha256(disabledPolicy),
-        smokePolicyId: persistentObjectiveCompletionPolicyV7Sha256(smokePolicy),
+        disabledPolicyId: persistentObjectiveCompletionPolicyV8Sha256(disabledPolicy),
+        smokePolicyId: persistentObjectiveCompletionPolicyV8Sha256(smokePolicy),
         countryCount: Object.values(Countries).length,
         reciprocalSlotCount: 2,
         gameCount: rows.length * PERSISTENT_OBJECTIVE_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT,
@@ -667,7 +672,7 @@ const main = async (): Promise<void> => {
         status: output.status,
         gameCount: output.gameCount,
     }));
-    if (!passed) throw new Error("Persistent objective compatibility-v9 failed; preserved diagnostic artifact");
+    if (!passed) throw new Error("Persistent objective compatibility-v10 failed; preserved diagnostic artifact");
 };
 
 const invoked = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : null;
