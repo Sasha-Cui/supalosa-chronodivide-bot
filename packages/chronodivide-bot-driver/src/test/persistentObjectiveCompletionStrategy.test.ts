@@ -16,6 +16,7 @@ import { buildPersistentObjectiveCompletionPolicyV4 } from "../training/persiste
 import { buildPersistentObjectiveCompletionPolicyV5 } from "../training/persistentObjectiveCompletionPolicyV5.js";
 import { buildPersistentObjectiveCompletionPolicyV6 } from "../training/persistentObjectiveCompletionPolicyV6.js";
 import { buildPersistentObjectiveCompletionPolicyV7 } from "../training/persistentObjectiveCompletionPolicyV7.js";
+import { buildPersistentObjectiveCompletionPolicyV8 } from "../training/persistentObjectiveCompletionPolicyV8.js";
 
 const ordinaryWeapon = (special = false) => ({
     rules: {
@@ -487,6 +488,58 @@ describe("persistent objective-completion strategy", () => {
         } as any, { getMissions: () => [] }, vi.fn());
         expect(orders).toHaveLength(1);
         expect(orders[0][2]).toBe(accessibleTarget.id);
+    });
+
+    it("rotates to a different feasible building after a bounded mission makes no building damage", () => {
+        const tick = { value: 3 };
+        const firstTarget = building(100, 20, "enemy");
+        const secondTarget = building(101, -20, "enemy");
+        const units = [
+            combatant(1, 0), combatant(2, 1), combatant(3, 2),
+            building(10, 0, "candidate"),
+            firstTarget,
+            secondTarget,
+            combatant(200, 15, 0, "enemy"),
+        ];
+        const game = mockGame(units, tick);
+        (game.map as any).getTilesInRect = (rect: any) => [{
+            id: 999,
+            rx: rect.x + Math.floor(rect.width / 2),
+            ry: rect.y + Math.floor(rect.height / 2),
+            onBridgeLandType: false,
+        }];
+        const orders: any[][] = [];
+        let inner: any;
+        inner = { onAiUpdate: () => inner };
+        const strategy = new PersistentObjectiveCompletionStrategy(
+            inner,
+            Countries.USA,
+            buildPersistentObjectiveCompletionPolicyV8({
+                terminalMinTick: 0,
+                assaultMinTick: 0,
+                assaultBuildingCount: 100,
+                ordinaryReserveCombatants: 0,
+                minimumOwnBuildingsForAssault: 1,
+                homeThreatRadius: 0,
+                homeReserveRadius: 0,
+                buildingNoProgressDeadlineTicks: 21,
+                maximumLeaseTicks: 21,
+                fallbackCooldownTicks: 3,
+            }),
+            () => undefined,
+        );
+        const context = {
+            game,
+            player: { name: "candidate", actions: { orderUnits: (...args: any[]) => orders.push(args) } },
+        };
+        strategy.onAiUpdate(context as any, { getMissions: () => [] }, vi.fn());
+        tick.value = 24;
+        strategy.onAiUpdate(context as any, { getMissions: () => [] }, vi.fn());
+        tick.value = 27;
+        strategy.onAiUpdate(context as any, { getMissions: () => [] }, vi.fn());
+        expect(orders).toHaveLength(2);
+        expect(orders[0][2]).toBe(firstTarget.id);
+        expect(orders[1][2]).toBe(secondTarget.id);
     });
 
     it("reasserts the final-building order after Supalosa every three ticks and ignores off-route forces", () => {
