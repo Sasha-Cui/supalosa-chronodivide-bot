@@ -15,6 +15,7 @@ import { buildMissionNativeCloseoutPolicyV17 } from "../training/missionNativeCl
 import { buildMissionNativeCloseoutPolicyV18 } from "../training/missionNativeCloseoutPolicyV18.js";
 import { buildMissionNativeCloseoutPolicyV19 } from "../training/missionNativeCloseoutPolicyV19.js";
 import { buildMissionNativeCloseoutPolicyV20 } from "../training/missionNativeCloseoutPolicyV20.js";
+import { buildMissionNativeCloseoutPolicyV21 } from "../training/missionNativeCloseoutPolicyV21.js";
 
 describe("mission-native closeout candidate", () => {
     it("returns the exact external baseline path when disabled", () => {
@@ -307,4 +308,19 @@ describe("mission-native closeout candidate", () => {
         )).toBe(injected);
         expect(factory.createWithStrategy).toHaveBeenCalledOnce();
     });
+
+    it("accepts the frozen readiness-defense v21 policy", () => {
+        const injected = { kind: "injected-v21" } as any;
+        let inner: any;
+        inner = { onAiUpdate: vi.fn(() => inner) };
+        const factory = {
+            descriptor: { kind: "external-package", packageRoot: "/baseline" },
+            create: vi.fn(), createDefaultStrategy: vi.fn(() => inner),
+            createWithStrategy: vi.fn(() => injected),
+        } as any;
+        expect(createMissionNativeCloseoutCandidate(
+            factory, "candidate", Countries.USA, buildMissionNativeCloseoutPolicyV21(),
+        )).toBe(injected);
+        expect(factory.createWithStrategy).toHaveBeenCalledOnce();
+    }, 15_000);
 });
