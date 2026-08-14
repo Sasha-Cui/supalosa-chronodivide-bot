@@ -4,6 +4,7 @@ import { createMissionNativeCloseoutCandidate } from "../training/missionNativeC
 import { buildMissionNativeCloseoutPolicy } from "../training/missionNativeCloseoutPolicy.js";
 import { buildMissionNativeCloseoutPolicyV2 } from "../training/missionNativeCloseoutPolicyV2.js";
 import { buildMissionNativeCloseoutPolicyV3 } from "../training/missionNativeCloseoutPolicyV3.js";
+import { buildMissionNativeCloseoutPolicyV4 } from "../training/missionNativeCloseoutPolicyV4.js";
 
 describe("mission-native closeout candidate", () => {
     it("returns the exact external baseline path when disabled", () => {
@@ -84,6 +85,25 @@ describe("mission-native closeout candidate", () => {
             "candidate",
             Countries.USA,
             buildMissionNativeCloseoutPolicyV3(),
+        )).toBe(injected);
+        expect(factory.createWithStrategy).toHaveBeenCalledOnce();
+    });
+
+    it("accepts the frozen progress-retargeting v4 policy", () => {
+        const injected = { kind: "injected-v4" } as any;
+        let inner: any;
+        inner = { onAiUpdate: vi.fn(() => inner) };
+        const factory = {
+            descriptor: { kind: "external-package", packageRoot: "/baseline" },
+            create: vi.fn(),
+            createDefaultStrategy: vi.fn(() => inner),
+            createWithStrategy: vi.fn(() => injected),
+        } as any;
+        expect(createMissionNativeCloseoutCandidate(
+            factory,
+            "candidate",
+            Countries.USA,
+            buildMissionNativeCloseoutPolicyV4(),
         )).toBe(injected);
         expect(factory.createWithStrategy).toHaveBeenCalledOnce();
     });

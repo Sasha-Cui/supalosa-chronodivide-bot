@@ -52,6 +52,7 @@ export type BuildingEliminationOptions = {
     reachabilityAwareTargets?: boolean;
     stallTicks?: number;
     reassignStalledTargets?: boolean;
+    retargetStalledBuildings?: boolean;
     adaptiveAirTargetCount?: number;
     adaptiveNavalTargetCount?: number;
     adaptiveProductionPriority?: number;
@@ -220,6 +221,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     reachabilityAwareTargets: false,
     stallTicks: 900,
     reassignStalledTargets: false,
+    retargetStalledBuildings: false,
     adaptiveAirTargetCount: 0,
     adaptiveNavalTargetCount: 0,
     adaptiveProductionPriority: 140,
@@ -782,6 +784,15 @@ export const prioritizeStalledBuildingTargets = (
         Number(progress.get(left.id ?? -1)?.stalled === true),
     );
 
+export const deferStalledBuildingTargets = (
+    targets: BuildingTargetDescriptor[],
+    progress: ReadonlyMap<number, BuildingTargetProgressState>,
+): BuildingTargetDescriptor[] =>
+    targets.slice().sort((left, right) =>
+        Number(progress.get(left.id ?? -1)?.stalled === true) -
+        Number(progress.get(right.id ?? -1)?.stalled === true),
+    );
+
 export type BuildingCapabilityGap = {
     stalledBuildingIds: number[];
     incompatibleBuildingIds: number[];
@@ -1212,9 +1223,14 @@ class BuildingEliminationMission extends Mission {
         if (this.options.reassignStalledTargets) {
             rankedTargets = prioritizeStalledBuildingTargets(rankedTargets, this.targetProgress);
         }
+        if (this.options.retargetStalledBuildings) {
+            rankedTargets = deferStalledBuildingTargets(rankedTargets, this.targetProgress);
+        }
         if (this.options.engagementMode === "completionRace" && this.committedTargetId !== null) {
             const committed = rankedTargets.find(({ id }) => id === this.committedTargetId);
-            if (committed) {
+            const committedIsStalled = committed?.id !== undefined &&
+                this.targetProgress.get(committed.id)?.stalled === true;
+            if (committed && !(this.options.retargetStalledBuildings && committedIsStalled)) {
                 rankedTargets = [committed, ...rankedTargets.filter(({ id }) => id !== this.committedTargetId)];
             } else {
                 this.committedTargetId = null;

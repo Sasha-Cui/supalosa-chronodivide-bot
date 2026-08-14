@@ -7,6 +7,7 @@ import {
     BuildingTargetDescriptor,
     classifyBuildingCapabilityGaps,
     chooseBuildingEliminationEngagement,
+    deferStalledBuildingTargets,
     getBuildingCapabilityProductionPlan,
     getBuildingCapabilityUnitMissionAction,
     getBuildingTargetWeight,
@@ -345,6 +346,17 @@ describe("building elimination policy", () => {
         ]);
     });
 
+    test("progress-certified retargeting defers a stalled committed structure", () => {
+        const stalled = target({ id: 1, name: "GAREFN" });
+        const untried = target({ id: 2, name: "GAPOWR" });
+        const progress = new Map([
+            [1, { hitPoints: 1_000, lastObservedTick: 4_000, lastDamageTick: 3_400, stalled: true }],
+            [2, { hitPoints: 750, lastObservedTick: 4_000, lastDamageTick: 4_000, stalled: false }],
+        ]);
+        expect(deferStalledBuildingTargets([stalled, untried], progress)).toEqual([untried, stalled]);
+        expect(deferStalledBuildingTargets([stalled], progress)).toEqual([stalled]);
+    });
+
     test("memory is retained under fog and invalidated after its tile is re-observed empty", () => {
         const hidden = target({ id: 7, x: 20, y: 30, visible: false });
         const retained = reconcileRememberedBuildingTargets(new Map([[7, hidden]]), [], () => false);
@@ -536,6 +548,7 @@ describe("building elimination policy", () => {
             "reachabilityAwareTargets",
             "stallTicks",
             "reassignStalledTargets",
+            "retargetStalledBuildings",
             "adaptiveAirTargetCount",
             "adaptiveNavalTargetCount",
             "adaptiveProductionPriority",
