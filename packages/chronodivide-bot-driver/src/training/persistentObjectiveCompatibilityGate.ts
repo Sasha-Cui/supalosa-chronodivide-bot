@@ -17,10 +17,10 @@ import { derivePairedEngineSeed, withSeededOfflineGame } from "../benchmark/seed
 import { METHOD_V5_EQUIVALENCE_MAP_SHA256 } from "./methodV5BaselineEquivalence.js";
 import { sha256File } from "./methodV5PlanRunner.js";
 import {
-    PersistentObjectiveCompletionPolicyV2,
-    buildPersistentObjectiveCompletionPolicyV2,
-    persistentObjectiveCompletionPolicyV2Sha256,
-} from "./persistentObjectiveCompletionPolicyV2.js";
+    PersistentObjectiveCompletionPolicyV3,
+    buildPersistentObjectiveCompletionPolicyV3,
+    persistentObjectiveCompletionPolicyV3Sha256,
+} from "./persistentObjectiveCompletionPolicyV3.js";
 import {
     PersistentObjectiveCompletionTelemetry,
     createPersistentObjectiveCompletionCandidate,
@@ -28,7 +28,7 @@ import {
 } from "./persistentObjectiveCompletionStrategy.js";
 
 export const PERSISTENT_OBJECTIVE_COMPATIBILITY_MAX_TICKS = 5_400 as const;
-export const PERSISTENT_OBJECTIVE_COMPATIBILITY_ENGINE_SEED_BASE = 4_270_000_000 as const;
+export const PERSISTENT_OBJECTIVE_COMPATIBILITY_ENGINE_SEED_BASE = 4_280_000_000 as const;
 export const PERSISTENT_OBJECTIVE_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT = 4 as const;
 
 type Factory = Awaited<ReturnType<typeof loadBaselineFactory>>;
@@ -135,7 +135,7 @@ const run = async (args: {
     country: Countries;
     candidateSlot: 0 | 1;
     requestedEngineSeed: number;
-    policy: PersistentObjectiveCompletionPolicyV2 | null;
+    policy: PersistentObjectiveCompletionPolicyV3 | null;
 }): Promise<RunTrace> => {
     const { factory, mapName, country, candidateSlot, requestedEngineSeed, policy } = args;
     const telemetry: PersistentObjectiveCompletionTelemetry[] = [];
@@ -216,13 +216,16 @@ export const validatePersistentObjectiveCompatibilityExposure = (
         if (selectedDiagnostics.some(({ compatible, reachable }) => !compatible || !reachable)) {
             throw new Error(`Incompatible selected attacker for ${country} slot ${slot}`);
         }
+        if (!event.terminal && selectedDiagnostics.length > 8) {
+            throw new Error(`Multi-building lease exceeded the overall count cap for ${country} slot ${slot}`);
+        }
         const selectedLocked = selectedDiagnostics.filter(({ missionLocked }) => missionLocked === true);
         if (!event.terminal && selectedLocked.some(({ missionName }) =>
             !missionName || !isObjectiveOffensiveMissionName(missionName),
         )) {
             throw new Error(`Multi-building lease commandeered a non-offensive locked mission for ${country} slot ${slot}`);
         }
-        if (!event.terminal && selectedLocked.length > 4) {
+        if (!event.terminal && selectedLocked.length > 6) {
             throw new Error(`Multi-building lease exceeded the locked offensive count cap for ${country} slot ${slot}`);
         }
         if (!event.terminal) {
@@ -241,8 +244,33 @@ export const validatePersistentObjectiveCompatibilityExposure = (
             }
             for (const [missionName, selectedCount] of selectedLockedByMission) {
                 const available = lockedCompatibleByMission.get(missionName) ?? 0;
-                if (selectedCount > Math.floor(available / 3)) {
+                const limit = Math.min(available, Math.max(3, Math.ceil(available / 2)));
+                if (selectedCount > limit) {
                     throw new Error(`Locked offensive mission fraction exceeded for ${country} slot ${slot}`);
+                }
+            }
+            if (
+                (event.phase === "building_strike" || event.phase === "blocker_clear") &&
+                !event.homeThreatened
+            ) {
+                const eligibleUnlocked = event.unitDiagnostics.filter((diagnostic) =>
+                    diagnostic.compatible && diagnostic.missionLocked !== true &&
+                    (!diagnostic.missionName || isObjectiveOffensiveMissionName(diagnostic.missionName)),
+                ).length;
+                const boundedLocked = Math.min(6, [...lockedCompatibleByMission.entries()]
+                    .filter(([missionName]) => isObjectiveOffensiveMissionName(missionName))
+                    .reduce((sum, [, available]) =>
+                        sum + Math.min(available, Math.max(3, Math.ceil(available / 2))), 0));
+                const eligible = eligibleUnlocked + boundedLocked;
+                const reserve = Math.min(4, Math.max(0, eligible - 3));
+                const available = eligible - reserve;
+                const compatible = event.unitDiagnostics.filter(({ compatible }) => compatible).length;
+                const expected = available === 0 ? 0 : Math.min(
+                    8,
+                    Math.min(available, Math.max(3, Math.ceil(compatible / 2))),
+                );
+                if (selectedDiagnostics.length !== expected) {
+                    throw new Error(`Minimum viable detachment arithmetic drifted for ${country} slot ${slot}`);
                 }
             }
         }
@@ -401,12 +429,11 @@ const main = async (): Promise<void> => {
         throw new Error("Persistent objective compatibility map bytes drifted");
     }
     const factory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
-    const disabledPolicy = buildPersistentObjectiveCompletionPolicyV2({ enabled: false });
-    const smokePolicy = buildPersistentObjectiveCompletionPolicyV2({
+    const disabledPolicy = buildPersistentObjectiveCompletionPolicyV3({ enabled: false });
+    const smokePolicy = buildPersistentObjectiveCompletionPolicyV3({
         terminalMinTick: 0,
         assaultMinTick: 0,
         assaultBuildingCount: 100,
-        ordinaryReserveCombatants: 0,
         minimumOwnBuildingsForAssault: 1,
         homeThreatRadius: 0,
         homeReserveRadius: 0,
@@ -503,8 +530,8 @@ const main = async (): Promise<void> => {
         maps: [mapName],
         effectiveConfig: {
             purpose: "outcome-free-persistent-objective-equivalence-determinism-and-command-exposure",
-            disabledPolicyId: persistentObjectiveCompletionPolicyV2Sha256(disabledPolicy),
-            smokePolicyId: persistentObjectiveCompletionPolicyV2Sha256(smokePolicy),
+            disabledPolicyId: persistentObjectiveCompletionPolicyV3Sha256(disabledPolicy),
+            smokePolicyId: persistentObjectiveCompletionPolicyV3Sha256(smokePolicy),
             countries: Object.values(Countries),
             reciprocalSlots: [0, 1],
             runsPerCountrySlot: PERSISTENT_OBJECTIVE_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT,
@@ -521,18 +548,18 @@ const main = async (): Promise<void> => {
     ) throw new Error("Persistent objective compatibility provenance or coverage failed");
     const passed = rows.every((row) => row.passed === true);
     const output = {
-        schemaVersion: 4,
+        schemaVersion: 5,
         status: passed
-            ? "PASS_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V4"
-            : "FAIL_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V4",
+            ? "PASS_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V5"
+            : "FAIL_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V5",
         generatedAt: new Date().toISOString(),
         passed,
         outcomeFree: true,
         sourceGitCommit: manifest.source.gitCommit,
         scheduler: manifest.scheduler,
         externalBaseline: manifest.software.baseline,
-        disabledPolicyId: persistentObjectiveCompletionPolicyV2Sha256(disabledPolicy),
-        smokePolicyId: persistentObjectiveCompletionPolicyV2Sha256(smokePolicy),
+        disabledPolicyId: persistentObjectiveCompletionPolicyV3Sha256(disabledPolicy),
+        smokePolicyId: persistentObjectiveCompletionPolicyV3Sha256(smokePolicy),
         countryCount: Object.values(Countries).length,
         reciprocalSlotCount: 2,
         gameCount: rows.length * PERSISTENT_OBJECTIVE_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT,
@@ -547,7 +574,7 @@ const main = async (): Promise<void> => {
         status: output.status,
         gameCount: output.gameCount,
     }));
-    if (!passed) throw new Error("Persistent objective compatibility-v4 failed; preserved diagnostic artifact");
+    if (!passed) throw new Error("Persistent objective compatibility-v5 failed; preserved diagnostic artifact");
 };
 
 const invoked = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : null;

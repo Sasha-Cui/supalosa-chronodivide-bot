@@ -66,16 +66,17 @@ describe("persistent objective outcome-blind compatibility gate", () => {
         )).toThrow(/locked mission/);
     });
 
-    it("accepts one selected combatant from three compatible locked offensive combatants", () => {
+    it("accepts the three-unit minimum from three compatible locked offensive combatants", () => {
         const base = decision().unitDiagnostics[0];
         const row = decision({
-            selectedAttackerIds: [1],
+            selectedAttackerIds: [1, 2, 3],
+            selectedAttackerRulesNames: ["MTNK", "MTNK", "MTNK"],
             unitDiagnostics: [1, 2, 3].map((id) => ({
                 ...base,
                 id,
                 missionName: "attack_1.1",
                 missionLocked: true,
-                selected: id === 1,
+                selected: true,
             })),
         });
         expect(() => validatePersistentObjectiveCompatibilityExposure(
@@ -83,7 +84,7 @@ describe("persistent objective outcome-blind compatibility gate", () => {
         )).not.toThrow();
     });
 
-    it("rejects taking more than one third of a compatible locked offensive mission", () => {
+    it("rejects failing to preserve the three-unit minimum objective detachment", () => {
         const base = decision().unitDiagnostics[0];
         const row = decision({
             selectedAttackerIds: [1, 2],
@@ -94,6 +95,24 @@ describe("persistent objective outcome-blind compatibility gate", () => {
                 missionName: "attack_1.1",
                 missionLocked: true,
                 selected: id !== 3,
+            })),
+        });
+        expect(() => validatePersistentObjectiveCompatibilityExposure(
+            [row], Countries.USA, 0,
+        )).toThrow(/Minimum viable detachment/);
+    });
+
+    it("rejects taking more than half of a larger locked offensive mission", () => {
+        const base = decision().unitDiagnostics[0];
+        const row = decision({
+            selectedAttackerIds: [1, 2, 3, 4, 5],
+            selectedAttackerRulesNames: Array(5).fill("MTNK"),
+            unitDiagnostics: Array.from({ length: 8 }, (_, index) => ({
+                ...base,
+                id: index + 1,
+                missionName: "attack_1.1",
+                missionLocked: true,
+                selected: index < 5,
             })),
         });
         expect(() => validatePersistentObjectiveCompatibilityExposure(
