@@ -666,6 +666,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 lastPhysicalProgressTick: this.lastPhysicalProgressTick,
                 missionStartedTick: this.missionStartedTick,
                 progressDeadlineExpired,
+                exactEnemyBuildingCount: this.exactEnemyBuildingCount,
                 terminalReserveReleased,
             });
         }

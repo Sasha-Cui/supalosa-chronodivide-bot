@@ -221,6 +221,9 @@ export const validateProgressCertifiedCompatibilityExposure = (
         if (event.exactEnemyBuildingCount === 1 && event.terminalReserveReleased !== true) {
             throw new Error(`Terminal reserve was not released for ${country} slot ${slot}`);
         }
+        if (event.terminalReserveReleased === true && event.exactEnemyBuildingCount !== 1) {
+            throw new Error(`Terminal reserve release lacks exact final-building provenance for ${country} slot ${slot}`);
+        }
         const selected = new Set(event.selectedAttackerIds ?? []);
         if ((event.reservedCombatantIds ?? []).some((id) => selected.has(id))) {
             throw new Error(`Reserved combatant was assigned for ${country} slot ${slot}`);

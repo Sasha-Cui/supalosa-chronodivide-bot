@@ -6,6 +6,7 @@ import {
     PROGRESS_CERTIFIED_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT,
     validateProgressCertifiedCompatibilityExposure,
 } from "../training/progressCertifiedCompatibilityGate.js";
+import { TerminalObjectiveTelemetry } from "../training/terminalObjectiveStrategy.js";
 
 describe("progress-certified compatibility gate", () => {
     it("freezes an outcome-blind all-country equivalence, repeatability, and exposure budget", () => {
@@ -53,5 +54,40 @@ describe("progress-certified compatibility gate", () => {
             progressDeadlineExpired: null,
             terminalReserveReleased: true,
         }], Countries.USA, 0)).toThrow("Dynamic reserve size drifted");
+    });
+
+    it("requires an exact final-building count on reserve-release telemetry", () => {
+        const fallback: TerminalObjectiveTelemetry = {
+            schemaVersion: 3,
+            event: "decision",
+            informationBoundary: "public_complete_state",
+            tick: 1_000,
+            mechanism: "progress_certified_terminal_conversion",
+            decisionKind: "predecessor_fallback",
+            decisionReason: "physical_progress_deadline",
+            selectedBuildingId: 10,
+            selectedAttackerIds: [2],
+            lastPhysicalProgressTick: 600,
+            physicalNoProgressTicks: 400,
+            progressDeadlineExpired: "blocker",
+            terminalReserveReleased: true,
+        };
+        const action: TerminalObjectiveTelemetry = {
+            ...fallback,
+            decisionKind: "building_strike",
+            decisionReason: "direct_building_is_fastest_survivable_mission",
+            exactEnemyBuildingCount: 2,
+            eligibleAttackerCount: 1,
+            reservedCombatantCount: 1,
+            reservedCombatantIds: [3],
+            progressDeadlineExpired: null,
+            terminalReserveReleased: false,
+        };
+        expect(() => validateProgressCertifiedCompatibilityExposure([action, {
+            ...fallback,
+            exactEnemyBuildingCount: 1,
+        }], Countries.USA, 0)).not.toThrow();
+        expect(() => validateProgressCertifiedCompatibilityExposure([action, fallback], Countries.USA, 0))
+            .toThrow("lacks exact final-building provenance");
     });
 });
