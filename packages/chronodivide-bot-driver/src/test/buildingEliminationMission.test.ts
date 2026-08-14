@@ -914,6 +914,7 @@ describe("building elimination policy", () => {
             "adaptiveGroundAssaultProductionReservation",
             "adaptiveGroundAssaultProductionScopeLatch",
             "adaptiveGroundAssaultScreenTargetCount",
+            "adaptiveGroundAssaultScreenFactoryTrigger",
             "adaptiveGroundAssaultInfrastructurePriority",
             "adaptiveProductionPriority",
             "adaptiveTechPriority",
@@ -972,6 +973,9 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({
             adaptiveGroundAssaultProductionScopeLatch: "yes" as any,
         })).toThrow("production-scope latch");
+        expect(() => resolveBuildingEliminationOptions({
+            adaptiveGroundAssaultScreenFactoryTrigger: "yes" as any,
+        })).toThrow("screen factory trigger");
     });
 
     test("terminal production reservation retains only the side-correct factory and tank", () => {
@@ -1035,5 +1039,17 @@ describe("building elimination policy", () => {
         expect(getBuildingEliminationAssaultProductionRequests(
             "HTNK", 1, 4, "E2", 4, 4, 140,
         )).toEqual({ HTNK: 140 });
+    });
+
+    test("factory-triggered screen production runs in parallel with the first tank", () => {
+        expect(getBuildingEliminationAssaultProductionRequests(
+            "MTNK", 0, 4, "E1", 0, 4, 140, false,
+        )).toEqual({ MTNK: 140 });
+        expect(getBuildingEliminationAssaultProductionRequests(
+            "MTNK", 0, 4, "E1", 0, 4, 140, true,
+        )).toEqual({ MTNK: 140, E1: 140 });
+        expect(getBuildingEliminationAssaultProductionRequests(
+            "MTNK", 0, 4, "E1", 4, 4, 140, true,
+        )).toEqual({ MTNK: 140 });
     });
 });

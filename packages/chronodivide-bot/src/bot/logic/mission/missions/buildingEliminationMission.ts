@@ -64,6 +64,7 @@ export type BuildingEliminationOptions = {
     adaptiveGroundAssaultProductionReservation?: boolean;
     adaptiveGroundAssaultProductionScopeLatch?: boolean;
     adaptiveGroundAssaultScreenTargetCount?: number;
+    adaptiveGroundAssaultScreenFactoryTrigger?: boolean;
     adaptiveGroundAssaultInfrastructurePriority?: number;
     adaptiveProductionPriority?: number;
     adaptiveTechPriority?: number;
@@ -355,6 +356,9 @@ export type BuildingEliminationTelemetryEvent =
           currentCount: number;
           mainTankPresent: boolean;
           requested: boolean;
+          factoryCount?: number;
+          factoryTriggerActive?: boolean;
+          readinessOwned?: boolean;
       }
     | {
           schemaVersion: 10;
@@ -400,6 +404,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     adaptiveGroundAssaultProductionReservation: false,
     adaptiveGroundAssaultProductionScopeLatch: false,
     adaptiveGroundAssaultScreenTargetCount: 0,
+    adaptiveGroundAssaultScreenFactoryTrigger: false,
     adaptiveGroundAssaultInfrastructurePriority: 130,
     adaptiveProductionPriority: 140,
     adaptiveTechPriority: 130,
@@ -504,6 +509,12 @@ export const resolveBuildingEliminationOptions = (
         throw new Error(
             "Invalid building-elimination ground-assault production-scope latch: " +
             `${resolved.adaptiveGroundAssaultProductionScopeLatch}`,
+        );
+    }
+    if (typeof resolved.adaptiveGroundAssaultScreenFactoryTrigger !== "boolean") {
+        throw new Error(
+            "Invalid building-elimination ground-assault screen factory trigger: " +
+            `${resolved.adaptiveGroundAssaultScreenFactoryTrigger}`,
         );
     }
     return resolved;
@@ -1555,7 +1566,10 @@ export const updateBuildingEliminationProductionScopeLatch = (
     enabled: boolean,
 ): boolean => latched || (enabled && currentlyMeetsCloseoutGate);
 
-type BuildingEliminationCloseoutLatch = { activated: boolean };
+type BuildingEliminationCloseoutLatch = {
+    activated: boolean;
+    readinessScreenCount: number;
+};
 
 type BuildingEliminationExecutionHeartbeatState = {
     targetId: number;
@@ -2280,9 +2294,10 @@ export const getBuildingEliminationAssaultProductionRequests = (
     currentScreenCount: number,
     screenTargetCount: number,
     priority: number,
+    screenTriggerActive = currentCount >= 1,
 ): Record<string, number> => ({
     ...(currentCount < targetCount ? { [unitName]: priority } : {}),
-    ...(currentCount >= 1 && currentScreenCount < screenTargetCount
+    ...(screenTriggerActive && currentScreenCount < screenTargetCount
         ? { [screenUnitName]: priority }
         : {}),
 });
@@ -2444,7 +2459,13 @@ class BuildingEliminationAssaultProductionMission extends Mission {
         const unitName = getBuildingEliminationGroundAssaultUnitName(side);
         const currentCount = countOwnVisibleUnits(context, unitName);
         const screenUnitName = getBuildingEliminationGroundAssaultScreenUnitName(side);
-        const currentScreenCount = countOwnVisibleUnits(context, screenUnitName);
+        const structureName = getBuildingEliminationGroundAssaultStructureName(side);
+        const factoryCount = countOwnVisibleUnits(context, structureName);
+        const factoryTriggeredScreen = this.options.adaptiveGroundAssaultScreenFactoryTrigger;
+        const currentScreenCount = factoryTriggeredScreen
+            ? this.closeoutLatch.readinessScreenCount
+            : countOwnVisibleUnits(context, screenUnitName);
+        const screenTriggerActive = factoryTriggeredScreen ? factoryCount >= 1 : currentCount >= 1;
         const requested = currentCount < this.options.adaptiveGroundAssaultTargetCount;
         const available = context.player.production.getAvailableObjects(QueueType.Vehicles)
             .some(({ name }) => name === unitName);
@@ -2460,7 +2481,7 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             vehicleQueue.status,
             vehicleQueue.items.map(({ rules, quantity }) => ({ name: rules.name, quantity })),
         );
-        const screenRequested = currentCount >= 1 &&
+        const screenRequested = screenTriggerActive &&
             currentScreenCount < this.options.adaptiveGroundAssaultScreenTargetCount;
         this.emitScreenTelemetry(
             context.game.getCurrentTick(),
@@ -2469,6 +2490,9 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             currentScreenCount,
             currentCount >= 1,
             screenRequested,
+            factoryTriggeredScreen ? factoryCount : undefined,
+            factoryTriggeredScreen ? screenTriggerActive : undefined,
+            factoryTriggeredScreen ? true : undefined,
         );
         const requests = getBuildingEliminationAssaultProductionRequests(
             unitName,
@@ -2478,6 +2502,7 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             currentScreenCount,
             this.options.adaptiveGroundAssaultScreenTargetCount,
             this.options.adaptiveProductionPriority,
+            screenTriggerActive,
         );
         return Object.keys(requests).length > 0 ? requestUnits(requests) : noop();
     }
@@ -2535,6 +2560,9 @@ class BuildingEliminationAssaultProductionMission extends Mission {
         currentCount: number,
         mainTankPresent: boolean,
         requested: boolean,
+        factoryCount?: number,
+        factoryTriggerActive?: boolean,
+        readinessOwned?: boolean,
     ): void {
         if (this.options.adaptiveGroundAssaultScreenTargetCount <= 0) return;
         const event: Extract<BuildingEliminationTelemetryEvent, { event: "assault_screen_production" }> = {
@@ -2547,6 +2575,9 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             currentCount,
             mainTankPresent,
             requested,
+            ...(factoryCount === undefined ? {} : { factoryCount }),
+            ...(factoryTriggerActive === undefined ? {} : { factoryTriggerActive }),
+            ...(readinessOwned === undefined ? {} : { readinessOwned }),
         };
         const signature = JSON.stringify({ ...event, tick: 0 });
         if (signature === this.lastScreenTelemetrySignature &&
@@ -2739,6 +2770,7 @@ class BuildingEliminationReadinessReserveMission extends Mission {
     constructor(
         private options: Required<BuildingEliminationOptions>,
         private vanguardUnitIds: ReadonlySet<number>,
+        private closeoutLatch: BuildingEliminationCloseoutLatch,
         logger: DebugLogger,
         private telemetrySink: BuildingEliminationTelemetrySink,
     ) {
@@ -2752,6 +2784,11 @@ class BuildingEliminationReadinessReserveMission extends Mission {
             this.vanguardUnitIds,
         );
         const stagedCombatants = this.getUnits(context.game);
+        const side = getPlayerSide(context);
+        const screenUnitName = side === null ? null : getBuildingEliminationGroundAssaultScreenUnitName(side);
+        this.closeoutLatch.readinessScreenCount = screenUnitName === null
+            ? 0
+            : stagedCombatants.filter(({ rules }) => rules.name === screenUnitName).length;
         const tick = context.game.getCurrentTick();
         if (tick >= this.lastOrderAt + this.options.orderIntervalTicks) {
             const start = context.game.getPlayerData(context.player.name).startLocation;
@@ -2759,7 +2796,6 @@ class BuildingEliminationReadinessReserveMission extends Mission {
                 .map((id) => context.game.getUnitData(id))
                 .filter((unit): unit is UnitData => !!unit && unit.rules.isSelectableCombatant &&
                     !unit.rules.harvester && unit.rules.type !== ObjectType.Building);
-            const side = getPlayerSide(context);
             const protectedStructures = side === null ? [] : context.game
                 .getVisibleUnits(context.player.name, "self", (rules) =>
                     rules.name === getBuildingEliminationGroundAssaultStructureName(side),
@@ -2867,7 +2903,10 @@ export class BuildingEliminationMissionFactory {
     private lastProductionReservationTelemetryAt = Number.NEGATIVE_INFINITY;
     private stalledBuildingIds = new Set<number>();
     private capabilityGapCache: BuildingCapabilityGapCache;
-    private closeoutLatch: BuildingEliminationCloseoutLatch = { activated: false };
+    private closeoutLatch: BuildingEliminationCloseoutLatch = {
+        activated: false,
+        readinessScreenCount: 0,
+    };
     private readinessVanguardUnitIds: Set<number> | null = null;
 
     constructor(
@@ -3193,6 +3232,7 @@ export class BuildingEliminationMissionFactory {
         missionController.addMission(new BuildingEliminationReadinessReserveMission(
             this.options,
             this.readinessVanguardUnitIds,
+            this.closeoutLatch,
             logger,
             this.telemetrySink,
         ));
@@ -3233,6 +3273,7 @@ export class BuildingEliminationMissionFactory {
                 BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
             );
         }
+        this.closeoutLatch.readinessScreenCount = 0;
         this.readinessVanguardUnitIds = null;
     }
 
@@ -3301,10 +3342,19 @@ export class BuildingEliminationMissionFactory {
         const unitName = getBuildingEliminationGroundAssaultUnitName(side);
         const structureName = getBuildingEliminationGroundAssaultStructureName(side);
         const currentTankCount = countOwnVisibleUnits(context, unitName);
-        if (currentTankCount >= this.options.adaptiveGroundAssaultTargetCount) return;
+        const factoryCount = countOwnVisibleUnits(context, structureName);
+        const factoryTriggeredScreen = this.options.adaptiveGroundAssaultScreenFactoryTrigger;
+        const screenTriggerActive = factoryTriggeredScreen ? factoryCount >= 1 : currentTankCount >= 1;
+        const needsScreen = screenTriggerActive && this.options.adaptiveGroundAssaultScreenTargetCount > 0 &&
+            (factoryTriggeredScreen
+                ? this.closeoutLatch.readinessScreenCount
+                : countOwnVisibleUnits(context, getBuildingEliminationGroundAssaultScreenUnitName(side))) <
+                    this.options.adaptiveGroundAssaultScreenTargetCount;
+        if (currentTankCount >= this.options.adaptiveGroundAssaultTargetCount &&
+            (!factoryTriggeredScreen || !needsScreen)) return;
 
         const retainedNames = new Set<string>([structureName, unitName]);
-        if (currentTankCount >= 1 && this.options.adaptiveGroundAssaultScreenTargetCount > 0) {
+        if (screenTriggerActive && this.options.adaptiveGroundAssaultScreenTargetCount > 0) {
             retainedNames.add(getBuildingEliminationGroundAssaultScreenUnitName(side));
         }
         const queueTypes = [
