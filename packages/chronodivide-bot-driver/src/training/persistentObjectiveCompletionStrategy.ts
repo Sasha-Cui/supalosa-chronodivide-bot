@@ -31,12 +31,17 @@ import {
     PersistentObjectiveCompletionPolicyV5,
     validatePersistentObjectiveCompletionPolicyV5,
 } from "./persistentObjectiveCompletionPolicyV5.js";
+import {
+    PersistentObjectiveCompletionPolicyV6,
+    validatePersistentObjectiveCompletionPolicyV6,
+} from "./persistentObjectiveCompletionPolicyV6.js";
 
 type PersistentObjectivePolicy = PersistentObjectiveCompletionPolicy |
     PersistentObjectiveCompletionPolicyV2 |
     PersistentObjectiveCompletionPolicyV3 |
     PersistentObjectiveCompletionPolicyV4 |
-    PersistentObjectiveCompletionPolicyV5;
+    PersistentObjectiveCompletionPolicyV5 |
+    PersistentObjectiveCompletionPolicyV6;
 
 type Point = { x: number; y: number };
 type Logger = (message: string, sayInGame?: boolean) => void;
@@ -85,7 +90,7 @@ export type ObjectiveUnitDiagnostic = {
 };
 
 export type PersistentObjectiveCompletionTelemetry = {
-    schemaVersion: 3;
+    schemaVersion: 4;
     event: "objective_completion_decision";
     informationInterface: "public_complete_state";
     tick: number;
@@ -108,6 +113,7 @@ export type PersistentObjectiveCompletionTelemetry = {
     estimatedBuildingCompletionTicks: number | null;
     estimatedDetachmentSurvivalTicks: number | null;
     routeThreatCount: number;
+    earliestRouteThreatInterceptTicks: number | null;
     homeThreatened: boolean;
     issuedOrder: "attack_building" | "attack_blocker" | "none";
     unitDiagnostics: ObjectiveUnitDiagnostic[];
@@ -290,7 +296,7 @@ const isLeaseSourceEligible = (
 ): boolean => {
     if (
         policy.schemaVersion === 6 || policy.schemaVersion === 7 ||
-        policy.schemaVersion === 8 || policy.schemaVersion === 9
+        policy.schemaVersion === 8 || policy.schemaVersion === 9 || policy.schemaVersion === 10
     ) {
         return !assignment || isObjectiveOffensiveMissionName(assignment.missionName);
     }
@@ -440,13 +446,112 @@ const routeInterceptionRace = (
     };
 };
 
+const unitSpeedTilesPerTick = (unit: UnitData): number => {
+    const speed = unit.rules.speed / 256;
+    return Number.isFinite(speed) && speed > 0 ? speed : 1 / 15;
+};
+
+const maximumDamageRangeAgainst = (attacker: UnitData, target: UnitData): number =>
+    Math.max(0, ...[attacker.primaryWeapon, attacker.secondaryWeapon]
+        .filter((weapon): weapon is WeaponData => weaponCanDamageObjectiveBuilding(weapon, target))
+        .map(({ maxRange }) => maxRange));
+
+const piecewiseDetachmentSurvivalTicks = (
+    hitPoints: number,
+    arrivals: readonly { interceptTicks: number; damagePerTick: number }[],
+): number => {
+    const ordered = arrivals.slice().sort((left, right) => left.interceptTicks - right.interceptTicks);
+    let remaining = hitPoints;
+    let activeDamagePerTick = 0;
+    let tick = 0;
+    for (const arrival of ordered) {
+        const interval = Math.max(0, arrival.interceptTicks - tick);
+        const intervalDamage = activeDamagePerTick * interval;
+        if (activeDamagePerTick > 0 && intervalDamage >= remaining) {
+            return tick + remaining / activeDamagePerTick;
+        }
+        remaining -= intervalDamage;
+        tick = arrival.interceptTicks;
+        activeDamagePerTick += arrival.damagePerTick;
+    }
+    return activeDamagePerTick > 0
+        ? tick + remaining / activeDamagePerTick
+        : Number.POSITIVE_INFINITY;
+};
+
+const timeAwareRouteInterceptionRace = (
+    game: GameApi,
+    forces: readonly UnitData[],
+    attackers: readonly UnitData[],
+    target: UnitData,
+    corridorRadius: number,
+) => {
+    const buildingDamagePerTick = attackers.reduce(
+        (sum, attacker) => sum + unitDamagePerTickAgainst(attacker, target),
+        0,
+    );
+    const approachTicks = Math.min(...attackers.map((attacker) => {
+        const range = objectiveUnitCompatibility(game, attacker, target).maximumRange;
+        return Math.max(0, distanceToFoundation(point(attacker), target) - range) /
+            unitSpeedTilesPerTick(attacker);
+    }));
+    const estimatedBuildingCompletionTicks = buildingDamagePerTick > 0
+        ? approachTicks + target.hitPoints / buildingDamagePerTick
+        : Number.POSITIVE_INFINITY;
+    const threats = routeBlockers(forces, attackers, target, corridorRadius)
+        .filter((candidate) => isDamageCapableRouteThreat(game, candidate, attackers))
+        .map((candidate) => {
+            const threatDamagePerTick = Math.max(
+                0,
+                ...attackers.map((attacker) => unitDamagePerTickAgainst(candidate, attacker)),
+            );
+            const interceptTicks = Math.min(...attackers.map((attacker) => {
+                const closingSpeed = unitSpeedTilesPerTick(candidate) + unitSpeedTilesPerTick(attacker);
+                const range = maximumDamageRangeAgainst(candidate, attacker);
+                return Math.max(0, distance(point(candidate), point(attacker)) - range) / closingSpeed;
+            }));
+            const removalDamagePerTick = attackers.reduce(
+                (sum, attacker) => sum + unitDamagePerTickAgainst(attacker, candidate),
+                0,
+            );
+            const removalTicks = removalDamagePerTick > 0
+                ? candidate.hitPoints / removalDamagePerTick
+                : Number.POSITIVE_INFINITY;
+            const threatScore = removalTicks > 0 && Number.isFinite(removalTicks)
+                ? threatDamagePerTick / removalTicks / (1 + interceptTicks)
+                : 0;
+            return { candidate, threatDamagePerTick, threatScore, interceptTicks };
+        })
+        .filter(({ threatDamagePerTick, interceptTicks }) =>
+            threatDamagePerTick > 0 && interceptTicks < estimatedBuildingCompletionTicks,
+        )
+        .sort((left, right) => right.threatScore - left.threatScore ||
+            left.candidate.id - right.candidate.id);
+    const estimatedDetachmentSurvivalTicks = piecewiseDetachmentSurvivalTicks(
+        attackers.reduce((sum, attacker) => sum + attacker.hitPoints, 0),
+        threats.map(({ interceptTicks, threatDamagePerTick }) => ({
+            interceptTicks,
+            damagePerTick: threatDamagePerTick,
+        })),
+    );
+    return {
+        estimatedBuildingCompletionTicks,
+        estimatedDetachmentSurvivalTicks,
+        earliestRouteThreatInterceptTicks: threats.length === 0
+            ? Number.POSITIVE_INFINITY
+            : Math.min(...threats.map(({ interceptTicks }) => interceptTicks)),
+        threats,
+    };
+};
+
 export class PersistentObjectiveCompletionStrategy implements StrategyLike {
     private committedTargetId: number | null = null;
     private committedTargetHitPoints: number | null = null;
     private committedBlockerId: number | null = null;
     private committedBlockerHitPoints: number | null = null;
     private committedBlockerReason: "preemptive_route_interception_blocker" |
-        "completion_race_route_blocker" | "minimum_route_blocker_after_stall" | null = null;
+        "completion_race_route_blocker" | "time_aware_completion_race_route_blocker" |
+        "minimum_route_blocker_after_stall" | null = null;
     private leasedIds = new Set<number>();
     private leaseStartedTick = 0;
     private lastBuildingDamageTick = 0;
@@ -593,6 +698,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
         let estimatedBuildingCompletionTicks: number | null = null;
         let estimatedDetachmentSurvivalTicks: number | null = null;
         let routeThreatCount = 0;
+        let earliestRouteThreatInterceptTicks: number | null = null;
         let buildingRaceReason: string | null = null;
         if (this.policy.schemaVersion === 8 && this.committedBlockerId === null) {
             const buildingInRange = selected.some((unit) => {
@@ -652,6 +758,53 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
                     this.lastBlockerDamageTick = tick;
                 }
                 if (blocker) this.committedBlockerReason = "completion_race_route_blocker";
+            }
+        }
+        if (this.policy.schemaVersion === 10) {
+            const buildingInRange = selected.some((unit) => {
+                const compatibility = objectiveUnitCompatibility(game, unit, target!);
+                return distanceToFoundation(point(unit), target!) <= compatibility.maximumRange;
+            });
+            const race = timeAwareRouteInterceptionRace(
+                game,
+                forces,
+                selected,
+                target,
+                this.policy.routeCorridorRadius,
+            );
+            estimatedBuildingCompletionTicks = Number.isFinite(race.estimatedBuildingCompletionTicks)
+                ? race.estimatedBuildingCompletionTicks
+                : null;
+            estimatedDetachmentSurvivalTicks = Number.isFinite(race.estimatedDetachmentSurvivalTicks)
+                ? race.estimatedDetachmentSurvivalTicks
+                : null;
+            earliestRouteThreatInterceptTicks = Number.isFinite(race.earliestRouteThreatInterceptTicks)
+                ? race.earliestRouteThreatInterceptTicks
+                : null;
+            routeThreatCount = race.threats.length;
+            const favorBuilding = buildingInRange || objectiveRaceFavorsBuilding(
+                race.estimatedBuildingCompletionTicks,
+                race.estimatedDetachmentSurvivalTicks,
+            );
+            if (favorBuilding) {
+                if (race.threats.length > 0) {
+                    buildingRaceReason = buildingInRange
+                        ? "building_in_range_overrides_route_threats"
+                        : "building_completion_race_bypasses_forces";
+                }
+                if (this.committedBlockerReason === "time_aware_completion_race_route_blocker") {
+                    this.committedBlockerId = null;
+                    this.committedBlockerHitPoints = null;
+                    this.committedBlockerReason = null;
+                }
+            } else {
+                const blocker = race.threats[0]?.candidate ?? null;
+                if (blocker && blocker.id !== this.committedBlockerId) {
+                    this.committedBlockerId = blocker.id;
+                    this.committedBlockerHitPoints = blocker.hitPoints;
+                    this.lastBlockerDamageTick = tick;
+                }
+                if (blocker) this.committedBlockerReason = "time_aware_completion_race_route_blocker";
             }
         }
         if (
@@ -738,7 +891,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
             buildings, ownBuildings, terminal, target, blocker, selected, assignments,
             mine, homeThreatened, issuedOrder: blocker ? "attack_blocker" : "attack_building",
             buildingDamage, blockerDamage, routeProgress, estimatedBuildingCompletionTicks,
-            estimatedDetachmentSurvivalTicks, routeThreatCount,
+            estimatedDetachmentSurvivalTicks, routeThreatCount, earliestRouteThreatInterceptTicks,
         }));
     }
 
@@ -758,7 +911,8 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
             this.policy.schemaVersion === 6 ||
             this.policy.schemaVersion === 7 ||
             this.policy.schemaVersion === 8 ||
-            this.policy.schemaVersion === 9
+            this.policy.schemaVersion === 9 ||
+            this.policy.schemaVersion === 10
         ) {
             const policy = this.policy;
             const byMission = new Map<string, UnitData[]>();
@@ -791,7 +945,8 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
             });
         }
         const reserveCount = this.policy.schemaVersion === 7 ||
-            this.policy.schemaVersion === 8 || this.policy.schemaVersion === 9
+            this.policy.schemaVersion === 8 || this.policy.schemaVersion === 9 ||
+            this.policy.schemaVersion === 10
             ? Math.min(
                 this.policy.ordinaryReserveCombatants,
                 Math.max(0, eligible.length - this.policy.minimumAssaultCombatants),
@@ -802,13 +957,15 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
         ).slice(0, reserveCount);
         const reservedIds = new Set(reserved.map(({ id }) => id));
         const fractionalMaximum = this.policy.schemaVersion === 7 ||
-            this.policy.schemaVersion === 8 || this.policy.schemaVersion === 9
+            this.policy.schemaVersion === 8 || this.policy.schemaVersion === 9 ||
+            this.policy.schemaVersion === 10
             ? Math.ceil(compatible.length * this.policy.maximumAssaultFraction)
             : Math.floor(compatible.length * this.policy.maximumAssaultFraction);
         const maximumByFraction = Math.max(
             1,
             this.policy.schemaVersion === 7 ||
-            this.policy.schemaVersion === 8 || this.policy.schemaVersion === 9
+            this.policy.schemaVersion === 8 || this.policy.schemaVersion === 9 ||
+            this.policy.schemaVersion === 10
                 ? Math.min(eligible.length - reserveCount, Math.max(
                     this.policy.minimumAssaultCombatants,
                     fractionalMaximum,
@@ -884,6 +1041,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
         estimatedBuildingCompletionTicks?: number | null;
         estimatedDetachmentSurvivalTicks?: number | null;
         routeThreatCount?: number;
+        earliestRouteThreatInterceptTicks?: number | null;
     }): PersistentObjectiveCompletionTelemetry {
         const selectedIds = new Set(args.selected.map(({ id }) => id));
         const diagnostics = args.target === null ? [] : args.mine
@@ -913,7 +1071,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
                 };
             }).sort((left, right) => left.id - right.id);
         return {
-            schemaVersion: 3,
+            schemaVersion: 4,
             event: "objective_completion_decision",
             informationInterface: "public_complete_state",
             tick: args.tick,
@@ -936,6 +1094,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
             estimatedBuildingCompletionTicks: args.estimatedBuildingCompletionTicks ?? null,
             estimatedDetachmentSurvivalTicks: args.estimatedDetachmentSurvivalTicks ?? null,
             routeThreatCount: args.routeThreatCount ?? 0,
+            earliestRouteThreatInterceptTicks: args.earliestRouteThreatInterceptTicks ?? null,
             homeThreatened: args.homeThreatened,
             issuedOrder: args.issuedOrder,
             unitDiagnostics: diagnostics,
@@ -960,15 +1119,17 @@ export const createPersistentObjectiveCompletionCandidate = (
     rawPolicy: PersistentObjectivePolicy,
     telemetry: TelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 9
-        ? validatePersistentObjectiveCompletionPolicyV5(rawPolicy as PersistentObjectiveCompletionPolicyV5)
-        : rawPolicy.schemaVersion === 8
-            ? validatePersistentObjectiveCompletionPolicyV4(rawPolicy as PersistentObjectiveCompletionPolicyV4)
-            : rawPolicy.schemaVersion === 7
-                ? validatePersistentObjectiveCompletionPolicyV3(rawPolicy as PersistentObjectiveCompletionPolicyV3)
-                : rawPolicy.schemaVersion === 6
-                    ? validatePersistentObjectiveCompletionPolicyV2(rawPolicy as PersistentObjectiveCompletionPolicyV2)
-                    : validatePersistentObjectiveCompletionPolicy(rawPolicy);
+    const policy = rawPolicy.schemaVersion === 10
+        ? validatePersistentObjectiveCompletionPolicyV6(rawPolicy as PersistentObjectiveCompletionPolicyV6)
+        : rawPolicy.schemaVersion === 9
+            ? validatePersistentObjectiveCompletionPolicyV5(rawPolicy as PersistentObjectiveCompletionPolicyV5)
+            : rawPolicy.schemaVersion === 8
+                ? validatePersistentObjectiveCompletionPolicyV4(rawPolicy as PersistentObjectiveCompletionPolicyV4)
+                : rawPolicy.schemaVersion === 7
+                    ? validatePersistentObjectiveCompletionPolicyV3(rawPolicy as PersistentObjectiveCompletionPolicyV3)
+                    : rawPolicy.schemaVersion === 6
+                        ? validatePersistentObjectiveCompletionPolicyV2(rawPolicy as PersistentObjectiveCompletionPolicyV2)
+                        : validatePersistentObjectiveCompletionPolicy(rawPolicy);
     if (!policy.enabled) return baselineFactory.create(name, country);
     if (!baselineFactory.createDefaultStrategy || !baselineFactory.createWithStrategy) {
         throw new Error("Baseline factory does not expose the persistent objective strategy interface");
