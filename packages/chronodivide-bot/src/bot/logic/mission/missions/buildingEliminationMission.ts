@@ -63,6 +63,7 @@ export type BuildingEliminationOptions = {
     engagementAllocationMode?: BuildingEliminationEngagementAllocationMode;
     commitRouteBlocker?: boolean;
     routeCorridorRadius?: number;
+    readinessReserve?: boolean;
 };
 
 export type BuildingTargetDescriptor = {
@@ -232,6 +233,15 @@ export type BuildingEliminationTelemetryEvent =
           directBuildingAttackCommandCount: number;
           moveTowardBuildingCommandCount: number;
           blockerAttackCommandCount: number;
+      }
+    | {
+          schemaVersion: 6;
+          event: "readiness_reserve";
+          tick: number;
+          phase: "created" | "accumulating" | "released";
+          stagedCombatants: number;
+          eligibleCombatants: number;
+          vanguardCombatants: number;
       };
 
 export type BuildingEliminationTelemetrySink = (event: BuildingEliminationTelemetryEvent) => void;
@@ -271,6 +281,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     engagementAllocationMode: "allBlocker",
     commitRouteBlocker: false,
     routeCorridorRadius: 8,
+    readinessReserve: false,
 };
 
 const requireIntegerInRange = (name: string, value: number, minimum: number, maximum: number): void => {
@@ -322,6 +333,9 @@ export const resolveBuildingEliminationOptions = (
             `Invalid building-elimination engagement allocation mode: ${resolved.engagementAllocationMode}`,
         );
     }
+    if (typeof resolved.readinessReserve !== "boolean") {
+        throw new Error(`Invalid building-elimination readiness reserve: ${resolved.readinessReserve}`);
+    }
     return resolved;
 };
 
@@ -329,6 +343,8 @@ const BUILDING_ELIMINATION_MISSION_NAME = "buildingElimination";
 const BUILDING_ELIMINATION_CAPABILITY_BUILD_MISSION_NAME = "buildingEliminationCapabilityBuild";
 const BUILDING_ELIMINATION_CAPABILITY_UNIT_MISSION_NAME = "buildingEliminationCapabilityUnits";
 const BUILDING_ELIMINATION_PRIORITY = 300;
+const BUILDING_ELIMINATION_READINESS_RESERVE_PRIORITY = 290;
+const BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME = "buildingEliminationReadinessReserve";
 const TELEMETRY_HEARTBEAT_TICKS = 120;
 const BLOCKED_TELEMETRY_HEARTBEAT_TICKS = 300;
 const POWER_BUILDINGS = new Set(["NAPOWR", "NANRCT", "GAPOWR"]);
@@ -1144,6 +1160,11 @@ export const selectCommittedBuildingAttackers = (
             distanceSquared({ x: left.tile.rx, y: left.tile.ry }, start);
     })
     .slice(0, Math.max(0, eligibleAttackers.length - reserveCombatants));
+
+export const selectBuildingEliminationReadinessReserveCandidates = (
+    eligibleAttackers: UnitData[],
+    vanguardUnitIds: ReadonlySet<number>,
+): UnitData[] => eligibleAttackers.filter(({ id }) => !vanguardUnitIds.has(id));
 
 export const meetsBuildingEliminationActivationGate = (
     ownCombatantCount: number,
@@ -2029,6 +2050,94 @@ class BuildingEliminationCapabilityUnitMission extends Mission {
     }
 }
 
+class BuildingEliminationReadinessReserveMission extends Mission {
+    private lastOrderAt = Number.NEGATIVE_INFINITY;
+    private lastTelemetryAt = Number.NEGATIVE_INFINITY;
+    private lastTelemetrySignature = "";
+
+    constructor(
+        private options: Required<BuildingEliminationOptions>,
+        private vanguardUnitIds: ReadonlySet<number>,
+        logger: DebugLogger,
+        private telemetrySink: BuildingEliminationTelemetrySink,
+    ) {
+        super(BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME, logger);
+    }
+
+    _onAiUpdate(context: MissionContext): MissionAction {
+        const eligibleAttackers = getEligibleBuildingAttackers(context);
+        const reserveCandidates = selectBuildingEliminationReadinessReserveCandidates(
+            eligibleAttackers,
+            this.vanguardUnitIds,
+        );
+        const stagedCombatants = this.getUnits(context.game);
+        const tick = context.game.getCurrentTick();
+        if (tick >= this.lastOrderAt + this.options.orderIntervalTicks) {
+            const start = context.game.getPlayerData(context.player.name).startLocation;
+            for (const unit of stagedCombatants) {
+                if (distanceSquared(
+                    { x: unit.tile.rx, y: unit.tile.ry },
+                    { x: start.x, y: start.y },
+                ) > 16) {
+                    context.actionBatcher.push(BatchableAction.toPoint(
+                        unit.id,
+                        OrderType.Move,
+                        new Vector2(start.x, start.y),
+                    ));
+                }
+            }
+            this.lastOrderAt = tick;
+        }
+        this.emitTelemetry(
+            tick,
+            stagedCombatants.length,
+            eligibleAttackers.length,
+            eligibleAttackers.filter(({ id }) => this.vanguardUnitIds.has(id)).length,
+        );
+        return requestSpecificUnits(
+            reserveCandidates.map(({ id }) => id),
+            BUILDING_ELIMINATION_READINESS_RESERVE_PRIORITY,
+        );
+    }
+
+    getGlobalDebugText(): string | undefined {
+        return `finish reserve=${this.getUnitIds().length}`;
+    }
+
+    getPriority(): number {
+        return BUILDING_ELIMINATION_READINESS_RESERVE_PRIORITY;
+    }
+
+    canDonateLockedUnitsTo(requestingMission: Mission<any>): boolean {
+        return requestingMission.getUniqueName() === BUILDING_ELIMINATION_MISSION_NAME;
+    }
+
+    private emitTelemetry(
+        tick: number,
+        stagedCombatants: number,
+        eligibleCombatants: number,
+        vanguardCombatants: number,
+    ): void {
+        const event: Extract<BuildingEliminationTelemetryEvent, { event: "readiness_reserve" }> = {
+            schemaVersion: 6,
+            event: "readiness_reserve",
+            tick,
+            phase: "accumulating",
+            stagedCombatants,
+            eligibleCombatants,
+            vanguardCombatants,
+        };
+        const signature = JSON.stringify({ ...event, tick: 0 });
+        if (
+            signature === this.lastTelemetrySignature &&
+            tick < this.lastTelemetryAt + TELEMETRY_HEARTBEAT_TICKS
+        ) return;
+        this.lastTelemetrySignature = signature;
+        this.lastTelemetryAt = tick;
+        this.telemetrySink(event);
+    }
+}
+
 export class BuildingEliminationMissionFactory {
     private options: Required<BuildingEliminationOptions>;
     private lastBlockedTelemetrySignature = "";
@@ -2036,6 +2145,7 @@ export class BuildingEliminationMissionFactory {
     private stalledBuildingIds = new Set<number>();
     private capabilityGapCache: BuildingCapabilityGapCache;
     private closeoutLatch: BuildingEliminationCloseoutLatch = { activated: false };
+    private readinessVanguardUnitIds: Set<number> | null = null;
 
     constructor(
         options: BuildingEliminationOptions = {},
@@ -2148,10 +2258,17 @@ export class BuildingEliminationMissionFactory {
                     ownCombatants.length,
                     enemyCombatantCount,
                 );
+                this.maybeCreateReadinessReserve(
+                    context,
+                    missionController,
+                    logger,
+                    ownCombatants,
+                );
                 return;
             }
         }
 
+        this.releaseReadinessReserve(context, missionController, ownCombatants);
         const preemptedMissions = this.preemptAttacks(missionController);
         this.closeoutLatch.activated = true;
         this.telemetrySink({
@@ -2173,6 +2290,60 @@ export class BuildingEliminationMissionFactory {
             ),
         );
         this.lastBlockedTelemetrySignature = "";
+    }
+
+    private maybeCreateReadinessReserve(
+        context: SupabotContext,
+        missionController: MissionController,
+        logger: DebugLogger,
+        ownCombatants: UnitData[],
+    ): void {
+        if (!this.options.readinessReserve || this.readinessVanguardUnitIds !== null) return;
+        if (missionController.getMissions().some(
+            (mission) => mission.getUniqueName() === BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
+        )) return;
+        this.readinessVanguardUnitIds = new Set(ownCombatants.map(({ id }) => id));
+        missionController.addMission(new BuildingEliminationReadinessReserveMission(
+            this.options,
+            this.readinessVanguardUnitIds,
+            logger,
+            this.telemetrySink,
+        ));
+        this.telemetrySink({
+            schemaVersion: 6,
+            event: "readiness_reserve",
+            tick: context.game.getCurrentTick(),
+            phase: "created",
+            stagedCombatants: 0,
+            eligibleCombatants: ownCombatants.length,
+            vanguardCombatants: ownCombatants.length,
+        });
+    }
+
+    private releaseReadinessReserve(
+        context: SupabotContext,
+        missionController: MissionController,
+        ownCombatants: UnitData[],
+    ): void {
+        if (this.readinessVanguardUnitIds === null) return;
+        const reserve = missionController.getMissions().find(
+            (mission) => mission.getUniqueName() === BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
+        );
+        if (reserve) {
+            this.telemetrySink({
+                schemaVersion: 6,
+                event: "readiness_reserve",
+                tick: context.game.getCurrentTick(),
+                phase: "released",
+                stagedCombatants: reserve.getUnitIds().length,
+                eligibleCombatants: ownCombatants.length,
+                vanguardCombatants: ownCombatants.filter(({ id }) =>
+                    this.readinessVanguardUnitIds?.has(id) === true,
+                ).length,
+            });
+            missionController.disbandMission(BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME);
+        }
+        this.readinessVanguardUnitIds = null;
     }
 
     private maybeCreateCapabilityMissions(missionController: MissionController, logger: DebugLogger): void {

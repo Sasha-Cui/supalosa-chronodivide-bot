@@ -49,4 +49,14 @@ describe("specific mission transfers", () => {
         expect(canTransferSpecificUnit(undefined, closeout, 300)).toBe(true);
         expect(canTransferSpecificUnit(closeout, closeout, 300)).toBe(false);
     });
+
+    test("allows the frozen readiness reserve to yield to the closeout handoff", () => {
+        const readinessReserve = new TestMission(
+            "buildingEliminationReadinessReserve",
+            290,
+            true,
+            "buildingElimination",
+        );
+        expect(canTransferSpecificUnit(readinessReserve, closeout, 300)).toBe(true);
+    });
 });

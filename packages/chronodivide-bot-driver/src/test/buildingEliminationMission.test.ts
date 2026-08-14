@@ -22,6 +22,7 @@ import {
     reconcileRememberedBuildingTargets,
     resolveBuildingEliminationOptions,
     selectAvailableCapabilityStructures,
+    selectBuildingEliminationReadinessReserveCandidates,
     selectCommittedBuildingAttackers,
     selectCompatibleBuildingTargets,
     shouldRunBuildingEliminationCapabilityProduction,
@@ -466,6 +467,20 @@ describe("building elimination policy", () => {
         )).toBe(true);
     });
 
+    test("readiness reserve excludes the frozen vanguard and retains later attackers", () => {
+        const vanguard = combatant(1, 0) as any;
+        const firstReinforcement = combatant(2, 0) as any;
+        const secondReinforcement = combatant(3, 0) as any;
+        expect(selectBuildingEliminationReadinessReserveCandidates(
+            [vanguard, firstReinforcement, secondReinforcement],
+            new Set([vanguard.id]),
+        ).map(({ id }) => id)).toEqual([firstReinforcement.id, secondReinforcement.id]);
+        expect(selectBuildingEliminationReadinessReserveCandidates(
+            [vanguard, firstReinforcement],
+            new Set([vanguard.id]),
+        ).map(({ id }) => id)).toEqual([firstReinforcement.id]);
+    });
+
     test("finishes an in-range building instead of being distracted by enemy forces", () => {
         const attackers = [combatant(1, 8, 0, 500, 100, 5, 10)] as any[];
         const building = buildingUnit(200, 10, 200) as any;
@@ -661,6 +676,7 @@ describe("building elimination policy", () => {
             "engagementAllocationMode",
             "commitRouteBlocker",
             "routeCorridorRadius",
+            "readinessReserve",
         ]);
     });
 
@@ -681,6 +697,9 @@ describe("building elimination policy", () => {
         );
         expect(() => resolveBuildingEliminationOptions({ engagementAllocationMode: "unknown" as any })).toThrow(
             "allocation mode",
+        );
+        expect(() => resolveBuildingEliminationOptions({ readinessReserve: "yes" as any })).toThrow(
+            "readiness reserve",
         );
     });
 });

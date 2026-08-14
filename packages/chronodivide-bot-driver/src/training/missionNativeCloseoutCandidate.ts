@@ -36,10 +36,15 @@ import {
     MissionNativeCloseoutPolicyV8,
     validateMissionNativeCloseoutPolicyV8,
 } from "./missionNativeCloseoutPolicyV8.js";
+import {
+    MissionNativeCloseoutPolicyV9,
+    validateMissionNativeCloseoutPolicyV9,
+} from "./missionNativeCloseoutPolicyV9.js";
 
 type MissionNativePolicy = MissionNativeCloseoutPolicy | MissionNativeCloseoutPolicyV2 |
     MissionNativeCloseoutPolicyV3 | MissionNativeCloseoutPolicyV4 | MissionNativeCloseoutPolicyV5 |
-    MissionNativeCloseoutPolicyV6 | MissionNativeCloseoutPolicyV7 | MissionNativeCloseoutPolicyV8;
+    MissionNativeCloseoutPolicyV6 | MissionNativeCloseoutPolicyV7 | MissionNativeCloseoutPolicyV8 |
+    MissionNativeCloseoutPolicyV9;
 
 type StrategyLike = {
     onAiUpdate(context: any, missionController: any, logger: any): StrategyLike;
@@ -84,6 +89,7 @@ class MissionNativeCloseoutStrategy implements StrategyLike {
                 ? policy.retargetStalledBuildings
                 : false,
             routeCorridorRadius: "routeCorridorRadius" in policy ? policy.routeCorridorRadius : 8,
+            readinessReserve: "readinessReserve" in policy ? policy.readinessReserve : false,
         }, telemetrySink);
     }
 
@@ -102,9 +108,11 @@ export const createMissionNativeCloseoutCandidate = (
     rawPolicy: MissionNativePolicy,
     telemetrySink: BuildingEliminationTelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 8
-        ? validateMissionNativeCloseoutPolicyV8(rawPolicy)
-        : rawPolicy.schemaVersion === 7
+    const policy = rawPolicy.schemaVersion === 9
+        ? validateMissionNativeCloseoutPolicyV9(rawPolicy)
+        : rawPolicy.schemaVersion === 8
+            ? validateMissionNativeCloseoutPolicyV8(rawPolicy)
+            : rawPolicy.schemaVersion === 7
             ? validateMissionNativeCloseoutPolicyV7(rawPolicy)
             : rawPolicy.schemaVersion === 6
                 ? validateMissionNativeCloseoutPolicyV6(rawPolicy)
