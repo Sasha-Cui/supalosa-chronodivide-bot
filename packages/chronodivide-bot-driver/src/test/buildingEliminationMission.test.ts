@@ -871,6 +871,7 @@ describe("building elimination policy", () => {
             "adaptiveNavalTargetCount",
             "adaptiveGroundAssaultTargetCount",
             "adaptiveGroundAssaultInfrastructure",
+            "adaptiveGroundAssaultInfrastructurePriority",
             "adaptiveProductionPriority",
             "adaptiveTechPriority",
             "activationMode",
@@ -894,6 +895,9 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({ stallTicks: 0 })).toThrow("stallTicks");
         expect(() => resolveBuildingEliminationOptions({ maxEnemyBuildings: 0 })).toThrow("maxEnemyBuildings");
         expect(() => resolveBuildingEliminationOptions({ routeCorridorRadius: 0 })).toThrow("routeCorridorRadius");
+        expect(() => resolveBuildingEliminationOptions({
+            adaptiveGroundAssaultInfrastructurePriority: 0,
+        })).toThrow("adaptiveGroundAssaultInfrastructurePriority");
         expect(() => resolveBuildingEliminationOptions({ activationMode: "unknown" as any })).toThrow(
             "activation mode",
         );

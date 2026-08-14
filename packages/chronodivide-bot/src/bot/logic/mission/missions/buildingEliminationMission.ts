@@ -61,6 +61,7 @@ export type BuildingEliminationOptions = {
     adaptiveNavalTargetCount?: number;
     adaptiveGroundAssaultTargetCount?: number;
     adaptiveGroundAssaultInfrastructure?: boolean;
+    adaptiveGroundAssaultInfrastructurePriority?: number;
     adaptiveProductionPriority?: number;
     adaptiveTechPriority?: number;
     activationMode?: BuildingEliminationActivationMode;
@@ -355,6 +356,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     adaptiveNavalTargetCount: 0,
     adaptiveGroundAssaultTargetCount: 0,
     adaptiveGroundAssaultInfrastructure: false,
+    adaptiveGroundAssaultInfrastructurePriority: 130,
     adaptiveProductionPriority: 140,
     adaptiveTechPriority: 130,
     activationMode: "forceAdvantage",
@@ -393,6 +395,12 @@ export const resolveBuildingEliminationOptions = (
     requireIntegerInRange("adaptiveAirTargetCount", resolved.adaptiveAirTargetCount, 0, 100);
     requireIntegerInRange("adaptiveNavalTargetCount", resolved.adaptiveNavalTargetCount, 0, 100);
     requireIntegerInRange("adaptiveGroundAssaultTargetCount", resolved.adaptiveGroundAssaultTargetCount, 0, 100);
+    requireIntegerInRange(
+        "adaptiveGroundAssaultInfrastructurePriority",
+        resolved.adaptiveGroundAssaultInfrastructurePriority,
+        1,
+        1_000,
+    );
     requireIntegerInRange("adaptiveProductionPriority", resolved.adaptiveProductionPriority, 1, 1_000);
     requireIntegerInRange("adaptiveTechPriority", resolved.adaptiveTechPriority, 1, 1_000);
     requireIntegerInRange("maxEnemyBuildings", resolved.maxEnemyBuildings, 1, 1_000);
@@ -2232,7 +2240,7 @@ class BuildingEliminationAssaultBuildMission extends Mission {
         return requested && location
             ? buildStructureAtLocation(
                 structureName,
-                this.options.adaptiveTechPriority,
+                this.options.adaptiveGroundAssaultInfrastructurePriority,
                 location.rx,
                 location.ry,
             )
