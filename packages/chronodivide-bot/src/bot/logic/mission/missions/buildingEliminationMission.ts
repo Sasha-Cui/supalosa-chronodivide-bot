@@ -29,7 +29,8 @@ import { BUILDING_NAME_TO_RULES, getDefaultPlacementLocation } from "../../build
 
 export type BuildingEliminationObservationMode = "publicApi" | "visibleOnly";
 export type BuildingEliminationTargetPriority = "production" | "reinforcement" | "defense" | "nearest";
-export type BuildingEliminationActivationMode = "forceAdvantage" | "lowBuilding" | "objectiveRace";
+export type BuildingEliminationActivationMode = "forceAdvantage" | "lowBuilding" |
+    "objectiveRace" | "objectiveClearance";
 export type BuildingEliminationEngagementMode = "directBuilding" | "completionRace";
 export type BuildingEliminationEngagementAllocationMode = "allBlocker" | "boundedScreen" | "singleScreen";
 
@@ -100,7 +101,7 @@ export type BuildingEliminationTelemetryEvent =
           event: "activation_blocked";
           tick: number;
           reason: "insufficient_own_combatants" | "enemy_combatant_limit" | "insufficient_advantage" |
-              "no_viable_building_race";
+              "no_viable_building_race" | "no_viable_objective_clearance";
           ownCombatants: number;
           enemyCombatants: number;
           reservedCombatants: number;
@@ -242,6 +243,21 @@ export type BuildingEliminationTelemetryEvent =
           stagedCombatants: number;
           eligibleCombatants: number;
           vanguardCombatants: number;
+      }
+    | {
+          schemaVersion: 7;
+          event: "activation_evaluation";
+          tick: number;
+          phase: "no_target" | "building_ready" | "blocker_ready" | "blocked";
+          targetId: number | null;
+          targetName: string | null;
+          blockerId: number | null;
+          blockerName: string | null;
+          compatibleAttackerCount: number;
+          routeThreatCount: number;
+          estimatedBuildingCompletionTicks: number | null;
+          estimatedForceSurvivalTicks: number | null;
+          estimatedBlockerRemovalTicks: number | null;
       };
 
 export type BuildingEliminationTelemetrySink = (event: BuildingEliminationTelemetryEvent) => void;
@@ -319,7 +335,9 @@ export const resolveBuildingEliminationOptions = (
     if (!new Set<BuildingEliminationObservationMode>(["publicApi", "visibleOnly"]).has(resolved.observationMode)) {
         throw new Error(`Invalid building-elimination observation mode: ${resolved.observationMode}`);
     }
-    if (!new Set<BuildingEliminationActivationMode>(["forceAdvantage", "lowBuilding", "objectiveRace"])
+    if (!new Set<BuildingEliminationActivationMode>([
+        "forceAdvantage", "lowBuilding", "objectiveRace", "objectiveClearance",
+    ])
         .has(resolved.activationMode)) {
         throw new Error(`Invalid building-elimination activation mode: ${resolved.activationMode}`);
     }
@@ -628,6 +646,7 @@ export type BuildingEliminationEngagementDecision = {
     estimatedBuildingCompletionTicks: number;
     estimatedForceSurvivalTicks: number;
     earliestRouteThreatInterceptTicks: number;
+    estimatedBlockerRemovalTicks: number;
 };
 
 export const chooseBuildingEliminationEngagement = (
@@ -711,6 +730,24 @@ export const chooseBuildingEliminationEngagement = (
     const earliestRouteThreatInterceptTicks = threats.length === 0
         ? Number.POSITIVE_INFINITY
         : Math.min(...threats.map(({ interceptTicks }) => interceptTicks));
+    const selectedBlocker = threats.find(({ force }) => force.id === preferredBlockerId)?.force ??
+        threats[0]?.force ?? null;
+    const blockerDamagePerTick = selectedBlocker === null ? 0 : attackers.reduce(
+        (sum, attacker) => sum + unitDamagePerTickAgainst(attacker, selectedBlocker),
+        0,
+    );
+    const blockerApproachTicks = selectedBlocker === null || attackers.length === 0
+        ? Number.POSITIVE_INFINITY
+        : Math.min(...attackers.map((attacker) => Math.max(
+            0,
+            distance(
+                { x: attacker.tile.rx, y: attacker.tile.ry },
+                { x: selectedBlocker.tile.rx, y: selectedBlocker.tile.ry },
+            ) - maximumDamageRangeAgainst(attacker, selectedBlocker),
+        ) / unitSpeedTilesPerTick(attacker)));
+    const estimatedBlockerRemovalTicks = selectedBlocker !== null && blockerDamagePerTick > 0
+        ? blockerApproachTicks + selectedBlocker.hitPoints / blockerDamagePerTick
+        : Number.POSITIVE_INFINITY;
     if (buildingInRange) return {
         blocker: null,
         reason: "building_in_range",
@@ -718,6 +755,7 @@ export const chooseBuildingEliminationEngagement = (
         estimatedBuildingCompletionTicks,
         estimatedForceSurvivalTicks,
         earliestRouteThreatInterceptTicks,
+        estimatedBlockerRemovalTicks,
     };
     if (threats.length === 0) return {
         blocker: null,
@@ -726,6 +764,7 @@ export const chooseBuildingEliminationEngagement = (
         estimatedBuildingCompletionTicks,
         estimatedForceSurvivalTicks,
         earliestRouteThreatInterceptTicks,
+        estimatedBlockerRemovalTicks,
     };
     if (estimatedBuildingCompletionTicks <= estimatedForceSurvivalTicks) return {
         blocker: null,
@@ -734,14 +773,16 @@ export const chooseBuildingEliminationEngagement = (
         estimatedBuildingCompletionTicks,
         estimatedForceSurvivalTicks,
         earliestRouteThreatInterceptTicks,
+        estimatedBlockerRemovalTicks,
     };
     return {
-        blocker: threats.find(({ force }) => force.id === preferredBlockerId)?.force ?? threats[0].force,
+        blocker: selectedBlocker,
         reason: "route_interception_wins",
         routeThreatCount: threats.length,
         estimatedBuildingCompletionTicks,
         estimatedForceSurvivalTicks,
         earliestRouteThreatInterceptTicks,
+        estimatedBlockerRemovalTicks,
     };
 };
 
@@ -756,6 +797,17 @@ export const meetsObjectiveRaceBuildingEliminationActivationGate = (
     enemyForces,
     corridorRadius,
 ).blocker === null;
+
+export const meetsObjectiveClearanceBuildingEliminationActivationGate = (
+    attackers: UnitData[],
+    target: UnitData,
+    enemyForces: UnitData[],
+    corridorRadius: number,
+): boolean => {
+    const decision = chooseBuildingEliminationEngagement(attackers, target, enemyForces, corridorRadius);
+    return decision.blocker === null ||
+        decision.estimatedBlockerRemovalTicks <= decision.estimatedForceSurvivalTicks;
+};
 
 export type BuildingEliminationEngagementAllocation = {
     buildingAttackers: UnitData[];
@@ -1208,7 +1260,10 @@ const isBuildingEliminationCloseoutState = (
         options.observationMode,
         (unit) => unit.rules.type === ObjectType.Building,
     ).length;
-    if (options.activationMode === "lowBuilding" || options.activationMode === "objectiveRace") {
+    if (
+        options.activationMode === "lowBuilding" || options.activationMode === "objectiveRace" ||
+        options.activationMode === "objectiveClearance"
+    ) {
         return meetsLowBuildingEliminationActivationGate(
             ownCombatantCount,
             enemyBuildingCount,
@@ -2142,6 +2197,8 @@ export class BuildingEliminationMissionFactory {
     private options: Required<BuildingEliminationOptions>;
     private lastBlockedTelemetrySignature = "";
     private lastBlockedTelemetryAt = Number.NEGATIVE_INFINITY;
+    private lastActivationEvaluationSignature = "";
+    private lastActivationEvaluationAt = Number.NEGATIVE_INFINITY;
     private stalledBuildingIds = new Set<number>();
     private capabilityGapCache: BuildingCapabilityGapCache;
     private closeoutLatch: BuildingEliminationCloseoutLatch = { activated: false };
@@ -2204,7 +2261,10 @@ export class BuildingEliminationMissionFactory {
             this.emitBlockedTelemetry(context, "insufficient_advantage", ownCombatants.length, enemyCombatantCount);
             return;
         }
-        if (this.options.activationMode === "objectiveRace") {
+        if (
+            this.options.activationMode === "objectiveRace" ||
+            this.options.activationMode === "objectiveClearance"
+        ) {
             const committedAttackers = selectCommittedBuildingAttackers(
                 ownCombatants,
                 context.game.getPlayerData(context.player.name).startLocation,
@@ -2243,18 +2303,38 @@ export class BuildingEliminationMissionFactory {
                 (unit) => unit.rules.isSelectableCombatant && !unit.rules.harvester &&
                     unit.rules.type !== ObjectType.Building,
             );
-            if (
-                !target || compatibleAttackers.length === 0 ||
-                !meetsObjectiveRaceBuildingEliminationActivationGate(
+            const decision = target && compatibleAttackers.length > 0
+                ? chooseBuildingEliminationEngagement(
                     compatibleAttackers,
                     target,
                     enemyForces,
                     this.options.routeCorridorRadius,
                 )
-            ) {
+                : null;
+            const buildingReady = decision?.blocker === null;
+            const blockerReady = this.options.activationMode === "objectiveClearance" &&
+                decision !== null && decision.blocker !== null &&
+                decision.estimatedBlockerRemovalTicks <= decision.estimatedForceSurvivalTicks;
+            const activationPhase = !target || compatibleAttackers.length === 0 || decision === null
+                ? "no_target"
+                : buildingReady
+                    ? "building_ready"
+                    : blockerReady
+                        ? "blocker_ready"
+                        : "blocked";
+            this.emitActivationEvaluation(
+                context,
+                activationPhase,
+                target ?? null,
+                compatibleAttackers.length,
+                decision,
+            );
+            if (!buildingReady && !blockerReady) {
                 this.emitBlockedTelemetry(
                     context,
-                    "no_viable_building_race",
+                    this.options.activationMode === "objectiveClearance"
+                        ? "no_viable_objective_clearance"
+                        : "no_viable_building_race",
                     ownCombatants.length,
                     enemyCombatantCount,
                 );
@@ -2290,6 +2370,41 @@ export class BuildingEliminationMissionFactory {
             ),
         );
         this.lastBlockedTelemetrySignature = "";
+    }
+
+    private emitActivationEvaluation(
+        context: SupabotContext,
+        phase: Extract<BuildingEliminationTelemetryEvent, { event: "activation_evaluation" }>["phase"],
+        target: UnitData | null,
+        compatibleAttackerCount: number,
+        decision: BuildingEliminationEngagementDecision | null,
+    ): void {
+        const finiteOrNull = (value: number | undefined): number | null =>
+            value !== undefined && Number.isFinite(value) ? value : null;
+        const event: Extract<BuildingEliminationTelemetryEvent, { event: "activation_evaluation" }> = {
+            schemaVersion: 7,
+            event: "activation_evaluation",
+            tick: context.game.getCurrentTick(),
+            phase,
+            targetId: target?.id ?? null,
+            targetName: target?.rules.name ?? null,
+            blockerId: decision?.blocker?.id ?? null,
+            blockerName: decision?.blocker?.rules.name ?? null,
+            compatibleAttackerCount,
+            routeThreatCount: decision?.routeThreatCount ?? 0,
+            estimatedBuildingCompletionTicks: finiteOrNull(decision?.estimatedBuildingCompletionTicks),
+            estimatedForceSurvivalTicks: finiteOrNull(decision?.estimatedForceSurvivalTicks),
+            estimatedBlockerRemovalTicks: finiteOrNull(decision?.estimatedBlockerRemovalTicks),
+        };
+        const signature = JSON.stringify({ ...event, tick: 0 });
+        const ready = phase === "building_ready" || phase === "blocker_ready";
+        if (
+            !ready && signature === this.lastActivationEvaluationSignature &&
+            event.tick < this.lastActivationEvaluationAt + BLOCKED_TELEMETRY_HEARTBEAT_TICKS
+        ) return;
+        this.lastActivationEvaluationSignature = signature;
+        this.lastActivationEvaluationAt = event.tick;
+        this.telemetrySink(event);
     }
 
     private maybeCreateReadinessReserve(

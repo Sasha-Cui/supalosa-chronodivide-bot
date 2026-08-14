@@ -14,6 +14,7 @@ import {
     isPreemptibleBuildingEliminationMission,
     meetsBuildingEliminationActivationGate,
     meetsLowBuildingEliminationActivationGate,
+    meetsObjectiveClearanceBuildingEliminationActivationGate,
     meetsObjectiveRaceBuildingEliminationActivationGate,
     mergeCurrentAndRememberedBuildingTargets,
     prioritizeStalledBuildingTargets,
@@ -456,6 +457,41 @@ describe("building elimination policy", () => {
             routeForces,
             8,
         )).toBe(false);
+    });
+
+    test("objective-clearance takeover still rejects a suicidal one-unit blocker attack", () => {
+        expect(meetsObjectiveClearanceBuildingEliminationActivationGate(
+            [combatant(1, 0, 0, 100, 10, 1, 1)] as any[],
+            buildingUnit(200, 20, 1_000) as any,
+            [combatant(100, 5, 0, 500, 500, 5, 1)] as any[],
+            8,
+        )).toBe(false);
+    });
+
+    test("objective-clearance takeover launches a reserve that can remove the blocker before destruction", () => {
+        const attackers = Array.from({ length: 25 }, (_, index) =>
+            combatant(index + 1, 0, index % 2, 500, 100, 1, 30),
+        ) as any[];
+        const threats = Array.from({ length: 20 }, (_, index) =>
+            combatant(100 + index, 5 + index % 3, index % 2, 500, 100, 5, 30),
+        ) as any[];
+        const fortifiedBuilding = buildingUnit(200, 20, 100_000) as any;
+        const decision = chooseBuildingEliminationEngagement(
+            attackers,
+            fortifiedBuilding,
+            threats,
+            8,
+        );
+        expect(decision.blocker).not.toBeNull();
+        expect(decision.estimatedBlockerRemovalTicks).toBeLessThanOrEqual(
+            decision.estimatedForceSurvivalTicks,
+        );
+        expect(meetsObjectiveClearanceBuildingEliminationActivationGate(
+            attackers,
+            fortifiedBuilding,
+            threats,
+            8,
+        )).toBe(true);
     });
 
     test("objective-race takeover attacks immediately when the building is already in range", () => {
