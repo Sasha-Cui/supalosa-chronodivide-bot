@@ -26,6 +26,7 @@ import {
 } from "./missionNativeCloseoutPolicyV5.js";
 import { MissionNativeCloseoutPolicyV6 } from "./missionNativeCloseoutPolicyV6.js";
 import { MissionNativeCloseoutPolicyV7 } from "./missionNativeCloseoutPolicyV7.js";
+import { MissionNativeCloseoutPolicyV8 } from "./missionNativeCloseoutPolicyV8.js";
 
 export const MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_MAX_TICKS = 5_400 as const;
 export const MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_ENGINE_SEED_BASE = 4_000_000_000 as const;
@@ -135,7 +136,8 @@ export const runMissionNativeCloseoutTrace = async (args: {
     country: Countries;
     candidateSlot: 0 | 1;
     requestedEngineSeed: number;
-    policy: MissionNativeCloseoutPolicyV5 | MissionNativeCloseoutPolicyV6 | MissionNativeCloseoutPolicyV7 | null;
+    policy: MissionNativeCloseoutPolicyV5 | MissionNativeCloseoutPolicyV6 | MissionNativeCloseoutPolicyV7 |
+        MissionNativeCloseoutPolicyV8 | null;
 }): Promise<MissionNativeCloseoutRunTrace> => {
     const { factory, mapName, country, candidateSlot, requestedEngineSeed, policy } = args;
     const telemetry: BuildingEliminationTelemetryEvent[] = [];

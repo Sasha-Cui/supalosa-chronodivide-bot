@@ -32,10 +32,14 @@ import {
     MissionNativeCloseoutPolicyV7,
     validateMissionNativeCloseoutPolicyV7,
 } from "./missionNativeCloseoutPolicyV7.js";
+import {
+    MissionNativeCloseoutPolicyV8,
+    validateMissionNativeCloseoutPolicyV8,
+} from "./missionNativeCloseoutPolicyV8.js";
 
 type MissionNativePolicy = MissionNativeCloseoutPolicy | MissionNativeCloseoutPolicyV2 |
     MissionNativeCloseoutPolicyV3 | MissionNativeCloseoutPolicyV4 | MissionNativeCloseoutPolicyV5 |
-    MissionNativeCloseoutPolicyV6 | MissionNativeCloseoutPolicyV7;
+    MissionNativeCloseoutPolicyV6 | MissionNativeCloseoutPolicyV7 | MissionNativeCloseoutPolicyV8;
 
 type StrategyLike = {
     onAiUpdate(context: any, missionController: any, logger: any): StrategyLike;
@@ -98,19 +102,21 @@ export const createMissionNativeCloseoutCandidate = (
     rawPolicy: MissionNativePolicy,
     telemetrySink: BuildingEliminationTelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 7
-        ? validateMissionNativeCloseoutPolicyV7(rawPolicy)
-        : rawPolicy.schemaVersion === 6
-            ? validateMissionNativeCloseoutPolicyV6(rawPolicy)
-            : rawPolicy.schemaVersion === 5
-                ? validateMissionNativeCloseoutPolicyV5(rawPolicy)
-                : rawPolicy.schemaVersion === 4
-                    ? validateMissionNativeCloseoutPolicyV4(rawPolicy)
-                    : rawPolicy.schemaVersion === 3
-                        ? validateMissionNativeCloseoutPolicyV3(rawPolicy)
-                        : rawPolicy.schemaVersion === 2
-                            ? validateMissionNativeCloseoutPolicyV2(rawPolicy)
-                            : validateMissionNativeCloseoutPolicy(rawPolicy);
+    const policy = rawPolicy.schemaVersion === 8
+        ? validateMissionNativeCloseoutPolicyV8(rawPolicy)
+        : rawPolicy.schemaVersion === 7
+            ? validateMissionNativeCloseoutPolicyV7(rawPolicy)
+            : rawPolicy.schemaVersion === 6
+                ? validateMissionNativeCloseoutPolicyV6(rawPolicy)
+                : rawPolicy.schemaVersion === 5
+                    ? validateMissionNativeCloseoutPolicyV5(rawPolicy)
+                    : rawPolicy.schemaVersion === 4
+                        ? validateMissionNativeCloseoutPolicyV4(rawPolicy)
+                        : rawPolicy.schemaVersion === 3
+                            ? validateMissionNativeCloseoutPolicyV3(rawPolicy)
+                            : rawPolicy.schemaVersion === 2
+                                ? validateMissionNativeCloseoutPolicyV2(rawPolicy)
+                                : validateMissionNativeCloseoutPolicy(rawPolicy);
     if (!policy.enabled) return baselineFactory.create(name, country);
     if (!baselineFactory.createDefaultStrategy || !baselineFactory.createWithStrategy) {
         throw new Error("Mission-native closeout requires an injectable external baseline strategy");

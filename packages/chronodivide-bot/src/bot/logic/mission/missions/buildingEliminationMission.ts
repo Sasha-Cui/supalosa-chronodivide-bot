@@ -29,7 +29,7 @@ import { BUILDING_NAME_TO_RULES, getDefaultPlacementLocation } from "../../build
 
 export type BuildingEliminationObservationMode = "publicApi" | "visibleOnly";
 export type BuildingEliminationTargetPriority = "production" | "reinforcement" | "defense" | "nearest";
-export type BuildingEliminationActivationMode = "forceAdvantage" | "lowBuilding";
+export type BuildingEliminationActivationMode = "forceAdvantage" | "lowBuilding" | "objectiveRace";
 export type BuildingEliminationEngagementMode = "directBuilding" | "completionRace";
 export type BuildingEliminationEngagementAllocationMode = "allBlocker" | "boundedScreen" | "singleScreen";
 
@@ -98,7 +98,8 @@ export type BuildingEliminationTelemetryEvent =
           schemaVersion: 2;
           event: "activation_blocked";
           tick: number;
-          reason: "insufficient_own_combatants" | "enemy_combatant_limit" | "insufficient_advantage";
+          reason: "insufficient_own_combatants" | "enemy_combatant_limit" | "insufficient_advantage" |
+              "no_viable_building_race";
           ownCombatants: number;
           enemyCombatants: number;
           reservedCombatants: number;
@@ -307,7 +308,7 @@ export const resolveBuildingEliminationOptions = (
     if (!new Set<BuildingEliminationObservationMode>(["publicApi", "visibleOnly"]).has(resolved.observationMode)) {
         throw new Error(`Invalid building-elimination observation mode: ${resolved.observationMode}`);
     }
-    if (!new Set<BuildingEliminationActivationMode>(["forceAdvantage", "lowBuilding"])
+    if (!new Set<BuildingEliminationActivationMode>(["forceAdvantage", "lowBuilding", "objectiveRace"])
         .has(resolved.activationMode)) {
         throw new Error(`Invalid building-elimination activation mode: ${resolved.activationMode}`);
     }
@@ -727,6 +728,18 @@ export const chooseBuildingEliminationEngagement = (
         earliestRouteThreatInterceptTicks,
     };
 };
+
+export const meetsObjectiveRaceBuildingEliminationActivationGate = (
+    attackers: UnitData[],
+    target: UnitData,
+    enemyForces: UnitData[],
+    corridorRadius: number,
+): boolean => chooseBuildingEliminationEngagement(
+    attackers,
+    target,
+    enemyForces,
+    corridorRadius,
+).blocker === null;
 
 export type BuildingEliminationEngagementAllocation = {
     buildingAttackers: UnitData[];
@@ -1174,7 +1187,7 @@ const isBuildingEliminationCloseoutState = (
         options.observationMode,
         (unit) => unit.rules.type === ObjectType.Building,
     ).length;
-    if (options.activationMode === "lowBuilding") {
+    if (options.activationMode === "lowBuilding" || options.activationMode === "objectiveRace") {
         return meetsLowBuildingEliminationActivationGate(
             ownCombatantCount,
             enemyBuildingCount,
@@ -2055,11 +2068,12 @@ export class BuildingEliminationMissionFactory {
         }
 
         const ownCombatants = getEligibleBuildingAttackers(context);
-        const enemyBuildingCount = getEnemyUnits(
+        const enemyBuildings = getEnemyUnits(
             context,
             this.options.observationMode,
             (unit) => unit.rules.type === ObjectType.Building,
-        ).length;
+        );
+        const enemyBuildingCount = enemyBuildings.length;
         if (enemyBuildingCount === 0 || enemyBuildingCount > this.options.maxEnemyBuildings) {
             return;
         }
@@ -2079,6 +2093,63 @@ export class BuildingEliminationMissionFactory {
         ) {
             this.emitBlockedTelemetry(context, "insufficient_advantage", ownCombatants.length, enemyCombatantCount);
             return;
+        }
+        if (this.options.activationMode === "objectiveRace") {
+            const committedAttackers = selectCommittedBuildingAttackers(
+                ownCombatants,
+                context.game.getPlayerData(context.player.name).startLocation,
+                this.options.reserveCombatants,
+            );
+            const visibleEnemyIds = new Set(context.game.getVisibleUnits(context.player.name, "enemy"));
+            const rankedTargets = rankBuildingTargets(
+                enemyBuildings.map((building) => toTargetDescriptor(
+                    building,
+                    visibleEnemyIds.has(building.id),
+                )),
+                this.options.targetPriority,
+                committedAttackers.map((unit) => ({ x: unit.tile.rx, y: unit.tile.ry })),
+            );
+            const buildingById = new Map(enemyBuildings.map((building) => [building.id, building]));
+            const pairIsCompatible = (attacker: UnitData, descriptor: BuildingTargetDescriptor): boolean => {
+                const target = descriptor.id === undefined ? undefined : buildingById.get(descriptor.id);
+                if (!target) return false;
+                if (this.options.capabilityAwareAttackers && !unitCanDamageBuilding(attacker, target)) return false;
+                return !this.options.reachabilityAwareTargets ||
+                    canReachBuildingFiringPerimeter(context.game, attacker, target);
+            };
+            const descriptor = selectCompatibleBuildingTargets(
+                committedAttackers,
+                rankedTargets,
+                1,
+                pairIsCompatible,
+            )[0];
+            const target = descriptor?.id === undefined ? undefined : buildingById.get(descriptor.id);
+            const compatibleAttackers = target && descriptor
+                ? committedAttackers.filter((attacker) => pairIsCompatible(attacker, descriptor))
+                : [];
+            const enemyForces = getEnemyUnits(
+                context,
+                this.options.observationMode,
+                (unit) => unit.rules.isSelectableCombatant && !unit.rules.harvester &&
+                    unit.rules.type !== ObjectType.Building,
+            );
+            if (
+                !target || compatibleAttackers.length === 0 ||
+                !meetsObjectiveRaceBuildingEliminationActivationGate(
+                    compatibleAttackers,
+                    target,
+                    enemyForces,
+                    this.options.routeCorridorRadius,
+                )
+            ) {
+                this.emitBlockedTelemetry(
+                    context,
+                    "no_viable_building_race",
+                    ownCombatants.length,
+                    enemyCombatantCount,
+                );
+                return;
+            }
         }
 
         const preemptedMissions = this.preemptAttacks(missionController);

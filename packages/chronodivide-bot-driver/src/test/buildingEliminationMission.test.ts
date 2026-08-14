@@ -14,6 +14,7 @@ import {
     isPreemptibleBuildingEliminationMission,
     meetsBuildingEliminationActivationGate,
     meetsLowBuildingEliminationActivationGate,
+    meetsObjectiveRaceBuildingEliminationActivationGate,
     mergeCurrentAndRememberedBuildingTargets,
     prioritizeStalledBuildingTargets,
     rankBuildingTargets,
@@ -426,6 +427,43 @@ describe("building elimination policy", () => {
         expect(meetsLowBuildingEliminationActivationGate(0, 1, gate)).toBe(false);
         expect(meetsLowBuildingEliminationActivationGate(100, 6, gate)).toBe(false);
         expect(meetsLowBuildingEliminationActivationGate(100, 0, gate)).toBe(false);
+    });
+
+    test("objective-race takeover ignores 100 armed units that are off the building route", () => {
+        const attackers = [combatant(1, 0, 0, 500, 100, 5, 10)] as any[];
+        const building = buildingUnit(200, 20, 1_000) as any;
+        const offRouteForces = Array.from({ length: 100 }, (_, index) =>
+            combatant(100 + index, 10 + index % 4, 30 + Math.floor(index / 4), 500, 100, 5, 10),
+        ) as any[];
+        expect(meetsObjectiveRaceBuildingEliminationActivationGate(
+            attackers,
+            building,
+            offRouteForces,
+            8,
+        )).toBe(true);
+    });
+
+    test("objective-race takeover waits when the same armed force lethally intercepts the route", () => {
+        const attackers = [combatant(1, 0, 0, 100, 10, 1, 30)] as any[];
+        const building = buildingUnit(200, 20, 1_000) as any;
+        const routeForces = Array.from({ length: 100 }, (_, index) =>
+            combatant(100 + index, 5 + index % 4, index % 3, 500, 500, 5, 1),
+        ) as any[];
+        expect(meetsObjectiveRaceBuildingEliminationActivationGate(
+            attackers,
+            building,
+            routeForces,
+            8,
+        )).toBe(false);
+    });
+
+    test("objective-race takeover attacks immediately when the building is already in range", () => {
+        expect(meetsObjectiveRaceBuildingEliminationActivationGate(
+            [combatant(1, 8, 0, 100, 10, 5, 30)] as any[],
+            buildingUnit(200, 10, 1_000) as any,
+            [combatant(100, 8, 0, 500, 500, 5, 1)] as any[],
+            8,
+        )).toBe(true);
     });
 
     test("finishes an in-range building instead of being distracted by enemy forces", () => {
