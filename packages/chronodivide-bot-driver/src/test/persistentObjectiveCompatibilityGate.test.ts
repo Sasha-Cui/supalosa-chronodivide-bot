@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
-import { validatePersistentObjectiveCompatibilityExposure } from "../training/persistentObjectiveCompatibilityGate.js";
+import {
+    summarizePersistentObjectiveCompatibilityTelemetry,
+    validatePersistentObjectiveCompatibilityExposure,
+} from "../training/persistentObjectiveCompatibilityGate.js";
 import { PersistentObjectiveCompletionTelemetry } from "../training/persistentObjectiveCompletionStrategy.js";
 
 const decision = (
@@ -22,7 +25,7 @@ const decision = (
     blockerId: null,
     selectedAttackerIds: [1],
     selectedAttackerRulesNames: ["MTNK"],
-    buildingDamageSincePreviousDecision: 0,
+    buildingDamageSincePreviousDecision: 100,
     blockerDamageSincePreviousDecision: 0,
     routeProgressSincePreviousDecision: 1,
     homeThreatened: false,
@@ -70,5 +73,31 @@ describe("persistent objective outcome-blind compatibility gate", () => {
         expect(() => validatePersistentObjectiveCompatibilityExposure(
             [row], Countries.USA, 0,
         )).toThrow(/command response/);
+    });
+
+    it("rejects command exposure that never produces physical building damage", () => {
+        expect(() => validatePersistentObjectiveCompatibilityExposure(
+            [decision({ buildingDamageSincePreviousDecision: 0 })], Countries.USA, 0,
+        )).toThrow(/building damage/);
+    });
+
+    it("retains per-type selection, action, rejection, and physical-progress counts", () => {
+        expect(summarizePersistentObjectiveCompatibilityTelemetry([decision()])).toMatchObject({
+            telemetryCount: 1,
+            compatibleObservations: 1,
+            selectedObservations: 1,
+            selectedFractionOfCompatibleObservations: 1,
+            selectedActionCounts: { moving: 1 },
+            buildingDamageEvents: 1,
+            buildingDamage: 100,
+            rules: {
+                MTNK: {
+                    observations: 1,
+                    compatibleObservations: 1,
+                    selectedObservations: 1,
+                    selectedActionCounts: { moving: 1 },
+                },
+            },
+        });
     });
 });

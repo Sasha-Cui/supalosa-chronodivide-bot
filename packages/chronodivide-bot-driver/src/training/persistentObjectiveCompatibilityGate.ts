@@ -27,7 +27,7 @@ import {
 } from "./persistentObjectiveCompletionStrategy.js";
 
 export const PERSISTENT_OBJECTIVE_COMPATIBILITY_MAX_TICKS = 5_400 as const;
-export const PERSISTENT_OBJECTIVE_COMPATIBILITY_ENGINE_SEED_BASE = 4_240_000_000 as const;
+export const PERSISTENT_OBJECTIVE_COMPATIBILITY_ENGINE_SEED_BASE = 4_250_000_000 as const;
 export const PERSISTENT_OBJECTIVE_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT = 4 as const;
 
 type Factory = Awaited<ReturnType<typeof loadBaselineFactory>>;
@@ -188,6 +188,9 @@ export const validatePersistentObjectiveCompatibilityExposure = (
     if (!active.some(({ unitDiagnostics }) => unitDiagnostics.some(({ selected, currentAction }) =>
         selected && (currentAction === "moving" || currentAction === "attacking"),
     ))) throw new Error(`No next-cycle command response for ${country} slot ${slot}`);
+    if (!telemetry.some(({ buildingDamageSincePreviousDecision }) => buildingDamageSincePreviousDecision > 0)) {
+        throw new Error(`No physical building damage for ${country} slot ${slot}`);
+    }
     for (const event of telemetry) {
         if (
             event.schemaVersion !== 1 ||
@@ -227,6 +230,124 @@ export const validatePersistentObjectiveCompatibilityExposure = (
             }
         }
     }
+};
+
+type CountMap = Record<string, number>;
+
+const increment = (counts: CountMap, key: string, amount = 1): void => {
+    counts[key] = (counts[key] ?? 0) + amount;
+};
+
+export const summarizePersistentObjectiveCompatibilityTelemetry = (
+    telemetry: readonly PersistentObjectiveCompletionTelemetry[],
+): Record<string, unknown> => {
+    const phaseCounts: CountMap = {};
+    const reasonCounts: CountMap = {};
+    const selectedActionCounts: CountMap = {};
+    const delegatedActionCounts: CountMap = {};
+    const rejectionReasonCounts: CountMap = {};
+    const rules = new Map<string, {
+        observations: number;
+        compatibleObservations: number;
+        selectedObservations: number;
+        lockedObservations: number;
+        selectedWhileLocked: number;
+        ordinaryWeaponWithSpecialSecondaryObservations: number;
+        selectedActionCounts: CountMap;
+        delegatedActionCounts: CountMap;
+        rejectionReasonCounts: CountMap;
+    }>();
+    let compatibleObservations = 0;
+    let selectedObservations = 0;
+    let buildingDamageEvents = 0;
+    let buildingDamage = 0;
+    let blockerDamageEvents = 0;
+    let blockerDamage = 0;
+    let routeProgressEvents = 0;
+    let routeProgress = 0;
+    let ordinaryWeaponWithSpecialSecondaryObservations = 0;
+    let selectedOrdinaryWeaponWithSpecialSecondaryObservations = 0;
+    for (const event of telemetry) {
+        increment(phaseCounts, event.phase);
+        increment(reasonCounts, event.reason);
+        if (event.buildingDamageSincePreviousDecision > 0) buildingDamageEvents += 1;
+        buildingDamage += event.buildingDamageSincePreviousDecision;
+        if (event.blockerDamageSincePreviousDecision > 0) blockerDamageEvents += 1;
+        blockerDamage += event.blockerDamageSincePreviousDecision;
+        if (event.routeProgressSincePreviousDecision > 0) routeProgressEvents += 1;
+        routeProgress += event.routeProgressSincePreviousDecision;
+        for (const diagnostic of event.unitDiagnostics) {
+            const row = rules.get(diagnostic.rulesName) ?? {
+                observations: 0,
+                compatibleObservations: 0,
+                selectedObservations: 0,
+                lockedObservations: 0,
+                selectedWhileLocked: 0,
+                ordinaryWeaponWithSpecialSecondaryObservations: 0,
+                selectedActionCounts: {},
+                delegatedActionCounts: {},
+                rejectionReasonCounts: {},
+            };
+            row.observations += 1;
+            if (diagnostic.compatible) {
+                compatibleObservations += 1;
+                row.compatibleObservations += 1;
+            }
+            if (diagnostic.missionLocked === true) row.lockedObservations += 1;
+            if (diagnostic.hasOrdinaryCompatibleWeapon && diagnostic.hasSpecialSecondaryMechanic) {
+                ordinaryWeaponWithSpecialSecondaryObservations += 1;
+                row.ordinaryWeaponWithSpecialSecondaryObservations += 1;
+            }
+            if (diagnostic.selected) {
+                selectedObservations += 1;
+                row.selectedObservations += 1;
+                increment(selectedActionCounts, diagnostic.currentAction);
+                increment(row.selectedActionCounts, diagnostic.currentAction);
+                if (diagnostic.missionLocked === true) row.selectedWhileLocked += 1;
+                if (diagnostic.hasOrdinaryCompatibleWeapon && diagnostic.hasSpecialSecondaryMechanic) {
+                    selectedOrdinaryWeaponWithSpecialSecondaryObservations += 1;
+                }
+            } else {
+                increment(delegatedActionCounts, diagnostic.currentAction);
+                increment(row.delegatedActionCounts, diagnostic.currentAction);
+            }
+            if (diagnostic.rejectionReason) {
+                increment(rejectionReasonCounts, diagnostic.rejectionReason);
+                increment(row.rejectionReasonCounts, diagnostic.rejectionReason);
+            }
+            rules.set(diagnostic.rulesName, row);
+        }
+    }
+    return {
+        telemetryCount: telemetry.length,
+        phaseCounts,
+        reasonCounts,
+        exactEnemyBuildingCountRange: telemetry.length === 0 ? null : [
+            Math.min(...telemetry.map(({ exactEnemyBuildingCount }) => exactEnemyBuildingCount)),
+            Math.max(...telemetry.map(({ exactEnemyBuildingCount }) => exactEnemyBuildingCount)),
+        ],
+        selectedAttackerCountRange: telemetry.length === 0 ? null : [
+            Math.min(...telemetry.map(({ selectedAttackerIds }) => selectedAttackerIds.length)),
+            Math.max(...telemetry.map(({ selectedAttackerIds }) => selectedAttackerIds.length)),
+        ],
+        compatibleObservations,
+        selectedObservations,
+        selectedFractionOfCompatibleObservations: compatibleObservations === 0
+            ? 0
+            : selectedObservations / compatibleObservations,
+        selectedActionCounts,
+        delegatedActionCounts,
+        rejectionReasonCounts,
+        buildingDamageEvents,
+        buildingDamage,
+        blockerDamageEvents,
+        blockerDamage,
+        routeProgressEvents,
+        routeProgress,
+        ordinaryWeaponWithSpecialSecondaryObservations,
+        selectedOrdinaryWeaponWithSpecialSecondaryObservations,
+        rules: Object.fromEntries([...rules.entries()].sort(([left], [right]) => left.localeCompare(right))),
+    };
 };
 
 const main = async (): Promise<void> => {
@@ -326,6 +447,7 @@ const main = async (): Promise<void> => {
             enabledOrdinaryWeaponWithSpecialSecondaryObserved: diagnostics.some((diagnostic) =>
                 diagnostic.hasOrdinaryCompatibleWeapon && diagnostic.hasSpecialSecondaryMechanic,
             ),
+            enabledTelemetrySummary: summarizePersistentObjectiveCompatibilityTelemetry(first.telemetry),
             quitAttempts,
             outcomeInspected: false,
         });
@@ -353,8 +475,8 @@ const main = async (): Promise<void> => {
         manifest.software.baseline.trackedDirty !== false || rows.length !== 18
     ) throw new Error("Persistent objective compatibility provenance or coverage failed");
     const output = {
-        schemaVersion: 1,
-        status: "PASS_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY",
+        schemaVersion: 2,
+        status: "PASS_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V2",
         generatedAt: new Date().toISOString(),
         passed: true,
         outcomeFree: true,
