@@ -31,7 +31,7 @@ export type BuildingEliminationObservationMode = "publicApi" | "visibleOnly";
 export type BuildingEliminationTargetPriority = "production" | "defense" | "nearest";
 export type BuildingEliminationActivationMode = "forceAdvantage" | "lowBuilding";
 export type BuildingEliminationEngagementMode = "directBuilding" | "completionRace";
-export type BuildingEliminationEngagementAllocationMode = "allBlocker" | "boundedScreen";
+export type BuildingEliminationEngagementAllocationMode = "allBlocker" | "boundedScreen" | "singleScreen";
 
 export type BuildingEliminationOptions = {
     enabled?: boolean;
@@ -275,7 +275,7 @@ export const resolveBuildingEliminationOptions = (
         .has(resolved.engagementMode)) {
         throw new Error(`Invalid building-elimination engagement mode: ${resolved.engagementMode}`);
     }
-    if (!new Set<BuildingEliminationEngagementAllocationMode>(["allBlocker", "boundedScreen"])
+    if (!new Set<BuildingEliminationEngagementAllocationMode>(["allBlocker", "boundedScreen", "singleScreen"])
         .has(resolved.engagementAllocationMode)) {
         throw new Error(
             `Invalid building-elimination engagement allocation mode: ${resolved.engagementAllocationMode}`,
@@ -714,8 +714,9 @@ export const allocateBuildingEliminationEngagement = (
         tileDistanceToFoundation(attacker.tile.rx, attacker.tile.ry, target) <=
             maximumDamageRangeAgainst(attacker, target),
     ).map(({ id }) => id));
+    const allocationLimit = mode === "singleScreen" ? 1 : Math.floor(attackers.length / 2);
     const maximumBlockerAttackers = Math.min(
-        Math.floor(attackers.length / 2),
+        allocationLimit,
         attackers.length - Math.max(1, inRangeIds.size),
     );
     const blockerAttackers = attackers

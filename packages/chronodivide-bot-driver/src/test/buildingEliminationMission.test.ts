@@ -478,6 +478,18 @@ describe("building elimination policy", () => {
         ])).toEqual(new Set(attackers.map(({ id }) => id)));
     });
 
+    test("single-screen allocation sends only one compatible attacker to the blocker", () => {
+        const attackers = Array.from({ length: 6 }, (_, index) => combatant(index + 1, 0)) as any[];
+        const allocation = allocateBuildingEliminationEngagement(
+            attackers,
+            buildingUnit(200, 20) as any,
+            combatant(100, 5) as any,
+            "singleScreen",
+        );
+        expect(allocation.buildingAttackers).toHaveLength(5);
+        expect(allocation.blockerAttackers).toHaveLength(1);
+    });
+
     test("never diverts an in-range building attacker to the blocker screen", () => {
         const inRange = [combatant(1, 19), combatant(2, 19)];
         const allocation = allocateBuildingEliminationEngagement(
