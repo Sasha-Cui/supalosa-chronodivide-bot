@@ -170,7 +170,8 @@ export class AttackMission extends Mission<AttackFailReason> {
     }
 
     public override canDonateLockedUnitsTo(requestingMission: Mission<any>): boolean {
-        return this.options.allowDefenceSteal && requestingMission.getUniqueName().startsWith("globalDefence.");
+        return requestingMission.getUniqueName() === "buildingEliminationReadinessForce" ||
+            (this.options.allowDefenceSteal && requestingMission.getUniqueName().startsWith("globalDefence."));
     }
 
     public getPriority() {

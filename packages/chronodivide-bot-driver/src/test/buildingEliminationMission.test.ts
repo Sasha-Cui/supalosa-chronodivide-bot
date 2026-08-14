@@ -18,11 +18,13 @@ import {
     getBuildingEliminationGroundAssaultUnitName,
     getBuildingEliminationGroundAssaultScreenUnitName,
     getBuildingEliminationGroundAssaultStructureName,
+    getBuildingEliminationReadinessMissionName,
     getBuildingTargetWeight,
     getAssignedBuildingEliminationMissionName,
     isPreemptibleBuildingEliminationMission,
     isTransferCertifiedBuildingEliminationMission,
     meetsBuildingEliminationActivationGate,
+    meetsProgressiveBuildingEliminationBlockerLaunchGate,
     meetsLowBuildingEliminationActivationGate,
     meetsObjectiveClearanceBuildingEliminationActivationGate,
     meetsObjectiveRaceBuildingEliminationActivationGate,
@@ -915,6 +917,8 @@ describe("building elimination policy", () => {
             "adaptiveGroundAssaultProductionScopeLatch",
             "adaptiveGroundAssaultScreenTargetCount",
             "adaptiveGroundAssaultScreenFactoryTrigger",
+            "adaptiveGroundAssaultReadinessForceOwnership",
+            "progressiveRouteBlockerLaunch",
             "adaptiveGroundAssaultInfrastructurePriority",
             "adaptiveProductionPriority",
             "adaptiveTechPriority",
@@ -976,6 +980,12 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({
             adaptiveGroundAssaultScreenFactoryTrigger: "yes" as any,
         })).toThrow("screen factory trigger");
+        expect(() => resolveBuildingEliminationOptions({
+            adaptiveGroundAssaultReadinessForceOwnership: "yes" as any,
+        })).toThrow("readiness force ownership");
+        expect(() => resolveBuildingEliminationOptions({
+            progressiveRouteBlockerLaunch: "yes" as any,
+        })).toThrow("progressive route-blocker launch");
     });
 
     test("terminal production reservation retains only the side-correct factory and tank", () => {
@@ -1051,5 +1061,25 @@ describe("building elimination policy", () => {
         expect(getBuildingEliminationAssaultProductionRequests(
             "MTNK", 0, 4, "E1", 4, 4, 140, true,
         )).toEqual({ MTNK: 140 });
+    });
+
+    test("V24 uses a distinct force-owning readiness mission", () => {
+        expect(getBuildingEliminationReadinessMissionName(false)).toBe(
+            "buildingEliminationReadinessReserve",
+        );
+        expect(getBuildingEliminationReadinessMissionName(true)).toBe(
+            "buildingEliminationReadinessForce",
+        );
+        expect(isTransferCertifiedBuildingEliminationMission(
+            "buildingEliminationReadinessForce",
+        )).toBe(true);
+    });
+
+    test("progressive blocker launch requires owned combined arms and a survivable next blocker", () => {
+        expect(meetsProgressiveBuildingEliminationBlockerLaunchGate(true, 1, 1, 2, 30)).toBe(true);
+        expect(meetsProgressiveBuildingEliminationBlockerLaunchGate(true, 0, 4, 2, 30)).toBe(false);
+        expect(meetsProgressiveBuildingEliminationBlockerLaunchGate(true, 1, 0, 2, 30)).toBe(false);
+        expect(meetsProgressiveBuildingEliminationBlockerLaunchGate(true, 1, 1, 31, 30)).toBe(false);
+        expect(meetsProgressiveBuildingEliminationBlockerLaunchGate(false, 1, 1, 2, 30)).toBe(false);
     });
 });

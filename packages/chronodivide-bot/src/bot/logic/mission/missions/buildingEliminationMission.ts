@@ -65,6 +65,8 @@ export type BuildingEliminationOptions = {
     adaptiveGroundAssaultProductionScopeLatch?: boolean;
     adaptiveGroundAssaultScreenTargetCount?: number;
     adaptiveGroundAssaultScreenFactoryTrigger?: boolean;
+    adaptiveGroundAssaultReadinessForceOwnership?: boolean;
+    progressiveRouteBlockerLaunch?: boolean;
     adaptiveGroundAssaultInfrastructurePriority?: number;
     adaptiveProductionPriority?: number;
     adaptiveTechPriority?: number;
@@ -359,6 +361,22 @@ export type BuildingEliminationTelemetryEvent =
           factoryCount?: number;
           factoryTriggerActive?: boolean;
           readinessOwned?: boolean;
+          readinessTankCount?: number;
+      }
+    | {
+          schemaVersion: 18;
+          event: "progressive_blocker_launch";
+          tick: number;
+          targetId: number;
+          targetName: string;
+          blockerId: number;
+          blockerName: string;
+          compatibleAttackerCount: number;
+          readinessTankCount: number;
+          readinessScreenCount: number;
+          estimatedBlockerRemovalTicks: number;
+          estimatedRouteClearanceTicks: number;
+          estimatedForceSurvivalTicks: number;
       }
     | {
           schemaVersion: 10;
@@ -405,6 +423,8 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     adaptiveGroundAssaultProductionScopeLatch: false,
     adaptiveGroundAssaultScreenTargetCount: 0,
     adaptiveGroundAssaultScreenFactoryTrigger: false,
+    adaptiveGroundAssaultReadinessForceOwnership: false,
+    progressiveRouteBlockerLaunch: false,
     adaptiveGroundAssaultInfrastructurePriority: 130,
     adaptiveProductionPriority: 140,
     adaptiveTechPriority: 130,
@@ -517,6 +537,17 @@ export const resolveBuildingEliminationOptions = (
             `${resolved.adaptiveGroundAssaultScreenFactoryTrigger}`,
         );
     }
+    if (typeof resolved.adaptiveGroundAssaultReadinessForceOwnership !== "boolean") {
+        throw new Error(
+            "Invalid building-elimination ground-assault readiness force ownership: " +
+            `${resolved.adaptiveGroundAssaultReadinessForceOwnership}`,
+        );
+    }
+    if (typeof resolved.progressiveRouteBlockerLaunch !== "boolean") {
+        throw new Error(
+            `Invalid building-elimination progressive route-blocker launch: ${resolved.progressiveRouteBlockerLaunch}`,
+        );
+    }
     return resolved;
 };
 
@@ -528,6 +559,15 @@ const BUILDING_ELIMINATION_ASSAULT_BUILD_MISSION_NAME = "buildingEliminationAssa
 const BUILDING_ELIMINATION_PRIORITY = 300;
 const BUILDING_ELIMINATION_READINESS_RESERVE_PRIORITY = 290;
 const BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME = "buildingEliminationReadinessReserve";
+export const BUILDING_ELIMINATION_READINESS_FORCE_MISSION_NAME = "buildingEliminationReadinessForce";
+const isBuildingEliminationReadinessMissionName = (name: string | null): boolean =>
+    name === BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME ||
+    name === BUILDING_ELIMINATION_READINESS_FORCE_MISSION_NAME;
+export const getBuildingEliminationReadinessMissionName = (
+    forceOwnership: boolean,
+): string => forceOwnership
+    ? BUILDING_ELIMINATION_READINESS_FORCE_MISSION_NAME
+    : BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME;
 const TELEMETRY_HEARTBEAT_TICKS = 120;
 const BLOCKED_TELEMETRY_HEARTBEAT_TICKS = 300;
 const POWER_BUILDINGS = new Set(["NAPOWR", "NANRCT", "GAPOWR"]);
@@ -1352,7 +1392,7 @@ export const isPreemptibleBuildingEliminationMission = (name: string): boolean =
     name.startsWith("attack_") || name.startsWith("retreat-from-attack") || name === "allInAttack";
 
 export const isTransferCertifiedBuildingEliminationMission = (name: string | null): boolean =>
-    name === null || name === BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME ||
+    name === null || isBuildingEliminationReadinessMissionName(name) ||
     isPreemptibleBuildingEliminationMission(name);
 
 export type BuildingEliminationMissionOwnershipView = {
@@ -1408,7 +1448,7 @@ export const selectStagedBuildingEliminationAttackers = (
     eligibleAttackers: UnitData[],
     missionNameForUnit: (unitId: number) => string | null,
 ): UnitData[] => eligibleAttackers.filter(({ id }) =>
-    missionNameForUnit(id) === BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
+    isBuildingEliminationReadinessMissionName(missionNameForUnit(id)),
 );
 
 export const classifyBuildingEliminationLaunchHandoff = (
@@ -1566,9 +1606,21 @@ export const updateBuildingEliminationProductionScopeLatch = (
     enabled: boolean,
 ): boolean => latched || (enabled && currentlyMeetsCloseoutGate);
 
+export const meetsProgressiveBuildingEliminationBlockerLaunchGate = (
+    enabled: boolean,
+    readinessTankCount: number,
+    readinessScreenCount: number,
+    estimatedBlockerRemovalTicks: number,
+    estimatedForceSurvivalTicks: number,
+): boolean => enabled && readinessTankCount >= 1 && readinessScreenCount >= 1 &&
+    Number.isFinite(estimatedBlockerRemovalTicks) && estimatedBlockerRemovalTicks >= 0 &&
+    Number.isFinite(estimatedForceSurvivalTicks) && estimatedForceSurvivalTicks >= 0 &&
+    estimatedBlockerRemovalTicks <= estimatedForceSurvivalTicks;
+
 type BuildingEliminationCloseoutLatch = {
     activated: boolean;
     readinessScreenCount: number;
+    readinessTankCount: number;
 };
 
 type BuildingEliminationExecutionHeartbeatState = {
@@ -2493,6 +2545,9 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             factoryTriggeredScreen ? factoryCount : undefined,
             factoryTriggeredScreen ? screenTriggerActive : undefined,
             factoryTriggeredScreen ? true : undefined,
+            this.options.adaptiveGroundAssaultReadinessForceOwnership
+                ? this.closeoutLatch.readinessTankCount
+                : undefined,
         );
         const requests = getBuildingEliminationAssaultProductionRequests(
             unitName,
@@ -2563,6 +2618,7 @@ class BuildingEliminationAssaultProductionMission extends Mission {
         factoryCount?: number,
         factoryTriggerActive?: boolean,
         readinessOwned?: boolean,
+        readinessTankCount?: number,
     ): void {
         if (this.options.adaptiveGroundAssaultScreenTargetCount <= 0) return;
         const event: Extract<BuildingEliminationTelemetryEvent, { event: "assault_screen_production" }> = {
@@ -2578,6 +2634,7 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             ...(factoryCount === undefined ? {} : { factoryCount }),
             ...(factoryTriggerActive === undefined ? {} : { factoryTriggerActive }),
             ...(readinessOwned === undefined ? {} : { readinessOwned }),
+            ...(readinessTankCount === undefined ? {} : { readinessTankCount }),
         };
         const signature = JSON.stringify({ ...event, tick: 0 });
         if (signature === this.lastScreenTelemetrySignature &&
@@ -2774,7 +2831,12 @@ class BuildingEliminationReadinessReserveMission extends Mission {
         logger: DebugLogger,
         private telemetrySink: BuildingEliminationTelemetrySink,
     ) {
-        super(BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME, logger);
+        super(
+            options.adaptiveGroundAssaultReadinessForceOwnership
+                ? BUILDING_ELIMINATION_READINESS_FORCE_MISSION_NAME
+                : BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
+            logger,
+        );
     }
 
     _onAiUpdate(context: MissionContext): MissionAction {
@@ -2789,6 +2851,10 @@ class BuildingEliminationReadinessReserveMission extends Mission {
         this.closeoutLatch.readinessScreenCount = screenUnitName === null
             ? 0
             : stagedCombatants.filter(({ rules }) => rules.name === screenUnitName).length;
+        const tankUnitName = side === null ? null : getBuildingEliminationGroundAssaultUnitName(side);
+        this.closeoutLatch.readinessTankCount = tankUnitName === null
+            ? 0
+            : stagedCombatants.filter(({ rules }) => rules.name === tankUnitName).length;
         const tick = context.game.getCurrentTick();
         if (tick >= this.lastOrderAt + this.options.orderIntervalTicks) {
             const start = context.game.getPlayerData(context.player.name).startLocation;
@@ -2906,6 +2972,7 @@ export class BuildingEliminationMissionFactory {
     private closeoutLatch: BuildingEliminationCloseoutLatch = {
         activated: false,
         readinessScreenCount: 0,
+        readinessTankCount: 0,
     };
     private readinessVanguardUnitIds: Set<number> | null = null;
 
@@ -3033,8 +3100,9 @@ export class BuildingEliminationMissionFactory {
                 ? totalCommittedAttackers.filter((attacker) => pairIsCompatible(attacker, descriptor)).length
                 : 0;
             const stagedCompatibleAttackerCount = compatibleAttackers.filter((attacker) =>
-                getAssignedBuildingEliminationMissionName(missionController, attacker.id) ===
-                    BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
+                isBuildingEliminationReadinessMissionName(
+                    getAssignedBuildingEliminationMissionName(missionController, attacker.id),
+                ),
             ).length;
             const assaultTankCount = compatibleAttackers.filter(({ rules }) =>
                 rules.name === "HTNK" || rules.name === "MTNK",
@@ -3057,7 +3125,7 @@ export class BuildingEliminationMissionFactory {
                 )
                 : null;
             const buildingReady = decision?.blocker === null;
-            const blockerReady = decision !== null && decision.blocker !== null && (
+            const conventionalBlockerReady = decision !== null && decision.blocker !== null && (
                 this.options.activationMode === "objectiveClearance"
                     ? decision.estimatedBlockerRemovalTicks <= decision.estimatedForceSurvivalTicks
                     : this.options.activationMode === "objectiveStagedBlockerClearance"
@@ -3068,6 +3136,32 @@ export class BuildingEliminationMissionFactory {
                         this.options.activationMode === "objectiveVanguardRouteClearance") &&
                         decision.estimatedRouteClearanceTicks <= decision.estimatedForceSurvivalTicks
             );
+            const progressiveBlockerReady = decision !== null && decision.blocker !== null &&
+                meetsProgressiveBuildingEliminationBlockerLaunchGate(
+                    this.options.progressiveRouteBlockerLaunch,
+                    this.closeoutLatch.readinessTankCount,
+                    this.closeoutLatch.readinessScreenCount,
+                    decision.estimatedBlockerRemovalTicks,
+                    decision.estimatedForceSurvivalTicks,
+                );
+            const blockerReady = conventionalBlockerReady || progressiveBlockerReady;
+            if (progressiveBlockerReady && target && decision?.blocker) {
+                this.telemetrySink({
+                    schemaVersion: 18,
+                    event: "progressive_blocker_launch",
+                    tick: context.game.getCurrentTick(),
+                    targetId: target.id,
+                    targetName: target.rules.name,
+                    blockerId: decision.blocker.id,
+                    blockerName: decision.blocker.rules.name,
+                    compatibleAttackerCount: compatibleAttackers.length,
+                    readinessTankCount: this.closeoutLatch.readinessTankCount,
+                    readinessScreenCount: this.closeoutLatch.readinessScreenCount,
+                    estimatedBlockerRemovalTicks: decision.estimatedBlockerRemovalTicks,
+                    estimatedRouteClearanceTicks: decision.estimatedRouteClearanceTicks,
+                    estimatedForceSurvivalTicks: decision.estimatedForceSurvivalTicks,
+                });
+            }
             const activationPhase = !target || compatibleAttackers.length === 0 || decision === null
                 ? "no_target"
                 : buildingReady
@@ -3122,7 +3216,7 @@ export class BuildingEliminationMissionFactory {
             ? certifiedLaunchUnitIds
             : this.options.activationMode === "objectiveStagedBlockerClearance"
             ? missionController.getMissions().find((mission) =>
-                mission.getUniqueName() === BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
+                isBuildingEliminationReadinessMissionName(mission.getUniqueName()),
             )?.getUnitIds().slice().sort((left, right) => left - right) ?? []
             : [];
         this.releaseReadinessReserve(context, missionController, ownCombatants);
@@ -3224,7 +3318,7 @@ export class BuildingEliminationMissionFactory {
     ): void {
         if (!this.options.readinessReserve || this.readinessVanguardUnitIds !== null) return;
         if (missionController.getMissions().some(
-            (mission) => mission.getUniqueName() === BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
+            (mission) => isBuildingEliminationReadinessMissionName(mission.getUniqueName()),
         )) return;
         const fullForce = this.options.readinessReserveScope === "fullForce";
         this.readinessVanguardUnitIds = new Set(fullForce ? [] : ownCombatants.map(({ id }) => id));
@@ -3254,7 +3348,7 @@ export class BuildingEliminationMissionFactory {
     ): void {
         if (this.readinessVanguardUnitIds === null) return;
         const reserve = missionController.getMissions().find(
-            (mission) => mission.getUniqueName() === BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
+            (mission) => isBuildingEliminationReadinessMissionName(mission.getUniqueName()),
         );
         if (reserve) {
             this.telemetrySink({
@@ -3270,10 +3364,11 @@ export class BuildingEliminationMissionFactory {
             });
             disbandBuildingEliminationMissionForTransfer(
                 missionController,
-                BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
+                reserve.getUniqueName(),
             );
         }
         this.closeoutLatch.readinessScreenCount = 0;
+        this.closeoutLatch.readinessTankCount = 0;
         this.readinessVanguardUnitIds = null;
     }
 

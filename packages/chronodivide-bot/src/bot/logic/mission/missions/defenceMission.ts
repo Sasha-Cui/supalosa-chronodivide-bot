@@ -90,7 +90,8 @@ export class DefenceMission extends Mission<CombatSquad> {
     }
 
     public override canDonateLockedUnitsTo(requestingMission: Mission<any>): boolean {
-        return requestingMission.getUniqueName() === "buildingElimination";
+        return requestingMission.getUniqueName() === "buildingElimination" ||
+            requestingMission.getUniqueName() === "buildingEliminationReadinessForce";
     }
 }
 
