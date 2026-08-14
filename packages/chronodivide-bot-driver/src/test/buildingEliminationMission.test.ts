@@ -23,9 +23,11 @@ import {
     getBuildingTargetWeight,
     getAssignedBuildingEliminationMissionName,
     isPreemptibleBuildingEliminationMission,
+    isWithinBuildingEliminationActivationScope,
     isTransferCertifiedBuildingEliminationMission,
     meetsBuildingEliminationActivationGate,
     meetsGroundAssaultCapabilityActivationGate,
+    meetsTransferredGroundAssaultCapabilityActivationGate,
     meetsPositiveProgressBuildingEliminationBlockerLaunchGate,
     meetsProgressiveBuildingEliminationBlockerLaunchGate,
     meetsLowBuildingEliminationActivationGate,
@@ -926,6 +928,8 @@ describe("building elimination policy", () => {
             "requireGroundAssaultCapabilityForActivation",
             "queueAwareGroundAssaultTargets",
             "positiveProgressBlockerLaunch",
+            "persistentCloseoutActivationScope",
+            "requireTransferredGroundAssaultCapabilityForActivation",
             "adaptiveGroundAssaultInfrastructurePriority",
             "adaptiveProductionPriority",
             "adaptiveTechPriority",
@@ -1002,6 +1006,12 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({
             positiveProgressBlockerLaunch: "yes" as any,
         })).toThrow("positive-progress");
+        expect(() => resolveBuildingEliminationOptions({
+            persistentCloseoutActivationScope: "yes" as any,
+        })).toThrow("persistent activation scope");
+        expect(() => resolveBuildingEliminationOptions({
+            requireTransferredGroundAssaultCapabilityForActivation: "yes" as any,
+        })).toThrow("transferred activation capability");
     });
 
     test("terminal production reservation retains only the side-correct factory and tank", () => {
@@ -1029,6 +1039,20 @@ describe("building elimination policy", () => {
         expect(updateBuildingEliminationProductionScopeLatch(false, true, true)).toBe(true);
         expect(updateBuildingEliminationProductionScopeLatch(true, false, true)).toBe(true);
         expect(updateBuildingEliminationProductionScopeLatch(false, true, false)).toBe(false);
+    });
+
+    test("persistent activation scope survives rebuilding but never invents an initial closeout", () => {
+        expect(isWithinBuildingEliminationActivationScope(0, 5, true)).toBe(false);
+        expect(isWithinBuildingEliminationActivationScope(4, 5, false)).toBe(true);
+        expect(isWithinBuildingEliminationActivationScope(6, 5, false)).toBe(false);
+        expect(isWithinBuildingEliminationActivationScope(6, 5, true)).toBe(true);
+    });
+
+    test("transferred activation capability requires a tank and a screen in the selected force", () => {
+        expect(meetsTransferredGroundAssaultCapabilityActivationGate(false, 0, 0)).toBe(true);
+        expect(meetsTransferredGroundAssaultCapabilityActivationGate(true, 0, 2)).toBe(false);
+        expect(meetsTransferredGroundAssaultCapabilityActivationGate(true, 1, 0)).toBe(false);
+        expect(meetsTransferredGroundAssaultCapabilityActivationGate(true, 1, 1)).toBe(true);
     });
 
     test("readiness defense chooses the nearest visible threat to reserve infrastructure", () => {

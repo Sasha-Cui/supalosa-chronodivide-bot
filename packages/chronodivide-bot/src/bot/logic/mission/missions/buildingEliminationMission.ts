@@ -70,6 +70,8 @@ export type BuildingEliminationOptions = {
     requireGroundAssaultCapabilityForActivation?: boolean;
     queueAwareGroundAssaultTargets?: boolean;
     positiveProgressBlockerLaunch?: boolean;
+    persistentCloseoutActivationScope?: boolean;
+    requireTransferredGroundAssaultCapabilityForActivation?: boolean;
     adaptiveGroundAssaultInfrastructurePriority?: number;
     adaptiveProductionPriority?: number;
     adaptiveTechPriority?: number;
@@ -322,6 +324,31 @@ export type BuildingEliminationTelemetryEvent =
           estimatedRouteClearanceTicks: number | null;
       }
     | {
+          schemaVersion: 21;
+          event: "activation_evaluation";
+          tick: number;
+          phase: "no_target" | "building_ready" | "blocker_ready" | "blocked";
+          targetId: number | null;
+          targetName: string | null;
+          blockerId: number | null;
+          blockerName: string | null;
+          compatibleAttackerCount: number;
+          totalCompatibleAttackerCount: number;
+          transferCertifiedAttackerCount: number;
+          stagedCompatibleAttackerCount: number;
+          vanguardCompatibleAttackerCount: number;
+          assaultTankCount: number;
+          assaultScreenCount: number;
+          transferredCapabilityReady: boolean;
+          enemyBuildingCount: number;
+          activationScopeLatched: boolean;
+          routeThreatCount: number;
+          estimatedBuildingCompletionTicks: number | null;
+          estimatedForceSurvivalTicks: number | null;
+          estimatedBlockerRemovalTicks: number | null;
+          estimatedRouteClearanceTicks: number | null;
+      }
+    | {
           schemaVersion: 13;
           event: "assault_infrastructure";
           tick: number;
@@ -471,6 +498,8 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     requireGroundAssaultCapabilityForActivation: false,
     queueAwareGroundAssaultTargets: false,
     positiveProgressBlockerLaunch: false,
+    persistentCloseoutActivationScope: false,
+    requireTransferredGroundAssaultCapabilityForActivation: false,
     adaptiveGroundAssaultInfrastructurePriority: 130,
     adaptiveProductionPriority: 140,
     adaptiveTechPriority: 130,
@@ -608,6 +637,17 @@ export const resolveBuildingEliminationOptions = (
     if (typeof resolved.positiveProgressBlockerLaunch !== "boolean") {
         throw new Error(
             `Invalid building-elimination positive-progress blocker launch: ${resolved.positiveProgressBlockerLaunch}`,
+        );
+    }
+    if (typeof resolved.persistentCloseoutActivationScope !== "boolean") {
+        throw new Error(
+            `Invalid building-elimination persistent activation scope: ${resolved.persistentCloseoutActivationScope}`,
+        );
+    }
+    if (typeof resolved.requireTransferredGroundAssaultCapabilityForActivation !== "boolean") {
+        throw new Error(
+            "Invalid building-elimination transferred activation capability: " +
+            `${resolved.requireTransferredGroundAssaultCapabilityForActivation}`,
         );
     }
     return resolved;
@@ -1690,11 +1730,25 @@ export const updateBuildingEliminationProductionScopeLatch = (
     enabled: boolean,
 ): boolean => latched || (enabled && currentlyMeetsCloseoutGate);
 
+export const isWithinBuildingEliminationActivationScope = (
+    enemyBuildingCount: number,
+    maxEnemyBuildings: number,
+    activationScopeLatched: boolean,
+): boolean => enemyBuildingCount > 0 && (
+    enemyBuildingCount <= maxEnemyBuildings || activationScopeLatched
+);
+
 export const meetsGroundAssaultCapabilityActivationGate = (
     enabled: boolean,
     readinessTankCount: number,
     readinessScreenCount: number,
 ): boolean => !enabled || readinessTankCount >= 1 && readinessScreenCount >= 1;
+
+export const meetsTransferredGroundAssaultCapabilityActivationGate = (
+    enabled: boolean,
+    assaultTankCount: number,
+    assaultScreenCount: number,
+): boolean => !enabled || assaultTankCount >= 1 && assaultScreenCount >= 1;
 
 export const meetsProgressiveBuildingEliminationBlockerLaunchGate = (
     enabled: boolean,
@@ -3138,7 +3192,8 @@ export class BuildingEliminationMissionFactory {
         this.closeoutLatch.activated = updateBuildingEliminationProductionScopeLatch(
             this.closeoutLatch.activated,
             isBuildingEliminationCloseoutState(context, this.options),
-            this.options.adaptiveGroundAssaultProductionScopeLatch,
+            this.options.adaptiveGroundAssaultProductionScopeLatch ||
+                this.options.persistentCloseoutActivationScope,
         );
         this.maybeCreateCapabilityMissions(missionController, logger);
         this.applyGroundAssaultProductionReservation(context, missionController);
@@ -3158,7 +3213,13 @@ export class BuildingEliminationMissionFactory {
             (unit) => unit.rules.type === ObjectType.Building,
         );
         const enemyBuildingCount = enemyBuildings.length;
-        if (enemyBuildingCount === 0 || enemyBuildingCount > this.options.maxEnemyBuildings) {
+        const activationScopeLatched = this.options.persistentCloseoutActivationScope &&
+            this.closeoutLatch.activated;
+        if (!isWithinBuildingEliminationActivationScope(
+            enemyBuildingCount,
+            this.options.maxEnemyBuildings,
+            activationScopeLatched,
+        )) {
             return;
         }
         if (ownCombatants.length < this.options.minCombatants + this.options.reserveCombatants) {
@@ -3246,6 +3307,14 @@ export class BuildingEliminationMissionFactory {
             const assaultTankCount = compatibleAttackers.filter(({ rules }) =>
                 rules.name === "HTNK" || rules.name === "MTNK",
             ).length;
+            const assaultScreenCount = compatibleAttackers.filter(({ rules }) =>
+                rules.name === "E1" || rules.name === "E2",
+            ).length;
+            const transferredCapabilityReady = meetsTransferredGroundAssaultCapabilityActivationGate(
+                this.options.requireTransferredGroundAssaultCapabilityForActivation,
+                assaultTankCount,
+                assaultScreenCount,
+            );
             if (this.options.activationMode === "objectiveVanguardRouteClearance") {
                 certifiedLaunchUnitIds = compatibleAttackers.map(({ id }) => id).sort((left, right) => left - right);
             }
@@ -3265,7 +3334,7 @@ export class BuildingEliminationMissionFactory {
                 this.options.requireGroundAssaultCapabilityForActivation,
                 this.closeoutLatch.readinessTankCount,
                 this.closeoutLatch.readinessScreenCount,
-            );
+            ) && transferredCapabilityReady;
             const buildingReady = decision?.blocker === null && capabilityReady;
             const conventionalBlockerReady = decision !== null && decision.blocker !== null && (
                 this.options.activationMode === "objectiveClearance"
@@ -3386,6 +3455,10 @@ export class BuildingEliminationMissionFactory {
                 this.options.activationMode === "objectiveVanguardRouteClearance",
                 stagedCompatibleAttackerCount,
                 assaultTankCount,
+                assaultScreenCount,
+                transferredCapabilityReady,
+                enemyBuildingCount,
+                activationScopeLatched,
                 decision,
             );
             if (!buildingReady && !blockerReady) {
@@ -3460,6 +3533,10 @@ export class BuildingEliminationMissionFactory {
         vanguardCertified: boolean,
         stagedCompatibleAttackerCount: number,
         assaultTankCount: number,
+        assaultScreenCount: number,
+        transferredCapabilityReady: boolean,
+        enemyBuildingCount: number,
+        activationScopeLatched: boolean,
         decision: BuildingEliminationEngagementDecision | null,
     ): void {
         const finiteOrNull = (value: number | undefined): number | null =>
@@ -3485,7 +3562,21 @@ export class BuildingEliminationMissionFactory {
             estimatedRouteClearanceTicks: finiteOrNull(decision?.estimatedRouteClearanceTicks),
         };
         const event: Extract<BuildingEliminationTelemetryEvent, { event: "activation_evaluation" }> =
-            vanguardCertified
+            vanguardCertified && this.options.requireTransferredGroundAssaultCapabilityForActivation
+                ? {
+                    ...common,
+                    schemaVersion: 21,
+                    totalCompatibleAttackerCount,
+                    transferCertifiedAttackerCount: compatibleAttackerCount,
+                    stagedCompatibleAttackerCount,
+                    vanguardCompatibleAttackerCount: compatibleAttackerCount - stagedCompatibleAttackerCount,
+                    assaultTankCount,
+                    assaultScreenCount,
+                    transferredCapabilityReady,
+                    enemyBuildingCount,
+                    activationScopeLatched,
+                }
+                : vanguardCertified
                 ? {
                     ...common,
                     schemaVersion: 12,
