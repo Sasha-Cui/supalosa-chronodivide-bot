@@ -25,6 +25,12 @@ DRIVER="$REPO/packages/chronodivide-bot-driver"
 BASELINE=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/supalosa-chronodivide-bot/packages/chronodivide-bot
 : "${EVIDENCE_ROOT:?EVIDENCE_ROOT is required}"
 
+JOB_ROOT="$EVIDENCE_ROOT/$SLURM_JOB_ID"
+[[ ! -e "$JOB_ROOT" ]] || { echo "Refusing to reuse $JOB_ROOT" >&2; exit 2; }
+install -d -m 0700 "$EVIDENCE_ROOT"
+mkdir -m 0700 "$JOB_ROOT"
+exec >"$JOB_ROOT/job.stdout.log" 2>"$JOB_ROOT/job.stderr.log"
+
 JOB_LINE=$(/opt/slurm/current/bin/scontrol show job -o "$SLURM_JOB_ID")
 [[ "$JOB_LINE" =~ (^|[[:space:]])Account=([^[:space:]]+) ]] || { echo "Missing account" >&2; exit 2; }
 [[ "${BASH_REMATCH[2]}" == "pi_jss233" ]] || { echo "Wrong account ${BASH_REMATCH[2]}" >&2; exit 2; }
@@ -34,11 +40,6 @@ cd "$REPO"
 [[ "$(git branch --show-current)" == "main" && -z "$(git status --porcelain=v1 --untracked-files=no)" ]] || {
     echo "Gate requires clean tracked main" >&2; exit 2;
 }
-JOB_ROOT="$EVIDENCE_ROOT/$SLURM_JOB_ID"
-[[ ! -e "$JOB_ROOT" ]] || { echo "Refusing to reuse $JOB_ROOT" >&2; exit 2; }
-install -d -m 0700 "$EVIDENCE_ROOT"
-mkdir -m 0700 "$JOB_ROOT"
-exec >"$JOB_ROOT/job.stdout.log" 2>"$JOB_ROOT/job.stderr.log"
 cd "$DRIVER"
 export BASELINE_PACKAGE_ROOT="$BASELINE" REQUIRE_EXTERNAL_BASELINE=true
 export OUT_FILE="$JOB_ROOT/compatibility.json"
