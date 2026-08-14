@@ -12,6 +12,8 @@ import {
     deferStalledBuildingTargets,
     getBuildingCapabilityProductionPlan,
     getBuildingCapabilityUnitMissionAction,
+    getBuildingEliminationAssaultProductionAction,
+    getBuildingEliminationGroundAssaultUnitName,
     getBuildingTargetWeight,
     getAssignedBuildingEliminationMissionName,
     isPreemptibleBuildingEliminationMission,
@@ -334,6 +336,22 @@ describe("building elimination policy", () => {
             unitNameToPriority: { JUMPJET: 140 },
         });
         expect(getBuildingCapabilityUnitMissionAction([], {})).toEqual({ type: "noop" });
+    });
+
+    test("requests the side-generic main battle tank up to the frozen ceiling", () => {
+        expect(getBuildingEliminationGroundAssaultUnitName(SideType.Nod)).toBe("HTNK");
+        expect(getBuildingEliminationGroundAssaultUnitName(SideType.GDI)).toBe("MTNK");
+        expect(getBuildingEliminationAssaultProductionAction([], "MTNK", 3, 4, 140)).toEqual({
+            type: "request",
+            unitNameToPriority: { MTNK: 140 },
+        });
+        expect(getBuildingEliminationAssaultProductionAction([], "HTNK", 4, 4, 140)).toEqual({
+            type: "noop",
+        });
+        expect(getBuildingEliminationAssaultProductionAction([71], "HTNK", 1, 4, 140)).toEqual({
+            type: "releaseUnits",
+            unitIds: [71],
+        });
     });
 
     test("keeps capability production active after the closeout gate has fired", () => {
@@ -848,6 +866,7 @@ describe("building elimination policy", () => {
             "retargetStalledBuildings",
             "adaptiveAirTargetCount",
             "adaptiveNavalTargetCount",
+            "adaptiveGroundAssaultTargetCount",
             "adaptiveProductionPriority",
             "adaptiveTechPriority",
             "activationMode",
