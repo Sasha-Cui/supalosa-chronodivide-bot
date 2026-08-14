@@ -62,6 +62,7 @@ export type BuildingEliminationOptions = {
     adaptiveGroundAssaultTargetCount?: number;
     adaptiveGroundAssaultInfrastructure?: boolean;
     adaptiveGroundAssaultProductionReservation?: boolean;
+    adaptiveGroundAssaultProductionScopeLatch?: boolean;
     adaptiveGroundAssaultInfrastructurePriority?: number;
     adaptiveProductionPriority?: number;
     adaptiveTechPriority?: number;
@@ -373,6 +374,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     adaptiveGroundAssaultTargetCount: 0,
     adaptiveGroundAssaultInfrastructure: false,
     adaptiveGroundAssaultProductionReservation: false,
+    adaptiveGroundAssaultProductionScopeLatch: false,
     adaptiveGroundAssaultInfrastructurePriority: 130,
     adaptiveProductionPriority: 140,
     adaptiveTechPriority: 130,
@@ -468,6 +470,12 @@ export const resolveBuildingEliminationOptions = (
         throw new Error(
             "Invalid building-elimination ground-assault production reservation: " +
             `${resolved.adaptiveGroundAssaultProductionReservation}`,
+        );
+    }
+    if (typeof resolved.adaptiveGroundAssaultProductionScopeLatch !== "boolean") {
+        throw new Error(
+            "Invalid building-elimination ground-assault production-scope latch: " +
+            `${resolved.adaptiveGroundAssaultProductionScopeLatch}`,
         );
     }
     return resolved;
@@ -1512,6 +1520,12 @@ export const shouldRunBuildingEliminationCapabilityProduction = (
     closeoutWasActivated: boolean,
     currentlyMeetsCloseoutGate: boolean,
 ): boolean => closeoutWasActivated || currentlyMeetsCloseoutGate;
+
+export const updateBuildingEliminationProductionScopeLatch = (
+    latched: boolean,
+    currentlyMeetsCloseoutGate: boolean,
+    enabled: boolean,
+): boolean => latched || (enabled && currentlyMeetsCloseoutGate);
 
 type BuildingEliminationCloseoutLatch = { activated: boolean };
 
@@ -2716,6 +2730,11 @@ export class BuildingEliminationMissionFactory {
         if (!this.options.enabled || context.game.getCurrentTick() < this.options.minTick) {
             return;
         }
+        this.closeoutLatch.activated = updateBuildingEliminationProductionScopeLatch(
+            this.closeoutLatch.activated,
+            isBuildingEliminationCloseoutState(context, this.options),
+            this.options.adaptiveGroundAssaultProductionScopeLatch,
+        );
         this.maybeCreateCapabilityMissions(missionController, logger);
         this.applyGroundAssaultProductionReservation(context, missionController);
         const existing = missionController

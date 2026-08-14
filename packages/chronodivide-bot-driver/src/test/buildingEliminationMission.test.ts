@@ -42,6 +42,7 @@ import {
     shouldDirectAttackBuildingTarget,
     summarizeBuildingExecutionDistances,
     updateBuildingTargetProgress,
+    updateBuildingEliminationProductionScopeLatch,
 } from "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
 
 const target = (overrides: Partial<BuildingTargetDescriptor>): BuildingTargetDescriptor => ({
@@ -908,6 +909,7 @@ describe("building elimination policy", () => {
             "adaptiveGroundAssaultTargetCount",
             "adaptiveGroundAssaultInfrastructure",
             "adaptiveGroundAssaultProductionReservation",
+            "adaptiveGroundAssaultProductionScopeLatch",
             "adaptiveGroundAssaultInfrastructurePriority",
             "adaptiveProductionPriority",
             "adaptiveTechPriority",
@@ -956,6 +958,9 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({
             adaptiveGroundAssaultProductionReservation: "yes" as any,
         })).toThrow("production reservation");
+        expect(() => resolveBuildingEliminationOptions({
+            adaptiveGroundAssaultProductionScopeLatch: "yes" as any,
+        })).toThrow("production-scope latch");
     });
 
     test("terminal production reservation retains only the side-correct factory and tank", () => {
@@ -976,5 +981,12 @@ describe("building elimination policy", () => {
                 { queue: QueueType.Vehicles, name: "HARV", quantity: 1 },
             ],
         });
+    });
+
+    test("production scope latches on once and ignores later force attrition", () => {
+        expect(updateBuildingEliminationProductionScopeLatch(false, false, true)).toBe(false);
+        expect(updateBuildingEliminationProductionScopeLatch(false, true, true)).toBe(true);
+        expect(updateBuildingEliminationProductionScopeLatch(true, false, true)).toBe(true);
+        expect(updateBuildingEliminationProductionScopeLatch(false, true, false)).toBe(false);
     });
 });
