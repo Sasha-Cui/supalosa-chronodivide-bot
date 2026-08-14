@@ -28,7 +28,7 @@ import { manageAttackMicro, manageMoveMicro } from "./squads/common.js";
 import { BUILDING_NAME_TO_RULES, getDefaultPlacementLocation } from "../../building/buildingRules.js";
 
 export type BuildingEliminationObservationMode = "publicApi" | "visibleOnly";
-export type BuildingEliminationTargetPriority = "production" | "defense" | "nearest";
+export type BuildingEliminationTargetPriority = "production" | "reinforcement" | "defense" | "nearest";
 export type BuildingEliminationActivationMode = "forceAdvantage" | "lowBuilding";
 export type BuildingEliminationEngagementMode = "directBuilding" | "completionRace";
 export type BuildingEliminationEngagementAllocationMode = "allBlocker" | "boundedScreen" | "singleScreen";
@@ -300,7 +300,8 @@ export const resolveBuildingEliminationOptions = (
     requireIntegerInRange("adaptiveTechPriority", resolved.adaptiveTechPriority, 1, 1_000);
     requireIntegerInRange("maxEnemyBuildings", resolved.maxEnemyBuildings, 1, 1_000);
     requireIntegerInRange("routeCorridorRadius", resolved.routeCorridorRadius, 1, 64);
-    if (!new Set<BuildingEliminationTargetPriority>(["production", "defense", "nearest"]).has(resolved.targetPriority)) {
+    if (!new Set<BuildingEliminationTargetPriority>(["production", "reinforcement", "defense", "nearest"])
+        .has(resolved.targetPriority)) {
         throw new Error(`Invalid building-elimination target priority: ${resolved.targetPriority}`);
     }
     if (!new Set<BuildingEliminationObservationMode>(["publicApi", "visibleOnly"]).has(resolved.observationMode)) {
@@ -374,6 +375,15 @@ export const getBuildingTargetWeight = (
 ): number => {
     if (priority === "nearest") {
         return 0;
+    }
+    if (priority === "reinforcement") {
+        if (target.barracks) return 8_000_000 + target.maxHitPoints;
+        if (target.weaponsFactory) return 7_000_000 + target.maxHitPoints;
+        if (target.constructionYard) return 6_000_000 + target.maxHitPoints;
+        if (target.power) return 5_000_000 + target.maxHitPoints;
+        if (target.defense) return 4_000_000 + target.maxHitPoints;
+        if (target.refinery) return 3_000_000 + target.maxHitPoints;
+        return 2_000_000 + target.maxHitPoints;
     }
     if (priority === "defense") {
         if (target.power) return 8_000_000 + target.maxHitPoints;

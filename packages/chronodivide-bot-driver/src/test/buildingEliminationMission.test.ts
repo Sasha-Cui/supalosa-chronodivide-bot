@@ -146,6 +146,20 @@ describe("building elimination policy", () => {
         );
     });
 
+    test("reinforcement priority attacks barracks and weapons factories before refineries", () => {
+        const barracks = target({ id: 1, name: "GAPILE", barracks: true, x: 30 });
+        const weapons = target({ id: 2, name: "GAWEAP", weaponsFactory: true, x: 20 });
+        const refinery = target({ id: 3, name: "GAREFN", refinery: true, x: 1 });
+        expect(rankBuildingTargets(
+            [refinery, weapons, barracks],
+            "reinforcement",
+            [{ x: 0, y: 0 }],
+        )).toEqual([barracks, weapons, refinery]);
+        expect(getBuildingTargetWeight(barracks, "reinforcement")).toBeGreaterThan(
+            getBuildingTargetWeight(refinery, "reinforcement"),
+        );
+    });
+
     test("defense priority cuts power and static defenses first", () => {
         const yard = target({ id: 1, name: "NACNST", constructionYard: true });
         const laser = target({ id: 2, name: "NALASR", defense: true });
