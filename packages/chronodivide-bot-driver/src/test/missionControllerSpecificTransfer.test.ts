@@ -1,6 +1,9 @@
 import { describe, expect, test } from "vitest";
 import { Mission, MissionAction, noop } from "@supalosa/chronodivide-bot/dist/bot/logic/mission/mission.js";
-import { canTransferSpecificUnit } from "@supalosa/chronodivide-bot/dist/bot/logic/mission/missionController.js";
+import {
+    canTransferSpecificUnit,
+    clearForceDisbandedUnitOwnership,
+} from "@supalosa/chronodivide-bot/dist/bot/logic/mission/missionController.js";
 
 class TestMission extends Mission {
     constructor(
@@ -58,5 +61,20 @@ describe("specific mission transfers", () => {
             "buildingElimination",
         );
         expect(canTransferSpecificUnit(readinessReserve, closeout, 300)).toBe(true);
+    });
+
+    test("releases a force-disbanded locked donor before same-update transfer", () => {
+        const donor = new TestMission("attack_12", 100, true);
+        donor.addUnit(71);
+        donor.addUnit(72);
+        const ownerMap = new Map<number, Mission<any>>([[71, donor], [72, donor]]);
+        expect(canTransferSpecificUnit(ownerMap.get(71), closeout, 300)).toBe(false);
+        expect(clearForceDisbandedUnitOwnership(
+            [donor, closeout],
+            new Set([donor.getUniqueName()]),
+            ownerMap,
+        )).toEqual([71, 72]);
+        expect(canTransferSpecificUnit(ownerMap.get(71), closeout, 300)).toBe(true);
+        expect(ownerMap.size).toBe(0);
     });
 });

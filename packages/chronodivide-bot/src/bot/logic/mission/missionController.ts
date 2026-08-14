@@ -44,6 +44,23 @@ export const canTransferSpecificUnit = (
     return !donatingMission.isUnitsLocked() || donatingMission.canDonateLockedUnitsTo(requestingMission);
 };
 
+export const clearForceDisbandedUnitOwnership = (
+    missions: readonly Mission<any>[],
+    forceDisbandedMissionNames: ReadonlySet<string>,
+    unitIdToMission: Map<number, Mission<any>>,
+): number[] => {
+    const released: number[] = [];
+    for (const mission of missions) {
+        if (!forceDisbandedMissionNames.has(mission.getUniqueName())) continue;
+        for (const unitId of mission.getUnitIds()) {
+            if (unitIdToMission.get(unitId) !== mission) continue;
+            unitIdToMission.delete(unitId);
+            released.push(unitId);
+        }
+    }
+    return released.sort((left, right) => left - right);
+};
+
 export class MissionController {
     private missions: Mission<any>[] = [];
 
@@ -103,7 +120,10 @@ export class MissionController {
 
         // Handle disbands and merges.
         const disbandedMissions: Map<string, any> = new Map();
+        const forcedNames = new Set(this.forceDisbandedMissions);
         this.forceDisbandedMissions.forEach((name) => disbandedMissions.set(name, null));
+        clearForceDisbandedUnitOwnership(this.missions, forcedNames, this.unitIdToMission)
+            .forEach((unitId) => context.player.actions.setUnitDebugText(unitId, undefined));
         this.forceDisbandedMissions = [];
         missionActions.filter(isDisbandMission).forEach((a) => {
             this.logger(`Mission ${a.mission.getUniqueName()} disbanding as requested.`);
