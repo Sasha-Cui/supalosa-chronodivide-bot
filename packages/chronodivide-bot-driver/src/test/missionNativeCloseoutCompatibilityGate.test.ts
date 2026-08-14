@@ -36,6 +36,24 @@ const trace = (): BuildingEliminationTelemetryEvent[] => [
         targetCount: 1,
     },
     {
+        schemaVersion: 3,
+        event: "engagement_decision",
+        tick: 2_703,
+        phase: "building_strike",
+        reason: "building_completion_race",
+        targetId: 100,
+        targetName: "GAPOWR",
+        targetHitPoints: 1_000,
+        blockerId: null,
+        blockerName: null,
+        ownedAttackerCount: 4,
+        assignedAttackerCount: 4,
+        routeThreatCount: 2,
+        estimatedBuildingCompletionTicks: 120,
+        estimatedForceSurvivalTicks: 180,
+        earliestRouteThreatInterceptTicks: 30,
+    },
+    {
         schemaVersion: 2,
         event: "target_progress",
         tick: 2_706,
@@ -57,6 +75,10 @@ describe("mission-native closeout outcome-blind gate", () => {
             targetNames: ["GAPOWR"],
             attackerCountRange: [4, 4],
             assignedAttackerCountRange: [4, 4],
+            engagementPhases: { building_strike: 1 },
+            engagementReasons: { building_completion_race: 1 },
+            estimatedBuildingCompletionTickRange: [120, 120],
+            estimatedForceSurvivalTickRange: [180, 180],
             preemptedMissions: ["attack_1"],
         });
     });
@@ -77,5 +99,41 @@ describe("mission-native closeout outcome-blind gate", () => {
         >;
         order.targets.push({ id: 101, name: "GAREFN", x: 30, y: 30, visible: true });
         expect(() => validateMissionNativeCloseoutExposure(events, Countries.USA, 0)).toThrow(/single-target/);
+    });
+
+    it("rejects a building-race decision whose timing certificate contradicts it", () => {
+        const events = trace();
+        const decision = events.find((event) => event.event === "engagement_decision") as Extract<
+            BuildingEliminationTelemetryEvent,
+            { event: "engagement_decision" }
+        >;
+        decision.estimatedBuildingCompletionTicks = 181;
+        expect(() => validateMissionNativeCloseoutExposure(events, Countries.USA, 0)).toThrow(
+            /building-completion certificate/,
+        );
+    });
+
+    it("accepts a blocker only with a route-interception certificate", () => {
+        const events = trace();
+        const decision = events.find((event) => event.event === "engagement_decision") as Extract<
+            BuildingEliminationTelemetryEvent,
+            { event: "engagement_decision" }
+        >;
+        Object.assign(decision, {
+            phase: "blocker_clear",
+            reason: "route_interception_wins",
+            blockerId: 400,
+            blockerName: "HTNK",
+            estimatedBuildingCompletionTicks: 181,
+            estimatedForceSurvivalTicks: 180,
+        });
+        events.push({
+            ...decision,
+            phase: "building_strike",
+            reason: "building_in_range",
+            blockerId: null,
+            blockerName: null,
+        });
+        expect(() => validateMissionNativeCloseoutExposure(events, Countries.USA, 0)).not.toThrow();
     });
 });
