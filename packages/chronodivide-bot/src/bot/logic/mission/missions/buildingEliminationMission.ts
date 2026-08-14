@@ -29,6 +29,7 @@ import { BUILDING_NAME_TO_RULES, getDefaultPlacementLocation } from "../../build
 
 export type BuildingEliminationObservationMode = "publicApi" | "visibleOnly";
 export type BuildingEliminationTargetPriority = "production" | "defense" | "nearest";
+export type BuildingEliminationActivationMode = "forceAdvantage" | "lowBuilding";
 
 export type BuildingEliminationOptions = {
     enabled?: boolean;
@@ -53,6 +54,8 @@ export type BuildingEliminationOptions = {
     adaptiveNavalTargetCount?: number;
     adaptiveProductionPriority?: number;
     adaptiveTechPriority?: number;
+    activationMode?: BuildingEliminationActivationMode;
+    maxEnemyBuildings?: number;
 };
 
 export type BuildingTargetDescriptor = {
@@ -184,6 +187,8 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     adaptiveNavalTargetCount: 0,
     adaptiveProductionPriority: 140,
     adaptiveTechPriority: 130,
+    activationMode: "forceAdvantage",
+    maxEnemyBuildings: 1_000,
 };
 
 const requireIntegerInRange = (name: string, value: number, minimum: number, maximum: number): void => {
@@ -212,11 +217,16 @@ export const resolveBuildingEliminationOptions = (
     requireIntegerInRange("adaptiveNavalTargetCount", resolved.adaptiveNavalTargetCount, 0, 100);
     requireIntegerInRange("adaptiveProductionPriority", resolved.adaptiveProductionPriority, 1, 1_000);
     requireIntegerInRange("adaptiveTechPriority", resolved.adaptiveTechPriority, 1, 1_000);
+    requireIntegerInRange("maxEnemyBuildings", resolved.maxEnemyBuildings, 1, 1_000);
     if (!new Set<BuildingEliminationTargetPriority>(["production", "defense", "nearest"]).has(resolved.targetPriority)) {
         throw new Error(`Invalid building-elimination target priority: ${resolved.targetPriority}`);
     }
     if (!new Set<BuildingEliminationObservationMode>(["publicApi", "visibleOnly"]).has(resolved.observationMode)) {
         throw new Error(`Invalid building-elimination observation mode: ${resolved.observationMode}`);
+    }
+    if (!new Set<BuildingEliminationActivationMode>(["forceAdvantage", "lowBuilding"])
+        .has(resolved.activationMode)) {
+        throw new Error(`Invalid building-elimination activation mode: ${resolved.activationMode}`);
     }
     return resolved;
 };
@@ -742,6 +752,17 @@ export const meetsBuildingEliminationActivationGate = (
     enemyCombatantCount <= options.maxEnemyCombatants &&
     ownCombatantCount - options.reserveCombatants >= enemyCombatantCount + options.combatantAdvantage;
 
+export const meetsLowBuildingEliminationActivationGate = (
+    ownCombatantCount: number,
+    enemyBuildingCount: number,
+    options: Pick<
+        Required<BuildingEliminationOptions>,
+        "minCombatants" | "reserveCombatants" | "maxEnemyBuildings"
+    >,
+): boolean =>
+    enemyBuildingCount > 0 && enemyBuildingCount <= options.maxEnemyBuildings &&
+    ownCombatantCount >= options.minCombatants + options.reserveCombatants;
+
 const getEnemyCombatantCount = (
     context: SupabotContext,
     observationMode: BuildingEliminationObservationMode,
@@ -754,11 +775,26 @@ const getEnemyCombatantCount = (
 const isBuildingEliminationCloseoutState = (
     context: SupabotContext,
     options: Required<BuildingEliminationOptions>,
-): boolean => meetsBuildingEliminationActivationGate(
-    getEligibleBuildingAttackers(context).length,
-    getEnemyCombatantCount(context, options.observationMode),
-    options,
-);
+): boolean => {
+    const ownCombatantCount = getEligibleBuildingAttackers(context).length;
+    const enemyBuildingCount = getEnemyUnits(
+        context,
+        options.observationMode,
+        (unit) => unit.rules.type === ObjectType.Building,
+    ).length;
+    if (options.activationMode === "lowBuilding") {
+        return meetsLowBuildingEliminationActivationGate(
+            ownCombatantCount,
+            enemyBuildingCount,
+            options,
+        );
+    }
+    return enemyBuildingCount <= options.maxEnemyBuildings && meetsBuildingEliminationActivationGate(
+        ownCombatantCount,
+        getEnemyCombatantCount(context, options.observationMode),
+        options,
+    );
+};
 
 export const shouldRunBuildingEliminationCapabilityProduction = (
     closeoutWasActivated: boolean,
@@ -1338,16 +1374,25 @@ export class BuildingEliminationMissionFactory {
         }
 
         const ownCombatants = getEligibleBuildingAttackers(context);
+        const enemyBuildingCount = getEnemyUnits(
+            context,
+            this.options.observationMode,
+            (unit) => unit.rules.type === ObjectType.Building,
+        ).length;
+        if (enemyBuildingCount === 0 || enemyBuildingCount > this.options.maxEnemyBuildings) {
+            return;
+        }
         if (ownCombatants.length < this.options.minCombatants + this.options.reserveCombatants) {
             this.emitBlockedTelemetry(context, "insufficient_own_combatants", ownCombatants.length, 0);
             return;
         }
         const enemyCombatantCount = getEnemyCombatantCount(context, this.options.observationMode);
-        if (enemyCombatantCount > this.options.maxEnemyCombatants) {
+        if (this.options.activationMode === "forceAdvantage" && enemyCombatantCount > this.options.maxEnemyCombatants) {
             this.emitBlockedTelemetry(context, "enemy_combatant_limit", ownCombatants.length, enemyCombatantCount);
             return;
         }
         if (
+            this.options.activationMode === "forceAdvantage" &&
             ownCombatants.length - this.options.reserveCombatants <
             enemyCombatantCount + this.options.combatantAdvantage
         ) {

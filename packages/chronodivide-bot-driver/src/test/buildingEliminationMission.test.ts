@@ -10,6 +10,7 @@ import {
     getBuildingTargetWeight,
     isPreemptibleBuildingEliminationMission,
     meetsBuildingEliminationActivationGate,
+    meetsLowBuildingEliminationActivationGate,
     mergeCurrentAndRememberedBuildingTargets,
     prioritizeStalledBuildingTargets,
     rankBuildingTargets,
@@ -300,6 +301,19 @@ describe("building elimination policy", () => {
         expect(meetsBuildingEliminationActivationGate(12, 5, gate)).toBe(false);
     });
 
+    test("low-building closeout ignores the enemy army count but keeps the building and reserve gates", () => {
+        const gate = {
+            minCombatants: 1,
+            reserveCombatants: 0,
+            maxEnemyBuildings: 5,
+        };
+        expect(meetsLowBuildingEliminationActivationGate(1, 5, gate)).toBe(true);
+        expect(meetsLowBuildingEliminationActivationGate(1, 1, gate)).toBe(true);
+        expect(meetsLowBuildingEliminationActivationGate(0, 1, gate)).toBe(false);
+        expect(meetsLowBuildingEliminationActivationGate(100, 6, gate)).toBe(false);
+        expect(meetsLowBuildingEliminationActivationGate(100, 0, gate)).toBe(false);
+    });
+
     test("configuration resolves to a canonical complete object without undefined overrides", () => {
         const resolved = resolveBuildingEliminationOptions({
             enabled: true,
@@ -335,6 +349,8 @@ describe("building elimination policy", () => {
             "adaptiveNavalTargetCount",
             "adaptiveProductionPriority",
             "adaptiveTechPriority",
+            "activationMode",
+            "maxEnemyBuildings",
         ]);
     });
 
@@ -345,5 +361,9 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({ maxTargetGroups: 1.5 })).toThrow("maxTargetGroups");
         expect(() => resolveBuildingEliminationOptions({ minTick: -1 })).toThrow("minTick");
         expect(() => resolveBuildingEliminationOptions({ stallTicks: 0 })).toThrow("stallTicks");
+        expect(() => resolveBuildingEliminationOptions({ maxEnemyBuildings: 0 })).toThrow("maxEnemyBuildings");
+        expect(() => resolveBuildingEliminationOptions({ activationMode: "unknown" as any })).toThrow(
+            "activation mode",
+        );
     });
 });
