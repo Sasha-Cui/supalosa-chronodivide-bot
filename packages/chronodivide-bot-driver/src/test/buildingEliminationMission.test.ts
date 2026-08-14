@@ -25,6 +25,7 @@ import {
     selectCompatibleBuildingTargets,
     shouldRunBuildingEliminationCapabilityProduction,
     shouldDirectAttackBuildingTarget,
+    summarizeBuildingExecutionDistances,
     updateBuildingTargetProgress,
 } from "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
 
@@ -488,6 +489,19 @@ describe("building elimination policy", () => {
         );
         expect(allocation.buildingAttackers).toHaveLength(5);
         expect(allocation.blockerAttackers).toHaveLength(1);
+    });
+
+    test("summarizes execution distance to the actual building firing perimeter", () => {
+        expect(summarizeBuildingExecutionDistances(
+            [combatant(1, 0), combatant(2, 10), combatant(3, 20)] as any[],
+            buildingUnit(200, 20) as any,
+        )).toEqual({ minimum: 0, median: 5, maximum: 15, inRangeCount: 1 });
+        expect(summarizeBuildingExecutionDistances([], buildingUnit(200, 20) as any)).toEqual({
+            minimum: null,
+            median: null,
+            maximum: null,
+            inRangeCount: 0,
+        });
     });
 
     test("never diverts an in-range building attacker to the blocker screen", () => {

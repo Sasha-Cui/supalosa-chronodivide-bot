@@ -193,6 +193,43 @@ export type BuildingEliminationTelemetryEvent =
           buildingAttackerCount: number;
           blockerAttackerCount: number;
           inRangeBuildingAttackerCount: number;
+      }
+    | {
+          schemaVersion: 5;
+          event: "execution_heartbeat";
+          tick: number;
+          targetId: number;
+          targetName: string;
+          targetHitPoints: number;
+          targetHitPointDelta: number | null;
+          targetVisible: boolean;
+          blockerId: number | null;
+          blockerName: string | null;
+          routeThreatCount: number;
+          assignedAttackerIds: number[];
+          buildingAttackerIds: number[];
+          blockerAttackerIds: number[];
+          assignedAttackerTypes: Record<string, number>;
+          attackStateCounts: Record<string, number>;
+          assignedAttackerCount: number;
+          buildingAttackerCount: number;
+          blockerAttackerCount: number;
+          inRangeBuildingAttackerCount: number;
+          totalAssignedHitPoints: number;
+          totalBuildingAttackerHitPoints: number;
+          totalBlockerAttackerHitPoints: number;
+          idleAttackerCount: number;
+          movingAttackerCount: number;
+          minimumDistanceToFiringPerimeter: number | null;
+          medianDistanceToFiringPerimeter: number | null;
+          maximumDistanceToFiringPerimeter: number | null;
+          minimumDistanceDelta: number | null;
+          medianDistanceDelta: number | null;
+          noLongerAssignedUnitIds: number[];
+          destroyedAssignedUnitIds: number[];
+          directBuildingAttackCommandCount: number;
+          moveTowardBuildingCommandCount: number;
+          blockerAttackCommandCount: number;
       };
 
 export type BuildingEliminationTelemetrySink = (event: BuildingEliminationTelemetryEvent) => void;
@@ -740,6 +777,37 @@ export const allocateBuildingEliminationEngagement = (
     };
 };
 
+export type BuildingExecutionDistanceSummary = {
+    minimum: number | null;
+    median: number | null;
+    maximum: number | null;
+    inRangeCount: number;
+};
+
+export const summarizeBuildingExecutionDistances = (
+    attackers: UnitData[],
+    target: UnitData,
+): BuildingExecutionDistanceSummary => {
+    const distances = attackers.map((attacker) => Math.max(
+        0,
+        tileDistanceToFoundation(attacker.tile.rx, attacker.tile.ry, target) -
+            maximumDamageRangeAgainst(attacker, target),
+    )).sort((left, right) => left - right);
+    if (distances.length === 0) {
+        return { minimum: null, median: null, maximum: null, inRangeCount: 0 };
+    }
+    const middle = Math.floor(distances.length / 2);
+    const median = distances.length % 2 === 0
+        ? (distances[middle - 1] + distances[middle]) / 2
+        : distances[middle];
+    return {
+        minimum: distances[0],
+        median,
+        maximum: distances[distances.length - 1],
+        inRangeCount: distances.filter((value) => value === 0).length,
+    };
+};
+
 export const assignAttackersToCompatibleTargets = <T extends PointDescriptor, U extends PointDescriptor>(
     attackers: T[],
     targets: U[],
@@ -1114,6 +1182,15 @@ export const shouldRunBuildingEliminationCapabilityProduction = (
 
 type BuildingEliminationCloseoutLatch = { activated: boolean };
 
+type BuildingEliminationExecutionHeartbeatState = {
+    targetId: number;
+    tick: number;
+    targetHitPoints: number;
+    minimumDistanceToFiringPerimeter: number | null;
+    medianDistanceToFiringPerimeter: number | null;
+    assignedAttackerIds: number[];
+};
+
 class BuildingEliminationMission extends Mission {
     private lastOrderAt = Number.NEGATIVE_INFINITY;
     private rememberedBuildings = new Map<number, BuildingTargetDescriptor>();
@@ -1125,6 +1202,7 @@ class BuildingEliminationMission extends Mission {
     private lastEngagementTelemetryAt = Number.NEGATIVE_INFINITY;
     private lastAllocationTelemetrySignature = "";
     private lastAllocationTelemetryAt = Number.NEGATIVE_INFINITY;
+    private executionHeartbeatState: BuildingEliminationExecutionHeartbeatState | null = null;
     private committedTargetId: number | null = null;
     private targetProgress = new Map<number, BuildingTargetProgressState>();
     private progressTelemetry = new Map<number, { hitPoints: number; lastEmittedTick: number }>();
@@ -1395,6 +1473,14 @@ class BuildingEliminationMission extends Mission {
                     blockerAttackerCount: allocation.blockerAttackers.length,
                     inRangeBuildingAttackerCount: allocation.inRangeBuildingAttackerCount,
                 });
+                this.maybeEmitExecutionHeartbeat(
+                    context,
+                    currentPrimaryTarget,
+                    allocation,
+                    blocker,
+                    decision.routeThreatCount,
+                    primaryTarget.visible,
+                );
             } else if (this.options.engagementMode === "completionRace") {
                 this.emitEngagementTelemetry({
                     schemaVersion: 3,
@@ -1575,6 +1661,109 @@ class BuildingEliminationMission extends Mission {
         this.lastAllocationTelemetrySignature = signature;
         this.lastAllocationTelemetryAt = event.tick;
         this.telemetrySink(event);
+    }
+
+    private maybeEmitExecutionHeartbeat(
+        context: MissionContext,
+        target: UnitData,
+        allocation: BuildingEliminationEngagementAllocation,
+        blocker: UnitData | null,
+        routeThreatCount: number,
+        targetVisible: boolean,
+    ): void {
+        const tick = context.game.getCurrentTick();
+        const previous = this.executionHeartbeatState;
+        const sameTargetPrevious = previous?.targetId === target.id ? previous : null;
+        if (sameTargetPrevious && tick < sameTargetPrevious.tick + TELEMETRY_HEARTBEAT_TICKS) return;
+
+        const buildingAttackers = allocation.buildingAttackers.slice().sort((left, right) => left.id - right.id);
+        const blockerAttackers = allocation.blockerAttackers.slice().sort((left, right) => left.id - right.id);
+        const assignedAttackers = [...buildingAttackers, ...blockerAttackers]
+            .sort((left, right) => left.id - right.id);
+        const assignedAttackerIds = assignedAttackers.map(({ id }) => id);
+        const assignedIdSet = new Set(assignedAttackerIds);
+        const noLongerAssignedUnitIds = sameTargetPrevious
+            ? sameTargetPrevious.assignedAttackerIds
+                .filter((id) => !assignedIdSet.has(id)).sort((left, right) => left - right)
+            : [];
+        const destroyedAssignedUnitIds = noLongerAssignedUnitIds.filter((id) => {
+            const unit = context.game.getUnitData(id);
+            return !unit || unit.hitPoints <= 0 || unit.owner !== context.player.name;
+        });
+        const distances = summarizeBuildingExecutionDistances(buildingAttackers, target);
+        const typeCounts = new Map<string, number>();
+        const attackStateCounts = new Map<string, number>();
+        for (const attacker of assignedAttackers) {
+            typeCounts.set(attacker.rules.name, (typeCounts.get(attacker.rules.name) ?? 0) + 1);
+            const attackState = String(attacker.attackState ?? "unknown");
+            attackStateCounts.set(attackState, (attackStateCounts.get(attackState) ?? 0) + 1);
+        }
+        const directBuildingAttack = shouldDirectAttackBuildingTarget(
+            this.options.directVisibleAttack,
+            targetVisible,
+            true,
+        );
+        const sumHitPoints = (attackers: UnitData[]): number =>
+            attackers.reduce((sum, attacker) => sum + Math.max(0, attacker.hitPoints), 0);
+        this.telemetrySink({
+            schemaVersion: 5,
+            event: "execution_heartbeat",
+            tick,
+            targetId: target.id,
+            targetName: target.rules.name,
+            targetHitPoints: target.hitPoints,
+            targetHitPointDelta: sameTargetPrevious
+                ? target.hitPoints - sameTargetPrevious.targetHitPoints
+                : null,
+            targetVisible,
+            blockerId: blocker?.id ?? null,
+            blockerName: blocker?.rules.name ?? null,
+            routeThreatCount,
+            assignedAttackerIds,
+            buildingAttackerIds: buildingAttackers.map(({ id }) => id),
+            blockerAttackerIds: blockerAttackers.map(({ id }) => id),
+            assignedAttackerTypes: Object.fromEntries([...typeCounts.entries()].sort(([left], [right]) =>
+                left.localeCompare(right),
+            )),
+            attackStateCounts: Object.fromEntries([...attackStateCounts.entries()].sort(([left], [right]) =>
+                left.localeCompare(right),
+            )),
+            assignedAttackerCount: assignedAttackers.length,
+            buildingAttackerCount: buildingAttackers.length,
+            blockerAttackerCount: blockerAttackers.length,
+            inRangeBuildingAttackerCount: distances.inRangeCount,
+            totalAssignedHitPoints: sumHitPoints(assignedAttackers),
+            totalBuildingAttackerHitPoints: sumHitPoints(buildingAttackers),
+            totalBlockerAttackerHitPoints: sumHitPoints(blockerAttackers),
+            idleAttackerCount: assignedAttackers.filter(({ isIdle }) => isIdle === true).length,
+            movingAttackerCount: assignedAttackers.filter(({ velocity }) =>
+                !!velocity && Math.hypot(velocity.x, velocity.y, velocity.z) > Number.EPSILON,
+            ).length,
+            minimumDistanceToFiringPerimeter: distances.minimum,
+            medianDistanceToFiringPerimeter: distances.median,
+            maximumDistanceToFiringPerimeter: distances.maximum,
+            minimumDistanceDelta: sameTargetPrevious && distances.minimum !== null &&
+                sameTargetPrevious.minimumDistanceToFiringPerimeter !== null
+                ? distances.minimum - sameTargetPrevious.minimumDistanceToFiringPerimeter
+                : null,
+            medianDistanceDelta: sameTargetPrevious && distances.median !== null &&
+                sameTargetPrevious.medianDistanceToFiringPerimeter !== null
+                ? distances.median - sameTargetPrevious.medianDistanceToFiringPerimeter
+                : null,
+            noLongerAssignedUnitIds,
+            destroyedAssignedUnitIds,
+            directBuildingAttackCommandCount: directBuildingAttack ? buildingAttackers.length : 0,
+            moveTowardBuildingCommandCount: directBuildingAttack ? 0 : buildingAttackers.length,
+            blockerAttackCommandCount: blockerAttackers.length,
+        });
+        this.executionHeartbeatState = {
+            targetId: target.id,
+            tick,
+            targetHitPoints: target.hitPoints,
+            minimumDistanceToFiringPerimeter: distances.minimum,
+            medianDistanceToFiringPerimeter: distances.median,
+            assignedAttackerIds,
+        };
     }
 
     private emitOrderTelemetry(
