@@ -61,6 +61,7 @@ export type BuildingEliminationOptions = {
     maxEnemyBuildings?: number;
     engagementMode?: BuildingEliminationEngagementMode;
     engagementAllocationMode?: BuildingEliminationEngagementAllocationMode;
+    commitRouteBlocker?: boolean;
     routeCorridorRadius?: number;
 };
 
@@ -267,6 +268,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     maxEnemyBuildings: 1_000,
     engagementMode: "directBuilding",
     engagementAllocationMode: "allBlocker",
+    commitRouteBlocker: false,
     routeCorridorRadius: 8,
 };
 
@@ -606,6 +608,7 @@ export const chooseBuildingEliminationEngagement = (
     target: UnitData,
     enemyForces: UnitData[],
     corridorRadius: number,
+    preferredBlockerId: number | null = null,
 ): BuildingEliminationEngagementDecision => {
     const center = {
         x: attackers.reduce((sum, attacker) => sum + attacker.tile.rx, 0) / Math.max(1, attackers.length),
@@ -706,7 +709,7 @@ export const chooseBuildingEliminationEngagement = (
         earliestRouteThreatInterceptTicks,
     };
     return {
-        blocker: threats[0].force,
+        blocker: threats.find(({ force }) => force.id === preferredBlockerId)?.force ?? threats[0].force,
         reason: "route_interception_wins",
         routeThreatCount: threats.length,
         estimatedBuildingCompletionTicks,
@@ -1204,6 +1207,7 @@ class BuildingEliminationMission extends Mission {
     private lastAllocationTelemetryAt = Number.NEGATIVE_INFINITY;
     private executionHeartbeatState: BuildingEliminationExecutionHeartbeatState | null = null;
     private committedTargetId: number | null = null;
+    private committedRouteBlocker: { targetId: number; blockerId: number } | null = null;
     private targetProgress = new Map<number, BuildingTargetProgressState>();
     private progressTelemetry = new Map<number, { hitPoints: number; lastEmittedTick: number }>();
 
@@ -1376,6 +1380,7 @@ class BuildingEliminationMission extends Mission {
             });
             if (selectedTargets.length === 0 || assignments.length === 0) {
                 this.committedTargetId = null;
+                this.committedRouteBlocker = null;
                 if (this.options.engagementMode === "completionRace") {
                     this.emitEngagementTelemetry({
                         schemaVersion: 3,
@@ -1432,8 +1437,15 @@ class BuildingEliminationMission extends Mission {
                     currentPrimaryTarget,
                     enemyForces,
                     this.options.routeCorridorRadius,
+                    this.options.commitRouteBlocker &&
+                        this.committedRouteBlocker?.targetId === currentPrimaryTarget.id
+                        ? this.committedRouteBlocker.blockerId
+                        : null,
                 );
                 blocker = decision.blocker;
+                this.committedRouteBlocker = this.options.commitRouteBlocker && blocker
+                    ? { targetId: currentPrimaryTarget.id, blockerId: blocker.id }
+                    : null;
                 const finiteOrNull = (value: number): number | null => Number.isFinite(value) ? value : null;
                 this.emitEngagementTelemetry({
                     schemaVersion: 3,
@@ -1482,6 +1494,7 @@ class BuildingEliminationMission extends Mission {
                     primaryTarget.visible,
                 );
             } else if (this.options.engagementMode === "completionRace") {
+                this.committedRouteBlocker = null;
                 this.emitEngagementTelemetry({
                     schemaVersion: 3,
                     event: "engagement_decision",
@@ -1519,6 +1532,7 @@ class BuildingEliminationMission extends Mission {
         }
 
         this.committedTargetId = null;
+        this.committedRouteBlocker = null;
 
         if (!this.options.sweepWhenNoTargets) {
             return;

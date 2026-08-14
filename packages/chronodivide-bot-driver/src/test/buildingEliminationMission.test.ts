@@ -450,6 +450,30 @@ describe("building elimination policy", () => {
         );
     });
 
+    test("preserves a preferred blocker while it remains a certified route threat", () => {
+        const first = combatant(100, 5, 0, 100, 500, 5, 1) as any;
+        const preferred = combatant(101, 6, 0, 100, 500, 5, 1) as any;
+        const decision = chooseBuildingEliminationEngagement(
+            [combatant(1, 0, 0, 100, 10, 1, 1)] as any[],
+            buildingUnit(200, 20, 1_000) as any,
+            [first, preferred],
+            8,
+            preferred.id,
+        );
+        expect(decision).toMatchObject({
+            blocker: preferred,
+            reason: "route_interception_wins",
+            routeThreatCount: 2,
+        });
+        expect(chooseBuildingEliminationEngagement(
+            [combatant(1, 0, 0, 100, 10, 1, 1)] as any[],
+            buildingUnit(200, 20, 1_000) as any,
+            [first],
+            8,
+            preferred.id,
+        )).toMatchObject({ blocker: first, reason: "route_interception_wins", routeThreatCount: 1 });
+    });
+
     test("races a finishable building when completion precedes force destruction", () => {
         const decision = chooseBuildingEliminationEngagement(
             [combatant(1, 0, 0, 500, 100, 1, 1)] as any[],
@@ -583,6 +607,7 @@ describe("building elimination policy", () => {
             "maxEnemyBuildings",
             "engagementMode",
             "engagementAllocationMode",
+            "commitRouteBlocker",
             "routeCorridorRadius",
         ]);
     });
