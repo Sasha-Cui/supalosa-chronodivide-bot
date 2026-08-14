@@ -13,6 +13,7 @@ import { buildMissionNativeCloseoutPolicyV15 } from "../training/missionNativeCl
 import { buildMissionNativeCloseoutPolicyV16 } from "../training/missionNativeCloseoutPolicyV16.js";
 import { buildMissionNativeCloseoutPolicyV17 } from "../training/missionNativeCloseoutPolicyV17.js";
 import { buildMissionNativeCloseoutPolicyV18 } from "../training/missionNativeCloseoutPolicyV18.js";
+import { buildMissionNativeCloseoutPolicyV19 } from "../training/missionNativeCloseoutPolicyV19.js";
 
 describe("mission-native closeout candidate", () => {
     it("returns the exact external baseline path when disabled", () => {
@@ -264,6 +265,25 @@ describe("mission-native closeout candidate", () => {
             "candidate",
             Countries.USA,
             buildMissionNativeCloseoutPolicyV18(),
+        )).toBe(injected);
+        expect(factory.createWithStrategy).toHaveBeenCalledOnce();
+    });
+
+    it("accepts the frozen terminal-production-reservation v19 policy", () => {
+        const injected = { kind: "injected-v19" } as any;
+        let inner: any;
+        inner = { onAiUpdate: vi.fn(() => inner) };
+        const factory = {
+            descriptor: { kind: "external-package", packageRoot: "/baseline" },
+            create: vi.fn(),
+            createDefaultStrategy: vi.fn(() => inner),
+            createWithStrategy: vi.fn(() => injected),
+        } as any;
+        expect(createMissionNativeCloseoutCandidate(
+            factory,
+            "candidate",
+            Countries.USA,
+            buildMissionNativeCloseoutPolicyV19(),
         )).toBe(injected);
         expect(factory.createWithStrategy).toHaveBeenCalledOnce();
     });
