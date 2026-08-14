@@ -3,11 +3,13 @@ import { AttackState, FactoryType, ObjectType, SpeedType } from "@chronodivide/g
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import {
     PersistentObjectiveCompletionStrategy,
+    isObjectiveOffensiveMissionName,
     objectiveMissionAssignments,
     objectiveUnitCompatibility,
     weaponCanDamageObjectiveBuilding,
 } from "../training/persistentObjectiveCompletionStrategy.js";
 import { buildPersistentObjectiveCompletionPolicy } from "../training/persistentObjectiveCompletionPolicy.js";
+import { buildPersistentObjectiveCompletionPolicyV2 } from "../training/persistentObjectiveCompletionPolicyV2.js";
 
 const ordinaryWeapon = (special = false) => ({
     rules: {
@@ -139,6 +141,64 @@ describe("persistent objective-completion strategy", () => {
             locked: true,
             priority: 100,
         });
+    });
+
+    it("recognizes only the prospectively frozen offensive mission-name classes", () => {
+        expect(isObjectiveOffensiveMissionName("attack_7.2")).toBe(true);
+        expect(isObjectiveOffensiveMissionName("allInAttack")).toBe(true);
+        expect(isObjectiveOffensiveMissionName("navalAssault")).toBe(true);
+        expect(isObjectiveOffensiveMissionName("globalDefence.1.1")).toBe(false);
+        expect(isObjectiveOffensiveMissionName("scout_7.2")).toBe(false);
+        expect(isObjectiveOffensiveMissionName("attack")).toBe(false);
+    });
+
+    it("borrows only a one-third detachment from a locked offensive mission", () => {
+        const tick = { value: 0 };
+        const units = [
+            combatant(1, 0), combatant(2, 1), combatant(3, 2),
+            combatant(4, 3), combatant(5, 4), combatant(6, 5),
+            building(10, 0, "candidate"),
+            building(100, 20, "enemy"),
+            building(101, 25, "enemy"),
+        ];
+        const game = mockGame(units, tick);
+        const orders: any[][] = [];
+        let inner: any;
+        inner = { onAiUpdate: () => inner };
+        const strategy = new PersistentObjectiveCompletionStrategy(
+            inner,
+            Countries.USA,
+            buildPersistentObjectiveCompletionPolicyV2({
+                terminalMinTick: 0,
+                assaultMinTick: 0,
+                assaultBuildingCount: 100,
+                ordinaryReserveCombatants: 0,
+                minimumOwnBuildingsForAssault: 1,
+                homeThreatRadius: 0,
+                homeReserveRadius: 0,
+            }),
+            () => undefined,
+        );
+        const mission = (name: string, ids: number[]) => ({
+            getUnitIds: () => ids,
+            getUniqueName: () => name,
+            isUnitsLocked: () => true,
+            getPriority: () => 100,
+        });
+        const controller = {
+            getMissions: () => [
+                mission("attack_0.0", [1, 2, 3]),
+                mission("globalDefence.0.0", [4, 5, 6]),
+            ],
+        };
+        strategy.onAiUpdate({
+            game,
+            player: { name: "candidate", actions: { orderUnits: (...args: any[]) => orders.push(args) } },
+        } as any, controller, vi.fn());
+        expect(orders).toHaveLength(1);
+        expect(orders[0][0]).toHaveLength(1);
+        expect([1, 2, 3]).toContain(orders[0][0][0]);
+        expect(orders[0][0]).not.toEqual(expect.arrayContaining([4, 5, 6]));
     });
 
     it("reasserts the final-building order after Supalosa every three ticks and ignores off-route forces", () => {

@@ -15,6 +15,12 @@ import {
     PersistentObjectiveCompletionPolicy,
     validatePersistentObjectiveCompletionPolicy,
 } from "./persistentObjectiveCompletionPolicy.js";
+import {
+    PersistentObjectiveCompletionPolicyV2,
+    validatePersistentObjectiveCompletionPolicyV2,
+} from "./persistentObjectiveCompletionPolicyV2.js";
+
+type PersistentObjectivePolicy = PersistentObjectiveCompletionPolicy | PersistentObjectiveCompletionPolicyV2;
 
 type Point = { x: number; y: number };
 type Logger = (message: string, sayInGame?: boolean) => void;
@@ -260,13 +266,19 @@ export const objectiveMissionAssignments = (missionController: unknown): Map<num
 const isLeaseSourceEligible = (
     unit: UnitData,
     assignment: ObjectiveMissionAssignment | undefined,
-    policy: PersistentObjectiveCompletionPolicy,
+    policy: PersistentObjectivePolicy,
 ): boolean => {
+    if (policy.schemaVersion === 6) {
+        return !assignment || isObjectiveOffensiveMissionName(assignment.missionName);
+    }
     if (assignment?.locked) return false;
     if (policy.leaseSource === "unassigned_idle") return !assignment && unit.isIdle === true;
     if (policy.leaseSource === "unassigned_available") return !assignment;
     return !assignment || !assignment.locked;
 };
+
+export const isObjectiveOffensiveMissionName = (missionName: string): boolean =>
+    missionName.startsWith("attack_") || missionName === "allInAttack" || missionName === "navalAssault";
 
 const centroid = (units: readonly UnitData[]): Point | null => units.length === 0 ? null : ({
     x: units.reduce((sum, unit) => sum + unit.tile.rx, 0) / units.length,
@@ -345,7 +357,7 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
     constructor(
         private inner: StrategyLike,
         private readonly country: Countries,
-        private readonly policy: PersistentObjectiveCompletionPolicy,
+        private readonly policy: PersistentObjectivePolicy,
         private readonly telemetry: TelemetrySink,
     ) {}
 
@@ -566,10 +578,36 @@ export class PersistentObjectiveCompletionStrategy implements StrategyLike {
         ownStart: Point,
         tick: number,
     ): UnitData[] {
-        const eligible = compatible.filter((unit) =>
+        let eligible = compatible.filter((unit) =>
             !protectedHomeIds.has(unit.id) &&
             isLeaseSourceEligible(unit, assignments.get(unit.id), this.policy),
         );
+        if (this.policy.schemaVersion === 6) {
+            const policy = this.policy;
+            const byMission = new Map<string, UnitData[]>();
+            for (const unit of eligible) {
+                const assignment = assignments.get(unit.id);
+                if (!assignment?.locked || !isObjectiveOffensiveMissionName(assignment.missionName)) continue;
+                const group = byMission.get(assignment.missionName) ?? [];
+                group.push(unit);
+                byMission.set(assignment.missionName, group);
+            }
+            const lockedAllowed = [...byMission.entries()].flatMap(([, group]) => {
+                const missionLimit = Math.floor(group.length * policy.maximumLockedOffensiveFraction);
+                return group.slice().sort((left, right) =>
+                    distanceToFoundation(point(left), target) - distanceToFoundation(point(right), target) ||
+                    left.id - right.id,
+                ).slice(0, missionLimit);
+            }).sort((left, right) =>
+                distanceToFoundation(point(left), target) - distanceToFoundation(point(right), target) ||
+                left.id - right.id,
+            ).slice(0, policy.maximumLockedOffensiveCombatants);
+            const lockedAllowedIds = new Set(lockedAllowed.map(({ id }) => id));
+            eligible = eligible.filter((unit) => {
+                const assignment = assignments.get(unit.id);
+                return assignment?.locked !== true || lockedAllowedIds.has(unit.id);
+            });
+        }
         const reserved = eligible.slice().sort((left, right) =>
             distance(point(left), ownStart) - distance(point(right), ownStart) || left.id - right.id,
         ).slice(0, Math.min(this.policy.ordinaryReserveCombatants, eligible.length));
@@ -707,10 +745,12 @@ export const createPersistentObjectiveCompletionCandidate = (
     baselineFactory: BaselineFactory,
     name: string,
     country: Countries,
-    rawPolicy: PersistentObjectiveCompletionPolicy,
+    rawPolicy: PersistentObjectivePolicy,
     telemetry: TelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = validatePersistentObjectiveCompletionPolicy(rawPolicy);
+    const policy = rawPolicy.schemaVersion === 6
+        ? validatePersistentObjectiveCompletionPolicyV2(rawPolicy as PersistentObjectiveCompletionPolicyV2)
+        : validatePersistentObjectiveCompletionPolicy(rawPolicy);
     if (!policy.enabled) return baselineFactory.create(name, country);
     if (!baselineFactory.createDefaultStrategy || !baselineFactory.createWithStrategy) {
         throw new Error("Baseline factory does not expose the persistent objective strategy interface");
