@@ -44,18 +44,20 @@ export const canTransferSpecificUnit = (
     return !donatingMission.isUnitsLocked() || donatingMission.canDonateLockedUnitsTo(requestingMission);
 };
 
-export const clearForceDisbandedUnitOwnership = (
+export const releaseTransferDisbandedUnits = (
     missions: readonly Mission<any>[],
-    forceDisbandedMissionNames: ReadonlySet<string>,
+    transferDisbandedMissionNames: ReadonlySet<string>,
     unitIdToMission: Map<number, Mission<any>>,
 ): number[] => {
     const released: number[] = [];
     for (const mission of missions) {
-        if (!forceDisbandedMissionNames.has(mission.getUniqueName())) continue;
-        for (const unitId of mission.getUnitIds()) {
-            if (unitIdToMission.get(unitId) !== mission) continue;
-            unitIdToMission.delete(unitId);
-            released.push(unitId);
+        if (!transferDisbandedMissionNames.has(mission.getUniqueName())) continue;
+        for (const unitId of [...mission.getUnitIds()]) {
+            mission.removeUnit(unitId);
+            if (unitIdToMission.get(unitId) === mission) {
+                unitIdToMission.delete(unitId);
+                released.push(unitId);
+            }
         }
     }
     return released.sort((left, right) => left - right);
@@ -74,6 +76,10 @@ export class MissionController {
 
     // Tracks missions to be externally disbanded the next time the mission update loop occurs.
     private forceDisbandedMissions: string[] = [];
+
+    // Tracks missions whose units must be released from both ownership representations
+    // before same-update specific-unit requests are resolved.
+    private transferDisbandedMissions: string[] = [];
 
     private recentBatchableActions: Map<number, SubmittedBatchableAction> = new Map();
 
@@ -120,11 +126,13 @@ export class MissionController {
 
         // Handle disbands and merges.
         const disbandedMissions: Map<string, any> = new Map();
-        const forcedNames = new Set(this.forceDisbandedMissions);
         this.forceDisbandedMissions.forEach((name) => disbandedMissions.set(name, null));
-        clearForceDisbandedUnitOwnership(this.missions, forcedNames, this.unitIdToMission)
-            .forEach((unitId) => context.player.actions.setUnitDebugText(unitId, undefined));
         this.forceDisbandedMissions = [];
+        const transferNames = new Set(this.transferDisbandedMissions);
+        this.transferDisbandedMissions.forEach((name) => disbandedMissions.set(name, null));
+        releaseTransferDisbandedUnits(this.missions, transferNames, this.unitIdToMission)
+            .forEach((unitId) => context.player.actions.setUnitDebugText(unitId, undefined));
+        this.transferDisbandedMissions = [];
         missionActions.filter(isDisbandMission).forEach((a) => {
             this.logger(`Mission ${a.mission.getUniqueName()} disbanding as requested.`);
             a.mission.getUnitIds().forEach((unitId) => {
@@ -455,6 +463,15 @@ export class MissionController {
      */
     public disbandMission(missionName: string) {
         this.forceDisbandedMissions.push(missionName);
+    }
+
+    /**
+     * Disband a mission while making its units available to specific-unit
+     * requests in the same controller update. Unlike ordinary forced disband,
+     * this also empties the donor's unit list before its completion callback.
+     */
+    public disbandMissionForTransfer(missionName: string) {
+        this.transferDisbandedMissions.push(missionName);
     }
 
     // return text to display for global debug

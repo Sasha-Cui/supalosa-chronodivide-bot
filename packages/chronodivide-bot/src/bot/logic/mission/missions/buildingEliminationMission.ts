@@ -2943,7 +2943,7 @@ export class BuildingEliminationMissionFactory {
                     this.readinessVanguardUnitIds?.has(id) === true,
                 ).length,
             });
-            missionController.disbandMission(BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME);
+            missionController.disbandMissionForTransfer(BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME);
         }
         this.readinessVanguardUnitIds = null;
     }
@@ -3034,7 +3034,7 @@ export class BuildingEliminationMissionFactory {
             .map((mission) => mission.getUniqueName())
             .filter(isPreemptibleBuildingEliminationMission)
             .sort();
-        names.forEach((name) => missionController.disbandMission(name));
+        names.forEach((name) => missionController.disbandMissionForTransfer(name));
         return names;
     }
 }
