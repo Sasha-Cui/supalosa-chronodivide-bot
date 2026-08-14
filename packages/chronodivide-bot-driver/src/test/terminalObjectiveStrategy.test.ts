@@ -6,11 +6,13 @@ import {
     hasBridgeUncalibratedFriendlyObjectiveMechanic,
     hasBridgeUncalibratedObjectiveMechanic,
     partitionContinuousOffenseCombatants,
+    objectiveReserveCombatantCount,
     terminalRaceActivationReason,
 } from "../training/terminalObjectiveStrategy.js";
 import { buildTerminalObjectiveArms } from "../training/terminalObjectivePolicy.js";
 import { buildTerminalRaceArms } from "../training/terminalRacePolicy.js";
 import { buildContinuousOffensePolicy } from "../training/continuousOffensePolicy.js";
+import { buildProgressCertifiedConversionPolicy } from "../training/progressCertifiedConversionPolicy.js";
 
 const arms = new Map(buildTerminalObjectiveArms().map((arm) => [arm.armId, arm]));
 const terminalRaceArms = new Map(buildTerminalRaceArms().map((arm) => [arm.armId, arm]));
@@ -59,6 +61,52 @@ describe("terminal-objective strategy construction", () => {
         expect(result).toBe(wrapped);
         expect(factory.createDefaultStrategy).toHaveBeenCalledOnce();
         expect(factory.createWithStrategy).toHaveBeenCalledOnce();
+    });
+
+    it("constructs progress-certified conversion on the exact external predecessor", () => {
+        const inner = { onAiUpdate: vi.fn() as any };
+        inner.onAiUpdate.mockReturnValue(inner);
+        const wrapped = { tag: "progress-certified-conversion" };
+        const factory = {
+            descriptor: { kind: "external-package", packageRoot: "/pinned" } as const,
+            create: vi.fn(() => ({ tag: "baseline" })),
+            createDefaultStrategy: vi.fn(() => inner),
+            createWithStrategy: vi.fn(() => wrapped),
+        };
+        const result = createTerminalObjectiveCandidate(
+            factory as any,
+            "candidate",
+            Countries.USA,
+            buildProgressCertifiedConversionPolicy(),
+        );
+        expect(result).toBe(wrapped);
+        expect(factory.create).not.toHaveBeenCalled();
+        expect(factory.createDefaultStrategy).toHaveBeenCalledOnce();
+        expect(factory.createWithStrategy).toHaveBeenCalledOnce();
+    });
+
+    it("keeps the progress-certified disabled arm on the exact baseline path", () => {
+        const baseline = { tag: "exact-external-baseline" };
+        const factory = {
+            descriptor: { kind: "external-package", packageRoot: "/pinned" } as const,
+            create: vi.fn(() => baseline),
+            createDefaultStrategy: vi.fn(() => {
+                throw new Error("disabled overlay must not construct a strategy");
+            }),
+            createWithStrategy: vi.fn(() => {
+                throw new Error("disabled overlay must not wrap the bot");
+            }),
+        };
+        const result = createTerminalObjectiveCandidate(
+            factory as any,
+            "candidate",
+            Countries.USA,
+            buildProgressCertifiedConversionPolicy({ enabled: false }),
+        );
+        expect(result).toBe(baseline);
+        expect(factory.create).toHaveBeenCalledOnce();
+        expect(factory.createDefaultStrategy).not.toHaveBeenCalled();
+        expect(factory.createWithStrategy).not.toHaveBeenCalled();
     });
 
     it("always runs the external predecessor before considering an overlay", () => {
@@ -250,5 +298,23 @@ describe("terminal-objective strategy construction", () => {
         );
         expect(partition.reserved.map(({ id }) => id)).toEqual([1, 2]);
         expect(partition.active.map(({ id }) => id)).toEqual([4, 3]);
+    });
+
+    it("releases the reserve for the exact final-building race", () => {
+        const policy = buildProgressCertifiedConversionPolicy({
+            ordinaryReserveCombatants: 2,
+            terminalReserveCombatants: 0,
+        });
+        expect(objectiveReserveCombatantCount(policy, 3)).toBe(2);
+        expect(objectiveReserveCombatantCount(policy, 1)).toBe(0);
+        expect(objectiveReserveCombatantCount(policy, null)).toBe(2);
+    });
+
+    it("activates final-building conversion earlier without taking over multi-building play", () => {
+        const policy = buildProgressCertifiedConversionPolicy();
+        expect(terminalRaceActivationReason(policy as any, 3_599, 1, 10)).toBeNull();
+        expect(terminalRaceActivationReason(policy as any, 3_600, 2, 10)).toBeNull();
+        expect(terminalRaceActivationReason(policy as any, 3_600, 1, 10)).toBe("guarded_building_count");
+        expect(terminalRaceActivationReason(policy as any, 7_200, 2, 10)).toBeNull();
     });
 });

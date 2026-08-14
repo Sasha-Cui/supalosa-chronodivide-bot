@@ -109,6 +109,12 @@ export type ObjectiveBuildingOpportunity = {
     committedMadeProgress: boolean;
 };
 
+export type ObjectiveMissionOpportunity = ObjectiveBuildingOpportunity & {
+    directStrikeSurvives: boolean;
+    blockerThenBuildingCompletionTicks: number | null;
+    missionSwitchPenaltyTicks: number;
+};
+
 export type ObjectiveMissionDecision =
     | { kind: "terminal_candidate_strike"; buildingId: number; predictedCompletionTicks: number; reason: "sole_known_building_before_intercept" }
     | { kind: "building_strike"; buildingId: number; predictedCompletionTicks: number; reason: "direct_objective_progress" | "retain_committed_building" }
@@ -119,7 +125,8 @@ export type ObjectiveMissionDecision =
     | {
           kind: "predecessor_fallback";
           threatIds: number[];
-          reason: "uncalibrated_relevant_threat" | "analysis_horizon_exceeded";
+          reason: "uncalibrated_relevant_threat" | "analysis_horizon_exceeded" |
+              "physical_progress_deadline";
       };
 
 const finiteNonnegative = (value: number): boolean => Number.isFinite(value) && value >= 0;
@@ -175,6 +182,46 @@ export const rankObjectiveBuildingOpportunities = <T extends ObjectiveBuildingOp
     right.strategicRemovalValue - left.strategicRemovalValue ||
     left.building.id - right.building.id
 );
+
+/**
+ * Rank the complete conversion mission rather than only the counterfactual
+ * direct-building time. A lethal direct route has infinite cost unless a
+ * finite blocker-then-building continuation exists. Switching away from the
+ * committed target pays an explicit, deterministic hysteresis penalty.
+ */
+export const rankObjectiveMissionOpportunities = <T extends ObjectiveMissionOpportunity>(
+    opportunities: readonly T[],
+): T[] => opportunities.slice().sort((left, right) => {
+    const completion = (value: ObjectiveMissionOpportunity): number => {
+        const base = value.directStrikeSurvives
+            ? value.directCompletionTicks
+            : value.blockerThenBuildingCompletionTicks;
+        return base === null
+            ? Number.POSITIVE_INFINITY
+            : base + (value.committed ? 0 : value.missionSwitchPenaltyTicks);
+    };
+    return completion(left) - completion(right) ||
+        Number(right.committed && right.committedMadeProgress) -
+            Number(left.committed && left.committedMadeProgress) ||
+        right.strategicRemovalValue - left.strategicRemovalValue ||
+        left.building.id - right.building.id;
+});
+
+export const objectiveMissionProgressDeadlineExpired = (args: {
+    tick: number;
+    lastPhysicalProgressTick: number;
+    missionStartedTick: number;
+    deadlineTicks: number;
+}): boolean => {
+    const { tick, lastPhysicalProgressTick, missionStartedTick, deadlineTicks } = args;
+    if (
+        !Number.isSafeInteger(tick) || !Number.isSafeInteger(lastPhysicalProgressTick) ||
+        !Number.isSafeInteger(missionStartedTick) || !Number.isSafeInteger(deadlineTicks) ||
+        tick < 0 || lastPhysicalProgressTick < 0 || missionStartedTick < 0 || deadlineTicks < 1 ||
+        lastPhysicalProgressTick > tick || missionStartedTick > tick
+    ) throw new Error("objective mission progress deadline input is invalid");
+    return tick - Math.max(lastPhysicalProgressTick, missionStartedTick) >= deadlineTicks;
+};
 
 export const estimateObjectiveStrikeCompletionTicks = (
     attackers: readonly ObjectiveAttacker[],

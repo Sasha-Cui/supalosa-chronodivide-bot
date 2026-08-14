@@ -6,6 +6,8 @@ import {
     ObjectiveSchedulerThresholds,
     ObjectiveThreat,
     selectContinuousObjectiveMission,
+    objectiveMissionProgressDeadlineExpired,
+    rankObjectiveMissionOpportunities,
     selectObjectiveMission,
 } from "@supalosa/chronodivide-bot/dist/bot/logic/objective/terminalObjectiveDecisionCore.js";
 
@@ -227,5 +229,82 @@ describe("continuous objective offense", () => {
             kind: "terminal_candidate_strike",
             buildingId: lastBuilding.id,
         });
+    });
+});
+
+describe("progress-certified conversion", () => {
+    it("ranks finite blocker-then-building missions ahead of nominally faster lethal routes", () => {
+        const building = (id: number) => ({ id, x: id, y: 0, hitPoints: 100, visible: true });
+        const ranked = rankObjectiveMissionOpportunities([
+            {
+                building: building(1),
+                directCompletionTicks: 20,
+                strategicRemovalValue: 0,
+                committed: false,
+                committedMadeProgress: false,
+                directStrikeSurvives: false,
+                blockerThenBuildingCompletionTicks: 200,
+                missionSwitchPenaltyTicks: 0,
+            },
+            {
+                building: building(2),
+                directCompletionTicks: 80,
+                strategicRemovalValue: 0,
+                committed: false,
+                committedMadeProgress: false,
+                directStrikeSurvives: true,
+                blockerThenBuildingCompletionTicks: null,
+                missionSwitchPenaltyTicks: 0,
+            },
+        ]);
+        expect(ranked.map(({ building: value }) => value.id)).toEqual([2, 1]);
+    });
+
+    it("uses a switching penalty to preserve a nearly equivalent committed mission", () => {
+        const building = (id: number) => ({ id, x: id, y: 0, hitPoints: 100, visible: true });
+        const ranked = rankObjectiveMissionOpportunities([
+            {
+                building: building(1),
+                directCompletionTicks: 100,
+                strategicRemovalValue: 0,
+                committed: true,
+                committedMadeProgress: true,
+                directStrikeSurvives: true,
+                blockerThenBuildingCompletionTicks: null,
+                missionSwitchPenaltyTicks: 20,
+            },
+            {
+                building: building(2),
+                directCompletionTicks: 90,
+                strategicRemovalValue: 0,
+                committed: false,
+                committedMadeProgress: false,
+                directStrikeSurvives: true,
+                blockerThenBuildingCompletionTicks: null,
+                missionSwitchPenaltyTicks: 20,
+            },
+        ]);
+        expect(ranked.map(({ building: value }) => value.id)).toEqual([1, 2]);
+    });
+
+    it("expires only after the physical-progress deadline", () => {
+        expect(objectiveMissionProgressDeadlineExpired({
+            tick: 359,
+            lastPhysicalProgressTick: 0,
+            missionStartedTick: 0,
+            deadlineTicks: 360,
+        })).toBe(false);
+        expect(objectiveMissionProgressDeadlineExpired({
+            tick: 360,
+            lastPhysicalProgressTick: 0,
+            missionStartedTick: 0,
+            deadlineTicks: 360,
+        })).toBe(true);
+        expect(objectiveMissionProgressDeadlineExpired({
+            tick: 500,
+            lastPhysicalProgressTick: 400,
+            missionStartedTick: 0,
+            deadlineTicks: 360,
+        })).toBe(false);
     });
 });

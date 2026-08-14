@@ -21,6 +21,8 @@ import {
     estimateBlockerThenBuildingCompletionTicks,
     estimateObjectiveStrikeCompletionTicks,
     rankObjectiveBuildingOpportunities,
+    rankObjectiveMissionOpportunities,
+    objectiveMissionProgressDeadlineExpired,
     selectMinimumSufficientObjectiveStrikeGroup,
     selectContinuousObjectiveMission,
     selectObjectiveMission,
@@ -50,6 +52,10 @@ import {
     ContinuousOffensePolicy,
     validateContinuousOffensePolicy,
 } from "./continuousOffensePolicy.js";
+import {
+    ProgressCertifiedConversionPolicy,
+    validateProgressCertifiedConversionPolicy,
+} from "./progressCertifiedConversionPolicy.js";
 
 type Point = { x: number; y: number };
 
@@ -89,14 +95,15 @@ type SearchPoint = Point & {
     lastOrderedTick: number;
 };
 
-type ObjectiveOverlayPolicy = TerminalObjectivePolicy | TerminalRacePolicy | ContinuousOffensePolicy;
+type ObjectiveOverlayPolicy = TerminalObjectivePolicy | TerminalRacePolicy | ContinuousOffensePolicy |
+    ProgressCertifiedConversionPolicy;
 type ObjectiveOverlayMechanism = ObjectiveOverlayPolicy["mechanism"];
 type ObjectiveInformationBoundary =
     | typeof TERMINAL_OBJECTIVE_INFORMATION_BOUNDARY
     | TerminalRacePolicy["informationInterface"];
 
 export type TerminalObjectiveTelemetry = {
-    schemaVersion: 1 | 2;
+    schemaVersion: 1 | 2 | 3;
     event: "decision" | "search_orders" | "memory_invalidated";
     informationBoundary: ObjectiveInformationBoundary;
     tick: number;
@@ -128,6 +135,12 @@ export type TerminalObjectiveTelemetry = {
     selectedAttackerRulesNames?: string[];
     delegatedActionCounts?: { idle: number; moving: number; attacking: number; other: number };
     assignedCombatantFraction?: number;
+    lastPhysicalProgressTick?: number;
+    physicalNoProgressTicks?: number;
+    missionStartedTick?: number;
+    progressDeadlineExpired?: "blocker" | "building" | null;
+    terminalReserveReleased?: boolean;
+    completeMissionCostTicks?: number | null;
 };
 
 type TelemetrySink = (event: TerminalObjectiveTelemetry) => void;
@@ -166,13 +179,51 @@ const isTerminalRacePolicy = (policy: ObjectiveOverlayPolicy): policy is Termina
 const isContinuousOffensePolicy = (policy: ObjectiveOverlayPolicy): policy is ContinuousOffensePolicy =>
     policy.schemaVersion === 3;
 
+const isProgressCertifiedPolicy = (
+    policy: ObjectiveOverlayPolicy,
+): policy is ProgressCertifiedConversionPolicy => policy.schemaVersion === 4;
+
+const hasPublicObjectiveInterface = (
+    policy: ObjectiveOverlayPolicy,
+): policy is TerminalRacePolicy | ContinuousOffensePolicy | ProgressCertifiedConversionPolicy =>
+    isTerminalRacePolicy(policy) || isContinuousOffensePolicy(policy) || isProgressCertifiedPolicy(policy);
+
+const missionLivenessTicks = (policy: ObjectiveOverlayPolicy): number =>
+    isProgressCertifiedPolicy(policy)
+        ? policy.buildingNoDamageDeadlineTicks
+        : policy.missionLivenessTicks;
+
+export const objectiveReserveCombatantCount = (
+    policy: ObjectiveOverlayPolicy,
+    exactEnemyBuildingCount: number | null,
+): number => isProgressCertifiedPolicy(policy)
+    ? exactEnemyBuildingCount === 1
+      ? policy.terminalReserveCombatants
+      : policy.ordinaryReserveCombatants
+    : isContinuousOffensePolicy(policy)
+      ? policy.reserveCombatants
+      : 0;
+
+const continuousForceEngagementMode = (
+    policy: ContinuousOffensePolicy | ProgressCertifiedConversionPolicy,
+): "all_observed_forces_first" | "route_blockers_only" | "buildings_only" =>
+    isContinuousOffensePolicy(policy)
+        ? policy.forceEngagementMode
+        : policy.terminalForceMode === "direct_building"
+          ? "buildings_only"
+          : "route_blockers_only";
+
 const objectiveInformationBoundary = (policy: ObjectiveOverlayPolicy): ObjectiveInformationBoundary =>
-    isTerminalRacePolicy(policy) || isContinuousOffensePolicy(policy)
+    hasPublicObjectiveInterface(policy)
         ? policy.informationInterface
         : TERMINAL_OBJECTIVE_INFORMATION_BOUNDARY;
 
-const objectiveTelemetrySchemaVersion = (policy: ObjectiveOverlayPolicy): 1 | 2 =>
-    isTerminalRacePolicy(policy) || isContinuousOffensePolicy(policy) ? 2 : 1;
+const objectiveTelemetrySchemaVersion = (policy: ObjectiveOverlayPolicy): 1 | 2 | 3 =>
+    isProgressCertifiedPolicy(policy)
+        ? 3
+        : isTerminalRacePolicy(policy) || isContinuousOffensePolicy(policy)
+          ? 2
+          : 1;
 
 export const terminalRaceActivationReason = (
     policy: ObjectiveOverlayPolicy,
@@ -180,6 +231,18 @@ export const terminalRaceActivationReason = (
     exactEnemyBuildingCount: number | null,
     maximumPreviouslyObservedExactCount: number,
 ): "fixed_tick" | "guarded_building_count" | null => {
+    if (isProgressCertifiedPolicy(policy)) {
+        const inScope = exactEnemyBuildingCount !== null &&
+            exactEnemyBuildingCount <= policy.activationBuildingCount &&
+            (policy.conversionScope !== "final_building_only" || exactEnemyBuildingCount === 1);
+        if (!inScope || tick < policy.activationMinTick) return null;
+        if (tick >= policy.minTick) return "fixed_tick";
+        if (
+            !policy.requireObservedCountAboveThreshold ||
+            maximumPreviouslyObservedExactCount > policy.activationBuildingCount
+        ) return "guarded_building_count";
+        return null;
+    }
     if (tick >= policy.minTick) return "fixed_tick";
     if (
         (isContinuousOffensePolicy(policy) ||
@@ -369,7 +432,7 @@ const bindAttacker = (
     if (!isMobileAntiGroundCombatant(unit)) return null;
     const multipliers = mechanicsMultipliers(game, unit);
     const targetDivisor = armorDivisor(game, target);
-    const uncalibrated = isTerminalRacePolicy(policy) || isContinuousOffensePolicy(policy)
+    const uncalibrated = hasPublicObjectiveInterface(policy)
         ? hasBridgeUncalibratedFriendlyObjectiveMechanic(
             unit,
             target,
@@ -445,7 +508,7 @@ const rejectionReason = (
     if (!isMobileAntiGroundCombatant(unit)) return "not_mobile_anti_ground_combatant";
     const multipliers = mechanicsMultipliers(game, unit);
     const divisor = armorDivisor(game, target);
-    const bridgeUncalibrated = isTerminalRacePolicy(policy) || isContinuousOffensePolicy(policy)
+    const bridgeUncalibrated = hasPublicObjectiveInterface(policy)
         ? hasBridgeUncalibratedFriendlyObjectiveMechanic(
             unit,
             target,
@@ -499,6 +562,9 @@ export class TerminalObjectiveStrategy implements StrategyLike {
     private committedBlockerClear = false;
     private committedBlockerIds = new Set<number>();
     private lastProgressTick = 0;
+    private lastPhysicalProgressTick = 0;
+    private missionStartedTick = 0;
+    private objectiveSuspendedUntilTick = 0;
     private lastOrderTick = Number.NEGATIVE_INFINITY;
     private lastTelemetry = new Map<string, { signature: string; tick: number }>();
     private exactEnemyBuildingCount: number | null = null;
@@ -522,6 +588,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
     private update(context: StrategyContext): void {
         const { game, player } = context;
         const tick = game.getCurrentTick();
+        const progressPolicy = isProgressCertifiedPolicy(this.policy) ? this.policy : null;
         this.updateMemory(game, player.name, tick);
         this.updateSearchCoverage(game, player.name, tick);
         this.activationReason = terminalRaceActivationReason(
@@ -540,24 +607,81 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             .map((id) => game.getUnitData(id))
             .filter((unit): unit is UnitData => !!unit);
         const eligible = selfUnits.filter(isMobileAntiGroundCombatant);
-        const partition = isContinuousOffensePolicy(this.policy)
+        const managedReserve = isContinuousOffensePolicy(this.policy) || progressPolicy !== null;
+        const reserveCount = objectiveReserveCombatantCount(this.policy, this.exactEnemyBuildingCount);
+        const terminalReserveReleased = progressPolicy !== null &&
+            this.exactEnemyBuildingCount === 1 &&
+            progressPolicy.terminalReserveCombatants < progressPolicy.ordinaryReserveCombatants;
+        const partition = managedReserve
             ? partitionContinuousOffenseCombatants(
                 eligible,
                 game.getPlayerData(player.name).startLocation,
-                this.policy.reserveCombatants,
+                reserveCount,
             )
             : { active: eligible, reserved: [] };
         const activeEligible = partition.active;
         const noProgressTicks = Math.max(0, tick - this.lastProgressTick);
+        const physicalNoProgressTicks = Math.max(0, tick - this.lastPhysicalProgressTick);
+        const blockerDeadlineExpired = progressPolicy !== null && this.committedBlockerClear &&
+            objectiveMissionProgressDeadlineExpired({
+                tick,
+                lastPhysicalProgressTick: this.lastPhysicalProgressTick,
+                missionStartedTick: this.missionStartedTick,
+                deadlineTicks: progressPolicy.blockerNoDamageDeadlineTicks,
+            });
+        const buildingDeadlineExpired = progressPolicy !== null &&
+            this.committedBuildingId !== null && !this.committedBlockerClear &&
+            objectiveMissionProgressDeadlineExpired({
+                tick,
+                lastPhysicalProgressTick: this.lastPhysicalProgressTick,
+                missionStartedTick: this.missionStartedTick,
+                deadlineTicks: progressPolicy.buildingNoDamageDeadlineTicks,
+            });
+        const progressDeadlineExpired = blockerDeadlineExpired
+            ? "blocker" as const
+            : buildingDeadlineExpired
+              ? "building" as const
+              : null;
+        if (progressDeadlineExpired !== null) {
+            // A mission that is not producing physical damage yields briefly to
+            // the unchanged Supalosa predecessor. This is a bounded tactical
+            // fallback, not an idle state: the predecessor continues ordinary
+            // combat while the overlay waits before replanning the objective.
+            this.objectiveSuspendedUntilTick = tick + progressPolicy!.blockerNoDamageDeadlineTicks;
+            this.emit({
+                schemaVersion: objectiveTelemetrySchemaVersion(this.policy),
+                event: "decision",
+                informationBoundary: objectiveInformationBoundary(this.policy),
+                tick,
+                mechanism: this.policy.mechanism,
+                decisionKind: "predecessor_fallback",
+                decisionReason: "physical_progress_deadline",
+                selectedBuildingId: this.committedBuildingId,
+                selectedAttackerIds: [],
+                blockerIds: progressDeadlineExpired === "blocker"
+                    ? [...this.committedBlockerIds].sort((left, right) => left - right)
+                    : [],
+                noProgressTicks,
+                physicalNoProgressTicks,
+                lastPhysicalProgressTick: this.lastPhysicalProgressTick,
+                missionStartedTick: this.missionStartedTick,
+                progressDeadlineExpired,
+                terminalReserveReleased,
+            });
+        }
         if (
             this.committedBuildingId !== null &&
-            (!this.buildings.has(this.committedBuildingId) || noProgressTicks >= this.policy.missionLivenessTicks)
+            (!this.buildings.has(this.committedBuildingId) ||
+                (isProgressCertifiedPolicy(this.policy)
+                    ? progressDeadlineExpired !== null
+                    : noProgressTicks >= missionLivenessTicks(this.policy)))
         ) {
             this.committedBuildingId = null;
             this.committedBuildingMadeProgress = false;
             this.committedBlockerClear = false;
             this.committedBlockerIds.clear();
         }
+        if (progressPolicy !== null && tick < this.objectiveSuspendedUntilTick) return;
 
         if (this.buildings.size === 0) {
             this.issueSearch(
@@ -593,12 +717,61 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 },
             };
         });
+        const progressCertifiedMissionOpportunities = progressPolicy !== null
+            ? candidates.map((candidate) => {
+                if (candidate.opportunity.directCompletionTicks === null || candidate.attackers.length === 0) {
+                    return {
+                        ...candidate.opportunity,
+                        directStrikeSurvives: false,
+                        blockerThenBuildingCompletionTicks: null,
+                        missionSwitchPenaltyTicks: progressPolicy.missionSwitchPenaltyTicks,
+                    };
+                }
+                const bound = this.bindThreatState(
+                    game, tick, candidate.target.unit, candidate.attackers, selfUnits,
+                );
+                const classification = classifyObjectiveThreats({
+                    attackers: candidate.attackers.map(({ core }) => core),
+                    building: candidate.opportunity.building,
+                    threats: bound.threats,
+                    baseAssets: bound.baseAssets,
+                    assetThreatProjections: bound.assetThreatProjections,
+                    directCompletionTicks: candidate.opportunity.directCompletionTicks,
+                    thresholds: this.thresholds(),
+                });
+                const directSurvives = classification.uncalibratedStrikeThreatIds.length === 0 &&
+                    (classification.earliestLethalInterceptTick === null ||
+                        candidate.opportunity.directCompletionTicks +
+                            progressPolicy.directCompletionSafetyMarginTicks <
+                                classification.earliestLethalInterceptTick);
+                const blockerIds = [...new Set([
+                    ...classification.blockerIds,
+                    ...classification.uncalibratedStrikeThreatIds,
+                ])].sort((left, right) => left - right);
+                return {
+                    ...candidate.opportunity,
+                    directStrikeSurvives: directSurvives,
+                    blockerThenBuildingCompletionTicks: this.blockerCompletion(
+                        game,
+                        candidate.attackers,
+                        blockerIds,
+                        candidate.opportunity.directCompletionTicks,
+                        bound.threatUnitsById,
+                    ),
+                    missionSwitchPenaltyTicks: progressPolicy.missionSwitchPenaltyTicks,
+                };
+            })
+            : null;
         const retained = this.committedBuildingId !== null &&
             (this.committedBuildingMadeProgress || this.committedBlockerClear) &&
-            noProgressTicks < this.policy.missionLivenessTicks
+            (progressPolicy !== null
+                ? progressDeadlineExpired === null
+                : noProgressTicks < missionLivenessTicks(this.policy))
             ? candidates.find(({ target }) => target.unit.id === this.committedBuildingId)
             : undefined;
-        const rankedIds = rankObjectiveBuildingOpportunities(candidates.map(({ opportunity }) => opportunity))
+        const rankedIds = (progressPolicy !== null
+            ? rankObjectiveMissionOpportunities(progressCertifiedMissionOpportunities!)
+            : rankObjectiveBuildingOpportunities(candidates.map(({ opportunity }) => opportunity)))
             .map(({ building }) => building.id);
         const selected = retained ?? rankedIds.map((id) =>
             candidates.find(({ target }) => target.unit.id === id),
@@ -623,19 +796,28 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 activationReason: this.activationReason ?? undefined,
                 exactEnemyBuildingCount: this.exactEnemyBuildingCount,
                 eligibleAttackerCount: eligible.length,
-                reservedCombatantCount: isContinuousOffensePolicy(this.policy)
+                reservedCombatantCount: managedReserve
                     ? partition.reserved.length
                     : undefined,
-                reservedCombatantIds: isContinuousOffensePolicy(this.policy)
+                reservedCombatantIds: managedReserve
                     ? partition.reserved.map(({ id }) => id).sort((a, b) => a - b)
                     : undefined,
-                reservedActionCounts: isContinuousOffensePolicy(this.policy)
+                reservedActionCounts: managedReserve
                     ? delegatedActionCounts(partition.reserved, new Set())
                     : undefined,
                 certifiedAttackerCount: selected?.attackers.length ?? 0,
                 rejectedAttackerCountsByReason: countReasons(reasons.filter((reason) => reason !== "certified")),
                 delegatedActionCounts: delegatedActionCounts(activeEligible, new Set()),
                 assignedCombatantFraction: 0,
+                lastPhysicalProgressTick: isProgressCertifiedPolicy(this.policy)
+                    ? this.lastPhysicalProgressTick
+                    : undefined,
+                physicalNoProgressTicks: isProgressCertifiedPolicy(this.policy)
+                    ? physicalNoProgressTicks
+                    : undefined,
+                missionStartedTick: isProgressCertifiedPolicy(this.policy) ? this.missionStartedTick : undefined,
+                progressDeadlineExpired: isProgressCertifiedPolicy(this.policy) ? progressDeadlineExpired : undefined,
+                terminalReserveReleased: isProgressCertifiedPolicy(this.policy) ? terminalReserveReleased : undefined,
             });
             return;
         }
@@ -674,10 +856,10 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 reason: retained ? "retain_committed_building" : "direct_objective_progress",
             };
         } else {
-            const terminalMechanism = isTerminalRacePolicy(this.policy) || isContinuousOffensePolicy(this.policy) ||
+            const terminalMechanism = hasPublicObjectiveInterface(this.policy) ||
                 this.policy.mechanism === "terminal_candidate" ||
                 this.policy.mechanism === "full_sufficient_strike";
-            const decide = isContinuousOffensePolicy(this.policy)
+            const decide = isContinuousOffensePolicy(this.policy) || isProgressCertifiedPolicy(this.policy)
                 ? selectContinuousObjectiveMission
                 : selectObjectiveMission;
             decision = decide({
@@ -701,15 +883,15 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 noProgressTicks,
                 thresholds,
                 blockerThenBuildingCompletionTicks,
-                forceEngagementMode: isContinuousOffensePolicy(this.policy)
-                    ? this.policy.forceEngagementMode
+                forceEngagementMode: isContinuousOffensePolicy(this.policy) || isProgressCertifiedPolicy(this.policy)
+                    ? continuousForceEngagementMode(this.policy)
                     : undefined,
             });
         }
 
         let strike = selected.attackers;
         if (
-            (isTerminalRacePolicy(this.policy) || isContinuousOffensePolicy(this.policy) ||
+            (hasPublicObjectiveInterface(this.policy) ||
                 this.policy.mechanism === "full_sufficient_strike") &&
             (decision.kind === "building_strike" || decision.kind === "terminal_candidate_strike")
         ) {
@@ -722,8 +904,8 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             const deadline = Number.isFinite(threatDeadline)
                 ? Math.max(0, threatDeadline - thresholds.directCompletionSafetyMarginTicks - 1)
                 : decision.predictedCompletionTicks;
-            const useFullForce = isContinuousOffensePolicy(this.policy) &&
-                this.policy.strikeGroupMode === "full_compatible_force";
+            const useFullForce = isProgressCertifiedPolicy(this.policy) ||
+                isContinuousOffensePolicy(this.policy) && this.policy.strikeGroupMode === "full_compatible_force";
             const minimum = useFullForce ? null : selectMinimumSufficientObjectiveStrikeGroup({
                 attackers: selected.attackers.map(({ core }) => core),
                 building: selected.opportunity.building,
@@ -732,7 +914,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             if (minimum) {
                 const minimumIds = new Set(minimum.attackers.map(({ id }) => id));
                 const proposed = selected.attackers.filter(({ unit }) => minimumIds.has(unit.id));
-                const rechecked = (isContinuousOffensePolicy(this.policy)
+                const rechecked = (isContinuousOffensePolicy(this.policy) || isProgressCertifiedPolicy(this.policy)
                     ? selectContinuousObjectiveMission
                     : selectObjectiveMission)({
                     attackers: proposed.map(({ core }) => core),
@@ -748,8 +930,8 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                     noProgressTicks,
                     thresholds,
                     blockerThenBuildingCompletionTicks: null,
-                    forceEngagementMode: isContinuousOffensePolicy(this.policy)
-                        ? this.policy.forceEngagementMode
+                    forceEngagementMode: isContinuousOffensePolicy(this.policy) || isProgressCertifiedPolicy(this.policy)
+                        ? continuousForceEngagementMode(this.policy)
                         : undefined,
                 });
                 if (rechecked.kind === "building_strike" || rechecked.kind === "terminal_candidate_strike") {
@@ -765,10 +947,12 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             decision.kind === "blocker_clear"
         ) {
             const nextBlockerClear = decision.kind === "blocker_clear";
+            const missionChanged = this.committedBuildingId !== selected.target.unit.id ||
+                this.committedBlockerClear !== nextBlockerClear;
             if (
-                this.committedBuildingId !== selected.target.unit.id ||
-                this.committedBlockerClear !== nextBlockerClear
+                missionChanged && !isProgressCertifiedPolicy(this.policy)
             ) this.lastProgressTick = tick;
+            if (missionChanged && isProgressCertifiedPolicy(this.policy)) this.missionStartedTick = tick;
             this.committedBuildingId = selected.target.unit.id;
             this.committedBlockerClear = nextBlockerClear;
             this.committedBlockerIds = new Set(
@@ -806,13 +990,13 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             activationReason: this.activationReason ?? undefined,
             exactEnemyBuildingCount: this.exactEnemyBuildingCount,
             eligibleAttackerCount: eligible.length,
-            reservedCombatantCount: isContinuousOffensePolicy(this.policy)
+            reservedCombatantCount: managedReserve
                 ? partition.reserved.length
                 : undefined,
-            reservedCombatantIds: isContinuousOffensePolicy(this.policy)
+            reservedCombatantIds: managedReserve
                 ? partition.reserved.map(({ id }) => id).sort((a, b) => a - b)
                 : undefined,
-            reservedActionCounts: isContinuousOffensePolicy(this.policy)
+            reservedActionCounts: managedReserve
                 ? delegatedActionCounts(partition.reserved, new Set())
                 : undefined,
             certifiedAttackerCount: selected.attackers.length,
@@ -825,6 +1009,24 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 new Set(strike.map(({ unit }) => unit.id)),
             ),
             assignedCombatantFraction: activeEligible.length === 0 ? 0 : strike.length / activeEligible.length,
+            lastPhysicalProgressTick: isProgressCertifiedPolicy(this.policy)
+                ? this.lastPhysicalProgressTick
+                : undefined,
+            physicalNoProgressTicks: isProgressCertifiedPolicy(this.policy)
+                ? physicalNoProgressTicks
+                : undefined,
+            missionStartedTick: isProgressCertifiedPolicy(this.policy) ? this.missionStartedTick : undefined,
+            progressDeadlineExpired: isProgressCertifiedPolicy(this.policy) ? progressDeadlineExpired : undefined,
+            terminalReserveReleased: isProgressCertifiedPolicy(this.policy) ? terminalReserveReleased : undefined,
+            completeMissionCostTicks: isProgressCertifiedPolicy(this.policy)
+                ? (classification.uncalibratedStrikeThreatIds.length === 0 &&
+                    (classification.earliestLethalInterceptTick === null ||
+                        selected.opportunity.directCompletionTicks! +
+                            thresholds.directCompletionSafetyMarginTicks <
+                                classification.earliestLethalInterceptTick)
+                    ? selected.opportunity.directCompletionTicks
+                    : blockerThenBuildingCompletionTicks)
+                : undefined,
         });
     }
 
@@ -835,7 +1037,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             baseDefenseHorizonTicks: this.policy.baseDefenseHorizonTicks,
             blockerLethalDamageFraction: this.policy.blockerLethalDamageFraction,
             directCompletionSafetyMarginTicks: this.policy.directCompletionSafetyMarginTicks,
-            missionLivenessTicks: this.policy.missionLivenessTicks,
+            missionLivenessTicks: missionLivenessTicks(this.policy),
         };
     }
 
@@ -845,7 +1047,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         searchCoverageFraction: number;
         requiredSearchCoverageFraction: number;
     } {
-        const exact = (isTerminalRacePolicy(this.policy) || isContinuousOffensePolicy(this.policy)) &&
+        const exact = hasPublicObjectiveInterface(this.policy) &&
             this.policy.informationInterface === "public_complete_state" &&
             this.exactEnemyBuildingCount !== null;
         return {
@@ -952,7 +1154,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         const forceAttackers: ObjectiveForceAttacker[] = attackers.flatMap(({ unit }) => {
             const divisors = new Map(blockers.map((target) => [target.id, armorDivisor(game, target)]));
             const multipliers = mechanicsMultipliers(game, unit);
-            const friendlyCalibrationMode = isTerminalRacePolicy(this.policy) || isContinuousOffensePolicy(this.policy)
+            const friendlyCalibrationMode = hasPublicObjectiveInterface(this.policy)
                 ? this.policy.friendlyCalibrationMode
                 : null;
             const envelope = calibrateObjectiveAttackerEnvelope(
@@ -1085,7 +1287,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             tick,
             mechanism: this.policy.mechanism,
             decisionKind: "search",
-            decisionReason: noProgressTicks >= this.policy.missionLivenessTicks
+            decisionReason: noProgressTicks >= missionLivenessTicks(this.policy)
                 ? "offensive_liveness_deadline"
                 : "no_known_building",
             selectedBuildingId: null,
@@ -1110,7 +1312,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
     }
 
     private updateMemory(game: GameApi, playerName: string, tick: number): void {
-        const publicComplete = (isTerminalRacePolicy(this.policy) || isContinuousOffensePolicy(this.policy)) &&
+        const publicComplete = hasPublicObjectiveInterface(this.policy) &&
             this.policy.informationInterface === "public_complete_state";
         const actuallyVisibleEnemyIds = new Set(game.getVisibleUnits(playerName, "enemy"));
         const visibleBuildings = publicComplete
@@ -1133,6 +1335,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             const madeProgress = previous !== undefined && unit.hitPoints < previous.unit.hitPoints;
             if (madeProgress) {
                 this.lastProgressTick = tick;
+                this.lastPhysicalProgressTick = tick;
                 if (this.committedBuildingId === unit.id) this.committedBuildingMadeProgress = true;
             }
             this.buildings.set(unit.id, {
@@ -1155,6 +1358,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                     this.committedBlockerClear = false;
                     this.committedBlockerIds.clear();
                     this.lastProgressTick = tick;
+                    this.lastPhysicalProgressTick = tick;
                 }
                 continue;
             }
@@ -1168,6 +1372,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                     this.committedBlockerClear = false;
                     this.committedBlockerIds.clear();
                     this.lastProgressTick = tick;
+                    this.lastPhysicalProgressTick = tick;
                 }
             }
         }
@@ -1192,7 +1397,10 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             if (
                 previous && unit.hitPoints < previous.unit.hitPoints &&
                 this.committedBlockerIds.has(unit.id)
-            ) this.lastProgressTick = tick;
+            ) {
+                this.lastProgressTick = tick;
+                this.lastPhysicalProgressTick = tick;
+            }
             this.threats.set(unit.id, {
                 unit: snapshotUnit(unit),
                 visible: actuallyVisibleEnemyIds.has(unit.id),
@@ -1204,13 +1412,19 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             if (visibleThreatIds.has(id)) continue;
             if (publicComplete) {
                 this.threats.delete(id);
-                if (this.committedBlockerIds.delete(id)) this.lastProgressTick = tick;
+                if (this.committedBlockerIds.delete(id)) {
+                    this.lastProgressTick = tick;
+                    this.lastPhysicalProgressTick = tick;
+                }
                 continue;
             }
             remembered.visible = false;
             if (this.uncertaintyRegionFullyObserved(game, playerName, remembered, tick)) {
                 this.threats.delete(id);
-                if (this.committedBlockerIds.delete(id)) this.lastProgressTick = tick;
+                if (this.committedBlockerIds.delete(id)) {
+                    this.lastProgressTick = tick;
+                    this.lastPhysicalProgressTick = tick;
+                }
             }
         }
         if (invalidated.length > 0) {
@@ -1313,7 +1527,9 @@ export const createTerminalObjectiveCandidate = (
     rawPolicy: ObjectiveOverlayPolicy,
     telemetry: TelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 3
+    const policy = rawPolicy.schemaVersion === 4
+        ? validateProgressCertifiedConversionPolicy(rawPolicy as ProgressCertifiedConversionPolicy)
+        : rawPolicy.schemaVersion === 3
         ? validateContinuousOffensePolicy(rawPolicy as ContinuousOffensePolicy)
         : rawPolicy.schemaVersion === 2
           ? validateTerminalRacePolicy(rawPolicy as TerminalRacePolicy)
