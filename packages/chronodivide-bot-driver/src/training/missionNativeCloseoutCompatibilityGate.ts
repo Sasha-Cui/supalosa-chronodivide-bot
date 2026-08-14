@@ -20,13 +20,13 @@ import { METHOD_V5_EQUIVALENCE_MAP_SHA256 } from "./methodV5BaselineEquivalence.
 import { sha256File } from "./methodV5PlanRunner.js";
 import { createMissionNativeCloseoutCandidate } from "./missionNativeCloseoutCandidate.js";
 import {
-    MissionNativeCloseoutPolicyV2,
-    buildMissionNativeCloseoutPolicyV2,
-    missionNativeCloseoutPolicyV2Sha256,
-} from "./missionNativeCloseoutPolicyV2.js";
+    MissionNativeCloseoutPolicyV3,
+    buildMissionNativeCloseoutPolicyV3,
+    missionNativeCloseoutPolicyV3Sha256,
+} from "./missionNativeCloseoutPolicyV3.js";
 
 export const MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_MAX_TICKS = 5_400 as const;
-export const MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_ENGINE_SEED_BASE = 3_960_000_000 as const;
+export const MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_ENGINE_SEED_BASE = 3_970_000_000 as const;
 export const MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT = 4 as const;
 
 type Factory = Awaited<ReturnType<typeof loadBaselineFactory>>;
@@ -133,7 +133,7 @@ const run = async (args: {
     country: Countries;
     candidateSlot: 0 | 1;
     requestedEngineSeed: number;
-    policy: MissionNativeCloseoutPolicyV2 | null;
+    policy: MissionNativeCloseoutPolicyV3 | null;
 }): Promise<RunTrace> => {
     const { factory, mapName, country, candidateSlot, requestedEngineSeed, policy } = args;
     const telemetry: BuildingEliminationTelemetryEvent[] = [];
@@ -208,9 +208,10 @@ export const validateMissionNativeCloseoutExposure = (
     const decisions = telemetry.filter((event): event is Extract<BuildingEliminationTelemetryEvent, {
         event: "engagement_decision";
     }> => event.event === "engagement_decision");
-    if (!decisions.some(({ phase }) => phase === "building_strike")) {
-        throw new Error(`No mission-native building-strike decision for ${country} slot ${slot}`);
-    }
+    const allocations = telemetry.filter((event): event is Extract<BuildingEliminationTelemetryEvent, {
+        event: "engagement_allocation";
+    }> => event.event === "engagement_allocation");
+    if (decisions.length === 0) throw new Error(`No engagement decision for ${country} slot ${slot}`);
     for (const decision of decisions) {
         if (decision.schemaVersion !== 3) {
             throw new Error(`Engagement-decision schema drifted for ${country} slot ${slot}`);
@@ -256,6 +257,23 @@ export const validateMissionNativeCloseoutExposure = (
             throw new Error(`Unknown engagement certificate for ${country} slot ${slot}`);
         }
     }
+    if (allocations.length === 0) {
+        throw new Error(`No mission-native engagement allocation for ${country} slot ${slot}`);
+    }
+    for (const allocation of allocations) {
+        if (
+            allocation.schemaVersion !== 4 || allocation.assignedAttackerCount <= 0 ||
+            allocation.buildingAttackerCount < 1 ||
+            allocation.buildingAttackerCount + allocation.blockerAttackerCount !==
+                allocation.assignedAttackerCount ||
+            allocation.buildingAttackerCount < Math.ceil(allocation.assignedAttackerCount / 2) ||
+            allocation.blockerAttackerCount > Math.floor(allocation.assignedAttackerCount / 2) ||
+            allocation.inRangeBuildingAttackerCount > allocation.buildingAttackerCount ||
+            (allocation.blockerId === null && allocation.blockerAttackerCount !== 0)
+        ) {
+            throw new Error(`Invalid bounded-screen allocation for ${country} slot ${slot}`);
+        }
+    }
     const progress = telemetry.filter((event): event is Extract<BuildingEliminationTelemetryEvent, {
         event: "target_progress";
     }> => event.event === "target_progress");
@@ -289,6 +307,9 @@ export const summarizeMissionNativeCloseoutTelemetry = (
     const decisions = telemetry.filter((event): event is Extract<BuildingEliminationTelemetryEvent, {
         event: "engagement_decision";
     }> => event.event === "engagement_decision");
+    const allocations = telemetry.filter((event): event is Extract<BuildingEliminationTelemetryEvent, {
+        event: "engagement_allocation";
+    }> => event.event === "engagement_allocation");
     const numericRange = (values: Array<number | null>): [number, number] | null => {
         const finite = values.filter((value): value is number => value !== null && Number.isFinite(value));
         return finite.length === 0 ? null : [Math.min(...finite), Math.max(...finite)];
@@ -327,6 +348,16 @@ export const summarizeMissionNativeCloseoutTelemetry = (
         earliestRouteThreatInterceptTickRange: numericRange(
             decisions.map(({ earliestRouteThreatInterceptTicks }) => earliestRouteThreatInterceptTicks),
         ),
+        buildingAttackerCountRange: allocations.length === 0 ? null : [
+            Math.min(...allocations.map(({ buildingAttackerCount }) => buildingAttackerCount)),
+            Math.max(...allocations.map(({ buildingAttackerCount }) => buildingAttackerCount)),
+        ],
+        blockerAttackerCountRange: allocations.length === 0 ? null : [
+            Math.min(...allocations.map(({ blockerAttackerCount }) => blockerAttackerCount)),
+            Math.max(...allocations.map(({ blockerAttackerCount }) => blockerAttackerCount)),
+        ],
+        splitAllocationCount: allocations.filter(({ blockerAttackerCount }) => blockerAttackerCount > 0).length,
+        pureBuildingAllocationCount: allocations.filter(({ blockerAttackerCount }) => blockerAttackerCount === 0).length,
         preemptedMissions: [...new Set(telemetry.flatMap((event) =>
             event.event === "activated" ? event.preemptedMissions : [],
         ))].sort(),
@@ -345,8 +376,8 @@ const main = async (): Promise<void> => {
         throw new Error("Mission-native compatibility map bytes drifted");
     }
     const factory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
-    const disabledPolicy = buildMissionNativeCloseoutPolicyV2(false);
-    const enabledPolicy = buildMissionNativeCloseoutPolicyV2(true);
+    const disabledPolicy = buildMissionNativeCloseoutPolicyV3(false);
+    const enabledPolicy = buildMissionNativeCloseoutPolicyV3(true);
     const rows: Array<Record<string, unknown>> = [];
     await cdapi.init(path.join(process.cwd(), "data"));
     let index = 0;
@@ -423,9 +454,9 @@ const main = async (): Promise<void> => {
         mixDir: path.join(process.cwd(), "data"),
         maps: [mapName],
         effectiveConfig: {
-            purpose: "outcome-free-mission-native-completion-race-and-building-damage-v2",
-            disabledPolicyId: missionNativeCloseoutPolicyV2Sha256(disabledPolicy),
-            enabledPolicyId: missionNativeCloseoutPolicyV2Sha256(enabledPolicy),
+            purpose: "outcome-free-mission-native-bounded-screen-and-building-damage-v3",
+            disabledPolicyId: missionNativeCloseoutPolicyV3Sha256(disabledPolicy),
+            enabledPolicyId: missionNativeCloseoutPolicyV3Sha256(enabledPolicy),
             countries: Object.values(Countries),
             reciprocalSlots: [0, 1],
             runsPerCountrySlot: MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT,
@@ -449,40 +480,36 @@ const main = async (): Promise<void> => {
             : [];
     }));
     if (targetNames.size < 2) globalValidationErrors.push("Native mission exercised fewer than two building types");
-    const engagementReasons = new Set(rows.flatMap((row) => {
-        const summary = row.enabledTelemetrySummary as { engagementReasons?: unknown } | undefined;
-        return summary?.engagementReasons && typeof summary.engagementReasons === "object"
-            ? Object.keys(summary.engagementReasons)
-            : [];
-    }));
-    const engagementPhases = new Set(rows.flatMap((row) => {
-        const summary = row.enabledTelemetrySummary as { engagementPhases?: unknown } | undefined;
-        return summary?.engagementPhases && typeof summary.engagementPhases === "object"
-            ? Object.keys(summary.engagementPhases)
-            : [];
-    }));
-    if (!engagementPhases.has("blocker_clear")) {
-        globalValidationErrors.push("Native mission never exercised the blocker-clear branch");
+    const splitAllocationCount = rows.reduce((sum, row) => {
+        const summary = row.enabledTelemetrySummary as { splitAllocationCount?: unknown } | undefined;
+        return sum + (typeof summary?.splitAllocationCount === "number" ? summary.splitAllocationCount : 0);
+    }, 0);
+    const pureBuildingAllocationCount = rows.reduce((sum, row) => {
+        const summary = row.enabledTelemetrySummary as { pureBuildingAllocationCount?: unknown } | undefined;
+        return sum + (typeof summary?.pureBuildingAllocationCount === "number"
+            ? summary.pureBuildingAllocationCount
+            : 0);
+    }, 0);
+    if (splitAllocationCount === 0) {
+        globalValidationErrors.push("Native mission never exercised the bounded blocker screen");
     }
-    if (!engagementPhases.has("building_strike") || ![
-        "building_in_range", "building_completion_race", "no_route_threat", "direct_building",
-    ].some((reason) => engagementReasons.has(reason))) {
-        globalValidationErrors.push("Native mission never exercised a certified building-strike branch");
+    if (pureBuildingAllocationCount === 0) {
+        globalValidationErrors.push("Native mission never exercised a pure building allocation");
     }
     const passed = rows.every((row) => row.passed === true) && globalValidationErrors.length === 0;
     const output = {
-        schemaVersion: 2,
+        schemaVersion: 3,
         status: passed
-            ? "PASS_OUTCOME_FREE_MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_V2"
-            : "FAIL_OUTCOME_FREE_MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_V2",
+            ? "PASS_OUTCOME_FREE_MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_V3"
+            : "FAIL_OUTCOME_FREE_MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_V3",
         generatedAt: new Date().toISOString(),
         passed,
         outcomeFree: true,
         sourceGitCommit: manifest.source.gitCommit,
         scheduler: manifest.scheduler,
         externalBaseline: manifest.software.baseline,
-        disabledPolicyId: missionNativeCloseoutPolicyV2Sha256(disabledPolicy),
-        enabledPolicyId: missionNativeCloseoutPolicyV2Sha256(enabledPolicy),
+        disabledPolicyId: missionNativeCloseoutPolicyV3Sha256(disabledPolicy),
+        enabledPolicyId: missionNativeCloseoutPolicyV3Sha256(enabledPolicy),
         countryCount: Object.values(Countries).length,
         reciprocalSlotCount: 2,
         gameCount: rows.length * MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT,
@@ -498,7 +525,7 @@ const main = async (): Promise<void> => {
         status: output.status,
         gameCount: output.gameCount,
     }));
-    if (!passed) throw new Error("Mission-native closeout compatibility-v2 failed; preserved diagnostic artifact");
+    if (!passed) throw new Error("Mission-native closeout compatibility-v3 failed; preserved diagnostic artifact");
 };
 
 const invoked = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : null;

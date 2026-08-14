@@ -54,6 +54,19 @@ const trace = (): BuildingEliminationTelemetryEvent[] => [
         earliestRouteThreatInterceptTicks: 30,
     },
     {
+        schemaVersion: 4,
+        event: "engagement_allocation",
+        tick: 2_703,
+        targetId: 100,
+        targetName: "GAPOWR",
+        blockerId: null,
+        blockerName: null,
+        assignedAttackerCount: 4,
+        buildingAttackerCount: 4,
+        blockerAttackerCount: 0,
+        inRangeBuildingAttackerCount: 0,
+    },
+    {
         schemaVersion: 2,
         event: "target_progress",
         tick: 2_706,
@@ -79,6 +92,9 @@ describe("mission-native closeout outcome-blind gate", () => {
             engagementReasons: { building_completion_race: 1 },
             estimatedBuildingCompletionTickRange: [120, 120],
             estimatedForceSurvivalTickRange: [180, 180],
+            buildingAttackerCountRange: [4, 4],
+            blockerAttackerCountRange: [0, 0],
+            pureBuildingAllocationCount: 1,
             preemptedMissions: ["attack_1"],
         });
     });
@@ -127,6 +143,16 @@ describe("mission-native closeout outcome-blind gate", () => {
             estimatedBuildingCompletionTicks: 181,
             estimatedForceSurvivalTicks: 180,
         });
+        const allocation = events.find((event) => event.event === "engagement_allocation") as Extract<
+            BuildingEliminationTelemetryEvent,
+            { event: "engagement_allocation" }
+        >;
+        Object.assign(allocation, {
+            blockerId: 400,
+            blockerName: "HTNK",
+            buildingAttackerCount: 2,
+            blockerAttackerCount: 2,
+        });
         events.push({
             ...decision,
             phase: "building_strike",
@@ -135,5 +161,22 @@ describe("mission-native closeout outcome-blind gate", () => {
             blockerName: null,
         });
         expect(() => validateMissionNativeCloseoutExposure(events, Countries.USA, 0)).not.toThrow();
+    });
+
+    it("rejects an allocation that diverts more than half the assault force", () => {
+        const events = trace();
+        const allocation = events.find((event) => event.event === "engagement_allocation") as Extract<
+            BuildingEliminationTelemetryEvent,
+            { event: "engagement_allocation" }
+        >;
+        Object.assign(allocation, {
+            blockerId: 400,
+            blockerName: "E1",
+            buildingAttackerCount: 1,
+            blockerAttackerCount: 3,
+        });
+        expect(() => validateMissionNativeCloseoutExposure(events, Countries.USA, 0)).toThrow(
+            /bounded-screen allocation/,
+        );
     });
 });
