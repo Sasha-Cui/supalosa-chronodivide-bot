@@ -14,6 +14,7 @@ import {
     getBuildingCapabilityUnitMissionAction,
     getBuildingEliminationAssaultProductionAction,
     getBuildingEliminationGroundAssaultUnitName,
+    getBuildingEliminationGroundAssaultStructureName,
     getBuildingTargetWeight,
     getAssignedBuildingEliminationMissionName,
     isPreemptibleBuildingEliminationMission,
@@ -341,6 +342,8 @@ describe("building elimination policy", () => {
     test("requests the side-generic main battle tank up to the frozen ceiling", () => {
         expect(getBuildingEliminationGroundAssaultUnitName(SideType.Nod)).toBe("HTNK");
         expect(getBuildingEliminationGroundAssaultUnitName(SideType.GDI)).toBe("MTNK");
+        expect(getBuildingEliminationGroundAssaultStructureName(SideType.Nod)).toBe("NAWEAP");
+        expect(getBuildingEliminationGroundAssaultStructureName(SideType.GDI)).toBe("GAWEAP");
         expect(getBuildingEliminationAssaultProductionAction([], "MTNK", 3, 4, 140)).toEqual({
             type: "request",
             unitNameToPriority: { MTNK: 140 },
@@ -867,6 +870,7 @@ describe("building elimination policy", () => {
             "adaptiveAirTargetCount",
             "adaptiveNavalTargetCount",
             "adaptiveGroundAssaultTargetCount",
+            "adaptiveGroundAssaultInfrastructure",
             "adaptiveProductionPriority",
             "adaptiveTechPriority",
             "activationMode",

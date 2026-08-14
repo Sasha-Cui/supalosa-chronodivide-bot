@@ -60,6 +60,7 @@ export type BuildingEliminationOptions = {
     adaptiveAirTargetCount?: number;
     adaptiveNavalTargetCount?: number;
     adaptiveGroundAssaultTargetCount?: number;
+    adaptiveGroundAssaultInfrastructure?: boolean;
     adaptiveProductionPriority?: number;
     adaptiveTechPriority?: number;
     activationMode?: BuildingEliminationActivationMode;
@@ -304,6 +305,16 @@ export type BuildingEliminationTelemetryEvent =
           estimatedRouteClearanceTicks: number | null;
       }
     | {
+          schemaVersion: 13;
+          event: "assault_infrastructure";
+          tick: number;
+          side: SideType.Nod | SideType.GDI;
+          structureName: "NAWEAP" | "GAWEAP";
+          currentCount: number;
+          available: boolean;
+          requested: boolean;
+      }
+    | {
           schemaVersion: 10;
           event: "launch_handoff";
           tick: number;
@@ -343,6 +354,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     adaptiveAirTargetCount: 0,
     adaptiveNavalTargetCount: 0,
     adaptiveGroundAssaultTargetCount: 0,
+    adaptiveGroundAssaultInfrastructure: false,
     adaptiveProductionPriority: 140,
     adaptiveTechPriority: 130,
     activationMode: "forceAdvantage",
@@ -422,6 +434,11 @@ export const resolveBuildingEliminationOptions = (
             `Invalid building-elimination contact-only blocker clearance: ${resolved.contactOnlyBlockerClearance}`,
         );
     }
+    if (typeof resolved.adaptiveGroundAssaultInfrastructure !== "boolean") {
+        throw new Error(
+            `Invalid building-elimination ground-assault infrastructure: ${resolved.adaptiveGroundAssaultInfrastructure}`,
+        );
+    }
     return resolved;
 };
 
@@ -429,6 +446,7 @@ const BUILDING_ELIMINATION_MISSION_NAME = "buildingElimination";
 const BUILDING_ELIMINATION_CAPABILITY_BUILD_MISSION_NAME = "buildingEliminationCapabilityBuild";
 const BUILDING_ELIMINATION_CAPABILITY_UNIT_MISSION_NAME = "buildingEliminationCapabilityUnits";
 const BUILDING_ELIMINATION_ASSAULT_PRODUCTION_MISSION_NAME = "buildingEliminationAssaultProduction";
+const BUILDING_ELIMINATION_ASSAULT_BUILD_MISSION_NAME = "buildingEliminationAssaultBuild";
 const BUILDING_ELIMINATION_PRIORITY = 300;
 const BUILDING_ELIMINATION_READINESS_RESERVE_PRIORITY = 290;
 const BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME = "buildingEliminationReadinessReserve";
@@ -2155,6 +2173,10 @@ export const getBuildingEliminationGroundAssaultUnitName = (
     side: SideType.Nod | SideType.GDI,
 ): "HTNK" | "MTNK" => side === SideType.Nod ? "HTNK" : "MTNK";
 
+export const getBuildingEliminationGroundAssaultStructureName = (
+    side: SideType.Nod | SideType.GDI,
+): "NAWEAP" | "GAWEAP" => side === SideType.Nod ? "NAWEAP" : "GAWEAP";
+
 export const getBuildingEliminationAssaultProductionAction = (
     assignedUnitIds: number[],
     unitName: "HTNK" | "MTNK",
@@ -2165,6 +2187,93 @@ export const getBuildingEliminationAssaultProductionAction = (
     if (assignedUnitIds.length > 0) return releaseUnits(assignedUnitIds);
     return currentCount < targetCount ? requestUnits({ [unitName]: priority }) : noop();
 };
+
+class BuildingEliminationAssaultBuildMission extends Mission {
+    private lastTelemetrySignature = "";
+    private lastTelemetryAt = Number.NEGATIVE_INFINITY;
+
+    constructor(
+        private options: Required<BuildingEliminationOptions>,
+        private closeoutLatch: BuildingEliminationCloseoutLatch,
+        logger: DebugLogger,
+        private telemetrySink: BuildingEliminationTelemetrySink,
+    ) {
+        super(BUILDING_ELIMINATION_ASSAULT_BUILD_MISSION_NAME, logger);
+    }
+
+    _onAiUpdate(context: MissionContext): MissionAction {
+        const side = getPlayerSide(context);
+        if (side === null || context.game.getCurrentTick() < this.options.minTick) return noop();
+        if (!shouldRunBuildingEliminationCapabilityProduction(
+            this.closeoutLatch.activated,
+            isBuildingEliminationCloseoutState(context, this.options),
+        )) return noop();
+        const structureName = getBuildingEliminationGroundAssaultStructureName(side);
+        const currentCount = countOwnVisibleUnits(context, structureName);
+        const availableRules = [
+            ...context.player.production.getAvailableObjects(QueueType.Structures),
+            ...context.player.production.getAvailableObjects(QueueType.Armory),
+        ].find(({ name }) => name === structureName);
+        const playerData = context.game.getPlayerData(context.player.name);
+        const buildingRules = BUILDING_NAME_TO_RULES.get(structureName);
+        const location = currentCount === 0 && availableRules
+            ? buildingRules?.getPlacementLocation(context.game, playerData, availableRules) ??
+                getDefaultPlacementLocation(context.game, playerData, playerData.startLocation, availableRules)
+            : null;
+        const requested = currentCount === 0 && location !== null && location !== undefined;
+        this.emitTelemetry(
+            context.game.getCurrentTick(),
+            side,
+            structureName,
+            currentCount,
+            availableRules !== undefined,
+            requested,
+        );
+        return requested && location
+            ? buildStructureAtLocation(
+                structureName,
+                this.options.adaptiveTechPriority,
+                location.rx,
+                location.ry,
+            )
+            : noop();
+    }
+
+    getGlobalDebugText(): string | undefined {
+        return "finish assault infrastructure";
+    }
+
+    getPriority(): number {
+        return 0;
+    }
+
+    private emitTelemetry(
+        tick: number,
+        side: SideType.Nod | SideType.GDI,
+        structureName: "NAWEAP" | "GAWEAP",
+        currentCount: number,
+        available: boolean,
+        requested: boolean,
+    ): void {
+        const event: Extract<BuildingEliminationTelemetryEvent, { event: "assault_infrastructure" }> = {
+            schemaVersion: 13,
+            event: "assault_infrastructure",
+            tick,
+            side,
+            structureName,
+            currentCount,
+            available,
+            requested,
+        };
+        const signature = JSON.stringify({ ...event, tick: 0 });
+        if (signature === this.lastTelemetrySignature && tick < this.lastTelemetryAt + TELEMETRY_HEARTBEAT_TICKS) {
+            return;
+        }
+        this.lastTelemetrySignature = signature;
+        this.lastTelemetryAt = tick;
+        this.telemetrySink(event);
+    }
+}
 
 class BuildingEliminationAssaultProductionMission extends Mission {
     private lastTelemetrySignature = "";
@@ -2843,7 +2952,8 @@ export class BuildingEliminationMissionFactory {
         const needsCapabilityProduction = this.options.adaptiveAirTargetCount > 0 ||
             this.options.adaptiveNavalTargetCount > 0;
         const needsAssaultProduction = this.options.adaptiveGroundAssaultTargetCount > 0;
-        if (!needsCapabilityProduction && !needsAssaultProduction) return;
+        const needsAssaultInfrastructure = this.options.adaptiveGroundAssaultInfrastructure;
+        if (!needsCapabilityProduction && !needsAssaultProduction && !needsAssaultInfrastructure) return;
         const names = new Set(missionController.getMissions().map((mission) => mission.getUniqueName()));
         if (needsCapabilityProduction && !names.has(BUILDING_ELIMINATION_CAPABILITY_BUILD_MISSION_NAME)) {
             missionController.addMission(
@@ -2869,6 +2979,16 @@ export class BuildingEliminationMissionFactory {
         if (needsAssaultProduction && !names.has(BUILDING_ELIMINATION_ASSAULT_PRODUCTION_MISSION_NAME)) {
             missionController.addMission(
                 new BuildingEliminationAssaultProductionMission(
+                    this.options,
+                    this.closeoutLatch,
+                    logger,
+                    this.telemetrySink,
+                ),
+            );
+        }
+        if (needsAssaultInfrastructure && !names.has(BUILDING_ELIMINATION_ASSAULT_BUILD_MISSION_NAME)) {
+            missionController.addMission(
+                new BuildingEliminationAssaultBuildMission(
                     this.options,
                     this.closeoutLatch,
                     logger,
