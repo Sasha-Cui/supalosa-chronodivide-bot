@@ -275,7 +275,7 @@ export type BuildingEliminationTelemetryEvent =
           estimatedRouteClearanceTicks: number | null;
       }
     | {
-          schemaVersion: 11;
+          schemaVersion: 11 | 14;
           event: "assault_production";
           tick: number;
           side: SideType.Nod | SideType.GDI;
@@ -283,6 +283,10 @@ export type BuildingEliminationTelemetryEvent =
           targetCount: number;
           currentCount: number;
           requested: boolean;
+          available?: boolean;
+          credits?: number;
+          vehicleQueueStatus?: number;
+          vehicleQueueItems?: Array<{ name: string; quantity: number }>;
       }
     | {
           schemaVersion: 12;
@@ -2325,7 +2329,20 @@ class BuildingEliminationAssaultProductionMission extends Mission {
         const unitName = getBuildingEliminationGroundAssaultUnitName(side);
         const currentCount = countOwnVisibleUnits(context, unitName);
         const requested = currentCount < this.options.adaptiveGroundAssaultTargetCount;
-        this.emitTelemetry(context.game.getCurrentTick(), side, unitName, currentCount, requested);
+        const available = context.player.production.getAvailableObjects(QueueType.Vehicles)
+            .some(({ name }) => name === unitName);
+        const vehicleQueue = context.player.production.getQueueData(QueueType.Vehicles);
+        this.emitTelemetry(
+            context.game.getCurrentTick(),
+            side,
+            unitName,
+            currentCount,
+            requested,
+            available,
+            context.game.getPlayerData(context.player.name).credits,
+            vehicleQueue.status,
+            vehicleQueue.items.map(({ rules, quantity }) => ({ name: rules.name, quantity })),
+        );
         return getBuildingEliminationAssaultProductionAction(
             [],
             unitName,
@@ -2353,9 +2370,13 @@ class BuildingEliminationAssaultProductionMission extends Mission {
         unitName: "HTNK" | "MTNK",
         currentCount: number,
         requested: boolean,
+        available: boolean,
+        credits: number,
+        vehicleQueueStatus: number,
+        vehicleQueueItems: Array<{ name: string; quantity: number }>,
     ): void {
         const event: Extract<BuildingEliminationTelemetryEvent, { event: "assault_production" }> = {
-            schemaVersion: 11,
+            schemaVersion: 14,
             event: "assault_production",
             tick,
             side,
@@ -2363,6 +2384,10 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             targetCount: this.options.adaptiveGroundAssaultTargetCount,
             currentCount,
             requested,
+            available,
+            credits,
+            vehicleQueueStatus,
+            vehicleQueueItems,
         };
         const signature = JSON.stringify({ ...event, tick: 0 });
         if (signature === this.lastTelemetrySignature && tick < this.lastTelemetryAt + TELEMETRY_HEARTBEAT_TICKS) {
