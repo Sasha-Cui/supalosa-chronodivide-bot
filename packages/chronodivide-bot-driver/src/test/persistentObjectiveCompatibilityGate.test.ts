@@ -9,7 +9,7 @@ import { PersistentObjectiveCompletionTelemetry } from "../training/persistentOb
 const decision = (
     changes: Partial<PersistentObjectiveCompletionTelemetry> = {},
 ): PersistentObjectiveCompletionTelemetry => ({
-    schemaVersion: 1,
+    schemaVersion: 2,
     event: "objective_completion_decision",
     informationInterface: "public_complete_state",
     tick: 3,
@@ -23,6 +23,7 @@ const decision = (
     targetArmor: "8",
     targetHitPoints: 1_000,
     blockerId: null,
+    blockerRulesName: null,
     selectedAttackerIds: [1],
     selectedAttackerRulesNames: ["MTNK"],
     buildingDamageSincePreviousDecision: 100,
@@ -102,6 +103,20 @@ describe("persistent objective outcome-blind compatibility gate", () => {
         )).toThrow(/Minimum viable detachment/);
     });
 
+    it("accepts a preemptive blocker clear followed by physical building damage", () => {
+        const blocker = decision({
+            phase: "blocker_clear",
+            reason: "preemptive_route_interception_blocker",
+            blockerId: 200,
+            blockerRulesName: "E1",
+            buildingDamageSincePreviousDecision: 0,
+            issuedOrder: "attack_blocker",
+        });
+        expect(() => validatePersistentObjectiveCompatibilityExposure(
+            [blocker, decision({ tick: 6 })], Countries.USA, 0,
+        )).not.toThrow();
+    });
+
     it("rejects taking more than half of a larger locked offensive mission", () => {
         const base = decision().unitDiagnostics[0];
         const row = decision({
@@ -142,6 +157,10 @@ describe("persistent objective outcome-blind compatibility gate", () => {
             selectedObservations: 1,
             selectedFractionOfCompatibleObservations: 1,
             selectedActionCounts: { moving: 1 },
+            targetRulesNameCounts: { GACNST: 1 },
+            blockerRulesNameCounts: {},
+            selectedUnitDisappearanceTransitions: 0,
+            selectedUnitDeselectionTransitions: 0,
             buildingDamageEvents: 1,
             buildingDamage: 100,
             rules: {

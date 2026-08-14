@@ -17,10 +17,10 @@ import { derivePairedEngineSeed, withSeededOfflineGame } from "../benchmark/seed
 import { METHOD_V5_EQUIVALENCE_MAP_SHA256 } from "./methodV5BaselineEquivalence.js";
 import { sha256File } from "./methodV5PlanRunner.js";
 import {
-    PersistentObjectiveCompletionPolicyV3,
-    buildPersistentObjectiveCompletionPolicyV3,
-    persistentObjectiveCompletionPolicyV3Sha256,
-} from "./persistentObjectiveCompletionPolicyV3.js";
+    PersistentObjectiveCompletionPolicyV4,
+    buildPersistentObjectiveCompletionPolicyV4,
+    persistentObjectiveCompletionPolicyV4Sha256,
+} from "./persistentObjectiveCompletionPolicyV4.js";
 import {
     PersistentObjectiveCompletionTelemetry,
     createPersistentObjectiveCompletionCandidate,
@@ -28,7 +28,7 @@ import {
 } from "./persistentObjectiveCompletionStrategy.js";
 
 export const PERSISTENT_OBJECTIVE_COMPATIBILITY_MAX_TICKS = 5_400 as const;
-export const PERSISTENT_OBJECTIVE_COMPATIBILITY_ENGINE_SEED_BASE = 4_280_000_000 as const;
+export const PERSISTENT_OBJECTIVE_COMPATIBILITY_ENGINE_SEED_BASE = 4_290_000_000 as const;
 export const PERSISTENT_OBJECTIVE_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT = 4 as const;
 
 type Factory = Awaited<ReturnType<typeof loadBaselineFactory>>;
@@ -135,7 +135,7 @@ const run = async (args: {
     country: Countries;
     candidateSlot: 0 | 1;
     requestedEngineSeed: number;
-    policy: PersistentObjectiveCompletionPolicyV3 | null;
+    policy: PersistentObjectiveCompletionPolicyV4 | null;
 }): Promise<RunTrace> => {
     const { factory, mapName, country, candidateSlot, requestedEngineSeed, policy } = args;
     const telemetry: PersistentObjectiveCompletionTelemetry[] = [];
@@ -194,7 +194,7 @@ export const validatePersistentObjectiveCompatibilityExposure = (
     }
     for (const event of telemetry) {
         if (
-            event.schemaVersion !== 1 ||
+            event.schemaVersion !== 2 ||
             event.event !== "objective_completion_decision" ||
             event.informationInterface !== "public_complete_state"
         ) throw new Error(`Persistent objective telemetry identity drifted for ${country} slot ${slot}`);
@@ -302,6 +302,8 @@ export const summarizePersistentObjectiveCompatibilityTelemetry = (
     const selectedActionCounts: CountMap = {};
     const delegatedActionCounts: CountMap = {};
     const rejectionReasonCounts: CountMap = {};
+    const targetRulesNameCounts: CountMap = {};
+    const blockerRulesNameCounts: CountMap = {};
     const rules = new Map<string, {
         observations: number;
         compatibleObservations: number;
@@ -326,9 +328,21 @@ export const summarizePersistentObjectiveCompatibilityTelemetry = (
     let routeProgress = 0;
     let ordinaryWeaponWithSpecialSecondaryObservations = 0;
     let selectedOrdinaryWeaponWithSpecialSecondaryObservations = 0;
+    let selectedUnitDisappearanceTransitions = 0;
+    let selectedUnitDeselectionTransitions = 0;
+    let previousSelectedIds = new Set<number>();
     for (const event of telemetry) {
         increment(phaseCounts, event.phase);
         increment(reasonCounts, event.reason);
+        if (event.targetRulesName) increment(targetRulesNameCounts, event.targetRulesName);
+        if (event.blockerRulesName) increment(blockerRulesNameCounts, event.blockerRulesName);
+        const currentIds = new Set(event.unitDiagnostics.map(({ id }) => id));
+        const currentSelectedIds = new Set(event.selectedAttackerIds);
+        for (const id of previousSelectedIds) {
+            if (!currentIds.has(id)) selectedUnitDisappearanceTransitions += 1;
+            else if (!currentSelectedIds.has(id)) selectedUnitDeselectionTransitions += 1;
+        }
+        previousSelectedIds = currentSelectedIds;
         if (event.buildingDamageSincePreviousDecision > 0) buildingDamageEvents += 1;
         buildingDamage += event.buildingDamageSincePreviousDecision;
         if (event.blockerDamageSincePreviousDecision > 0) blockerDamageEvents += 1;
@@ -405,6 +419,10 @@ export const summarizePersistentObjectiveCompatibilityTelemetry = (
         selectedActionCounts,
         delegatedActionCounts,
         rejectionReasonCounts,
+        targetRulesNameCounts,
+        blockerRulesNameCounts,
+        selectedUnitDisappearanceTransitions,
+        selectedUnitDeselectionTransitions,
         buildingDamageEvents,
         buildingDamage,
         blockerDamageEvents,
@@ -429,8 +447,8 @@ const main = async (): Promise<void> => {
         throw new Error("Persistent objective compatibility map bytes drifted");
     }
     const factory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
-    const disabledPolicy = buildPersistentObjectiveCompletionPolicyV3({ enabled: false });
-    const smokePolicy = buildPersistentObjectiveCompletionPolicyV3({
+    const disabledPolicy = buildPersistentObjectiveCompletionPolicyV4({ enabled: false });
+    const smokePolicy = buildPersistentObjectiveCompletionPolicyV4({
         terminalMinTick: 0,
         assaultMinTick: 0,
         assaultBuildingCount: 100,
@@ -516,6 +534,9 @@ const main = async (): Promise<void> => {
             enabledOrdinaryWeaponWithSpecialSecondaryObserved: diagnostics.some((diagnostic) =>
                 diagnostic.hasOrdinaryCompatibleWeapon && diagnostic.hasSpecialSecondaryMechanic,
             ),
+            enabledPreemptiveRouteInterceptionObserved: first.telemetry.some(({ reason }) =>
+                reason === "preemptive_route_interception_blocker",
+            ),
             enabledTelemetrySummary: summarizePersistentObjectiveCompatibilityTelemetry(first.telemetry),
             repeatTelemetrySummary: summarizePersistentObjectiveCompatibilityTelemetry(repeat.telemetry),
             validationErrors,
@@ -530,8 +551,8 @@ const main = async (): Promise<void> => {
         maps: [mapName],
         effectiveConfig: {
             purpose: "outcome-free-persistent-objective-equivalence-determinism-and-command-exposure",
-            disabledPolicyId: persistentObjectiveCompletionPolicyV3Sha256(disabledPolicy),
-            smokePolicyId: persistentObjectiveCompletionPolicyV3Sha256(smokePolicy),
+            disabledPolicyId: persistentObjectiveCompletionPolicyV4Sha256(disabledPolicy),
+            smokePolicyId: persistentObjectiveCompletionPolicyV4Sha256(smokePolicy),
             countries: Object.values(Countries),
             reciprocalSlots: [0, 1],
             runsPerCountrySlot: PERSISTENT_OBJECTIVE_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT,
@@ -546,24 +567,29 @@ const main = async (): Promise<void> => {
         manifest.source.trackedDirty !== false || manifest.software.baseline.kind !== "external-package" ||
         manifest.software.baseline.trackedDirty !== false || rows.length !== 18
     ) throw new Error("Persistent objective compatibility provenance or coverage failed");
-    const passed = rows.every((row) => row.passed === true);
+    const globalValidationErrors: string[] = [];
+    if (!rows.some((row) => row.enabledPreemptiveRouteInterceptionObserved === true)) {
+        globalValidationErrors.push("No live preemptive route-interception exposure was observed");
+    }
+    const passed = rows.every((row) => row.passed === true) && globalValidationErrors.length === 0;
     const output = {
-        schemaVersion: 5,
+        schemaVersion: 6,
         status: passed
-            ? "PASS_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V5"
-            : "FAIL_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V5",
+            ? "PASS_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V6"
+            : "FAIL_OUTCOME_FREE_PERSISTENT_OBJECTIVE_COMPATIBILITY_V6",
         generatedAt: new Date().toISOString(),
         passed,
         outcomeFree: true,
         sourceGitCommit: manifest.source.gitCommit,
         scheduler: manifest.scheduler,
         externalBaseline: manifest.software.baseline,
-        disabledPolicyId: persistentObjectiveCompletionPolicyV3Sha256(disabledPolicy),
-        smokePolicyId: persistentObjectiveCompletionPolicyV3Sha256(smokePolicy),
+        disabledPolicyId: persistentObjectiveCompletionPolicyV4Sha256(disabledPolicy),
+        smokePolicyId: persistentObjectiveCompletionPolicyV4Sha256(smokePolicy),
         countryCount: Object.values(Countries).length,
         reciprocalSlotCount: 2,
         gameCount: rows.length * PERSISTENT_OBJECTIVE_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT,
         maxTicks: PERSISTENT_OBJECTIVE_COMPATIBILITY_MAX_TICKS,
+        globalValidationErrors,
         rows,
     };
     fs.mkdirSync(path.dirname(outFile), { recursive: true, mode: 0o700 });
@@ -574,7 +600,7 @@ const main = async (): Promise<void> => {
         status: output.status,
         gameCount: output.gameCount,
     }));
-    if (!passed) throw new Error("Persistent objective compatibility-v5 failed; preserved diagnostic artifact");
+    if (!passed) throw new Error("Persistent objective compatibility-v6 failed; preserved diagnostic artifact");
 };
 
 const invoked = process.argv[1] ? pathToFileURL(path.resolve(process.argv[1])).href : null;
