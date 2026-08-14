@@ -1,10 +1,11 @@
 import { describe, expect, test } from "vitest";
-import { ObjectType, SideType } from "@chronodivide/game-api";
+import { AttackState, FactoryType, ObjectType, SideType, SpeedType } from "@chronodivide/game-api";
 import {
     assignAttackersToTargets,
     assignAttackersToCompatibleTargets,
     BuildingTargetDescriptor,
     classifyBuildingCapabilityGaps,
+    chooseBuildingEliminationEngagement,
     getBuildingCapabilityProductionPlan,
     getBuildingCapabilityUnitMissionAction,
     getBuildingTargetWeight,
@@ -40,6 +41,91 @@ const target = (overrides: Partial<BuildingTargetDescriptor>): BuildingTargetDes
     defense: false,
     visible: true,
     ...overrides,
+});
+
+const ordinaryWeapon = (damage = 100, range = 5, rof = 30) => ({
+    rules: {
+        name: "ordinary",
+        damage,
+        burst: 1,
+        rof,
+        neverUse: false,
+        areaFire: false,
+        spawner: false,
+        limboLaunch: false,
+        suicide: false,
+        fireOnce: false,
+    },
+    projectileRules: { isAntiGround: true, arcing: false },
+    warheadRules: {
+        verses: new Map([[8, 1]]),
+        cellSpread: 0,
+        temporal: false,
+        mindControl: false,
+        ivanBomb: false,
+    },
+    maxRange: range,
+    cooldownTicks: 0,
+});
+
+const baseRules = (name: string, type: ObjectType, speed = 256) => ({
+    name,
+    type,
+    armor: 8,
+    speed,
+    isSelectableCombatant: type !== ObjectType.Building,
+    harvester: false,
+    ammo: 0,
+    speedType: type === ObjectType.Infantry ? SpeedType.Foot : SpeedType.Track,
+    deployFire: false,
+    c4: false,
+    ivan: false,
+    spawns: false,
+    teleporter: false,
+    constructionYard: false,
+    factory: FactoryType.None,
+});
+
+const combatant = (
+    id: number,
+    x: number,
+    y = 0,
+    hitPoints = 500,
+    damage = 100,
+    range = 5,
+    rof = 30,
+) => ({
+    id,
+    name: `TANK${id}`,
+    type: ObjectType.Vehicle,
+    owner: id < 100 ? "candidate" : "enemy",
+    rules: baseRules(`TANK${id}`, ObjectType.Vehicle),
+    tile: { id: id * 10, rx: x, ry: y },
+    foundation: { width: 1, height: 1 },
+    hitPoints,
+    maxHitPoints: hitPoints,
+    primaryWeapon: ordinaryWeapon(damage, range, rof),
+    secondaryWeapon: undefined,
+    canMove: true,
+    isIdle: true,
+    attackState: AttackState.Idle,
+    onBridge: false,
+});
+
+const buildingUnit = (id: number, x: number, hitPoints = 1_000) => ({
+    id,
+    name: `BUILDING${id}`,
+    type: ObjectType.Building,
+    owner: "enemy",
+    rules: baseRules(`BUILDING${id}`, ObjectType.Building, 0),
+    tile: { id: id * 10, rx: x, ry: 0 },
+    foundation: { width: 2, height: 2 },
+    hitPoints,
+    maxHitPoints: hitPoints,
+    canMove: false,
+    isIdle: true,
+    attackState: AttackState.Idle,
+    onBridge: false,
 });
 
 describe("building elimination policy", () => {
@@ -314,6 +400,55 @@ describe("building elimination policy", () => {
         expect(meetsLowBuildingEliminationActivationGate(100, 0, gate)).toBe(false);
     });
 
+    test("finishes an in-range building instead of being distracted by enemy forces", () => {
+        const attackers = [combatant(1, 8, 0, 500, 100, 5, 10)] as any[];
+        const building = buildingUnit(200, 10, 200) as any;
+        const threats = Array.from({ length: 20 }, (_, index) =>
+            combatant(100 + index, 7, index % 2, 500, 100, 5, 10),
+        ) as any[];
+        expect(chooseBuildingEliminationEngagement(attackers, building, threats, 8)).toMatchObject({
+            blocker: null,
+            reason: "building_in_range",
+        });
+    });
+
+    test("ignores armed forces that cannot intersect the route to the committed building", () => {
+        const decision = chooseBuildingEliminationEngagement(
+            [combatant(1, 0)] as any[],
+            buildingUnit(200, 20) as any,
+            [combatant(100, 10, 30)] as any[],
+            8,
+        );
+        expect(decision).toMatchObject({ blocker: null, reason: "no_route_threat", routeThreatCount: 0 });
+    });
+
+    test("clears one removable route blocker when interception beats building completion", () => {
+        const blocker = combatant(100, 5, 0, 100, 500, 5, 1) as any;
+        const decision = chooseBuildingEliminationEngagement(
+            [combatant(1, 0, 0, 100, 10, 1, 1)] as any[],
+            buildingUnit(200, 20, 1_000) as any,
+            [blocker],
+            8,
+        );
+        expect(decision).toMatchObject({ blocker, reason: "route_interception_wins", routeThreatCount: 1 });
+        expect(decision.estimatedBuildingCompletionTicks).toBeGreaterThan(
+            decision.estimatedForceSurvivalTicks,
+        );
+    });
+
+    test("races a finishable building when completion precedes force destruction", () => {
+        const decision = chooseBuildingEliminationEngagement(
+            [combatant(1, 0, 0, 500, 100, 1, 1)] as any[],
+            buildingUnit(200, 10, 10) as any,
+            [combatant(100, 6, 0, 500, 1, 1, 30)] as any[],
+            8,
+        );
+        expect(decision).toMatchObject({ blocker: null, reason: "building_completion_race", routeThreatCount: 1 });
+        expect(decision.estimatedBuildingCompletionTicks).toBeLessThanOrEqual(
+            decision.estimatedForceSurvivalTicks,
+        );
+    });
+
     test("configuration resolves to a canonical complete object without undefined overrides", () => {
         const resolved = resolveBuildingEliminationOptions({
             enabled: true,
@@ -351,6 +486,8 @@ describe("building elimination policy", () => {
             "adaptiveTechPriority",
             "activationMode",
             "maxEnemyBuildings",
+            "engagementMode",
+            "routeCorridorRadius",
         ]);
     });
 
@@ -362,8 +499,12 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({ minTick: -1 })).toThrow("minTick");
         expect(() => resolveBuildingEliminationOptions({ stallTicks: 0 })).toThrow("stallTicks");
         expect(() => resolveBuildingEliminationOptions({ maxEnemyBuildings: 0 })).toThrow("maxEnemyBuildings");
+        expect(() => resolveBuildingEliminationOptions({ routeCorridorRadius: 0 })).toThrow("routeCorridorRadius");
         expect(() => resolveBuildingEliminationOptions({ activationMode: "unknown" as any })).toThrow(
             "activation mode",
+        );
+        expect(() => resolveBuildingEliminationOptions({ engagementMode: "unknown" as any })).toThrow(
+            "engagement mode",
         );
     });
 });

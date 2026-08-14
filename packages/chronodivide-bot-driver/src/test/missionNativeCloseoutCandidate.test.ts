@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from "vitest";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { createMissionNativeCloseoutCandidate } from "../training/missionNativeCloseoutCandidate.js";
 import { buildMissionNativeCloseoutPolicy } from "../training/missionNativeCloseoutPolicy.js";
+import { buildMissionNativeCloseoutPolicyV2 } from "../training/missionNativeCloseoutPolicyV2.js";
 
 describe("mission-native closeout candidate", () => {
     it("returns the exact external baseline path when disabled", () => {
@@ -46,5 +47,24 @@ describe("mission-native closeout candidate", () => {
             expect.objectContaining({ onAiUpdate: expect.any(Function) }),
         );
         expect(factory.create).not.toHaveBeenCalled();
+    });
+
+    it("accepts the frozen completion-race v2 policy", () => {
+        const injected = { kind: "injected-v2" } as any;
+        let inner: any;
+        inner = { onAiUpdate: vi.fn(() => inner) };
+        const factory = {
+            descriptor: { kind: "external-package", packageRoot: "/baseline" },
+            create: vi.fn(),
+            createDefaultStrategy: vi.fn(() => inner),
+            createWithStrategy: vi.fn(() => injected),
+        } as any;
+        expect(createMissionNativeCloseoutCandidate(
+            factory,
+            "candidate",
+            Countries.USA,
+            buildMissionNativeCloseoutPolicyV2(),
+        )).toBe(injected);
+        expect(factory.createWithStrategy).toHaveBeenCalledOnce();
     });
 });

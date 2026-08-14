@@ -30,6 +30,7 @@ import { BUILDING_NAME_TO_RULES, getDefaultPlacementLocation } from "../../build
 export type BuildingEliminationObservationMode = "publicApi" | "visibleOnly";
 export type BuildingEliminationTargetPriority = "production" | "defense" | "nearest";
 export type BuildingEliminationActivationMode = "forceAdvantage" | "lowBuilding";
+export type BuildingEliminationEngagementMode = "directBuilding" | "completionRace";
 
 export type BuildingEliminationOptions = {
     enabled?: boolean;
@@ -56,6 +57,8 @@ export type BuildingEliminationOptions = {
     adaptiveTechPriority?: number;
     activationMode?: BuildingEliminationActivationMode;
     maxEnemyBuildings?: number;
+    engagementMode?: BuildingEliminationEngagementMode;
+    routeCorridorRadius?: number;
 };
 
 export type BuildingTargetDescriptor = {
@@ -155,6 +158,25 @@ export type BuildingEliminationTelemetryEvent =
           tick: number;
           attackerCount: number;
           targets: PointDescriptor[];
+      }
+    | {
+          schemaVersion: 3;
+          event: "engagement_decision";
+          tick: number;
+          phase: "building_strike" | "blocker_clear" | "no_compatible_target";
+          reason: "direct_building" | "building_in_range" | "building_completion_race" |
+              "no_route_threat" | "route_interception_wins" | "no_compatible_target";
+          targetId: number | null;
+          targetName: string | null;
+          targetHitPoints: number | null;
+          blockerId: number | null;
+          blockerName: string | null;
+          ownedAttackerCount: number;
+          assignedAttackerCount: number;
+          routeThreatCount: number;
+          estimatedBuildingCompletionTicks: number | null;
+          estimatedForceSurvivalTicks: number | null;
+          earliestRouteThreatInterceptTicks: number | null;
       };
 
 export type BuildingEliminationTelemetrySink = (event: BuildingEliminationTelemetryEvent) => void;
@@ -189,6 +211,8 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     adaptiveTechPriority: 130,
     activationMode: "forceAdvantage",
     maxEnemyBuildings: 1_000,
+    engagementMode: "directBuilding",
+    routeCorridorRadius: 8,
 };
 
 const requireIntegerInRange = (name: string, value: number, minimum: number, maximum: number): void => {
@@ -218,6 +242,7 @@ export const resolveBuildingEliminationOptions = (
     requireIntegerInRange("adaptiveProductionPriority", resolved.adaptiveProductionPriority, 1, 1_000);
     requireIntegerInRange("adaptiveTechPriority", resolved.adaptiveTechPriority, 1, 1_000);
     requireIntegerInRange("maxEnemyBuildings", resolved.maxEnemyBuildings, 1, 1_000);
+    requireIntegerInRange("routeCorridorRadius", resolved.routeCorridorRadius, 1, 64);
     if (!new Set<BuildingEliminationTargetPriority>(["production", "defense", "nearest"]).has(resolved.targetPriority)) {
         throw new Error(`Invalid building-elimination target priority: ${resolved.targetPriority}`);
     }
@@ -227,6 +252,10 @@ export const resolveBuildingEliminationOptions = (
     if (!new Set<BuildingEliminationActivationMode>(["forceAdvantage", "lowBuilding"])
         .has(resolved.activationMode)) {
         throw new Error(`Invalid building-elimination activation mode: ${resolved.activationMode}`);
+    }
+    if (!new Set<BuildingEliminationEngagementMode>(["directBuilding", "completionRace"])
+        .has(resolved.engagementMode)) {
+        throw new Error(`Invalid building-elimination engagement mode: ${resolved.engagementMode}`);
     }
     return resolved;
 };
@@ -436,6 +465,193 @@ export const canReachBuildingFiringPerimeter = (
         game.mapApi.isPassableTile(tile, speedType, !!tile.onBridgeLandType, subCell) &&
         reachability.isReachable(from, { tile, onBridge: !!tile.onBridgeLandType }),
     );
+};
+
+const distance = (left: PointDescriptor, right: PointDescriptor): number =>
+    Math.sqrt(distanceSquared(left, right));
+
+const distanceToSegment = (
+    candidate: PointDescriptor,
+    start: PointDescriptor,
+    end: PointDescriptor,
+): number => {
+    const dx = end.x - start.x;
+    const dy = end.y - start.y;
+    const lengthSquared = dx * dx + dy * dy;
+    if (lengthSquared === 0) return distance(candidate, start);
+    const projection = Math.max(0, Math.min(1,
+        ((candidate.x - start.x) * dx + (candidate.y - start.y) * dy) / lengthSquared,
+    ));
+    return distance(candidate, {
+        x: start.x + projection * dx,
+        y: start.y + projection * dy,
+    });
+};
+
+const weaponDamagePerTickAgainst = (weapon: WeaponData | undefined, target: UnitData): number => {
+    if (!weapon?.projectileRules.isAntiGround || weapon.rules.damage <= 0 || weapon.rules.neverUse) return 0;
+    const verses = weapon.warheadRules.verses.get(target.rules.armor) ?? 0;
+    return verses <= 0 ? 0 : weapon.rules.damage * Math.max(1, weapon.rules.burst) * verses /
+        Math.max(1, weapon.rules.rof);
+};
+
+const unitDamagePerTickAgainst = (attacker: UnitData, target: UnitData): number =>
+    Math.max(0, ...[attacker.primaryWeapon, attacker.secondaryWeapon]
+        .map((weapon) => weaponDamagePerTickAgainst(weapon, target)));
+
+const maximumDamageRangeAgainst = (attacker: UnitData, target: UnitData): number =>
+    Math.max(0, ...[attacker.primaryWeapon, attacker.secondaryWeapon]
+        .filter((weapon) => weaponDamagePerTickAgainst(weapon, target) > 0)
+        .map((weapon) => weapon?.maxRange ?? 0));
+
+const unitSpeedTilesPerTick = (unit: UnitData): number => {
+    const speed = Number(unit.rules.speed ?? 0) / 256;
+    return Number.isFinite(speed) && speed > 0 ? speed : 1 / 15;
+};
+
+const piecewiseForceSurvivalTicks = (
+    hitPoints: number,
+    arrivals: readonly { interceptTicks: number; damagePerTick: number }[],
+): number => {
+    const ordered = arrivals.slice().sort((left, right) => left.interceptTicks - right.interceptTicks);
+    let remaining = hitPoints;
+    let activeDamagePerTick = 0;
+    let tick = 0;
+    for (const arrival of ordered) {
+        const interval = Math.max(0, arrival.interceptTicks - tick);
+        const intervalDamage = activeDamagePerTick * interval;
+        if (activeDamagePerTick > 0 && intervalDamage >= remaining) {
+            return tick + remaining / activeDamagePerTick;
+        }
+        remaining -= intervalDamage;
+        tick = arrival.interceptTicks;
+        activeDamagePerTick += arrival.damagePerTick;
+    }
+    return activeDamagePerTick > 0 ? tick + remaining / activeDamagePerTick : Number.POSITIVE_INFINITY;
+};
+
+export type BuildingEliminationEngagementDecision = {
+    blocker: UnitData | null;
+    reason: "building_in_range" | "building_completion_race" |
+        "no_route_threat" | "route_interception_wins";
+    routeThreatCount: number;
+    estimatedBuildingCompletionTicks: number;
+    estimatedForceSurvivalTicks: number;
+    earliestRouteThreatInterceptTicks: number;
+};
+
+export const chooseBuildingEliminationEngagement = (
+    attackers: UnitData[],
+    target: UnitData,
+    enemyForces: UnitData[],
+    corridorRadius: number,
+): BuildingEliminationEngagementDecision => {
+    const center = {
+        x: attackers.reduce((sum, attacker) => sum + attacker.tile.rx, 0) / Math.max(1, attackers.length),
+        y: attackers.reduce((sum, attacker) => sum + attacker.tile.ry, 0) / Math.max(1, attackers.length),
+    };
+    const targetPoint = { x: target.tile.rx, y: target.tile.ry };
+    const buildingDamagePerTick = attackers.reduce(
+        (sum, attacker) => sum + unitDamagePerTickAgainst(attacker, target),
+        0,
+    );
+    const approachTicks = attackers.length === 0 ? Number.POSITIVE_INFINITY : Math.min(...attackers.map((attacker) =>
+        Math.max(
+            0,
+            tileDistanceToFoundation(attacker.tile.rx, attacker.tile.ry, target) -
+                maximumDamageRangeAgainst(attacker, target),
+        ) / unitSpeedTilesPerTick(attacker),
+    ));
+    const estimatedBuildingCompletionTicks = buildingDamagePerTick > 0
+        ? approachTicks + target.hitPoints / buildingDamagePerTick
+        : Number.POSITIVE_INFINITY;
+    const buildingInRange = attackers.some((attacker) =>
+        tileDistanceToFoundation(attacker.tile.rx, attacker.tile.ry, target) <=
+            maximumDamageRangeAgainst(attacker, target),
+    );
+    const threats = enemyForces
+        .filter((force) => distanceToSegment(
+            { x: force.tile.rx, y: force.tile.ry },
+            center,
+            targetPoint,
+        ) <= corridorRadius)
+        .map((force) => {
+            const threatDamagePerTick = Math.max(
+                0,
+                ...attackers.map((attacker) => unitDamagePerTickAgainst(force, attacker)),
+            );
+            const interceptTicks = attackers.length === 0 ? Number.POSITIVE_INFINITY : Math.min(
+                ...attackers.map((attacker) => {
+                    const closingSpeed = unitSpeedTilesPerTick(force) + unitSpeedTilesPerTick(attacker);
+                    const range = maximumDamageRangeAgainst(force, attacker);
+                    return Math.max(
+                        0,
+                        distance(
+                            { x: force.tile.rx, y: force.tile.ry },
+                            { x: attacker.tile.rx, y: attacker.tile.ry },
+                        ) - range,
+                    ) / closingSpeed;
+                }),
+            );
+            const removalDamagePerTick = attackers.reduce(
+                (sum, attacker) => sum + unitDamagePerTickAgainst(attacker, force),
+                0,
+            );
+            const removalTicks = removalDamagePerTick > 0
+                ? force.hitPoints / removalDamagePerTick
+                : Number.POSITIVE_INFINITY;
+            const score = Number.isFinite(removalTicks) && removalTicks > 0
+                ? threatDamagePerTick / removalTicks / (1 + interceptTicks)
+                : 0;
+            return { force, threatDamagePerTick, interceptTicks, removalTicks, score };
+        })
+        .filter(({ threatDamagePerTick, interceptTicks, removalTicks }) =>
+            threatDamagePerTick > 0 && Number.isFinite(removalTicks) &&
+            interceptTicks < estimatedBuildingCompletionTicks,
+        )
+        .sort((left, right) => right.score - left.score || left.force.id - right.force.id);
+    const estimatedForceSurvivalTicks = piecewiseForceSurvivalTicks(
+        attackers.reduce((sum, attacker) => sum + attacker.hitPoints, 0),
+        threats.map(({ interceptTicks, threatDamagePerTick }) => ({
+            interceptTicks,
+            damagePerTick: threatDamagePerTick,
+        })),
+    );
+    const earliestRouteThreatInterceptTicks = threats.length === 0
+        ? Number.POSITIVE_INFINITY
+        : Math.min(...threats.map(({ interceptTicks }) => interceptTicks));
+    if (buildingInRange) return {
+        blocker: null,
+        reason: "building_in_range",
+        routeThreatCount: threats.length,
+        estimatedBuildingCompletionTicks,
+        estimatedForceSurvivalTicks,
+        earliestRouteThreatInterceptTicks,
+    };
+    if (threats.length === 0) return {
+        blocker: null,
+        reason: "no_route_threat",
+        routeThreatCount: 0,
+        estimatedBuildingCompletionTicks,
+        estimatedForceSurvivalTicks,
+        earliestRouteThreatInterceptTicks,
+    };
+    if (estimatedBuildingCompletionTicks <= estimatedForceSurvivalTicks) return {
+        blocker: null,
+        reason: "building_completion_race",
+        routeThreatCount: threats.length,
+        estimatedBuildingCompletionTicks,
+        estimatedForceSurvivalTicks,
+        earliestRouteThreatInterceptTicks,
+    };
+    return {
+        blocker: threats[0].force,
+        reason: "route_interception_wins",
+        routeThreatCount: threats.length,
+        estimatedBuildingCompletionTicks,
+        estimatedForceSurvivalTicks,
+        earliestRouteThreatInterceptTicks,
+    };
 };
 
 export const assignAttackersToCompatibleTargets = <T extends PointDescriptor, U extends PointDescriptor>(
@@ -810,6 +1026,9 @@ class BuildingEliminationMission extends Mission {
     private lastOrderTelemetrySignature = "";
     private lastAssignmentTelemetrySignature = "";
     private lastAssignmentTelemetryAt = Number.NEGATIVE_INFINITY;
+    private lastEngagementTelemetrySignature = "";
+    private lastEngagementTelemetryAt = Number.NEGATIVE_INFINITY;
+    private committedTargetId: number | null = null;
     private targetProgress = new Map<number, BuildingTargetProgressState>();
     private progressTelemetry = new Map<number, { hitPoints: number; lastEmittedTick: number }>();
 
@@ -908,6 +1127,14 @@ class BuildingEliminationMission extends Mission {
         if (this.options.reassignStalledTargets) {
             rankedTargets = prioritizeStalledBuildingTargets(rankedTargets, this.targetProgress);
         }
+        if (this.options.engagementMode === "completionRace" && this.committedTargetId !== null) {
+            const committed = rankedTargets.find(({ id }) => id === this.committedTargetId);
+            if (committed) {
+                rankedTargets = [committed, ...rankedTargets.filter(({ id }) => id !== this.committedTargetId)];
+            } else {
+                this.committedTargetId = null;
+            }
+        }
         if (rankedTargets.length > 0) {
             const attackerDescriptors = units.map((unit) => ({ ...unit, x: unit.tile.rx, y: unit.tile.ry }));
             let incompatiblePairs = 0;
@@ -938,28 +1165,18 @@ class BuildingEliminationMission extends Mission {
                 pairCompatibility.set(key, true);
                 return true;
             };
+            const maximumTargetGroups = this.options.engagementMode === "completionRace"
+                ? 1
+                : this.options.maxTargetGroups;
             const selectedTargets =
                 this.options.capabilityAwareAttackers || this.options.reachabilityAwareTargets
                     ? selectCompatibleBuildingTargets(
                         attackerDescriptors,
                         rankedTargets,
-                        this.options.maxTargetGroups,
+                        maximumTargetGroups,
                         compatible,
                     )
-                    : rankedTargets.slice(0, this.options.maxTargetGroups);
-            this.emitOrderTelemetry({
-                schemaVersion: 1,
-                event: "target_orders",
-                tick: context.game.getCurrentTick(),
-                attackerCount: units.length,
-                targets: selectedTargets.map((target) => ({
-                    id: target.id ?? null,
-                    name: target.name,
-                    x: target.x,
-                    y: target.y,
-                    visible: target.visible,
-                })),
-            });
+                    : rankedTargets.slice(0, maximumTargetGroups);
             const assignments =
                 this.options.capabilityAwareAttackers || this.options.reachabilityAwareTargets
                     ? assignAttackersToCompatibleTargets(attackerDescriptors, selectedTargets, compatible)
@@ -977,10 +1194,110 @@ class BuildingEliminationMission extends Mission {
                 unreachablePairs,
                 targetCount: selectedTargets.length,
             });
+            if (selectedTargets.length === 0 || assignments.length === 0) {
+                this.committedTargetId = null;
+                if (this.options.engagementMode === "completionRace") {
+                    this.emitEngagementTelemetry({
+                        schemaVersion: 3,
+                        event: "engagement_decision",
+                        tick: context.game.getCurrentTick(),
+                        phase: "no_compatible_target",
+                        reason: "no_compatible_target",
+                        targetId: null,
+                        targetName: null,
+                        targetHitPoints: null,
+                        blockerId: null,
+                        blockerName: null,
+                        ownedAttackerCount: units.length,
+                        assignedAttackerCount: 0,
+                        routeThreatCount: 0,
+                        estimatedBuildingCompletionTicks: null,
+                        estimatedForceSurvivalTicks: null,
+                        earliestRouteThreatInterceptTicks: null,
+                    });
+                }
+                return;
+            }
+            const primaryTarget = selectedTargets[0];
+            if (this.options.engagementMode === "completionRace") {
+                this.committedTargetId = primaryTarget.id ?? null;
+            }
+            this.emitOrderTelemetry({
+                schemaVersion: 1,
+                event: "target_orders",
+                tick: context.game.getCurrentTick(),
+                attackerCount: units.length,
+                targets: selectedTargets.map((target) => ({
+                    id: target.id ?? null,
+                    name: target.name,
+                    x: target.x,
+                    y: target.y,
+                    visible: target.visible,
+                })),
+            });
+            const currentPrimaryTarget = primaryTarget.id === undefined
+                ? undefined
+                : currentTargetById.get(primaryTarget.id);
+            let blocker: UnitData | null = null;
+            if (this.options.engagementMode === "completionRace" && currentPrimaryTarget) {
+                const assignedUnits = assignments.map(({ attacker }) => attacker);
+                const enemyForces = getEnemyUnits(
+                    context,
+                    this.options.observationMode,
+                    (unit) => unit.rules.type !== ObjectType.Building && !!unit.rules.isSelectableCombatant,
+                );
+                const decision = chooseBuildingEliminationEngagement(
+                    assignedUnits,
+                    currentPrimaryTarget,
+                    enemyForces,
+                    this.options.routeCorridorRadius,
+                );
+                blocker = decision.blocker;
+                const finiteOrNull = (value: number): number | null => Number.isFinite(value) ? value : null;
+                this.emitEngagementTelemetry({
+                    schemaVersion: 3,
+                    event: "engagement_decision",
+                    tick: context.game.getCurrentTick(),
+                    phase: blocker ? "blocker_clear" : "building_strike",
+                    reason: decision.reason,
+                    targetId: currentPrimaryTarget.id,
+                    targetName: currentPrimaryTarget.rules.name,
+                    targetHitPoints: currentPrimaryTarget.hitPoints,
+                    blockerId: blocker?.id ?? null,
+                    blockerName: blocker?.rules.name ?? null,
+                    ownedAttackerCount: units.length,
+                    assignedAttackerCount: assignments.length,
+                    routeThreatCount: decision.routeThreatCount,
+                    estimatedBuildingCompletionTicks: finiteOrNull(decision.estimatedBuildingCompletionTicks),
+                    estimatedForceSurvivalTicks: finiteOrNull(decision.estimatedForceSurvivalTicks),
+                    earliestRouteThreatInterceptTicks: finiteOrNull(decision.earliestRouteThreatInterceptTicks),
+                });
+            } else if (this.options.engagementMode === "completionRace") {
+                this.emitEngagementTelemetry({
+                    schemaVersion: 3,
+                    event: "engagement_decision",
+                    tick: context.game.getCurrentTick(),
+                    phase: "building_strike",
+                    reason: "direct_building",
+                    targetId: primaryTarget.id ?? null,
+                    targetName: primaryTarget.name,
+                    targetHitPoints: primaryTarget.hitPoints,
+                    blockerId: null,
+                    blockerName: null,
+                    ownedAttackerCount: units.length,
+                    assignedAttackerCount: assignments.length,
+                    routeThreatCount: 0,
+                    estimatedBuildingCompletionTicks: null,
+                    estimatedForceSurvivalTicks: null,
+                    earliestRouteThreatInterceptTicks: null,
+                });
+            }
             for (const { attacker, target } of assignments) {
                 const currentTarget = target.id === undefined ? undefined : currentTargetById.get(target.id);
                 const action =
-                    currentTarget && shouldDirectAttackBuildingTarget(
+                    blocker && unitDamagePerTickAgainst(attacker, blocker) > 0
+                        ? manageAttackMicro(attacker, blocker)
+                        : currentTarget && shouldDirectAttackBuildingTarget(
                         this.options.directVisibleAttack,
                         target.visible,
                         true,
@@ -991,6 +1308,8 @@ class BuildingEliminationMission extends Mission {
             }
             return;
         }
+
+        this.committedTargetId = null;
 
         if (!this.options.sweepWhenNoTargets) {
             return;
@@ -1106,6 +1425,19 @@ class BuildingEliminationMission extends Mission {
         if (event.tick < this.lastAssignmentTelemetryAt + TELEMETRY_HEARTBEAT_TICKS) return;
         this.lastAssignmentTelemetrySignature = signature;
         this.lastAssignmentTelemetryAt = event.tick;
+        this.telemetrySink(event);
+    }
+
+    private emitEngagementTelemetry(
+        event: Extract<BuildingEliminationTelemetryEvent, { event: "engagement_decision" }>,
+    ): void {
+        const signature = JSON.stringify({ ...event, tick: 0 });
+        if (
+            signature === this.lastEngagementTelemetrySignature &&
+            event.tick < this.lastEngagementTelemetryAt + TELEMETRY_HEARTBEAT_TICKS
+        ) return;
+        this.lastEngagementTelemetrySignature = signature;
+        this.lastEngagementTelemetryAt = event.tick;
         this.telemetrySink(event);
     }
 

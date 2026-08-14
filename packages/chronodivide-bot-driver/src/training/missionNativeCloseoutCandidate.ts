@@ -8,6 +8,10 @@ import {
     MissionNativeCloseoutPolicy,
     validateMissionNativeCloseoutPolicy,
 } from "./missionNativeCloseoutPolicy.js";
+import {
+    MissionNativeCloseoutPolicyV2,
+    validateMissionNativeCloseoutPolicyV2,
+} from "./missionNativeCloseoutPolicyV2.js";
 
 type StrategyLike = {
     onAiUpdate(context: any, missionController: any, logger: any): StrategyLike;
@@ -18,7 +22,7 @@ class MissionNativeCloseoutStrategy implements StrategyLike {
 
     constructor(
         private inner: StrategyLike,
-        policy: MissionNativeCloseoutPolicy,
+        policy: MissionNativeCloseoutPolicy | MissionNativeCloseoutPolicyV2,
         telemetrySink: BuildingEliminationTelemetrySink,
     ) {
         this.factory = new BuildingEliminationMissionFactory({
@@ -43,6 +47,8 @@ class MissionNativeCloseoutStrategy implements StrategyLike {
             reassignStalledTargets: policy.reassignStalledTargets,
             adaptiveAirTargetCount: 0,
             adaptiveNavalTargetCount: 0,
+            engagementMode: policy.schemaVersion === 2 ? policy.engagementMode : "directBuilding",
+            routeCorridorRadius: policy.schemaVersion === 2 ? policy.routeCorridorRadius : 8,
         }, telemetrySink);
     }
 
@@ -58,10 +64,12 @@ export const createMissionNativeCloseoutCandidate = (
     baselineFactory: BaselineFactory,
     name: string,
     country: Countries,
-    rawPolicy: MissionNativeCloseoutPolicy,
+    rawPolicy: MissionNativeCloseoutPolicy | MissionNativeCloseoutPolicyV2,
     telemetrySink: BuildingEliminationTelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = validateMissionNativeCloseoutPolicy(rawPolicy);
+    const policy = rawPolicy.schemaVersion === 2
+        ? validateMissionNativeCloseoutPolicyV2(rawPolicy)
+        : validateMissionNativeCloseoutPolicy(rawPolicy);
     if (!policy.enabled) return baselineFactory.create(name, country);
     if (!baselineFactory.createDefaultStrategy || !baselineFactory.createWithStrategy) {
         throw new Error("Mission-native closeout requires an injectable external baseline strategy");
