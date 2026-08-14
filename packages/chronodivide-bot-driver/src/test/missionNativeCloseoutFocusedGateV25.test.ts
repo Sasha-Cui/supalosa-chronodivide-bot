@@ -3,8 +3,13 @@ import { QueueType, SideType } from "@chronodivide/game-api";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { BuildingEliminationTelemetryEvent } from
     "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
-import { validateMissionNativeCloseoutFocusedGateV25Telemetry } from
+import {
+    MISSION_NATIVE_CLOSEOUT_FOCUSED_GATE_V25_COUNTRIES,
+    MISSION_NATIVE_CLOSEOUT_FOCUSED_GATE_V25_ENGINE_SEED_BASE,
+    validateMissionNativeCloseoutFocusedGateV25Telemetry,
+} from
     "../training/missionNativeCloseoutFocusedGateV25.js";
+import { derivePairedEngineSeed } from "../benchmark/seededOfflineGame.js";
 
 const valid = (): BuildingEliminationTelemetryEvent[] => [
     {
@@ -85,6 +90,17 @@ const valid = (): BuildingEliminationTelemetryEvent[] => [
 ];
 
 describe("mission-native closeout focused gate v25", () => {
+    it("keeps every focused seed inside the engine uint32 domain", () => {
+        for (const index of MISSION_NATIVE_CLOSEOUT_FOCUSED_GATE_V25_COUNTRIES.keys()) {
+            const seed = derivePairedEngineSeed(
+                MISSION_NATIVE_CLOSEOUT_FOCUSED_GATE_V25_ENGINE_SEED_BASE,
+                index,
+            );
+            expect(seed).toBeGreaterThanOrEqual(0);
+            expect(seed).toBeLessThanOrEqual(0xffff_ffff);
+        }
+    });
+
     it("requires factory-triggered readiness ownership, persistent tanks, and building damage", () => {
         expect(() => validateMissionNativeCloseoutFocusedGateV25Telemetry(valid(), Countries.USA)).not.toThrow();
     });

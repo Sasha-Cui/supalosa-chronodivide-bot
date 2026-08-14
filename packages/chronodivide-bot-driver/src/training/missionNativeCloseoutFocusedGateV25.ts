@@ -22,7 +22,7 @@ import {
 } from "./missionNativeCloseoutPolicyV25.js";
 
 export const MISSION_NATIVE_CLOSEOUT_FOCUSED_GATE_V25_SCHEMA_VERSION = 1 as const;
-export const MISSION_NATIVE_CLOSEOUT_FOCUSED_GATE_V25_ENGINE_SEED_BASE = 4_300_000_000 as const;
+export const MISSION_NATIVE_CLOSEOUT_FOCUSED_GATE_V25_ENGINE_SEED_BASE = 4_275_000_000 as const;
 export const MISSION_NATIVE_CLOSEOUT_FOCUSED_GATE_V25_COUNTRIES = [Countries.USA, Countries.LIBYA] as const;
 
 const requiredPath = (name: string): string => {
