@@ -28,7 +28,7 @@ import {
 } from "./persistentObjectiveCompletionStrategy.js";
 
 export const PERSISTENT_OBJECTIVE_COMPATIBILITY_MAX_TICKS = 5_400 as const;
-export const PERSISTENT_OBJECTIVE_COMPATIBILITY_ENGINE_SEED_BASE = 4_300_000_000 as const;
+export const PERSISTENT_OBJECTIVE_COMPATIBILITY_ENGINE_SEED_BASE = 3_900_000_000 as const;
 export const PERSISTENT_OBJECTIVE_COMPATIBILITY_RUNS_PER_COUNTRY_SLOT = 4 as const;
 
 type Factory = Awaited<ReturnType<typeof loadBaselineFactory>>;
