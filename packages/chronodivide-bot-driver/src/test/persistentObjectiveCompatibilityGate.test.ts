@@ -71,7 +71,7 @@ describe("persistent objective outcome-blind compatibility gate", () => {
         )).toThrow(/locked mission/);
     });
 
-    it("accepts the three-unit minimum from three compatible locked offensive combatants", () => {
+    it("accepts all compatible locked offensive combatants", () => {
         const base = decision().unitDiagnostics[0];
         const row = decision({
             selectedAttackerIds: [1, 2, 3],
@@ -89,7 +89,7 @@ describe("persistent objective outcome-blind compatibility gate", () => {
         )).not.toThrow();
     });
 
-    it("rejects failing to preserve the three-unit minimum objective detachment", () => {
+    it("rejects leaving part of a compatible offensive mission behind", () => {
         const base = decision().unitDiagnostics[0];
         const row = decision({
             selectedAttackerIds: [1, 2],
@@ -104,7 +104,7 @@ describe("persistent objective outcome-blind compatibility gate", () => {
         });
         expect(() => validatePersistentObjectiveCompatibilityExposure(
             [row], Countries.USA, 0,
-        )).toThrow(/Minimum viable detachment/);
+        )).toThrow(/Full compatible offensive force/);
     });
 
     it("accepts a completion-race blocker clear followed by physical building damage", () => {
@@ -123,7 +123,7 @@ describe("persistent objective outcome-blind compatibility gate", () => {
         )).not.toThrow();
     });
 
-    it("rejects taking more than half of a larger locked offensive mission", () => {
+    it("rejects taking only part of a larger locked offensive mission", () => {
         const base = decision().unitDiagnostics[0];
         const row = decision({
             selectedAttackerIds: [1, 2, 3, 4, 5],
@@ -138,7 +138,7 @@ describe("persistent objective outcome-blind compatibility gate", () => {
         });
         expect(() => validatePersistentObjectiveCompatibilityExposure(
             [row], Countries.USA, 0,
-        )).toThrow(/fraction exceeded/);
+        )).toThrow(/Full compatible offensive force/);
     });
 
     it("rejects a policy label without a next-cycle movement or attack response", () => {
