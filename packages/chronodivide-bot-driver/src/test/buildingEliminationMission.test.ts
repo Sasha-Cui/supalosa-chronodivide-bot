@@ -1,4 +1,4 @@
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { AttackState, FactoryType, ObjectType, SideType, SpeedType } from "@chronodivide/game-api";
 import {
     assignAttackersToTargets,
@@ -10,6 +10,7 @@ import {
     classifyBuildingEliminationLaunchHandoff,
     chooseBuildingEliminationEngagement,
     deferStalledBuildingTargets,
+    disbandBuildingEliminationMissionForTransfer,
     getBuildingCapabilityProductionPlan,
     getBuildingCapabilityUnitMissionAction,
     getBuildingEliminationAssaultProductionAction,
@@ -502,6 +503,40 @@ describe("building elimination policy", () => {
         expect(() => getAssignedBuildingEliminationMissionName({
             getMissions: () => [mission("attack_12", [1]), mission("defence_12", [1])],
         }, 1)).toThrow(/multiple missions/);
+    });
+
+    test("transfer disband delegates natively or empties a pinned legacy donor", () => {
+        const nativeTransfer = vi.fn();
+        const nativeDisband = vi.fn();
+        disbandBuildingEliminationMissionForTransfer({
+            disbandMissionForTransfer: nativeTransfer,
+            disbandMission: nativeDisband,
+            getMissions: () => [],
+        } as any, "attack_12");
+        expect(nativeTransfer).toHaveBeenCalledWith("attack_12");
+        expect(nativeDisband).not.toHaveBeenCalled();
+
+        let unitIds = [71, 72];
+        let completionUnitIds: number[] | null = null;
+        const donor = {
+            getUniqueName: () => "attack_12",
+            getUnitIds: () => unitIds,
+            removeUnit: (unitId: number) => {
+                unitIds = unitIds.filter((value) => value !== unitId);
+            },
+            endMission: () => {
+                completionUnitIds = [...unitIds];
+            },
+        };
+        const legacyDisband = vi.fn();
+        disbandBuildingEliminationMissionForTransfer({
+            getMissions: () => [donor],
+            disbandMission: legacyDisband,
+        } as any, "attack_12");
+        donor.endMission();
+        expect(unitIds).toEqual([]);
+        expect(completionUnitIds).toEqual([]);
+        expect(legacyDisband).toHaveBeenCalledWith("attack_12");
     });
 
     test("adaptive closeout is gated by the same reserve and advantage conditions", () => {

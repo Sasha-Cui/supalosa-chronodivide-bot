@@ -1309,6 +1309,24 @@ export const getAssignedBuildingEliminationMissionName = (
     return owners[0]?.getUniqueName() ?? null;
 };
 
+export const disbandBuildingEliminationMissionForTransfer = (
+    missionController: MissionController,
+    missionName: string,
+): void => {
+    const nativeTransferDisband = (missionController as unknown as {
+        disbandMissionForTransfer?: (name: string) => void;
+    }).disbandMissionForTransfer;
+    if (typeof nativeTransferDisband === "function") {
+        nativeTransferDisband.call(missionController, missionName);
+        return;
+    }
+    const donor = missionController.getMissions().find(
+        (mission) => mission.getUniqueName() === missionName,
+    );
+    donor?.getUnitIds().slice().forEach((unitId) => donor.removeUnit(unitId));
+    missionController.disbandMission(missionName);
+};
+
 export const selectTransferCertifiedBuildingEliminationAttackers = (
     eligibleAttackers: UnitData[],
     missionNameForUnit: (unitId: number) => string | null,
@@ -2951,7 +2969,10 @@ export class BuildingEliminationMissionFactory {
                     this.readinessVanguardUnitIds?.has(id) === true,
                 ).length,
             });
-            missionController.disbandMissionForTransfer(BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME);
+            disbandBuildingEliminationMissionForTransfer(
+                missionController,
+                BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
+            );
         }
         this.readinessVanguardUnitIds = null;
     }
@@ -3042,7 +3063,7 @@ export class BuildingEliminationMissionFactory {
             .map((mission) => mission.getUniqueName())
             .filter(isPreemptibleBuildingEliminationMission)
             .sort();
-        names.forEach((name) => missionController.disbandMissionForTransfer(name));
+        names.forEach((name) => disbandBuildingEliminationMissionForTransfer(missionController, name));
         return names;
     }
 }
