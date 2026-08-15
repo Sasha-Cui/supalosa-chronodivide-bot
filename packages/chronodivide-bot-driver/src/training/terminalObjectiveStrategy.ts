@@ -118,6 +118,7 @@ export type TerminalObjectiveTelemetry = {
     selectedBuildingId?: number | null;
     selectedBuildingVisible?: boolean;
     selectedBuildingObservedBy?: "vision" | "memory" | "public_complete_state";
+    selectedBuildingCoordinates?: { x: number; y: number };
     selectedBuildingOrderMode?: ObjectiveBuildingOrderMode;
     selectedAttackerIds?: number[];
     blockerIds?: number[];
@@ -1006,6 +1007,9 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 : selected.target.exact
                   ? "public_complete_state"
                   : "memory",
+            selectedBuildingCoordinates: isProgressCertifiedPolicyV5(this.policy)
+                ? point(selected.target.unit)
+                : undefined,
             selectedBuildingOrderMode: isProgressCertifiedPolicyV5(this.policy) &&
                 (decision.kind === "building_strike" || decision.kind === "terminal_candidate_strike")
                 ? resolveObjectiveBuildingOrderMode(selected.target, this.policy)
