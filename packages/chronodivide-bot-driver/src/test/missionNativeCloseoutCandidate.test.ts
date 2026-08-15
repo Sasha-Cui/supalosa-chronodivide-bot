@@ -25,6 +25,7 @@ import { buildMissionNativeCloseoutPolicyV27 } from "../training/missionNativeCl
 import { buildMissionNativeCloseoutPolicyV28 } from "../training/missionNativeCloseoutPolicyV28.js";
 import { buildMissionNativeCloseoutPolicyV29 } from "../training/missionNativeCloseoutPolicyV29.js";
 import { buildMissionNativeCloseoutPolicyV30 } from "../training/missionNativeCloseoutPolicyV30.js";
+import { buildMissionNativeCloseoutPolicyV31 } from "../training/missionNativeCloseoutPolicyV31.js";
 
 describe("mission-native closeout candidate", () => {
     it("returns the exact external baseline path when disabled", () => {
@@ -467,4 +468,19 @@ describe("mission-native closeout candidate", () => {
         )).toBe(injected);
         expect(factory.createWithStrategy).toHaveBeenCalledOnce();
     }, 240_000);
+
+    it("accepts the prospective queue-safe production-focus v31 policy", () => {
+        const injected = { kind: "injected-v31" } as any;
+        let inner: any;
+        inner = { onAiUpdate: vi.fn(() => inner) };
+        const factory = {
+            descriptor: { kind: "external-package", packageRoot: "/baseline" },
+            create: vi.fn(), createDefaultStrategy: vi.fn(() => inner),
+            createWithStrategy: vi.fn(() => injected),
+        } as any;
+        expect(createMissionNativeCloseoutCandidate(
+            factory, "candidate", Countries.IRAQ, buildMissionNativeCloseoutPolicyV31(),
+        )).toBe(injected);
+        expect(factory.createWithStrategy).toHaveBeenCalledOnce();
+    }, 300_000);
 });

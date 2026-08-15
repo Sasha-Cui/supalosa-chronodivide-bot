@@ -1,5 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
-import { AttackState, FactoryType, ObjectType, QueueType, SideType, SpeedType } from "@chronodivide/game-api";
+import { AttackState, FactoryType, ObjectType, QueueStatus, QueueType, SideType, SpeedType } from
+    "@chronodivide/game-api";
 import {
     assignAttackersToTargets,
     assignAttackersToCompatibleTargets,
@@ -48,6 +49,7 @@ import {
     selectBuildingEliminationRouteThreatCandidates,
     selectCommittedBuildingAttackers,
     selectCompatibleBuildingTargets,
+    shouldUseBuildingEliminationQueueSafeProductionFocus,
     selectStagedBuildingEliminationAttackers,
     selectTransferCertifiedBuildingEliminationAttackers,
     shouldRunBuildingEliminationCapabilityProduction,
@@ -372,6 +374,24 @@ describe("building elimination policy", () => {
             type: "releaseUnits",
             unitIds: [71],
         });
+    });
+
+    test("focuses production only on an idle queue or the already-selected queue head", () => {
+        expect(shouldUseBuildingEliminationQueueSafeProductionFocus(QueueStatus.Idle, null, "HTNK")).toBe(true);
+        expect(shouldUseBuildingEliminationQueueSafeProductionFocus(QueueStatus.Active, "HTNK", "HTNK")).toBe(true);
+        expect(shouldUseBuildingEliminationQueueSafeProductionFocus(QueueStatus.OnHold, "HTNK", "HTNK")).toBe(true);
+        expect(shouldUseBuildingEliminationQueueSafeProductionFocus(QueueStatus.Active, "HARV", "HTNK")).toBe(false);
+        expect(shouldUseBuildingEliminationQueueSafeProductionFocus(QueueStatus.OnHold, "HARV", "HTNK")).toBe(false);
+        expect(shouldUseBuildingEliminationQueueSafeProductionFocus(QueueStatus.Ready, "HTNK", "HTNK")).toBe(false);
+    });
+
+    test("can focus the tank and screen requests independently", () => {
+        expect(getBuildingEliminationAssaultProductionRequests(
+            "HTNK", 0, 4, "E2", 0, 4, 1_000, true, 1, 1, 140,
+        )).toEqual({ HTNK: 1_000, E2: 140 });
+        expect(getBuildingEliminationAssaultProductionRequests(
+            "HTNK", 1, 4, "E2", 0, 4, 140, true, 1, 1, 1_000,
+        )).toEqual({ HTNK: 140, E2: 1_000 });
     });
 
     test("keeps capability production active after the closeout gate has fired", () => {
@@ -923,6 +943,7 @@ describe("building elimination policy", () => {
             "adaptiveGroundAssaultTargetCount",
             "adaptiveGroundAssaultInfrastructure",
             "adaptiveGroundAssaultScreenInfrastructure",
+            "adaptiveGroundAssaultQueuedProductionFocusPriority",
             "adaptiveGroundAssaultProductionReservation",
             "adaptiveGroundAssaultProductionScopeLatch",
             "adaptiveGroundAssaultScreenTargetCount",
@@ -992,6 +1013,9 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({
             adaptiveGroundAssaultScreenInfrastructure: "yes" as any,
         })).toThrow("screen infrastructure");
+        expect(() => resolveBuildingEliminationOptions({
+            adaptiveGroundAssaultQueuedProductionFocusPriority: -1,
+        })).toThrow("adaptiveGroundAssaultQueuedProductionFocusPriority");
         expect(() => resolveBuildingEliminationOptions({
             adaptiveGroundAssaultProductionReservation: "yes" as any,
         })).toThrow("production reservation");

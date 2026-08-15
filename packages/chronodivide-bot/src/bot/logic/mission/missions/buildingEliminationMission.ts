@@ -3,6 +3,7 @@ import {
     GameApi,
     ObjectType,
     OrderType,
+    QueueStatus,
     QueueType,
     SideType,
     SpeedType,
@@ -62,6 +63,7 @@ export type BuildingEliminationOptions = {
     adaptiveGroundAssaultTargetCount?: number;
     adaptiveGroundAssaultInfrastructure?: boolean;
     adaptiveGroundAssaultScreenInfrastructure?: boolean;
+    adaptiveGroundAssaultQueuedProductionFocusPriority?: number;
     adaptiveGroundAssaultProductionReservation?: boolean;
     adaptiveGroundAssaultProductionScopeLatch?: boolean;
     adaptiveGroundAssaultScreenTargetCount?: number;
@@ -438,6 +440,27 @@ export type BuildingEliminationTelemetryEvent =
           requested: boolean;
       }
     | {
+          schemaVersion: 25;
+          event: "assault_production_focus";
+          tick: number;
+          side: SideType.Nod | SideType.GDI;
+          phase: "inactive" | "tank" | "screen";
+          unitName: "HTNK" | "MTNK";
+          screenUnitName: "E1" | "E2";
+          currentTankCount: number;
+          currentScreenCount: number;
+          focusPriority: number;
+          tankRequestPriority: number;
+          screenRequestPriority: number;
+          screenInfrastructureReady: boolean;
+          tankAvailable: boolean;
+          screenAvailable: boolean;
+          vehicleQueueStatus: QueueStatus;
+          vehicleQueueHeadName: string | null;
+          infantryQueueStatus: QueueStatus;
+          infantryQueueHeadName: string | null;
+      }
+    | {
           schemaVersion: 15;
           event: "assault_production_reservation";
           tick: number;
@@ -569,6 +592,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     adaptiveGroundAssaultTargetCount: 0,
     adaptiveGroundAssaultInfrastructure: false,
     adaptiveGroundAssaultScreenInfrastructure: false,
+    adaptiveGroundAssaultQueuedProductionFocusPriority: 0,
     adaptiveGroundAssaultProductionReservation: false,
     adaptiveGroundAssaultProductionScopeLatch: false,
     adaptiveGroundAssaultScreenTargetCount: 0,
@@ -629,6 +653,12 @@ export const resolveBuildingEliminationOptions = (
         resolved.adaptiveGroundAssaultInfrastructurePriority,
         1,
         1_000,
+    );
+    requireIntegerInRange(
+        "adaptiveGroundAssaultQueuedProductionFocusPriority",
+        resolved.adaptiveGroundAssaultQueuedProductionFocusPriority,
+        0,
+        10_000,
     );
     requireIntegerInRange("adaptiveProductionPriority", resolved.adaptiveProductionPriority, 1, 1_000);
     requireIntegerInRange("adaptiveTechPriority", resolved.adaptiveTechPriority, 1, 1_000);
@@ -2720,6 +2750,15 @@ export const getBuildingEliminationGroundAssaultScreenStructureName = (
     side: SideType.Nod | SideType.GDI,
 ): "NAHAND" | "GAPILE" => side === SideType.Nod ? "NAHAND" : "GAPILE";
 
+export const shouldUseBuildingEliminationQueueSafeProductionFocus = (
+    queueStatus: QueueStatus,
+    queueHeadName: string | null,
+    requestedName: string,
+): boolean => queueStatus === QueueStatus.Idle || (
+    (queueStatus === QueueStatus.Active || queueStatus === QueueStatus.OnHold) &&
+    queueHeadName === requestedName
+);
+
 export const getBuildingEliminationAssaultProductionRequests = (
     unitName: "HTNK" | "MTNK",
     currentCount: number,
@@ -2731,10 +2770,11 @@ export const getBuildingEliminationAssaultProductionRequests = (
     screenTriggerActive = currentCount >= 1,
     queuedUnitCount = 0,
     queuedScreenCount = 0,
+    screenPriority = priority,
 ): Record<string, number> => ({
     ...(currentCount + queuedUnitCount < targetCount ? { [unitName]: priority } : {}),
     ...(screenTriggerActive && currentScreenCount + queuedScreenCount < screenTargetCount
-        ? { [screenUnitName]: priority }
+        ? { [screenUnitName]: screenPriority }
         : {}),
 });
 
@@ -2975,6 +3015,8 @@ class BuildingEliminationAssaultProductionMission extends Mission {
     private lastTelemetryAt = Number.NEGATIVE_INFINITY;
     private lastScreenTelemetrySignature = "";
     private lastScreenTelemetryAt = Number.NEGATIVE_INFINITY;
+    private lastFocusTelemetrySignature = "";
+    private lastFocusTelemetryAt = Number.NEGATIVE_INFINITY;
 
     constructor(
         private options: Required<BuildingEliminationOptions>,
@@ -3005,6 +3047,8 @@ class BuildingEliminationAssaultProductionMission extends Mission {
         const screenTriggerActive = factoryTriggeredScreen ? factoryCount >= 1 : currentCount >= 1;
         const available = context.player.production.getAvailableObjects(QueueType.Vehicles)
             .some(({ name }) => name === unitName);
+        const screenAvailable = context.player.production.getAvailableObjects(QueueType.Infantry)
+            .some(({ name }) => name === screenUnitName);
         const vehicleQueue = context.player.production.getQueueData(QueueType.Vehicles);
         const infantryQueue = context.player.production.getQueueData(QueueType.Infantry);
         const queuedUnitCount = this.options.queueAwareGroundAssaultTargets
@@ -3013,6 +3057,27 @@ class BuildingEliminationAssaultProductionMission extends Mission {
         const queuedScreenCount = this.options.queueAwareGroundAssaultTargets
             ? infantryQueue.items.find(({ rules }) => rules.name === screenUnitName)?.quantity ?? 0
             : 0;
+        const focusPriority = this.options.adaptiveGroundAssaultQueuedProductionFocusPriority;
+        const screenStructureName = getBuildingEliminationGroundAssaultScreenStructureName(side);
+        const screenInfrastructureReady = countOwnVisibleUnits(context, screenStructureName) >= 1;
+        const vehicleQueueHeadName = vehicleQueue.items[0]?.rules.name ?? null;
+        const infantryQueueHeadName = infantryQueue.items[0]?.rules.name ?? null;
+        const tankFocusActive = focusPriority > 0 && screenInfrastructureReady && available && currentCount < 1 &&
+            shouldUseBuildingEliminationQueueSafeProductionFocus(
+                vehicleQueue.status,
+                vehicleQueueHeadName,
+                unitName,
+            );
+        const screenFocusActive = focusPriority > 0 && screenInfrastructureReady && screenAvailable &&
+            currentCount >= 1 &&
+            currentScreenCount + queuedScreenCount < this.options.adaptiveGroundAssaultScreenTargetCount &&
+            shouldUseBuildingEliminationQueueSafeProductionFocus(
+                infantryQueue.status,
+                infantryQueueHeadName,
+                screenUnitName,
+            );
+        const tankRequestPriority = tankFocusActive ? focusPriority : this.options.adaptiveProductionPriority;
+        const screenRequestPriority = screenFocusActive ? focusPriority : this.options.adaptiveProductionPriority;
         const requested = currentCount + queuedUnitCount < this.options.adaptiveGroundAssaultTargetCount;
         this.emitTelemetry(
             context.game.getCurrentTick(),
@@ -3045,6 +3110,25 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             this.options.queueAwareGroundAssaultTargets ? queuedScreenCount : undefined,
             this.options.queueAwareGroundAssaultTargets ? true : undefined,
         );
+        this.emitFocusTelemetry(
+            context.game.getCurrentTick(),
+            side,
+            tankFocusActive ? "tank" : screenFocusActive ? "screen" : "inactive",
+            unitName,
+            screenUnitName,
+            currentCount,
+            currentScreenCount,
+            focusPriority,
+            tankRequestPriority,
+            screenRequestPriority,
+            screenInfrastructureReady,
+            available,
+            screenAvailable,
+            vehicleQueue.status,
+            vehicleQueueHeadName,
+            infantryQueue.status,
+            infantryQueueHeadName,
+        );
         const requests = getBuildingEliminationAssaultProductionRequests(
             unitName,
             currentCount,
@@ -3052,10 +3136,11 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             screenUnitName,
             currentScreenCount,
             this.options.adaptiveGroundAssaultScreenTargetCount,
-            this.options.adaptiveProductionPriority,
+            tankRequestPriority,
             screenTriggerActive,
             queuedUnitCount,
             queuedScreenCount,
+            screenRequestPriority,
         );
         return Object.keys(requests).length > 0 ? requestUnits(requests) : noop();
     }
@@ -3146,6 +3231,55 @@ class BuildingEliminationAssaultProductionMission extends Mission {
             tick < this.lastScreenTelemetryAt + TELEMETRY_HEARTBEAT_TICKS) return;
         this.lastScreenTelemetrySignature = signature;
         this.lastScreenTelemetryAt = tick;
+        this.telemetrySink(event);
+    }
+
+    private emitFocusTelemetry(
+        tick: number,
+        side: SideType.Nod | SideType.GDI,
+        phase: "inactive" | "tank" | "screen",
+        unitName: "HTNK" | "MTNK",
+        screenUnitName: "E1" | "E2",
+        currentTankCount: number,
+        currentScreenCount: number,
+        focusPriority: number,
+        tankRequestPriority: number,
+        screenRequestPriority: number,
+        screenInfrastructureReady: boolean,
+        tankAvailable: boolean,
+        screenAvailable: boolean,
+        vehicleQueueStatus: QueueStatus,
+        vehicleQueueHeadName: string | null,
+        infantryQueueStatus: QueueStatus,
+        infantryQueueHeadName: string | null,
+    ): void {
+        if (focusPriority <= 0) return;
+        const event: Extract<BuildingEliminationTelemetryEvent, { event: "assault_production_focus" }> = {
+            schemaVersion: 25,
+            event: "assault_production_focus",
+            tick,
+            side,
+            phase,
+            unitName,
+            screenUnitName,
+            currentTankCount,
+            currentScreenCount,
+            focusPriority,
+            tankRequestPriority,
+            screenRequestPriority,
+            screenInfrastructureReady,
+            tankAvailable,
+            screenAvailable,
+            vehicleQueueStatus,
+            vehicleQueueHeadName,
+            infantryQueueStatus,
+            infantryQueueHeadName,
+        };
+        const signature = JSON.stringify({ ...event, tick: 0 });
+        if (signature === this.lastFocusTelemetrySignature &&
+            tick < this.lastFocusTelemetryAt + TELEMETRY_HEARTBEAT_TICKS) return;
+        this.lastFocusTelemetrySignature = signature;
+        this.lastFocusTelemetryAt = tick;
         this.telemetrySink(event);
     }
 }

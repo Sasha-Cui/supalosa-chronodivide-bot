@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { cdapi } from "@chronodivide/game-api";
+import { QueueStatus, cdapi } from "@chronodivide/game-api";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { BuildingEliminationTelemetryEvent } from
     "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
@@ -68,6 +68,8 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
     profile: {
         productionReservation: "required" | "forbidden";
         screenInfrastructure: "ignored" | "required";
+        screenProductionEvidence?: "request_before_tank" | "sufficient_before_tank";
+        productionFocus?: "ignored" | "required";
     } = { productionReservation: "required", screenInfrastructure: "ignored" },
 ): void => {
     const expected = expectedNames(country);
@@ -78,6 +80,7 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
     const screen = eventsOf(telemetry, "assault_screen_production");
     const infrastructure = eventsOf(telemetry, "assault_infrastructure");
     const screenInfrastructure = eventsOf(telemetry, "assault_screen_infrastructure");
+    const productionFocus = eventsOf(telemetry, "assault_production_focus");
     const progressive = eventsOf(telemetry, "progressive_blocker_launch");
     const capability = eventsOf(telemetry, "assault_capability_launch");
     const attritional = eventsOf(telemetry, "attritional_blocker_launch");
@@ -113,6 +116,41 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
             event.currentCount < 0,
         ) || !screenInfrastructure.some((event) => event.currentCount >= 1 || event.requested)
     )) throw new Error(`Invalid assault screen infrastructure for ${country}`);
+    if (profile.productionFocus === "required") {
+        if (productionFocus.length === 0 || productionFocus.some((event) => {
+            const tankFocused = event.phase === "tank";
+            const screenFocused = event.phase === "screen";
+            const tankQueueSafe = event.vehicleQueueStatus === QueueStatus.Idle || (
+                (event.vehicleQueueStatus === QueueStatus.Active ||
+                    event.vehicleQueueStatus === QueueStatus.OnHold) &&
+                event.vehicleQueueHeadName === event.unitName
+            );
+            const screenQueueSafe = event.infantryQueueStatus === QueueStatus.Idle || (
+                (event.infantryQueueStatus === QueueStatus.Active ||
+                    event.infantryQueueStatus === QueueStatus.OnHold) &&
+                event.infantryQueueHeadName === event.screenUnitName
+            );
+            return event.schemaVersion !== 25 || event.unitName !== expected.tank ||
+                event.screenUnitName !== expected.screen || event.focusPriority !== 1_000 ||
+                (tankFocused && (
+                    event.currentTankCount >= 1 || !event.screenInfrastructureReady || !event.tankAvailable ||
+                    event.tankRequestPriority !== event.focusPriority ||
+                    event.screenRequestPriority === event.focusPriority || !tankQueueSafe
+                )) ||
+                (screenFocused && (
+                    event.currentTankCount < 1 || !event.screenInfrastructureReady || !event.screenAvailable ||
+                    event.screenRequestPriority !== event.focusPriority ||
+                    event.tankRequestPriority === event.focusPriority || !screenQueueSafe
+                )) ||
+                (event.phase === "inactive" && (
+                    event.tankRequestPriority === event.focusPriority ||
+                    event.screenRequestPriority === event.focusPriority
+                ));
+        })) throw new Error(`Invalid schema-25 queue-safe production focus for ${country}`);
+        if (!productionFocus.some((event) => event.phase !== "inactive")) {
+            throw new Error(`No active queue-safe production focus for ${country}`);
+        }
+    }
     if (production.length === 0 || production.some((event) =>
         event.schemaVersion !== 14 || event.unitName !== expected.tank ||
         event.queueAwareTargeting !== true || !Number.isInteger(event.queuedCount) ||
@@ -148,9 +186,21 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
         (event.requested && event.currentCount + (event.queuedCount ?? 0) >= event.targetCount),
     )) throw new Error(`Invalid schema-17 assault screen for ${country}`);
     const firstRequest = screen.find(({ requested }) => requested);
-    if (!firstRequest) throw new Error(`No factory-triggered ${expected.screen} request for ${country}`);
-    if (firstRequest.tick < firstPhysicalFactory.tick || firstRequest.mainTankPresent) {
-        throw new Error(`Screen did not start from the physical factory before the first tank for ${country}`);
+    if (profile.screenProductionEvidence === "sufficient_before_tank") {
+        const sufficientBeforeTank = screen.some((event) =>
+            event.tick >= firstPhysicalFactory.tick && !event.mainTankPresent &&
+            event.currentCount + (event.queuedCount ?? 0) >= event.targetCount,
+        );
+        const requestedBeforeTank = firstRequest !== undefined &&
+            firstRequest.tick >= firstPhysicalFactory.tick && !firstRequest.mainTankPresent;
+        if (!sufficientBeforeTank && !requestedBeforeTank) {
+            throw new Error(`No pre-tank ${expected.screen} sufficiency or request for ${country}`);
+        }
+    } else {
+        if (!firstRequest) throw new Error(`No factory-triggered ${expected.screen} request for ${country}`);
+        if (firstRequest.tick < firstPhysicalFactory.tick || firstRequest.mainTankPresent) {
+            throw new Error(`Screen did not start from the physical factory before the first tank for ${country}`);
+        }
     }
     if (profile.productionReservation === "required" && !reservation.some((event) =>
         event.tick >= firstPhysicalFactory.tick &&

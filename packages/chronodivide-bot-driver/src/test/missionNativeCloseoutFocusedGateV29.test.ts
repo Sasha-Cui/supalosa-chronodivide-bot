@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { QueueType, SideType } from "@chronodivide/game-api";
+import { QueueStatus, QueueType, SideType } from "@chronodivide/game-api";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { BuildingEliminationTelemetryEvent } from
     "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
@@ -217,6 +217,32 @@ const sovietDirectLaunch = (): BuildingEliminationTelemetryEvent[] => directLaun
     return event;
 });
 
+const v31DirectLaunch = (): BuildingEliminationTelemetryEvent[] => [
+    ...directLaunch().filter((event) => event.event !== "assault_production_reservation"),
+    {
+        schemaVersion: 24, event: "assault_screen_infrastructure", tick: 2_600,
+        side: SideType.GDI, structureName: "GAPILE", currentCount: 1,
+        available: true, requested: false,
+    },
+    {
+        schemaVersion: 25, event: "assault_production_focus", tick: 3_000,
+        side: SideType.GDI, phase: "tank", unitName: "MTNK", screenUnitName: "E1",
+        currentTankCount: 0, currentScreenCount: 0, focusPriority: 1_000,
+        tankRequestPriority: 1_000, screenRequestPriority: 140,
+        screenInfrastructureReady: true, tankAvailable: true, screenAvailable: true,
+        vehicleQueueStatus: QueueStatus.Active,
+        vehicleQueueHeadName: "MTNK", infantryQueueStatus: QueueStatus.Idle,
+        infantryQueueHeadName: null,
+    },
+];
+
+const v31Profile = {
+    productionReservation: "forbidden",
+    screenInfrastructure: "required",
+    screenProductionEvidence: "sufficient_before_tank",
+    productionFocus: "required",
+} as const;
+
 describe("mission-native closeout focused gate v29", () => {
     it("keeps every focused seed inside the engine uint32 domain", () => {
         for (const index of MISSION_NATIVE_CLOSEOUT_FOCUSED_GATE_V29_COUNTRIES.keys()) {
@@ -245,6 +271,41 @@ describe("mission-native closeout focused gate v29", () => {
         expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
             sovietDirectLaunch(), Countries.CUBA,
         )).not.toThrow();
+    });
+
+    it("accepts queue-safe V31 focus without destructive reservation", () => {
+        expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
+            v31DirectLaunch(), Countries.USA, v31Profile,
+        )).not.toThrow();
+    });
+
+    it("accepts a pre-tank screen that is already sufficient without a forced request", () => {
+        const telemetry = v31DirectLaunch().map((event) =>
+            event.event === "assault_screen_production" && !event.mainTankPresent
+                ? { ...event, currentCount: 4, queuedCount: 0, requested: false }
+                : event,
+        ) as BuildingEliminationTelemetryEvent[];
+        expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
+            telemetry, Countries.USA, v31Profile,
+        )).not.toThrow();
+    });
+
+    it("rejects focus that would displace a different active queue head", () => {
+        const telemetry = v31DirectLaunch().map((event) => event.event === "assault_production_focus"
+            ? { ...event, vehicleQueueHeadName: "HARV" }
+            : event) as BuildingEliminationTelemetryEvent[];
+        expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
+            telemetry, Countries.USA, v31Profile,
+        )).toThrow("queue-safe production focus");
+    });
+
+    it("rejects focus before the desired queue item is buildable", () => {
+        const telemetry = v31DirectLaunch().map((event) => event.event === "assault_production_focus"
+            ? { ...event, tankAvailable: false }
+            : event) as BuildingEliminationTelemetryEvent[];
+        expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
+            telemetry, Countries.USA, v31Profile,
+        )).toThrow("queue-safe production focus");
     });
 
     it("rejects a preterminal objective-feasible infantry-only launch", () => {
