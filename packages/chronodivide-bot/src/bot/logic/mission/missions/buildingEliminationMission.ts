@@ -91,6 +91,7 @@ export type BuildingEliminationOptions = {
     readinessReserveScope?: BuildingEliminationReadinessReserveScope;
     readinessReserveDefenseRadius?: number;
     contactOnlyBlockerClearance?: boolean;
+    terminalBuildingPriority?: boolean;
 };
 
 export type BuildingTargetDescriptor = {
@@ -201,7 +202,7 @@ export type BuildingEliminationTelemetryEvent =
           phase: "building_strike" | "blocker_clear" | "no_compatible_target";
           reason: "direct_building" | "building_in_range" | "building_completion_race" |
               "no_route_threat" | "route_interception_wins" | "objective_advance" |
-              "no_compatible_target";
+              "terminal_building" | "no_compatible_target";
           targetId: number | null;
           targetName: string | null;
           targetHitPoints: number | null;
@@ -226,6 +227,20 @@ export type BuildingEliminationTelemetryEvent =
           buildingAttackerCount: number;
           blockerAttackerCount: number;
           inRangeBuildingAttackerCount: number;
+      }
+    | {
+          schemaVersion: 27;
+          event: "objective_race_allocation";
+          tick: number;
+          targetId: number;
+          targetName: string;
+          remainingEnemyBuildingCount: number;
+          terminalPriorityActive: boolean;
+          allocationMode: BuildingEliminationEngagementAllocationMode;
+          blockerId: number | null;
+          assignedAttackerCount: number;
+          buildingAttackerCount: number;
+          blockerAttackerCount: number;
       }
     | {
           schemaVersion: 5;
@@ -632,6 +647,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     readinessReserveScope: "reinforcements",
     readinessReserveDefenseRadius: 0,
     contactOnlyBlockerClearance: false,
+    terminalBuildingPriority: false,
 };
 
 const requireIntegerInRange = (name: string, value: number, minimum: number, maximum: number): void => {
@@ -712,6 +728,11 @@ export const resolveBuildingEliminationOptions = (
     if (typeof resolved.contactOnlyBlockerClearance !== "boolean") {
         throw new Error(
             `Invalid building-elimination contact-only blocker clearance: ${resolved.contactOnlyBlockerClearance}`,
+        );
+    }
+    if (typeof resolved.terminalBuildingPriority !== "boolean") {
+        throw new Error(
+            `Invalid building-elimination terminal-building priority: ${resolved.terminalBuildingPriority}`,
         );
     }
     if (typeof resolved.adaptiveGroundAssaultInfrastructure !== "boolean") {
@@ -1107,7 +1128,7 @@ const piecewiseForceSurvivalTicks = (
 export type BuildingEliminationEngagementDecision = {
     blocker: UnitData | null;
     reason: "building_in_range" | "building_completion_race" |
-        "no_route_threat" | "route_interception_wins" | "objective_advance";
+        "no_route_threat" | "route_interception_wins" | "objective_advance" | "terminal_building";
     routeThreatCount: number;
     staticRouteThreatCount: number;
     estimatedBuildingCompletionTicks: number;
@@ -1126,6 +1147,16 @@ export const applyContactTriggeredBuildingAdvance = (
     !preserveCommittedBlocker
         ? { ...decision, blocker: null, reason: "objective_advance" }
         : decision;
+
+export const applyTerminalBuildingPriority = (
+    decision: BuildingEliminationEngagementDecision,
+    remainingEnemyBuildingCount: number,
+    enabled: boolean,
+): BuildingEliminationEngagementDecision => enabled && remainingEnemyBuildingCount === 1 &&
+    (decision.blocker === null ||
+        decision.estimatedBuildingCompletionTicks <= decision.estimatedForceSurvivalTicks)
+    ? { ...decision, blocker: null, reason: "terminal_building" }
+    : decision;
 
 export const chooseBuildingEliminationEngagement = (
     attackers: UnitData[],
@@ -2320,12 +2351,17 @@ class BuildingEliminationMission extends Mission {
                         ? this.committedRouteBlocker.blockerId
                         : null,
                 );
+                const terminalDecision = applyTerminalBuildingPriority(
+                    predictedDecision,
+                    currentTargets.length,
+                    this.options.terminalBuildingPriority,
+                );
                 const preserveCommittedBlocker = this.options.commitRouteBlocker &&
                     this.committedRouteBlocker?.targetId === currentPrimaryTarget.id &&
-                    predictedDecision.blocker?.id === this.committedRouteBlocker.blockerId;
+                    terminalDecision.blocker?.id === this.committedRouteBlocker.blockerId;
                 const decision = this.options.contactOnlyBlockerClearance
-                    ? applyContactTriggeredBuildingAdvance(predictedDecision, preserveCommittedBlocker)
-                    : predictedDecision;
+                    ? applyContactTriggeredBuildingAdvance(terminalDecision, preserveCommittedBlocker)
+                    : terminalDecision;
                 blocker = decision.blocker;
                 this.committedRouteBlocker = this.options.commitRouteBlocker && blocker
                     ? { targetId: currentPrimaryTarget.id, blockerId: blocker.id }
@@ -2369,6 +2405,22 @@ class BuildingEliminationMission extends Mission {
                     blockerAttackerCount: allocation.blockerAttackers.length,
                     inRangeBuildingAttackerCount: allocation.inRangeBuildingAttackerCount,
                 });
+                if (this.options.terminalBuildingPriority) {
+                    this.telemetrySink({
+                        schemaVersion: 27,
+                        event: "objective_race_allocation",
+                        tick: context.game.getCurrentTick(),
+                        targetId: currentPrimaryTarget.id,
+                        targetName: currentPrimaryTarget.rules.name,
+                        remainingEnemyBuildingCount: currentTargets.length,
+                        terminalPriorityActive: currentTargets.length === 1,
+                        allocationMode: this.options.engagementAllocationMode,
+                        blockerId: blocker?.id ?? null,
+                        assignedAttackerCount: assignedUnits.length,
+                        buildingAttackerCount: allocation.buildingAttackers.length,
+                        blockerAttackerCount: allocation.blockerAttackers.length,
+                    });
+                }
                 this.maybeEmitExecutionHeartbeat(
                     context,
                     currentPrimaryTarget,
