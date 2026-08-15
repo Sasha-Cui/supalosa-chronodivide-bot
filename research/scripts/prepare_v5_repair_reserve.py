@@ -235,10 +235,16 @@ def download(args: argparse.Namespace) -> None:
         if not output.exists():
             if temporary.exists():
                 temporary.unlink()
-            subprocess.run([
+            curl_command = [
                 args.curl, "-L", "--fail", "--silent", "--show-error", "--max-time", "60",
-                "--retry", "3", f"https://cncmaparchive.org/download/YR/{sha1}", "-o", str(temporary),
-            ], check=True)
+                "--retry", "3",
+            ]
+            if args.curl_resolve is not None:
+                curl_command.extend(["--resolve", args.curl_resolve])
+            curl_command.extend([
+                f"https://cncmaparchive.org/download/YR/{sha1}", "-o", str(temporary),
+            ])
+            subprocess.run(curl_command, check=True)
             if hashlib.sha1(temporary.read_bytes()).hexdigest() != sha1:
                 raise RuntimeError(f"Downloaded reserve bytes do not match source SHA-1 {sha1}")
             temporary.replace(output)
@@ -262,6 +268,14 @@ def download(args: argparse.Namespace) -> None:
         "selectionPath": str(args.selection.resolve()),
         "selectionSha256": sha256_file(args.selection),
         "selectionPopulationCommitmentSha256": selection["populationCommitmentSha256"],
+        "transport": {
+            "urlHost": "cncmaparchive.org",
+            "curlResolve": args.curl_resolve,
+            "note": (
+                "A curl DNS override affects transport only; every retrieved object is still "
+                "authenticated against its prospectively frozen source SHA-1."
+            ),
+        },
         "mapCount": len(rows),
         "mapCommitmentSha256": canonical_sha256(rows),
         "maps": rows,
@@ -505,6 +519,10 @@ def parse_args() -> argparse.Namespace:
     download_parser.add_argument("--map-root", type=Path, required=True)
     download_parser.add_argument("--output", type=Path, required=True)
     download_parser.add_argument("--curl", default="curl")
+    download_parser.add_argument(
+        "--curl-resolve",
+        help="Optional curl --resolve value, for example cncmaparchive.org:443:84.247.130.58",
+    )
     download_parser.set_defaults(func=download)
     screen_parser = subparsers.add_parser("screen")
     screen_parser.add_argument("--selection", type=Path, required=True)
