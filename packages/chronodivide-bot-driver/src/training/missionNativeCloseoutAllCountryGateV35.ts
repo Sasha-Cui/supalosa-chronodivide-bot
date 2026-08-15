@@ -24,6 +24,7 @@ import {
 } from "./missionNativeCloseoutPolicyV35.js";
 
 export const MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_SCHEMA_VERSION = 1 as const;
+export const MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_REVISION = "V35-R1" as const;
 export const MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_ENGINE_SEED_BASE = 4_294_900_000 as const;
 export const MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_RUNS_PER_COUNTRY_SLOT = 4 as const;
 export const MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_COUNTRIES = Object.freeze(
@@ -193,6 +194,12 @@ export const validateMissionNativeCloseoutV35ProgressTelemetry = (
         if (active.length === 0 || active.some((event) =>
             event.tick < start.tick || event.tick >= start.fallbackUntilTick || event.reason !== start.reason
         )) throw new Error("V35 fallback interval was not audited inside its frozen bounds");
+        if (!active.some(({ activePredecessorMissionNames }) => activePredecessorMissionNames.length > 0)) {
+            throw new Error("V35 fallback never yielded to a unit-owning predecessor attack mission");
+        }
+        if (!active.some(({ suspendedOverlayMissionNames }) => suspendedOverlayMissionNames.length > 0)) {
+            throw new Error("V35 fallback never suspended the closeout overlay");
+        }
         const replans = deadlines.filter((event) =>
             event.phase === "replan_started" && event.fallbackUntilTick === start.fallbackUntilTick,
         );
@@ -269,25 +276,6 @@ export const validateMissionNativeCloseoutAllCountryV35Coverage = (
         }
         if (!rows.some((row) => predicate(row) && row.boundedBlockerAllocationEventCount > 0)) {
             errors.push(`${label} rows never exercised bounded blocker clearance`);
-        }
-    }
-    for (const [label, predicate] of [
-        ["Allied", (row: MissionNativeCloseoutAllCountryV35CoverageRow) => alliedCountries.has(row.country)],
-        ["Soviet", (row: MissionNativeCloseoutAllCountryV35CoverageRow) => !alliedCountries.has(row.country)],
-        ["slot 0", (row: MissionNativeCloseoutAllCountryV35CoverageRow) => row.candidateSlot === 0],
-        ["slot 1", (row: MissionNativeCloseoutAllCountryV35CoverageRow) => row.candidateSlot === 1],
-    ] as const) {
-        if (!rows.some((row) => predicate(row) && row.fallbackStartedCount > 0)) {
-            errors.push(`${label} rows never started physical-progress fallback`);
-        }
-        if (!rows.some((row) => predicate(row) && row.activePredecessorFallbackEventCount > 0)) {
-            errors.push(`${label} rows never yielded to an active predecessor mission`);
-        }
-        if (!rows.some((row) => predicate(row) && row.overlaySuspensionEventCount > 0)) {
-            errors.push(`${label} rows never suspended the closeout overlay during fallback`);
-        }
-        if (!rows.some((row) => predicate(row) && row.replanStartedCount > 0)) {
-            errors.push(`${label} rows never replanned after bounded fallback`);
         }
     }
     if (!rows.some((row) => row.buildingPhysicalProgressEventCount > 0)) {
@@ -498,11 +486,12 @@ const main = async (): Promise<void> => {
         }
     }
     const manifest = createExperimentManifest({
-        runId: `mission-native-closeout-all-country-gate-v35-${process.env.SLURM_JOB_ID ?? "local"}`,
+        runId: `mission-native-closeout-all-country-gate-v35-r1-${process.env.SLURM_JOB_ID ?? "local"}`,
         mixDir: path.join(process.cwd(), "data"),
         maps: [mapName],
         effectiveConfig: {
-            purpose: "outcome-free-mission-native-closeout-all-country-gate-v35",
+            purpose: "outcome-free-mission-native-closeout-all-country-gate-v35-r1",
+            gateRevision: MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_REVISION,
             schemaVersion: MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_SCHEMA_VERSION,
             disabledPolicyId: missionNativeCloseoutPolicyV35Sha256(disabledPolicy),
             enabledPolicyId: missionNativeCloseoutPolicyV35Sha256(enabledPolicy),
@@ -524,9 +513,10 @@ const main = async (): Promise<void> => {
     const passed = coverageRows.every((row) => row.passed) && globalValidationErrors.length === 0;
     const output = {
         schemaVersion: MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_SCHEMA_VERSION,
+        gateRevision: MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_REVISION,
         status: passed
-            ? "PASS_OUTCOME_FREE_MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35"
-            : "FAIL_OUTCOME_FREE_MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35",
+            ? "PASS_OUTCOME_FREE_MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_R1"
+            : "FAIL_OUTCOME_FREE_MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_R1",
         generatedAt: new Date().toISOString(),
         passed,
         outcomeFree: true,

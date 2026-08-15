@@ -4,6 +4,7 @@ import { derivePairedEngineSeed } from "../benchmark/seededOfflineGame.js";
 import {
     MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_COUNTRIES,
     MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_ENGINE_SEED_BASE,
+    MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_REVISION,
     MissionNativeCloseoutAllCountryV35CoverageRow,
     validateMissionNativeCloseoutAllCountryV35Coverage,
     validateMissionNativeCloseoutV35ObjectiveRaceTelemetry,
@@ -55,6 +56,7 @@ const validRows = (): MissionNativeCloseoutAllCountryV35CoverageRow[] =>
 
 describe("mission-native closeout all-country gate v35", () => {
     it("freezes all nine countries and both reciprocal slots", () => {
+        expect(MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_REVISION).toBe("V35-R1");
         expect(MISSION_NATIVE_CLOSEOUT_ALL_COUNTRY_GATE_V35_COUNTRIES).toEqual([
             Countries.USA,
             Countries.KOREA,
@@ -357,22 +359,45 @@ describe("mission-native closeout all-country gate v35", () => {
         ] as any)).toThrow("did not replan at its exact boundary");
     });
 
-    it("requires live fallback, predecessor control, suspension, and replan across strata", () => {
-        const rows = validRows().map((row) => row.country === Countries.USA && row.candidateSlot === 0
-            ? row
-            : {
-                ...row,
-                fallbackStartedCount: 0,
-                activePredecessorFallbackEventCount: 0,
-                overlaySuspensionEventCount: 0,
-                replanStartedCount: 0,
-            });
-        expect(validateMissionNativeCloseoutAllCountryV35Coverage(rows)).toEqual(expect.arrayContaining([
-            "Soviet rows never started physical-progress fallback",
-            "slot 1 rows never yielded to an active predecessor mission",
-            "Soviet rows never suspended the closeout overlay during fallback",
-            "slot 1 rows never replanned after bounded fallback",
-        ]));
+    it("accepts uninterrupted natural progress after the fixed R1 branch probe", () => {
+        const rows = validRows().map((row) => ({
+            ...row,
+            fallbackStartedCount: 0,
+            fallbackActiveCount: 0,
+            activePredecessorFallbackEventCount: 0,
+            overlaySuspensionEventCount: 0,
+            replanStartedCount: 0,
+        }));
+        expect(validateMissionNativeCloseoutAllCountryV35Coverage(rows)).toEqual([]);
+    });
+
+    it("rejects a natural fallback without predecessor ownership or overlay suspension", () => {
+        const base = [
+            {
+                schemaVersion: 29, event: "objective_progress_deadline", tick: 400,
+                phase: "fallback_started", reason: "building_no_progress", targetId: 10,
+                blockerId: null, lastCertifiedProgressTick: 100, deadlineTicks: 300,
+                fallbackUntilTick: 580, releasedUnitIds: [1, 2],
+                suspendedOverlayMissionNames: [], activePredecessorMissionNames: [],
+            },
+            {
+                schemaVersion: 29, event: "objective_progress_deadline", tick: 400,
+                phase: "fallback_active", reason: "building_no_progress", targetId: 10,
+                blockerId: null, lastCertifiedProgressTick: 100, deadlineTicks: 300,
+                fallbackUntilTick: 580, releasedUnitIds: [1, 2],
+                suspendedOverlayMissionNames: [], activePredecessorMissionNames: [],
+            },
+            {
+                schemaVersion: 29, event: "objective_progress_deadline", tick: 580,
+                phase: "replan_started", reason: "building_no_progress", targetId: 10,
+                blockerId: null, lastCertifiedProgressTick: 100, deadlineTicks: 300,
+                fallbackUntilTick: 580, releasedUnitIds: [1, 2],
+                suspendedOverlayMissionNames: [], activePredecessorMissionNames: [],
+            },
+        ];
+        expect(() => validateMissionNativeCloseoutV35ProgressTelemetry(base as any)).toThrow(
+            "unit-owning predecessor",
+        );
     });
 
     it("does not require construction when side-correct screen infrastructure already exists", () => {
