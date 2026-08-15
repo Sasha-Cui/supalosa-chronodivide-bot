@@ -6,6 +6,7 @@ import {
     assignAttackersToCompatibleTargets,
     allocateBuildingEliminationEngagement,
     applyContactTriggeredBuildingAdvance,
+    applyTerminalBuildingPriority,
     BuildingTargetDescriptor,
     classifyBuildingCapabilityGaps,
     classifyBuildingEliminationLaunchHandoff,
@@ -854,6 +855,52 @@ describe("building elimination policy", () => {
         expect(allocation.blockerAttackers).toHaveLength(1);
     });
 
+    test("sends the full compatible force to the last building despite 100 off-route tanks", () => {
+        const attackers = Array.from({ length: 6 }, (_, index) => combatant(index + 1, 0)) as any[];
+        const building = buildingUnit(200, 20) as any;
+        const offRouteTanks = Array.from(
+            { length: 100 },
+            (_, index) => combatant(1_000 + index, 10, 30, 500, 100, 5, 30),
+        ) as any[];
+        const predicted = chooseBuildingEliminationEngagement(attackers, building, offRouteTanks, 8);
+        const terminal = applyTerminalBuildingPriority(predicted, 1, true);
+        const allocation = allocateBuildingEliminationEngagement(
+            attackers,
+            building,
+            terminal.blocker,
+            "boundedScreen",
+        );
+        expect(terminal).toMatchObject({ blocker: null, reason: "terminal_building", routeThreatCount: 0 });
+        expect(allocation.buildingAttackers).toHaveLength(6);
+        expect(allocation.blockerAttackers).toEqual([]);
+    });
+
+    test("clears only a bounded screen when a force can prevent the last-building strike", () => {
+        const attackers = Array.from({ length: 6 }, (_, index) =>
+            combatant(index + 1, 0, 0, 100, 30, 1, 30)) as any[];
+        const building = buildingUnit(200, 20) as any;
+        const lethalBlocker = combatant(1_000, 5, 0, 5_000, 500, 10, 1) as any;
+        const predicted = chooseBuildingEliminationEngagement(attackers, building, [lethalBlocker], 8);
+        const terminal = applyTerminalBuildingPriority(predicted, 1, true);
+        const allocation = allocateBuildingEliminationEngagement(
+            attackers,
+            building,
+            terminal.blocker,
+            "boundedScreen",
+        );
+        expect(terminal).toMatchObject({ blocker: lethalBlocker, reason: "route_interception_wins" });
+        expect(allocation.buildingAttackers).toHaveLength(3);
+        expect(allocation.blockerAttackers).toHaveLength(3);
+    });
+
+    test("does not relabel a nonterminal building strike as terminal", () => {
+        const attackers = [combatant(1, 0)] as any[];
+        const building = buildingUnit(200, 20) as any;
+        const predicted = chooseBuildingEliminationEngagement(attackers, building, [], 8);
+        expect(applyTerminalBuildingPriority(predicted, 2, true)).toBe(predicted);
+        expect(applyTerminalBuildingPriority(predicted, 1, false)).toBe(predicted);
+    });
+
     test("summarizes execution distance to the actual building firing perimeter", () => {
         expect(summarizeBuildingExecutionDistances(
             [combatant(1, 0), combatant(2, 10), combatant(3, 20)] as any[],
@@ -971,6 +1018,7 @@ describe("building elimination policy", () => {
             "readinessReserveScope",
             "readinessReserveDefenseRadius",
             "contactOnlyBlockerClearance",
+            "terminalBuildingPriority",
         ]);
     });
 
@@ -1009,6 +1057,9 @@ describe("building elimination policy", () => {
         );
         expect(() => resolveBuildingEliminationOptions({ contactOnlyBlockerClearance: "yes" as any })).toThrow(
             "contact-only blocker clearance",
+        );
+        expect(() => resolveBuildingEliminationOptions({ terminalBuildingPriority: "yes" as any })).toThrow(
+            "terminal-building priority",
         );
         expect(() => resolveBuildingEliminationOptions({
             adaptiveGroundAssaultScreenInfrastructure: "yes" as any,
