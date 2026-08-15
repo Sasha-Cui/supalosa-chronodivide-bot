@@ -288,6 +288,15 @@ const v33Recovery = (): BuildingEliminationTelemetryEvent[] => [
     },
 ];
 
+const repeatedDirectLaunch = (): BuildingEliminationTelemetryEvent[] => [
+    ...directLaunch(),
+    ...directLaunch()
+        .filter((event) => [
+            "assault_capability_launch", "activation_evaluation", "activated", "launch_handoff",
+        ].includes(event.event))
+        .map((event) => ({ ...event, tick: event.tick + 500 })) as BuildingEliminationTelemetryEvent[],
+];
+
 describe("mission-native closeout focused gate v29", () => {
     it("keeps every focused seed inside the engine uint32 domain", () => {
         for (const index of MISSION_NATIVE_CLOSEOUT_FOCUSED_GATE_V29_COUNTRIES.keys()) {
@@ -303,6 +312,19 @@ describe("mission-native closeout focused gate v29", () => {
     it("accepts a composition-certified direct launch despite zero readiness ownership", () => {
         expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
             directLaunch(), Countries.USA,
+        )).not.toThrow();
+    });
+
+    it("accepts one fully audited relaunch only under the recovery profile", () => {
+        expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
+            repeatedDirectLaunch(), Countries.USA,
+        )).toThrow("Invalid schema-19 assault capability launch");
+        expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
+            repeatedDirectLaunch(), Countries.USA, {
+                productionReservation: "required",
+                screenInfrastructure: "ignored",
+                allowRepeatedLaunchAfterRecovery: true,
+            },
         )).not.toThrow();
     });
 

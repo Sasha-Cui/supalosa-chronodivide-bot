@@ -73,6 +73,7 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
         productionFocusPriority?: number;
         exclusiveProductionFocusScheduler?: "ignored" | "required";
         allowPredecessorExhaustionDuringRecovery?: boolean;
+        allowRepeatedLaunchAfterRecovery?: boolean;
     } = { productionReservation: "required", screenInfrastructure: "ignored" },
 ): void => {
     const expected = expectedNames(country);
@@ -254,7 +255,7 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
         !Number.isFinite(event.estimatedForceSurvivalTicks) || event.estimatedBlockerRemovalTicks < 0 ||
         event.estimatedBlockerRemovalTicks > event.estimatedForceSurvivalTicks,
     )) throw new Error(`Invalid schema-18 progressive blocker launch for ${country}`);
-    if (capability.length > 1 || capability.some((event) => {
+    if ((profile.allowRepeatedLaunchAfterRecovery !== true && capability.length > 1) || capability.some((event) => {
         const direct = event.launchMode === "direct_building";
         const safeBlocker = event.launchMode === "progressive_blocker" ||
             event.launchMode === "conventional_blocker";
@@ -280,11 +281,13 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
                 event.estimatedBlockerRemovalTicks > survival) ||
             (!direct && !blocker);
     })) throw new Error(`Invalid schema-19 assault capability launch for ${country}`);
-    const attritionalCapability = capability[0]?.launchMode === "attritional_blocker";
-    if ((attritionalCapability && attritional.length !== 1) || (!attritionalCapability && attritional.length !== 0) ||
+    const attritionalCapabilities = capability.filter(({ launchMode }) => launchMode === "attritional_blocker");
+    if (attritional.length !== attritionalCapabilities.length ||
         attritional.some((event) =>
-            event.schemaVersion !== 20 || event.tick !== capability[0].tick ||
-            event.targetId !== capability[0].targetId || event.blockerId !== capability[0].blockerId ||
+            event.schemaVersion !== 20 || !attritionalCapabilities.some((launch) =>
+                event.tick === launch.tick && event.targetId === launch.targetId &&
+                event.blockerId === launch.blockerId
+            ) ||
             event.compatibleAttackerCount < 2 || event.readinessTankCount < 0 ||
             event.readinessScreenCount < 0 || !Number.isFinite(event.estimatedBlockerApproachTicks) ||
             !Number.isFinite(event.estimatedBlockerRemovalTicks) ||
@@ -336,8 +339,12 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
                 profile.allowPredecessorExhaustionDuringRecovery !== true);
     })) throw new Error(`Invalid schema-23 force-objective arbitration for ${country}`);
 
-    const progressiveCapability = capability[0]?.launchMode === "progressive_blocker";
-    if ((progressiveCapability && progressive.length !== 1) || (!progressiveCapability && progressive.length !== 0)) {
+    const progressiveCapabilities = capability.filter(({ launchMode }) => launchMode === "progressive_blocker");
+    if (progressive.length !== progressiveCapabilities.length || progressive.some((event) =>
+        !progressiveCapabilities.some((launch) =>
+            event.tick === launch.tick && event.targetId === launch.targetId && event.blockerId === launch.blockerId
+        )
+    )) {
         throw new Error(`Progressive launch telemetry mismatch for ${country}`);
     }
     if (capability.length === 0) {
@@ -358,37 +365,43 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
         return;
     }
 
-    if (activated.length !== 1) throw new Error(`Expected one closeout activation for ${country}`);
-    const launch = capability[0];
-    const launchEvaluation = activation.find((event) => event.tick === launch.tick);
-    if (
-        launch.tick !== activated[0].tick ||
-        launchEvaluation?.schemaVersion !== 23 ||
-        launchEvaluation.compatibleAttackerCount !== launch.compatibleAttackerCount ||
-        launchEvaluation.targetId !== launch.targetId || launchEvaluation.blockerId !== launch.blockerId ||
-        launchEvaluation.phase !== (launch.launchMode === "direct_building"
-            ? "building_ready"
-            : "blocker_ready") ||
-        (launch.launchMode === "direct_building" && !launchEvaluation.directObjectiveFeasible) ||
-        (launch.launchMode === "conventional_blocker" && !launchEvaluation.completeRouteFeasible) ||
-        (launchEvaluation.enemyBuildingCount > 1 && !launchEvaluation.compositionReady) ||
-        ((launch.launchMode === "progressive_blocker" || launch.launchMode === "attritional_blocker") &&
-            (!launchEvaluation.partialBlockerLaunchPermitted || launchEvaluation.enemyBuildingCount !== 1 ||
-                !launchEvaluation.compositionReady))
-    ) {
-        throw new Error(`Launch does not match schema-23 force-objective feasibility for ${country}`);
+    if (activated.length !== capability.length) {
+        throw new Error(`Expected one closeout activation per capability launch for ${country}`);
     }
+    const launchEvaluations = capability.map((launch) => {
+        const launchEvaluation = activation.find((event) => event.tick === launch.tick);
+        const matchingActivated = activated.filter((event) => event.tick === launch.tick);
+        if (
+            matchingActivated.length !== 1 || launchEvaluation?.schemaVersion !== 23 ||
+            launchEvaluation.compatibleAttackerCount !== launch.compatibleAttackerCount ||
+            launchEvaluation.targetId !== launch.targetId || launchEvaluation.blockerId !== launch.blockerId ||
+            launchEvaluation.phase !== (launch.launchMode === "direct_building"
+                ? "building_ready"
+                : "blocker_ready") ||
+            (launch.launchMode === "direct_building" && !launchEvaluation.directObjectiveFeasible) ||
+            (launch.launchMode === "conventional_blocker" && !launchEvaluation.completeRouteFeasible) ||
+            (launchEvaluation.enemyBuildingCount > 1 && !launchEvaluation.compositionReady) ||
+            ((launch.launchMode === "progressive_blocker" || launch.launchMode === "attritional_blocker") &&
+                (!launchEvaluation.partialBlockerLaunchPermitted || launchEvaluation.enemyBuildingCount !== 1 ||
+                    !launchEvaluation.compositionReady))
+        ) {
+            throw new Error(`Launch does not match schema-23 force-objective feasibility for ${country}`);
+        }
+        return launchEvaluation;
+    });
     if (progress.reduce((total, event) => total + event.damage, 0) <= 0) {
         throw new Error(`No physical enemy-building damage after objective-feasible launch for ${country}`);
     }
-    if (handoff.length === 0 || handoff.some((event) => {
+    if (handoff.length !== capability.length || handoff.some((event, index) => {
+        const launchEvaluation = launchEvaluations[index];
+        const nextLaunchTick = capability[index + 1]?.tick ?? Number.POSITIVE_INFINITY;
         const expectedIds = [...event.expectedStagedUnitIds].sort((left, right) => left - right);
         const classified = [
             ...event.assignedExpectedUnitIds,
             ...event.destroyedExpectedUnitIds,
             ...event.aliveUnassignedExpectedUnitIds,
         ].sort((left, right) => left - right);
-        return event.schemaVersion !== 10 ||
+        return event.schemaVersion !== 10 || event.tick < capability[index].tick || event.tick >= nextLaunchTick ||
             event.expectedStagedUnitIds.length !== launchEvaluation.compatibleAttackerCount ||
             event.assignedExpectedUnitIds.length === 0 || event.aliveUnassignedExpectedUnitIds.length > 0 ||
             classified.length !== expectedIds.length ||
