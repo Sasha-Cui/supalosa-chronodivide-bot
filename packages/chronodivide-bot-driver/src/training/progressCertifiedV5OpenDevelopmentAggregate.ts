@@ -72,6 +72,24 @@ type OutcomeCounts = {
 const SHA256 = /^[0-9a-f]{64}$/;
 const isRecord = (value: unknown): value is RecordValue =>
     !!value && typeof value === "object" && !Array.isArray(value);
+const PROGRESS_CERTIFIED_V5_AGGREGATION_REPAIR_PATHS = new Set([
+    "packages/chronodivide-bot-driver/src/training/progressCertifiedTechnicalGate.ts",
+    "packages/chronodivide-bot-driver/src/test/progressCertifiedTechnicalGate.test.ts",
+    "packages/chronodivide-bot-driver/src/training/progressCertifiedV5OpenDevelopmentAggregate.ts",
+    "packages/chronodivide-bot-driver/src/test/progressCertifiedV5OpenDevelopmentAggregate.test.ts",
+]);
+export const isProgressCertifiedV5AggregationRevisionAllowed = ({
+    branch,
+    dirty,
+    campaignSourceIsAncestor,
+    changedPaths,
+}: {
+    branch: string;
+    dirty: boolean;
+    campaignSourceIsAncestor: boolean;
+    changedPaths: readonly string[];
+}): boolean => branch === "main" && !dirty && campaignSourceIsAncestor &&
+    changedPaths.every((changedPath) => PROGRESS_CERTIFIED_V5_AGGREGATION_REPAIR_PATHS.has(changedPath));
 const readJson = (filePath: string): unknown => JSON.parse(fs.readFileSync(filePath, "utf8"));
 const requiredPath = (name: string): string => {
     const value = process.env[name];
@@ -721,8 +739,26 @@ const main = (): void => {
     const gitCommit = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
     const gitBranch = execFileSync("git", ["branch", "--show-current"], { encoding: "utf8" }).trim();
     const dirty = execFileSync("git", ["status", "--short", "--untracked-files=no"], { encoding: "utf8" }).trim();
-    if (gitCommit !== campaign.sourceGitCommit || gitBranch !== "main" || dirty.length > 0) {
-        throw new Error("V5 aggregate requires the exact clean evaluated main revision");
+    const campaignSourceIsAncestor = (() => {
+        try {
+            execFileSync("git", ["merge-base", "--is-ancestor", campaign.sourceGitCommit, gitCommit]);
+            return true;
+        } catch {
+            return false;
+        }
+    })();
+    const aggregationSourceChangedPaths = execFileSync(
+        "git",
+        ["diff", "--name-only", `${campaign.sourceGitCommit}..${gitCommit}`],
+        { encoding: "utf8" },
+    ).trim().split("\n").filter(Boolean);
+    if (!isProgressCertifiedV5AggregationRevisionAllowed({
+        branch: gitBranch,
+        dirty: dirty.length > 0,
+        campaignSourceIsAncestor,
+        changedPaths: aggregationSourceChangedPaths,
+    })) {
+        throw new Error("V5 aggregate requires clean main with only allowlisted outcome-blind aggregation repairs");
     }
     const schedulerTasks = parseProgressCertifiedV5Sacct(execFileSync(
         "/opt/slurm/current/bin/sacct",
@@ -769,6 +805,8 @@ const main = (): void => {
         outcomeAccess: "permanently-open-development-only-no-paper-claim",
         sourceGitCommit: campaign.sourceGitCommit,
         aggregationGitCommit: gitCommit,
+        aggregationRuntimeSha256: sha256File(path.resolve(process.argv[1]!)),
+        aggregationSourceChangedPaths,
         campaignPath,
         campaignSha256,
         arrayJobId,

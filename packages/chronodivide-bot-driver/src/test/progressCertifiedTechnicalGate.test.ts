@@ -111,11 +111,23 @@ describe("progress-certified technical gate", () => {
             selectedBuildingVisible: true,
             selectedBuildingOrderMode: "attack_visible_building",
         }, 4).selectedBuildingOrderMode).toBe("attack_visible_building");
+        expect(validateProgressCertifiedTelemetry({
+            ...base,
+            decisionKind: "blocker_clear",
+            selectedBuildingVisible: false,
+            blockerIds: [99],
+        }, 4).selectedBuildingCoordinates).toEqual({ x: 31, y: 47 });
         expect(() => validateProgressCertifiedTelemetry({
             ...base,
             selectedBuildingVisible: false,
             selectedBuildingOrderMode: "attack_visible_building",
         }, 4)).toThrow("coordinate-approach");
+        expect(() => validateProgressCertifiedTelemetry({
+            ...base,
+            decisionKind: "blocker_clear",
+            selectedBuildingVisible: false,
+            selectedBuildingOrderMode: "attack_move_exact_unseen_coordinates",
+        }, 4)).toThrow("declares a building order mode");
         expect(() => validateProgressCertifiedTelemetry({
             ...base,
             schemaVersion: 3,

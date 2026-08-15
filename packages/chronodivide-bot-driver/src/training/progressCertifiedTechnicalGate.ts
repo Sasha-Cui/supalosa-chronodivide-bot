@@ -223,14 +223,18 @@ export const validateProgressCertifiedTelemetry = (
         value.selectedBuildingCoordinates !== undefined || value.selectedBuildingOrderMode !== undefined
     )) throw new Error("Progress-certified schema-v3 telemetry contains visibility-aware fields");
     if (schemaVersion === 4) {
+        if (
+            value.selectedBuildingCoordinates !== undefined &&
+            (!isRecord(value.selectedBuildingCoordinates) ||
+                !Number.isFinite(value.selectedBuildingCoordinates.x) ||
+                !Number.isFinite(value.selectedBuildingCoordinates.y))
+        ) throw new Error("Progress-certified schema-v4 building context has invalid coordinates");
         const buildingDecision = value.decisionKind === "building_strike" ||
             value.decisionKind === "terminal_candidate_strike";
         if (buildingDecision) {
-            if (
-                !isRecord(value.selectedBuildingCoordinates) ||
-                !Number.isFinite(value.selectedBuildingCoordinates.x) ||
-                !Number.isFinite(value.selectedBuildingCoordinates.y)
-            ) throw new Error("Progress-certified schema-v4 building decision lacks finite coordinates");
+            if (value.selectedBuildingCoordinates === undefined) {
+                throw new Error("Progress-certified schema-v4 building decision lacks finite coordinates");
+            }
             if (
                 value.selectedBuildingVisible === true &&
                 value.selectedBuildingOrderMode !== "attack_visible_building"
@@ -240,9 +244,9 @@ export const validateProgressCertifiedTelemetry = (
                 value.selectedBuildingObservedBy === "public_complete_state" &&
                 value.selectedBuildingOrderMode !== "attack_move_exact_unseen_coordinates"
             ) throw new Error("Progress-certified exact unseen building lacks coordinate-approach mode");
-        } else if (
-            value.selectedBuildingCoordinates !== undefined || value.selectedBuildingOrderMode !== undefined
-        ) throw new Error("Progress-certified non-building decision contains visibility-aware fields");
+        } else if (value.selectedBuildingOrderMode !== undefined) {
+            throw new Error("Progress-certified non-building decision declares a building order mode");
+        }
     }
     if (value.terminalReserveReleased !== undefined && typeof value.terminalReserveReleased !== "boolean") {
         throw new Error("Progress-certified terminal-reserve release flag is not boolean");

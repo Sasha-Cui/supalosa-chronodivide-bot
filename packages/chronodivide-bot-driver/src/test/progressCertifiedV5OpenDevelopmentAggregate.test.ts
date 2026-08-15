@@ -7,6 +7,7 @@ import { PROGRESS_CERTIFIED_V5_ARM_ORDER } from "../training/progressCertifiedV5
 import {
     ProgressCertifiedV5Observation,
     evaluateProgressCertifiedV5Advancement,
+    isProgressCertifiedV5AggregationRevisionAllowed,
     parseProgressCertifiedV5Sacct,
     progressCertifiedV5PairedFamilyScoreEffects,
     validateProgressCertifiedV5Telemetry,
@@ -23,6 +24,33 @@ const outcomeCounts = (wins: number, draws: number, losses: number) => ({
 });
 
 describe("progress-certified V5 open-development aggregate", () => {
+    it("allows only clean outcome-blind aggregation repairs after campaign execution", () => {
+        const changedPaths = [
+            "packages/chronodivide-bot-driver/src/training/progressCertifiedTechnicalGate.ts",
+            "packages/chronodivide-bot-driver/src/test/progressCertifiedTechnicalGate.test.ts",
+            "packages/chronodivide-bot-driver/src/training/progressCertifiedV5OpenDevelopmentAggregate.ts",
+            "packages/chronodivide-bot-driver/src/test/progressCertifiedV5OpenDevelopmentAggregate.test.ts",
+        ];
+        expect(isProgressCertifiedV5AggregationRevisionAllowed({
+            branch: "main",
+            dirty: false,
+            campaignSourceIsAncestor: true,
+            changedPaths,
+        })).toBe(true);
+        expect(isProgressCertifiedV5AggregationRevisionAllowed({
+            branch: "main",
+            dirty: false,
+            campaignSourceIsAncestor: true,
+            changedPaths: [...changedPaths, "packages/chronodivide-bot-driver/src/training/terminalObjectiveStrategy.ts"],
+        })).toBe(false);
+        expect(isProgressCertifiedV5AggregationRevisionAllowed({
+            branch: "main",
+            dirty: true,
+            campaignSourceIsAncestor: true,
+            changedPaths,
+        })).toBe(false);
+    });
+
     it("requires all 90 clean authorized scheduler tasks", () => {
         const raw = Array.from({ length: 90 }, (_, index) =>
             `123_${index}|${9000 + index}|COMPLETED|0:0|pi_jss233`,
