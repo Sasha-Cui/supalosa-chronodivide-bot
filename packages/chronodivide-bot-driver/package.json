@@ -39,6 +39,9 @@
         "research:v5-run-plan": "node dist/training/methodV5PlanRunner.js --es-module-specifier-resolution=node",
         "research:v5-technical-gate": "node dist/training/methodV5TechnicalGate.js --es-module-specifier-resolution=node",
         "research:v5-analyze": "node dist/training/methodV5Analyzer.js --es-module-specifier-resolution=node",
+        "research:pcv5-generate-confirmatory": "node dist/training/progressCertifiedV5ConfirmatoryCampaign.js --es-module-specifier-resolution=node",
+        "research:pcv5-gate-confirmatory": "node dist/training/progressCertifiedV5ConfirmatoryTechnicalGate.js --es-module-specifier-resolution=node",
+        "research:pcv5-unblind-confirmatory": "node dist/training/progressCertifiedV5ConfirmatoryUnblinder.js --es-module-specifier-resolution=node",
         "analyze:training": "node dist/training/analyzeTrainingResults.js --es-module-specifier-resolution=node",
         "test": "vitest"
     },
