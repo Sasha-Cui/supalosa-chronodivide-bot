@@ -480,6 +480,8 @@ describe("building elimination policy", () => {
         expect(shouldRecoverNoOwnerBuildingEliminationFallback(true, 220, 100, 120, true, 0)).toBe(false);
         expect(shouldRecoverNoOwnerBuildingEliminationFallback(true, 220, 100, 120, false, 1)).toBe(false);
         expect(shouldRecoverNoOwnerBuildingEliminationFallback(false, 220, 100, 120, false, 0)).toBe(false);
+        expect(shouldRecoverNoOwnerBuildingEliminationFallback(true, 220, 100, 120, true, 0, true)).toBe(true);
+        expect(shouldRecoverNoOwnerBuildingEliminationFallback(true, 220, 100, 120, true, 1, true)).toBe(false);
     });
 
     test("transfer certification matches the units the takeover can command", () => {
@@ -1035,6 +1037,7 @@ describe("building elimination policy", () => {
             "predecessorFallbackTicks",
             "noOwnerFallbackRecovery",
             "predecessorOwnershipGraceTicks",
+            "recoverAfterPredecessorOwnershipLoss",
         ]);
     });
 
@@ -1067,6 +1070,13 @@ describe("building elimination policy", () => {
             predecessorFallbackTicks: 60,
             predecessorOwnershipGraceTicks: 120,
         })).toThrow("cannot exceed predecessorFallbackTicks");
+        expect(() => resolveBuildingEliminationOptions({
+            recoverAfterPredecessorOwnershipLoss: true,
+        })).toThrow("requires no-owner fallback recovery");
+        expect(() => resolveBuildingEliminationOptions({
+            noOwnerFallbackRecovery: true,
+            recoverAfterPredecessorOwnershipLoss: "yes" as any,
+        })).toThrow("ownership-loss fallback recovery");
         expect(() => resolveBuildingEliminationOptions({
             adaptiveGroundAssaultInfrastructurePriority: 0,
         })).toThrow("adaptiveGroundAssaultInfrastructurePriority");

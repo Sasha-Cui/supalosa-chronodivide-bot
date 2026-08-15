@@ -99,6 +99,7 @@ export type BuildingEliminationOptions = {
     predecessorFallbackTicks?: number;
     noOwnerFallbackRecovery?: boolean;
     predecessorOwnershipGraceTicks?: number;
+    recoverAfterPredecessorOwnershipLoss?: boolean;
 };
 
 export type BuildingTargetDescriptor = {
@@ -289,6 +290,19 @@ export type BuildingEliminationTelemetryEvent =
           plannedFallbackUntilTick: number;
           releasedUnitIds: number[];
           suspendedOverlayMissionNames: string[];
+          activePredecessorMissionNames: string[];
+      }
+    | {
+          schemaVersion: 31;
+          event: "objective_predecessor_ownership";
+          tick: number;
+          phase: "fallback_predecessor_ownership_observed";
+          reason: "building_no_progress" | "blocker_no_progress";
+          targetId: number;
+          blockerId: number | null;
+          fallbackStartedTick: number;
+          plannedFallbackUntilTick: number;
+          releasedUnitIds: number[];
           activePredecessorMissionNames: string[];
       }
     | {
@@ -703,6 +717,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     predecessorFallbackTicks: 180,
     noOwnerFallbackRecovery: false,
     predecessorOwnershipGraceTicks: 120,
+    recoverAfterPredecessorOwnershipLoss: false,
 };
 
 const requireIntegerInRange = (name: string, value: number, minimum: number, maximum: number): void => {
@@ -902,6 +917,20 @@ export const resolveBuildingEliminationOptions = (
         throw new Error(
             `Invalid building-elimination physical-progress fallback: ${resolved.physicalProgressDeadlineFallback}`,
         );
+    }
+    if (typeof resolved.noOwnerFallbackRecovery !== "boolean") {
+        throw new Error(
+            `Invalid building-elimination no-owner fallback recovery: ${resolved.noOwnerFallbackRecovery}`,
+        );
+    }
+    if (typeof resolved.recoverAfterPredecessorOwnershipLoss !== "boolean") {
+        throw new Error(
+            "Invalid building-elimination ownership-loss fallback recovery: " +
+            `${resolved.recoverAfterPredecessorOwnershipLoss}`,
+        );
+    }
+    if (resolved.recoverAfterPredecessorOwnershipLoss && !resolved.noOwnerFallbackRecovery) {
+        throw new Error("Ownership-loss recovery requires no-owner fallback recovery");
     }
     return resolved;
 };
@@ -1897,7 +1926,9 @@ export const shouldRecoverNoOwnerBuildingEliminationFallback = (
     predecessorOwnershipGraceTicks: number,
     predecessorOwnershipObserved: boolean,
     activePredecessorMissionCount: number,
-): boolean => enabled && !predecessorOwnershipObserved && activePredecessorMissionCount === 0 &&
+    recoverAfterPredecessorOwnershipLoss = false,
+): boolean => enabled && (recoverAfterPredecessorOwnershipLoss || !predecessorOwnershipObserved) &&
+    activePredecessorMissionCount === 0 &&
     tick >= fallbackStartedTick + predecessorOwnershipGraceTicks;
 
 export const isTransferCertifiedBuildingEliminationMission = (name: string | null): boolean =>
@@ -4019,6 +4050,25 @@ export class BuildingEliminationMissionFactory {
                 )
                 .map((mission) => mission.getUniqueName())
                 .sort((left, right) => left.localeCompare(right));
+            if (
+                this.options.recoverAfterPredecessorOwnershipLoss &&
+                !fallback.predecessorOwnershipObserved &&
+                activePredecessorMissionNames.length > 0
+            ) {
+                this.telemetrySink({
+                    schemaVersion: 31,
+                    event: "objective_predecessor_ownership",
+                    tick,
+                    phase: "fallback_predecessor_ownership_observed",
+                    reason: fallback.reason,
+                    targetId: fallback.targetId,
+                    blockerId: fallback.blockerId,
+                    fallbackStartedTick: fallback.tick,
+                    plannedFallbackUntilTick: fallback.fallbackUntilTick,
+                    releasedUnitIds: fallback.releasedUnitIds,
+                    activePredecessorMissionNames,
+                });
+            }
             if (activePredecessorMissionNames.length > 0) {
                 fallback.predecessorOwnershipObserved = true;
             }
@@ -4047,6 +4097,7 @@ export class BuildingEliminationMissionFactory {
                 this.options.predecessorOwnershipGraceTicks,
                 fallback.predecessorOwnershipObserved,
                 activePredecessorMissionNames.length,
+                this.options.recoverAfterPredecessorOwnershipLoss,
             )) {
                 this.telemetrySink({
                     schemaVersion: 30,

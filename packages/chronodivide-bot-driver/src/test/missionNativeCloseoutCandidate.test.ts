@@ -31,6 +31,7 @@ import { buildMissionNativeCloseoutPolicyV33 } from "../training/missionNativeCl
 import { buildMissionNativeCloseoutPolicyV34 } from "../training/missionNativeCloseoutPolicyV34.js";
 import { buildMissionNativeCloseoutPolicyV35 } from "../training/missionNativeCloseoutPolicyV35.js";
 import { buildMissionNativeCloseoutPolicyV36 } from "../training/missionNativeCloseoutPolicyV36.js";
+import { buildMissionNativeCloseoutPolicyV37 } from "../training/missionNativeCloseoutPolicyV37.js";
 
 describe("mission-native closeout candidate", () => {
     it("returns the exact external baseline path when disabled", () => {
@@ -608,6 +609,35 @@ describe("mission-native closeout candidate", () => {
             "candidate",
             Countries.IRAQ,
             buildMissionNativeCloseoutPolicyV36(),
+            telemetrySink,
+        )).toBe(injected);
+        expect(factory.createWithStrategyAndExclusiveProductionFocus).toHaveBeenCalledWith(
+            "candidate",
+            Countries.IRAQ,
+            expect.objectContaining({ onAiUpdate: expect.any(Function) }),
+            telemetrySink,
+        );
+        expect(factory.createWithStrategy).not.toHaveBeenCalled();
+        expect(factory.create).not.toHaveBeenCalled();
+    }, 300_000);
+
+    it("routes V37 ownership-loss recovery through the same external focus adapter", () => {
+        const injected = { kind: "injected-v37" } as any;
+        let inner: any;
+        inner = { onAiUpdate: vi.fn(() => inner) };
+        const telemetrySink = vi.fn();
+        const factory = {
+            descriptor: { kind: "external-package", packageRoot: "/baseline" },
+            create: vi.fn(),
+            createDefaultStrategy: vi.fn(() => inner),
+            createWithStrategy: vi.fn(),
+            createWithStrategyAndExclusiveProductionFocus: vi.fn(() => injected),
+        } as any;
+        expect(createMissionNativeCloseoutCandidate(
+            factory,
+            "candidate",
+            Countries.IRAQ,
+            buildMissionNativeCloseoutPolicyV37(),
             telemetrySink,
         )).toBe(injected);
         expect(factory.createWithStrategyAndExclusiveProductionFocus).toHaveBeenCalledWith(
