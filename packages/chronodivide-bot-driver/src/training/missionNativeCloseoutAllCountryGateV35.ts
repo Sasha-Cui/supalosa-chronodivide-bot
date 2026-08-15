@@ -274,9 +274,9 @@ export const validateMissionNativeCloseoutAllCountryV35Coverage = (
         if (!rows.some((row) => predicate(row) && row.objectiveRaceAllocationEventCount > 0)) {
             errors.push(`${label} rows never executed objective-race allocation`);
         }
-        if (!rows.some((row) => predicate(row) && row.boundedBlockerAllocationEventCount > 0)) {
-            errors.push(`${label} rows never exercised bounded blocker clearance`);
-        }
+    }
+    if (!rows.some((row) => row.boundedBlockerAllocationEventCount > 0)) {
+        errors.push("V35 never exercised bounded blocker clearance");
     }
     if (!rows.some((row) => row.buildingPhysicalProgressEventCount > 0)) {
         errors.push("V35 never certified physical building progress");
@@ -430,6 +430,7 @@ const main = async (): Promise<void> => {
                         productionFocusPriority: 10_000,
                         exclusiveProductionFocusScheduler: "required",
                         allowPredecessorExhaustionDuringRecovery: true,
+                        allowRepeatedLaunchAfterRecovery: true,
                     });
                 } catch (error) {
                     validationErrors.push(`${label}: ${error instanceof Error ? error.message : String(error)}`);

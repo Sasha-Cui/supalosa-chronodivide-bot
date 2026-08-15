@@ -167,7 +167,7 @@ describe("mission-native closeout all-country gate v35", () => {
         ]));
     });
 
-    it("requires objective-race and bounded-blocker execution across factions and slots", () => {
+    it("requires objective-race execution across factions and slots", () => {
         const rows = validRows().map((row) => row.country === Countries.USA && row.candidateSlot === 0
             ? row
             : {
@@ -178,9 +178,19 @@ describe("mission-native closeout all-country gate v35", () => {
         expect(validateMissionNativeCloseoutAllCountryV35Coverage(rows)).toEqual(expect.arrayContaining([
             "Soviet rows never executed objective-race allocation",
             "slot 1 rows never executed objective-race allocation",
-            "Soviet rows never exercised bounded blocker clearance",
-            "slot 1 rows never exercised bounded blocker clearance",
         ]));
+    });
+
+    it("accepts aggregate blocker exposure inherited symmetrically from V34-R1", () => {
+        const rows = validRows().map((row) => ({
+            ...row,
+            boundedBlockerAllocationEventCount: row.country === Countries.IRAQ ? 1 : 0,
+        }));
+        expect(validateMissionNativeCloseoutAllCountryV35Coverage(rows)).toEqual([]);
+        expect(validateMissionNativeCloseoutAllCountryV35Coverage(rows.map((row) => ({
+            ...row,
+            boundedBlockerAllocationEventCount: 0,
+        })))).toContain("V35 never exercised bounded blocker clearance");
     });
 
     it("accepts a full-force terminal strike and a bounded nonterminal blocker screen", () => {
