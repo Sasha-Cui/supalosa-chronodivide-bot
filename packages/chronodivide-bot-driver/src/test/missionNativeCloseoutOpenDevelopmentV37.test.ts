@@ -9,6 +9,7 @@ import {
 } from "../training/missionNativeCloseoutOpenDevelopmentV37Campaign.js";
 import {
     MissionNativeCloseoutV37PositiveGateInput,
+    areMissionNativeCloseoutV37CommitmentsStructurallyEqual,
     evaluateMissionNativeCloseoutV37PositiveGate,
 } from "../training/missionNativeCloseoutOpenDevelopmentV37Aggregate.js";
 
@@ -54,6 +55,16 @@ describe("mission-native V37 open development", () => {
             ));
         expect(new Set(seeds).size).toBe(MISSION_NATIVE_CLOSEOUT_V37_OPEN_DEVELOPMENT_SHARD_COUNT);
         expect(seeds.every((seed) => Number.isSafeInteger(seed) && seed >= 0 && seed <= 0xffff_ffff)).toBe(true);
+    });
+
+    it("treats object-key order as irrelevant while preserving structural commitments", () => {
+        const campaignArm = { armId: "arm", policy: { schemaVersion: 1, enabled: true }, policyId: "policy" };
+        const parsedPlanArm = { armId: "arm", policyId: "policy", policy: { enabled: true, schemaVersion: 1 } };
+        expect(areMissionNativeCloseoutV37CommitmentsStructurallyEqual(parsedPlanArm, campaignArm)).toBe(true);
+        expect(areMissionNativeCloseoutV37CommitmentsStructurallyEqual(
+            { ...parsedPlanArm, policyId: "changed" },
+            campaignArm,
+        )).toBe(false);
     });
 
     it("advances only when every prespecified positive condition passes", () => {

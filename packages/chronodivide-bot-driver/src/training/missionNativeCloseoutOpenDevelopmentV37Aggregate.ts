@@ -3,6 +3,7 @@ import crypto from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { isDeepStrictEqual } from "node:util";
 import { BuildingEliminationTelemetryEvent } from
     "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
 import { derivePairedEngineSeed } from "../benchmark/seededOfflineGame.js";
@@ -110,6 +111,10 @@ const SHA256 = /^[0-9a-f]{64}$/;
 const COMMIT = /^[0-9a-f]{40}$/;
 const isRecord = (value: unknown): value is RecordValue =>
     typeof value === "object" && value !== null && !Array.isArray(value);
+export const areMissionNativeCloseoutV37CommitmentsStructurallyEqual = (
+    actual: unknown,
+    expected: unknown,
+): boolean => isDeepStrictEqual(actual, expected);
 const readJson = (filePath: string): unknown => JSON.parse(fs.readFileSync(filePath, "utf8"));
 const requiredPath = (name: string): string => {
     const value = process.env[name];
@@ -286,8 +291,11 @@ const validateShard = (
         plan.family.mapSha256 !== shard.mapSha256 || plan.country !== shard.country ||
         plan.engineSeedBase !== campaign.engineSeedBase || plan.seedBlockIndex !== shard.seedBlockIndex ||
         plan.requestedEngineSeed !== shard.requestedEngineSeed || plan.maxTicks !== campaign.maxTicks ||
-        JSON.stringify(plan.arms) !== JSON.stringify(campaign.arms) ||
-        JSON.stringify(plan.episodes) !== JSON.stringify(buildMissionNativeCloseoutV37OpenDevelopmentEpisodes(campaign.arms))
+        !areMissionNativeCloseoutV37CommitmentsStructurallyEqual(plan.arms, campaign.arms) ||
+        !areMissionNativeCloseoutV37CommitmentsStructurallyEqual(
+            plan.episodes,
+            buildMissionNativeCloseoutV37OpenDevelopmentEpisodes(campaign.arms),
+        )
     ) throw new Error(`V37 shard ${shard.shardIndex} plan commitments drifted`);
     const manifest = outer.manifest;
     const scheduler = manifest.scheduler;
