@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
     parseProgressCertifiedV5ConfirmatorySacct,
     parseProgressCertifiedV5SealedSummary,
+    validateProgressCertifiedV5ConfirmatoryEndpointTechnicalState,
 } from
     "../training/progressCertifiedV5ConfirmatoryTechnicalGate.js";
 
@@ -45,5 +46,38 @@ describe("progress-certified V5 confirmatory technical gate", () => {
             rows.replace("COMPLETED|0:0|pi_jss233", "FAILED|1:0|pi_jss233"),
             "999",
         )).toThrow("failed");
+    });
+
+    it("requires both sides to establish the literal endpoint before unblinding", () => {
+        const expected = {
+            endpointVersion: 5,
+            endpointSha256: "b".repeat(64),
+            maxTicks: 24_000,
+        };
+        const clean = {
+            technicalFailure: null,
+            shortGame: false,
+            endpointVersion: 5,
+            endpointSha256: "b".repeat(64),
+            maxTicks: 24_000,
+            endpointEstablished: { candidate: true, baseline: true },
+            winner: "sealed-and-not-inspected-by-the-validator",
+        };
+        expect(() => validateProgressCertifiedV5ConfirmatoryEndpointTechnicalState(
+            clean,
+            expected,
+        )).not.toThrow();
+        expect(() => validateProgressCertifiedV5ConfirmatoryEndpointTechnicalState({
+            ...clean,
+            endpointEstablished: { candidate: false, baseline: true },
+        }, expected)).toThrow("endpoint technical state");
+        expect(() => validateProgressCertifiedV5ConfirmatoryEndpointTechnicalState({
+            ...clean,
+            shortGame: true,
+        }, expected)).toThrow("endpoint technical state");
+        expect(() => validateProgressCertifiedV5ConfirmatoryEndpointTechnicalState({
+            ...clean,
+            technicalFailure: { reason: "example" },
+        }, expected)).toThrow("endpoint technical state");
     });
 });

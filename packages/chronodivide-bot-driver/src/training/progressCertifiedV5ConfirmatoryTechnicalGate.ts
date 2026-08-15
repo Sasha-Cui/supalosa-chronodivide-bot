@@ -84,6 +84,37 @@ export const parseProgressCertifiedV5SealedSummary = (value: unknown): RecordVal
     return value;
 };
 
+/**
+ * Validate only the outcome-independent endpoint preconditions required for a
+ * literal-building-elimination episode to be technically admissible. The
+ * caller deliberately does not read winner, score, terminal orientation, or
+ * any other competitive field while the confirmation remains sealed.
+ */
+export const validateProgressCertifiedV5ConfirmatoryEndpointTechnicalState = (
+    value: unknown,
+    expected: {
+        endpointVersion: number;
+        endpointSha256: string;
+        maxTicks: number;
+    },
+): void => {
+    if (!isRecord(value)) throw new Error("Confirmatory completion result must be an object");
+    const endpointEstablished = value.endpointEstablished;
+    if (
+        value.technicalFailure !== null ||
+        value.shortGame !== false ||
+        value.endpointVersion !== expected.endpointVersion ||
+        value.endpointSha256 !== expected.endpointSha256 ||
+        value.maxTicks !== expected.maxTicks ||
+        !isRecord(endpointEstablished) ||
+        Object.keys(endpointEstablished).sort().join(",") !== "baseline,candidate" ||
+        endpointEstablished.candidate !== true ||
+        endpointEstablished.baseline !== true
+    ) {
+        throw new Error("Confirmatory completion failed the outcome-blind endpoint technical state");
+    }
+};
+
 export const progressCertifiedV5ConfirmatoryResultCommitmentSha256 = (
     campaign: ProgressCertifiedV5ConfirmatoryCampaign,
     resultsRoot: string,
@@ -192,13 +223,18 @@ const validateShard = (
             launch.candidateSlot !== expected.candidateSlot || !isRecord(completion.result)
         ) throw new Error(`Confirmatory shard ${shard.shardIndex} launch identity drifted`);
         const result = completion.result;
+        validateProgressCertifiedV5ConfirmatoryEndpointTechnicalState(result, {
+            endpointVersion: campaign.endpointVersion,
+            endpointSha256: campaign.endpointSha256,
+            maxTicks: campaign.maxTicks,
+        });
         const resultEpisodeId = result.episodeId;
         const resultExpected = typeof resultEpisodeId === "string" ? expectedById.get(resultEpisodeId) : undefined;
         if (
             completion.launchIndex !== launchIndex || !resultExpected || resultEpisodeId !== expected.episodeId ||
             result.familyId !== shard.familyId || result.policyId !== expected.policyId ||
             result.seedBlockIndex !== shard.seedBlockIndex || result.requestedEngineSeed !== shard.requestedEngineSeed ||
-            result.candidateSlot !== expected.candidateSlot || result.technicalFailure !== null
+            result.candidateSlot !== expected.candidateSlot
         ) throw new Error(`Confirmatory shard ${shard.shardIndex} completion identity drifted`);
     }
     return String(scheduler.jobId);
