@@ -287,7 +287,7 @@ export const validateMissionNativeCloseoutAllCountryV35Coverage = (
     return errors;
 };
 
-const summarizeCoverage = (
+export const summarizeMissionNativeCloseoutAllCountryV35Coverage = (
     telemetry: readonly BuildingEliminationTelemetryEvent[],
     country: Countries,
     candidateSlot: 0 | 1,
@@ -456,7 +456,7 @@ const main = async (): Promise<void> => {
                 first.quitAttempts,
                 repeat.quitAttempts,
             ));
-            const coverage = summarizeCoverage(
+            const coverage = summarizeMissionNativeCloseoutAllCountryV35Coverage(
                 first.telemetry,
                 country,
                 candidateSlot,
