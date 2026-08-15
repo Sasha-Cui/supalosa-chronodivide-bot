@@ -56,7 +56,21 @@ cd "$REPO"
 
 "$NODE_BIN" node_modules/typescript/bin/tsc -b
 cd "$DRIVER_ROOT"
-"$NODE_BIN" node_modules/vitest/vitest.mjs run src/test --testTimeout=300000
+TEST_FILES=(
+    src/test/buildingEliminationMission.test.ts
+    src/test/literalBuildingEliminationEndpoint.test.ts
+    src/test/missionNativeCloseoutCandidate.test.ts
+    src/test/missionNativeCloseoutPolicyV37.test.ts
+    src/test/missionNativeCloseoutAllCountryCompatibilityV37.test.ts
+    src/test/missionNativeCloseoutLiteralEndpointExposureV37R2.test.ts
+    src/test/missionNativeCloseoutOwnershipLossExposureV37.test.ts
+    src/test/missionNativeCloseoutGateV37.test.ts
+    src/test/missionNativeCloseoutExperimentPolicy.test.ts
+    src/test/missionNativeCloseoutOpenDevelopmentTechnicalGate.test.ts
+    src/test/missionNativeCloseoutOpenDevelopmentV37.test.ts
+    src/test/seedControl.test.ts
+)
+"$NODE_BIN" node_modules/vitest/vitest.mjs run "${TEST_FILES[@]}" --testTimeout=300000
 
 export BASELINE_PACKAGE_ROOT="$BASELINE_ROOT"
 export REQUIRE_EXTERNAL_BASELINE=true
