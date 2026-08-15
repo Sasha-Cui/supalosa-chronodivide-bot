@@ -57,6 +57,7 @@ import {
     shouldDirectAttackBuildingTarget,
     summarizeBuildingExecutionDistances,
     updateBuildingTargetProgress,
+    updateBuildingEliminationObjectiveProgress,
     updateBuildingEliminationProductionScopeLatch,
 } from "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
 
@@ -1019,6 +1020,10 @@ describe("building elimination policy", () => {
             "readinessReserveDefenseRadius",
             "contactOnlyBlockerClearance",
             "terminalBuildingPriority",
+            "physicalProgressDeadlineFallback",
+            "buildingNoProgressDeadlineTicks",
+            "blockerNoProgressDeadlineTicks",
+            "predecessorFallbackTicks",
         ]);
     });
 
@@ -1033,6 +1038,15 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({ routeCorridorRadius: 0 })).toThrow("routeCorridorRadius");
         expect(() => resolveBuildingEliminationOptions({ readinessReserveDefenseRadius: -1 })).toThrow(
             "readinessReserveDefenseRadius",
+        );
+        expect(() => resolveBuildingEliminationOptions({ buildingNoProgressDeadlineTicks: 0 })).toThrow(
+            "buildingNoProgressDeadlineTicks",
+        );
+        expect(() => resolveBuildingEliminationOptions({ blockerNoProgressDeadlineTicks: 0 })).toThrow(
+            "blockerNoProgressDeadlineTicks",
+        );
+        expect(() => resolveBuildingEliminationOptions({ predecessorFallbackTicks: 0 })).toThrow(
+            "predecessorFallbackTicks",
         );
         expect(() => resolveBuildingEliminationOptions({
             adaptiveGroundAssaultInfrastructurePriority: 0,
@@ -1268,5 +1282,86 @@ describe("building elimination policy", () => {
         expect(meetsPositiveProgressBuildingEliminationBlockerLaunchGate(
             false, 1, 1, 20, 80, 30,
         )).toBe(false);
+    });
+
+    test("physical building progress expires exactly at its frozen deadline", () => {
+        const initial = updateBuildingEliminationObjectiveProgress(undefined, {
+            tick: 100,
+            targetId: 10,
+            targetHitPoints: 1_000,
+            previousTargetStillAlive: true,
+            blockerId: null,
+            blockerHitPoints: null,
+            previousBlockerStillAlive: true,
+        }, 300, 240);
+        expect(initial).toMatchObject({ deadlineTicks: 300, deadlineExpired: false, progress: [] });
+        const before = updateBuildingEliminationObjectiveProgress(initial.state, {
+            tick: 399,
+            targetId: 10,
+            targetHitPoints: 1_000,
+            previousTargetStillAlive: true,
+            blockerId: null,
+            blockerHitPoints: null,
+            previousBlockerStillAlive: true,
+        }, 300, 240);
+        expect(before.deadlineExpired).toBe(false);
+        expect(updateBuildingEliminationObjectiveProgress(before.state, {
+            tick: 400,
+            targetId: 10,
+            targetHitPoints: 1_000,
+            previousTargetStillAlive: true,
+            blockerId: null,
+            blockerHitPoints: null,
+            previousBlockerStillAlive: true,
+        }, 300, 240).deadlineExpired).toBe(true);
+    });
+
+    test("damage and destruction reset the clock but live target switching does not", () => {
+        const initial = updateBuildingEliminationObjectiveProgress(undefined, {
+            tick: 100, targetId: 10, targetHitPoints: 1_000, previousTargetStillAlive: true,
+            blockerId: null, blockerHitPoints: null, previousBlockerStillAlive: true,
+        }, 300, 240);
+        const damaged = updateBuildingEliminationObjectiveProgress(initial.state, {
+            tick: 350, targetId: 10, targetHitPoints: 900, previousTargetStillAlive: true,
+            blockerId: null, blockerHitPoints: null, previousBlockerStillAlive: true,
+        }, 300, 240);
+        expect(damaged.progress).toEqual([{ progressKind: "building_damage", objectId: 10, damage: 100 }]);
+        expect(damaged.state.lastCertifiedProgressTick).toBe(350);
+        const switched = updateBuildingEliminationObjectiveProgress(damaged.state, {
+            tick: 600, targetId: 11, targetHitPoints: 800, previousTargetStillAlive: true,
+            blockerId: null, blockerHitPoints: null, previousBlockerStillAlive: true,
+        }, 300, 240);
+        expect(switched.progress).toEqual([]);
+        expect(switched.state.lastCertifiedProgressTick).toBe(350);
+        const destroyed = updateBuildingEliminationObjectiveProgress(damaged.state, {
+            tick: 600, targetId: 11, targetHitPoints: 800, previousTargetStillAlive: false,
+            blockerId: null, blockerHitPoints: null, previousBlockerStillAlive: true,
+        }, 300, 240);
+        expect(destroyed.progress).toEqual([{ progressKind: "building_destroyed", objectId: 10, damage: 0 }]);
+        expect(destroyed.state.lastCertifiedProgressTick).toBe(600);
+    });
+
+    test("blocker damage and destruction certify progress under the shorter deadline", () => {
+        const initial = updateBuildingEliminationObjectiveProgress(undefined, {
+            tick: 100, targetId: 10, targetHitPoints: 1_000, previousTargetStillAlive: true,
+            blockerId: 20, blockerHitPoints: 500, previousBlockerStillAlive: true,
+        }, 300, 240);
+        const damaged = updateBuildingEliminationObjectiveProgress(initial.state, {
+            tick: 250, targetId: 10, targetHitPoints: 1_000, previousTargetStillAlive: true,
+            blockerId: 20, blockerHitPoints: 450, previousBlockerStillAlive: true,
+        }, 300, 240);
+        expect(damaged).toMatchObject({
+            deadlineTicks: 240,
+            deadlineExpired: false,
+            progress: [{ progressKind: "blocker_damage", objectId: 20, damage: 50 }],
+        });
+        const destroyed = updateBuildingEliminationObjectiveProgress(damaged.state, {
+            tick: 480, targetId: 10, targetHitPoints: 1_000, previousTargetStillAlive: true,
+            blockerId: null, blockerHitPoints: null, previousBlockerStillAlive: false,
+        }, 300, 240);
+        expect(destroyed.progress).toEqual([{ progressKind: "blocker_destroyed", objectId: 20, damage: 0 }]);
+        expect(destroyed.state.lastCertifiedProgressTick).toBe(480);
+        expect(destroyed.deadlineTicks).toBe(300);
+        expect(destroyed.deadlineExpired).toBe(false);
     });
 });
