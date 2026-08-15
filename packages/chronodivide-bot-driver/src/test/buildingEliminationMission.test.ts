@@ -55,6 +55,7 @@ import {
     selectTransferCertifiedBuildingEliminationAttackers,
     shouldRunBuildingEliminationCapabilityProduction,
     shouldDirectAttackBuildingTarget,
+    shouldRecoverNoOwnerBuildingEliminationFallback,
     summarizeBuildingExecutionDistances,
     updateBuildingTargetProgress,
     updateBuildingEliminationObjectiveProgress,
@@ -471,6 +472,14 @@ describe("building elimination policy", () => {
         expect(isPreemptibleBuildingEliminationMission("allInAttack")).toBe(true);
         expect(isPreemptibleBuildingEliminationMission("defence_12")).toBe(false);
         expect(isPreemptibleBuildingEliminationMission("buildingElimination")).toBe(false);
+    });
+
+    test("no-owner recovery waits through its grace boundary but never overrides observed ownership", () => {
+        expect(shouldRecoverNoOwnerBuildingEliminationFallback(true, 219, 100, 120, false, 0)).toBe(false);
+        expect(shouldRecoverNoOwnerBuildingEliminationFallback(true, 220, 100, 120, false, 0)).toBe(true);
+        expect(shouldRecoverNoOwnerBuildingEliminationFallback(true, 220, 100, 120, true, 0)).toBe(false);
+        expect(shouldRecoverNoOwnerBuildingEliminationFallback(true, 220, 100, 120, false, 1)).toBe(false);
+        expect(shouldRecoverNoOwnerBuildingEliminationFallback(false, 220, 100, 120, false, 0)).toBe(false);
     });
 
     test("transfer certification matches the units the takeover can command", () => {
@@ -1024,6 +1033,8 @@ describe("building elimination policy", () => {
             "buildingNoProgressDeadlineTicks",
             "blockerNoProgressDeadlineTicks",
             "predecessorFallbackTicks",
+            "noOwnerFallbackRecovery",
+            "predecessorOwnershipGraceTicks",
         ]);
     });
 
@@ -1048,6 +1059,14 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({ predecessorFallbackTicks: 0 })).toThrow(
             "predecessorFallbackTicks",
         );
+        expect(() => resolveBuildingEliminationOptions({ predecessorOwnershipGraceTicks: 0 })).toThrow(
+            "predecessorOwnershipGraceTicks",
+        );
+        expect(() => resolveBuildingEliminationOptions({
+            noOwnerFallbackRecovery: true,
+            predecessorFallbackTicks: 60,
+            predecessorOwnershipGraceTicks: 120,
+        })).toThrow("cannot exceed predecessorFallbackTicks");
         expect(() => resolveBuildingEliminationOptions({
             adaptiveGroundAssaultInfrastructurePriority: 0,
         })).toThrow("adaptiveGroundAssaultInfrastructurePriority");

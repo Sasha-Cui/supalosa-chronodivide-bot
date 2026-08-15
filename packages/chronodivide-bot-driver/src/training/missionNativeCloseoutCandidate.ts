@@ -144,6 +144,10 @@ import {
     MissionNativeCloseoutPolicyV35,
     validateMissionNativeCloseoutPolicyV35,
 } from "./missionNativeCloseoutPolicyV35.js";
+import {
+    MissionNativeCloseoutPolicyV36,
+    validateMissionNativeCloseoutPolicyV36,
+} from "./missionNativeCloseoutPolicyV36.js";
 
 type MissionNativePolicy = MissionNativeCloseoutPolicy | MissionNativeCloseoutPolicyV2 |
     MissionNativeCloseoutPolicyV3 | MissionNativeCloseoutPolicyV4 | MissionNativeCloseoutPolicyV5 |
@@ -156,7 +160,8 @@ type MissionNativePolicy = MissionNativeCloseoutPolicy | MissionNativeCloseoutPo
     MissionNativeCloseoutPolicyV24 | MissionNativeCloseoutPolicyV25 | MissionNativeCloseoutPolicyV26 |
     MissionNativeCloseoutPolicyV27 | MissionNativeCloseoutPolicyV28 | MissionNativeCloseoutPolicyV29 |
     MissionNativeCloseoutPolicyV30 | MissionNativeCloseoutPolicyV31 | MissionNativeCloseoutPolicyV32 |
-    MissionNativeCloseoutPolicyV33 | MissionNativeCloseoutPolicyV34 | MissionNativeCloseoutPolicyV35;
+    MissionNativeCloseoutPolicyV33 | MissionNativeCloseoutPolicyV34 | MissionNativeCloseoutPolicyV35 |
+    MissionNativeCloseoutPolicyV36;
 
 type StrategyLike = {
     onAiUpdate(context: any, missionController: any, logger: any): StrategyLike;
@@ -300,6 +305,12 @@ class MissionNativeCloseoutStrategy implements StrategyLike {
             predecessorFallbackTicks: "predecessorFallbackTicks" in policy
                 ? policy.predecessorFallbackTicks
                 : 180,
+            noOwnerFallbackRecovery: "noOwnerFallbackRecovery" in policy
+                ? policy.noOwnerFallbackRecovery
+                : false,
+            predecessorOwnershipGraceTicks: "predecessorOwnershipGraceTicks" in policy
+                ? policy.predecessorOwnershipGraceTicks
+                : 120,
         }, telemetrySink);
     }
 
@@ -318,7 +329,9 @@ export const createMissionNativeCloseoutCandidate = (
     rawPolicy: MissionNativePolicy,
     telemetrySink: BuildingEliminationTelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 35
+    const policy = rawPolicy.schemaVersion === 36
+        ? validateMissionNativeCloseoutPolicyV36(rawPolicy)
+        : rawPolicy.schemaVersion === 35
         ? validateMissionNativeCloseoutPolicyV35(rawPolicy)
         : rawPolicy.schemaVersion === 34
         ? validateMissionNativeCloseoutPolicyV34(rawPolicy)
@@ -393,7 +406,10 @@ export const createMissionNativeCloseoutCandidate = (
     }
     const inner = baselineFactory.createDefaultStrategy() as StrategyLike;
     const strategy = new MissionNativeCloseoutStrategy(inner, policy, telemetrySink);
-    if (policy.schemaVersion === 33 || policy.schemaVersion === 34 || policy.schemaVersion === 35) {
+    if (
+        policy.schemaVersion === 33 || policy.schemaVersion === 34 ||
+        policy.schemaVersion === 35 || policy.schemaVersion === 36
+    ) {
         if (!baselineFactory.createWithStrategyAndExclusiveProductionFocus) {
             throw new Error(
                 "Mission-native closeout v33 or later requires the external queue-controller focus adapter",

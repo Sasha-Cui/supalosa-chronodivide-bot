@@ -97,6 +97,8 @@ export type BuildingEliminationOptions = {
     buildingNoProgressDeadlineTicks?: number;
     blockerNoProgressDeadlineTicks?: number;
     predecessorFallbackTicks?: number;
+    noOwnerFallbackRecovery?: boolean;
+    predecessorOwnershipGraceTicks?: number;
 };
 
 export type BuildingTargetDescriptor = {
@@ -269,6 +271,22 @@ export type BuildingEliminationTelemetryEvent =
           lastCertifiedProgressTick: number | null;
           deadlineTicks: number | null;
           fallbackUntilTick: number;
+          releasedUnitIds: number[];
+          suspendedOverlayMissionNames: string[];
+          activePredecessorMissionNames: string[];
+      }
+    | {
+          schemaVersion: 30;
+          event: "objective_progress_recovery";
+          tick: number;
+          phase: "fallback_no_predecessor_replan";
+          reason: "building_no_progress" | "blocker_no_progress";
+          targetId: number;
+          blockerId: number | null;
+          fallbackStartedTick: number;
+          predecessorOwnershipGraceTicks: number;
+          predecessorOwnershipGraceUntilTick: number;
+          plannedFallbackUntilTick: number;
           releasedUnitIds: number[];
           suspendedOverlayMissionNames: string[];
           activePredecessorMissionNames: string[];
@@ -683,6 +701,8 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     buildingNoProgressDeadlineTicks: 300,
     blockerNoProgressDeadlineTicks: 240,
     predecessorFallbackTicks: 180,
+    noOwnerFallbackRecovery: false,
+    predecessorOwnershipGraceTicks: 120,
 };
 
 const requireIntegerInRange = (name: string, value: number, minimum: number, maximum: number): void => {
@@ -741,6 +761,16 @@ export const resolveBuildingEliminationOptions = (
         100_000,
     );
     requireIntegerInRange("predecessorFallbackTicks", resolved.predecessorFallbackTicks, 1, 100_000);
+    requireIntegerInRange(
+        "predecessorOwnershipGraceTicks",
+        resolved.predecessorOwnershipGraceTicks,
+        1,
+        100_000,
+    );
+    if (
+        resolved.noOwnerFallbackRecovery &&
+        resolved.predecessorOwnershipGraceTicks > resolved.predecessorFallbackTicks
+    ) throw new Error("predecessorOwnershipGraceTicks cannot exceed predecessorFallbackTicks");
     if (!new Set<BuildingEliminationTargetPriority>(["production", "reinforcement", "defense", "nearest"])
         .has(resolved.targetPriority)) {
         throw new Error(`Invalid building-elimination target priority: ${resolved.targetPriority}`);
@@ -1860,6 +1890,16 @@ export const rankSweepPoints = (
 export const isPreemptibleBuildingEliminationMission = (name: string): boolean =>
     name.startsWith("attack_") || name.startsWith("retreat-from-attack") || name === "allInAttack";
 
+export const shouldRecoverNoOwnerBuildingEliminationFallback = (
+    enabled: boolean,
+    tick: number,
+    fallbackStartedTick: number,
+    predecessorOwnershipGraceTicks: number,
+    predecessorOwnershipObserved: boolean,
+    activePredecessorMissionCount: number,
+): boolean => enabled && !predecessorOwnershipObserved && activePredecessorMissionCount === 0 &&
+    tick >= fallbackStartedTick + predecessorOwnershipGraceTicks;
+
 export const isTransferCertifiedBuildingEliminationMission = (name: string | null): boolean =>
     name === null || isBuildingEliminationReadinessMissionName(name) ||
     isPreemptibleBuildingEliminationMission(name);
@@ -2257,6 +2297,7 @@ type BuildingEliminationProgressFallback = {
     deadlineTicks: number;
     fallbackUntilTick: number;
     releasedUnitIds: number[];
+    predecessorOwnershipObserved: boolean;
 };
 
 class BuildingEliminationMission extends Mission {
@@ -2734,6 +2775,7 @@ class BuildingEliminationMission extends Mission {
             deadlineTicks: update.deadlineTicks,
             fallbackUntilTick: tick + this.options.predecessorFallbackTicks,
             releasedUnitIds: this.getUnitIds().slice().sort((left, right) => left - right),
+            predecessorOwnershipObserved: false,
         };
         this.telemetrySink({
             schemaVersion: 29,
@@ -3968,6 +4010,7 @@ export class BuildingEliminationMissionFactory {
             this.options.physicalProgressDeadlineFallback && this.progressFallback &&
             tick < this.progressFallback.fallbackUntilTick
         ) {
+            const fallback = this.progressFallback;
             const suspendedOverlayMissionNames = this.suspendOverlayMissions(missionController);
             const activePredecessorMissionNames = missionController.getMissions()
                 .filter((mission) =>
@@ -3976,25 +4019,57 @@ export class BuildingEliminationMissionFactory {
                 )
                 .map((mission) => mission.getUniqueName())
                 .sort((left, right) => left.localeCompare(right));
+            if (activePredecessorMissionNames.length > 0) {
+                fallback.predecessorOwnershipObserved = true;
+            }
             if (tick >= this.lastProgressFallbackTelemetryAt + TELEMETRY_HEARTBEAT_TICKS) {
                 this.telemetrySink({
                     schemaVersion: 29,
                     event: "objective_progress_deadline",
                     tick,
                     phase: "fallback_active",
-                    reason: this.progressFallback.reason,
-                    targetId: this.progressFallback.targetId,
-                    blockerId: this.progressFallback.blockerId,
-                    lastCertifiedProgressTick: this.progressFallback.lastCertifiedProgressTick,
-                    deadlineTicks: this.progressFallback.deadlineTicks,
-                    fallbackUntilTick: this.progressFallback.fallbackUntilTick,
-                    releasedUnitIds: this.progressFallback.releasedUnitIds,
+                    reason: fallback.reason,
+                    targetId: fallback.targetId,
+                    blockerId: fallback.blockerId,
+                    lastCertifiedProgressTick: fallback.lastCertifiedProgressTick,
+                    deadlineTicks: fallback.deadlineTicks,
+                    fallbackUntilTick: fallback.fallbackUntilTick,
+                    releasedUnitIds: fallback.releasedUnitIds,
                     suspendedOverlayMissionNames,
                     activePredecessorMissionNames,
                 });
                 this.lastProgressFallbackTelemetryAt = tick;
             }
-            return;
+            if (shouldRecoverNoOwnerBuildingEliminationFallback(
+                this.options.noOwnerFallbackRecovery,
+                tick,
+                fallback.tick,
+                this.options.predecessorOwnershipGraceTicks,
+                fallback.predecessorOwnershipObserved,
+                activePredecessorMissionNames.length,
+            )) {
+                this.telemetrySink({
+                    schemaVersion: 30,
+                    event: "objective_progress_recovery",
+                    tick,
+                    phase: "fallback_no_predecessor_replan",
+                    reason: fallback.reason,
+                    targetId: fallback.targetId,
+                    blockerId: fallback.blockerId,
+                    fallbackStartedTick: fallback.tick,
+                    predecessorOwnershipGraceTicks: this.options.predecessorOwnershipGraceTicks,
+                    predecessorOwnershipGraceUntilTick:
+                        fallback.tick + this.options.predecessorOwnershipGraceTicks,
+                    plannedFallbackUntilTick: fallback.fallbackUntilTick,
+                    releasedUnitIds: fallback.releasedUnitIds,
+                    suspendedOverlayMissionNames,
+                    activePredecessorMissionNames,
+                });
+                this.progressFallback = null;
+                this.lastProgressFallbackTelemetryAt = Number.NEGATIVE_INFINITY;
+            } else {
+                return;
+            }
         }
         if (
             this.options.physicalProgressDeadlineFallback && this.progressFallback &&
