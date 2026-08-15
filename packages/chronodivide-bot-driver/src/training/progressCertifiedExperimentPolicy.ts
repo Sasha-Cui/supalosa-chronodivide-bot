@@ -4,6 +4,10 @@ import {
     buildProgressCertifiedConversionPolicy,
     validateProgressCertifiedConversionPolicy,
 } from "./progressCertifiedConversionPolicy.js";
+import {
+    ProgressCertifiedConversionPolicyV5,
+    validateProgressCertifiedConversionPolicyV5,
+} from "./progressCertifiedConversionPolicyV5.js";
 
 export const PROGRESS_CERTIFIED_EXPERIMENT_POLICY_SCHEMA_VERSION = 1 as const;
 
@@ -21,7 +25,7 @@ export type ProgressCertifiedArmId = typeof PROGRESS_CERTIFIED_ARM_ORDER[number]
 export type ProgressCertifiedExperimentPolicy = {
     schemaVersion: typeof PROGRESS_CERTIFIED_EXPERIMENT_POLICY_SCHEMA_VERSION;
     candidateCore: "external_supalosa";
-    objectivePolicy: ProgressCertifiedConversionPolicy;
+    objectivePolicy: ProgressCertifiedConversionPolicy | ProgressCertifiedConversionPolicyV5;
 };
 
 export type ProgressCertifiedArm = {
@@ -45,7 +49,10 @@ export const validateProgressCertifiedExperimentPolicy = (
     if (value.candidateCore !== "external_supalosa") {
         throw new Error("Progress-certified experiment requires the exact external Supalosa core");
     }
-    return { ...value, objectivePolicy: validateProgressCertifiedConversionPolicy(value.objectivePolicy) };
+    const objectivePolicy = value.objectivePolicy.schemaVersion === 5
+        ? validateProgressCertifiedConversionPolicyV5(value.objectivePolicy)
+        : validateProgressCertifiedConversionPolicy(value.objectivePolicy);
+    return { ...value, objectivePolicy };
 };
 
 const canonical = (value: unknown): unknown => {

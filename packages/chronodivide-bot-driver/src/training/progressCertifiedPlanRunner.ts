@@ -276,6 +276,8 @@ export const runProgressCertifiedPlanFromEnvironment = async (): Promise<void> =
         path.join(driverRoot, "dist", "training", "terminalObjectiveStrategy.js"),
         path.join(driverRoot, "src", "training", "progressCertifiedConversionPolicy.ts"),
         path.join(driverRoot, "dist", "training", "progressCertifiedConversionPolicy.js"),
+        path.join(driverRoot, "src", "training", "progressCertifiedConversionPolicyV5.ts"),
+        path.join(driverRoot, "dist", "training", "progressCertifiedConversionPolicyV5.js"),
         path.join(driverRoot, "src", "training", "progressCertifiedExperimentPolicy.ts"),
         path.join(driverRoot, "dist", "training", "progressCertifiedExperimentPolicy.js"),
         path.join(driverRoot, "src", "training", "terminalRacePublicState.ts"),

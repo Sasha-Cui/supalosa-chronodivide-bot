@@ -7,12 +7,14 @@ import {
     hasBridgeUncalibratedObjectiveMechanic,
     partitionContinuousOffenseCombatants,
     objectiveReserveCombatantCount,
+    resolveObjectiveBuildingOrderMode,
     terminalRaceActivationReason,
 } from "../training/terminalObjectiveStrategy.js";
 import { buildTerminalObjectiveArms } from "../training/terminalObjectivePolicy.js";
 import { buildTerminalRaceArms } from "../training/terminalRacePolicy.js";
 import { buildContinuousOffensePolicy } from "../training/continuousOffensePolicy.js";
 import { buildProgressCertifiedConversionPolicy } from "../training/progressCertifiedConversionPolicy.js";
+import { buildProgressCertifiedConversionPolicyV5 } from "../training/progressCertifiedConversionPolicyV5.js";
 
 const arms = new Map(buildTerminalObjectiveArms().map((arm) => [arm.armId, arm]));
 const terminalRaceArms = new Map(buildTerminalRaceArms().map((arm) => [arm.armId, arm]));
@@ -85,6 +87,45 @@ describe("terminal-objective strategy construction", () => {
         expect(factory.createWithStrategy).toHaveBeenCalledOnce();
     });
 
+    it("constructs visibility-aware conversion on the exact external predecessor", () => {
+        const inner = { onAiUpdate: vi.fn() as any };
+        inner.onAiUpdate.mockReturnValue(inner);
+        const wrapped = { tag: "visibility-aware-progress-certified-conversion" };
+        const factory = {
+            descriptor: { kind: "external-package", packageRoot: "/pinned" } as const,
+            create: vi.fn(() => ({ tag: "baseline" })),
+            createDefaultStrategy: vi.fn(() => inner),
+            createWithStrategy: vi.fn(() => wrapped),
+        };
+        const result = createTerminalObjectiveCandidate(
+            factory as any,
+            "candidate",
+            Countries.USA,
+            buildProgressCertifiedConversionPolicyV5(),
+        );
+        expect(result).toBe(wrapped);
+        expect(factory.create).not.toHaveBeenCalled();
+        expect(factory.createDefaultStrategy).toHaveBeenCalledOnce();
+        expect(factory.createWithStrategy).toHaveBeenCalledOnce();
+    });
+
+    it("approaches an exact unseen final building before switching to direct attack", () => {
+        const legacy = buildProgressCertifiedConversionPolicy();
+        const visibilityAware = buildProgressCertifiedConversionPolicyV5();
+        expect(resolveObjectiveBuildingOrderMode(
+            { visible: false, exact: true }, legacy,
+        )).toBe("attack_exact_unseen_building");
+        expect(resolveObjectiveBuildingOrderMode(
+            { visible: false, exact: true }, visibilityAware,
+        )).toBe("attack_move_exact_unseen_coordinates");
+        expect(resolveObjectiveBuildingOrderMode(
+            { visible: true, exact: true }, visibilityAware,
+        )).toBe("attack_visible_building");
+        expect(resolveObjectiveBuildingOrderMode(
+            { visible: false, exact: false }, visibilityAware,
+        )).toBe("attack_move_remembered_coordinates");
+    });
+
     it("keeps the progress-certified disabled arm on the exact baseline path", () => {
         const baseline = { tag: "exact-external-baseline" };
         const factory = {
@@ -102,6 +143,30 @@ describe("terminal-objective strategy construction", () => {
             "candidate",
             Countries.USA,
             buildProgressCertifiedConversionPolicy({ enabled: false }),
+        );
+        expect(result).toBe(baseline);
+        expect(factory.create).toHaveBeenCalledOnce();
+        expect(factory.createDefaultStrategy).not.toHaveBeenCalled();
+        expect(factory.createWithStrategy).not.toHaveBeenCalled();
+    });
+
+    it("keeps the visibility-aware disabled arm on the exact baseline path", () => {
+        const baseline = { tag: "exact-external-baseline" };
+        const factory = {
+            descriptor: { kind: "external-package", packageRoot: "/pinned" } as const,
+            create: vi.fn(() => baseline),
+            createDefaultStrategy: vi.fn(() => {
+                throw new Error("disabled overlay must not construct a strategy");
+            }),
+            createWithStrategy: vi.fn(() => {
+                throw new Error("disabled overlay must not wrap the bot");
+            }),
+        };
+        const result = createTerminalObjectiveCandidate(
+            factory as any,
+            "candidate",
+            Countries.USA,
+            buildProgressCertifiedConversionPolicyV5({ enabled: false }),
         );
         expect(result).toBe(baseline);
         expect(factory.create).toHaveBeenCalledOnce();

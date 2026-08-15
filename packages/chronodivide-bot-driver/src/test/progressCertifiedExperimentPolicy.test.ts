@@ -3,7 +3,9 @@ import {
     PROGRESS_CERTIFIED_ARM_ORDER,
     buildProgressCertifiedArms,
     progressCertifiedExperimentPolicySha256,
+    validateProgressCertifiedExperimentPolicy,
 } from "../training/progressCertifiedExperimentPolicy.js";
+import { buildProgressCertifiedConversionPolicyV5 } from "../training/progressCertifiedConversionPolicyV5.js";
 
 describe("progress-certified experiment arms", () => {
     it("freezes six unique exact-external causal arms in declared order", () => {
@@ -31,5 +33,18 @@ describe("progress-certified experiment arms", () => {
         expect(arms.get("external_low_count_route_no_deadline")?.blockerNoDamageDeadlineTicks).toBe(100_000);
         expect(arms.get("external_low_count_progress_hybrid")?.blockerNoDamageDeadlineTicks).toBe(360);
         expect(arms.get("external_low_count_progress_hybrid")?.buildingNoDamageDeadlineTicks).toBe(600);
+    });
+
+    it("accepts a schema-v5 objective without changing the frozen six-arm builder", () => {
+        const policy = validateProgressCertifiedExperimentPolicy({
+            schemaVersion: 1,
+            candidateCore: "external_supalosa",
+            objectivePolicy: buildProgressCertifiedConversionPolicyV5(),
+        });
+        expect(policy.objectivePolicy.schemaVersion).toBe(5);
+        expect(progressCertifiedExperimentPolicySha256(policy)).toMatch(/^[0-9a-f]{64}$/);
+        expect(buildProgressCertifiedArms().every(({ policy: armPolicy }) =>
+            armPolicy.objectivePolicy.schemaVersion === 4,
+        )).toBe(true);
     });
 });

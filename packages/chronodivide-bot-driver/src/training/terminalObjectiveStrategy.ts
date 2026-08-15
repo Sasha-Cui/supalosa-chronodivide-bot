@@ -56,6 +56,11 @@ import {
     ProgressCertifiedConversionPolicy,
     validateProgressCertifiedConversionPolicy,
 } from "./progressCertifiedConversionPolicy.js";
+import {
+    PROGRESS_CERTIFIED_CONVERSION_POLICY_V5_SCHEMA_VERSION,
+    ProgressCertifiedConversionPolicyV5,
+    validateProgressCertifiedConversionPolicyV5,
+} from "./progressCertifiedConversionPolicyV5.js";
 
 type Point = { x: number; y: number };
 
@@ -96,14 +101,14 @@ type SearchPoint = Point & {
 };
 
 type ObjectiveOverlayPolicy = TerminalObjectivePolicy | TerminalRacePolicy | ContinuousOffensePolicy |
-    ProgressCertifiedConversionPolicy;
+    ProgressCertifiedConversionPolicy | ProgressCertifiedConversionPolicyV5;
 type ObjectiveOverlayMechanism = ObjectiveOverlayPolicy["mechanism"];
 type ObjectiveInformationBoundary =
     | typeof TERMINAL_OBJECTIVE_INFORMATION_BOUNDARY
     | TerminalRacePolicy["informationInterface"];
 
 export type TerminalObjectiveTelemetry = {
-    schemaVersion: 1 | 2 | 3;
+    schemaVersion: 1 | 2 | 3 | 4;
     event: "decision" | "search_orders" | "memory_invalidated";
     informationBoundary: ObjectiveInformationBoundary;
     tick: number;
@@ -113,6 +118,7 @@ export type TerminalObjectiveTelemetry = {
     selectedBuildingId?: number | null;
     selectedBuildingVisible?: boolean;
     selectedBuildingObservedBy?: "vision" | "memory" | "public_complete_state";
+    selectedBuildingOrderMode?: ObjectiveBuildingOrderMode;
     selectedAttackerIds?: number[];
     blockerIds?: number[];
     threatIds?: number[];
@@ -179,14 +185,37 @@ const isTerminalRacePolicy = (policy: ObjectiveOverlayPolicy): policy is Termina
 const isContinuousOffensePolicy = (policy: ObjectiveOverlayPolicy): policy is ContinuousOffensePolicy =>
     policy.schemaVersion === 3;
 
+const isProgressCertifiedPolicyV5 = (
+    policy: ObjectiveOverlayPolicy,
+): policy is ProgressCertifiedConversionPolicyV5 => policy.schemaVersion === 5;
+
+type ProgressCertifiedPolicy = ProgressCertifiedConversionPolicy | ProgressCertifiedConversionPolicyV5;
+
 const isProgressCertifiedPolicy = (
     policy: ObjectiveOverlayPolicy,
-): policy is ProgressCertifiedConversionPolicy => policy.schemaVersion === 4;
+): policy is ProgressCertifiedPolicy => policy.schemaVersion === 4 || policy.schemaVersion === 5;
 
 const hasPublicObjectiveInterface = (
     policy: ObjectiveOverlayPolicy,
-): policy is TerminalRacePolicy | ContinuousOffensePolicy | ProgressCertifiedConversionPolicy =>
+): policy is TerminalRacePolicy | ContinuousOffensePolicy | ProgressCertifiedPolicy =>
     isTerminalRacePolicy(policy) || isContinuousOffensePolicy(policy) || isProgressCertifiedPolicy(policy);
+
+export type ObjectiveBuildingOrderMode =
+    | "attack_visible_building"
+    | "attack_exact_unseen_building"
+    | "attack_move_exact_unseen_coordinates"
+    | "attack_move_remembered_coordinates";
+
+export const resolveObjectiveBuildingOrderMode = (
+    target: { visible: boolean; exact: boolean },
+    policy: { schemaVersion: number },
+): ObjectiveBuildingOrderMode => {
+    if (target.visible) return "attack_visible_building";
+    if (!target.exact) return "attack_move_remembered_coordinates";
+    return policy.schemaVersion === PROGRESS_CERTIFIED_CONVERSION_POLICY_V5_SCHEMA_VERSION
+        ? "attack_move_exact_unseen_coordinates"
+        : "attack_exact_unseen_building";
+};
 
 const missionLivenessTicks = (policy: ObjectiveOverlayPolicy): number =>
     isProgressCertifiedPolicy(policy)
@@ -205,7 +234,7 @@ export const objectiveReserveCombatantCount = (
       : 0;
 
 const continuousForceEngagementMode = (
-    policy: ContinuousOffensePolicy | ProgressCertifiedConversionPolicy,
+    policy: ContinuousOffensePolicy | ProgressCertifiedPolicy,
 ): "all_observed_forces_first" | "route_blockers_only" | "buildings_only" =>
     isContinuousOffensePolicy(policy)
         ? policy.forceEngagementMode
@@ -218,8 +247,10 @@ const objectiveInformationBoundary = (policy: ObjectiveOverlayPolicy): Objective
         ? policy.informationInterface
         : TERMINAL_OBJECTIVE_INFORMATION_BOUNDARY;
 
-const objectiveTelemetrySchemaVersion = (policy: ObjectiveOverlayPolicy): 1 | 2 | 3 =>
-    isProgressCertifiedPolicy(policy)
+const objectiveTelemetrySchemaVersion = (policy: ObjectiveOverlayPolicy): 1 | 2 | 3 | 4 =>
+    isProgressCertifiedPolicyV5(policy)
+        ? 4
+        : isProgressCertifiedPolicy(policy)
         ? 3
         : isTerminalRacePolicy(policy) || isContinuousOffensePolicy(policy)
           ? 2
@@ -975,6 +1006,10 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 : selected.target.exact
                   ? "public_complete_state"
                   : "memory",
+            selectedBuildingOrderMode: isProgressCertifiedPolicyV5(this.policy) &&
+                (decision.kind === "building_strike" || decision.kind === "terminal_candidate_strike")
+                ? resolveObjectiveBuildingOrderMode(selected.target, this.policy)
+                : undefined,
             selectedAttackerIds: strike.map(({ unit }) => unit.id).sort((a, b) => a - b),
             blockerIds: decision.kind === "blocker_clear" ? decision.blockerIds : classification.blockerIds,
             threatIds: decision.kind === "base_defense" || decision.kind === "predecessor_fallback"
@@ -1218,7 +1253,8 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         const ids = attackers.map(({ unit }) => unit.id);
         if (ids.length === 0) return;
         if (decision.kind === "building_strike" || decision.kind === "terminal_candidate_strike") {
-            if (target.visible || target.exact) {
+            const orderMode = resolveObjectiveBuildingOrderMode(target, this.policy);
+            if (orderMode === "attack_visible_building" || orderMode === "attack_exact_unseen_building") {
                 context.player.actions.orderUnits(ids, OrderType.Attack, target.unit.id);
             }
             else context.player.actions.orderUnits(ids, OrderType.AttackMove, target.unit.tile.rx, target.unit.tile.ry);
@@ -1528,7 +1564,9 @@ export const createTerminalObjectiveCandidate = (
     rawPolicy: ObjectiveOverlayPolicy,
     telemetry: TelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 4
+    const policy = rawPolicy.schemaVersion === 5
+        ? validateProgressCertifiedConversionPolicyV5(rawPolicy as ProgressCertifiedConversionPolicyV5)
+        : rawPolicy.schemaVersion === 4
         ? validateProgressCertifiedConversionPolicy(rawPolicy as ProgressCertifiedConversionPolicy)
         : rawPolicy.schemaVersion === 3
         ? validateContinuousOffensePolicy(rawPolicy as ContinuousOffensePolicy)
