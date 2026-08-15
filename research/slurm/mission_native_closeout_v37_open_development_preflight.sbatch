@@ -55,10 +55,9 @@ cd "$REPO"
 }
 
 "$NODE_BIN" node_modules/typescript/bin/tsc -b
-"$NODE_BIN" packages/chronodivide-bot-driver/node_modules/vitest/vitest.mjs run \
-    packages/chronodivide-bot-driver/src/test --testTimeout=300000
-
 cd "$DRIVER_ROOT"
+"$NODE_BIN" node_modules/vitest/vitest.mjs run src/test --testTimeout=300000
+
 export BASELINE_PACKAGE_ROOT="$BASELINE_ROOT"
 export REQUIRE_EXTERNAL_BASELINE=true
 export MISSION_NATIVE_CLOSEOUT_V37_PROTOCOL="$PROTOCOL"
