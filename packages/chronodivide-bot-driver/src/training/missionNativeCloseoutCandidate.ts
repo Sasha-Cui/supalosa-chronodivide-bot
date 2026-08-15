@@ -132,6 +132,10 @@ import {
     MissionNativeCloseoutPolicyV32,
     validateMissionNativeCloseoutPolicyV32,
 } from "./missionNativeCloseoutPolicyV32.js";
+import {
+    MissionNativeCloseoutPolicyV33,
+    validateMissionNativeCloseoutPolicyV33,
+} from "./missionNativeCloseoutPolicyV33.js";
 
 type MissionNativePolicy = MissionNativeCloseoutPolicy | MissionNativeCloseoutPolicyV2 |
     MissionNativeCloseoutPolicyV3 | MissionNativeCloseoutPolicyV4 | MissionNativeCloseoutPolicyV5 |
@@ -143,7 +147,8 @@ type MissionNativePolicy = MissionNativeCloseoutPolicy | MissionNativeCloseoutPo
     MissionNativeCloseoutPolicyV21 | MissionNativeCloseoutPolicyV22 | MissionNativeCloseoutPolicyV23 |
     MissionNativeCloseoutPolicyV24 | MissionNativeCloseoutPolicyV25 | MissionNativeCloseoutPolicyV26 |
     MissionNativeCloseoutPolicyV27 | MissionNativeCloseoutPolicyV28 | MissionNativeCloseoutPolicyV29 |
-    MissionNativeCloseoutPolicyV30 | MissionNativeCloseoutPolicyV31 | MissionNativeCloseoutPolicyV32;
+    MissionNativeCloseoutPolicyV30 | MissionNativeCloseoutPolicyV31 | MissionNativeCloseoutPolicyV32 |
+    MissionNativeCloseoutPolicyV33;
 
 type StrategyLike = {
     onAiUpdate(context: any, missionController: any, logger: any): StrategyLike;
@@ -290,7 +295,9 @@ export const createMissionNativeCloseoutCandidate = (
     rawPolicy: MissionNativePolicy,
     telemetrySink: BuildingEliminationTelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 32
+    const policy = rawPolicy.schemaVersion === 33
+        ? validateMissionNativeCloseoutPolicyV33(rawPolicy)
+        : rawPolicy.schemaVersion === 32
         ? validateMissionNativeCloseoutPolicyV32(rawPolicy)
         : rawPolicy.schemaVersion === 31
         ? validateMissionNativeCloseoutPolicyV31(rawPolicy)
@@ -354,13 +361,30 @@ export const createMissionNativeCloseoutCandidate = (
                                 ? validateMissionNativeCloseoutPolicyV2(rawPolicy)
                                 : validateMissionNativeCloseoutPolicy(rawPolicy);
     if (!policy.enabled) return baselineFactory.create(name, country);
-    if (!baselineFactory.createDefaultStrategy || !baselineFactory.createWithStrategy) {
+    if (!baselineFactory.createDefaultStrategy) {
         throw new Error("Mission-native closeout requires an injectable external baseline strategy");
     }
     const inner = baselineFactory.createDefaultStrategy() as StrategyLike;
+    const strategy = new MissionNativeCloseoutStrategy(inner, policy, telemetrySink);
+    if (policy.schemaVersion === 33) {
+        if (!baselineFactory.createWithStrategyAndExclusiveProductionFocus) {
+            throw new Error(
+                "Mission-native closeout v33 requires the external queue-controller focus adapter",
+            );
+        }
+        return baselineFactory.createWithStrategyAndExclusiveProductionFocus(
+            name,
+            country,
+            strategy,
+            telemetrySink,
+        );
+    }
+    if (!baselineFactory.createWithStrategy) {
+        throw new Error("Mission-native closeout requires an injectable external baseline strategy");
+    }
     return baselineFactory.createWithStrategy(
         name,
         country,
-        new MissionNativeCloseoutStrategy(inner, policy, telemetrySink),
+        strategy,
     );
 };

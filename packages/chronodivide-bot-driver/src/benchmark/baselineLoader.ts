@@ -5,7 +5,10 @@ import { ActionsApi, GameApi, ProductionApi } from "@chronodivide/game-api";
 import { SupalosaBot } from "@supalosa/chronodivide-bot/dist/bot/bot.js";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { DefaultStrategy } from "@supalosa/chronodivide-bot/dist/bot/strategy/defaultStrategy.js";
+import { BuildingEliminationTelemetrySink } from
+    "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
 import { BaselineDescriptor } from "./provenance.js";
+import { ExclusiveProductionFocusQueueController } from "./exclusiveProductionFocusQueueController.js";
 
 export type InspectableBaselineBot = SupalosaBot & {
     lastGameApi: GameApi | null;
@@ -18,10 +21,24 @@ export type BaselineFactory = {
     createDefaultStrategy?(): unknown;
     create(name: string, country: Countries): InspectableBaselineBot;
     createWithStrategy?(name: string, country: Countries, strategy: unknown): InspectableBaselineBot;
+    createWithStrategyAndExclusiveProductionFocus?(
+        name: string,
+        country: Countries,
+        strategy: unknown,
+        telemetrySink: BuildingEliminationTelemetrySink,
+    ): InspectableBaselineBot;
 };
 
 type BotConstructor = typeof SupalosaBot;
 type StrategyConstructor = typeof DefaultStrategy;
+type QueueControllerConstructor = new () => {
+    onAiUpdate(
+        context: any,
+        threatCache: unknown,
+        unitTypeRequests: Map<string, { priority: number; specificLocation: unknown }>,
+        logger: (message: string) => void,
+    ): void;
+};
 
 const parseBoolValue = (raw: string | undefined): boolean => {
     if (!raw) {
@@ -90,7 +107,20 @@ const externalFactory = async (packageRoot: string): Promise<BaselineFactory> =>
     const resolvedRoot = path.resolve(packageRoot);
     const botModulePath = path.join(resolvedRoot, "dist", "bot", "bot.js");
     const strategyModulePath = path.join(resolvedRoot, "dist", "bot", "strategy", "defaultStrategy.js");
-    for (const requiredPath of [botModulePath, strategyModulePath, path.join(resolvedRoot, "package.json")]) {
+    const queueControllerModulePath = path.join(
+        resolvedRoot,
+        "dist",
+        "bot",
+        "logic",
+        "building",
+        "queueController.js",
+    );
+    for (const requiredPath of [
+        botModulePath,
+        strategyModulePath,
+        queueControllerModulePath,
+        path.join(resolvedRoot, "package.json"),
+    ]) {
         if (!fs.existsSync(requiredPath)) {
             throw new Error(
                 `External baseline is incomplete: ${requiredPath} is missing. Build the pinned clean checkout before evaluation.`,
@@ -102,8 +132,12 @@ const externalFactory = async (packageRoot: string): Promise<BaselineFactory> =>
     const strategyModule = (await import(pathToFileURL(strategyModulePath).href)) as {
         DefaultStrategy: StrategyConstructor;
     };
+    const queueControllerModule = (await import(pathToFileURL(queueControllerModulePath).href)) as {
+        QueueController: QueueControllerConstructor;
+    };
     const ExternalBot = botModule.SupalosaBot;
     const ExternalStrategy = strategyModule.DefaultStrategy;
+    const ExternalQueueController = queueControllerModule.QueueController;
 
     class InspectableExternalBot extends ExternalBot {
         public lastGameApi: GameApi | null = null;
@@ -120,6 +154,23 @@ const externalFactory = async (packageRoot: string): Promise<BaselineFactory> =>
         override onGameTick(game: GameApi): void {
             this.lastGameApi = game;
             super.onGameTick(game);
+        }
+    }
+
+    class InspectableExternalFocusedBot extends InspectableExternalBot {
+        constructor(
+            name: string,
+            country: Countries,
+            strategy: InstanceType<StrategyConstructor>,
+            private injectedQueueController: ExclusiveProductionFocusQueueController,
+        ) {
+            super(name, country, [], false, strategy);
+        }
+
+        override onGameStart(game: GameApi): void {
+            super.onGameStart(game);
+            (this as unknown as { queueController: ExclusiveProductionFocusQueueController }).queueController =
+                this.injectedQueueController;
         }
     }
 
@@ -147,6 +198,19 @@ const externalFactory = async (packageRoot: string): Promise<BaselineFactory> =>
                 [],
                 false,
                 strategy as InstanceType<StrategyConstructor>,
+            ) as InspectableBaselineBot;
+        },
+        createWithStrategyAndExclusiveProductionFocus(
+            name: string,
+            country: Countries,
+            strategy: unknown,
+            telemetrySink: BuildingEliminationTelemetrySink,
+        ): InspectableBaselineBot {
+            return new InspectableExternalFocusedBot(
+                name,
+                country,
+                strategy as InstanceType<StrategyConstructor>,
+                new ExclusiveProductionFocusQueueController(new ExternalQueueController(), telemetrySink),
             ) as InspectableBaselineBot;
         },
     };

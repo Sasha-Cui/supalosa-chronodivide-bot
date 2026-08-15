@@ -461,6 +461,18 @@ export type BuildingEliminationTelemetryEvent =
           infantryQueueHeadName: string | null;
       }
     | {
+          schemaVersion: 26;
+          event: "exclusive_queue_focus_scheduler";
+          tick: number;
+          focusQueue: QueueType;
+          focusRequestName: string;
+          focusPriority: number;
+          focusQueueStatus: QueueStatus;
+          pausedQueueTypes: QueueType[];
+          deferredQueueTypes: QueueType[];
+          readyQueueTypes: QueueType[];
+      }
+    | {
           schemaVersion: 15;
           event: "assault_production_reservation";
           tick: number;
