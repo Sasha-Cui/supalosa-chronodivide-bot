@@ -17,6 +17,7 @@ import {
     getBuildingEliminationAssaultProductionRequests,
     getBuildingEliminationGroundAssaultUnitName,
     getBuildingEliminationGroundAssaultScreenUnitName,
+    getBuildingEliminationGroundAssaultScreenStructureName,
     getBuildingEliminationGroundAssaultStructureName,
     getBuildingEliminationReadinessMissionName,
     getSaturatedGroundAssaultRequestNames,
@@ -358,6 +359,8 @@ describe("building elimination policy", () => {
         expect(getBuildingEliminationGroundAssaultUnitName(SideType.GDI)).toBe("MTNK");
         expect(getBuildingEliminationGroundAssaultStructureName(SideType.Nod)).toBe("NAWEAP");
         expect(getBuildingEliminationGroundAssaultStructureName(SideType.GDI)).toBe("GAWEAP");
+        expect(getBuildingEliminationGroundAssaultScreenStructureName(SideType.Nod)).toBe("NAHAND");
+        expect(getBuildingEliminationGroundAssaultScreenStructureName(SideType.GDI)).toBe("GAPILE");
         expect(getBuildingEliminationAssaultProductionAction([], "MTNK", 3, 4, 140)).toEqual({
             type: "request",
             unitNameToPriority: { MTNK: 140 },
@@ -919,6 +922,7 @@ describe("building elimination policy", () => {
             "adaptiveNavalTargetCount",
             "adaptiveGroundAssaultTargetCount",
             "adaptiveGroundAssaultInfrastructure",
+            "adaptiveGroundAssaultScreenInfrastructure",
             "adaptiveGroundAssaultProductionReservation",
             "adaptiveGroundAssaultProductionScopeLatch",
             "adaptiveGroundAssaultScreenTargetCount",
@@ -985,6 +989,9 @@ describe("building elimination policy", () => {
         expect(() => resolveBuildingEliminationOptions({ contactOnlyBlockerClearance: "yes" as any })).toThrow(
             "contact-only blocker clearance",
         );
+        expect(() => resolveBuildingEliminationOptions({
+            adaptiveGroundAssaultScreenInfrastructure: "yes" as any,
+        })).toThrow("screen infrastructure");
         expect(() => resolveBuildingEliminationOptions({
             adaptiveGroundAssaultProductionReservation: "yes" as any,
         })).toThrow("production reservation");

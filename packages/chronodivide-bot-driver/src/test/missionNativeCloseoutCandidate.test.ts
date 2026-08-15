@@ -24,6 +24,7 @@ import { buildMissionNativeCloseoutPolicyV26 } from "../training/missionNativeCl
 import { buildMissionNativeCloseoutPolicyV27 } from "../training/missionNativeCloseoutPolicyV27.js";
 import { buildMissionNativeCloseoutPolicyV28 } from "../training/missionNativeCloseoutPolicyV28.js";
 import { buildMissionNativeCloseoutPolicyV29 } from "../training/missionNativeCloseoutPolicyV29.js";
+import { buildMissionNativeCloseoutPolicyV30 } from "../training/missionNativeCloseoutPolicyV30.js";
 
 describe("mission-native closeout candidate", () => {
     it("returns the exact external baseline path when disabled", () => {
@@ -448,6 +449,21 @@ describe("mission-native closeout candidate", () => {
         } as any;
         expect(createMissionNativeCloseoutCandidate(
             factory, "candidate", Countries.USA, buildMissionNativeCloseoutPolicyV29(),
+        )).toBe(injected);
+        expect(factory.createWithStrategy).toHaveBeenCalledOnce();
+    }, 240_000);
+
+    it("accepts the prospective production-safe screen-infrastructure v30 policy", () => {
+        const injected = { kind: "injected-v30" } as any;
+        let inner: any;
+        inner = { onAiUpdate: vi.fn(() => inner) };
+        const factory = {
+            descriptor: { kind: "external-package", packageRoot: "/baseline" },
+            create: vi.fn(), createDefaultStrategy: vi.fn(() => inner),
+            createWithStrategy: vi.fn(() => injected),
+        } as any;
+        expect(createMissionNativeCloseoutCandidate(
+            factory, "candidate", Countries.IRAQ, buildMissionNativeCloseoutPolicyV30(),
         )).toBe(injected);
         expect(factory.createWithStrategy).toHaveBeenCalledOnce();
     }, 240_000);

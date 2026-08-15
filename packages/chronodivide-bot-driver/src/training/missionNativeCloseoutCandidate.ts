@@ -120,6 +120,10 @@ import {
     MissionNativeCloseoutPolicyV29,
     validateMissionNativeCloseoutPolicyV29,
 } from "./missionNativeCloseoutPolicyV29.js";
+import {
+    MissionNativeCloseoutPolicyV30,
+    validateMissionNativeCloseoutPolicyV30,
+} from "./missionNativeCloseoutPolicyV30.js";
 
 type MissionNativePolicy = MissionNativeCloseoutPolicy | MissionNativeCloseoutPolicyV2 |
     MissionNativeCloseoutPolicyV3 | MissionNativeCloseoutPolicyV4 | MissionNativeCloseoutPolicyV5 |
@@ -130,7 +134,8 @@ type MissionNativePolicy = MissionNativeCloseoutPolicy | MissionNativeCloseoutPo
     MissionNativeCloseoutPolicyV18 | MissionNativeCloseoutPolicyV19 | MissionNativeCloseoutPolicyV20 |
     MissionNativeCloseoutPolicyV21 | MissionNativeCloseoutPolicyV22 | MissionNativeCloseoutPolicyV23 |
     MissionNativeCloseoutPolicyV24 | MissionNativeCloseoutPolicyV25 | MissionNativeCloseoutPolicyV26 |
-    MissionNativeCloseoutPolicyV27 | MissionNativeCloseoutPolicyV28 | MissionNativeCloseoutPolicyV29;
+    MissionNativeCloseoutPolicyV27 | MissionNativeCloseoutPolicyV28 | MissionNativeCloseoutPolicyV29 |
+    MissionNativeCloseoutPolicyV30;
 
 type StrategyLike = {
     onAiUpdate(context: any, missionController: any, logger: any): StrategyLike;
@@ -172,6 +177,10 @@ class MissionNativeCloseoutStrategy implements StrategyLike {
             adaptiveGroundAssaultInfrastructure: "adaptiveGroundAssaultInfrastructure" in policy
                 ? policy.adaptiveGroundAssaultInfrastructure
                 : false,
+            adaptiveGroundAssaultScreenInfrastructure:
+                "adaptiveGroundAssaultScreenInfrastructure" in policy
+                    ? policy.adaptiveGroundAssaultScreenInfrastructure
+                    : false,
             adaptiveGroundAssaultProductionReservation:
                 "adaptiveGroundAssaultProductionReservation" in policy
                     ? policy.adaptiveGroundAssaultProductionReservation
@@ -269,7 +278,9 @@ export const createMissionNativeCloseoutCandidate = (
     rawPolicy: MissionNativePolicy,
     telemetrySink: BuildingEliminationTelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 29
+    const policy = rawPolicy.schemaVersion === 30
+        ? validateMissionNativeCloseoutPolicyV30(rawPolicy)
+        : rawPolicy.schemaVersion === 29
         ? validateMissionNativeCloseoutPolicyV29(rawPolicy)
         : rawPolicy.schemaVersion === 28
         ? validateMissionNativeCloseoutPolicyV28(rawPolicy)

@@ -61,6 +61,7 @@ export type BuildingEliminationOptions = {
     adaptiveNavalTargetCount?: number;
     adaptiveGroundAssaultTargetCount?: number;
     adaptiveGroundAssaultInfrastructure?: boolean;
+    adaptiveGroundAssaultScreenInfrastructure?: boolean;
     adaptiveGroundAssaultProductionReservation?: boolean;
     adaptiveGroundAssaultProductionScopeLatch?: boolean;
     adaptiveGroundAssaultScreenTargetCount?: number;
@@ -427,6 +428,16 @@ export type BuildingEliminationTelemetryEvent =
           requested: boolean;
       }
     | {
+          schemaVersion: 24;
+          event: "assault_screen_infrastructure";
+          tick: number;
+          side: SideType.Nod | SideType.GDI;
+          structureName: "NAHAND" | "GAPILE";
+          currentCount: number;
+          available: boolean;
+          requested: boolean;
+      }
+    | {
           schemaVersion: 15;
           event: "assault_production_reservation";
           tick: number;
@@ -557,6 +568,7 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     adaptiveNavalTargetCount: 0,
     adaptiveGroundAssaultTargetCount: 0,
     adaptiveGroundAssaultInfrastructure: false,
+    adaptiveGroundAssaultScreenInfrastructure: false,
     adaptiveGroundAssaultProductionReservation: false,
     adaptiveGroundAssaultProductionScopeLatch: false,
     adaptiveGroundAssaultScreenTargetCount: 0,
@@ -665,6 +677,12 @@ export const resolveBuildingEliminationOptions = (
             `Invalid building-elimination ground-assault infrastructure: ${resolved.adaptiveGroundAssaultInfrastructure}`,
         );
     }
+    if (typeof resolved.adaptiveGroundAssaultScreenInfrastructure !== "boolean") {
+        throw new Error(
+            "Invalid building-elimination ground-assault screen infrastructure: " +
+            `${resolved.adaptiveGroundAssaultScreenInfrastructure}`,
+        );
+    }
     if (typeof resolved.adaptiveGroundAssaultProductionReservation !== "boolean") {
         throw new Error(
             "Invalid building-elimination ground-assault production reservation: " +
@@ -747,6 +765,7 @@ const BUILDING_ELIMINATION_CAPABILITY_BUILD_MISSION_NAME = "buildingEliminationC
 const BUILDING_ELIMINATION_CAPABILITY_UNIT_MISSION_NAME = "buildingEliminationCapabilityUnits";
 const BUILDING_ELIMINATION_ASSAULT_PRODUCTION_MISSION_NAME = "buildingEliminationAssaultProduction";
 const BUILDING_ELIMINATION_ASSAULT_BUILD_MISSION_NAME = "buildingEliminationAssaultBuild";
+const BUILDING_ELIMINATION_ASSAULT_SCREEN_BUILD_MISSION_NAME = "buildingEliminationAssaultScreenBuild";
 const BUILDING_ELIMINATION_PRIORITY = 300;
 const BUILDING_ELIMINATION_READINESS_RESERVE_PRIORITY = 290;
 const BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME = "buildingEliminationReadinessReserve";
@@ -2697,6 +2716,10 @@ export const getBuildingEliminationGroundAssaultScreenUnitName = (
     side: SideType.Nod | SideType.GDI,
 ): "E2" | "E1" => side === SideType.Nod ? "E2" : "E1";
 
+export const getBuildingEliminationGroundAssaultScreenStructureName = (
+    side: SideType.Nod | SideType.GDI,
+): "NAHAND" | "GAPILE" => side === SideType.Nod ? "NAHAND" : "GAPILE";
+
 export const getBuildingEliminationAssaultProductionRequests = (
     unitName: "HTNK" | "MTNK",
     currentCount: number,
@@ -2843,6 +2866,93 @@ class BuildingEliminationAssaultBuildMission extends Mission {
         const event: Extract<BuildingEliminationTelemetryEvent, { event: "assault_infrastructure" }> = {
             schemaVersion: 13,
             event: "assault_infrastructure",
+            tick,
+            side,
+            structureName,
+            currentCount,
+            available,
+            requested,
+        };
+        const signature = JSON.stringify({ ...event, tick: 0 });
+        if (signature === this.lastTelemetrySignature && tick < this.lastTelemetryAt + TELEMETRY_HEARTBEAT_TICKS) {
+            return;
+        }
+        this.lastTelemetrySignature = signature;
+        this.lastTelemetryAt = tick;
+        this.telemetrySink(event);
+    }
+}
+
+class BuildingEliminationAssaultScreenBuildMission extends Mission {
+    private lastTelemetrySignature = "";
+    private lastTelemetryAt = Number.NEGATIVE_INFINITY;
+
+    constructor(
+        private options: Required<BuildingEliminationOptions>,
+        private closeoutLatch: BuildingEliminationCloseoutLatch,
+        logger: DebugLogger,
+        private telemetrySink: BuildingEliminationTelemetrySink,
+    ) {
+        super(BUILDING_ELIMINATION_ASSAULT_SCREEN_BUILD_MISSION_NAME, logger);
+    }
+
+    _onAiUpdate(context: MissionContext): MissionAction {
+        const side = getPlayerSide(context);
+        if (side === null || context.game.getCurrentTick() < this.options.minTick) return noop();
+        if (!shouldRunBuildingEliminationCapabilityProduction(
+            this.closeoutLatch.activated,
+            isBuildingEliminationCloseoutState(context, this.options),
+        )) return noop();
+        const structureName = getBuildingEliminationGroundAssaultScreenStructureName(side);
+        const currentCount = countOwnVisibleUnits(context, structureName);
+        const availableRules = [
+            ...context.player.production.getAvailableObjects(QueueType.Structures),
+            ...context.player.production.getAvailableObjects(QueueType.Armory),
+        ].find(({ name }) => name === structureName);
+        const playerData = context.game.getPlayerData(context.player.name);
+        const buildingRules = BUILDING_NAME_TO_RULES.get(structureName);
+        const location = currentCount === 0 && availableRules
+            ? buildingRules?.getPlacementLocation(context.game, playerData, availableRules) ??
+                getDefaultPlacementLocation(context.game, playerData, playerData.startLocation, availableRules)
+            : null;
+        const requested = currentCount === 0 && location !== null && location !== undefined;
+        this.emitTelemetry(
+            context.game.getCurrentTick(),
+            side,
+            structureName,
+            currentCount,
+            availableRules !== undefined,
+            requested,
+        );
+        return requested && location
+            ? buildStructureAtLocation(
+                structureName,
+                this.options.adaptiveGroundAssaultInfrastructurePriority,
+                location.rx,
+                location.ry,
+            )
+            : noop();
+    }
+
+    getGlobalDebugText(): string | undefined {
+        return "finish assault screen infrastructure";
+    }
+
+    getPriority(): number {
+        return 0;
+    }
+
+    private emitTelemetry(
+        tick: number,
+        side: SideType.Nod | SideType.GDI,
+        structureName: "NAHAND" | "GAPILE",
+        currentCount: number,
+        available: boolean,
+        requested: boolean,
+    ): void {
+        const event: Extract<BuildingEliminationTelemetryEvent, { event: "assault_screen_infrastructure" }> = {
+            schemaVersion: 24,
+            event: "assault_screen_infrastructure",
             tick,
             side,
             structureName,
@@ -3938,7 +4048,11 @@ export class BuildingEliminationMissionFactory {
             this.options.adaptiveNavalTargetCount > 0;
         const needsAssaultProduction = this.options.adaptiveGroundAssaultTargetCount > 0;
         const needsAssaultInfrastructure = this.options.adaptiveGroundAssaultInfrastructure;
-        if (!needsCapabilityProduction && !needsAssaultProduction && !needsAssaultInfrastructure) return;
+        const needsAssaultScreenInfrastructure = this.options.adaptiveGroundAssaultScreenInfrastructure;
+        if (
+            !needsCapabilityProduction && !needsAssaultProduction && !needsAssaultInfrastructure &&
+            !needsAssaultScreenInfrastructure
+        ) return;
         const names = new Set(missionController.getMissions().map((mission) => mission.getUniqueName()));
         if (needsCapabilityProduction && !names.has(BUILDING_ELIMINATION_CAPABILITY_BUILD_MISSION_NAME)) {
             missionController.addMission(
@@ -3974,6 +4088,19 @@ export class BuildingEliminationMissionFactory {
         if (needsAssaultInfrastructure && !names.has(BUILDING_ELIMINATION_ASSAULT_BUILD_MISSION_NAME)) {
             missionController.addMission(
                 new BuildingEliminationAssaultBuildMission(
+                    this.options,
+                    this.closeoutLatch,
+                    logger,
+                    this.telemetrySink,
+                ),
+            );
+        }
+        if (
+            needsAssaultScreenInfrastructure &&
+            !names.has(BUILDING_ELIMINATION_ASSAULT_SCREEN_BUILD_MISSION_NAME)
+        ) {
+            missionController.addMission(
+                new BuildingEliminationAssaultScreenBuildMission(
                     this.options,
                     this.closeoutLatch,
                     logger,

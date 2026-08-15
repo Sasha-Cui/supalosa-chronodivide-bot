@@ -48,22 +48,27 @@ const expectedNames = (country: Countries): {
     tank: "MTNK" | "HTNK";
     screen: "E1" | "E2";
     factory: "GAWEAP" | "NAWEAP";
+    screenInfrastructure: "GAPILE" | "NAHAND";
     retained: string[];
     retainedWithScreen: string[];
 } =>
     alliedCountries.has(country)
         ? {
-            tank: "MTNK", screen: "E1", factory: "GAWEAP",
+            tank: "MTNK", screen: "E1", factory: "GAWEAP", screenInfrastructure: "GAPILE",
             retained: ["GAWEAP", "MTNK"], retainedWithScreen: ["E1", "GAWEAP", "MTNK"],
         }
         : {
-            tank: "HTNK", screen: "E2", factory: "NAWEAP",
+            tank: "HTNK", screen: "E2", factory: "NAWEAP", screenInfrastructure: "NAHAND",
             retained: ["HTNK", "NAWEAP"], retainedWithScreen: ["E2", "HTNK", "NAWEAP"],
         };
 
 export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
     telemetry: readonly BuildingEliminationTelemetryEvent[],
     country: Countries,
+    profile: {
+        productionReservation: "required" | "forbidden";
+        screenInfrastructure: "ignored" | "required";
+    } = { productionReservation: "required", screenInfrastructure: "ignored" },
 ): void => {
     const expected = expectedNames(country);
     const reservation = eventsOf(telemetry, "assault_production_reservation");
@@ -72,14 +77,20 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
     const defense = eventsOf(telemetry, "readiness_defense");
     const screen = eventsOf(telemetry, "assault_screen_production");
     const infrastructure = eventsOf(telemetry, "assault_infrastructure");
+    const screenInfrastructure = eventsOf(telemetry, "assault_screen_infrastructure");
     const progressive = eventsOf(telemetry, "progressive_blocker_launch");
     const capability = eventsOf(telemetry, "assault_capability_launch");
     const attritional = eventsOf(telemetry, "attritional_blocker_launch");
     const activation = eventsOf(telemetry, "activation_evaluation");
     const activated = eventsOf(telemetry, "activated");
     const handoff = eventsOf(telemetry, "launch_handoff");
-    if (reservation.length === 0) throw new Error(`Missing schema-15 reservation for ${country}`);
-    for (const event of reservation) {
+    if (profile.productionReservation === "required" && reservation.length === 0) {
+        throw new Error(`Missing schema-15 reservation for ${country}`);
+    }
+    if (profile.productionReservation === "forbidden" && reservation.length !== 0) {
+        throw new Error(`Unexpected schema-15 reservation for ${country}`);
+    }
+    for (const event of profile.productionReservation === "required" ? reservation : []) {
         const retained = JSON.stringify(event.retainedNames);
         if (
             event.schemaVersion !== 15 || event.currentTankCount < 0 || event.targetTankCount !== 4 ||
@@ -96,6 +107,12 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
     )) throw new Error(`Invalid assault infrastructure for ${country}`);
     const firstPhysicalFactory = infrastructure.find((event) => event.currentCount >= 1);
     if (!firstPhysicalFactory) throw new Error(`No physical ${expected.factory} acquisition for ${country}`);
+    if (profile.screenInfrastructure === "required" && (
+        screenInfrastructure.length === 0 || screenInfrastructure.some((event) =>
+            event.schemaVersion !== 24 || event.structureName !== expected.screenInfrastructure ||
+            event.currentCount < 0,
+        ) || !screenInfrastructure.some((event) => event.currentCount >= 1 || event.requested)
+    )) throw new Error(`Invalid assault screen infrastructure for ${country}`);
     if (production.length === 0 || production.some((event) =>
         event.schemaVersion !== 14 || event.unitName !== expected.tank ||
         event.queueAwareTargeting !== true || !Number.isInteger(event.queuedCount) ||
@@ -135,7 +152,7 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
     if (firstRequest.tick < firstPhysicalFactory.tick || firstRequest.mainTankPresent) {
         throw new Error(`Screen did not start from the physical factory before the first tank for ${country}`);
     }
-    if (!reservation.some((event) =>
+    if (profile.productionReservation === "required" && !reservation.some((event) =>
         event.tick >= firstPhysicalFactory.tick &&
         JSON.stringify(event.retainedNames) === JSON.stringify(expected.retainedWithScreen),
     )) throw new Error(`Factory-triggered screen was not retained for ${country}`);
