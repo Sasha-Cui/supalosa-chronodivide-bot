@@ -115,6 +115,22 @@ export const areMissionNativeCloseoutV37CommitmentsStructurallyEqual = (
     actual: unknown,
     expected: unknown,
 ): boolean => isDeepStrictEqual(actual, expected);
+const MISSION_NATIVE_CLOSEOUT_V37_AGGREGATION_REPAIR_PATHS = new Set([
+    "packages/chronodivide-bot-driver/src/training/missionNativeCloseoutOpenDevelopmentV37Aggregate.ts",
+    "packages/chronodivide-bot-driver/src/test/missionNativeCloseoutOpenDevelopmentV37.test.ts",
+]);
+export const isMissionNativeCloseoutV37AggregationRevisionAllowed = ({
+    branch,
+    dirty,
+    campaignSourceIsAncestor,
+    changedPaths,
+}: {
+    branch: string;
+    dirty: boolean;
+    campaignSourceIsAncestor: boolean;
+    changedPaths: readonly string[];
+}): boolean => branch === "main" && !dirty && campaignSourceIsAncestor &&
+    changedPaths.every((changedPath) => MISSION_NATIVE_CLOSEOUT_V37_AGGREGATION_REPAIR_PATHS.has(changedPath));
 const readJson = (filePath: string): unknown => JSON.parse(fs.readFileSync(filePath, "utf8"));
 const requiredPath = (name: string): string => {
     const value = process.env[name];
@@ -407,8 +423,28 @@ const main = (): void => {
     const gitCommit = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
     const gitBranch = execFileSync("git", ["branch", "--show-current"], { encoding: "utf8" }).trim();
     const dirty = execFileSync("git", ["status", "--short", "--untracked-files=no"], { encoding: "utf8" }).trim();
-    if (gitBranch !== "main" || dirty || gitCommit !== campaign.sourceGitCommit) {
-        throw new Error("V37 aggregate requires the exact clean evaluated main revision");
+    const campaignSourceIsAncestor = (() => {
+        try {
+            execFileSync("git", ["merge-base", "--is-ancestor", campaign.sourceGitCommit, gitCommit], {
+                stdio: "ignore",
+            });
+            return true;
+        } catch {
+            return false;
+        }
+    })();
+    const aggregationSourceChangedPaths = execFileSync(
+        "git",
+        ["diff", "--name-only", `${campaign.sourceGitCommit}..${gitCommit}`],
+        { encoding: "utf8" },
+    ).trim().split("\n").filter(Boolean);
+    if (!isMissionNativeCloseoutV37AggregationRevisionAllowed({
+        branch: gitBranch,
+        dirty: dirty.length > 0,
+        campaignSourceIsAncestor,
+        changedPaths: aggregationSourceChangedPaths,
+    })) {
+        throw new Error("V37 aggregate requires clean main with only allowlisted outcome-blind aggregation repairs");
     }
     const schedulerTasks = parseMissionNativeCloseoutOpenDevelopmentSacct(execFileSync(
         "/opt/slurm/current/bin/sacct",
@@ -564,6 +600,9 @@ const main = (): void => {
         campaignPath,
         campaignSha256,
         sourceGitCommit: campaign.sourceGitCommit,
+        aggregationGitCommit: gitCommit,
+        aggregationRuntimeSha256: sha256File(path.resolve(process.argv[1]!)),
+        aggregationSourceChangedPaths,
         arrayJobId,
         schedulerAccount: "pi_jss233",
         schedulerJobIds: [...schedulerTasks.values()].map(({ schedulerJobId }) => schedulerJobId),

@@ -11,6 +11,7 @@ import {
     MissionNativeCloseoutV37PositiveGateInput,
     areMissionNativeCloseoutV37CommitmentsStructurallyEqual,
     evaluateMissionNativeCloseoutV37PositiveGate,
+    isMissionNativeCloseoutV37AggregationRevisionAllowed,
 } from "../training/missionNativeCloseoutOpenDevelopmentV37Aggregate.js";
 
 const passingGate = (): MissionNativeCloseoutV37PositiveGateInput => ({
@@ -65,6 +66,28 @@ describe("mission-native V37 open development", () => {
             { ...parsedPlanArm, policyId: "changed" },
             campaignArm,
         )).toBe(false);
+    });
+
+    it("allows only clean-main aggregation repairs descended from the evaluated source", () => {
+        const allowed = {
+            branch: "main",
+            dirty: false,
+            campaignSourceIsAncestor: true,
+            changedPaths: [
+                "packages/chronodivide-bot-driver/src/training/missionNativeCloseoutOpenDevelopmentV37Aggregate.ts",
+                "packages/chronodivide-bot-driver/src/test/missionNativeCloseoutOpenDevelopmentV37.test.ts",
+            ],
+        };
+        expect(isMissionNativeCloseoutV37AggregationRevisionAllowed(allowed)).toBe(true);
+        expect(isMissionNativeCloseoutV37AggregationRevisionAllowed({ ...allowed, dirty: true })).toBe(false);
+        expect(isMissionNativeCloseoutV37AggregationRevisionAllowed({
+            ...allowed,
+            campaignSourceIsAncestor: false,
+        })).toBe(false);
+        expect(isMissionNativeCloseoutV37AggregationRevisionAllowed({
+            ...allowed,
+            changedPaths: [...allowed.changedPaths, "packages/chronodivide-bot/src/bot.ts"],
+        })).toBe(false);
     });
 
     it("advances only when every prespecified positive condition passes", () => {
