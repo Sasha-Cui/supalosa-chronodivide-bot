@@ -3,6 +3,8 @@ import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/util
 import {
     PROGRESS_CERTIFIED_PLAN_KIND,
     PROGRESS_CERTIFIED_PLAN_SCHEMA_VERSION,
+    PROGRESS_CERTIFIED_SEALED_PLAN_KIND,
+    buildProgressCertifiedRunSummary,
     parseProgressCertifiedRunPlan,
     serializeProgressCertifiedRunPlan,
 } from "../training/progressCertifiedPlanRunner.js";
@@ -60,5 +62,42 @@ describe("progress-certified plan runner", () => {
         const value = base();
         value.arms[0] = { ...value.arms[0], policyId: "3".repeat(64) };
         expect(() => parseProgressCertifiedRunPlan(value)).toThrow("policy hash drifted");
+    });
+
+    it("accepts the sealed confirmatory plan kind", () => {
+        expect(parseProgressCertifiedRunPlan({
+            ...base(),
+            kind: PROGRESS_CERTIFIED_SEALED_PLAN_KIND,
+        }).kind).toBe(PROGRESS_CERTIFIED_SEALED_PLAN_KIND);
+    });
+
+    it("omits every outcome aggregate from sealed summaries", () => {
+        const summary = buildProgressCertifiedRunSummary({
+            sealedConfirmatory: true,
+            generatedAt: "2026-08-15T00:00:00.000Z",
+            runId: "sealed-example",
+            planSha256: "a".repeat(64),
+            requestedLaunches: 6,
+            completed: 6,
+            technicalFailures: 0,
+            candidateWins: 4,
+            baselineWins: 1,
+            draws: 1,
+        });
+        expect(summary).toEqual({
+            schemaVersion: 2,
+            status: "COMPLETE_PROGRESS_CERTIFIED_SEALED_CONFIRMATORY_SHARD",
+            generatedAt: "2026-08-15T00:00:00.000Z",
+            runId: "sealed-example",
+            planSha256: "a".repeat(64),
+            requestedLaunches: 6,
+            accountedLaunches: 6,
+            completed: 6,
+            technicalFailures: 0,
+            complete: true,
+            technicallyClean: true,
+            outcomeAccess: "sealed-private-events",
+        });
+        expect(JSON.stringify(summary)).not.toMatch(/candidateWins|baselineWins|draws|literalWinRate|winner|score/);
     });
 });

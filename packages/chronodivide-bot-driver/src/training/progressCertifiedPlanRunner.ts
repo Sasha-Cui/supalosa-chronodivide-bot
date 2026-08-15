@@ -24,6 +24,12 @@ import {
 
 export const PROGRESS_CERTIFIED_PLAN_SCHEMA_VERSION = 2 as const;
 export const PROGRESS_CERTIFIED_PLAN_KIND = "progress-certified-open-development-literal-endpoint" as const;
+export const PROGRESS_CERTIFIED_SEALED_PLAN_KIND =
+    "progress-certified-v5-sealed-confirmatory-literal-endpoint" as const;
+
+export type ProgressCertifiedPlanKind =
+    | typeof PROGRESS_CERTIFIED_PLAN_KIND
+    | typeof PROGRESS_CERTIFIED_SEALED_PLAN_KIND;
 
 export type ProgressCertifiedPlanArm = {
     armId: string;
@@ -40,7 +46,7 @@ export type ProgressCertifiedPlanEpisode = {
 
 export type ProgressCertifiedRunPlan = {
     schemaVersion: typeof PROGRESS_CERTIFIED_PLAN_SCHEMA_VERSION;
-    kind: typeof PROGRESS_CERTIFIED_PLAN_KIND;
+    kind: ProgressCertifiedPlanKind;
     runId: string;
     sourceGitCommit: string;
     sourceRuntimeSha256: string;
@@ -103,7 +109,10 @@ export const parseProgressCertifiedRunPlan = (value: unknown): ProgressCertified
         "endpointSha256", "family", "country", "engineSeedBase", "seedBlockIndex",
         "requestedEngineSeed", "maxTicks", "arms", "episodes",
     ], "Progress-certified run plan");
-    if (value.schemaVersion !== PROGRESS_CERTIFIED_PLAN_SCHEMA_VERSION || value.kind !== PROGRESS_CERTIFIED_PLAN_KIND) {
+    if (
+        value.schemaVersion !== PROGRESS_CERTIFIED_PLAN_SCHEMA_VERSION ||
+        (value.kind !== PROGRESS_CERTIFIED_PLAN_KIND && value.kind !== PROGRESS_CERTIFIED_SEALED_PLAN_KIND)
+    ) {
         throw new Error("Progress-certified plan identity is invalid");
     }
     if (
@@ -166,7 +175,7 @@ export const parseProgressCertifiedRunPlan = (value: unknown): ProgressCertified
     }
     return {
         schemaVersion: PROGRESS_CERTIFIED_PLAN_SCHEMA_VERSION,
-        kind: PROGRESS_CERTIFIED_PLAN_KIND,
+        kind: value.kind,
         runId: requireString(value.runId, "runId", IDENTIFIER),
         sourceGitCommit: requireString(value.sourceGitCommit, "sourceGitCommit", COMMIT),
         sourceRuntimeSha256: requireString(value.sourceRuntimeSha256, "sourceRuntimeSha256", SHA256),
@@ -217,6 +226,60 @@ const requireEnvPath = (name: string): string => {
     return path.resolve(value);
 };
 
+export const buildProgressCertifiedRunSummary = ({
+    sealedConfirmatory,
+    generatedAt,
+    runId,
+    planSha256,
+    requestedLaunches,
+    completed,
+    technicalFailures,
+    candidateWins,
+    baselineWins,
+    draws,
+}: {
+    sealedConfirmatory: boolean;
+    generatedAt: string;
+    runId: string;
+    planSha256: string;
+    requestedLaunches: number;
+    completed: number;
+    technicalFailures: number;
+    candidateWins: number;
+    baselineWins: number;
+    draws: number;
+}): Record<string, unknown> => {
+    const sharedSummary = {
+        schemaVersion: 2,
+        generatedAt,
+        runId,
+        planSha256,
+        requestedLaunches,
+        accountedLaunches: completed + technicalFailures,
+        completed,
+        technicalFailures,
+        complete: completed + technicalFailures === requestedLaunches,
+        technicallyClean: technicalFailures === 0,
+    };
+    return sealedConfirmatory ? {
+        ...sharedSummary,
+        status: technicalFailures === 0
+            ? "COMPLETE_PROGRESS_CERTIFIED_SEALED_CONFIRMATORY_SHARD"
+            : "FAILED_PROGRESS_CERTIFIED_SEALED_CONFIRMATORY_TECHNICAL_SHARD",
+        outcomeAccess: "sealed-private-events",
+    } : {
+        ...sharedSummary,
+        status: technicalFailures === 0
+            ? "COMPLETE_PROGRESS_CERTIFIED_OPEN_DEVELOPMENT_SHARD"
+            : "FAILED_PROGRESS_CERTIFIED_TECHNICAL_SHARD",
+        candidateWins,
+        baselineWins,
+        draws,
+        literalWinRate: completed > 0 ? candidateWins / completed : null,
+        outcomeAccess: "open-development-only",
+    };
+};
+
 export const runProgressCertifiedPlanFromEnvironment = async (): Promise<void> => {
     const repoRoot = gitRoot();
     const driverRoot = path.join(repoRoot, "packages", "chronodivide-bot-driver");
@@ -229,6 +292,7 @@ export const runProgressCertifiedPlanFromEnvironment = async (): Promise<void> =
     }
     const planSha256 = sha256File(planPath);
     const plan = parseProgressCertifiedRunPlan(JSON.parse(fs.readFileSync(planPath, "utf8")));
+    const sealedConfirmatory = plan.kind === PROGRESS_CERTIFIED_SEALED_PLAN_KIND;
     const baselineFactory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
     const mixDir = path.join(driverRoot, "data");
     const manifest = createExperimentManifest({
@@ -248,7 +312,7 @@ export const runProgressCertifiedPlanFromEnvironment = async (): Promise<void> =
             quitSuppression: "symmetric_no_forwarding",
             endpointVersion: plan.endpointVersion,
             endpointSha256: plan.endpointSha256,
-            outcomeAccess: "open-development-only",
+            outcomeAccess: sealedConfirmatory ? "sealed-private-events" : "open-development-only",
         },
         baseline: baselineFactory.descriptor,
         gameSeedBase: plan.engineSeedBase,
@@ -365,24 +429,18 @@ export const runProgressCertifiedPlanFromEnvironment = async (): Promise<void> =
             });
         }
     }
-    const summary = {
-        schemaVersion: 2,
-        status: technicalFailures === 0 ? "COMPLETE_PROGRESS_CERTIFIED_OPEN_DEVELOPMENT_SHARD" : "FAILED_PROGRESS_CERTIFIED_TECHNICAL_SHARD",
+    const summary = buildProgressCertifiedRunSummary({
+        sealedConfirmatory,
         generatedAt: new Date().toISOString(),
         runId: plan.runId,
         planSha256,
         requestedLaunches: plan.episodes.length,
-        accountedLaunches: completed + technicalFailures,
         completed,
         technicalFailures,
         candidateWins,
         baselineWins,
         draws,
-        literalWinRate: completed > 0 ? candidateWins / completed : null,
-        complete: completed + technicalFailures === plan.episodes.length,
-        technicallyClean: technicalFailures === 0,
-        outcomeAccess: "open-development-only",
-    };
+    });
     fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 2), { flag: "wx" });
     appendJsonLine(eventsPath, { event: "run_complete", summary });
     console.log(JSON.stringify(summary));
