@@ -27,6 +27,7 @@ import { buildMissionNativeCloseoutPolicyV29 } from "../training/missionNativeCl
 import { buildMissionNativeCloseoutPolicyV30 } from "../training/missionNativeCloseoutPolicyV30.js";
 import { buildMissionNativeCloseoutPolicyV31 } from "../training/missionNativeCloseoutPolicyV31.js";
 import { buildMissionNativeCloseoutPolicyV32 } from "../training/missionNativeCloseoutPolicyV32.js";
+import { buildMissionNativeCloseoutPolicyV33 } from "../training/missionNativeCloseoutPolicyV33.js";
 
 describe("mission-native closeout candidate", () => {
     it("returns the exact external baseline path when disabled", () => {
@@ -498,5 +499,34 @@ describe("mission-native closeout candidate", () => {
             factory, "candidate", Countries.IRAQ, buildMissionNativeCloseoutPolicyV32(),
         )).toBe(injected);
         expect(factory.createWithStrategy).toHaveBeenCalledOnce();
+    }, 300_000);
+
+    it("routes V33 through the external queue-controller focus adapter", () => {
+        const injected = { kind: "injected-v33" } as any;
+        let inner: any;
+        inner = { onAiUpdate: vi.fn(() => inner) };
+        const telemetrySink = vi.fn();
+        const factory = {
+            descriptor: { kind: "external-package", packageRoot: "/baseline" },
+            create: vi.fn(),
+            createDefaultStrategy: vi.fn(() => inner),
+            createWithStrategy: vi.fn(),
+            createWithStrategyAndExclusiveProductionFocus: vi.fn(() => injected),
+        } as any;
+        expect(createMissionNativeCloseoutCandidate(
+            factory,
+            "candidate",
+            Countries.IRAQ,
+            buildMissionNativeCloseoutPolicyV33(),
+            telemetrySink,
+        )).toBe(injected);
+        expect(factory.createWithStrategyAndExclusiveProductionFocus).toHaveBeenCalledWith(
+            "candidate",
+            Countries.IRAQ,
+            expect.objectContaining({ onAiUpdate: expect.any(Function) }),
+            telemetrySink,
+        );
+        expect(factory.createWithStrategy).not.toHaveBeenCalled();
+        expect(factory.create).not.toHaveBeenCalled();
     }, 300_000);
 });

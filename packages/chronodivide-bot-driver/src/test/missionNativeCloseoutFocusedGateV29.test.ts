@@ -249,6 +249,11 @@ const v32Profile = {
     allowPredecessorExhaustionDuringRecovery: true,
 } as const;
 
+const v33Profile = {
+    ...v32Profile,
+    exclusiveProductionFocusScheduler: "required",
+} as const;
+
 const v32Recovery = (): BuildingEliminationTelemetryEvent[] => [
     ...compositionBlockedPreterminal()
         .filter((event) => event.event !== "assault_production_reservation")
@@ -269,6 +274,17 @@ const v32Recovery = (): BuildingEliminationTelemetryEvent[] => [
         vehicleQueueStatus: QueueStatus.Active,
         vehicleQueueHeadName: "MTNK", infantryQueueStatus: QueueStatus.Idle,
         infantryQueueHeadName: null,
+    },
+];
+
+const v33Recovery = (): BuildingEliminationTelemetryEvent[] => [
+    ...v32Recovery(),
+    {
+        schemaVersion: 26, event: "exclusive_queue_focus_scheduler", tick: 3_000,
+        focusQueue: QueueType.Vehicles, focusRequestName: "MTNK", focusPriority: 10_000,
+        focusQueueStatus: QueueStatus.Active, pausedQueueTypes: [QueueType.Infantry],
+        deferredQueueTypes: [QueueType.Structures, QueueType.Armory, QueueType.Ships],
+        readyQueueTypes: [QueueType.Aircrafts],
     },
 ];
 
@@ -341,6 +357,40 @@ describe("mission-native closeout focused gate v29", () => {
         expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
             v32Recovery(), Countries.USA, v32Profile,
         )).not.toThrow();
+    });
+
+    it("accepts runtime proof from the V33 external queue-controller adapter", () => {
+        expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
+            v33Recovery(), Countries.USA, v33Profile,
+        )).not.toThrow();
+    });
+
+    it("accepts scheduler proof within the preceding focus heartbeat interval", () => {
+        const telemetry = v33Recovery().map((event) =>
+            event.event === "exclusive_queue_focus_scheduler"
+                ? { ...event, tick: event.tick + 150 }
+                : event,
+        ) as BuildingEliminationTelemetryEvent[];
+        expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
+            telemetry, Countries.USA, v33Profile,
+        )).not.toThrow();
+    });
+
+    it("rejects V33 telemetry without runtime adapter proof", () => {
+        expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
+            v32Recovery(), Countries.USA, v33Profile,
+        )).toThrow("external queue-controller focus adapter");
+    });
+
+    it("rejects scheduler proof that disagrees with the mission focus", () => {
+        const telemetry = v33Recovery().map((event) =>
+            event.event === "exclusive_queue_focus_scheduler"
+                ? { ...event, focusQueue: QueueType.Infantry }
+                : event,
+        ) as BuildingEliminationTelemetryEvent[];
+        expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
+            telemetry, Countries.USA, v33Profile,
+        )).toThrow("external queue-controller focus adapter");
     });
 
     it("does not relax predecessor exhaustion for earlier profiles", () => {

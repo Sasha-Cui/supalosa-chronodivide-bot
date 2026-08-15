@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { QueueStatus, cdapi } from "@chronodivide/game-api";
+import { QueueStatus, QueueType, cdapi } from "@chronodivide/game-api";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { BuildingEliminationTelemetryEvent } from
     "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
@@ -71,6 +71,7 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
         screenProductionEvidence?: "request_before_tank" | "sufficient_before_tank";
         productionFocus?: "ignored" | "required";
         productionFocusPriority?: number;
+        exclusiveProductionFocusScheduler?: "ignored" | "required";
         allowPredecessorExhaustionDuringRecovery?: boolean;
     } = { productionReservation: "required", screenInfrastructure: "ignored" },
 ): void => {
@@ -83,6 +84,7 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
     const infrastructure = eventsOf(telemetry, "assault_infrastructure");
     const screenInfrastructure = eventsOf(telemetry, "assault_screen_infrastructure");
     const productionFocus = eventsOf(telemetry, "assault_production_focus");
+    const exclusiveProductionFocusScheduler = eventsOf(telemetry, "exclusive_queue_focus_scheduler");
     const progressive = eventsOf(telemetry, "progressive_blocker_launch");
     const capability = eventsOf(telemetry, "assault_capability_launch");
     const attritional = eventsOf(telemetry, "attritional_blocker_launch");
@@ -152,6 +154,41 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
         })) throw new Error(`Invalid schema-25 queue-safe production focus for ${country}`);
         if (!productionFocus.some((event) => event.phase !== "inactive")) {
             throw new Error(`No active queue-safe production focus for ${country}`);
+        }
+    }
+    if (profile.exclusiveProductionFocusScheduler === "required") {
+        const canonicalQueues = [
+            QueueType.Structures,
+            QueueType.Armory,
+            QueueType.Infantry,
+            QueueType.Vehicles,
+            QueueType.Aircrafts,
+            QueueType.Ships,
+        ];
+        const expectedFocusPriority = profile.productionFocusPriority ?? 10_000;
+        if (exclusiveProductionFocusScheduler.length === 0 ||
+            exclusiveProductionFocusScheduler.some((event) => {
+                const correspondingFocus = productionFocus.find((focus) =>
+                    focus.tick <= event.tick && focus.tick >= event.tick - 300 && focus.phase !== "inactive" &&
+                    event.focusQueue === (focus.phase === "tank" ? QueueType.Vehicles : QueueType.Infantry) &&
+                    event.focusRequestName === (focus.phase === "tank" ? expected.tank : expected.screen),
+                );
+                const classifiedQueues = [
+                    ...event.pausedQueueTypes,
+                    ...event.deferredQueueTypes,
+                    ...event.readyQueueTypes,
+                ];
+                return event.schemaVersion !== 26 || event.focusPriority !== expectedFocusPriority ||
+                    correspondingFocus === undefined ||
+                    !canonicalQueues.includes(event.focusQueue) ||
+                    classifiedQueues.includes(event.focusQueue) ||
+                    new Set(classifiedQueues).size !== canonicalQueues.length - 1 ||
+                    canonicalQueues.some((queue) =>
+                        queue !== event.focusQueue && !classifiedQueues.includes(queue),
+                    ) ||
+                    !Object.values(QueueStatus).includes(event.focusQueueStatus);
+            })) {
+            throw new Error(`Invalid schema-26 external queue-controller focus adapter for ${country}`);
         }
     }
     if (production.length === 0 || production.some((event) =>
