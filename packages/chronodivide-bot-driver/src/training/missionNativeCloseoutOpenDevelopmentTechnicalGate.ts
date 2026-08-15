@@ -44,6 +44,21 @@ type RecordValue = Record<string, unknown>;
 const isRecord = (value: unknown): value is RecordValue =>
     typeof value === "object" && value !== null && !Array.isArray(value);
 const readJson = (filePath: string): unknown => JSON.parse(fs.readFileSync(filePath, "utf8"));
+const FROZEN_CAMPAIGN_SHA256 = "8d3213c7b5469e92122c29f127e954905deaeb50647023251d2a7421fff3ae7d";
+const FROZEN_EVALUATED_SOURCE_GIT_COMMIT = "0b2b61221ad874268cc4296b7a651c616b4cd1d9";
+const FROZEN_EVALUATION_FILES = [
+    ["packages/chronodivide-bot-driver/src/training/missionNativeCloseoutCandidate.ts", "6e78f71e0c720237e617aaba5f6d4e7d941489248878538e42a6da8c19833d41"],
+    ["packages/chronodivide-bot-driver/dist/training/missionNativeCloseoutCandidate.js", "ce69e9e3f6cd6ae48b32d66d714db62422c3f171aed50567febd271a9bd63e81"],
+    ["packages/chronodivide-bot-driver/src/training/missionNativeCloseoutPolicyV34.ts", "68456a5bc96a9793589077f6b6852b05d6f235d6d7940d79cec113df6058b682"],
+    ["packages/chronodivide-bot-driver/dist/training/missionNativeCloseoutPolicyV34.js", "e2476d3da631e9c7a316d8a27f30266af345c7461978b6070054c5ff24ee7307"],
+    ["packages/chronodivide-bot-driver/src/training/missionNativeCloseoutPolicyV35.ts", "4ded8ea6504c29667b04248be9c75a4d6009a8d8c88b3eb6473b2e76b7ebfa3f"],
+    ["packages/chronodivide-bot-driver/dist/training/missionNativeCloseoutPolicyV35.js", "4b7e066d86b1293fb89a84fef61513c72f1d0b0fba279c59106cdf4a3de64c3c"],
+    ["packages/chronodivide-bot/src/bot/logic/mission/missions/buildingEliminationMission.ts", "a29ab553e42bf5af763a37eea70523bdb594eca79b7eaa2014a9da49a140e8ec"],
+    ["packages/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js", "b8171cacd930fbcd681b3b1ff901697f8c86eb78f96e6b4a4b1afe628d01f39d"],
+    ["packages/chronodivide-bot-driver/src/training/literalBuildingEliminationEndpoint.ts", "e50c4523f2bc8e74addd94e75d7377972b82f3a825f8310878508ca6cf60e920"],
+    ["packages/chronodivide-bot-driver/dist/training/literalBuildingEliminationEndpoint.js", "8823bf03697b3605d4039fdc24893f8e12edbd98e33db1538da0221333de2bee"],
+    ["package-lock.json", "5854f0a70c2c2e6217beef35fc5820497ce9203e51cc2d399085b8250a0d6e65"],
+] as const;
 const requiredPath = (name: string): string => {
     const value = process.env[name];
     if (!value) throw new Error(`${name} is required`);
@@ -53,6 +68,20 @@ const requiredArrayJobId = (): string => {
     const value = process.env.ARRAY_JOB_ID;
     if (!value || !/^\d+$/.test(value)) throw new Error("ARRAY_JOB_ID must be numeric");
     return value;
+};
+export const validateMissionNativeCloseoutEvaluationFileCommitments = (
+    repoRoot: string,
+    commitments: readonly (readonly [string, string])[] = FROZEN_EVALUATION_FILES,
+): Record<string, string> => {
+    const validated: Record<string, string> = {};
+    for (const [relativePath, expectedSha256] of commitments) {
+        const absolutePath = path.join(repoRoot, relativePath);
+        if (!fs.existsSync(absolutePath) || sha256File(absolutePath) !== expectedSha256) {
+            throw new Error(`Frozen mission-native closeout evaluation file drifted: ${relativePath}`);
+        }
+        validated[relativePath] = expectedSha256;
+    }
+    return validated;
 };
 const exactKeys = (value: RecordValue, expected: string[], label: string): void => {
     const actual = Object.keys(value).sort();
@@ -136,6 +165,21 @@ export const validateMissionNativeCloseoutOpenDevelopmentCampaign = (value: unkn
         new Set(campaign.shards.map(({ planSha256 }) => planSha256)).size !== MISSION_NATIVE_CLOSEOUT_OPEN_DEVELOPMENT_SHARD_COUNT ||
         new Set(campaign.shards.map(({ runId }) => runId)).size !== MISSION_NATIVE_CLOSEOUT_OPEN_DEVELOPMENT_SHARD_COUNT
     ) throw new Error("Mission-native closeout open-development campaign schedule or evidence chain drifted");
+    const v35PopulationEvidence = campaign.technicalEvidence.find(
+        ({ role }) => role === "v35_population_revalidation",
+    );
+    const v35PopulationGate = v35PopulationEvidence ? readJson(v35PopulationEvidence.path) : null;
+    const v35PopulationInput = isRecord(v35PopulationGate) && isRecord(v35PopulationGate.input)
+        ? v35PopulationGate.input
+        : null;
+    if (
+        !v35PopulationInput ||
+        v35PopulationInput.sha256 !== "dc120885b30cf4d82b90cfcbe58fff6ec42c2f247112e53eeaf3c9b7d5409f85" ||
+        v35PopulationInput.originalSchedulerJobId !== "22265722" ||
+        v35PopulationInput.sourceGitCommit !== "329bd68913c390cae342df4fe9beaae37f9d79c2" ||
+        v35PopulationInput.gameCount !== 72 || typeof v35PopulationInput.file !== "string" ||
+        sha256File(v35PopulationInput.file) !== v35PopulationInput.sha256
+    ) throw new Error("Mission-native closeout V35-R2 evidence does not bind the complete V35-R1 population");
     return campaign;
 };
 
@@ -513,7 +557,7 @@ const validateShard = (
     arrayJobId: string,
     task: SchedulerTask,
     shard: MissionNativeCloseoutOpenDevelopmentCampaign["shards"][number],
-): { launches: number; exposedEnabledArmIds: string[] } => {
+): { launches: number; exposedEnabledArmSlotKeys: string[] } => {
     const resultDir = path.join(resultsRoot, `${arrayJobId}_${shard.shardIndex}`, "run");
     const manifestPath = path.join(resultDir, "manifest.json");
     const summaryPath = path.join(resultDir, "summary.json");
@@ -566,7 +610,7 @@ const validateShard = (
         throw new Error(`Mission-native closeout open-development shard ${shard.shardIndex} boundary events drifted`);
     }
     let cursor = 1;
-    const exposedEnabledArmIds = new Set<string>();
+    const exposedEnabledArmSlotKeys = new Set<string>();
     for (let launchIndex = 0; launchIndex < plan.episodes.length; launchIndex++) {
         const episode = plan.episodes[launchIndex];
         const launch = events[cursor++];
@@ -600,12 +644,12 @@ const validateShard = (
             arm.policy.missionPolicy !== null &&
             result.policyTelemetry.some(({ event }) => event === "activated" ||
                 event === "objective_race_allocation" || event === "objective_physical_progress")
-        ) exposedEnabledArmIds.add(arm.armId);
+        ) exposedEnabledArmSlotKeys.add(`${arm.armId}|slot${episode.candidateSlot}`);
     }
     if (cursor !== events.length - 1 || !isRecord(events[cursor].summary)) {
         throw new Error(`Mission-native closeout open-development shard ${shard.shardIndex} event accounting is incomplete`);
     }
-    return { launches: plan.episodes.length, exposedEnabledArmIds: [...exposedEnabledArmIds] };
+    return { launches: plan.episodes.length, exposedEnabledArmSlotKeys: [...exposedEnabledArmSlotKeys] };
 };
 
 export const missionNativeCloseoutOpenDevelopmentResultArtifactCommitmentSha256 = (
@@ -622,13 +666,36 @@ export const missionNativeCloseoutOpenDevelopmentResultArtifactCommitmentSha256 
     };
 }))).digest("hex");
 
+export const validateMissionNativeExposureByCountryAndSlot = (
+    exposureByCountry: ReadonlyMap<string, ReadonlySet<string>>,
+    enabledArmIds: readonly string[],
+): void => {
+    const requiredArmSlotKeys = enabledArmIds
+        .flatMap((armId) => ([0, 1] as const).map((slot) => `${armId}|slot${slot}`));
+    for (const country of MISSION_NATIVE_CLOSEOUT_OPEN_DEVELOPMENT_COUNTRIES) {
+        const exposed = exposureByCountry.get(country) ?? new Set<string>();
+        const missingExposure = requiredArmSlotKeys.filter((armSlotKey) => !exposed.has(armSlotKey));
+        if (missingExposure.length > 0) {
+            throw new Error(
+                `Mission-native closeout intervention exposure is absent for ${country}: ${missingExposure.join(",")}`,
+            );
+        }
+    }
+};
+
 const main = (): void => {
     const campaignPath = requiredPath("CAMPAIGN");
     const resultsRoot = requiredPath("RESULTS_ROOT");
     const outputPath = requiredPath("OUT_FILE");
     const arrayJobId = requiredArrayJobId();
     if (fs.existsSync(outputPath)) throw new Error(`Refusing to overwrite Mission-native closeout open-development gate ${outputPath}`);
+    if (sha256File(campaignPath) !== FROZEN_CAMPAIGN_SHA256) {
+        throw new Error("Mission-native closeout open-development campaign file drifted from its frozen commitment");
+    }
     const campaign = validateMissionNativeCloseoutOpenDevelopmentCampaign(readJson(campaignPath));
+    if (campaign.sourceGitCommit !== FROZEN_EVALUATED_SOURCE_GIT_COMMIT) {
+        throw new Error("Mission-native closeout open-development evaluated source commit drifted");
+    }
     const schedulerTasks = parseMissionNativeCloseoutOpenDevelopmentSacct(execFileSync(
         "/opt/slurm/current/bin/sacct",
         ["-j", arrayJobId, "-n", "-P", "-X", "--format=JobID,JobIDRaw,State,ExitCode,Account"],
@@ -642,27 +709,29 @@ const main = (): void => {
         );
         accountedLaunches += validated.launches;
         const countryExposure = exposureByCountry.get(shard.country) ?? new Set<string>();
-        validated.exposedEnabledArmIds.forEach((armId) => countryExposure.add(armId));
+        validated.exposedEnabledArmSlotKeys.forEach((armSlotKey) => countryExposure.add(armSlotKey));
         exposureByCountry.set(shard.country, countryExposure);
     }
     if (accountedLaunches !== MISSION_NATIVE_CLOSEOUT_OPEN_DEVELOPMENT_LAUNCH_COUNT) throw new Error("Mission-native closeout open-development launch accounting is incomplete");
-    const enabledArmIds = campaign.arms.filter(({ policy }) => policy.missionPolicy !== null).map(({ armId }) => armId);
-    const aggregateExposure = new Set([...exposureByCountry.values()].flatMap((arms) => [...arms]));
-    const missingExposure = enabledArmIds.filter((armId) => !aggregateExposure.has(armId));
-    if (missingExposure.length > 0) {
-        throw new Error(`Mission-native closeout intervention never activated: ${missingExposure.join(",")}`);
-    }
+    validateMissionNativeExposureByCountryAndSlot(
+        exposureByCountry,
+        campaign.arms.filter(({ policy }) => policy.missionPolicy !== null).map(({ armId }) => armId),
+    );
     const gitCommit = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
     const gitBranch = execFileSync("git", ["branch", "--show-current"], { encoding: "utf8" }).trim();
     const dirty = execFileSync("git", ["status", "--short", "--untracked-files=no"], { encoding: "utf8" }).trim();
-    if (gitCommit !== campaign.sourceGitCommit || gitBranch !== "main" || dirty) {
-        throw new Error("Mission-native closeout open-development gate requires the unchanged clean campaign source on main");
+    if (gitBranch !== "main" || dirty) {
+        throw new Error("Mission-native closeout open-development gate requires clean tracked main");
     }
+    const repoRoot = execFileSync("git", ["rev-parse", "--show-toplevel"], { encoding: "utf8" }).trim();
+    const evaluatedSourceFiles = validateMissionNativeCloseoutEvaluationFileCommitments(repoRoot);
     const output = {
-        schemaVersion: 2,
+        schemaVersion: 3,
         status: "PASSED_MISSION_NATIVE_CLOSEOUT_OPEN_DEVELOPMENT_LITERAL_ENDPOINT_TECHNICAL_GATE_OUTCOMES_NOT_SUMMARIZED",
         generatedAt: new Date().toISOString(),
         gateSourceGitCommit: gitCommit,
+        evaluatedSourceGitCommit: campaign.sourceGitCommit,
+        evaluatedSourceFiles,
         campaignPath,
         campaignSha256: sha256File(campaignPath),
         resultsRoot,
