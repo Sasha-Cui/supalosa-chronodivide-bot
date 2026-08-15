@@ -1,8 +1,9 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { BuildingEliminationTelemetryEvent } from
     "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/buildingEliminationMission.js";
 import {
+    installSuppressedMissionNativeCloseoutQuitAudit,
     summarizeMissionNativeCloseoutTelemetry,
     validateMissionNativeCloseoutExposure,
 } from "../training/missionNativeCloseoutCompatibilityGate.js";
@@ -79,6 +80,19 @@ const trace = (): BuildingEliminationTelemetryEvent[] => [
 ];
 
 describe("mission-native closeout outcome-blind gate", () => {
+    it("counts but cannot execute Supalosa's nonliteral resignation action", () => {
+        const originalQuitGame = vi.fn();
+        const actions = { quitGame: originalQuitGame } as any;
+        const audit = { attempts: 0 };
+        installSuppressedMissionNativeCloseoutQuitAudit(actions, audit);
+
+        actions.quitGame();
+        actions.quitGame();
+
+        expect(audit.attempts).toBe(2);
+        expect(originalQuitGame).not.toHaveBeenCalled();
+    });
+
     it("accepts persistent mission ownership and physical building damage", () => {
         expect(() => validateMissionNativeCloseoutExposure(trace(), Countries.USA, 0)).not.toThrow();
         expect(summarizeMissionNativeCloseoutTelemetry(trace())).toMatchObject({

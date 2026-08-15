@@ -114,6 +114,17 @@ const snapshot = (bot: InspectableBaselineBot, tick: number): Snapshot => {
     };
 };
 
+export const installSuppressedMissionNativeCloseoutQuitAudit = (
+    actions: ActionsApi,
+    quitAudit: { attempts: number },
+): void => {
+    Object.defineProperty(actions, "quitGame", {
+        configurable: true,
+        writable: true,
+        value: (): void => { quitAudit.attempts += 1; },
+    });
+};
+
 const installActionTrace = (
     bot: InspectableBaselineBot,
     trace: ActionTraceRow[],
@@ -133,11 +144,7 @@ const installActionTrace = (
                 return (originalOrderUnits as (...values: unknown[]) => unknown)(...args);
             },
         });
-        Object.defineProperty(actions as ActionsApi, "quitGame", {
-            configurable: true,
-            writable: true,
-            value: (): void => { quitAudit.attempts += 1; },
-        });
+        installSuppressedMissionNativeCloseoutQuitAudit(actions as ActionsApi, quitAudit);
     };
 };
 
