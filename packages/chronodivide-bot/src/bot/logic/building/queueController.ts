@@ -53,6 +53,25 @@ type QueueState = {
 
 const REPAIR_CHECK_INTERVAL = 30;
 const FLOATING_CREDITS_RESUME_THRESHOLD = 2500;
+export const EXCLUSIVE_PRODUCTION_FOCUS_PRIORITY = 10_000;
+
+export const selectExclusiveProductionFocusQueue = (
+    queues: readonly { queue: QueueType; priority: number }[],
+): QueueType | null => {
+    const focused = queues.filter(({ priority }) => priority >= EXCLUSIVE_PRODUCTION_FOCUS_PRIORITY);
+    return focused.length === 1 ? focused[0].queue : null;
+};
+
+export type ExclusiveProductionFocusDisposition = "normal" | "pause" | "defer";
+
+export const getExclusiveProductionFocusDisposition = (
+    queueType: QueueType,
+    queueStatus: QueueStatus,
+    focusQueue: QueueType | null,
+): ExclusiveProductionFocusDisposition => {
+    if (focusQueue === null || queueType === focusQueue || queueStatus === QueueStatus.Ready) return "normal";
+    return queueStatus === QueueStatus.Active ? "pause" : "defer";
+};
 
 export class QueueController {
     private queueStates: QueueState[] = [];
@@ -86,6 +105,11 @@ export class QueueController {
         const totalCostAcrossQueues = this.queueStates
             .map((decision) => decision.topItem?.unit.cost ?? 0)
             .reduce((pV, cV) => pV + cV, 0);
+        const exclusiveProductionFocusQueue = selectExclusiveProductionFocusQueue(
+            this.queueStates.flatMap(({ queue, topItem }) => topItem
+                ? [{ queue, priority: topItem.priority }]
+                : []),
+        );
 
         this.queueStates.forEach((decision) => {
             this.updateBuildQueue(
@@ -99,6 +123,7 @@ export class QueueController {
                 decision.topItem,
                 totalWeightAcrossQueues,
                 totalCostAcrossQueues,
+                exclusiveProductionFocusQueue,
                 logger,
             );
         });
@@ -129,11 +154,25 @@ export class QueueController {
         decision: TechnoRulesWithPriority | undefined,
         totalWeightAcrossQueues: number,
         totalCostAcrossQueues: number,
+        exclusiveProductionFocusQueue: QueueType | null,
         logger: (message: string) => void,
     ): void {
         const myCredits = playerData.credits;
 
         const queueData = productionApi.getQueueData(queueType);
+        const focusDisposition = getExclusiveProductionFocusDisposition(
+            queueType,
+            queueData.status,
+            exclusiveProductionFocusQueue,
+        );
+        if (focusDisposition === "pause") {
+            logger(`Pausing queue ${queueTypeToName(queueData.type)} for exclusive queue-safe production focus`);
+            actionsApi.pauseProduction(queueData.type);
+            return;
+        }
+        if (focusDisposition === "defer") {
+            return;
+        }
         if (queueData.status == QueueStatus.Idle) {
             // Start building the decided item.
             if (decision !== undefined) {

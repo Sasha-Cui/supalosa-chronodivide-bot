@@ -70,6 +70,8 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
         screenInfrastructure: "ignored" | "required";
         screenProductionEvidence?: "request_before_tank" | "sufficient_before_tank";
         productionFocus?: "ignored" | "required";
+        productionFocusPriority?: number;
+        allowPredecessorExhaustionDuringRecovery?: boolean;
     } = { productionReservation: "required", screenInfrastructure: "ignored" },
 ): void => {
     const expected = expectedNames(country);
@@ -117,6 +119,7 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
         ) || !screenInfrastructure.some((event) => event.currentCount >= 1 || event.requested)
     )) throw new Error(`Invalid assault screen infrastructure for ${country}`);
     if (profile.productionFocus === "required") {
+        const expectedFocusPriority = profile.productionFocusPriority ?? 1_000;
         if (productionFocus.length === 0 || productionFocus.some((event) => {
             const tankFocused = event.phase === "tank";
             const screenFocused = event.phase === "screen";
@@ -131,7 +134,7 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
                 event.infantryQueueHeadName === event.screenUnitName
             );
             return event.schemaVersion !== 25 || event.unitName !== expected.tank ||
-                event.screenUnitName !== expected.screen || event.focusPriority !== 1_000 ||
+                event.screenUnitName !== expected.screen || event.focusPriority !== expectedFocusPriority ||
                 (tankFocused && (
                     event.currentTankCount >= 1 || !event.screenInfrastructureReady || !event.tankAvailable ||
                     event.tankRequestPriority !== event.focusPriority ||
@@ -292,7 +295,8 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
             (event.completeRouteFeasible && !objectiveCompositionReady && event.phase !== "blocked") ||
             (event.phase === "building_ready" && !directReady) ||
             (event.phase === "blocker_ready" && event.blockerId === null) ||
-            (preterminalCompositionBlock && event.activePredecessorCompatibleAttackerCount < 1);
+            (preterminalCompositionBlock && event.activePredecessorCompatibleAttackerCount < 1 &&
+                profile.allowPredecessorExhaustionDuringRecovery !== true);
     })) throw new Error(`Invalid schema-23 force-objective arbitration for ${country}`);
 
     const progressiveCapability = capability[0]?.launchMode === "progressive_blocker";
@@ -305,7 +309,8 @@ export const validateMissionNativeCloseoutFocusedGateV29Telemetry = (
         }
         const blockedDelegation = activation.some((event) => event.schemaVersion === 23 &&
             event.phase === "blocked" && event.enemyBuildingCount > 1 &&
-            event.activePredecessorCompatibleAttackerCount > 0 && (
+            (event.activePredecessorCompatibleAttackerCount > 0 ||
+                profile.allowPredecessorExhaustionDuringRecovery === true) && (
                 (event.directObjectiveFeasible || event.completeRouteFeasible) && !event.compositionReady ||
                 !event.directObjectiveFeasible && !event.completeRouteFeasible &&
                     !event.partialBlockerLaunchPermitted

@@ -243,6 +243,35 @@ const v31Profile = {
     productionFocus: "required",
 } as const;
 
+const v32Profile = {
+    ...v31Profile,
+    productionFocusPriority: 10_000,
+    allowPredecessorExhaustionDuringRecovery: true,
+} as const;
+
+const v32Recovery = (): BuildingEliminationTelemetryEvent[] => [
+    ...compositionBlockedPreterminal()
+        .filter((event) => event.event !== "assault_production_reservation")
+        .map((event) => event.event === "activation_evaluation"
+            ? { ...event, activePredecessorCompatibleAttackerCount: 0 }
+            : event) as BuildingEliminationTelemetryEvent[],
+    {
+        schemaVersion: 24, event: "assault_screen_infrastructure", tick: 2_600,
+        side: SideType.GDI, structureName: "GAPILE", currentCount: 1,
+        available: true, requested: false,
+    },
+    {
+        schemaVersion: 25, event: "assault_production_focus", tick: 3_000,
+        side: SideType.GDI, phase: "tank", unitName: "MTNK", screenUnitName: "E1",
+        currentTankCount: 0, currentScreenCount: 0, focusPriority: 10_000,
+        tankRequestPriority: 10_000, screenRequestPriority: 140,
+        screenInfrastructureReady: true, tankAvailable: true, screenAvailable: true,
+        vehicleQueueStatus: QueueStatus.Active,
+        vehicleQueueHeadName: "MTNK", infantryQueueStatus: QueueStatus.Idle,
+        infantryQueueHeadName: null,
+    },
+];
+
 describe("mission-native closeout focused gate v29", () => {
     it("keeps every focused seed inside the engine uint32 domain", () => {
         for (const index of MISSION_NATIVE_CLOSEOUT_FOCUSED_GATE_V29_COUNTRIES.keys()) {
@@ -305,6 +334,30 @@ describe("mission-native closeout focused gate v29", () => {
             : event) as BuildingEliminationTelemetryEvent[];
         expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
             telemetry, Countries.USA, v31Profile,
+        )).toThrow("queue-safe production focus");
+    });
+
+    it("accepts exclusive V32 focus while a depleted predecessor recovers", () => {
+        expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
+            v32Recovery(), Countries.USA, v32Profile,
+        )).not.toThrow();
+    });
+
+    it("does not relax predecessor exhaustion for earlier profiles", () => {
+        expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
+            v32Recovery(), Countries.USA, {
+                ...v32Profile,
+                allowPredecessorExhaustionDuringRecovery: false,
+            },
+        )).toThrow("force-objective arbitration");
+    });
+
+    it("rejects V32 telemetry without the exclusive focus priority", () => {
+        const telemetry = v32Recovery().map((event) => event.event === "assault_production_focus"
+            ? { ...event, focusPriority: 1_000, tankRequestPriority: 1_000 }
+            : event) as BuildingEliminationTelemetryEvent[];
+        expect(() => validateMissionNativeCloseoutFocusedGateV29Telemetry(
+            telemetry, Countries.USA, v32Profile,
         )).toThrow("queue-safe production focus");
     });
 
