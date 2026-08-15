@@ -16,6 +16,7 @@ import {
     Mission,
     MissionAction,
     buildStructureAtLocation,
+    disbandMission,
     noop,
     releaseUnits,
     requestSpecificUnits,
@@ -92,6 +93,10 @@ export type BuildingEliminationOptions = {
     readinessReserveDefenseRadius?: number;
     contactOnlyBlockerClearance?: boolean;
     terminalBuildingPriority?: boolean;
+    physicalProgressDeadlineFallback?: boolean;
+    buildingNoProgressDeadlineTicks?: number;
+    blockerNoProgressDeadlineTicks?: number;
+    predecessorFallbackTicks?: number;
 };
 
 export type BuildingTargetDescriptor = {
@@ -241,6 +246,32 @@ export type BuildingEliminationTelemetryEvent =
           assignedAttackerCount: number;
           buildingAttackerCount: number;
           blockerAttackerCount: number;
+      }
+    | {
+          schemaVersion: 28;
+          event: "objective_physical_progress";
+          tick: number;
+          progressKind: "building_damage" | "building_destroyed" | "blocker_damage" | "blocker_destroyed";
+          targetId: number;
+          blockerId: number | null;
+          objectId: number;
+          damage: number;
+          lastCertifiedProgressTick: number;
+      }
+    | {
+          schemaVersion: 29;
+          event: "objective_progress_deadline";
+          tick: number;
+          phase: "fallback_started" | "fallback_active" | "replan_started";
+          reason: "building_no_progress" | "blocker_no_progress" | null;
+          targetId: number | null;
+          blockerId: number | null;
+          lastCertifiedProgressTick: number | null;
+          deadlineTicks: number | null;
+          fallbackUntilTick: number;
+          releasedUnitIds: number[];
+          suspendedOverlayMissionNames: string[];
+          activePredecessorMissionNames: string[];
       }
     | {
           schemaVersion: 5;
@@ -648,6 +679,10 @@ const DEFAULT_OPTIONS: Required<BuildingEliminationOptions> = {
     readinessReserveDefenseRadius: 0,
     contactOnlyBlockerClearance: false,
     terminalBuildingPriority: false,
+    physicalProgressDeadlineFallback: false,
+    buildingNoProgressDeadlineTicks: 300,
+    blockerNoProgressDeadlineTicks: 240,
+    predecessorFallbackTicks: 180,
 };
 
 const requireIntegerInRange = (name: string, value: number, minimum: number, maximum: number): void => {
@@ -693,6 +728,19 @@ export const resolveBuildingEliminationOptions = (
     requireIntegerInRange("maxEnemyBuildings", resolved.maxEnemyBuildings, 1, 1_000);
     requireIntegerInRange("routeCorridorRadius", resolved.routeCorridorRadius, 1, 64);
     requireIntegerInRange("readinessReserveDefenseRadius", resolved.readinessReserveDefenseRadius, 0, 64);
+    requireIntegerInRange(
+        "buildingNoProgressDeadlineTicks",
+        resolved.buildingNoProgressDeadlineTicks,
+        1,
+        100_000,
+    );
+    requireIntegerInRange(
+        "blockerNoProgressDeadlineTicks",
+        resolved.blockerNoProgressDeadlineTicks,
+        1,
+        100_000,
+    );
+    requireIntegerInRange("predecessorFallbackTicks", resolved.predecessorFallbackTicks, 1, 100_000);
     if (!new Set<BuildingEliminationTargetPriority>(["production", "reinforcement", "defense", "nearest"])
         .has(resolved.targetPriority)) {
         throw new Error(`Invalid building-elimination target priority: ${resolved.targetPriority}`);
@@ -820,6 +868,11 @@ export const resolveBuildingEliminationOptions = (
             `${resolved.preterminalObjectiveFeasibilityRequiresTransferredCapability}`,
         );
     }
+    if (typeof resolved.physicalProgressDeadlineFallback !== "boolean") {
+        throw new Error(
+            `Invalid building-elimination physical-progress fallback: ${resolved.physicalProgressDeadlineFallback}`,
+        );
+    }
     return resolved;
 };
 
@@ -833,6 +886,16 @@ const BUILDING_ELIMINATION_PRIORITY = 300;
 const BUILDING_ELIMINATION_READINESS_RESERVE_PRIORITY = 290;
 const BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME = "buildingEliminationReadinessReserve";
 export const BUILDING_ELIMINATION_READINESS_FORCE_MISSION_NAME = "buildingEliminationReadinessForce";
+const BUILDING_ELIMINATION_OVERLAY_MISSION_NAMES = new Set([
+    BUILDING_ELIMINATION_MISSION_NAME,
+    BUILDING_ELIMINATION_CAPABILITY_BUILD_MISSION_NAME,
+    BUILDING_ELIMINATION_CAPABILITY_UNIT_MISSION_NAME,
+    BUILDING_ELIMINATION_ASSAULT_PRODUCTION_MISSION_NAME,
+    BUILDING_ELIMINATION_ASSAULT_BUILD_MISSION_NAME,
+    BUILDING_ELIMINATION_ASSAULT_SCREEN_BUILD_MISSION_NAME,
+    BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME,
+    BUILDING_ELIMINATION_READINESS_FORCE_MISSION_NAME,
+]);
 const isBuildingEliminationReadinessMissionName = (name: string | null): boolean =>
     name === BUILDING_ELIMINATION_READINESS_RESERVE_MISSION_NAME ||
     name === BUILDING_ELIMINATION_READINESS_FORCE_MISSION_NAME;
@@ -952,6 +1015,107 @@ export const updateBuildingTargetProgress = (
         previousHitPoints,
         damage,
         becameStalled: stalled && previous?.stalled !== true,
+    };
+};
+
+export type BuildingEliminationObjectiveProgressState = {
+    lastCertifiedProgressTick: number;
+    targetId: number;
+    targetHitPoints: number;
+    blockerId: number | null;
+    blockerHitPoints: number | null;
+};
+
+export type BuildingEliminationObjectiveProgressObservation = {
+    tick: number;
+    targetId: number;
+    targetHitPoints: number;
+    previousTargetStillAlive: boolean;
+    blockerId: number | null;
+    blockerHitPoints: number | null;
+    previousBlockerStillAlive: boolean;
+};
+
+export type BuildingEliminationCertifiedProgress = {
+    progressKind: "building_damage" | "building_destroyed" | "blocker_damage" | "blocker_destroyed";
+    objectId: number;
+    damage: number;
+};
+
+export type BuildingEliminationObjectiveProgressUpdate = {
+    state: BuildingEliminationObjectiveProgressState;
+    progress: BuildingEliminationCertifiedProgress[];
+    deadlineTicks: number;
+    deadlineExpired: boolean;
+};
+
+/**
+ * Advances the complete-mission liveness clock using irreversible public-state
+ * facts only. Changing a target or blocker while the former object remains
+ * alive is deliberately not progress, and neither are repeated orders or raw
+ * movement. This prevents oscillation from extending a stale commitment.
+ */
+export const updateBuildingEliminationObjectiveProgress = (
+    previous: BuildingEliminationObjectiveProgressState | undefined,
+    observation: BuildingEliminationObjectiveProgressObservation,
+    buildingNoProgressDeadlineTicks: number,
+    blockerNoProgressDeadlineTicks: number,
+): BuildingEliminationObjectiveProgressUpdate => {
+    requireIntegerInRange("tick", observation.tick, 0, Number.MAX_SAFE_INTEGER);
+    requireIntegerInRange("targetId", observation.targetId, 0, Number.MAX_SAFE_INTEGER);
+    requireIntegerInRange("targetHitPoints", observation.targetHitPoints, 0, Number.MAX_SAFE_INTEGER);
+    requireIntegerInRange("buildingNoProgressDeadlineTicks", buildingNoProgressDeadlineTicks, 1, 100_000);
+    requireIntegerInRange("blockerNoProgressDeadlineTicks", blockerNoProgressDeadlineTicks, 1, 100_000);
+    if ((observation.blockerId === null) !== (observation.blockerHitPoints === null)) {
+        throw new Error("blocker identity and hit points must be present together");
+    }
+    if (observation.blockerId !== null) {
+        requireIntegerInRange("blockerId", observation.blockerId, 0, Number.MAX_SAFE_INTEGER);
+        requireIntegerInRange(
+            "blockerHitPoints",
+            observation.blockerHitPoints as number,
+            0,
+            Number.MAX_SAFE_INTEGER,
+        );
+    }
+
+    const progress: BuildingEliminationCertifiedProgress[] = [];
+    if (previous) {
+        if (previous.targetId === observation.targetId) {
+            const damage = Math.max(0, previous.targetHitPoints - observation.targetHitPoints);
+            if (damage > 0) progress.push({ progressKind: "building_damage", objectId: observation.targetId, damage });
+        } else if (!observation.previousTargetStillAlive) {
+            progress.push({ progressKind: "building_destroyed", objectId: previous.targetId, damage: 0 });
+        }
+        if (previous.blockerId !== null) {
+            if (previous.blockerId === observation.blockerId && observation.blockerHitPoints !== null) {
+                const damage = Math.max(0, (previous.blockerHitPoints ?? observation.blockerHitPoints) -
+                    observation.blockerHitPoints);
+                if (damage > 0) {
+                    progress.push({ progressKind: "blocker_damage", objectId: observation.blockerId, damage });
+                }
+            } else if (!observation.previousBlockerStillAlive) {
+                progress.push({ progressKind: "blocker_destroyed", objectId: previous.blockerId, damage: 0 });
+            }
+        }
+    }
+    const lastCertifiedProgressTick = !previous || progress.length > 0
+        ? observation.tick
+        : previous.lastCertifiedProgressTick;
+    const deadlineTicks = observation.blockerId === null
+        ? buildingNoProgressDeadlineTicks
+        : blockerNoProgressDeadlineTicks;
+    return {
+        state: {
+            lastCertifiedProgressTick,
+            targetId: observation.targetId,
+            targetHitPoints: observation.targetHitPoints,
+            blockerId: observation.blockerId,
+            blockerHitPoints: observation.blockerHitPoints,
+        },
+        progress,
+        deadlineTicks,
+        deadlineExpired: observation.tick - lastCertifiedProgressTick >= deadlineTicks,
     };
 };
 
@@ -2084,6 +2248,17 @@ type BuildingEliminationExecutionHeartbeatState = {
     assignedAttackerIds: number[];
 };
 
+type BuildingEliminationProgressFallback = {
+    tick: number;
+    reason: "building_no_progress" | "blocker_no_progress";
+    targetId: number;
+    blockerId: number | null;
+    lastCertifiedProgressTick: number;
+    deadlineTicks: number;
+    fallbackUntilTick: number;
+    releasedUnitIds: number[];
+};
+
 class BuildingEliminationMission extends Mission {
     private lastOrderAt = Number.NEGATIVE_INFINITY;
     private rememberedBuildings = new Map<number, BuildingTargetDescriptor>();
@@ -2101,6 +2276,8 @@ class BuildingEliminationMission extends Mission {
     private targetProgress = new Map<number, BuildingTargetProgressState>();
     private progressTelemetry = new Map<number, { hitPoints: number; lastEmittedTick: number }>();
     private launchHandoffEmitted = false;
+    private objectiveProgress: BuildingEliminationObjectiveProgressState | undefined;
+    private progressFallback: BuildingEliminationProgressFallback | null = null;
 
     constructor(
         private options: Required<BuildingEliminationOptions>,
@@ -2108,6 +2285,7 @@ class BuildingEliminationMission extends Mission {
         private telemetrySink: BuildingEliminationTelemetrySink,
         private stalledBuildingIds: Set<number>,
         private expectedStagedUnitIds: number[] = [],
+        private onProgressFallback: (fallback: BuildingEliminationProgressFallback) => void = () => undefined,
     ) {
         super(BUILDING_ELIMINATION_MISSION_NAME, logger);
     }
@@ -2122,6 +2300,10 @@ class BuildingEliminationMission extends Mission {
         ) {
             this.issueOrders(context);
             this.lastOrderAt = context.game.getCurrentTick();
+        }
+        if (this.progressFallback) {
+            this.onProgressFallback(this.progressFallback);
+            return disbandMission(this.progressFallback.reason);
         }
         return eligibleAttackers.length > 0
             ? requestSpecificUnits(eligibleAttackers.map((unit) => unit.id), BUILDING_ELIMINATION_PRIORITY)
@@ -2385,6 +2567,12 @@ class BuildingEliminationMission extends Mission {
                     estimatedForceSurvivalTicks: finiteOrNull(decision.estimatedForceSurvivalTicks),
                     earliestRouteThreatInterceptTicks: finiteOrNull(decision.earliestRouteThreatInterceptTicks),
                 });
+                if (this.applyPhysicalProgressDeadline(
+                    context,
+                    currentPrimaryTarget,
+                    blocker,
+                    currentTargetById,
+                )) return;
                 const allocation = allocateBuildingEliminationEngagement(
                     assignedUnits,
                     currentPrimaryTarget,
@@ -2493,6 +2681,79 @@ class BuildingEliminationMission extends Mission {
         for (const target of sweepPoints) {
             this.lastSweepAt.set(`${target.x},${target.y}`, context.game.getCurrentTick());
         }
+    }
+
+    private applyPhysicalProgressDeadline(
+        context: MissionContext,
+        target: UnitData,
+        blocker: UnitData | null,
+        currentTargetById: ReadonlyMap<number, UnitData>,
+    ): boolean {
+        if (!this.options.physicalProgressDeadlineFallback) return false;
+        const tick = context.game.getCurrentTick();
+        const previous = this.objectiveProgress;
+        const update = updateBuildingEliminationObjectiveProgress(
+            previous,
+            {
+                tick,
+                targetId: target.id,
+                targetHitPoints: target.hitPoints,
+                previousTargetStillAlive: previous ? currentTargetById.has(previous.targetId) : true,
+                blockerId: blocker?.id ?? null,
+                blockerHitPoints: blocker?.hitPoints ?? null,
+                previousBlockerStillAlive: previous?.blockerId === null || previous?.blockerId === undefined
+                    ? true
+                    : !!context.game.getGameObjectData(previous.blockerId),
+            },
+            this.options.buildingNoProgressDeadlineTicks,
+            this.options.blockerNoProgressDeadlineTicks,
+        );
+        this.objectiveProgress = update.state;
+        for (const progress of update.progress) {
+            this.telemetrySink({
+                schemaVersion: 28,
+                event: "objective_physical_progress",
+                tick,
+                progressKind: progress.progressKind,
+                targetId: target.id,
+                blockerId: blocker?.id ?? null,
+                objectId: progress.objectId,
+                damage: progress.damage,
+                lastCertifiedProgressTick: update.state.lastCertifiedProgressTick,
+            });
+        }
+        if (!update.deadlineExpired) return false;
+
+        const reason = blocker === null ? "building_no_progress" : "blocker_no_progress";
+        const fallback: BuildingEliminationProgressFallback = {
+            tick,
+            reason,
+            targetId: target.id,
+            blockerId: blocker?.id ?? null,
+            lastCertifiedProgressTick: update.state.lastCertifiedProgressTick,
+            deadlineTicks: update.deadlineTicks,
+            fallbackUntilTick: tick + this.options.predecessorFallbackTicks,
+            releasedUnitIds: this.getUnitIds().slice().sort((left, right) => left - right),
+        };
+        this.telemetrySink({
+            schemaVersion: 29,
+            event: "objective_progress_deadline",
+            tick,
+            phase: "fallback_started",
+            reason,
+            targetId: target.id,
+            blockerId: blocker?.id ?? null,
+            lastCertifiedProgressTick: update.state.lastCertifiedProgressTick,
+            deadlineTicks: update.deadlineTicks,
+            fallbackUntilTick: fallback.fallbackUntilTick,
+            releasedUnitIds: fallback.releasedUnitIds,
+            suspendedOverlayMissionNames: [],
+            activePredecessorMissionNames: [],
+        });
+        this.committedTargetId = null;
+        this.committedRouteBlocker = null;
+        this.progressFallback = fallback;
+        return true;
     }
 
     private selectSweepPoints(context: MissionContext, maximum: number): PointDescriptor[] {
@@ -3678,6 +3939,8 @@ export class BuildingEliminationMissionFactory {
         readinessTankCount: 0,
     };
     private readinessVanguardUnitIds: Set<number> | null = null;
+    private progressFallback: BuildingEliminationProgressFallback | null = null;
+    private lastProgressFallbackTelemetryAt = Number.NEGATIVE_INFINITY;
 
     constructor(
         options: BuildingEliminationOptions = {},
@@ -3696,8 +3959,71 @@ export class BuildingEliminationMissionFactory {
         missionController: MissionController,
         logger: DebugLogger,
     ): void {
-        if (!this.options.enabled || context.game.getCurrentTick() < this.options.minTick) {
+        if (!this.options.enabled) {
             return;
+        }
+        const tick = context.game.getCurrentTick();
+        if (tick < this.options.minTick) return;
+        if (
+            this.options.physicalProgressDeadlineFallback && this.progressFallback &&
+            tick < this.progressFallback.fallbackUntilTick
+        ) {
+            const suspendedOverlayMissionNames = this.suspendOverlayMissions(missionController);
+            const activePredecessorMissionNames = missionController.getMissions()
+                .filter((mission) =>
+                    isPreemptibleBuildingEliminationMission(mission.getUniqueName()) &&
+                    mission.getUnitIds().length > 0,
+                )
+                .map((mission) => mission.getUniqueName())
+                .sort((left, right) => left.localeCompare(right));
+            if (tick >= this.lastProgressFallbackTelemetryAt + TELEMETRY_HEARTBEAT_TICKS) {
+                this.telemetrySink({
+                    schemaVersion: 29,
+                    event: "objective_progress_deadline",
+                    tick,
+                    phase: "fallback_active",
+                    reason: this.progressFallback.reason,
+                    targetId: this.progressFallback.targetId,
+                    blockerId: this.progressFallback.blockerId,
+                    lastCertifiedProgressTick: this.progressFallback.lastCertifiedProgressTick,
+                    deadlineTicks: this.progressFallback.deadlineTicks,
+                    fallbackUntilTick: this.progressFallback.fallbackUntilTick,
+                    releasedUnitIds: this.progressFallback.releasedUnitIds,
+                    suspendedOverlayMissionNames,
+                    activePredecessorMissionNames,
+                });
+                this.lastProgressFallbackTelemetryAt = tick;
+            }
+            return;
+        }
+        if (
+            this.options.physicalProgressDeadlineFallback && this.progressFallback &&
+            tick >= this.progressFallback.fallbackUntilTick
+        ) {
+            const activePredecessorMissionNames = missionController.getMissions()
+                .filter((mission) =>
+                    isPreemptibleBuildingEliminationMission(mission.getUniqueName()) &&
+                    mission.getUnitIds().length > 0,
+                )
+                .map((mission) => mission.getUniqueName())
+                .sort((left, right) => left.localeCompare(right));
+            this.telemetrySink({
+                schemaVersion: 29,
+                event: "objective_progress_deadline",
+                tick,
+                phase: "replan_started",
+                reason: this.progressFallback.reason,
+                targetId: this.progressFallback.targetId,
+                blockerId: this.progressFallback.blockerId,
+                lastCertifiedProgressTick: this.progressFallback.lastCertifiedProgressTick,
+                deadlineTicks: this.progressFallback.deadlineTicks,
+                fallbackUntilTick: this.progressFallback.fallbackUntilTick,
+                releasedUnitIds: this.progressFallback.releasedUnitIds,
+                suspendedOverlayMissionNames: [],
+                activePredecessorMissionNames,
+            });
+            this.progressFallback = null;
+            this.lastProgressFallbackTelemetryAt = Number.NEGATIVE_INFINITY;
         }
         this.closeoutLatch.activated = updateBuildingEliminationProductionScopeLatch(
             this.closeoutLatch.activated,
@@ -4036,9 +4362,29 @@ export class BuildingEliminationMissionFactory {
                 this.telemetrySink,
                 this.stalledBuildingIds,
                 expectedStagedUnitIds,
+                (fallback) => { this.progressFallback = fallback; },
             ),
         );
         this.lastBlockedTelemetrySignature = "";
+    }
+
+    private suspendOverlayMissions(missionController: MissionController): string[] {
+        const names = missionController.getMissions()
+            .map((mission) => mission.getUniqueName())
+            .filter((name) => BUILDING_ELIMINATION_OVERLAY_MISSION_NAMES.has(name))
+            .sort((left, right) => left.localeCompare(right));
+        names.forEach((name) => disbandBuildingEliminationMissionForTransfer(missionController, name));
+        if (this.options.adaptiveGroundAssaultQueuedProductionFocusPriority > 0) {
+            for (const [name, request] of missionController.getRequestedUnitTypes()) {
+                if (request.priority >= this.options.adaptiveGroundAssaultQueuedProductionFocusPriority) {
+                    missionController.getRequestedUnitTypes().delete(name);
+                }
+            }
+        }
+        this.closeoutLatch.readinessScreenCount = 0;
+        this.closeoutLatch.readinessTankCount = 0;
+        this.readinessVanguardUnitIds = null;
+        return names;
     }
 
     private emitActivationEvaluation(

@@ -140,6 +140,10 @@ import {
     MissionNativeCloseoutPolicyV34,
     validateMissionNativeCloseoutPolicyV34,
 } from "./missionNativeCloseoutPolicyV34.js";
+import {
+    MissionNativeCloseoutPolicyV35,
+    validateMissionNativeCloseoutPolicyV35,
+} from "./missionNativeCloseoutPolicyV35.js";
 
 type MissionNativePolicy = MissionNativeCloseoutPolicy | MissionNativeCloseoutPolicyV2 |
     MissionNativeCloseoutPolicyV3 | MissionNativeCloseoutPolicyV4 | MissionNativeCloseoutPolicyV5 |
@@ -152,7 +156,7 @@ type MissionNativePolicy = MissionNativeCloseoutPolicy | MissionNativeCloseoutPo
     MissionNativeCloseoutPolicyV24 | MissionNativeCloseoutPolicyV25 | MissionNativeCloseoutPolicyV26 |
     MissionNativeCloseoutPolicyV27 | MissionNativeCloseoutPolicyV28 | MissionNativeCloseoutPolicyV29 |
     MissionNativeCloseoutPolicyV30 | MissionNativeCloseoutPolicyV31 | MissionNativeCloseoutPolicyV32 |
-    MissionNativeCloseoutPolicyV33 | MissionNativeCloseoutPolicyV34;
+    MissionNativeCloseoutPolicyV33 | MissionNativeCloseoutPolicyV34 | MissionNativeCloseoutPolicyV35;
 
 type StrategyLike = {
     onAiUpdate(context: any, missionController: any, logger: any): StrategyLike;
@@ -284,6 +288,18 @@ class MissionNativeCloseoutStrategy implements StrategyLike {
             terminalBuildingPriority: "terminalBuildingPriority" in policy
                 ? policy.terminalBuildingPriority
                 : false,
+            physicalProgressDeadlineFallback: "physicalProgressDeadlineFallback" in policy
+                ? policy.physicalProgressDeadlineFallback
+                : false,
+            buildingNoProgressDeadlineTicks: "buildingNoProgressDeadlineTicks" in policy
+                ? policy.buildingNoProgressDeadlineTicks
+                : 300,
+            blockerNoProgressDeadlineTicks: "blockerNoProgressDeadlineTicks" in policy
+                ? policy.blockerNoProgressDeadlineTicks
+                : 240,
+            predecessorFallbackTicks: "predecessorFallbackTicks" in policy
+                ? policy.predecessorFallbackTicks
+                : 180,
         }, telemetrySink);
     }
 
@@ -302,7 +318,9 @@ export const createMissionNativeCloseoutCandidate = (
     rawPolicy: MissionNativePolicy,
     telemetrySink: BuildingEliminationTelemetrySink = () => undefined,
 ): InspectableBaselineBot => {
-    const policy = rawPolicy.schemaVersion === 34
+    const policy = rawPolicy.schemaVersion === 35
+        ? validateMissionNativeCloseoutPolicyV35(rawPolicy)
+        : rawPolicy.schemaVersion === 34
         ? validateMissionNativeCloseoutPolicyV34(rawPolicy)
         : rawPolicy.schemaVersion === 33
         ? validateMissionNativeCloseoutPolicyV33(rawPolicy)
@@ -375,7 +393,7 @@ export const createMissionNativeCloseoutCandidate = (
     }
     const inner = baselineFactory.createDefaultStrategy() as StrategyLike;
     const strategy = new MissionNativeCloseoutStrategy(inner, policy, telemetrySink);
-    if (policy.schemaVersion === 33 || policy.schemaVersion === 34) {
+    if (policy.schemaVersion === 33 || policy.schemaVersion === 34 || policy.schemaVersion === 35) {
         if (!baselineFactory.createWithStrategyAndExclusiveProductionFocus) {
             throw new Error(
                 "Mission-native closeout v33 or later requires the external queue-controller focus adapter",
