@@ -4,7 +4,7 @@
 #SBATCH --partition=devel
 #SBATCH --time=01:00:00
 #SBATCH --cpus-per-task=2
-#SBATCH --mem=8G
+#SBATCH --mem=12G
 #SBATCH --output=/dev/null
 #SBATCH --error=/dev/null
 
