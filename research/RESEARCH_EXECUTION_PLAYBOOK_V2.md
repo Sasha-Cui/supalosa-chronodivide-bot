@@ -49,6 +49,34 @@ needed to reach the remaining buildings. Do not choose force clearance merely
 because the enemy army is valuable or close. Do not choose a suicidal building
 attack merely because buildings define the endpoint.
 
+The target hierarchy is therefore state-dependent, not a fixed instruction to
+attack either buildings or forces in every state:
+
+1. **Take a terminal building kill whenever it is feasible.** If destroying the
+   selected building reduces the opponent to zero buildings before relevant
+   interception can stop the strike, no surviving enemy army can outweigh that
+   action. The game ends on the building kill.
+2. **Remove only the forces that prevent a near-term building kill.** When an
+   interceptor, route blocker, or base threat makes the building mission fail,
+   suppress the minimum relevant subset and immediately resume the committed
+   building mission.
+3. **Clear the army when doing so creates free building kills.** If no building
+   can currently be destroyed safely and eliminating the opposing combat force
+   makes one or more buildings defenseless, force clearance is a valid terminal
+   subgoal. It must be justified by the resulting building missions rather than
+   by unit-value destruction alone.
+4. **Never idle after gaining an advantage.** Once relevant opposing forces are
+   gone, surviving buildings are free objectives and must be searched for,
+   reached, and destroyed without regroup loops or a retained post-victory
+   reserve.
+
+This is the **finish-advantage principle**: destroy forces to create or protect
+building access, then convert that access into physical building destruction.
+Conversely, bypass even a very large army when it cannot affect a feasible
+last-building strike. Armed-force destruction and building destruction are not
+co-equal score objectives; the former is useful only insofar as it changes the
+probability or completion time of the latter.
+
 The comparison must be counterfactual: estimate what happens if the strike
 group attacks the building now, if it removes only route-relevant blockers
 first, and if it clears the opposing army first. Count an enemy unit as relevant
@@ -230,9 +258,6 @@ ablations after fixing the primary result.
 - The V35 open-development population is permanently invalid without outcome
   access. Its live technical evidence exposed an ownerless predecessor-fallback
   state, so it cannot support a policy claim.
-- V37 isolates Supalosa's resignation behavior from the literal destruction
-  endpoint and adds bounded recovery while preserving active predecessor-owned
-  missions.
 - V37-R2 completed its frozen 18-cell outcome-blind gate under Slurm account
   `pi_jss233`. It exposed both predecessor-owned fallback and no-owner recovery,
   with no incomplete traces or ownership-loss recovery failures.
@@ -240,14 +265,43 @@ ablations after fixing the primary result.
   gate. It established intervention exposure, physical building and blocker
   progress, exclusive scheduling, objective-race allocation, handoff behavior,
   and exact disabled-overlay compatibility without reading outcomes.
-- The V37 positive open-development protocol is frozen at commit `c311779`.
-  Its 540-game comparison covers ten permanently open map families, all nine
-  countries, reciprocal slots, exact external Supalosa, V34, and V37. No game
-  from this outcome-bearing population has been launched or inspected at this
-  checkpoint.
+- The frozen V37 540-game open-development campaign completed under Slurm
+  account `pi_jss233` as array `22302207`. All 90 shards completed cleanly and
+  produced exactly 180 games for each of exact external Supalosa, V34, and V37.
+  The original controller `22302260` failed on a key-order-sensitive commitment
+  comparison; the prospective validator repair was tested in `22304967`, and a
+  provenance-safe aggregation repair was tested in `22305093`. Controller
+  `22305107` then aggregated the existing complete population without rerunning
+  any game.
+- V37 failed its frozen positive gate. Exact external Supalosa produced
+  34 wins, 113 draws, and 33 losses; V37 produced 6 wins, 98 draws, and 76
+  losses. The paired family-macro literal-score effect was -0.1972 and all ten
+  leave-one-family-out effects were negative. This is affirmative evidence
+  against the broad V37 takeover policy, not an inconclusive partial run.
+- The dominant V37 failure was premature, broad mission takeover. It activated
+  in 150 of 180 games, usually near tick 3,924 with roughly balanced armies,
+  preempted ordinary Supalosa attack missions in every activated game, and
+  often exposed the candidate base. Terminal-building prioritization itself
+  was not the observed problem: all five V37 games that reached its terminal
+  priority state were wins.
+- Permanently open prior evidence identifies a narrower foundation. The V4
+  final-building hybrid converted two exact-Supalosa draws into wins without
+  converting any win or draw into a loss (28/119/33 versus 26/121/33 over 180
+  paired games). The remaining 18 exposed final-building draws repeatedly
+  issued orders without physical progress.
+- Trace and source inspection found a concrete liveness defect in those draws:
+  an enemy building known through complete public state but not currently
+  visible receives a direct attack-by-ID order. The engine appears to ignore
+  that order, so units neither move to reveal the building nor damage it. The
+  next prospective mechanism is visibility-aware terminal assault: attack-move
+  to exact coordinates while the building is unseen, then switch to direct
+  attack once it becomes visible. This retains the narrow final-building gate
+  and hybrid clearance of genuinely route-relevant blockers.
 
 These statements are engineering checkpoints, not evidence that V37 improves
-win probability.
+win probability. V37 materially underperformed Supalosa. The V4 draw-to-win
+transitions and the unseen-target defect justify the next open-development test,
+but they do not establish that the proposed repair will beat Supalosa.
 
 ## Definition of done before paper writing
 
@@ -272,21 +326,31 @@ a candid no-go decision—not paper rhetoric.
 
 ## Immediate execution order
 
-1. Implement and test the sealed V37 open-development runner, result validator,
-   aggregate, and fail-closed Slurm controller without changing the frozen
-   protocol.
-2. Pass an exact-commit preflight, then launch the complete 540-game population
-   once under `pi_jss233`; do not inspect shards or selectively rerun games.
-3. After every shard completes cleanly, inspect the single aggregate and apply
-   the prespecified positive gate.
-4. If the gate fails, identify one repeated failure class—especially idle
-   closeout, irrelevant-force diversion, last-building opportunity latency, or
-   insufficient attacker compatibility—and make one prospective repair on the
-   permanently open families.
-5. Repeat complete, versioned open-development screens with fresh seeds until a
-   policy passes; preserve every negative version and keep confirmation families
-   sealed.
-6. Freeze the selected policy, run fresh multi-family all-country confirmation,
-   uncertainty analysis, and narrow causal ablations.
-7. Extract annotated screenshots only from traceable confirmed games, then write
-   the paper around the measured result and mechanism.
+1. Implement the single V5 repair to the narrow V4 final-building hybrid:
+   attack-move to an exact unseen building's coordinates and switch to direct
+   attack only when visible. Preserve exact Supalosa behavior outside the
+   terminal gate.
+2. Add deterministic tests for visible, exact-unseen, remembered, unreachable,
+   blocker-protected, and one-building-versus-100-irrelevant-tanks states. Prove
+   the intended order and ownership change before any outcome screen.
+3. Pass a fresh all-nine-country, reciprocal, outcome-blind live gate. Require
+   legal orders, actual unit ownership, direct evidence of exact-unseen movement,
+   visible-target handoff, physical progress, and active predecessor behavior
+   outside the intervention.
+4. Freeze a complete paired open-development comparison with three simultaneous
+   arms: exact external Supalosa, the V4 final-building hybrid, and V5. Use fresh
+   seeds, reciprocal starts, all nine countries, multiple open map families, a
+   fail-closed controller, and no selective reruns.
+5. Advance only if V5 passes the prospectively frozen positive rule: positive
+   family-clustered literal-score effect versus exact Supalosa, more wins than
+   losses overall and across both factions, broad country support, higher wins
+   and fewer draws than both controls, and no negative leave-one-family-out
+   effect. Otherwise diagnose the complete population and make one new
+   mechanism-specific open-development revision.
+6. After a policy passes, freeze it and run fresh multi-family, all-country
+   confirmation plus uncertainty analysis and narrow causal ablations of
+   visibility-aware approach, blocker clearance, and terminal-only activation.
+7. Extract annotated screenshots only from traceable confirmed games, including
+   a direct terminal bypass, a necessary blocker clearance, a force-clearance
+   transition to free buildings, and an exact-unseen approach-to-visible handoff.
+   Then write the paper around the measured result and supported mechanism.
