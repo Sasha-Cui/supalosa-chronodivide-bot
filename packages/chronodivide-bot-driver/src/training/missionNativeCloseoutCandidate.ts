@@ -417,7 +417,8 @@ export const createMissionNativeCloseoutCandidate = (
     const strategy = new MissionNativeCloseoutStrategy(inner, policy, telemetrySink);
     if (
         policy.schemaVersion === 33 || policy.schemaVersion === 34 ||
-        policy.schemaVersion === 35 || policy.schemaVersion === 36
+        policy.schemaVersion === 35 || policy.schemaVersion === 36 ||
+        policy.schemaVersion === 37
     ) {
         if (!baselineFactory.createWithStrategyAndExclusiveProductionFocus) {
             throw new Error(
