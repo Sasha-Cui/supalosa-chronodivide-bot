@@ -339,6 +339,38 @@ export const validateMissionNativeBuildingEliminationTelemetry = (
     return value as unknown as BuildingEliminationTelemetryEvent;
 };
 
+export const validateMissionNativeCloseoutV35FallbackTelemetry = (
+    telemetry: readonly RecordValue[],
+    episodeId: string,
+): void => {
+    const deadlines = telemetry.filter((event) => event.event === "objective_progress_deadline");
+    const starts = deadlines.filter((event) => event.phase === "fallback_started");
+    const active = deadlines.filter((event) => event.phase === "fallback_active");
+    const replans = deadlines.filter((event) => event.phase === "replan_started");
+    for (const start of starts) {
+        if (!Array.isArray(start.releasedUnitIds) || start.releasedUnitIds.length < 1) {
+            throw new Error(`Mission-native V35 fallback ${episodeId} did not release the overlay force`);
+        }
+        const matchingActive = active.filter((event) =>
+            typeof event.tick === "number" && typeof start.tick === "number" && event.tick >= start.tick &&
+            event.fallbackUntilTick === start.fallbackUntilTick,
+        );
+        if (!matchingActive.some((event) =>
+            Array.isArray(event.suspendedOverlayMissionNames) && event.suspendedOverlayMissionNames.length > 0,
+        )) throw new Error(`Mission-native V35 fallback ${episodeId} did not suspend the overlay missions`);
+        if (!matchingActive.some((event) =>
+            Array.isArray(event.activePredecessorMissionNames) && event.activePredecessorMissionNames.length > 0,
+        )) throw new Error(`Mission-native V35 fallback ${episodeId} lacked actual predecessor ownership`);
+        if (!replans.some((event) =>
+            typeof event.tick === "number" && typeof start.fallbackUntilTick === "number" &&
+            event.tick >= start.fallbackUntilTick,
+        )) throw new Error(`Mission-native V35 fallback ${episodeId} lacked its exact replan`);
+    }
+    if (active.length > 0 && starts.length === 0) {
+        throw new Error(`Mission-native V35 completion ${episodeId} has an orphan fallback-active phase`);
+    }
+};
+
 export const validateMissionNativeCloseoutOpenDevelopmentResult = (
     value: unknown,
     expected: {
@@ -410,25 +442,7 @@ export const validateMissionNativeCloseoutOpenDevelopmentResult = (
         value.policyTelemetry.some((event) => event.schemaVersion === 29 || event.event === "objective_progress_deadline")
     ) throw new Error(`Mission-native V34 completion ${expected.episodeId} emitted V35 deadline telemetry`);
     if (expected.candidateCore === "mission_native_v35") {
-        const deadlines = value.policyTelemetry.filter((event) => event.event === "objective_progress_deadline");
-        const starts = deadlines.filter((event) => event.phase === "fallback_started");
-        const active = deadlines.filter((event) => event.phase === "fallback_active");
-        const replans = deadlines.filter((event) => event.phase === "replan_started");
-        for (const start of starts) {
-            if (start.releasedUnitIds.length < 1 || start.suspendedOverlayMissionNames.length < 1) {
-                throw new Error(`Mission-native V35 fallback ${expected.episodeId} did not release the overlay force`);
-            }
-            if (!active.some((event) => event.tick >= start.tick && event.fallbackUntilTick === start.fallbackUntilTick &&
-                event.activePredecessorMissionNames.length > 0)) {
-                throw new Error(`Mission-native V35 fallback ${expected.episodeId} lacked actual predecessor ownership`);
-            }
-            if (!replans.some((event) => event.tick >= start.fallbackUntilTick)) {
-                throw new Error(`Mission-native V35 fallback ${expected.episodeId} lacked its exact replan`);
-            }
-        }
-        if (active.length > 0 && starts.length === 0) {
-            throw new Error(`Mission-native V35 completion ${expected.episodeId} has an orphan fallback-active phase`);
-        }
+        validateMissionNativeCloseoutV35FallbackTelemetry(value.policyTelemetry as unknown as RecordValue[], expected.episodeId);
     }
     const terminal = value.terminal;
     if (

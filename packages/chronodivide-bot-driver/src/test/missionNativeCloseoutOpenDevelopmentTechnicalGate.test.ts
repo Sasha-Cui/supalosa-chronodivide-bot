@@ -7,6 +7,7 @@ import { MISSION_NATIVE_CLOSEOUT_OPEN_DEVELOPMENT_COUNTRIES } from
     "../training/missionNativeCloseoutOpenDevelopmentCampaign.js";
 import {
     validateMissionNativeCloseoutEvaluationFileCommitments,
+    validateMissionNativeCloseoutV35FallbackTelemetry,
     validateMissionNativeExposureByCountryAndSlot,
 } from
     "../training/missionNativeCloseoutOpenDevelopmentTechnicalGate.js";
@@ -22,6 +23,35 @@ const completeExposure = (): Map<string, Set<string>> => new Map(
 );
 
 describe("mission-native closeout open-development technical gate", () => {
+    it("accepts suspension and predecessor ownership in correlated fallback-active events", () => {
+        const fallback = [
+            {
+                event: "objective_progress_deadline", phase: "fallback_started", tick: 100,
+                fallbackUntilTick: 280, releasedUnitIds: [1], suspendedOverlayMissionNames: [],
+                activePredecessorMissionNames: [],
+            },
+            {
+                event: "objective_progress_deadline", phase: "fallback_active", tick: 100,
+                fallbackUntilTick: 280, releasedUnitIds: [1], suspendedOverlayMissionNames: ["overlay"],
+                activePredecessorMissionNames: [],
+            },
+            {
+                event: "objective_progress_deadline", phase: "fallback_active", tick: 220,
+                fallbackUntilTick: 280, releasedUnitIds: [1], suspendedOverlayMissionNames: [],
+                activePredecessorMissionNames: ["attack_216"],
+            },
+            {
+                event: "objective_progress_deadline", phase: "replan_started", tick: 280,
+                fallbackUntilTick: 280, releasedUnitIds: [1], suspendedOverlayMissionNames: [],
+                activePredecessorMissionNames: ["attack_216"],
+            },
+        ];
+        expect(() => validateMissionNativeCloseoutV35FallbackTelemetry(fallback, "a2-s0")).not.toThrow();
+        fallback[1].suspendedOverlayMissionNames = [];
+        expect(() => validateMissionNativeCloseoutV35FallbackTelemetry(fallback, "a2-s0"))
+            .toThrow(/did not suspend the overlay missions/);
+    });
+
     it("accepts exact evaluation-file commitments and rejects post-campaign drift", () => {
         const root = fs.mkdtempSync(path.join(os.tmpdir(), "mission-native-closeout-gate-"));
         temporaryRoots.push(root);
