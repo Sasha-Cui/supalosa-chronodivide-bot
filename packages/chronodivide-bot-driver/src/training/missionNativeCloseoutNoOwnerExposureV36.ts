@@ -8,11 +8,8 @@ import { loadBaselineFactory } from "../benchmark/baselineLoader.js";
 import { createExperimentManifest } from "../benchmark/provenance.js";
 import { METHOD_V5_EQUIVALENCE_MAP_SHA256 } from "./methodV5BaselineEquivalence.js";
 import { sha256File } from "./methodV5PlanRunner.js";
-import {
-    MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_MAX_TICKS,
-    MissionNativeCloseoutRunTrace,
-    runMissionNativeCloseoutTrace,
-} from "./missionNativeCloseoutCompatibilityGate.js";
+import { MissionNativeCloseoutRunTrace, runMissionNativeCloseoutTrace } from
+    "./missionNativeCloseoutCompatibilityGate.js";
 import {
     validateMissionNativeCloseoutV35ObjectiveRaceTelemetry,
     validateMissionNativeCloseoutV35QuitAudits,
@@ -23,7 +20,8 @@ import {
     missionNativeCloseoutPolicyV36Sha256,
 } from "./missionNativeCloseoutPolicyV36.js";
 
-export const MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_SEED_BASE = 4_294_910_000 as const;
+export const MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_SEED_BASE = 4_294_920_000 as const;
+export const MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_MAX_TICKS = 7_200 as const;
 export const MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_COUNTRIES = [
     Countries.USA,
     Countries.KOREA,
@@ -77,18 +75,26 @@ const main = async (): Promise<void> => {
     const factory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
     const policy = buildMissionNativeCloseoutPolicyV36(true);
     await cdapi.init(path.join(process.cwd(), "data"));
-    const args = { factory, mapName, requestedEngineSeed, country, candidateSlot, policy };
+    const args = {
+        factory,
+        mapName,
+        requestedEngineSeed,
+        country,
+        candidateSlot,
+        policy,
+        maxTicks: MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_MAX_TICKS,
+    };
     const first = await runMissionNativeCloseoutTrace(args);
     const repeat = await runMissionNativeCloseoutTrace(args);
     validateMissionNativeCloseoutV35ObjectiveRaceTelemetry(first.telemetry);
     validateMissionNativeCloseoutV35ObjectiveRaceTelemetry(repeat.telemetry);
     const firstProgress = validateMissionNativeCloseoutV36ProgressTelemetry(
         first.telemetry,
-        MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_MAX_TICKS,
+        MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_MAX_TICKS,
     );
     const repeatProgress = validateMissionNativeCloseoutV36ProgressTelemetry(
         repeat.telemetry,
-        MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_MAX_TICKS,
+        MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_MAX_TICKS,
     );
     const firstSha256 = traceDigest(first, true);
     const repeatSha256 = traceDigest(repeat, true);
@@ -119,17 +125,17 @@ const main = async (): Promise<void> => {
         control = { directSha256, disabledSha256 };
     }
     const manifest = createExperimentManifest({
-        runId: `mission-native-closeout-v36-exposure-${process.env.SLURM_ARRAY_JOB_ID ?? "local"}-${taskIndex}`,
+        runId: `mission-native-closeout-v36-r2-exposure-${process.env.SLURM_ARRAY_JOB_ID ?? "local"}-${taskIndex}`,
         mixDir: path.join(process.cwd(), "data"),
         maps: [mapName],
         effectiveConfig: {
-            purpose: "outcome-free-mission-native-closeout-v36-country-slot-exposure",
+            purpose: "outcome-free-mission-native-closeout-v36-r2-country-slot-exposure",
             taskIndex,
             country,
             candidateSlot,
             requestedEngineSeed,
             traces: taskIndex === 0 ? 4 : 2,
-            maxTicks: MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_MAX_TICKS,
+            maxTicks: MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_MAX_TICKS,
             outcomeInspection: false,
         },
         baseline: factory.descriptor,
@@ -143,6 +149,7 @@ const main = async (): Promise<void> => {
     const passed = validationErrors.length === 0;
     const output = {
         schemaVersion: 1,
+        gateRevision: "V36-R2",
         status: passed ? "PASS_OUTCOME_FREE_V36_EXPOSURE_CELL" : "FAIL_OUTCOME_FREE_V36_EXPOSURE_CELL",
         passed,
         outcomeFree: true,
@@ -154,7 +161,7 @@ const main = async (): Promise<void> => {
         country,
         candidateSlot,
         requestedEngineSeed,
-        maxTicks: MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_MAX_TICKS,
+        maxTicks: MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_MAX_TICKS,
         gameCount: taskIndex === 0 ? 4 : 2,
         firstSha256,
         repeatSha256,

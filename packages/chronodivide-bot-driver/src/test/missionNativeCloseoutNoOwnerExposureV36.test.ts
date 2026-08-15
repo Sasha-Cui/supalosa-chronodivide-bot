@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
     MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_CELL_COUNT,
     MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_COUNTRIES,
+    MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_MAX_TICKS,
     MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_SEED_BASE,
 } from "../training/missionNativeCloseoutNoOwnerExposureV36.js";
 
@@ -13,8 +14,12 @@ describe("mission-native closeout V36 outcome-free exposure screen", () => {
     });
 
     it("uses a fresh valid uint32 seed interval", () => {
-        expect(MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_SEED_BASE).toBe(4_294_910_000);
+        expect(MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_SEED_BASE).toBe(4_294_920_000);
         expect(MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_SEED_BASE +
             MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_CELL_COUNT - 1).toBeLessThanOrEqual(0xffff_ffff);
+    });
+
+    it("extends only the outcome-blind diagnostic horizon", () => {
+        expect(MISSION_NATIVE_CLOSEOUT_V36_EXPOSURE_MAX_TICKS).toBe(7_200);
     });
 });

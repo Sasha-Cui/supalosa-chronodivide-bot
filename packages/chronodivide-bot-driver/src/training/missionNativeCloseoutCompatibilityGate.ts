@@ -164,6 +164,7 @@ export const runMissionNativeCloseoutTrace = async (args: {
     country: Countries;
     candidateSlot: 0 | 1;
     requestedEngineSeed: number;
+    maxTicks?: number;
     policy: MissionNativeCloseoutPolicyV5 | MissionNativeCloseoutPolicyV6 | MissionNativeCloseoutPolicyV7 |
         MissionNativeCloseoutPolicyV8 | MissionNativeCloseoutPolicyV9 | MissionNativeCloseoutPolicyV10 |
         MissionNativeCloseoutPolicyV11 | MissionNativeCloseoutPolicyV12 | MissionNativeCloseoutPolicyV13 |
@@ -180,6 +181,10 @@ export const runMissionNativeCloseoutTrace = async (args: {
         MissionNativeCloseoutPolicyV35 | MissionNativeCloseoutPolicyV36 | null;
 }): Promise<MissionNativeCloseoutRunTrace> => {
     const { factory, mapName, country, candidateSlot, requestedEngineSeed, policy } = args;
+    const maxTicks = args.maxTicks ?? MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_MAX_TICKS;
+    if (!Number.isSafeInteger(maxTicks) || maxTicks < 1 || maxTicks > 24_000) {
+        throw new Error("Outcome-free mission-native trace maxTicks must be an integer in [1, 24000]");
+    }
     const telemetry: BuildingEliminationTelemetryEvent[] = [];
     const candidate = policy === null
         ? factory.create(`Candidate_${country}_${candidateSlot}`, country)
@@ -203,7 +208,7 @@ export const runMissionNativeCloseoutTrace = async (args: {
         requestedEngineSeed,
         [{ agent: candidate, identity: "candidate" }, { agent: baseline, identity: "baseline" }],
         async (game) => {
-            for (let tick = 1; tick <= MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_MAX_TICKS; tick += 1) {
+            for (let tick = 1; tick <= maxTicks; tick += 1) {
                 if (game.isFinished()) {
                     throw new Error(`Outcome-free mission-native game ended before tick cap at ${tick}`);
                 }
