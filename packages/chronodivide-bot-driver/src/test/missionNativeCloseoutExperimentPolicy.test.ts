@@ -2,14 +2,32 @@ import { describe, expect, it } from "vitest";
 import { MissionNativeCloseoutPolicyV35 } from "../training/missionNativeCloseoutPolicyV35.js";
 import {
     MISSION_NATIVE_CLOSEOUT_ARM_ORDER,
+    MISSION_NATIVE_CLOSEOUT_ARM_ORDER_V2,
     MISSION_NATIVE_CLOSEOUT_V34_POLICY_ID,
     MISSION_NATIVE_CLOSEOUT_V35_POLICY_ID,
+    MISSION_NATIVE_CLOSEOUT_V37_POLICY_ID,
     buildMissionNativeCloseoutArms,
+    buildMissionNativeCloseoutArmsV2,
     missionNativeCloseoutExperimentPolicySha256,
     validateMissionNativeCloseoutExperimentPolicy,
 } from "../training/missionNativeCloseoutExperimentPolicy.js";
 
 describe("mission-native closeout experiment policies", () => {
+    it("freezes exact Supalosa, valid V34, and V37 in V2 causal order", () => {
+        const arms = buildMissionNativeCloseoutArmsV2();
+        expect(arms.map(({ armId }) => armId)).toEqual(MISSION_NATIVE_CLOSEOUT_ARM_ORDER_V2);
+        expect(arms.map(({ policy }) => policy.missionPolicyId)).toEqual([
+            null,
+            MISSION_NATIVE_CLOSEOUT_V34_POLICY_ID,
+            MISSION_NATIVE_CLOSEOUT_V37_POLICY_ID,
+        ]);
+        expect(new Set(arms.map(({ policyId }) => policyId)).size).toBe(3);
+        for (const arm of arms) {
+            expect(validateMissionNativeCloseoutExperimentPolicy(arm.policy)).toEqual(arm.policy);
+            expect(missionNativeCloseoutExperimentPolicySha256(arm.policy)).toBe(arm.policyId);
+        }
+    });
+
     it("freezes exact Supalosa, V34, and V35 in causal order", () => {
         const arms = buildMissionNativeCloseoutArms();
         expect(arms.map(({ armId }) => armId)).toEqual(MISSION_NATIVE_CLOSEOUT_ARM_ORDER);

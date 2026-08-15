@@ -106,7 +106,7 @@ const parseObservations = (
                 faction: ALLIED.has(shard.country) ? "Allied" : "Soviet",
                 seedBlockIndex: shard.seedBlockIndex,
                 candidateSlot: episode.candidateSlot,
-                armId: episode.armId,
+                armId: episode.armId as MissionNativeCloseoutArmId,
                 outcome: result.winner,
                 literalWin: result.winner === "candidate" ? 1 : 0,
                 score: result.winner === "candidate" ? 1 : result.winner === "baseline" ? 0 : 0.5,

@@ -38,6 +38,7 @@ import {
 } from "./literalBuildingEliminationEndpoint.js";
 import { MissionNativeCloseoutOpenDevelopmentEpisodeResult } from "./missionNativeCloseoutOpenDevelopmentEpisode.js";
 import { parseMissionNativeCloseoutOpenDevelopmentRunPlan, sha256File } from "./missionNativeCloseoutOpenDevelopmentPlanRunner.js";
+import { validateMissionNativeCloseoutV37ProgressTelemetry } from "./missionNativeCloseoutGateV37.js";
 import { derivePairedEngineSeed } from "../benchmark/seededOfflineGame.js";
 
 type RecordValue = Record<string, unknown>;
@@ -379,7 +380,7 @@ export const validateMissionNativeCloseoutOpenDevelopmentResult = (
         mapName: string;
         mapSha256: string;
         policyId: string;
-        candidateCore: "external_supalosa" | "mission_native_v34" | "mission_native_v35";
+        candidateCore: "external_supalosa" | "mission_native_v34" | "mission_native_v35" | "mission_native_v37";
         missionPolicyId: string | null;
         informationBoundary: "none" | "visible_memory" | "public_complete_state";
         candidateSlot: 0 | 1;
@@ -443,6 +444,12 @@ export const validateMissionNativeCloseoutOpenDevelopmentResult = (
     ) throw new Error(`Mission-native V34 completion ${expected.episodeId} emitted V35 deadline telemetry`);
     if (expected.candidateCore === "mission_native_v35") {
         validateMissionNativeCloseoutV35FallbackTelemetry(value.policyTelemetry as unknown as RecordValue[], expected.episodeId);
+    }
+    if (expected.candidateCore === "mission_native_v37") {
+        validateMissionNativeCloseoutV37ProgressTelemetry(
+            value.policyTelemetry as BuildingEliminationTelemetryEvent[],
+            value.ticks as number,
+        );
     }
     const terminal = value.terminal;
     if (

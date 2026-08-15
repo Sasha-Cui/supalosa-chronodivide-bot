@@ -237,7 +237,7 @@ export const runMissionNativeCloseoutOpenDevelopmentPlanFromEnvironment = async 
         mixDir,
         maps: [plan.family.mapName],
         effectiveConfig: {
-            runner: "missionNativeCloseoutOpenDevelopmentPlanRunner-v2",
+            runner: "missionNativeCloseoutOpenDevelopmentPlanRunner-v3-v37-compatible",
             planPath,
             planSha256,
             familyId: plan.family.familyId,
@@ -279,6 +279,8 @@ export const runMissionNativeCloseoutOpenDevelopmentPlanFromEnvironment = async 
         path.join(driverRoot, "dist", "training", "missionNativeCloseoutPolicyV34.js"),
         path.join(driverRoot, "src", "training", "missionNativeCloseoutPolicyV35.ts"),
         path.join(driverRoot, "dist", "training", "missionNativeCloseoutPolicyV35.js"),
+        path.join(driverRoot, "src", "training", "missionNativeCloseoutPolicyV37.ts"),
+        path.join(driverRoot, "dist", "training", "missionNativeCloseoutPolicyV37.js"),
         path.join(driverRoot, "src", "training", "missionNativeCloseoutExperimentPolicy.ts"),
         path.join(driverRoot, "dist", "training", "missionNativeCloseoutExperimentPolicy.js"),
     ];
@@ -379,7 +381,16 @@ export const runMissionNativeCloseoutOpenDevelopmentPlanFromEnvironment = async 
     };
     fs.writeFileSync(summaryPath, JSON.stringify(summary, null, 2), { flag: "wx" });
     appendJsonLine(eventsPath, { event: "run_complete", summary });
-    console.log(JSON.stringify(summary));
+    console.log(JSON.stringify({
+        status: summary.status,
+        runId: summary.runId,
+        requestedLaunches: summary.requestedLaunches,
+        accountedLaunches: summary.accountedLaunches,
+        technicalFailures: summary.technicalFailures,
+        complete: summary.complete,
+        technicallyClean: summary.technicallyClean,
+        outcomesSealedUntilController: true,
+    }));
     if (technicalFailures > 0) process.exitCode = 2;
 };
 
