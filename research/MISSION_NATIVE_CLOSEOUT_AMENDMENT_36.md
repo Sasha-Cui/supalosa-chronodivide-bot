@@ -1,108 +1,100 @@
 # Mission-Native Closeout: Amendment 36
 
-Date: 2026-08-15
+Date: 2026-08-14
 
-Status: **V35 open-development technical failure; prospective V36 no-owner recovery freeze**
+Status: **failed V28-R2 focused gate and prospective V29 preterminal force-certification freeze**
 
-## Preserved V35 campaign disposition
+## Preserved V28-R2 result
 
-The frozen V35 open-development campaign launched all 540 scheduled games in
-90 family-country shards under Slurm account `pi_jss233`. Every shard completed
-with exit `0:0`, all 90 summaries exist, and no shard stderr file is nonempty.
-The games are preserved and are not rerun.
+The V28-R2 focused gate ran exactly once as Slurm job `22241967` under account
+`pi_jss233`, from clean tracked `main` source
+`a985f9d0ede83893eec95d97f3a1475567f5af3d`. The unchanged V28 policy identifier
+was `7a831e109153a56f892529a41250c7bf77b5d0a5e8e6ff88684472d4c86d8c73`;
+the pinned external Supalosa baseline remained
+`165b77a71d0cf5ebd27c65b19d0486bcbae78d0f` with a clean tracked tree.
 
-The original dependent controller, job `22267947`, was cancelled while still
-pending because a pre-unblinding audit found that its intervention-exposure
-gate was weaker than the frozen protocol. Corrected controller job `22268863`
-failed before analysis on an event-sequencing validator defect. After that
-defect was repaired, controller job `22268924` failed before analysis on a real
-protocol violation: at least one V35 deadline fallback released its force,
-suspended the overlay, and replanned at the exact 180-tick boundary, but no
-unit-owning Supalosa predecessor attack mission appeared during the interval.
+- artifact: `research-evidence/mission-native-closeout/outcome-blind-focused-gate-v28-r2/22241967/focused-gate-v28-r2.json`
+- artifact SHA-256: `4c63e66675c346039da295c31e00523e109e0422221d94e6e1c82e071b3c0537`
+- scheduler: `FAILED`, exit `1:0`, elapsed `00:02:18`
+- artifact status: `FAIL_OUTCOME_FREE_MISSION_NATIVE_CLOSEOUT_FOCUSED_GATE_V28_R2`
+- four games; both same-seed repeats were exact; no win, loss, draw, score, or other competitive outcome was serialized or inspected
 
-The frozen protocol requires predecessor ownership for every V35 fallback.
-Therefore this campaign is technically invalid. Neither corrected controller
-created a technical-gate artifact or an open-development analysis artifact.
-No win, loss, draw, score, terminal tick, or other competitive outcome was
-inspected. The sealed confirmatory population remains unauthorized.
+The V28-R2 validator passed the American row. A complete-route-feasible group
+of ten infantry launched at tick 2700, transferred all ten expected units, and
+serialized 63 points of physical enemy-building damage. The gate nevertheless
+failed globally because this seed family did not expose a route-infeasible veto.
 
-The immutable disposition record is:
+More importantly, the African row failed its per-row contract. A direct
+building-feasibility certificate launched seventeen infantry at tick 2700 with
+predicted building completion in 289.587 ticks and predicted survival of
+400.317 ticks. All seventeen expected units transferred exactly, but the row
+serialized zero physical building damage. Public self-snapshots showed the
+assigned group falling from 17 living units at tick 2700 to 12 at tick 3000,
+7 at tick 3300, 1 at tick 3600, and 0 at tick 3900. This is a false-positive
+preterminal conversion certificate, not a validator failure.
 
-- `research-evidence/mission-native-closeout/open-development-v1/campaign-0b2b612-v1/results/campaign-invalid-no-outcome-access.txt`
-- SHA-256: `9d820f9b77415964e5a2470ec02f3de6faa65d379ba7cf4fcf5d0c4b24997c72`
+These are outcome-blind mechanism observations. Job `22241967` remains failed
+and its seed is never reused.
 
-## Failure interpretation
+## Causal interpretation
 
-The failed fallback is a controller-liveness defect, not evidence about
-competitive performance. Suspending the closeout layer for a fixed interval is
-useful only when Supalosa actually takes control and continues combat. If no
-predecessor mission owns the released units, the controller has converted a
-stalled objective attack into bounded passive waiting. Replanning only at the
-end of the full fallback interval violates the intended continuous-offense
-doctrine even though the interval is finite.
+V28 repaired the readiness-ownership veto by making the actual transferred set
+authoritative, but it also allowed objective feasibility to bypass actual force
+composition completely. That permitted early all-infantry preterminal waves.
+Across V28-R2, the nominal race model did not reliably certify physical
+conversion: the American wave produced only limited damage and the African wave
+produced none before complete attrition.
 
-## V36 no-owner recovery contract
+This does not justify a universal tank requirement for the literal final
+building. When exactly one building remains, an exposed winning strike still
+dominates fighting irrelevant forces. It does justify requiring a more robust
+actual transferred force before sacrificing the active vanguard while several
+buildings remain.
 
-V36 inherits V35's building and blocker no-progress deadlines unchanged. It
-adds one causal mechanism: a fallback must either establish predecessor attack
-ownership or end early and replan.
+## Frozen V29 repair
 
-1. On a physical no-progress deadline, release the overlay force, clear stale
-   target and blocker commitments, and suspend all closeout overlay missions.
-2. Give the unchanged Supalosa predecessor a bounded ownership grace interval.
-   Predecessor ownership means that a preemptible Supalosa attack or retreat
-   mission owns at least one combat unit; an empty mission name is insufficient.
-3. If predecessor ownership occurs, retain the existing bounded fallback and
-   replan no later than its frozen outer boundary.
-4. If no predecessor ownership occurs by the grace boundary, emit an explicit
-   `fallback_no_predecessor_replan` event, clear the fallback immediately, and
-   evaluate a fresh building, minimum-blocker, search, capability, or bounded-
-   defense action on that same controller update. Do not wait out the unused
-   remainder of the fallback interval.
-5. A no-owner recovery may not recreate the same stale commitment without a
-   change in target feasibility, blocker identity, physical progress state, or
-   assigned force. Repeated no-owner recoveries are counted and bounded by the
-   compatibility gate.
+V29 preserves V28 except for one new policy field:
 
-This amendment does not define continuous offense as indiscriminate fighting.
-The literal objective remains destruction of every enemy building. The policy
-compares the direct building mission with the minimum blocker-then-building
-mission. Clearing the enemy army is preferred only when it is necessary for the
-strike or makes subsequent building destruction faster or feasible. With one
-reachable enemy building remaining, a feasible lethal building strike has
-lexicographic priority even if a much larger off-route army survives.
+`preterminalObjectiveFeasibilityRequiresTransferredCapability: true`
 
-## Required outcome-blind evidence
+When more than one enemy building remains, direct-building and complete-route
+feasibility may bypass readiness-mission ownership counts but may not bypass the
+actual transferred ground-assault certificate. The transfer-certified set must
+contain at least one side-appropriate main tank and at least one compatible
+screen. Until then, compatible units remain under active Supalosa predecessor
+combat while readiness production continues and feasibility is re-evaluated.
 
-Before a fresh outcome-bearing screen, V36 must pass deterministic and live
-tests establishing:
+When exactly one enemy building remains, the objective-feasibility override is
+unchanged: a feasible direct or complete-route strike may launch without the
+preterminal composition requirement. Thus a reachable last-building kill still
+has lexicographic priority over an arbitrarily large off-route enemy army.
 
-- unchanged disabled behavior and unchanged V34/V35 behavior;
-- exact building and blocker deadline timing;
-- overlay-force release and overlay suspension;
-- the ordinary predecessor-owned fallback path;
-- the no-predecessor grace expiry and same-update replan path;
-- no passive interval after a no-owner recovery;
-- deterministic terminal-building priority with 100 irrelevant tanks;
-- minimum blocker clearance when the same force truly prevents the strike;
-- all-nine-country and reciprocal-slot exposure; and
-- no outcome fields in compatibility artifacts.
+Activation telemetry advances to schema 23 and records whether objective
+feasibility is currently allowed to bypass composition. Tests must establish:
 
-The full-population gate must accept only episodes in which every V36 fallback
-either demonstrates correlated predecessor ownership or demonstrates the exact
-bounded no-owner recovery and immediate replan. Aggregate exposure elsewhere
-cannot rescue a missing country-slot cell.
+1. preterminal direct and complete-route infantry-only forces do not launch;
+2. the same preterminal missions launch once the actual transfer-certified set
+   contains a main tank and screen, even when readiness-owned counts are zero;
+3. an infantry-only direct or complete-route mission may still launch when
+   exactly one building remains;
+4. blocked preterminal forces retain active predecessor delegation and
+   production; and
+5. the final-building-versus-100-off-route-tanks rule remains unchanged.
 
-## Fresh evaluation boundary
+## Frozen V29 focused gate
 
-V35 outcomes remain unopened permanently. V36 selection returns to the same
-permanently open development families with a newly frozen protocol, unused
-fresh paired seeds, reciprocal starts, all nine countries, and exact Supalosa
-control. V34 remains the no-deadline mechanism baseline; V35 is not reused as
-an outcome arm because its technical contract failed in the preserved
-population. No sealed confirmatory identity may be read unless the fresh V36
-campaign passes its complete technical gate and prespecified positive
-competitive signal.
+The outcome-blind V29 focused gate uses unused valid seed base
+`4_288_000_000`, repeats the American and African rows exactly, and serializes
+no competitive outcome. Every preterminal objective-feasible evaluation with a
+composition-incomplete transferred set must remain blocked. Every preterminal
+launch must have an actual transferred main tank and screen; terminal launches
+may use the literal-objective override. At least one row must expose the new
+preterminal block, and at least one row must subsequently launch a certified
+force, hand off every expected unit, and cause positive physical building
+damage. No resignation is permitted.
 
-This amendment is a prospective implementation and evaluation specification,
-not evidence that V36 reduces draws or beats Supalosa.
+The new gate does not require a fresh route-infeasible row: V29 does not change
+V28's full-route requirement, while the new intervention is specifically the
+composition-incomplete but nominally objective-feasible state. All-nine-country
+reciprocal-slot outcome-blind evaluation remains required after the focused
+gate. No sealed test-family outcome may be opened before both gates pass.
