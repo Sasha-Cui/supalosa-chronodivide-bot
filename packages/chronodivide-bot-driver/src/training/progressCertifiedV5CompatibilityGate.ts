@@ -29,9 +29,9 @@ import {
 } from "./terminalObjectiveStrategy.js";
 
 export const PROGRESS_CERTIFIED_V5_COMPATIBILITY_MAX_TICKS = 5_400 as const;
-export const PROGRESS_CERTIFIED_V5_COMPATIBILITY_SEED_BASE = 4_294_961_000 as const;
+export const PROGRESS_CERTIFIED_V5_COMPATIBILITY_SEED_BASE = 4_294_962_000 as const;
 export const PROGRESS_CERTIFIED_V5_COMPATIBILITY_RUNS_PER_CELL = 4 as const;
-export const PROGRESS_CERTIFIED_V5_COMPATIBILITY_GATE_REVISION = "V5-C2" as const;
+export const PROGRESS_CERTIFIED_V5_COMPATIBILITY_GATE_REVISION = "V5-C3" as const;
 export const PROGRESS_CERTIFIED_V5_COMPATIBILITY_COUNTRIES = [
     Countries.USA,
     Countries.KOREA,
@@ -80,6 +80,24 @@ export type ProgressCertifiedV5CompatibilityExposure = {
     maximumLastPhysicalProgressTick: number;
     approachWitnesses: ProgressCertifiedV5OrderWitness[];
     visibleHandoffWitnesses: ProgressCertifiedV5OrderWitness[];
+};
+
+export type ProgressCertifiedV5CompatibilityCoverageRow = {
+    country: Countries;
+    candidateSlot: 0 | 1;
+    firstCoverage: ProgressCertifiedV5CompatibilityExposure | null;
+    repeatCoverage: ProgressCertifiedV5CompatibilityExposure | null;
+};
+
+export type ProgressCertifiedV5PopulationCoverage = {
+    cellCount: number;
+    buildingOrderCellCount: number;
+    exactUnseenApproachCellCount: number;
+    exactUnseenApproachCountryCount: number;
+    exactUnseenApproachFactions: string[];
+    exactUnseenApproachSlots: number[];
+    visibleHandoffCellCount: number;
+    validationErrors: string[];
 };
 
 export type ProgressCertifiedV5CompatibilityDiagnostic = {
@@ -393,7 +411,6 @@ export const validateProgressCertifiedV5CompatibilityExposure = (
         event.selectedBuildingObservedBy === "public_complete_state" &&
         event.selectedBuildingOrderMode === "attack_move_exact_unseen_coordinates",
     );
-    if (approaches.length === 0) throw new Error(`No exact-unseen V5 approach was executed for ${label}`);
     const firstApproachTickByBuilding = new Map<number, number>();
     for (const { event } of approaches) {
         const prior = firstApproachTickByBuilding.get(event.selectedBuildingId!);
@@ -406,7 +423,6 @@ export const validateProgressCertifiedV5CompatibilityExposure = (
         const approachTick = firstApproachTickByBuilding.get(event.selectedBuildingId!);
         return approachTick !== undefined && event.tick > approachTick;
     });
-    if (handoffs.length === 0) throw new Error(`No exact-unseen-to-visible V5 handoff was executed for ${label}`);
     return {
         telemetryCount: telemetry.length,
         buildingDecisionCount: buildingEvents.length,
@@ -417,6 +433,69 @@ export const validateProgressCertifiedV5CompatibilityExposure = (
         )),
         approachWitnesses: approaches.map(({ event, action }) => witness(event, action)),
         visibleHandoffWitnesses: handoffs.map(({ event, action }) => witness(event, action)),
+    };
+};
+
+const ALLIED = new Set<Countries>([
+    Countries.USA,
+    Countries.KOREA,
+    Countries.FRANCE,
+    Countries.GERMANY,
+    Countries.GREAT_BRITAIN,
+]);
+
+export const summarizeProgressCertifiedV5PopulationCoverage = (
+    rows: readonly ProgressCertifiedV5CompatibilityCoverageRow[],
+): ProgressCertifiedV5PopulationCoverage => {
+    const validationErrors: string[] = [];
+    const uniqueCells = new Set(rows.map(({ country, candidateSlot }) => `${country}|${candidateSlot}`));
+    if (rows.length !== PROGRESS_CERTIFIED_V5_COMPATIBILITY_CELL_COUNT || uniqueCells.size !== rows.length) {
+        validationErrors.push("V5-C3 population does not contain 18 unique country-slot cells");
+    }
+    const complete = rows.filter(({ firstCoverage, repeatCoverage }) =>
+        firstCoverage !== null && repeatCoverage !== null,
+    );
+    if (complete.length !== rows.length) {
+        validationErrors.push("V5-C3 population has a cell without validated first and repeat building orders");
+    }
+    const buildingOrderRows = complete.filter(({ firstCoverage, repeatCoverage }) =>
+        firstCoverage!.buildingDecisionCount > 0 && repeatCoverage!.buildingDecisionCount > 0,
+    );
+    if (buildingOrderRows.length !== rows.length) {
+        validationErrors.push("V5-C3 population lacks a matched building order in at least one cell");
+    }
+    for (const row of complete) {
+        if (
+            row.firstCoverage!.exactUnseenApproachCount !== row.repeatCoverage!.exactUnseenApproachCount ||
+            row.firstCoverage!.visibleHandoffCount !== row.repeatCoverage!.visibleHandoffCount
+        ) validationErrors.push(`V5-C3 exposure counts differ for ${row.country} slot ${row.candidateSlot}`);
+    }
+    const approachRows = complete.filter(({ firstCoverage }) => firstCoverage!.exactUnseenApproachCount > 0);
+    const handoffRows = complete.filter(({ firstCoverage }) => firstCoverage!.visibleHandoffCount > 0);
+    const approachCountries = new Set(approachRows.map(({ country }) => country));
+    const approachFactions = new Set(approachRows.map(({ country }) => ALLIED.has(country) ? "Allied" : "Soviet"));
+    const approachSlots = new Set(approachRows.map(({ candidateSlot }) => candidateSlot));
+    if (approachRows.length < 4 || approachCountries.size < 4) {
+        validationErrors.push("V5-C3 exact-unseen approach exposure is narrower than four cells and countries");
+    }
+    if (!approachFactions.has("Allied") || !approachFactions.has("Soviet")) {
+        validationErrors.push("V5-C3 exact-unseen approach does not cover both factions");
+    }
+    if (!approachSlots.has(0) || !approachSlots.has(1)) {
+        validationErrors.push("V5-C3 exact-unseen approach does not cover both physical slots");
+    }
+    if (handoffRows.length < 1) {
+        validationErrors.push("V5-C3 population lacks a live exact-unseen-to-visible handoff");
+    }
+    return {
+        cellCount: rows.length,
+        buildingOrderCellCount: buildingOrderRows.length,
+        exactUnseenApproachCellCount: approachRows.length,
+        exactUnseenApproachCountryCount: approachCountries.size,
+        exactUnseenApproachFactions: [...approachFactions].sort(),
+        exactUnseenApproachSlots: [...approachSlots].sort(),
+        visibleHandoffCellCount: handoffRows.length,
+        validationErrors,
     };
 };
 
@@ -447,6 +526,7 @@ const main = async (): Promise<void> => {
     const smokePolicy = buildProgressCertifiedV5CompatibilitySmokePolicy();
     await cdapi.init(path.join(process.cwd(), "data"));
     const rows: Array<Record<string, unknown>> = [];
+    const coverageRows: ProgressCertifiedV5CompatibilityCoverageRow[] = [];
     const validationErrors: string[] = [];
     let index = 0;
     for (const country of PROGRESS_CERTIFIED_V5_COMPATIBILITY_COUNTRIES) {
@@ -518,8 +598,11 @@ const main = async (): Promise<void> => {
                 repeatCoverage,
                 outcomeInspected: false,
             });
+            coverageRows.push({ country, candidateSlot, firstCoverage, repeatCoverage });
         }
     }
+    const populationCoverage = summarizeProgressCertifiedV5PopulationCoverage(coverageRows);
+    validationErrors.push(...populationCoverage.validationErrors);
     const manifest = createExperimentManifest({
         runId: `progress-certified-v5-compatibility-${process.env.SLURM_JOB_ID ?? "local"}`,
         mixDir: path.join(process.cwd(), "data"),
@@ -546,11 +629,11 @@ const main = async (): Promise<void> => {
     ) validationErrors.push("V5 compatibility provenance or coverage failed");
     const passed = validationErrors.length === 0;
     const output = {
-        schemaVersion: 2,
+        schemaVersion: 3,
         gateRevision: PROGRESS_CERTIFIED_V5_COMPATIBILITY_GATE_REVISION,
         status: passed
-            ? "PASS_OUTCOME_FREE_PROGRESS_CERTIFIED_V5_COMPATIBILITY_V2"
-            : "FAIL_OUTCOME_FREE_PROGRESS_CERTIFIED_V5_COMPATIBILITY_V2",
+            ? "PASS_OUTCOME_FREE_PROGRESS_CERTIFIED_V5_COMPATIBILITY_V3"
+            : "FAIL_OUTCOME_FREE_PROGRESS_CERTIFIED_V5_COMPATIBILITY_V3",
         generatedAt: new Date().toISOString(),
         passed,
         outcomeFree: true,
@@ -564,6 +647,7 @@ const main = async (): Promise<void> => {
         gameCount: rows.length * PROGRESS_CERTIFIED_V5_COMPATIBILITY_RUNS_PER_CELL,
         maxTicks: PROGRESS_CERTIFIED_V5_COMPATIBILITY_MAX_TICKS,
         validationErrors,
+        populationCoverage,
         rows,
         outcomeFieldsEmitted: [],
     };

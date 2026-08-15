@@ -63,4 +63,4 @@ export OUT_FILE="$JOB_ROOT/compatibility.json"
 "$NODE_BIN" --es-module-specifier-resolution=node \
     dist/training/progressCertifiedV5CompatibilityGate.js
 sha256sum "$OUT_FILE" >"$JOB_ROOT/compatibility.sha256"
-printf '%s\n' PASS_OUTCOME_FREE_PROGRESS_CERTIFIED_V5_COMPATIBILITY_V2 >"$JOB_ROOT/COMPLETE"
+printf '%s\n' PASS_OUTCOME_FREE_PROGRESS_CERTIFIED_V5_COMPATIBILITY_V3 >"$JOB_ROOT/COMPLETE"

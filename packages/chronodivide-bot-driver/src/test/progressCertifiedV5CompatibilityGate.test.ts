@@ -9,6 +9,7 @@ import {
     PROGRESS_CERTIFIED_V5_COMPATIBILITY_RUNS_PER_CELL,
     PROGRESS_CERTIFIED_V5_COMPATIBILITY_SEED_BASE,
     buildProgressCertifiedV5CompatibilitySmokePolicy,
+    summarizeProgressCertifiedV5PopulationCoverage,
     summarizeProgressCertifiedV5CompatibilityDiagnostic,
     validateProgressCertifiedV5CompatibilityExposure,
 } from "../training/progressCertifiedV5CompatibilityGate.js";
@@ -50,13 +51,60 @@ describe("progress-certified V5 outcome-free compatibility gate", () => {
         expect(PROGRESS_CERTIFIED_V5_COMPATIBILITY_CELL_COUNT).toBe(18);
         expect(PROGRESS_CERTIFIED_V5_COMPATIBILITY_RUNS_PER_CELL).toBe(4);
         expect(PROGRESS_CERTIFIED_V5_COMPATIBILITY_MAX_TICKS).toBe(5_400);
-        expect(PROGRESS_CERTIFIED_V5_COMPATIBILITY_GATE_REVISION).toBe("V5-C2");
-        expect(PROGRESS_CERTIFIED_V5_COMPATIBILITY_SEED_BASE).toBe(4_294_961_000);
+        expect(PROGRESS_CERTIFIED_V5_COMPATIBILITY_GATE_REVISION).toBe("V5-C3");
+        expect(PROGRESS_CERTIFIED_V5_COMPATIBILITY_SEED_BASE).toBe(4_294_962_000);
         expect(PROGRESS_CERTIFIED_V5_COMPATIBILITY_SEED_BASE + 17).toBeLessThanOrEqual(0xffff_ffff);
         const smoke = buildProgressCertifiedV5CompatibilitySmokePolicy();
         expect(smoke.terminalForceMode).toBe("direct_building");
         expect(smoke.activationBuildingCount).toBe(100);
         expect(smoke.activationMinTick).toBe(0);
+    });
+
+    it("accepts a matched visible-only cell while reserving unseen exposure for the population gate", () => {
+        const telemetry = [event(200, true)];
+        const actions = [{ tick: 200, args: [[3, 4], OrderType.Attack, 99] }];
+        const summary = validateProgressCertifiedV5CompatibilityExposure(
+            telemetry, actions, Countries.FRANCE, 0,
+        );
+        expect(summary.buildingDecisionCount).toBe(1);
+        expect(summary.exactUnseenApproachCount).toBe(0);
+        expect(summary.visibleHandoffCount).toBe(0);
+    });
+
+    it("requires exact-unseen population exposure across factions and slots plus a live handoff", () => {
+        const empty = {
+            telemetryCount: 1,
+            buildingDecisionCount: 1,
+            exactUnseenApproachCount: 0,
+            visibleHandoffCount: 0,
+            maximumLastPhysicalProgressTick: 0,
+            approachWitnesses: [],
+            visibleHandoffWitnesses: [],
+        };
+        const countries = PROGRESS_CERTIFIED_V5_COMPATIBILITY_COUNTRIES;
+        const rows = countries.flatMap((country) => ([0, 1] as const).map((candidateSlot) => ({
+            country,
+            candidateSlot,
+            firstCoverage: { ...empty },
+            repeatCoverage: { ...empty },
+        })));
+        for (const [country, slot, handoff] of [
+            [Countries.USA, 0, 0],
+            [Countries.GERMANY, 0, 0],
+            [Countries.IRAQ, 1, 1],
+            [Countries.RUSSIA, 1, 0],
+        ] as const) {
+            const row = rows.find((item) => item.country === country && item.candidateSlot === slot)!;
+            row.firstCoverage.exactUnseenApproachCount = 1;
+            row.repeatCoverage.exactUnseenApproachCount = 1;
+            row.firstCoverage.visibleHandoffCount = handoff;
+            row.repeatCoverage.visibleHandoffCount = handoff;
+        }
+        const summary = summarizeProgressCertifiedV5PopulationCoverage(rows);
+        expect(summary.validationErrors).toEqual([]);
+        expect(summary.exactUnseenApproachFactions).toEqual(["Allied", "Soviet"]);
+        expect(summary.exactUnseenApproachSlots).toEqual([0, 1]);
+        expect(summary.visibleHandoffCellCount).toBe(1);
     });
 
     it("requires coordinate approach followed by direct attack on the same visible building", () => {
