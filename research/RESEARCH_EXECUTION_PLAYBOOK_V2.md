@@ -42,10 +42,20 @@ single nearby target:
    damageable, keep Supalosa's ordinary combat active while searching or
    producing the missing movement or damage capability.
 
-Choose the feasible mission with the shortest conservative time to the next
-building destruction. Do not choose force clearance merely because the enemy
-army is valuable or close. Do not choose a suicidal building attack merely
-because buildings define the endpoint.
+Choose the feasible mission with the shortest conservative time to zero enemy
+buildings. Time to the next building destruction is a useful local proxy, but
+it must not reward a quick kill that strands the army or removes the capability
+needed to reach the remaining buildings. Do not choose force clearance merely
+because the enemy army is valuable or close. Do not choose a suicidal building
+attack merely because buildings define the endpoint.
+
+The comparison must be counterfactual: estimate what happens if the strike
+group attacks the building now, if it removes only route-relevant blockers
+first, and if it clears the opposing army first. Count an enemy unit as relevant
+only when it can intercept the strike, block the route, destroy a capability
+that the strike requires, or prevent a subsequent building kill. This avoids
+the common failure mode in which combat looks productive while terminal
+progress stops.
 
 ### Final-building rule
 
@@ -74,6 +84,15 @@ destruction, certified route improvement, completed search coverage, or
 creation of a missing capability. Regroup loops, repeated fallback without an
 active predecessor-owned mission, and repeated orders without physical or
 certified progress are liveness failures.
+
+The policy must expose the distinction in telemetry. For every closeout mission,
+record the estimated direct-building completion time, blocker-first completion
+time, force-clearance completion time, selected mission, selected target,
+route-relevant forces, time since last physical progress, and reason for every
+replan. In particular, measure last-building opportunity latency: the ticks
+between the first feasible terminal strike and the attack order, and between the
+attack order and physical destruction. Frequent stalemates with an army capable
+of attacking are policy failures, not acceptable neutral outcomes.
 
 Every mission therefore needs a bounded no-progress deadline. On expiry, clear
 the stale commitment, permit active predecessor control for a bounded interval,
@@ -145,6 +164,29 @@ game screenshots are written only after the primary comparison and uncertainty
 analysis are complete. Screenshots illustrate telemetry-supported tactics; they
 do not substitute for population evidence.
 
+### 8. Optimize the research loop, not just the game policy
+
+Use the cheapest artifact that can answer the current question. A deterministic
+state test should establish a decision rule; a short outcome-blind live gate
+should establish ownership, execution, and telemetry; only a complete
+competitive population should estimate win probability. Do not pay for a large
+outcome screen to discover an interface error, an unexposed branch, or an idle
+fallback.
+
+Each development version should state one dominant population-level failure
+class and one intended causal repair before implementation. Keep the predecessor
+and exact Supalosa as simultaneous controls. If a version fails its frozen
+positive gate, use the complete open-development aggregate to select the next
+mechanism, assign a new version and fresh seeds, and preserve the failed version
+without selective reruns. Confirmation data remains untouched throughout this
+loop.
+
+Prefer fail-closed arrays with one immutable manifest, small homogeneous shards,
+structured progress telemetry, and a dependent controller that is incapable of
+aggregating a partial population. Monitor milestones rather than individual
+game outcomes. This makes scheduler failures cheap to diagnose and prevents
+research decisions from being driven by whichever games finish first.
+
 ## Staged empirical ladder
 
 ### Gate A: deterministic decision tests
@@ -188,17 +230,23 @@ ablations after fixing the primary result.
 - The V35 open-development population is permanently invalid without outcome
   access. Its live technical evidence exposed an ownerless predecessor-fallback
   state, so it cannot support a policy claim.
-- V36 adds bounded recovery from that ownerless state while leaving prior policy
-  semantics unchanged when a predecessor owns units.
-- V36-R1 array `22270897` passed its complete 18-cell outcome-blind technical
-  gate, but none of its traces exposed the new no-owner recovery branch. It
-  therefore established ordinary liveness but not the behavior specific to the
-  V36 repair.
-- V36-R2 is prospectively frozen to extend the live exposure horizon on fresh
-  seeds. It must exhibit at least one exact no-owner recovery and remain clean
-  across all planned cells before any competitive outcome screen.
+- V37 isolates Supalosa's resignation behavior from the literal destruction
+  endpoint and adds bounded recovery while preserving active predecessor-owned
+  missions.
+- V37-R2 completed its frozen 18-cell outcome-blind gate under Slurm account
+  `pi_jss233`. It exposed both predecessor-owned fallback and no-owner recovery,
+  with no incomplete traces or ownership-loss recovery failures.
+- V37-C1 completed a fresh 72-trace, all-nine-country, reciprocal compatibility
+  gate. It established intervention exposure, physical building and blocker
+  progress, exclusive scheduling, objective-race allocation, handoff behavior,
+  and exact disabled-overlay compatibility without reading outcomes.
+- The V37 positive open-development protocol is frozen at commit `c311779`.
+  Its 540-game comparison covers ten permanently open map families, all nine
+  countries, reciprocal slots, exact external Supalosa, V34, and V37. No game
+  from this outcome-bearing population has been launched or inspected at this
+  checkpoint.
 
-These statements are engineering checkpoints, not evidence that V36 improves
+These statements are engineering checkpoints, not evidence that V37 improves
 win probability.
 
 ## Definition of done before paper writing
@@ -224,12 +272,21 @@ a candid no-go decision—not paper rhetoric.
 
 ## Immediate execution order
 
-1. Finish V36-R2 outcome-blind no-owner exposure without inspecting outcomes.
-2. Pass the broader V36 all-country reciprocal compatibility gate.
-3. Run a fresh open-development comparison against exact Supalosa and the last
-   valid predecessor policy.
-4. Use complete aggregate diagnostics to decide whether the closeout mechanism
-   improved literal wins and which failure class remains.
-5. Iterate prospectively on open families until a frozen positive policy exists.
-6. Only then enter fresh sealed confirmation, uncertainty analysis, ablations,
-   screenshot extraction, and paper writing.
+1. Implement and test the sealed V37 open-development runner, result validator,
+   aggregate, and fail-closed Slurm controller without changing the frozen
+   protocol.
+2. Pass an exact-commit preflight, then launch the complete 540-game population
+   once under `pi_jss233`; do not inspect shards or selectively rerun games.
+3. After every shard completes cleanly, inspect the single aggregate and apply
+   the prespecified positive gate.
+4. If the gate fails, identify one repeated failure class—especially idle
+   closeout, irrelevant-force diversion, last-building opportunity latency, or
+   insufficient attacker compatibility—and make one prospective repair on the
+   permanently open families.
+5. Repeat complete, versioned open-development screens with fresh seeds until a
+   policy passes; preserve every negative version and keep confirmation families
+   sealed.
+6. Freeze the selected policy, run fresh multi-family all-country confirmation,
+   uncertainty analysis, and narrow causal ablations.
+7. Extract annotated screenshots only from traceable confirmed games, then write
+   the paper around the measured result and mechanism.
