@@ -55,6 +55,7 @@ import { MissionNativeCloseoutPolicyV33 } from "./missionNativeCloseoutPolicyV33
 import { MissionNativeCloseoutPolicyV34 } from "./missionNativeCloseoutPolicyV34.js";
 import { MissionNativeCloseoutPolicyV35 } from "./missionNativeCloseoutPolicyV35.js";
 import { MissionNativeCloseoutPolicyV36 } from "./missionNativeCloseoutPolicyV36.js";
+import { MissionNativeCloseoutPolicyV37 } from "./missionNativeCloseoutPolicyV37.js";
 
 export const MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_MAX_TICKS = 5_400 as const;
 export const MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_ENGINE_SEED_BASE = 4_000_000_000 as const;
@@ -73,6 +74,8 @@ export type MissionNativeCloseoutRunTrace = {
     snapshots: Snapshot[];
     quitAttempts: { candidate: number; baseline: number };
     telemetry: BuildingEliminationTelemetryEvent[];
+    observedTicks: number;
+    engineFinishObservedAtTick: number | null;
 };
 
 const requiredPath = (name: string): string => {
@@ -165,6 +168,7 @@ export const runMissionNativeCloseoutTrace = async (args: {
     candidateSlot: 0 | 1;
     requestedEngineSeed: number;
     maxTicks?: number;
+    allowOutcomeFreeEngineFinishTruncation?: boolean;
     policy: MissionNativeCloseoutPolicyV5 | MissionNativeCloseoutPolicyV6 | MissionNativeCloseoutPolicyV7 |
         MissionNativeCloseoutPolicyV8 | MissionNativeCloseoutPolicyV9 | MissionNativeCloseoutPolicyV10 |
         MissionNativeCloseoutPolicyV11 | MissionNativeCloseoutPolicyV12 | MissionNativeCloseoutPolicyV13 |
@@ -178,12 +182,16 @@ export const runMissionNativeCloseoutTrace = async (args: {
         MissionNativeCloseoutPolicyV29 | MissionNativeCloseoutPolicyV30 |
         MissionNativeCloseoutPolicyV31 | MissionNativeCloseoutPolicyV32 |
         MissionNativeCloseoutPolicyV33 | MissionNativeCloseoutPolicyV34 |
-        MissionNativeCloseoutPolicyV35 | MissionNativeCloseoutPolicyV36 | null;
+        MissionNativeCloseoutPolicyV35 | MissionNativeCloseoutPolicyV36 | MissionNativeCloseoutPolicyV37 | null;
 }): Promise<MissionNativeCloseoutRunTrace> => {
     const { factory, mapName, country, candidateSlot, requestedEngineSeed, policy } = args;
     const maxTicks = args.maxTicks ?? MISSION_NATIVE_CLOSEOUT_COMPATIBILITY_MAX_TICKS;
     if (!Number.isSafeInteger(maxTicks) || maxTicks < 1 || maxTicks > 24_000) {
         throw new Error("Outcome-free mission-native trace maxTicks must be an integer in [1, 24000]");
+    }
+    const allowOutcomeFreeEngineFinishTruncation = args.allowOutcomeFreeEngineFinishTruncation ?? false;
+    if (typeof allowOutcomeFreeEngineFinishTruncation !== "boolean") {
+        throw new Error("Outcome-free engine-finish truncation flag must be boolean");
     }
     const telemetry: BuildingEliminationTelemetryEvent[] = [];
     const candidate = policy === null
@@ -202,6 +210,8 @@ export const runMissionNativeCloseoutTrace = async (args: {
     installActionTrace(candidate, actions, candidateQuit);
     installActionTrace(baseline, [], baselineQuit);
     const snapshots: Snapshot[] = [];
+    let observedTicks = 0;
+    let engineFinishObservedAtTick: number | null = null;
     await withSeededOfflineGame(
         cdapi,
         settings(mapName, candidate, baseline, candidateSlot),
@@ -210,9 +220,14 @@ export const runMissionNativeCloseoutTrace = async (args: {
         async (game) => {
             for (let tick = 1; tick <= maxTicks; tick += 1) {
                 if (game.isFinished()) {
+                    if (allowOutcomeFreeEngineFinishTruncation) {
+                        engineFinishObservedAtTick = tick;
+                        break;
+                    }
                     throw new Error(`Outcome-free mission-native game ended before tick cap at ${tick}`);
                 }
                 await game.update();
+                observedTicks = tick;
                 if (tick % 300 === 0) snapshots.push(snapshot(candidate, tick));
             }
         },
@@ -222,6 +237,8 @@ export const runMissionNativeCloseoutTrace = async (args: {
         snapshots,
         quitAttempts: { candidate: candidateQuit.attempts, baseline: baselineQuit.attempts },
         telemetry,
+        observedTicks,
+        engineFinishObservedAtTick,
     };
 };
 
