@@ -159,9 +159,12 @@ export const parseProgressCertifiedSacct = (raw: string, arrayJobId: string): Ma
     return tasks;
 };
 
-export const validateProgressCertifiedTelemetry = (value: unknown): TerminalObjectiveTelemetry => {
+export const validateProgressCertifiedTelemetry = (
+    value: unknown,
+    schemaVersion: 3 | 4 = 3,
+): TerminalObjectiveTelemetry => {
     if (
-        !isRecord(value) || value.schemaVersion !== 3 || !Number.isSafeInteger(value.tick) ||
+        !isRecord(value) || value.schemaVersion !== schemaVersion || !Number.isSafeInteger(value.tick) ||
         (value.tick as number) < 0 ||
         !new Set(["visible_memory", "public_complete_state"]).has(String(value.informationBoundary)) ||
         value.informationBoundary !== "public_complete_state" ||
@@ -172,6 +175,7 @@ export const validateProgressCertifiedTelemetry = (value: unknown): TerminalObje
     const allowed = new Set([
         "schemaVersion", "event", "informationBoundary", "tick", "mechanism", "decisionKind",
         "decisionReason", "selectedBuildingId", "selectedBuildingVisible", "selectedBuildingObservedBy",
+        "selectedBuildingCoordinates", "selectedBuildingOrderMode",
         "selectedAttackerIds",
         "blockerIds", "threatIds", "predictedCompletionTicks", "directCompletionTicks",
         "earliestLethalInterceptTick", "earliestBaseDestructionTick", "noProgressTicks",
@@ -214,6 +218,31 @@ export const validateProgressCertifiedTelemetry = (value: unknown): TerminalObje
     ) throw new Error("Progress-certified search coverage is outside [0,1]");
     if (value.selectedBuildingVisible !== undefined && typeof value.selectedBuildingVisible !== "boolean") {
         throw new Error("Progress-certified selected-building visibility is not boolean");
+    }
+    if (schemaVersion === 3 && (
+        value.selectedBuildingCoordinates !== undefined || value.selectedBuildingOrderMode !== undefined
+    )) throw new Error("Progress-certified schema-v3 telemetry contains visibility-aware fields");
+    if (schemaVersion === 4) {
+        const buildingDecision = value.decisionKind === "building_strike" ||
+            value.decisionKind === "terminal_candidate_strike";
+        if (buildingDecision) {
+            if (
+                !isRecord(value.selectedBuildingCoordinates) ||
+                !Number.isFinite(value.selectedBuildingCoordinates.x) ||
+                !Number.isFinite(value.selectedBuildingCoordinates.y)
+            ) throw new Error("Progress-certified schema-v4 building decision lacks finite coordinates");
+            if (
+                value.selectedBuildingVisible === true &&
+                value.selectedBuildingOrderMode !== "attack_visible_building"
+            ) throw new Error("Progress-certified visible building lacks direct-attack mode");
+            if (
+                value.selectedBuildingVisible === false &&
+                value.selectedBuildingObservedBy === "public_complete_state" &&
+                value.selectedBuildingOrderMode !== "attack_move_exact_unseen_coordinates"
+            ) throw new Error("Progress-certified exact unseen building lacks coordinate-approach mode");
+        } else if (
+            value.selectedBuildingCoordinates !== undefined || value.selectedBuildingOrderMode !== undefined
+        ) throw new Error("Progress-certified non-building decision contains visibility-aware fields");
     }
     if (value.terminalReserveReleased !== undefined && typeof value.terminalReserveReleased !== "boolean") {
         throw new Error("Progress-certified terminal-reserve release flag is not boolean");
@@ -296,6 +325,7 @@ export const validateProgressCertifiedResult = (
         policyId: string;
         candidateCore: "external_supalosa";
         informationBoundary: "none" | "visible_memory" | "public_complete_state";
+        telemetrySchemaVersion?: 3 | 4;
         candidateSlot: 0 | 1;
         country: string;
         seedBlockIndex: number;
@@ -320,6 +350,7 @@ export const validateProgressCertifiedResult = (
         value.policyInformationBoundary !== expected.informationBoundary ||
         value.endpointVersion !== LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION ||
         value.endpointSha256 !== LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256 ||
+        value.endpoint !== LITERAL_BUILDING_ELIMINATION_ENDPOINT ||
         value.seedBlockIndex !== expected.seedBlockIndex || value.requestedEngineSeed !== expected.requestedEngineSeed ||
         value.candidateSlot !== expected.candidateSlot || value.candidateCountry !== expected.country ||
         value.baselineCountry !== expected.country || value.maxTicks !== expected.maxTicks || value.shortGame !== false ||
@@ -349,7 +380,7 @@ export const validateProgressCertifiedResult = (
         throw new Error(`Progress-certified disabled completion ${expected.episodeId} emitted policy telemetry`);
     }
     value.policyTelemetry.forEach((telemetry) => {
-        const event = validateProgressCertifiedTelemetry(telemetry);
+        const event = validateProgressCertifiedTelemetry(telemetry, expected.telemetrySchemaVersion ?? 3);
         if (event.informationBoundary !== expected.informationBoundary) {
             throw new Error(`Progress-certified completion ${expected.episodeId} telemetry boundary drifted`);
         }

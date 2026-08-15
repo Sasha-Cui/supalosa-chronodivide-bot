@@ -87,4 +87,40 @@ describe("progress-certified technical gate", () => {
             terminalReserveReleased: true,
         })).toThrow("outside the final-building state");
     });
+
+    it("validates visibility-aware unseen approach and visible handoff telemetry", () => {
+        const base = {
+            schemaVersion: 4,
+            event: "decision",
+            informationBoundary: "public_complete_state",
+            tick: 8_000,
+            mechanism: "progress_certified_terminal_conversion",
+            decisionKind: "building_strike",
+            selectedBuildingId: 42,
+            selectedBuildingObservedBy: "public_complete_state",
+            selectedBuildingCoordinates: { x: 31, y: 47 },
+            selectedAttackerIds: [10, 11],
+        } as const;
+        expect(validateProgressCertifiedTelemetry({
+            ...base,
+            selectedBuildingVisible: false,
+            selectedBuildingOrderMode: "attack_move_exact_unseen_coordinates",
+        }, 4).selectedBuildingOrderMode).toBe("attack_move_exact_unseen_coordinates");
+        expect(validateProgressCertifiedTelemetry({
+            ...base,
+            selectedBuildingVisible: true,
+            selectedBuildingOrderMode: "attack_visible_building",
+        }, 4).selectedBuildingOrderMode).toBe("attack_visible_building");
+        expect(() => validateProgressCertifiedTelemetry({
+            ...base,
+            selectedBuildingVisible: false,
+            selectedBuildingOrderMode: "attack_visible_building",
+        }, 4)).toThrow("coordinate-approach");
+        expect(() => validateProgressCertifiedTelemetry({
+            ...base,
+            schemaVersion: 3,
+            selectedBuildingVisible: false,
+            selectedBuildingOrderMode: "attack_move_exact_unseen_coordinates",
+        })).toThrow("visibility-aware");
+    });
 });
