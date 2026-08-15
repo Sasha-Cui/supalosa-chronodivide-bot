@@ -29,8 +29,9 @@ import {
 } from "./terminalObjectiveStrategy.js";
 
 export const PROGRESS_CERTIFIED_V5_COMPATIBILITY_MAX_TICKS = 5_400 as const;
-export const PROGRESS_CERTIFIED_V5_COMPATIBILITY_SEED_BASE = 4_294_960_000 as const;
+export const PROGRESS_CERTIFIED_V5_COMPATIBILITY_SEED_BASE = 4_294_961_000 as const;
 export const PROGRESS_CERTIFIED_V5_COMPATIBILITY_RUNS_PER_CELL = 4 as const;
+export const PROGRESS_CERTIFIED_V5_COMPATIBILITY_GATE_REVISION = "V5-C2" as const;
 export const PROGRESS_CERTIFIED_V5_COMPATIBILITY_COUNTRIES = [
     Countries.USA,
     Countries.KOREA,
@@ -80,6 +81,26 @@ export type ProgressCertifiedV5CompatibilityExposure = {
     approachWitnesses: ProgressCertifiedV5OrderWitness[];
     visibleHandoffWitnesses: ProgressCertifiedV5OrderWitness[];
 };
+
+export type ProgressCertifiedV5CompatibilityDiagnostic = {
+    telemetryCount: number;
+    actionableDecisionCount: number;
+    buildingDecisionCount: number;
+    decisionKindCounts: Record<string, number>;
+    orderModeCounts: Record<string, number>;
+    observedByCounts: Record<string, number>;
+    candidateOrderTypeCounts: Record<string, number>;
+};
+
+export const buildProgressCertifiedV5CompatibilitySmokePolicy =
+    (): ProgressCertifiedConversionPolicyV5 => buildProgressCertifiedConversionPolicyV5({
+        conversionScope: "guarded_low_building_count",
+        terminalForceMode: "direct_building",
+        activationBuildingCount: 100,
+        activationMinTick: 0,
+        requireObservedCountAboveThreshold: false,
+        minTick: 0,
+    });
 
 const requiredPath = (name: string): string => {
     const value = process.env[name];
@@ -252,6 +273,36 @@ const matchingBuildingAction = (
     }) ?? null;
 };
 
+const countStrings = (values: readonly string[]): Record<string, number> =>
+    values.reduce<Record<string, number>>((counts, value) => ({
+        ...counts,
+        [value]: (counts[value] ?? 0) + 1,
+    }), {});
+
+export const summarizeProgressCertifiedV5CompatibilityDiagnostic = (
+    telemetry: readonly TerminalObjectiveTelemetry[],
+    actions: readonly ProgressCertifiedV5ActionTraceRow[],
+): ProgressCertifiedV5CompatibilityDiagnostic => {
+    const decisions = telemetry.filter(({ event }) => event === "decision" || event === "search_orders");
+    return {
+        telemetryCount: telemetry.length,
+        actionableDecisionCount: decisions.filter(
+            ({ selectedAttackerIds }) => (selectedAttackerIds?.length ?? 0) > 0,
+        ).length,
+        buildingDecisionCount: decisions.filter(({ decisionKind }) =>
+            decisionKind === "building_strike" || decisionKind === "terminal_candidate_strike",
+        ).length,
+        decisionKindCounts: countStrings(decisions.map(({ decisionKind }) => String(decisionKind))),
+        orderModeCounts: countStrings(decisions.map(
+            ({ selectedBuildingOrderMode }) => String(selectedBuildingOrderMode),
+        )),
+        observedByCounts: countStrings(decisions.map(
+            ({ selectedBuildingObservedBy }) => String(selectedBuildingObservedBy),
+        )),
+        candidateOrderTypeCounts: countStrings(actions.map(({ args }) => String(args[1]))),
+    };
+};
+
 const witness = (
     event: TerminalObjectiveTelemetry,
     action: ProgressCertifiedV5ActionTraceRow,
@@ -393,13 +444,7 @@ const main = async (): Promise<void> => {
     }
     const factory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
     const disabledPolicy = buildProgressCertifiedConversionPolicyV5({ enabled: false });
-    const smokePolicy = buildProgressCertifiedConversionPolicyV5({
-        conversionScope: "guarded_low_building_count",
-        activationBuildingCount: 100,
-        activationMinTick: 0,
-        requireObservedCountAboveThreshold: false,
-        minTick: 0,
-    });
+    const smokePolicy = buildProgressCertifiedV5CompatibilitySmokePolicy();
     await cdapi.init(path.join(process.cwd(), "data"));
     const rows: Array<Record<string, unknown>> = [];
     const validationErrors: string[] = [];
@@ -463,6 +508,12 @@ const main = async (): Promise<void> => {
                     engineFinishObservedAtTick: repeat.engineFinishObservedAtTick,
                 },
                 suppressedQuitAttempts: { first: first.quitAttempts, repeat: repeat.quitAttempts },
+                firstDiagnostic: summarizeProgressCertifiedV5CompatibilityDiagnostic(
+                    first.telemetry, first.actions,
+                ),
+                repeatDiagnostic: summarizeProgressCertifiedV5CompatibilityDiagnostic(
+                    repeat.telemetry, repeat.actions,
+                ),
                 firstCoverage,
                 repeatCoverage,
                 outcomeInspected: false,
@@ -495,10 +546,11 @@ const main = async (): Promise<void> => {
     ) validationErrors.push("V5 compatibility provenance or coverage failed");
     const passed = validationErrors.length === 0;
     const output = {
-        schemaVersion: 1,
+        schemaVersion: 2,
+        gateRevision: PROGRESS_CERTIFIED_V5_COMPATIBILITY_GATE_REVISION,
         status: passed
-            ? "PASS_OUTCOME_FREE_PROGRESS_CERTIFIED_V5_COMPATIBILITY"
-            : "FAIL_OUTCOME_FREE_PROGRESS_CERTIFIED_V5_COMPATIBILITY",
+            ? "PASS_OUTCOME_FREE_PROGRESS_CERTIFIED_V5_COMPATIBILITY_V2"
+            : "FAIL_OUTCOME_FREE_PROGRESS_CERTIFIED_V5_COMPATIBILITY_V2",
         generatedAt: new Date().toISOString(),
         passed,
         outcomeFree: true,
