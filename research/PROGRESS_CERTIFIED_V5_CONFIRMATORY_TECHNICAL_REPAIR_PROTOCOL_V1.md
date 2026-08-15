@@ -95,11 +95,12 @@ Archive snapshot at
 Selection continues the existing SHA-256 rank after Blocks A-D, excludes every
 normalized revision family already represented in those blocks, retains the
 first content item for each remaining normalized family, and takes the complete
-71-family tail already identified as `below_frozen_block_d_rank_cutoff` in the
-Block-D trace. This rule is fixed before any tail map bytes are downloaded or
-inspected.
+Block-D tail already identified as `below_frozen_block_d_rank_cutoff`. That tail
+contains 71 content records and 70 unique normalized families, so the stated
+first-per-family rule yields exactly 70 reserve candidates. This rule and count
+are fixed before any tail map bytes are downloaded or inspected.
 
-All 71 tail items receive the unchanged strict ordinary-skirmish byte screen.
+All 70 selected tail families receive the unchanged strict ordinary-skirmish byte screen.
 There is no backfilling beyond this tail. Every byte-pass family then receives
 the complete deployability gate above. Selection never uses establishment
 speed, warnings among passing cells, map name preference, or a policy outcome.
