@@ -61,6 +61,10 @@ import {
     ProgressCertifiedConversionPolicyV5,
     validateProgressCertifiedConversionPolicyV5,
 } from "./progressCertifiedConversionPolicyV5.js";
+import {
+    TerminalBaseRaceMode,
+    evaluateTerminalBaseRaceGuard,
+} from "./terminalBaseRaceGuard.js";
 
 type Point = { x: number; y: number };
 
@@ -148,6 +152,9 @@ export type TerminalObjectiveTelemetry = {
     progressDeadlineExpired?: "blocker" | "building" | null;
     terminalReserveReleased?: boolean;
     completeMissionCostTicks?: number | null;
+    terminalBaseRaceMode?: TerminalBaseRaceMode;
+    terminalBaseRaceObjectiveCompletionTicks?: number | null;
+    terminalBaseRaceGuardIntervened?: boolean;
 };
 
 type TelemetrySink = (event: TerminalObjectiveTelemetry) => void;
@@ -608,6 +615,8 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         private readonly country: Countries,
         private readonly policy: ObjectiveOverlayPolicy,
         private readonly telemetry: TelemetrySink,
+        private readonly terminalBaseRaceMode: TerminalBaseRaceMode =
+            "legacy_v5_ignore_own_base_loss",
     ) {}
 
     onAiUpdate(context: StrategyContext, missionController: unknown, logger: Logger): StrategyLike {
@@ -881,6 +890,9 @@ export class TerminalObjectiveStrategy implements StrategyLike {
         );
 
         let decision: ObjectiveMissionDecision;
+        let terminalBaseRaceObjectiveCompletionTicks: number | null | undefined;
+        let terminalBaseRaceGuardIntervened = false;
+        let decisionTerminalEvidence = this.terminalEvidence();
         if (this.policy.mechanism === "persistent_liveness") {
             decision = {
                 kind: "building_strike",
@@ -892,6 +904,14 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             const terminalMechanism = hasPublicObjectiveInterface(this.policy) ||
                 this.policy.mechanism === "terminal_candidate" ||
                 this.policy.mechanism === "full_sufficient_strike";
+            decisionTerminalEvidence = terminalMechanism
+                ? this.terminalEvidence()
+                : {
+                    remainingKnownBuildingCount: 2,
+                    allPreviouslyKnownAlternativesInvalidated: false,
+                    searchCoverageFraction: this.searchCoverageFraction(),
+                    requiredSearchCoverageFraction: this.policy.requiredSearchCoverageFraction,
+                };
             const decide = isContinuousOffensePolicy(this.policy) || isProgressCertifiedPolicy(this.policy)
                 ? selectContinuousObjectiveMission
                 : selectObjectiveMission;
@@ -905,14 +925,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                 threats: bound.threats,
                 baseAssets: bound.baseAssets,
                 assetThreatProjections: bound.assetThreatProjections,
-                terminalEvidence: terminalMechanism
-                    ? this.terminalEvidence()
-                    : {
-                        remainingKnownBuildingCount: 2,
-                        allPreviouslyKnownAlternativesInvalidated: false,
-                        searchCoverageFraction: this.searchCoverageFraction(),
-                        requiredSearchCoverageFraction: this.policy.requiredSearchCoverageFraction,
-                    },
+                terminalEvidence: decisionTerminalEvidence,
                 noProgressTicks,
                 thresholds,
                 blockerThenBuildingCompletionTicks,
@@ -920,6 +933,18 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                     ? continuousForceEngagementMode(this.policy)
                     : undefined,
             });
+            const guard = evaluateTerminalBaseRaceGuard({
+                mode: this.terminalBaseRaceMode,
+                decision,
+                terminalEvidence: decisionTerminalEvidence,
+                classification,
+                safetyMarginTicks: thresholds.directCompletionSafetyMarginTicks,
+            });
+            decision = guard.decision;
+            if (this.terminalBaseRaceMode === "strict_literal_endpoint_base_race") {
+                terminalBaseRaceObjectiveCompletionTicks = guard.objectiveCompletionTicks;
+                terminalBaseRaceGuardIntervened = guard.intervened;
+            }
         }
 
         let strike = selected.attackers;
@@ -931,7 +956,9 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             const threatDeadline = Math.min(
                 classification.earliestLethalInterceptTick ?? Number.POSITIVE_INFINITY,
                 (decision.kind === "terminal_candidate_strike"
-                    ? null
+                    ? this.terminalBaseRaceMode === "strict_literal_endpoint_base_race"
+                        ? classification.earliestBaseDestructionTick
+                        : null
                     : classification.earliestBaseDestructionTick) ?? Number.POSITIVE_INFINITY,
             );
             const deadline = Number.isFinite(threatDeadline)
@@ -947,7 +974,7 @@ export class TerminalObjectiveStrategy implements StrategyLike {
             if (minimum) {
                 const minimumIds = new Set(minimum.attackers.map(({ id }) => id));
                 const proposed = selected.attackers.filter(({ unit }) => minimumIds.has(unit.id));
-                const rechecked = (isContinuousOffensePolicy(this.policy) || isProgressCertifiedPolicy(this.policy)
+                let rechecked = (isContinuousOffensePolicy(this.policy) || isProgressCertifiedPolicy(this.policy)
                     ? selectContinuousObjectiveMission
                     : selectObjectiveMission)({
                     attackers: proposed.map(({ core }) => core),
@@ -967,9 +994,21 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                         ? continuousForceEngagementMode(this.policy)
                         : undefined,
                 });
+                const guard = evaluateTerminalBaseRaceGuard({
+                    mode: this.terminalBaseRaceMode,
+                    decision: rechecked,
+                    terminalEvidence: this.terminalEvidence(),
+                    classification,
+                    safetyMarginTicks: thresholds.directCompletionSafetyMarginTicks,
+                });
+                rechecked = guard.decision;
                 if (rechecked.kind === "building_strike" || rechecked.kind === "terminal_candidate_strike") {
                     strike = proposed;
                     decision = rechecked;
+                    if (this.terminalBaseRaceMode === "strict_literal_endpoint_base_race") {
+                        terminalBaseRaceObjectiveCompletionTicks = guard.objectiveCompletionTicks;
+                        terminalBaseRaceGuardIntervened = guard.intervened;
+                    }
                 }
             }
         }
@@ -1066,6 +1105,17 @@ export class TerminalObjectiveStrategy implements StrategyLike {
                                 classification.earliestLethalInterceptTick)
                     ? selected.opportunity.directCompletionTicks
                     : blockerThenBuildingCompletionTicks)
+                : undefined,
+            terminalBaseRaceMode: this.terminalBaseRaceMode === "strict_literal_endpoint_base_race"
+                ? this.terminalBaseRaceMode
+                : undefined,
+            terminalBaseRaceObjectiveCompletionTicks: this.terminalBaseRaceMode ===
+                "strict_literal_endpoint_base_race"
+                ? terminalBaseRaceObjectiveCompletionTicks
+                : undefined,
+            terminalBaseRaceGuardIntervened: this.terminalBaseRaceMode ===
+                "strict_literal_endpoint_base_race"
+                ? terminalBaseRaceGuardIntervened
                 : undefined,
         });
     }
