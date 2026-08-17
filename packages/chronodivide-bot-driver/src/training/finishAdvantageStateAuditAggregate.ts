@@ -9,7 +9,10 @@ import {
     LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256,
     LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION,
 } from "./literalBuildingEliminationEndpoint.js";
-import { FINISH_ADVANTAGE_STATE_AUDIT_OPEN_CAMPAIGN_SHA256 } from "./finishAdvantageStateAuditCampaign.js";
+import {
+    FINISH_ADVANTAGE_STATE_AUDIT_ENGINE_SEED_BASE,
+    FINISH_ADVANTAGE_STATE_AUDIT_OPEN_CAMPAIGN_SHA256,
+} from "./finishAdvantageStateAuditCampaign.js";
 
 type RecordValue = Record<string, unknown>;
 type Margin = 0 | 2 | 4 | 8;
@@ -176,9 +179,9 @@ const main = (): void => {
     if (sha256File(campaignPath) !== campaignSha256) throw new Error("State-audit campaign drifted");
     const campaign = readJson(campaignPath);
     if (
-        !isRecord(campaign) || campaign.schemaVersion !== 1 ||
+        !isRecord(campaign) || campaign.schemaVersion !== 2 ||
         campaign.kind !== "finish-advantage-outcome-blind-state-audit" ||
-        campaign.status !== "FROZEN_FINISH_ADVANTAGE_OUTCOME_BLIND_STATE_AUDIT_V1" ||
+        campaign.status !== "FROZEN_FINISH_ADVANTAGE_OUTCOME_BLIND_STATE_AUDIT_V2_RUNTIME_REPAIR" ||
         typeof campaign.generatedAt !== "string" || Number.isNaN(Date.parse(campaign.generatedAt)) ||
         typeof campaign.sourceGitCommit !== "string" || !GIT_COMMIT.test(campaign.sourceGitCommit) ||
         typeof campaign.externalBaselineGitCommit !== "string" ||
@@ -196,11 +199,11 @@ const main = (): void => {
         !SHA256.test(campaign.generationManifestSha256) ||
         typeof campaign.protocolPath !== "string" ||
         typeof campaign.protocolSha256 !== "string" || !SHA256.test(campaign.protocolSha256) ||
-        !Array.isArray(campaign.amendmentPaths) || campaign.amendmentPaths.length !== 2 ||
+        !Array.isArray(campaign.amendmentPaths) || campaign.amendmentPaths.length !== 4 ||
         campaign.amendmentPaths.some((item) => typeof item !== "string") ||
-        !Array.isArray(campaign.amendmentSha256s) || campaign.amendmentSha256s.length !== 2 ||
+        !Array.isArray(campaign.amendmentSha256s) || campaign.amendmentSha256s.length !== 4 ||
         campaign.amendmentSha256s.some((hash) => typeof hash !== "string" || !SHA256.test(hash)) ||
-        new Set(campaign.amendmentSha256s).size !== 2 ||
+        new Set(campaign.amendmentSha256s).size !== 4 ||
         !Array.isArray(campaign.countries) ||
         JSON.stringify(campaign.countries) !== JSON.stringify(STANDARD_COUNTRIES) ||
         !Array.isArray(campaign.selectedFamilies) || campaign.selectedFamilies.length !== 10 ||
@@ -269,7 +272,8 @@ const main = (): void => {
             value.protocolSha256 !== campaign.protocolSha256 ||
             JSON.stringify(value.amendmentSha256s) !== JSON.stringify(campaign.amendmentSha256s) ||
             value.endpointVersion !== campaign.endpointVersion || value.endpointSha256 !== campaign.endpointSha256 ||
-            value.requestedEngineSeed !== 4_225_000_000 + taskIndex || value.launchedGameCount !== 4 ||
+            value.requestedEngineSeed !== FINISH_ADVANTAGE_STATE_AUDIT_ENGINE_SEED_BASE + taskIndex ||
+            value.launchedGameCount !== 4 ||
             !isRecord(value.scheduler) || value.scheduler.account !== "pi_jss233" ||
             String(value.scheduler.arrayJobId) !== arrayJobId || !Array.isArray(value.validationErrors) ||
             value.scheduler.jobId !== schedulerTasks.get(taskIndex)?.schedulerJobId ||

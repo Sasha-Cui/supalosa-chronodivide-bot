@@ -12,7 +12,7 @@ import {
 } from "./literalBuildingEliminationEndpoint.js";
 import { sha256File } from "./methodV5PlanRunner.js";
 
-export const FINISH_ADVANTAGE_STATE_AUDIT_ENGINE_SEED_BASE = 4_225_000_000 as const;
+export const FINISH_ADVANTAGE_STATE_AUDIT_ENGINE_SEED_BASE = 4_225_100_000 as const;
 export const FINISH_ADVANTAGE_STATE_AUDIT_MAX_TICKS = 24_000 as const;
 export const FINISH_ADVANTAGE_STATE_AUDIT_BASELINE_COMMIT =
     "165b77a71d0cf5ebd27c65b19d0486bcbae78d0f" as const;
@@ -23,6 +23,8 @@ export const FINISH_ADVANTAGE_STATE_AUDIT_PROTOCOL_SHA256 =
 export const FINISH_ADVANTAGE_STATE_AUDIT_AMENDMENT_SHA256S = [
     "f7d7fe8c33fb11d0855646a9720e8dbf999aac5ce38cb5b5d3ddf0d93a563335",
     "3d9931d52ce81ca01e19d56d72ea95e6e976a83b38263b20b29cf9dc59f264a6",
+    "3b5cd05481cb2dd27916ff5647ee3c9714c3c23a61f9a97ef333425b39b6700e",
+    "d5d2e22dc49a42de4e8ff852252ec8b2383eecf21888155ae1bfba1abf1827be",
 ] as const;
 
 export const FINISH_ADVANTAGE_STATE_AUDIT_COUNTRIES = [
@@ -44,9 +46,9 @@ export type FinishAdvantageStateAuditFamily = {
 };
 
 export type FinishAdvantageStateAuditCampaign = {
-    schemaVersion: 1;
+    schemaVersion: 2;
     kind: "finish-advantage-outcome-blind-state-audit";
-    status: "FROZEN_FINISH_ADVANTAGE_OUTCOME_BLIND_STATE_AUDIT_V1";
+    status: "FROZEN_FINISH_ADVANTAGE_OUTCOME_BLIND_STATE_AUDIT_V2_RUNTIME_REPAIR";
     generatedAt: string;
     sourceGitCommit: string;
     sourceRuntimeSha256: string;
@@ -61,8 +63,8 @@ export type FinishAdvantageStateAuditCampaign = {
     generationManifestSha256: string;
     protocolPath: string;
     protocolSha256: typeof FINISH_ADVANTAGE_STATE_AUDIT_PROTOCOL_SHA256;
-    amendmentPaths: [string, string];
-    amendmentSha256s: [string, string];
+    amendmentPaths: [string, string, string, string];
+    amendmentSha256s: [string, string, string, string];
     endpointVersion: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION;
     endpointSha256: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256;
     outcomeAccess: "outcome-free-state-exposure-only";
@@ -134,7 +136,9 @@ const main = async (): Promise<void> => {
     const amendmentPaths = [
         requiredPath("STATE_AUDIT_AMENDMENT_1"),
         requiredPath("STATE_AUDIT_AMENDMENT_2"),
-    ] as [string, string];
+        requiredPath("STATE_AUDIT_AMENDMENT_3"),
+        requiredPath("STATE_AUDIT_AMENDMENT_4"),
+    ] as [string, string, string, string];
     const outRoot = requiredPath("OUT_ROOT");
     if (fs.existsSync(outRoot)) throw new Error(`Refusing to reuse state-audit root ${outRoot}`);
     if (
@@ -193,9 +197,9 @@ const main = async (): Promise<void> => {
         mode: 0o600,
     });
     const campaign: FinishAdvantageStateAuditCampaign = {
-        schemaVersion: 1,
+        schemaVersion: 2,
         kind: "finish-advantage-outcome-blind-state-audit",
-        status: "FROZEN_FINISH_ADVANTAGE_OUTCOME_BLIND_STATE_AUDIT_V1",
+        status: "FROZEN_FINISH_ADVANTAGE_OUTCOME_BLIND_STATE_AUDIT_V2_RUNTIME_REPAIR",
         generatedAt: new Date().toISOString(),
         sourceGitCommit: manifest.source.gitCommit,
         sourceRuntimeSha256: runtimeCommitment(manifest.source.runtimeTrees),

@@ -11,7 +11,10 @@ import {
     LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256,
     LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION,
 } from "./literalBuildingEliminationEndpoint.js";
-import { FINISH_ADVANTAGE_STATE_AUDIT_OPEN_CAMPAIGN_SHA256 } from "./finishAdvantageStateAuditCampaign.js";
+import {
+    FINISH_ADVANTAGE_STATE_AUDIT_ENGINE_SEED_BASE,
+    FINISH_ADVANTAGE_STATE_AUDIT_OPEN_CAMPAIGN_SHA256,
+} from "./finishAdvantageStateAuditCampaign.js";
 import {
     FinishAdvantageStateAuditTrace,
     runFinishAdvantageStateAuditTrace,
@@ -19,9 +22,9 @@ import {
 
 type AuditFamily = { familyId: string; mapName: string; mapSha256: string };
 type AuditCampaign = {
-    schemaVersion: 1;
+    schemaVersion: 2;
     kind: "finish-advantage-outcome-blind-state-audit";
-    status: "FROZEN_FINISH_ADVANTAGE_OUTCOME_BLIND_STATE_AUDIT_V1";
+    status: "FROZEN_FINISH_ADVANTAGE_OUTCOME_BLIND_STATE_AUDIT_V2_RUNTIME_REPAIR";
     generatedAt: string;
     sourceGitCommit: string;
     sourceRuntimeSha256: string;
@@ -35,8 +38,8 @@ type AuditCampaign = {
     generationManifestSha256: string;
     protocolPath: string;
     protocolSha256: string;
-    amendmentPaths: [string, string];
-    amendmentSha256s: [string, string];
+    amendmentPaths: [string, string, string, string];
+    amendmentSha256s: [string, string, string, string];
     externalBaselineGitCommit: string;
     endpointVersion: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION;
     endpointSha256: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256;
@@ -45,7 +48,7 @@ type AuditCampaign = {
     countryCount: 9;
     reciprocalSlotCount: 2;
     observerConditionCount: 2;
-    engineSeedBase: 4_225_000_000;
+    engineSeedBase: typeof FINISH_ADVANTAGE_STATE_AUDIT_ENGINE_SEED_BASE;
     maxTicks: 24_000;
     countries: Countries[];
     selectedFamilies: AuditFamily[];
@@ -88,10 +91,10 @@ const requiredTaskIndex = (): number => {
 const readCampaign = (campaignPath: string): AuditCampaign => {
     const value = JSON.parse(fs.readFileSync(campaignPath, "utf8")) as AuditCampaign;
     if (
-        value.schemaVersion !== 1 || value.kind !== "finish-advantage-outcome-blind-state-audit" ||
-        value.status !== "FROZEN_FINISH_ADVANTAGE_OUTCOME_BLIND_STATE_AUDIT_V1" ||
+        value.schemaVersion !== 2 || value.kind !== "finish-advantage-outcome-blind-state-audit" ||
+        value.status !== "FROZEN_FINISH_ADVANTAGE_OUTCOME_BLIND_STATE_AUDIT_V2_RUNTIME_REPAIR" ||
         typeof value.generatedAt !== "string" || Number.isNaN(Date.parse(value.generatedAt)) ||
-        value.engineSeedBase !== 4_225_000_000 || value.maxTicks !== 24_000 ||
+        value.engineSeedBase !== FINISH_ADVANTAGE_STATE_AUDIT_ENGINE_SEED_BASE || value.maxTicks !== 24_000 ||
         value.selectedFamilies?.length !== 10 || value.countries?.length !== 9 ||
         value.familyCount !== 10 || value.countryCount !== 9 || value.reciprocalSlotCount !== 2 ||
         value.observerConditionCount !== 2 || value.cellCount !== 90 || value.launchedGameCount !== 360 ||
@@ -103,10 +106,10 @@ const readCampaign = (campaignPath: string): AuditCampaign => {
         typeof value.generationManifestPath !== "string" || !SHA256.test(value.generationManifestSha256) ||
         typeof value.protocolPath !== "string" ||
         !SHA256.test(value.protocolSha256) || !Array.isArray(value.amendmentPaths) ||
-        value.amendmentPaths.length !== 2 || value.amendmentPaths.some((item) => typeof item !== "string") ||
+        value.amendmentPaths.length !== 4 || value.amendmentPaths.some((item) => typeof item !== "string") ||
         !Array.isArray(value.amendmentSha256s) ||
-        value.amendmentSha256s.length !== 2 || value.amendmentSha256s.some((hash) => !SHA256.test(hash)) ||
-        new Set(value.amendmentSha256s).size !== 2 ||
+        value.amendmentSha256s.length !== 4 || value.amendmentSha256s.some((hash) => !SHA256.test(hash)) ||
+        new Set(value.amendmentSha256s).size !== 4 ||
         value.endpointVersion !== LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION ||
         value.endpointSha256 !== LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256 ||
         value.outcomeAccess !== "outcome-free-state-exposure-only" ||
