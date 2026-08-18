@@ -34,6 +34,12 @@ type ValidatedCell = {
 };
 
 const SHA256 = /^[0-9a-f]{64}$/;
+const OFFICIAL_MAP_V3_CAMPAIGN_SHA256 =
+    "fb887bbc5ca2f827550e47337a207de862ecd39f95177dbde9f4ac7b0d5b03d4" as const;
+const OFFICIAL_MAP_V3_SOURCE_COMMIT = "0bfd3ef1b2487b3914936d7b516e4abb1ca99b43" as const;
+const OFFICIAL_MAP_V3_ARRAY_JOB_ID = "22596084" as const;
+const OFFICIAL_MAP_AGGREGATION_REPAIR_SHA256 =
+    "d03f6921568f3c7a709c720447431fb148308e22913a5fae35c5a48c4beef88c" as const;
 const isRecord = (value: unknown): value is RecordValue =>
     !!value && typeof value === "object" && !Array.isArray(value);
 const requiredPath = (name: string): string => {
@@ -100,6 +106,37 @@ export const parseOfficialMapLiveSacct = (
 
 const stringArray = (value: unknown): value is string[] =>
     Array.isArray(value) && value.every((item) => typeof item === "string");
+
+export const validateOfficialMapReplicateShape = (
+    replicate: unknown,
+    replicateIndex: number,
+    candidateSlot: 0 | 1,
+    requestedEngineSeed: number,
+): boolean => {
+    if (
+        !isRecord(replicate) || replicate.replicate !== replicateIndex ||
+        replicate.candidateSlot !== candidateSlot || replicate.requestedEngineSeed !== requestedEngineSeed ||
+        !Number.isSafeInteger(replicate.updateCount) || Number(replicate.updateCount) < 0 ||
+        !Array.isArray(replicate.warnings) || typeof replicate.warningCaptureTruncated !== "boolean" ||
+        !stringArray(replicate.failureCategories) || !stringArray(replicate.reviewCategories) ||
+        !SHA256.test(String(replicate.technicalDigestSha256))
+    ) return false;
+    const gameModeValid = replicate.gameModeSha256 === null ||
+        (typeof replicate.gameModeSha256 === "string" && SHA256.test(replicate.gameModeSha256));
+    if (!gameModeValid) return false;
+    if (replicate.reachedTargetTick === true) {
+        return typeof replicate.gameModeSha256 === "string" &&
+            Number.isSafeInteger(replicate.initialTick) && Number.isSafeInteger(replicate.finalTick) &&
+            replicate.updateCount === 120 && replicate.tickArithmeticConsistent === true &&
+            isRecord(replicate.candidateStart) && isRecord(replicate.baselineStart) &&
+            replicate.distinctStarts === true && replicate.startsDeclared === true && replicate.error === null;
+    }
+    return replicate.reachedTargetTick === false && replicate.initialTick === null && replicate.finalTick === null &&
+        replicate.updateCount === 0 && replicate.tickArithmeticConsistent === false &&
+        replicate.candidateStart === null && replicate.baselineStart === null &&
+        replicate.distinctStarts === false && replicate.startsDeclared === false &&
+        isRecord(replicate.error) && replicate.failureCategories.length > 0;
+};
 
 const validateCell = (args: {
     value: unknown;
@@ -182,19 +219,9 @@ const validateCell = (args: {
     const digests = new Set<string>();
     const reviews: string[] = [];
     for (const [replicateIndex, replicate] of value.replicates.entries()) {
-        if (
-            !isRecord(replicate) || replicate.replicate !== replicateIndex ||
-            replicate.candidateSlot !== candidateSlot || replicate.requestedEngineSeed !== requestedEngineSeed ||
-            !SHA256.test(String(replicate.gameModeSha256)) || !Number.isSafeInteger(replicate.initialTick) ||
-            !Number.isSafeInteger(replicate.finalTick) || !Number.isSafeInteger(replicate.updateCount) ||
-            replicate.tickArithmeticConsistent !== true || replicate.reachedTargetTick !== true ||
-            !isRecord(replicate.candidateStart) || !isRecord(replicate.baselineStart) ||
-            replicate.distinctStarts !== true || replicate.startsDeclared !== true ||
-            !Array.isArray(replicate.warnings) || typeof replicate.warningCaptureTruncated !== "boolean" ||
-            (replicate.error !== null && !isRecord(replicate.error)) ||
-            !stringArray(replicate.failureCategories) || !stringArray(replicate.reviewCategories) ||
-            !SHA256.test(String(replicate.technicalDigestSha256))
-        ) throw new Error(`Official-map task ${taskIndex} replicate ${replicateIndex} is malformed`);
+        if (!validateOfficialMapReplicateShape(
+            replicate, replicateIndex, candidateSlot, requestedEngineSeed,
+        )) throw new Error(`Official-map task ${taskIndex} replicate ${replicateIndex} is malformed`);
         digests.add(String(replicate.technicalDigestSha256));
         reviews.push(...replicate.reviewCategories);
     }
@@ -251,11 +278,26 @@ const main = (): void => {
     if (fs.existsSync(outputPath)) throw new Error(`Refusing to overwrite ${outputPath}`);
     if (sha256File(campaignPath) !== campaignSha256) throw new Error("Official-map campaign drifted");
     const campaign = validateOfficialMapLiveCampaign(readJson(campaignPath));
-    if (
-        campaign.sourceGitCommit !== execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim() ||
-        execFileSync("git", ["branch", "--show-current"], { encoding: "utf8" }).trim() !== "main" ||
-        execFileSync("git", ["status", "--short", "--untracked-files=no"], { encoding: "utf8" }).trim() !== ""
-    ) throw new Error("Official-map finalizer source contract failed");
+    const aggregatorGitCommit = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+    const forkMain = execFileSync("git", ["rev-parse", "fork/main"], { encoding: "utf8" }).trim();
+    const branch = execFileSync("git", ["branch", "--show-current"], { encoding: "utf8" }).trim();
+    const trackedStatus = execFileSync(
+        "git", ["status", "--short", "--untracked-files=no"], { encoding: "utf8" },
+    ).trim();
+    if (branch !== "main" || trackedStatus !== "" || forkMain !== aggregatorGitCommit) {
+        throw new Error("Official-map finalizer requires clean pushed main");
+    }
+    let aggregationRepairSha256: string | null = null;
+    if (campaign.sourceGitCommit !== aggregatorGitCommit) {
+        const repairPath = requiredPath("OFFICIAL_MAP_AGGREGATION_REPAIR");
+        aggregationRepairSha256 = sha256File(repairPath);
+        if (
+            campaignSha256 !== OFFICIAL_MAP_V3_CAMPAIGN_SHA256 ||
+            campaign.sourceGitCommit !== OFFICIAL_MAP_V3_SOURCE_COMMIT ||
+            arrayJobId !== OFFICIAL_MAP_V3_ARRAY_JOB_ID ||
+            aggregationRepairSha256 !== OFFICIAL_MAP_AGGREGATION_REPAIR_SHA256
+        ) throw new Error("Official-map aggregation repair authorization failed");
+    }
     const schedulerTasks = parseOfficialMapLiveSacct(execFileSync(
         "/opt/slurm/current/bin/sacct",
         ["-j", arrayJobId, "-n", "-P", "-X", "--format=JobID,JobIDRaw,State,ExitCode,Account"],
@@ -327,6 +369,8 @@ const main = (): void => {
         notPolicyOutcomeEvidence: true,
         generatedAt: new Date().toISOString(),
         sourceGitCommit: campaign.sourceGitCommit,
+        aggregatorGitCommit,
+        aggregationRepairSha256,
         sourceRuntimeSha256: campaign.sourceRuntimeSha256,
         externalBaselineGitCommit: campaign.externalBaselineGitCommit,
         externalBaselineRuntimeSha256: campaign.externalBaselineRuntimeSha256,

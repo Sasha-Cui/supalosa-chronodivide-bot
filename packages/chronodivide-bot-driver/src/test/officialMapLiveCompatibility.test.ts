@@ -6,7 +6,10 @@ import {
     OFFICIAL_MAP_LIVE_WARNING_RULE,
     parseOfficialMapIni,
 } from "../training/officialMapLiveCompatibilityCampaign.js";
-import { parseOfficialMapLiveSacct } from "../training/officialMapLiveCompatibilityAggregate.js";
+import {
+    parseOfficialMapLiveSacct,
+    validateOfficialMapReplicateShape,
+} from "../training/officialMapLiveCompatibilityAggregate.js";
 
 describe("official-map live outcome-blind compatibility gate", () => {
     it("freezes the all-country, two-slot, two-replicate design", () => {
@@ -37,6 +40,54 @@ describe("official-map live outcome-blind compatibility gate", () => {
         expect(ini.get("waypoints")?.get("0")).toBe("10010");
         expect(ini.get("basic")?.get("maxplayer")).toBeUndefined();
         expect(ini.get("header")?.get("numberstartingpoints")).toBeUndefined();
+    });
+
+    it("accepts exact success and structured pre-horizon failure shapes", () => {
+        const seed = 4_226_200_000;
+        const common = {
+            replicate: 0,
+            candidateSlot: 0,
+            requestedEngineSeed: seed,
+            warnings: [],
+            warningCaptureTruncated: false,
+            reviewCategories: [],
+            technicalDigestSha256: "a".repeat(64),
+        };
+        const success = {
+            ...common,
+            gameModeSha256: "b".repeat(64),
+            initialTick: 0,
+            finalTick: 120,
+            updateCount: 120,
+            tickArithmeticConsistent: true,
+            reachedTargetTick: true,
+            candidateStart: { x: 1, y: 2 },
+            baselineStart: { x: 3, y: 4 },
+            distinctStarts: true,
+            startsDeclared: true,
+            error: null,
+            failureCategories: ["invalid_waypoint"],
+        };
+        expect(validateOfficialMapReplicateShape(success, 0, 0, seed)).toBe(true);
+        const failure = {
+            ...common,
+            gameModeSha256: null,
+            initialTick: null,
+            finalTick: null,
+            updateCount: 0,
+            tickArithmeticConsistent: false,
+            reachedTargetTick: false,
+            candidateStart: null,
+            baselineStart: null,
+            distinctStarts: false,
+            startsDeclared: false,
+            error: { category: "engine_error", name: "captured_error", messageSha256: "c".repeat(64) },
+            failureCategories: ["engine_error"],
+        };
+        expect(validateOfficialMapReplicateShape(failure, 0, 0, seed)).toBe(true);
+        expect(validateOfficialMapReplicateShape({ ...failure, updateCount: 1 }, 0, 0, seed)).toBe(false);
+        expect(validateOfficialMapReplicateShape({ ...failure, error: null }, 0, 0, seed)).toBe(false);
+        expect(validateOfficialMapReplicateShape({ ...success, reachedTargetTick: false }, 0, 0, seed)).toBe(false);
     });
 
     it("requires all 738 clean scheduler tasks on pi_jss233", () => {
