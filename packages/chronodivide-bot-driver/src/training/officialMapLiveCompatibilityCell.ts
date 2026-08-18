@@ -335,6 +335,7 @@ const main = async (): Promise<void> => {
             launchedGameCount: 2,
             populationSha256: campaign.populationSha256,
             protocolSha256: campaign.protocolSha256,
+            repairAmendmentSha256: campaign.repairAmendmentSha256,
             outcomeInspection: false,
         },
         baseline: baselineFactory.descriptor,
@@ -473,6 +474,7 @@ const main = async (): Promise<void> => {
             candidatePolicyId: campaign.candidatePolicyId,
             populationSha256: campaign.populationSha256,
             protocolSha256: campaign.protocolSha256,
+            repairAmendmentSha256: campaign.repairAmendmentSha256,
             scheduler: manifest.scheduler,
             mapLoadAttestation: {
                 protocol: MAP_LOAD_ATTESTATION_PROTOCOL,

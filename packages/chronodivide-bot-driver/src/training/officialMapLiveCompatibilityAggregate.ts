@@ -147,6 +147,7 @@ const validateCell = (args: {
         value.packageLockSha256 !== campaign.packageLockSha256 ||
         value.candidatePolicyId !== campaign.candidatePolicyId ||
         value.populationSha256 !== campaign.populationSha256 || value.protocolSha256 !== campaign.protocolSha256 ||
+        value.repairAmendmentSha256 !== campaign.repairAmendmentSha256 ||
         !isRecord(value.scheduler) || value.scheduler.account !== "pi_jss233" ||
         String(value.scheduler.arrayJobId) !== arrayJobId || value.scheduler.jobId !== scheduler.schedulerJobId ||
         !isRecord(value.mapLoadAttestation) || value.mapLoadAttestation.complete !== true ||
@@ -327,6 +328,7 @@ const main = (): void => {
         identityAuditSha256: campaign.identityAuditSha256,
         staticScreenSha256: campaign.staticScreenSha256,
         protocolSha256: campaign.protocolSha256,
+        repairAmendmentSha256: campaign.repairAmendmentSha256,
         campaignPath,
         campaignSha256,
         arrayJobId,

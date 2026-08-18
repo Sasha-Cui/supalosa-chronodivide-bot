@@ -14,7 +14,7 @@ describe("official-map live outcome-blind compatibility gate", () => {
         expect(new Set(OFFICIAL_MAP_LIVE_COUNTRIES).size).toBe(9);
         expect(41 * 9 * 2).toBe(738);
         expect(738 * 2).toBe(1_476);
-        expect(OFFICIAL_MAP_LIVE_ENGINE_SEED_BASE).toBe(4_226_000_000);
+        expect(OFFICIAL_MAP_LIVE_ENGINE_SEED_BASE).toBe(4_226_100_000);
         expect(OFFICIAL_MAP_LIVE_TARGET_TICK).toBe(120);
         expect(OFFICIAL_MAP_LIVE_WARNING_RULE.consoleErrorAlwaysFails).toBe(true);
         expect(OFFICIAL_MAP_LIVE_WARNING_RULE.truncatedCaptureFails).toBe(true);
