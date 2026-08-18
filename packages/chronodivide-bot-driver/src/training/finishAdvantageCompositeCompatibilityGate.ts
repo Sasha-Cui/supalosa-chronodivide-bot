@@ -274,11 +274,14 @@ export const validateTerminalBaseRaceCompatibilityTelemetry = (
             event.decisionKind === "building_strike" ||
             event.decisionKind === "blocker_clear"
         ) {
+            const completionRequired = event.decisionKind !== "blocker_clear" ||
+                event.earliestBaseDestructionTick !== null;
             if (
                 event.terminalBaseRaceGuardIntervened ||
-                event.terminalBaseRaceObjectiveCompletionTicks === null ||
                 !finiteNonnegativeOrNull(event.earliestBaseDestructionTick) ||
+                completionRequired && event.terminalBaseRaceObjectiveCompletionTicks === null ||
                 event.earliestBaseDestructionTick !== null &&
+                    event.terminalBaseRaceObjectiveCompletionTicks !== null &&
                     event.terminalBaseRaceObjectiveCompletionTicks + safetyMarginTicks >=
                         event.earliestBaseDestructionTick
             ) errors.push(`terminal base-race telemetry ${index} contains an unsafe building strike`);

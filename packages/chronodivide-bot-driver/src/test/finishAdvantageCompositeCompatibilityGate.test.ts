@@ -215,6 +215,20 @@ describe("finish-advantage outcome-free composite compatibility gate", () => {
         )).toContain("terminal base-race telemetry 0 contains an unsafe building strike");
         expect(validateTerminalBaseRaceCompatibilityTelemetry([{
             ...finalStrike[0],
+            decisionKind: "blocker_clear",
+            earliestBaseDestructionTick: null,
+            terminalBaseRaceObjectiveCompletionTicks: null,
+        }] as any, "strict_literal_endpoint_base_race", 2)).toEqual([]);
+        expect(validateTerminalBaseRaceCompatibilityTelemetry([{
+            ...finalStrike[0],
+            decisionKind: "blocker_clear",
+            earliestBaseDestructionTick: 30,
+            terminalBaseRaceObjectiveCompletionTicks: null,
+        }] as any, "strict_literal_endpoint_base_race", 2)).toContain(
+            "terminal base-race telemetry 0 contains an unsafe building strike",
+        );
+        expect(validateTerminalBaseRaceCompatibilityTelemetry([{
+            ...finalStrike[0],
             decisionKind: "base_defense",
             earliestBaseDestructionTick: 21,
             threatIds: [100],
