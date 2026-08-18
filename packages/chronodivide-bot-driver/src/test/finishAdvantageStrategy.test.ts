@@ -192,6 +192,27 @@ describe("mission-preserving finish-advantage strategy", () => {
         });
     });
 
+    it("serializes protected IDs when a nonempty protected set leaves no strike", () => {
+        const harness = run({
+            units: [
+                combatant(1, 0),
+                building(10, 0, "candidate"),
+                building(100, 20, "enemy"),
+                building(101, 35, "enemy"),
+            ],
+            missions: [mission("globalDefence.0.0", [1])],
+        });
+        harness.update();
+        expect(harness.orders).toHaveLength(0);
+        expect(last(harness.telemetry)).toMatchObject({
+            phase: "inactive",
+            nominalEligibleCount: 1,
+            protectedEligibleCount: 1,
+            protectedEligibleIds: [1],
+            strikePoolIds: [],
+        });
+    });
+
     it("runs Supalosa first and sweeps helpless buildings with all unprotected compatible units", () => {
         const harness = run({
             units: [

@@ -475,6 +475,7 @@ export class FinishAdvantageStrategy implements StrategyLike {
                 missionMembershipSha256: missionDigest(canonicalObjectiveMissionMembership(ownership)),
                 nominalEligibleCount: nominal.length,
                 protectedEligibleCount: protectedIds.size,
+                protectedEligibleIds: [...protectedIds].sort((left, right) => left - right),
                 additionalReserveIds: partition.additionalReserveIds,
                 strikePoolIds: partition.strikeIds,
             });

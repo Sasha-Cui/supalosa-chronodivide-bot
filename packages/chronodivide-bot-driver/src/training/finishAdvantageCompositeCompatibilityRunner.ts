@@ -15,15 +15,17 @@ import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/util
 import { InspectableBaselineBot, loadBaselineFactory } from "../benchmark/baselineLoader.js";
 import { createExperimentManifest } from "../benchmark/provenance.js";
 import { withSeededOfflineGame } from "../benchmark/seededOfflineGame.js";
-import { METHOD_V5_EQUIVALENCE_MAP_SHA256 } from "./methodV5BaselineEquivalence.js";
 import { sha256File } from "./methodV5PlanRunner.js";
 import {
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_2_SHA256,
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_3_SHA256,
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_4_SHA256,
+    FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_5_SHA256,
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_SHA256,
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_CELL_COUNT,
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_COUNTRIES,
+    FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_NAME,
+    FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_SHA256,
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAX_TICKS,
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_PROTOCOL_SHA256,
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_RUNS_PER_CELL,
@@ -342,6 +344,7 @@ const main = async (): Promise<void> => {
     const amendment2Path = requiredPath("COMPOSITE_GATE_AMENDMENT_2");
     const amendment3Path = requiredPath("COMPOSITE_GATE_AMENDMENT_3");
     const amendment4Path = requiredPath("COMPOSITE_GATE_AMENDMENT_4");
+    const amendment5Path = requiredPath("COMPOSITE_GATE_AMENDMENT_5");
     if (fs.existsSync(outFile)) throw new Error(`Refusing to overwrite ${outFile}`);
     if (process.env.SLURM_JOB_ACCOUNT !== "pi_jss233") {
         throw new Error("Composite compatibility gate requires Slurm account pi_jss233");
@@ -355,7 +358,8 @@ const main = async (): Promise<void> => {
         sha256File(amendmentPath) !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_SHA256 ||
         sha256File(amendment2Path) !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_2_SHA256 ||
         sha256File(amendment3Path) !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_3_SHA256 ||
-        sha256File(amendment4Path) !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_4_SHA256
+        sha256File(amendment4Path) !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_4_SHA256 ||
+        sha256File(amendment5Path) !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_5_SHA256
     ) throw new Error("Composite compatibility evidence commitment drifted");
     const stateAudit = JSON.parse(fs.readFileSync(stateAuditFile, "utf8")) as unknown;
     const selection = selectFinishAdvantageTechnicalGatePolicy(stateAudit, stateAuditSha256);
@@ -364,8 +368,9 @@ const main = async (): Promise<void> => {
     if (!Number.isSafeInteger(irreversibleExposedCellCount) || irreversibleExposedCellCount < 0) {
         throw new Error("State-audit irreversible exposure count is invalid");
     }
-    const mapName = "simple-1v1-no-preview.map";
-    if (sha256File(path.join(process.cwd(), "data", mapName)) !== METHOD_V5_EQUIVALENCE_MAP_SHA256) {
+    const mapName = FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_NAME;
+    if (sha256File(path.join(process.cwd(), "data", mapName)) !==
+        FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_SHA256) {
         throw new Error("Composite compatibility map bytes drifted");
     }
     const factory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
@@ -448,6 +453,9 @@ const main = async (): Promise<void> => {
             amendment2Sha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_2_SHA256,
             amendment3Sha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_3_SHA256,
             amendment4Sha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_4_SHA256,
+            amendment5Sha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_5_SHA256,
+            diagnosticMapName: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_NAME,
+            diagnosticMapSha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_SHA256,
             terminalBaseRaceMode: "strict_literal_endpoint_base_race",
             selectedMode: selection.selectedMode,
             selectedMargin: selection.selectedMargin,
@@ -490,6 +498,10 @@ const main = async (): Promise<void> => {
         amendment3Sha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_3_SHA256,
         amendment4Path,
         amendment4Sha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_4_SHA256,
+        amendment5Path,
+        amendment5Sha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_5_SHA256,
+        diagnosticMapName: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_NAME,
+        diagnosticMapSha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_SHA256,
         terminalBaseRaceMode: "strict_literal_endpoint_base_race",
         selectedMode: selection.selectedMode,
         selectedMargin: selection.selectedMargin,
