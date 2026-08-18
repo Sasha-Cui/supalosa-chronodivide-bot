@@ -3,6 +3,7 @@ import {
     FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_2_SHA256,
     FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_3_SHA256,
     FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_4_SHA256,
+    FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_5_SHA256,
     FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_SHA256,
     FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_COUNTRIES,
     FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_MAX_TICKS,
@@ -33,7 +34,7 @@ const campaign = (selectedMargins: number[] = [2, 8]): FinishAdvantageOpenCampai
     return {
         schemaVersion: FINISH_ADVANTAGE_OPEN_CAMPAIGN_SCHEMA_VERSION,
         kind: FINISH_ADVANTAGE_OPEN_CAMPAIGN_KIND,
-        status: "FROZEN_FINISH_ADVANTAGE_COMPLETE_OPEN_CAUSAL_SCREEN_V2",
+        status: "FROZEN_FINISH_ADVANTAGE_COMPLETE_OPEN_CAUSAL_SCREEN_V3",
         generatedAt: "2026-08-15T00:00:00.000Z",
         outcomeAccess: "permanently-open-development-only-no-paper-claim",
         sourceGitCommit: "b".repeat(40),
@@ -50,6 +51,7 @@ const campaign = (selectedMargins: number[] = [2, 8]): FinishAdvantageOpenCampai
         amendment2: { path: evidence.path, sha256: FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_2_SHA256 },
         amendment3: { path: evidence.path, sha256: FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_3_SHA256 },
         amendment4: { path: evidence.path, sha256: FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_4_SHA256 },
+        amendment5: { path: evidence.path, sha256: FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_5_SHA256 },
         stateAudit: evidence,
         officialMapGate: evidence,
         compositeGate: evidence,
@@ -88,14 +90,14 @@ describe("finish-advantage complete open causal-screen campaign", () => {
             taskIndex: 0,
             familyOrdinal: 0,
             countryOrdinal: 0,
-            requestedEngineSeed: 4_227_000_000,
+            requestedEngineSeed: 4_227_100_000,
             launchedGameCount: 12,
         });
         expect(value.shards[89]).toMatchObject({
             taskIndex: 89,
             familyOrdinal: 9,
             countryOrdinal: 8,
-            requestedEngineSeed: 4_227_000_089,
+            requestedEngineSeed: 4_227_100_089,
         });
         expect(value.launchedGameCount).toBe(1_080);
     });
@@ -132,6 +134,10 @@ describe("finish-advantage complete open causal-screen campaign", () => {
         expect(() => validateFinishAdvantageOpenCampaign({
             ...value,
             amendment4: { ...value.amendment4, sha256: hash },
+        })).toThrow("commitments drifted");
+        expect(() => validateFinishAdvantageOpenCampaign({
+            ...value,
+            amendment5: { ...value.amendment5, sha256: hash },
         })).toThrow("commitments drifted");
     });
 });

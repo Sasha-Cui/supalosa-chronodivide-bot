@@ -41,8 +41,8 @@ const irreversible: FinishAdvantageOpenArm = {
 
 describe("finish-advantage complete open causal-screen analysis", () => {
     it("derives the frozen same-seed family-country blocks", () => {
-        expect(deriveFinishAdvantageOpenSeed(0, 0)).toBe(4_227_000_000);
-        expect(deriveFinishAdvantageOpenSeed(9, 8)).toBe(4_227_000_089);
+        expect(deriveFinishAdvantageOpenSeed(0, 0)).toBe(4_227_100_000);
+        expect(deriveFinishAdvantageOpenSeed(9, 8)).toBe(4_227_100_089);
         expect(deriveFinishAdvantageOpenSeed(3, 4)).toBe(deriveFinishAdvantageOpenSeed(3, 4));
         expect(() => deriveFinishAdvantageOpenSeed(-1, 0)).toThrow("family ordinal");
         expect(() => deriveFinishAdvantageOpenSeed(0, 9)).toThrow("country ordinal");

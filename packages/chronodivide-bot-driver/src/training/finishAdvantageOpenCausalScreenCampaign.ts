@@ -14,10 +14,12 @@ import {
     FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_2_SHA256,
     FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_3_SHA256,
     FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_4_SHA256,
+    FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_5_SHA256,
     FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_SHA256,
     FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_COUNTRIES,
     FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_MAX_TICKS,
     FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_PROTOCOL_SHA256,
+    FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_SEED_BASE,
     FinishAdvantageOpenArm,
     buildFinishAdvantageOpenArms,
     deriveFinishAdvantageOpenSeed,
@@ -25,6 +27,9 @@ import {
 import { finishAdvantageOpenArmPolicyCommitment } from "./finishAdvantageOpenCausalScreenEpisode.js";
 import {
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_4_SHA256,
+    FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_6_SHA256,
+    FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_NAME,
+    FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_SHA256,
     selectFinishAdvantageTechnicalGatePolicy,
 } from "./finishAdvantageCompositeCompatibilityGate.js";
 import { FinishAdvantageMargin } from "./finishAdvantageControl.js";
@@ -33,11 +38,15 @@ import {
     ProgressCertifiedV5OpenDevelopmentFamily,
 } from "./progressCertifiedV5OpenDevelopmentCampaign.js";
 
-export const FINISH_ADVANTAGE_OPEN_CAMPAIGN_SCHEMA_VERSION = 2 as const;
+export const FINISH_ADVANTAGE_OPEN_CAMPAIGN_SCHEMA_VERSION = 3 as const;
 export const FINISH_ADVANTAGE_OPEN_CAMPAIGN_KIND =
     "finish-advantage-complete-open-causal-screen" as const;
 export const FINISH_ADVANTAGE_OPEN_BASELINE_COMMIT =
     "165b77a71d0cf5ebd27c65b19d0486bcbae78d0f" as const;
+const FINISH_ADVANTAGE_OFFICIAL_GATE_ARTIFACT_SHA256 =
+    "b29cc3d0d5501aa303d6e2fe40cd2c1f5aa761b86969100891efc098a18eaa50" as const;
+const FINISH_ADVANTAGE_COMPOSITE_GATE_ARTIFACT_SHA256 =
+    "c0391854746f7c4b5bc02d1fd9e01826b5708cedc05b54e42a72a8ffc4edbee9" as const;
 
 export type FinishAdvantageOpenCampaignArm = FinishAdvantageOpenArm & {
     policySha256: string;
@@ -58,7 +67,7 @@ export type FinishAdvantageOpenCampaignShard = {
 export type FinishAdvantageOpenCampaign = {
     schemaVersion: typeof FINISH_ADVANTAGE_OPEN_CAMPAIGN_SCHEMA_VERSION;
     kind: typeof FINISH_ADVANTAGE_OPEN_CAMPAIGN_KIND;
-    status: "FROZEN_FINISH_ADVANTAGE_COMPLETE_OPEN_CAUSAL_SCREEN_V2";
+    status: "FROZEN_FINISH_ADVANTAGE_COMPLETE_OPEN_CAUSAL_SCREEN_V3";
     generatedAt: string;
     outcomeAccess: "permanently-open-development-only-no-paper-claim";
     sourceGitCommit: string;
@@ -75,6 +84,7 @@ export type FinishAdvantageOpenCampaign = {
     amendment2: { path: string; sha256: typeof FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_2_SHA256 };
     amendment3: { path: string; sha256: typeof FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_3_SHA256 };
     amendment4: { path: string; sha256: typeof FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_4_SHA256 };
+    amendment5: { path: string; sha256: typeof FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_5_SHA256 };
     stateAudit: { path: string; sha256: string };
     officialMapGate: { path: string; sha256: string };
     compositeGate: { path: string; sha256: string };
@@ -157,7 +167,7 @@ export const validateFinishAdvantageOpenCampaign = (value: unknown): FinishAdvan
     if (
         !isRecord(value) || value.schemaVersion !== FINISH_ADVANTAGE_OPEN_CAMPAIGN_SCHEMA_VERSION ||
         value.kind !== FINISH_ADVANTAGE_OPEN_CAMPAIGN_KIND ||
-        value.status !== "FROZEN_FINISH_ADVANTAGE_COMPLETE_OPEN_CAUSAL_SCREEN_V2" ||
+        value.status !== "FROZEN_FINISH_ADVANTAGE_COMPLETE_OPEN_CAUSAL_SCREEN_V3" ||
         value.outcomeAccess !== "permanently-open-development-only-no-paper-claim" ||
         !GIT_COMMIT.test(String(value.sourceGitCommit)) || !SHA256.test(String(value.sourceRuntimeSha256)) ||
         value.externalBaselineGitCommit !== FINISH_ADVANTAGE_OPEN_BASELINE_COMMIT ||
@@ -172,7 +182,7 @@ export const validateFinishAdvantageOpenCampaign = (value: unknown): FinishAdvan
         !Array.isArray(value.countries) || !Array.isArray(value.selectedMargins) ||
         !Array.isArray(value.arms) || !Array.isArray(value.selectedFamilies) || !Array.isArray(value.shards) ||
         !isRecord(value.protocol) || !isRecord(value.amendment1) || !isRecord(value.amendment2) ||
-        !isRecord(value.amendment3) || !isRecord(value.amendment4) ||
+        !isRecord(value.amendment3) || !isRecord(value.amendment4) || !isRecord(value.amendment5) ||
         !isRecord(value.stateAudit) || !isRecord(value.officialMapGate) || !isRecord(value.compositeGate) ||
         !isRecord(value.programs)
     ) throw new Error("Finish-advantage open campaign has an invalid frozen schema");
@@ -186,6 +196,7 @@ export const validateFinishAdvantageOpenCampaign = (value: unknown): FinishAdvan
         campaign.amendment2.sha256 !== FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_2_SHA256 ||
         campaign.amendment3.sha256 !== FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_3_SHA256 ||
         campaign.amendment4.sha256 !== FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_4_SHA256 ||
+        campaign.amendment5.sha256 !== FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_5_SHA256 ||
         campaign.populationSha256 !== expectedPopulationSha256 ||
         JSON.stringify(campaign.countries) !== JSON.stringify(FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_COUNTRIES) ||
         JSON.stringify(campaign.selectedFamilies) !==
@@ -196,6 +207,7 @@ export const validateFinishAdvantageOpenCampaign = (value: unknown): FinishAdvan
     ) throw new Error("Finish-advantage open campaign commitments drifted");
     for (const evidence of [
         campaign.protocol, campaign.amendment1, campaign.amendment2, campaign.amendment3, campaign.amendment4,
+        campaign.amendment5,
         campaign.stateAudit,
         campaign.officialMapGate, campaign.compositeGate,
     ]) if (typeof evidence.path !== "string" || !SHA256.test(evidence.sha256)) {
@@ -236,6 +248,7 @@ const main = async (): Promise<void> => {
     const amendment2Path = requiredPath("OPEN_SCREEN_AMENDMENT_2");
     const amendment3Path = requiredPath("OPEN_SCREEN_AMENDMENT_3");
     const amendment4Path = requiredPath("OPEN_SCREEN_AMENDMENT_4");
+    const amendment5Path = requiredPath("OPEN_SCREEN_AMENDMENT_5");
     const stateAuditPath = requiredPath("STATE_AUDIT_FILE");
     const officialMapGatePath = requiredPath("OFFICIAL_MAP_GATE_FILE");
     const compositeGatePath = requiredPath("COMPOSITE_GATE_FILE");
@@ -253,7 +266,8 @@ const main = async (): Promise<void> => {
         sha256File(amendment1Path) !== FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_SHA256 ||
         sha256File(amendment2Path) !== FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_2_SHA256 ||
         sha256File(amendment3Path) !== FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_3_SHA256 ||
-        sha256File(amendment4Path) !== FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_4_SHA256
+        sha256File(amendment4Path) !== FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_4_SHA256 ||
+        sha256File(amendment5Path) !== FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_5_SHA256
     ) throw new Error("Finish-advantage open protocol commitment drifted");
     const stateAudit = verifyEvidence(stateAuditPath, stateAuditSha256);
     const officialMapGate = verifyEvidence(officialMapGatePath, officialMapGateSha256);
@@ -266,18 +280,32 @@ const main = async (): Promise<void> => {
     ) throw new Error("Finish-advantage open generation requires clean pushed main");
     const selection = selectFinishAdvantageTechnicalGatePolicy(stateAudit, stateAuditSha256);
     if (
+        officialMapGateSha256 !== FINISH_ADVANTAGE_OFFICIAL_GATE_ARTIFACT_SHA256 ||
         officialMapGate.kind !== "official-map-live-outcome-blind-compatibility-finalizer" ||
         officialMapGate.status !== "COMPLETE_OFFICIAL_MAP_LIVE_COMPATIBILITY_GATE" ||
         officialMapGate.complete !== true || officialMapGate.outcomeFree !== true ||
         officialMapGate.schedulerAccount !== "pi_jss233" || officialMapGate.cellCount !== 738 ||
-        officialMapGate.launchedGameCount !== 1_476 || officialMapGate.sourceGitCommit !== sourceGitCommit ||
+        officialMapGate.launchedGameCount !== 1_476 ||
+        officialMapGate.sourceGitCommit !== "0bfd3ef1b2487b3914936d7b516e4abb1ca99b43" ||
+        officialMapGate.aggregatorGitCommit !== "7f4a0eb3e23ba29d64cf63ee6fdeded9a91be4be" ||
+        officialMapGate.aggregationRepairSha256 !==
+            "d03f6921568f3c7a709c720447431fb148308e22913a5fae35c5a48c4beef88c" ||
+        officialMapGate.campaignSha256 !==
+            "fb887bbc5ca2f827550e47337a207de862ecd39f95177dbde9f4ac7b0d5b03d4" ||
+        officialMapGate.arrayJobId !== "22596084" || officialMapGate.controllerJobId !== "22597427" ||
+        compositeGateSha256 !== FINISH_ADVANTAGE_COMPOSITE_GATE_ARTIFACT_SHA256 ||
         compositeGate.kind !== "finish-advantage-outcome-free-composite-compatibility-gate" ||
         compositeGate.schemaVersion !== 2 ||
         compositeGate.status !== "PASS_OUTCOME_FREE_COMPOSITE_COMPATIBILITY" ||
         compositeGate.passed !== true || compositeGate.outcomeFree !== true ||
         !isRecord(compositeGate.scheduler) || compositeGate.scheduler.account !== "pi_jss233" ||
-        compositeGate.gameCount !== 72 || compositeGate.sourceGitCommit !== sourceGitCommit ||
+        compositeGate.gameCount !== 72 ||
+        compositeGate.sourceGitCommit !== "d98bc78296fc80f57ee7a180a9462c5f2782bec4" ||
         compositeGate.amendment4Sha256 !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_4_SHA256 ||
+        compositeGate.amendment6Sha256 !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_6_SHA256 ||
+        compositeGate.diagnosticMapName !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_NAME ||
+        compositeGate.diagnosticMapSha256 !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_SHA256 ||
+        compositeGate.maxTicks !== 24_000 ||
         compositeGate.terminalBaseRaceMode !== "strict_literal_endpoint_base_race" ||
         compositeGate.stateAuditSha256 !== stateAuditSha256 ||
         JSON.stringify(compositeGate.selectedMargins) !== JSON.stringify(selection.selectedMargins)
@@ -303,7 +331,7 @@ const main = async (): Promise<void> => {
             maxTicks: FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_MAX_TICKS,
         },
         baseline: baselineFactory.descriptor,
-        gameSeedBase: 4_227_000_000,
+        gameSeedBase: FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_SEED_BASE,
     });
     const baseline = generation.software.baseline;
     if (
@@ -316,7 +344,7 @@ const main = async (): Promise<void> => {
     const campaign: FinishAdvantageOpenCampaign = {
         schemaVersion: FINISH_ADVANTAGE_OPEN_CAMPAIGN_SCHEMA_VERSION,
         kind: FINISH_ADVANTAGE_OPEN_CAMPAIGN_KIND,
-        status: "FROZEN_FINISH_ADVANTAGE_COMPLETE_OPEN_CAUSAL_SCREEN_V2",
+        status: "FROZEN_FINISH_ADVANTAGE_COMPLETE_OPEN_CAUSAL_SCREEN_V3",
         generatedAt: new Date().toISOString(),
         outcomeAccess: "permanently-open-development-only-no-paper-claim",
         sourceGitCommit,
@@ -333,6 +361,7 @@ const main = async (): Promise<void> => {
         amendment2: { path: amendment2Path, sha256: FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_2_SHA256 },
         amendment3: { path: amendment3Path, sha256: FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_3_SHA256 },
         amendment4: { path: amendment4Path, sha256: FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_4_SHA256 },
+        amendment5: { path: amendment5Path, sha256: FINISH_ADVANTAGE_OPEN_CAUSAL_SCREEN_AMENDMENT_5_SHA256 },
         stateAudit: { path: stateAuditPath, sha256: stateAuditSha256 },
         officialMapGate: { path: officialMapGatePath, sha256: officialMapGateSha256 },
         compositeGate: { path: compositeGatePath, sha256: compositeGateSha256 },
