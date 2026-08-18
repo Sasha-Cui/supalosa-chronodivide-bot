@@ -102,6 +102,8 @@ export class ProgressTriggeredAttackReplacementStrategy implements StrategyLike 
         private readonly replaceFactory: (strategy: StrategyLike, factory: AttackMissionFactory) => void,
         private readonly replacementTelemetry: (event: ProgressTriggeredReplacementTelemetry) => void,
         private readonly attackFactoryTelemetry: (event: AttackMissionFactoryTelemetry) => void,
+        private readonly onReplacement: (context: SupabotContext, missionController: MissionController,
+            logger: DebugLogger) => void = () => undefined,
     ) { this.policy = validateProgressTriggeredReplacementPolicy(rawPolicy); }
 
     onAiUpdate(context: SupabotContext, missionController: MissionController, logger: DebugLogger): StrategyLike {
@@ -132,6 +134,7 @@ export class ProgressTriggeredAttackReplacementStrategy implements StrategyLike 
             ticksSinceBuildingProgress: tick - this.lastBuildingProgressTick,
             existingMissionNamesBefore: before, existingMissionNamesAfter: after,
             forbiddenFieldsEmitted: [] });
+        this.onReplacement(context, missionController, logger);
         return this;
     }
 }
@@ -147,6 +150,8 @@ export const createProgressTriggeredAttackReplacementCandidate = (
         replacement: (event: ProgressTriggeredReplacementTelemetry) => void;
         attackFactory: (event: AttackMissionFactoryTelemetry) => void;
     } = { v5: () => undefined, replacement: () => undefined, attackFactory: () => undefined },
+    onReplacement: (context: SupabotContext, missionController: MissionController,
+        logger: DebugLogger) => void = () => undefined,
 ): InspectableBaselineBot => {
     const v5 = validateProgressCertifiedConversionPolicyV5(rawV5Policy);
     const replacement = validateProgressTriggeredReplacementPolicy(rawReplacementPolicy);
@@ -158,7 +163,7 @@ export const createProgressTriggeredAttackReplacementCandidate = (
     const deferred: StrategyLike = replacement.enabled ? new ProgressTriggeredAttackReplacementStrategy(
         exact as StrategyLike, country, replacement,
         (inner, attackFactory) => factory.replaceDefaultStrategyAttackFactory!(inner, attackFactory),
-        telemetry.replacement, telemetry.attackFactory,
+        telemetry.replacement, telemetry.attackFactory, onReplacement,
     ) : exact as StrategyLike;
     const outer: StrategyLike = v5.enabled ? new TerminalObjectiveStrategy(
         deferred as never, country, v5, telemetry.v5, "strict_literal_endpoint_base_race",
