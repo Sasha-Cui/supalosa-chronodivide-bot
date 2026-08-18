@@ -148,6 +148,7 @@ const main = async (): Promise<void> => {
         fileHash(path.join(driverRoot, "data", MAP_NAME)) !== MAP_SHA256
     ) throw new Error("Stagnation-assault gate source or map contract failed");
 
+    await cdapi.init(path.join(driverRoot, "data"));
     const factory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
     const policy = buildStagnationAssaultPolicy("early_strong");
     const manifest = createExperimentManifest({
