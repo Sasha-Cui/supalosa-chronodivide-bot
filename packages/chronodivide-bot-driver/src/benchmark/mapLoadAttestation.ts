@@ -168,6 +168,8 @@ export type MapLoadAttestationEvidence = {
     expectedSha256: string;
     phases: Array<{ phase: MapLoadPhase; expectedReads: number; observedReads: number }>;
     reads: MapLoadReadAttestation[];
+    readPolicy?: "authenticated_cache_reuse_v2";
+    authenticatedCacheReusePhases?: MapLoadPhase[];
     complete: true;
 };
 
@@ -760,7 +762,26 @@ export class MapLoadAttestationSession {
     private phaseStart = 0;
     private nextPhaseIndex = 0;
 
-    constructor(private readonly materialized: MaterializedMapAlias) {}
+    constructor(
+        private readonly materialized: MaterializedMapAlias,
+        private readonly allowAuthenticatedCacheReuse = false,
+    ) {}
+
+    private assertAliasIntegrity(): void {
+        assertUniqueMaterializedAlias(
+            this.materialized.resolutionRoots,
+            this.materialized.alias,
+            this.materialized.aliasPath,
+        );
+        const stat = fs.lstatSync(this.materialized.aliasPath);
+        if (
+            !stat.isFile() || stat.isSymbolicLink() || (stat.mode & 0o777) !== 0o400 ||
+            stat.size !== this.materialized.bytes ||
+            sha256AttestationFile(this.materialized.aliasPath) !== this.materialized.sha256
+        ) {
+            throw new MapLoadAttestationError("Authenticated map alias drifted during cache-reuse attestation");
+        }
+    }
 
     async runPhase<T>(phase: MapLoadPhase, operation: () => Promise<T>): Promise<T> {
         if (this.activePhase !== null) {
@@ -770,17 +791,34 @@ export class MapLoadAttestationSession {
         if (phase !== expectedPhase) {
             throw new MapLoadAttestationError(`Expected map-load phase ${String(expectedPhase)}, got ${phase}`);
         }
+        if (this.allowAuthenticatedCacheReuse) this.assertAliasIntegrity();
         this.activePhase = phase;
         this.phaseStart = this.reads.length;
         try {
             const value = await operation();
             const observedReads = this.reads.length - this.phaseStart;
             const expectedReads = MAP_LOAD_PHASE_READ_COUNTS[phase];
-            if (observedReads !== expectedReads) {
+            const authenticatedCacheReuse = this.allowAuthenticatedCacheReuse &&
+                phase !== "initialization" && observedReads === 0;
+            if (observedReads !== expectedReads && !authenticatedCacheReuse) {
                 throw new MapLoadAttestationError(
                     `Map-load phase ${phase} observed ${observedReads} reads; expected ${expectedReads}`,
                 );
             }
+            if (authenticatedCacheReuse) {
+                const initializationReads = this.reads.filter((record) => record.phase === "initialization");
+                if (
+                    initializationReads.length !== 1 ||
+                    initializationReads[0].bytes !== this.materialized.bytes ||
+                    initializationReads[0].sha256 !== this.materialized.sha256 ||
+                    initializationReads[0].inMemorySnapshot !== true
+                ) {
+                    throw new MapLoadAttestationError(
+                        `Map-load phase ${phase} cannot reuse an unauthenticated initialization snapshot`,
+                    );
+                }
+            }
+            if (this.allowAuthenticatedCacheReuse) this.assertAliasIntegrity();
             this.completedPhases.push({ phase, expectedReads, observedReads });
             this.nextPhaseIndex++;
             return value;
@@ -845,7 +883,19 @@ export class MapLoadAttestationSession {
     }
 
     evidence(): MapLoadAttestationEvidence {
-        if (this.activePhase !== null || this.nextPhaseIndex !== PHASE_ORDER.length || this.reads.length !== 5) {
+        const cacheReusePhases = this.completedPhases
+            .filter(({ phase, observedReads }) => phase !== "initialization" && observedReads === 0)
+            .map(({ phase }) => phase);
+        const createReadCounts = this.completedPhases
+            .filter(({ phase }) => phase !== "initialization")
+            .map(({ observedReads }) => observedReads);
+        const completeReadCount = this.allowAuthenticatedCacheReuse
+            ? (this.reads.length === 1 || this.reads.length === 5)
+            : this.reads.length === 5;
+        if (
+            this.activePhase !== null || this.nextPhaseIndex !== PHASE_ORDER.length || !completeReadCount ||
+            (this.allowAuthenticatedCacheReuse && new Set(createReadCounts).size !== 1)
+        ) {
             throw new MapLoadAttestationError("Map-load attestation is incomplete");
         }
         return {
@@ -856,6 +906,10 @@ export class MapLoadAttestationSession {
             expectedSha256: this.materialized.sha256,
             phases: this.completedPhases.map((record) => ({ ...record })),
             reads: this.reads.map((record) => ({ ...record })),
+            ...(this.allowAuthenticatedCacheReuse ? {
+                readPolicy: "authenticated_cache_reuse_v2" as const,
+                authenticatedCacheReusePhases: cacheReusePhases,
+            } : {}),
             complete: true,
         };
     }
@@ -869,6 +923,7 @@ let installedSession: MapLoadAttestationSession | null = null;
  */
 export const withMapLoadAttestation = async <T>(args: {
     materialized: MaterializedMapAlias;
+    allowAuthenticatedCacheReuse?: boolean;
     operation: (session: MapLoadAttestationSession) => Promise<T>;
 }): Promise<{ value: T; evidence: MapLoadAttestationEvidence }> => {
     const compatibility = validateMapLoadCompatibility();
@@ -919,7 +974,10 @@ export const withMapLoadAttestation = async <T>(args: {
         throw new Error("Node adapter FileHandle.getFile descriptor is unavailable");
     }
     const originalGetFile = originalDescriptor.value as AdapterGetFile;
-    const session = new MapLoadAttestationSession(args.materialized);
+    const session = new MapLoadAttestationSession(
+        args.materialized,
+        args.allowAuthenticatedCacheReuse === true,
+    );
     installedSession = session;
     try {
         process.chdir(args.materialized.sandboxDirectory);

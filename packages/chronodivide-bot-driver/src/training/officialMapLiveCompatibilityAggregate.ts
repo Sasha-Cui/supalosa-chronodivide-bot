@@ -148,12 +148,15 @@ const validateCell = (args: {
         value.candidatePolicyId !== campaign.candidatePolicyId ||
         value.populationSha256 !== campaign.populationSha256 || value.protocolSha256 !== campaign.protocolSha256 ||
         value.repairAmendmentSha256 !== campaign.repairAmendmentSha256 ||
+        value.cacheReuseAmendmentSha256 !== campaign.cacheReuseAmendmentSha256 ||
         !isRecord(value.scheduler) || value.scheduler.account !== "pi_jss233" ||
         String(value.scheduler.arrayJobId) !== arrayJobId || value.scheduler.jobId !== scheduler.schedulerJobId ||
         !isRecord(value.mapLoadAttestation) || value.mapLoadAttestation.complete !== true ||
         value.mapLoadAttestation.expectedBytes !== family.mapBytes ||
         value.mapLoadAttestation.expectedSha256 !== family.mapSha256 ||
         !Array.isArray(value.mapLoadAttestation.phases) || value.mapLoadAttestation.phases.length !== 3 ||
+        value.mapLoadAttestation.readPolicy !== "authenticated_cache_reuse_v2" ||
+        !Array.isArray(value.mapLoadAttestation.authenticatedCacheReusePhases) ||
         !SHA256.test(String(value.mapLoadAttestation.readsSha256)) ||
         !isRecord(value.initialization) || !Array.isArray(value.replicates) || value.replicates.length !== 2 ||
         typeof value.deterministic !== "boolean" || !stringArray(value.validationErrors) ||
@@ -162,14 +165,20 @@ const validateCell = (args: {
         typeof value.privateDiagnostics.recordCount !== "number" ||
         !Number.isSafeInteger(value.privateDiagnostics.recordCount) || value.privateDiagnostics.recordCount < 0
     ) throw new Error(`Official-map task ${taskIndex} failed structural or provenance validation`);
-    const expectedPhases = [
-        { phase: "initialization", expectedReads: 1, observedReads: 1 },
-        { phase: "forward_create", expectedReads: 2, observedReads: 2 },
-        { phase: "reverse_create", expectedReads: 2, observedReads: 2 },
-    ];
-    if (JSON.stringify(value.mapLoadAttestation.phases) !== JSON.stringify(expectedPhases)) {
-        throw new Error(`Official-map task ${taskIndex} map-read attestation drifted`);
-    }
+    const phases = value.mapLoadAttestation.phases as RecordValue[];
+    const initialization = phases[0];
+    const forward = phases[1];
+    const reverse = phases[2];
+    const createReads = Number(forward.observedReads);
+    const expectedCacheReusePhases = createReads === 0 ? ["forward_create", "reverse_create"] : [];
+    if (
+        initialization.phase !== "initialization" || initialization.expectedReads !== 1 ||
+        initialization.observedReads !== 1 || forward.phase !== "forward_create" ||
+        forward.expectedReads !== 2 || reverse.phase !== "reverse_create" || reverse.expectedReads !== 2 ||
+        (createReads !== 0 && createReads !== 2) || reverse.observedReads !== createReads ||
+        JSON.stringify(value.mapLoadAttestation.authenticatedCacheReusePhases) !==
+            JSON.stringify(expectedCacheReusePhases)
+    ) throw new Error(`Official-map task ${taskIndex} map-read attestation drifted`);
     const digests = new Set<string>();
     const reviews: string[] = [];
     for (const [replicateIndex, replicate] of value.replicates.entries()) {
@@ -329,6 +338,7 @@ const main = (): void => {
         staticScreenSha256: campaign.staticScreenSha256,
         protocolSha256: campaign.protocolSha256,
         repairAmendmentSha256: campaign.repairAmendmentSha256,
+        cacheReuseAmendmentSha256: campaign.cacheReuseAmendmentSha256,
         campaignPath,
         campaignSha256,
         arrayJobId,

@@ -336,6 +336,7 @@ const main = async (): Promise<void> => {
             populationSha256: campaign.populationSha256,
             protocolSha256: campaign.protocolSha256,
             repairAmendmentSha256: campaign.repairAmendmentSha256,
+            cacheReuseAmendmentSha256: campaign.cacheReuseAmendmentSha256,
             outcomeInspection: false,
         },
         baseline: baselineFactory.descriptor,
@@ -365,6 +366,7 @@ const main = async (): Promise<void> => {
     try {
         const attested = await withMapLoadAttestation({
             materialized,
+            allowAuthenticatedCacheReuse: true,
             operation: async (session) => {
                 const initialization = await session.runPhase("initialization", async () => {
                     const captured = await captureConsoleWarnings(
@@ -475,6 +477,7 @@ const main = async (): Promise<void> => {
             populationSha256: campaign.populationSha256,
             protocolSha256: campaign.protocolSha256,
             repairAmendmentSha256: campaign.repairAmendmentSha256,
+            cacheReuseAmendmentSha256: campaign.cacheReuseAmendmentSha256,
             scheduler: manifest.scheduler,
             mapLoadAttestation: {
                 protocol: MAP_LOAD_ATTESTATION_PROTOCOL,
@@ -482,6 +485,8 @@ const main = async (): Promise<void> => {
                 expectedBytes: attested.evidence.expectedBytes,
                 expectedSha256: attested.evidence.expectedSha256,
                 phases: attested.evidence.phases,
+                readPolicy: attested.evidence.readPolicy,
+                authenticatedCacheReusePhases: attested.evidence.authenticatedCacheReusePhases,
                 readsSha256: canonicalSha256(attested.evidence.reads),
                 complete: attested.evidence.complete,
             },

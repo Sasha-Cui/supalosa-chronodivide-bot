@@ -9,7 +9,7 @@ import { createExperimentManifest } from "../benchmark/provenance.js";
 import { buildProgressCertifiedV5Arms } from "./progressCertifiedV5ExperimentPolicy.js";
 import { sha256File } from "./methodV5PlanRunner.js";
 
-export const OFFICIAL_MAP_LIVE_ENGINE_SEED_BASE = 4_226_100_000 as const;
+export const OFFICIAL_MAP_LIVE_ENGINE_SEED_BASE = 4_226_200_000 as const;
 export const OFFICIAL_MAP_LIVE_TARGET_TICK = 120 as const;
 export const OFFICIAL_MAP_LIVE_BASELINE_COMMIT =
     "165b77a71d0cf5ebd27c65b19d0486bcbae78d0f" as const;
@@ -21,6 +21,8 @@ export const OFFICIAL_MAP_LIVE_PROTOCOL_SHA256 =
     "472eaaada854fdeff04a8bcddfbc93efc1bb1fdb59d8b92f55b5651f07ef9ea0" as const;
 export const OFFICIAL_MAP_RUNTIME_REPAIR_SHA256 =
     "78ebc27c203e83fa9281756750562b4f05257ee492b1a6ed0a8558f9b71723de" as const;
+export const OFFICIAL_MAP_CACHE_REUSE_SHA256 =
+    "7ab0f11fdb9612753853b809370e2d9e74bae668a7ea6de70a0876059a12f3b6" as const;
 
 export const OFFICIAL_MAP_LIVE_COUNTRIES = [
     Countries.USA,
@@ -84,9 +86,9 @@ export type OfficialMapLiveFamily = {
 };
 
 export type OfficialMapLiveCampaign = {
-    schemaVersion: 2;
+    schemaVersion: 3;
     kind: "official-map-live-outcome-blind-compatibility";
-    status: "FROZEN_OFFICIAL_MAP_LIVE_COMPATIBILITY_V2_RUNTIME_REPAIR";
+    status: "FROZEN_OFFICIAL_MAP_LIVE_COMPATIBILITY_V3_AUTHENTICATED_CACHE_REUSE";
     generatedAt: string;
     sourceGitCommit: string;
     sourceRuntimeSha256: string;
@@ -104,6 +106,8 @@ export type OfficialMapLiveCampaign = {
     protocolSha256: typeof OFFICIAL_MAP_LIVE_PROTOCOL_SHA256;
     repairAmendmentPath: string;
     repairAmendmentSha256: typeof OFFICIAL_MAP_RUNTIME_REPAIR_SHA256;
+    cacheReuseAmendmentPath: string;
+    cacheReuseAmendmentSha256: typeof OFFICIAL_MAP_CACHE_REUSE_SHA256;
     generationManifestPath: string;
     generationManifestSha256: string;
     populationSha256: string;
@@ -307,9 +311,9 @@ export const loadOfficialMapLiveFamilies = (
 
 export const validateOfficialMapLiveCampaign = (value: unknown): OfficialMapLiveCampaign => {
     if (
-        !isRecord(value) || value.schemaVersion !== 2 ||
+        !isRecord(value) || value.schemaVersion !== 3 ||
         value.kind !== "official-map-live-outcome-blind-compatibility" ||
-        value.status !== "FROZEN_OFFICIAL_MAP_LIVE_COMPATIBILITY_V2_RUNTIME_REPAIR" ||
+        value.status !== "FROZEN_OFFICIAL_MAP_LIVE_COMPATIBILITY_V3_AUTHENTICATED_CACHE_REUSE" ||
         typeof value.generatedAt !== "string" || Number.isNaN(Date.parse(value.generatedAt)) ||
         typeof value.sourceGitCommit !== "string" || !/^[0-9a-f]{40}$/.test(value.sourceGitCommit) ||
         typeof value.sourceRuntimeSha256 !== "string" || !/^[0-9a-f]{64}$/.test(value.sourceRuntimeSha256) ||
@@ -325,6 +329,8 @@ export const validateOfficialMapLiveCampaign = (value: unknown): OfficialMapLive
         typeof value.protocolPath !== "string" || value.protocolSha256 !== OFFICIAL_MAP_LIVE_PROTOCOL_SHA256 ||
         typeof value.repairAmendmentPath !== "string" ||
         value.repairAmendmentSha256 !== OFFICIAL_MAP_RUNTIME_REPAIR_SHA256 ||
+        typeof value.cacheReuseAmendmentPath !== "string" ||
+        value.cacheReuseAmendmentSha256 !== OFFICIAL_MAP_CACHE_REUSE_SHA256 ||
         typeof value.generationManifestPath !== "string" ||
         typeof value.generationManifestSha256 !== "string" || !/^[0-9a-f]{64}$/.test(value.generationManifestSha256) ||
         typeof value.populationSha256 !== "string" || !/^[0-9a-f]{64}$/.test(value.populationSha256) ||
@@ -344,6 +350,7 @@ export const validateOfficialMapLiveCampaign = (value: unknown): OfficialMapLive
         sha256File(campaign.staticScreenPath) !== campaign.staticScreenSha256 ||
         sha256File(campaign.protocolPath) !== campaign.protocolSha256 ||
         sha256File(campaign.repairAmendmentPath) !== campaign.repairAmendmentSha256 ||
+        sha256File(campaign.cacheReuseAmendmentPath) !== campaign.cacheReuseAmendmentSha256 ||
         sha256File(campaign.generationManifestPath) !== campaign.generationManifestSha256 ||
         campaign.populationSha256 !== sha256Text(JSON.stringify(campaign.selectedFamilies)) ||
         JSON.stringify(campaign.selectedFamilies) !== JSON.stringify(loadOfficialMapLiveFamilies(
@@ -373,11 +380,13 @@ const main = async (): Promise<void> => {
     const staticScreenPath = requiredPath("OFFICIAL_MAP_STATIC_SCREEN");
     const protocolPath = requiredPath("OFFICIAL_MAP_LIVE_PROTOCOL");
     const repairAmendmentPath = requiredPath("OFFICIAL_MAP_RUNTIME_REPAIR");
+    const cacheReuseAmendmentPath = requiredPath("OFFICIAL_MAP_CACHE_REUSE");
     const outRoot = requiredPath("OUT_ROOT");
     if (fs.existsSync(outRoot)) throw new Error(`Refusing to reuse official-map campaign root ${outRoot}`);
     if (
         sha256File(protocolPath) !== OFFICIAL_MAP_LIVE_PROTOCOL_SHA256 ||
-        sha256File(repairAmendmentPath) !== OFFICIAL_MAP_RUNTIME_REPAIR_SHA256
+        sha256File(repairAmendmentPath) !== OFFICIAL_MAP_RUNTIME_REPAIR_SHA256 ||
+        sha256File(cacheReuseAmendmentPath) !== OFFICIAL_MAP_CACHE_REUSE_SHA256
     ) throw new Error("Official-map live protocol bytes drifted");
     const families = loadOfficialMapLiveFamilies(identityAuditPath, staticScreenPath);
     const candidateArm = buildProgressCertifiedV5Arms().find(
@@ -386,7 +395,7 @@ const main = async (): Promise<void> => {
     if (!candidateArm) throw new Error("Frozen V5 candidate arm is unavailable");
     const baselineFactory = await loadBaselineFactory(path.join(repoRoot, "packages", "chronodivide-bot"));
     const manifest = createExperimentManifest({
-        runId: "generate-official-map-live-outcome-blind-compatibility-v2-runtime-repair",
+        runId: "generate-official-map-live-outcome-blind-compatibility-v3-authenticated-cache-reuse",
         mixDir: path.join(driverRoot, "data"),
         maps: [],
         effectiveConfig: {
@@ -401,6 +410,7 @@ const main = async (): Promise<void> => {
             targetTick: OFFICIAL_MAP_LIVE_TARGET_TICK,
             protocolSha256: OFFICIAL_MAP_LIVE_PROTOCOL_SHA256,
             repairAmendmentSha256: OFFICIAL_MAP_RUNTIME_REPAIR_SHA256,
+            cacheReuseAmendmentSha256: OFFICIAL_MAP_CACHE_REUSE_SHA256,
             identityAuditSha256: OFFICIAL_MAP_IDENTITY_AUDIT_SHA256,
             staticScreenSha256: OFFICIAL_MAP_STATIC_SCREEN_SHA256,
             candidatePolicyId: candidateArm.policyId,
@@ -427,9 +437,9 @@ const main = async (): Promise<void> => {
         mode: 0o600,
     });
     const campaign: OfficialMapLiveCampaign = {
-        schemaVersion: 2,
+        schemaVersion: 3,
         kind: "official-map-live-outcome-blind-compatibility",
-        status: "FROZEN_OFFICIAL_MAP_LIVE_COMPATIBILITY_V2_RUNTIME_REPAIR",
+        status: "FROZEN_OFFICIAL_MAP_LIVE_COMPATIBILITY_V3_AUTHENTICATED_CACHE_REUSE",
         generatedAt: new Date().toISOString(),
         sourceGitCommit: manifest.source.gitCommit,
         sourceRuntimeSha256: runtimeCommitment(manifest.source.runtimeTrees),
@@ -447,6 +457,8 @@ const main = async (): Promise<void> => {
         protocolSha256: OFFICIAL_MAP_LIVE_PROTOCOL_SHA256,
         repairAmendmentPath,
         repairAmendmentSha256: OFFICIAL_MAP_RUNTIME_REPAIR_SHA256,
+        cacheReuseAmendmentPath,
+        cacheReuseAmendmentSha256: OFFICIAL_MAP_CACHE_REUSE_SHA256,
         generationManifestPath,
         generationManifestSha256: sha256File(generationManifestPath),
         populationSha256: sha256Text(JSON.stringify(families)),

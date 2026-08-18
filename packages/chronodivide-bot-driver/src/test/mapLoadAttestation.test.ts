@@ -367,6 +367,42 @@ describe("collision-free map-load attestation", () => {
         }
     });
 
+    it("attests authenticated initialization-snapshot reuse without weakening alias integrity", async () => {
+        const fixture = makeFixture();
+        try {
+            const map = materialize(fixture);
+            const result = await withMapLoadAttestation({
+                materialized: map,
+                allowAuthenticatedCacheReuse: true,
+                operation: async (session) => {
+                    await session.runPhase("initialization", async () => void (await readAlias(map, 1)));
+                    await session.runPhase("forward_create", async () => undefined);
+                    await session.runPhase("reverse_create", async () => undefined);
+                    return "cached";
+                },
+            });
+            expect(result.value).toBe("cached");
+            expect(result.evidence.phases).toEqual([
+                { phase: "initialization", expectedReads: 1, observedReads: 1 },
+                { phase: "forward_create", expectedReads: 2, observedReads: 0 },
+                { phase: "reverse_create", expectedReads: 2, observedReads: 0 },
+            ]);
+            expect(result.evidence.readPolicy).toBe("authenticated_cache_reuse_v2");
+            expect(result.evidence.authenticatedCacheReusePhases).toEqual([
+                "forward_create",
+                "reverse_create",
+            ]);
+            expect(result.evidence.reads).toHaveLength(1);
+            expect(result.evidence.reads[0]).toMatchObject({
+                phase: "initialization",
+                sha256: fixture.digest,
+                inMemorySnapshot: true,
+            });
+        } finally {
+            fs.rmSync(fixture.root, { recursive: true, force: true });
+        }
+    });
+
     it("preserves 1+2+2 evidence when each order fails after its first engine preparation read", async () => {
         const fixture = makeFixture();
         try {
