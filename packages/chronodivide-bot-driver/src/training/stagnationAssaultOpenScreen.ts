@@ -542,9 +542,23 @@ const finalize = (): void => {
     const arrayJobId = requiredText("ARRAY_JOB_ID", /^\d+$/);
     if (fs.existsSync(outFile) || fileHash(campaignPath) !== campaignSha256) throw new Error("Finalizer input drifted");
     const campaign = validateCampaign(readJson(campaignPath));
-    if (fileHash(process.argv[1]!) !== campaign.programs.screenSha256 ||
-        execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim() !== campaign.sourceGitCommit ||
-        fileHash(campaign.protocol.path) !== campaign.protocol.sha256 ||
+    const aggregatorGitCommit = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+    let aggregationRepairSha256: string | null = null;
+    let originalControllerJobId: string | null = null;
+    if (aggregatorGitCommit !== campaign.sourceGitCommit) {
+        const repairPath = requiredPath("AGGREGATION_REPAIR_PATH");
+        aggregationRepairSha256 = fileHash(repairPath);
+        originalControllerJobId = requiredText("ORIGINAL_CONTROLLER_JOB_ID", /^\d+$/);
+        if (
+            campaignSha256 !== "c33ae1474ac7251b506d7d8125b71e711a3a1a5d142802bb28d61696f2a19e17" ||
+            campaign.sourceGitCommit !== "78fc074581f69262604c6e2f555eb09955215268" ||
+            arrayJobId !== "22619156" || originalControllerJobId !== "22619157" ||
+            aggregationRepairSha256 !== "95995d1da71cefeb71edb941f6eaae48edc77e044fc1953577bccaeecf7816c8"
+        ) throw new Error("Finalizer aggregation repair authorization failed");
+    } else if (fileHash(process.argv[1]!) !== campaign.programs.screenSha256) {
+        throw new Error("Finalizer program drifted");
+    }
+    if (fileHash(campaign.protocol.path) !== campaign.protocol.sha256 ||
         fileHash(campaign.compatibilityGate.path) !== campaign.compatibilityGate.sha256) {
         throw new Error("Finalizer source drifted");
     }
@@ -613,6 +627,10 @@ const finalize = (): void => {
     if (observations.length !== 900) throw new Error(`Finalizer observed ${observations.length}/900 games`);
     const controlRows = rowsFor(observations, "external_supalosa_control");
     const v5Rows = rowsFor(observations, "unchanged_v5");
+    const v5ComparisonAliasRows = v5Rows.map((row) => ({
+        ...row,
+        armId: "visibility_aware_final_building_v5" as const,
+    })) as FinishAdvantageOpenOutcomeRow[];
     const controlAbsolute = summarizeFinishAdvantageOpenAbsoluteRates(controlRows);
     const v5Absolute = summarizeFinishAdvantageOpenAbsoluteRates(v5Rows);
     const evaluations = campaign.arms.filter(({ kind }) => kind === "assault").map((arm) => {
@@ -621,7 +639,11 @@ const finalize = (): void => {
         const absolute = summarizeFinishAdvantageOpenAbsoluteRates(armRows);
         const versusSupalosa = compareFinishAdvantageOpenArms(armRows, controlRows,
             "external_supalosa_control" as never);
-        const versusV5 = compareFinishAdvantageOpenArms(armRows, v5Rows, "visibility_aware_final_building_v5" as never);
+        const versusV5 = compareFinishAdvantageOpenArms(
+            armRows,
+            v5ComparisonAliasRows,
+            "visibility_aware_final_building_v5",
+        );
         const missionCreations = armObservations.flatMap(({ assault }) => assault)
             .filter(({ missionCreated }) => missionCreated).length;
         const eligibilityFailures: string[] = [];
@@ -659,7 +681,8 @@ const finalize = (): void => {
         status: selected ? "ADVANCING_CANDIDATE" : "NO_ADVANCING_CANDIDATE", complete: true,
         technicallyClean: true, developmentOnly: true, notPaperClaimEvidence: true,
         schedulerAccount: "pi_jss233", arrayJobId, controllerJobId: process.env.SLURM_JOB_ID,
-        sourceGitCommit: campaign.sourceGitCommit, campaignPath, campaignSha256,
+        sourceGitCommit: campaign.sourceGitCommit, aggregatorGitCommit, aggregationRepairSha256,
+        originalControllerJobId, campaignPath, campaignSha256,
         launchedGameCount: 900, familyCount: 10, countryCount: 9, reciprocalSlotCount: 2,
         armCount: 5, schedulerJobIds: [...scheduler.values()].sort((a, b) => Number(a) - Number(b)),
         selectedArmId: selected?.arm.armId ?? null, controlAbsolute, v5Absolute, evaluations, byArm,
