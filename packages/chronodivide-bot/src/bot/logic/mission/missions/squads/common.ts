@@ -5,7 +5,7 @@ import { BatchableAction } from "../../actionBatcher.js";
 const NONCE_GI_DEPLOY = 0;
 const NONCE_GI_UNDEPLOY = 1;
 
-export type CombatTargetPriority = "distance" | "strategic";
+export type CombatTargetPriority = "distance" | "strategic" | "objective";
 
 // Micro methods
 export function manageMoveMicro(attacker: UnitData, attackPoint: Vector2): BatchableAction {
@@ -101,8 +101,8 @@ export function getAttackWeight(
     if (targetPriority === "distance") {
         return distanceWeight;
     }
-
-    return getStrategicTargetWeight(target) + distanceWeight;
+    return (targetPriority === "strategic" ? getStrategicTargetWeight(target) :
+        getObjectiveTargetWeight(target)) + distanceWeight;
 }
 
 function canAttackZone(attacker: UnitData, targetZone: ZoneType): boolean {
@@ -133,6 +133,28 @@ function getStrategicTargetWeight(target: UnitData): number {
         return 5000000 + (target.maxHitPoints ?? 0);
     }
     if (target.type === ObjectType.Building) {
+        return 4000000 + (target.maxHitPoints ?? 0);
+    }
+    return target.maxHitPoints ?? 0;
+}
+
+function getObjectiveTargetWeight(target: UnitData): number {
+    if (target.rules.constructionYard) {
+        return 9000000 + (target.maxHitPoints ?? 0);
+    }
+    if (target.rules.weaponsFactory) {
+        return 8000000 + (target.maxHitPoints ?? 0);
+    }
+    if (target.rules.refinery) {
+        return 7000000 + (target.maxHitPoints ?? 0);
+    }
+    if (target.type === ObjectType.Building) {
+        return 6000000 + (target.maxHitPoints ?? 0);
+    }
+    if (target.rules.harvester) {
+        return 5000000 + (target.maxHitPoints ?? 0);
+    }
+    if (target.rules.isSelectableCombatant) {
         return 4000000 + (target.maxHitPoints ?? 0);
     }
     return target.maxHitPoints ?? 0;

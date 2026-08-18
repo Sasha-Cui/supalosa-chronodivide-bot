@@ -19,6 +19,7 @@ export type InspectableBaselineBot = SupalosaBot & {
 export type BaselineFactory = {
     descriptor: BaselineDescriptor;
     createDefaultStrategy?(): unknown;
+    createDefaultStrategyWithAttackFactory?(attackFactory: unknown): unknown;
     create(name: string, country: Countries): InspectableBaselineBot;
     createWithStrategy?(name: string, country: Countries, strategy: unknown): InspectableBaselineBot;
     createWithStrategyAndExclusiveProductionFocus?(
@@ -54,6 +55,13 @@ const localFactory = (packageRoot: string): BaselineFactory => ({
     },
     createDefaultStrategy(): unknown {
         return new DefaultStrategy();
+    },
+    createDefaultStrategyWithAttackFactory(attackFactory: unknown): unknown {
+        const strategy = new DefaultStrategy();
+        const record = strategy as unknown as Record<string, unknown>;
+        if (!("attackFactory" in record)) throw new Error("Local DefaultStrategy lacks its attack-factory seam");
+        record.attackFactory = attackFactory;
+        return strategy;
     },
     create(name: string, country: Countries): InspectableBaselineBot {
         class InspectableLocalBot extends SupalosaBot {
@@ -181,6 +189,15 @@ const externalFactory = async (packageRoot: string): Promise<BaselineFactory> =>
         },
         createDefaultStrategy(): unknown {
             return new ExternalStrategy();
+        },
+        createDefaultStrategyWithAttackFactory(attackFactory: unknown): unknown {
+            const strategy = new ExternalStrategy();
+            const record = strategy as unknown as Record<string, unknown>;
+            if (!("attackFactory" in record)) {
+                throw new Error("External DefaultStrategy lacks its pinned attack-factory seam");
+            }
+            record.attackFactory = attackFactory;
+            return strategy;
         },
         create(name: string, country: Countries): InspectableBaselineBot {
             return new InspectableExternalBot(
