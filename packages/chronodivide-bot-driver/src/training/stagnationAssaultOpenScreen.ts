@@ -490,12 +490,23 @@ const validateResult = (value: unknown, campaign: Campaign, shard: Shard, arm: A
         throw new Error("Literal endpoint result drifted");
     }
     const assault = value.assaultTelemetry as StagnationAssaultTelemetry[];
+    const v5 = value.v5Telemetry as TerminalObjectiveTelemetry[];
     if (arm.kind !== "assault" && assault.length !== 0) throw new Error("Comparator emitted assault telemetry");
+    if (arm.kind === "control" && v5.length !== 0) throw new Error("Exact control emitted V5 telemetry");
+    if (arm.kind !== "control" && v5.some((event) => event.schemaVersion !== 4 ||
+        event.informationBoundary !== "public_complete_state" ||
+        event.mechanism !== "progress_certified_terminal_conversion")) {
+        throw new Error("V5 telemetry identity drifted");
+    }
     const policy = buildStagnationAssaultPolicy(arm.variant);
+    const expectedComposition = ALLIED.has(shard.country) ? { MTNK: 5, FV: 1 } : { HTNK: 5, HTK: 1 };
     for (const event of assault) if (event.schemaVersion !== 1 || event.informationBoundary !== "public_complete_state" ||
         event.activeAssaultMissionCount > 1 || event.missionCreated && !event.triggerEligible ||
         event.triggerEligible && (event.tick < policy.activationNotBeforeTick ||
             event.ticksSinceBuildingProgress < policy.stagnationWindowTicks) ||
+        event.country !== shard.country || event.minimumUnits !== policy.minimumUnits ||
+        event.maximumUnits !== policy.maximumUnits ||
+        JSON.stringify(event.requestedComposition) !== JSON.stringify(expectedComposition) ||
         JSON.stringify(event).match(/winner|loser|score|outcome|endpoint|resignation|evaluator/i)) {
         throw new Error("Assault telemetry validation failed");
     }
@@ -532,7 +543,9 @@ const finalize = (): void => {
     if (fs.existsSync(outFile) || fileHash(campaignPath) !== campaignSha256) throw new Error("Finalizer input drifted");
     const campaign = validateCampaign(readJson(campaignPath));
     if (fileHash(process.argv[1]!) !== campaign.programs.screenSha256 ||
-        execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim() !== campaign.sourceGitCommit) {
+        execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim() !== campaign.sourceGitCommit ||
+        fileHash(campaign.protocol.path) !== campaign.protocol.sha256 ||
+        fileHash(campaign.compatibilityGate.path) !== campaign.compatibilityGate.sha256) {
         throw new Error("Finalizer source drifted");
     }
     const scheduler = parseSacct(execFileSync("/opt/slurm/current/bin/sacct",
@@ -562,10 +575,25 @@ const finalize = (): void => {
             throw new Error(`Shard ${shard.taskIndex} failed its summary gate`);
         }
         const outer = readJson(path.join(runRoot, "manifest.json"));
-        if (!isRecord(outer) || outer.campaignSha256 !== campaignSha256 || !isRecord(outer.manifest) ||
-            !isRecord(outer.manifest.scheduler) || String(outer.manifest.scheduler.jobId) !==
-                scheduler.get(shard.taskIndex) || outer.manifest.source &&
-                (!isRecord(outer.manifest.source) || outer.manifest.source.gitCommit !== campaign.sourceGitCommit)) {
+        const manifest = isRecord(outer) && isRecord(outer.manifest) ? outer.manifest : null;
+        const source = manifest && isRecord(manifest.source) ? manifest.source : null;
+        const software = manifest && isRecord(manifest.software) ? manifest.software : null;
+        const baseline = software && isRecord(software.baseline) ? software.baseline : null;
+        const baselineRuntime = baseline && isRecord(baseline.runtimeTree) ? baseline.runtimeTree : null;
+        const gameApiRuntime = software && isRecord(software.gameApiRuntimeTree) ? software.gameApiRuntimeTree : null;
+        if (!isRecord(outer) || outer.campaignSha256 !== campaignSha256 || !manifest ||
+            !isRecord(manifest.scheduler) || manifest.scheduler.account !== "pi_jss233" ||
+            String(manifest.scheduler.arrayJobId) !== arrayJobId ||
+            String(manifest.scheduler.arrayTaskId) !== String(shard.taskIndex) ||
+            String(manifest.scheduler.jobId) !== scheduler.get(shard.taskIndex) || !source ||
+            source.gitCommit !== campaign.sourceGitCommit || source.gitBranch !== "main" ||
+            source.trackedDirty !== false || !Array.isArray(source.runtimeTrees) ||
+            hash(source.runtimeTrees) !== campaign.sourceRuntimeSha256 || !software || !baseline ||
+            baseline.kind !== "external-package" || baseline.gitCommit !== campaign.externalBaselineGitCommit ||
+            baseline.trackedDirty !== false || !baselineRuntime ||
+            baselineRuntime.sha256 !== campaign.externalBaselineRuntimeSha256 || !gameApiRuntime ||
+            gameApiRuntime.sha256 !== campaign.gameApiRuntimeSha256 ||
+            software.packageLockSha256 !== campaign.packageLockSha256) {
             throw new Error(`Shard ${shard.taskIndex} manifest drifted`);
         }
         const events = fs.readFileSync(path.join(runRoot, "events.jsonl"), "utf8").split("\n").filter(Boolean)
