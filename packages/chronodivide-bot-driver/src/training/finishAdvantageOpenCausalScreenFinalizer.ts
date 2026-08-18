@@ -55,6 +55,12 @@ type ValidatedObservation = FinishAdvantageOpenOutcomeRow & {
 };
 
 const SHA256 = /^[0-9a-f]{64}$/;
+const OPEN_SCREEN_V3_CAMPAIGN_SHA256 =
+    "133d49d2a8ed1f0ed467c986c5c2d017df2adc675f0686972495973fc53b3edc" as const;
+const OPEN_SCREEN_V3_SOURCE_COMMIT = "9455404e96522b75bba3779d63765c9964e9ecdc" as const;
+const OPEN_SCREEN_V3_ARRAY_JOB_ID = "22610506" as const;
+const OPEN_SCREEN_FINALIZER_REPAIR_SHA256 =
+    "0f1a982e0874ca40c02abb828a6199700f4ff6f63d016677153c7304e74c999d" as const;
 const isRecord = (value: unknown): value is RecordValue =>
     !!value && typeof value === "object" && !Array.isArray(value);
 const requiredPath = (name: string): string => {
@@ -70,6 +76,8 @@ const requiredText = (name: string, pattern: RegExp): string => {
 const readJson = (filePath: string): unknown => JSON.parse(fs.readFileSync(filePath, "utf8"));
 const sha256Value = (value: unknown): string => crypto.createHash("sha256")
     .update(JSON.stringify(value)).digest("hex");
+export const matchesOpenScreenRuntimeTrees = (value: unknown, expectedSha256: string): boolean =>
+    Array.isArray(value) && SHA256.test(expectedSha256) && sha256Value(value) === expectedSha256;
 const readEvents = (filePath: string): RecordValue[] => fs.readFileSync(filePath, "utf8")
     .split("\n").filter(Boolean).map((line, index) => {
         const value = JSON.parse(line) as unknown;
@@ -385,7 +393,7 @@ const validateShard = (
         String(manifest.scheduler.arrayTaskId) !== String(shard.taskIndex) ||
         String(manifest.scheduler.jobId) !== scheduler.schedulerJobId || !source ||
         source.gitCommit !== campaign.sourceGitCommit || source.gitBranch !== "main" || source.trackedDirty !== false ||
-        !isRecord(source.runtimeTrees) || sha256Value(source.runtimeTrees) !== campaign.sourceRuntimeSha256 ||
+        !matchesOpenScreenRuntimeTrees(source.runtimeTrees, campaign.sourceRuntimeSha256) ||
         !baseline || baseline.kind !== "external-package" ||
         baseline.gitCommit !== campaign.externalBaselineGitCommit || baseline.trackedDirty !== false ||
         !baselineRuntime || baselineRuntime.sha256 !== campaign.externalBaselineRuntimeSha256 ||
@@ -471,13 +479,28 @@ const main = (): void => {
     if (fs.existsSync(outputPath)) throw new Error(`Refusing to overwrite ${outputPath}`);
     if (sha256File(campaignPath) !== campaignSha256) throw new Error("Open-screen campaign drifted");
     const campaign = validateFinishAdvantageOpenCampaign(readJson(campaignPath));
-    if (
-        execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim() !== campaign.sourceGitCommit ||
-        execFileSync("git", ["branch", "--show-current"], { encoding: "utf8" }).trim() !== "main" ||
-        execFileSync("git", ["status", "--short", "--untracked-files=no"], { encoding: "utf8" }).trim() !== ""
-    ) throw new Error("Open-screen finalizer source contract failed");
+    const aggregatorGitCommit = execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+    const forkMain = execFileSync("git", ["rev-parse", "fork/main"], { encoding: "utf8" }).trim();
+    const branch = execFileSync("git", ["branch", "--show-current"], { encoding: "utf8" }).trim();
+    const trackedStatus = execFileSync(
+        "git", ["status", "--short", "--untracked-files=no"], { encoding: "utf8" },
+    ).trim();
+    if (branch !== "main" || trackedStatus !== "" || forkMain !== aggregatorGitCommit) {
+        throw new Error("Open-screen finalizer requires clean pushed main");
+    }
     const runtimeProgram = process.argv[1] ? path.resolve(process.argv[1]) : null;
-    if (!runtimeProgram || sha256File(runtimeProgram) !== campaign.programs.finalizerSha256) {
+    if (!runtimeProgram) throw new Error("Open-screen finalizer program is unavailable");
+    let aggregationRepairSha256: string | null = null;
+    if (aggregatorGitCommit !== campaign.sourceGitCommit) {
+        const repairPath = requiredPath("OPEN_SCREEN_AGGREGATION_REPAIR");
+        aggregationRepairSha256 = sha256File(repairPath);
+        if (
+            campaignSha256 !== OPEN_SCREEN_V3_CAMPAIGN_SHA256 ||
+            campaign.sourceGitCommit !== OPEN_SCREEN_V3_SOURCE_COMMIT ||
+            arrayJobId !== OPEN_SCREEN_V3_ARRAY_JOB_ID ||
+            aggregationRepairSha256 !== OPEN_SCREEN_FINALIZER_REPAIR_SHA256
+        ) throw new Error("Open-screen finalizer repair authorization failed");
+    } else if (sha256File(runtimeProgram) !== campaign.programs.finalizerSha256) {
         throw new Error("Open-screen finalizer program commitment drifted");
     }
     const scheduler = parseFinishAdvantageOpenSacct(execFileSync(
@@ -560,6 +583,8 @@ const main = (): void => {
         campaignPath,
         campaignSha256,
         sourceGitCommit: campaign.sourceGitCommit,
+        aggregatorGitCommit,
+        aggregationRepairSha256,
         arrayJobId,
         controllerJobId: process.env.SLURM_JOB_ID ?? null,
         schedulerAccount: process.env.SLURM_JOB_ACCOUNT,

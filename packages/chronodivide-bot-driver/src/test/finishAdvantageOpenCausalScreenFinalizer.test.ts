@@ -1,6 +1,10 @@
+import { createHash } from "node:crypto";
 import { describe, expect, it } from "vitest";
-import { countFinishAdvantageMechanismTransitions, parseFinishAdvantageOpenSacct } from
-    "../training/finishAdvantageOpenCausalScreenFinalizer.js";
+import {
+    countFinishAdvantageMechanismTransitions,
+    matchesOpenScreenRuntimeTrees,
+    parseFinishAdvantageOpenSacct,
+} from "../training/finishAdvantageOpenCausalScreenFinalizer.js";
 
 const rows = (arrayJobId = "12345") => Array.from({ length: 90 }, (_, taskIndex) =>
     `${arrayJobId}_${taskIndex}|${Number(arrayJobId) + taskIndex}|COMPLETED|0:0|pi_jss233`,
@@ -14,6 +18,15 @@ describe("finish-advantage open causal-screen finalizer", () => {
             { irreversibleCertificateRevoked: false, stalledTargetId: 100 },
             { irreversibleCertificateRevoked: true, stalledTargetId: 101 },
         ] as any)).toEqual({ certificateRevocations: 2, stallRecoveries: 2 });
+    });
+
+    it("requires the provenance runtime-tree array and its exact canonical commitment", () => {
+        const trees = [{ root: "/a", sha256: "a".repeat(64) }, { root: "/b", sha256: "b".repeat(64) }];
+        const commitment = createHash("sha256")
+            .update(JSON.stringify(trees)).digest("hex");
+        expect(matchesOpenScreenRuntimeTrees(trees, commitment)).toBe(true);
+        expect(matchesOpenScreenRuntimeTrees({ ...trees }, commitment)).toBe(false);
+        expect(matchesOpenScreenRuntimeTrees(trees.slice().reverse(), commitment)).toBe(false);
     });
 
     it("requires all 90 exact successful pi_jss233 scheduler tasks", () => {
