@@ -27,11 +27,13 @@ enum AttackMissionState {
 export type AttackMissionFactoryOptions = {
     allowDefenceSteal?: boolean;
     targetPriority?: CombatTargetPriority;
+    missionNamePrefix?: string;
 };
 
 const DEFAULT_ATTACK_MISSION_FACTORY_OPTIONS: Required<AttackMissionFactoryOptions> = {
     allowDefenceSteal: false,
     targetPriority: "distance",
+    missionNamePrefix: "attack",
 };
 
 const NO_TARGET_RETARGET_TICKS = 450;
@@ -281,6 +283,9 @@ export class AttackMissionFactory {
         private lastAttackAt: number = -VISIBLE_TARGET_ATTACK_COOLDOWN_TICKS,
     ) {
         this.options = { ...DEFAULT_ATTACK_MISSION_FACTORY_OPTIONS, ...options };
+        if (!/^[A-Za-z0-9._-]+$/.test(this.options.missionNamePrefix)) {
+            throw new Error("Attack mission name prefix is invalid");
+        }
     }
 
     getName(): string {
@@ -325,7 +330,7 @@ export class AttackMissionFactory {
             return;
         }
 
-        const squadName = "attack_" + game.getCurrentTick();
+        const squadName = this.options.missionNamePrefix + "_" + game.getCurrentTick();
 
         const tryAttack = missionController.addMission(
             new AttackMission(
