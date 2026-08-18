@@ -21,6 +21,7 @@ import {
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_3_SHA256,
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_4_SHA256,
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_5_SHA256,
+    FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_6_SHA256,
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_SHA256,
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_CELL_COUNT,
     FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_COUNTRIES,
@@ -345,6 +346,7 @@ const main = async (): Promise<void> => {
     const amendment3Path = requiredPath("COMPOSITE_GATE_AMENDMENT_3");
     const amendment4Path = requiredPath("COMPOSITE_GATE_AMENDMENT_4");
     const amendment5Path = requiredPath("COMPOSITE_GATE_AMENDMENT_5");
+    const amendment6Path = requiredPath("COMPOSITE_GATE_AMENDMENT_6");
     if (fs.existsSync(outFile)) throw new Error(`Refusing to overwrite ${outFile}`);
     if (process.env.SLURM_JOB_ACCOUNT !== "pi_jss233") {
         throw new Error("Composite compatibility gate requires Slurm account pi_jss233");
@@ -359,7 +361,8 @@ const main = async (): Promise<void> => {
         sha256File(amendment2Path) !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_2_SHA256 ||
         sha256File(amendment3Path) !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_3_SHA256 ||
         sha256File(amendment4Path) !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_4_SHA256 ||
-        sha256File(amendment5Path) !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_5_SHA256
+        sha256File(amendment5Path) !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_5_SHA256 ||
+        sha256File(amendment6Path) !== FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_6_SHA256
     ) throw new Error("Composite compatibility evidence commitment drifted");
     const stateAudit = JSON.parse(fs.readFileSync(stateAuditFile, "utf8")) as unknown;
     const selection = selectFinishAdvantageTechnicalGatePolicy(stateAudit, stateAuditSha256);
@@ -454,6 +457,7 @@ const main = async (): Promise<void> => {
             amendment3Sha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_3_SHA256,
             amendment4Sha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_4_SHA256,
             amendment5Sha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_5_SHA256,
+            amendment6Sha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_6_SHA256,
             diagnosticMapName: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_NAME,
             diagnosticMapSha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_SHA256,
             terminalBaseRaceMode: "strict_literal_endpoint_base_race",
@@ -500,6 +504,8 @@ const main = async (): Promise<void> => {
         amendment4Sha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_4_SHA256,
         amendment5Path,
         amendment5Sha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_5_SHA256,
+        amendment6Path,
+        amendment6Sha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_AMENDMENT_6_SHA256,
         diagnosticMapName: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_NAME,
         diagnosticMapSha256: FINISH_ADVANTAGE_COMPOSITE_COMPATIBILITY_MAP_SHA256,
         terminalBaseRaceMode: "strict_literal_endpoint_base_race",
