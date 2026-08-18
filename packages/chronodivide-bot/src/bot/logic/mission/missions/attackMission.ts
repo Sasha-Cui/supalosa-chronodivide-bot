@@ -30,6 +30,19 @@ export type AttackMissionFactoryOptions = {
     missionNamePrefix?: string;
 };
 
+export type AttackMissionFactoryTelemetry = {
+    schemaVersion: 1;
+    event: "attack_mission_created";
+    informationBoundary: "public_complete_state";
+    tick: number;
+    targetPriority: CombatTargetPriority;
+    missionName: string;
+    composition: SideComposition;
+    target: { x: number; y: number };
+    includeEnemyBases: boolean;
+    forbiddenFieldsEmitted: [];
+};
+
 const DEFAULT_ATTACK_MISSION_FACTORY_OPTIONS: Required<AttackMissionFactoryOptions> = {
     allowDefenceSteal: false,
     targetPriority: "distance",
@@ -281,6 +294,7 @@ export class AttackMissionFactory {
     constructor(
         options: AttackMissionFactoryOptions = {},
         private lastAttackAt: number = -VISIBLE_TARGET_ATTACK_COOLDOWN_TICKS,
+        private telemetry: (event: AttackMissionFactoryTelemetry) => void = () => undefined,
     ) {
         this.options = { ...DEFAULT_ATTACK_MISSION_FACTORY_OPTIONS, ...options };
         if (!/^[A-Za-z0-9._-]+$/.test(this.options.missionNamePrefix)) {
@@ -360,6 +374,18 @@ export class AttackMissionFactory {
         );
         if (tryAttack) {
             this.lastAttackAt = game.getCurrentTick();
+            this.telemetry({
+                schemaVersion: 1,
+                event: "attack_mission_created",
+                informationBoundary: "public_complete_state",
+                tick: game.getCurrentTick(),
+                targetPriority: this.options.targetPriority,
+                missionName: squadName,
+                composition: structuredClone(composition),
+                target: { x: attackArea.x, y: attackArea.y },
+                includeEnemyBases,
+                forbiddenFieldsEmitted: [],
+            });
         }
     }
 }

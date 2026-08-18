@@ -1,5 +1,5 @@
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
-import { AttackMissionFactory } from
+import { AttackMissionFactory, AttackMissionFactoryTelemetry } from
     "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/attackMission.js";
 import { CombatTargetPriority } from
     "@supalosa/chronodivide-bot/dist/bot/logic/mission/missions/squads/common.js";
@@ -50,7 +50,10 @@ export const createObjectiveAwareAttackReplacementCandidate = (
     country: Countries,
     rawV5Policy: ProgressCertifiedConversionPolicyV5,
     rawReplacementPolicy: ObjectiveAwareReplacementPolicy,
-    v5Telemetry: (event: TerminalObjectiveTelemetry) => void = () => undefined,
+    telemetry: {
+        v5: (event: TerminalObjectiveTelemetry) => void;
+        attackFactory: (event: AttackMissionFactoryTelemetry) => void;
+    } = { v5: () => undefined, attackFactory: () => undefined },
 ): InspectableBaselineBot => {
     const v5 = validateProgressCertifiedConversionPolicyV5(rawV5Policy);
     const replacement = validateObjectiveAwareReplacementPolicy(rawReplacementPolicy);
@@ -64,7 +67,7 @@ export const createObjectiveAwareAttackReplacementCandidate = (
             allowDefenceSteal: false,
             targetPriority: replacement.targetPriority,
             missionNamePrefix: "attack",
-        }))
+        }, undefined, telemetry.attackFactory))
         : factory.createDefaultStrategy();
     if (!inner || typeof (inner as StrategyLike).onAiUpdate !== "function") {
         throw new Error("Objective-aware replacement did not produce a strategy");
@@ -73,7 +76,7 @@ export const createObjectiveAwareAttackReplacementCandidate = (
         inner as never,
         country,
         v5,
-        v5Telemetry,
+        telemetry.v5,
         "strict_literal_endpoint_base_race",
     ) as unknown as StrategyLike : inner as StrategyLike;
     return factory.createWithStrategy(name, country, outer as never);
