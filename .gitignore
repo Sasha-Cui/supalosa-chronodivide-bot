@@ -11,6 +11,12 @@ coverage/
 dist/
 game-client/
 node_modules/
+/benchmark-results/
+/tmp/
+packages/chronodivide-bot-driver/.method-v5-typecheck.*/
+packages/chronodivide-bot-driver/data-full-ra2
+pnpm-lock.yaml
+pnpm-workspace.yaml
 replays/
 packages/chronodivide-bot-driver/debug/
 packages/chronodivide-bot-launcher/
@@ -28,9 +34,8 @@ packages/chronodivide-bot-launcher/
 *.bag
 *.idx
 
-# maps - only allow maps directly in the test data 
+# Existing repository-owned test maps remain tracked; new map bytes stay local.
 *.map
-!packages/chronodivide-bot-driver/data/*.map
 # Public retrieval metadata is releasable; third-party fresh map bytes are not.
 packages/chronodivide-bot-driver/data/method_v3_fresh_*.map
 packages/chronodivide-bot-driver/benchmark-results/
