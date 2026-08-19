@@ -1,0 +1,1541 @@
+{
+  "baseUrl": "https://gameres.chronodivide.com/map/",
+  "generatedAt": "2026-06-06T04:46:23.437305+00:00",
+  "candidateCount": 211,
+  "downloadedCount": 133,
+  "results": [
+    {
+      "name": "2_divide_freezes_over_le.map",
+      "url": "https://gameres.chronodivide.com/map/2_divide_freezes_over_le.map",
+      "status": "downloaded",
+      "bytes": 271602,
+      "sha256": "407f6a39d590737eaee586cc3b8ce64b22451f72556c0d9d234ce576cb9651f0",
+      "compatMapName": "cd_chrono_2_divide_freezes_over_le.map"
+    },
+    {
+      "name": "2_malibu_cliffs_le.map",
+      "url": "https://gameres.chronodivide.com/map/2_malibu_cliffs_le.map",
+      "status": "downloaded",
+      "bytes": 370735,
+      "sha256": "f994192d4eb5774b13f1714441c3f42c48bf4c545f1bad25a8842fe4b127ccf2",
+      "compatMapName": "cd_chrono_2_malibu_cliffs_le.map"
+    },
+    {
+      "name": "2_montana_dmz_le.map",
+      "url": "https://gameres.chronodivide.com/map/2_montana_dmz_le.map",
+      "status": "downloaded",
+      "bytes": 206354,
+      "sha256": "c844f9580f591375ea0f2586abb6599f18a4e9a67213e2eb14d09f90098d7392",
+      "compatMapName": "cd_chrono_2_montana_dmz_le.map"
+    },
+    {
+      "name": "4_country_swing_le.map",
+      "url": "https://gameres.chronodivide.com/map/4_country_swing_le.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "4_country_swing_le_v2.map",
+      "url": "https://gameres.chronodivide.com/map/4_country_swing_le_v2.map",
+      "status": "downloaded",
+      "bytes": 183987,
+      "sha256": "653f4b2fbeede7323efd4e5d30af16eb9a0e40097b4fb4284c3eac7199ed0105",
+      "compatMapName": "cd_chrono_4_country_swing_le_v2.map"
+    },
+    {
+      "name": "4_divide_freezes_over.map",
+      "url": "https://gameres.chronodivide.com/map/4_divide_freezes_over.map",
+      "status": "downloaded",
+      "bytes": 310907,
+      "sha256": "fe17f7994bd890613fa6a1726033ab40b9dbb6587fef9d500d65c3a08fbb9ceb",
+      "compatMapName": "cd_chrono_4_divide_freezes_over.map"
+    },
+    {
+      "name": "4_heck_freezes_over_le.map",
+      "url": "https://gameres.chronodivide.com/map/4_heck_freezes_over_le.map",
+      "status": "downloaded",
+      "bytes": 242426,
+      "sha256": "161ef28ae660f7d7ce307544810831c7aa77841875a8181b2f82a586eaf38f6b",
+      "compatMapName": "cd_chrono_4_heck_freezes_over_le.map"
+    },
+    {
+      "name": "4_montana_dmz_le.map",
+      "url": "https://gameres.chronodivide.com/map/4_montana_dmz_le.map",
+      "status": "downloaded",
+      "bytes": 236815,
+      "sha256": "318878057cd00155df39ec5293188271c3e878db2bc0109d963aa4aca02e2819",
+      "compatMapName": "cd_chrono_4_montana_dmz_le.map"
+    },
+    {
+      "name": "6_near_ore_far.map",
+      "url": "https://gameres.chronodivide.com/map/6_near_ore_far.map",
+      "status": "downloaded",
+      "bytes": 102357,
+      "sha256": "b596e881a81dfb2d05c3b33300c8143e25fdabc9635096aaf0977e7f0778772c",
+      "compatMapName": "cd_chrono_6_near_ore_far.map"
+    },
+    {
+      "name": "8_near_ore_far.map",
+      "url": "https://gameres.chronodivide.com/map/8_near_ore_far.map",
+      "status": "downloaded",
+      "bytes": 97641,
+      "sha256": "d35a49d858e49bb31f63bbfe5d17e3cfcc2734fbfa4d4708c1b355ab6270d424",
+      "compatMapName": "cd_chrono_8_near_ore_far.map"
+    },
+    {
+      "name": "amazon01.map",
+      "url": "https://gameres.chronodivide.com/map/amazon01.map",
+      "status": "downloaded",
+      "bytes": 151377,
+      "sha256": "b91babfd0553683ec648be159cb7de0c6df264319f269f728ae522d7f44fb7a8",
+      "compatMapName": "cd_chrono_amazon01.map"
+    },
+    {
+      "name": "arena.map",
+      "url": "https://gameres.chronodivide.com/map/arena.map",
+      "status": "downloaded",
+      "bytes": 138999,
+      "sha256": "ee0507b9900599449758008394a13b1ef51ef6b9a9cd50be7b321a54c8752e27",
+      "compatMapName": "cd_chrono_arena.map"
+    },
+    {
+      "name": "barrel.map",
+      "url": "https://gameres.chronodivide.com/map/barrel.map",
+      "status": "downloaded",
+      "bytes": 122384,
+      "sha256": "9104cb6b4810dd40a79e265f5a4f668c39fb1a1dfe26a7ed9b8b5eee29402476",
+      "compatMapName": "cd_chrono_barrel.map"
+    },
+    {
+      "name": "bayopigs.map",
+      "url": "https://gameres.chronodivide.com/map/bayopigs.map",
+      "status": "downloaded",
+      "bytes": 368282,
+      "sha256": "0e9cb5f161facf1fcd4a003ada2512647307b6c09f4c47de403be22272475f15",
+      "compatMapName": "cd_chrono_bayopigs.map"
+    },
+    {
+      "name": "bermuda.map",
+      "url": "https://gameres.chronodivide.com/map/bermuda.map",
+      "status": "downloaded",
+      "bytes": 144403,
+      "sha256": "fcdf928757a2095ac57b98a1e356edafa8c6776087445237a296664d77ca49de",
+      "compatMapName": "cd_chrono_bermuda.map"
+    },
+    {
+      "name": "break.map",
+      "url": "https://gameres.chronodivide.com/map/break.map",
+      "status": "downloaded",
+      "bytes": 177320,
+      "sha256": "cb4c4dd3c5cda06bba067558f3160e6c48b96934e05e6e773a891b467bb156da",
+      "compatMapName": "cd_chrono_break.map"
+    },
+    {
+      "name": "c1m1a.map",
+      "url": "https://gameres.chronodivide.com/map/c1m1a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c1m1b.map",
+      "url": "https://gameres.chronodivide.com/map/c1m1b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c1m1c.map",
+      "url": "https://gameres.chronodivide.com/map/c1m1c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c1m2a.map",
+      "url": "https://gameres.chronodivide.com/map/c1m2a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c1m2b.map",
+      "url": "https://gameres.chronodivide.com/map/c1m2b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c1m2c.map",
+      "url": "https://gameres.chronodivide.com/map/c1m2c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c1m3a.map",
+      "url": "https://gameres.chronodivide.com/map/c1m3a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c1m3b.map",
+      "url": "https://gameres.chronodivide.com/map/c1m3b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c1m3c.map",
+      "url": "https://gameres.chronodivide.com/map/c1m3c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c1m4a.map",
+      "url": "https://gameres.chronodivide.com/map/c1m4a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c1m4b.map",
+      "url": "https://gameres.chronodivide.com/map/c1m4b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c1m4c.map",
+      "url": "https://gameres.chronodivide.com/map/c1m4c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c1m5a.map",
+      "url": "https://gameres.chronodivide.com/map/c1m5a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c1m5b.map",
+      "url": "https://gameres.chronodivide.com/map/c1m5b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c1m5c.map",
+      "url": "https://gameres.chronodivide.com/map/c1m5c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c2m1a.map",
+      "url": "https://gameres.chronodivide.com/map/c2m1a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c2m1b.map",
+      "url": "https://gameres.chronodivide.com/map/c2m1b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c2m1c.map",
+      "url": "https://gameres.chronodivide.com/map/c2m1c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c2m2a.map",
+      "url": "https://gameres.chronodivide.com/map/c2m2a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c2m2b.map",
+      "url": "https://gameres.chronodivide.com/map/c2m2b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c2m2c.map",
+      "url": "https://gameres.chronodivide.com/map/c2m2c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c2m3a.map",
+      "url": "https://gameres.chronodivide.com/map/c2m3a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c2m3b.map",
+      "url": "https://gameres.chronodivide.com/map/c2m3b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c2m3c.map",
+      "url": "https://gameres.chronodivide.com/map/c2m3c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c2m4a.map",
+      "url": "https://gameres.chronodivide.com/map/c2m4a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c2m4b.map",
+      "url": "https://gameres.chronodivide.com/map/c2m4b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c2m4c.map",
+      "url": "https://gameres.chronodivide.com/map/c2m4c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c2m5a.map",
+      "url": "https://gameres.chronodivide.com/map/c2m5a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c2m5b.map",
+      "url": "https://gameres.chronodivide.com/map/c2m5b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c2m5c.map",
+      "url": "https://gameres.chronodivide.com/map/c2m5c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c3m1a.map",
+      "url": "https://gameres.chronodivide.com/map/c3m1a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c3m1b.map",
+      "url": "https://gameres.chronodivide.com/map/c3m1b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c3m1c.map",
+      "url": "https://gameres.chronodivide.com/map/c3m1c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c3m2a.map",
+      "url": "https://gameres.chronodivide.com/map/c3m2a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c3m2b.map",
+      "url": "https://gameres.chronodivide.com/map/c3m2b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c3m2c.map",
+      "url": "https://gameres.chronodivide.com/map/c3m2c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c3m3a.map",
+      "url": "https://gameres.chronodivide.com/map/c3m3a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c3m3b.map",
+      "url": "https://gameres.chronodivide.com/map/c3m3b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c3m3c.map",
+      "url": "https://gameres.chronodivide.com/map/c3m3c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c3m4a.map",
+      "url": "https://gameres.chronodivide.com/map/c3m4a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c3m4b.map",
+      "url": "https://gameres.chronodivide.com/map/c3m4b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c3m4c.map",
+      "url": "https://gameres.chronodivide.com/map/c3m4c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c3m5a.map",
+      "url": "https://gameres.chronodivide.com/map/c3m5a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c3m5b.map",
+      "url": "https://gameres.chronodivide.com/map/c3m5b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c3m5c.map",
+      "url": "https://gameres.chronodivide.com/map/c3m5c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c4m1a.map",
+      "url": "https://gameres.chronodivide.com/map/c4m1a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c4m1b.map",
+      "url": "https://gameres.chronodivide.com/map/c4m1b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c4m1c.map",
+      "url": "https://gameres.chronodivide.com/map/c4m1c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c4m2a.map",
+      "url": "https://gameres.chronodivide.com/map/c4m2a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c4m2b.map",
+      "url": "https://gameres.chronodivide.com/map/c4m2b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c4m2c.map",
+      "url": "https://gameres.chronodivide.com/map/c4m2c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c4m3a.map",
+      "url": "https://gameres.chronodivide.com/map/c4m3a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c4m3b.map",
+      "url": "https://gameres.chronodivide.com/map/c4m3b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c4m3c.map",
+      "url": "https://gameres.chronodivide.com/map/c4m3c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c4m4a.map",
+      "url": "https://gameres.chronodivide.com/map/c4m4a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c4m4b.map",
+      "url": "https://gameres.chronodivide.com/map/c4m4b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c4m4c.map",
+      "url": "https://gameres.chronodivide.com/map/c4m4c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c4m5a.map",
+      "url": "https://gameres.chronodivide.com/map/c4m5a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c4m5b.map",
+      "url": "https://gameres.chronodivide.com/map/c4m5b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c4m5c.map",
+      "url": "https://gameres.chronodivide.com/map/c4m5c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c5m1a.map",
+      "url": "https://gameres.chronodivide.com/map/c5m1a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c5m1b.map",
+      "url": "https://gameres.chronodivide.com/map/c5m1b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c5m1c.map",
+      "url": "https://gameres.chronodivide.com/map/c5m1c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c5m2a.map",
+      "url": "https://gameres.chronodivide.com/map/c5m2a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c5m2b.map",
+      "url": "https://gameres.chronodivide.com/map/c5m2b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c5m2c.map",
+      "url": "https://gameres.chronodivide.com/map/c5m2c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c5m3a.map",
+      "url": "https://gameres.chronodivide.com/map/c5m3a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c5m3b.map",
+      "url": "https://gameres.chronodivide.com/map/c5m3b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c5m3c.map",
+      "url": "https://gameres.chronodivide.com/map/c5m3c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c5m4a.map",
+      "url": "https://gameres.chronodivide.com/map/c5m4a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c5m4b.map",
+      "url": "https://gameres.chronodivide.com/map/c5m4b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c5m4c.map",
+      "url": "https://gameres.chronodivide.com/map/c5m4c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c5m5a.map",
+      "url": "https://gameres.chronodivide.com/map/c5m5a.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c5m5b.map",
+      "url": "https://gameres.chronodivide.com/map/c5m5b.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "c5m5c.map",
+      "url": "https://gameres.chronodivide.com/map/c5m5c.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "carville.map",
+      "url": "https://gameres.chronodivide.com/map/carville.map",
+      "status": "downloaded",
+      "bytes": 146326,
+      "sha256": "f91c7446ad745d1f45b64d7c6a3b46f4db6094b9201db3876e8fd80f51166cc0",
+      "compatMapName": "cd_chrono_carville.map"
+    },
+    {
+      "name": "cavernsofsiberia.map",
+      "url": "https://gameres.chronodivide.com/map/cavernsofsiberia.map",
+      "status": "downloaded",
+      "bytes": 275482,
+      "sha256": "be9d9adc3b058740eefc2e97bf62b9f9fdc4dbba1b94ff6dcfd6945d2dc7ca3c",
+      "compatMapName": "cd_chrono_cavernsofsiberia.map"
+    },
+    {
+      "name": "countryswingfixed.map",
+      "url": "https://gameres.chronodivide.com/map/countryswingfixed.map",
+      "status": "downloaded",
+      "bytes": 193349,
+      "sha256": "68b57690de0494ae93d8f47ebc6f7d51fe56224059165cf50b7073ed34f51004",
+      "compatMapName": "cd_chrono_countryswingfixed.map"
+    },
+    {
+      "name": "deadman.map",
+      "url": "https://gameres.chronodivide.com/map/deadman.map",
+      "status": "downloaded",
+      "bytes": 108634,
+      "sha256": "9b87a321903681451784720661c06e3268165c4b414847aced1137bbe0277a62",
+      "compatMapName": "cd_chrono_deadman.map"
+    },
+    {
+      "name": "death.map",
+      "url": "https://gameres.chronodivide.com/map/death.map",
+      "status": "downloaded",
+      "bytes": 357336,
+      "sha256": "ea535189b962f6b974958e21e2795bc438bd2fbde85274d5db0aedda01c08669",
+      "compatMapName": "cd_chrono_death.map"
+    },
+    {
+      "name": "disaster.map",
+      "url": "https://gameres.chronodivide.com/map/disaster.map",
+      "status": "downloaded",
+      "bytes": 205207,
+      "sha256": "a103e2289fb13d526b285bc105a3af09fbde2ffbc0b7fe8c1d01778b5c5c1276",
+      "compatMapName": "cd_chrono_disaster.map"
+    },
+    {
+      "name": "dorado_descent_yr_port.mpr",
+      "url": "https://gameres.chronodivide.com/map/dorado_descent_yr_port.mpr",
+      "status": "downloaded",
+      "bytes": 294372,
+      "sha256": "32fd8cbb471aa3773e84926923f86a1e360e96f066ffe83b96f65c022897edcb",
+      "compatMapName": "cd_chrono_dorado_descent_yr_port.mpr"
+    },
+    {
+      "name": "dryheat.map",
+      "url": "https://gameres.chronodivide.com/map/dryheat.map",
+      "status": "downloaded",
+      "bytes": 103251,
+      "sha256": "151a210e0a15e3ef0bd937ead8a072114a2615ef91df858e172da43deede5274",
+      "compatMapName": "cd_chrono_dryheat.map"
+    },
+    {
+      "name": "dunepatrolremake.map",
+      "url": "https://gameres.chronodivide.com/map/dunepatrolremake.map",
+      "status": "downloaded",
+      "bytes": 111269,
+      "sha256": "195b9d01f163763c0bfc4800c55327d2a0efd97c00bc63f045263928cda563a8",
+      "compatMapName": "cd_chrono_dunepatrolremake.map"
+    },
+    {
+      "name": "dustbowl.map",
+      "url": "https://gameres.chronodivide.com/map/dustbowl.map",
+      "status": "downloaded",
+      "bytes": 125001,
+      "sha256": "3146e0a1ec1f7cb65b8cde29f6ec8871856815ee293ce16f180bafcf7d675d23",
+      "compatMapName": "cd_chrono_dustbowl.map"
+    },
+    {
+      "name": "eb1.map",
+      "url": "https://gameres.chronodivide.com/map/eb1.map",
+      "status": "downloaded",
+      "bytes": 84490,
+      "sha256": "07877146265d45dde75eca091a5825962eacd9eb7e0a8de328b45ea3f5f92104",
+      "compatMapName": "cd_chrono_eb1.map"
+    },
+    {
+      "name": "eb2.map",
+      "url": "https://gameres.chronodivide.com/map/eb2.map",
+      "status": "downloaded",
+      "bytes": 221519,
+      "sha256": "69962e7efc29cb5ba18075ff28c4c1d835a58d742c02f0d34fb5850591fb45c0",
+      "compatMapName": "cd_chrono_eb2.map"
+    },
+    {
+      "name": "eb3.map",
+      "url": "https://gameres.chronodivide.com/map/eb3.map",
+      "status": "downloaded",
+      "bytes": 192097,
+      "sha256": "fe566e94aa6ad855b10a82bd737835f59f01398cdf8e65c50fa6a35ac4e5503e",
+      "compatMapName": "cd_chrono_eb3.map"
+    },
+    {
+      "name": "eb4.map",
+      "url": "https://gameres.chronodivide.com/map/eb4.map",
+      "status": "downloaded",
+      "bytes": 157508,
+      "sha256": "f5fe5dc32295dfcb6097b2a104288d4288fbb31b748144e08b5d242d25a0b070",
+      "compatMapName": "cd_chrono_eb4.map"
+    },
+    {
+      "name": "eb5.map",
+      "url": "https://gameres.chronodivide.com/map/eb5.map",
+      "status": "downloaded",
+      "bytes": 98739,
+      "sha256": "ff3f4938e50bac7d91086189c989c9bf8fd5501642021cd101d7834894a40855",
+      "compatMapName": "cd_chrono_eb5.map"
+    },
+    {
+      "name": "goldst.map",
+      "url": "https://gameres.chronodivide.com/map/goldst.map",
+      "status": "downloaded",
+      "bytes": 191821,
+      "sha256": "787af513b39f6b7ca6fb3067ba2294d8d02be8d2183d0965d0a6ee42a60856ac",
+      "compatMapName": "cd_chrono_goldst.map"
+    },
+    {
+      "name": "grinder.map",
+      "url": "https://gameres.chronodivide.com/map/grinder.map",
+      "status": "downloaded",
+      "bytes": 195233,
+      "sha256": "0857085b6874f54b0af7891794f50a1d5713454cdc6bccc921142e19051d9bba",
+      "compatMapName": "cd_chrono_grinder.map"
+    },
+    {
+      "name": "hailmary.map",
+      "url": "https://gameres.chronodivide.com/map/hailmary.map",
+      "status": "downloaded",
+      "bytes": 146813,
+      "sha256": "cfdfa94ddecf7328bf8898ed23f22a3ee9c12e7a54d48faa0fc26c538a6911bb",
+      "compatMapName": "cd_chrono_hailmary.map"
+    },
+    {
+      "name": "heckbvb.map",
+      "url": "https://gameres.chronodivide.com/map/heckbvb.map",
+      "status": "downloaded",
+      "bytes": 244863,
+      "sha256": "79f7d632917debc3b8dad99db9b6e0b78fc08c08e9117bc6394c6d709753d32c",
+      "compatMapName": "cd_chrono_heckbvb.map"
+    },
+    {
+      "name": "heckcorners.map",
+      "url": "https://gameres.chronodivide.com/map/heckcorners.map",
+      "status": "downloaded",
+      "bytes": 245535,
+      "sha256": "3c4084020ed65f32fb3ca283c71f0549fee06b91feeb8049659d3a8d6b9c28ab",
+      "compatMapName": "cd_chrono_heckcorners.map"
+    },
+    {
+      "name": "heckcorners_b.map",
+      "url": "https://gameres.chronodivide.com/map/heckcorners_b.map",
+      "status": "downloaded",
+      "bytes": 216608,
+      "sha256": "0dd8b9b4eff27bf4732876d7988c23cb0e4e724664b4cf3689fa65a23dbb6390",
+      "compatMapName": "cd_chrono_heckcorners_b.map"
+    },
+    {
+      "name": "heckcorners_b_golden.map",
+      "url": "https://gameres.chronodivide.com/map/heckcorners_b_golden.map",
+      "status": "downloaded",
+      "bytes": 217537,
+      "sha256": "317f7716f9ba1965156997ba01c211df3cc3e4501ea26d9ebad98a9bbe0bedff",
+      "compatMapName": "cd_chrono_heckcorners_b_golden.map"
+    },
+    {
+      "name": "heckgolden.mpr",
+      "url": "https://gameres.chronodivide.com/map/heckgolden.mpr",
+      "status": "downloaded",
+      "bytes": 217810,
+      "sha256": "b8fc1589f3fae92a81d5300e3235605cd8c9820f0832c4bc665b2dc79d28d369",
+      "compatMapName": "cd_chrono_heckgolden.mpr"
+    },
+    {
+      "name": "hecklvl.map",
+      "url": "https://gameres.chronodivide.com/map/hecklvl.map",
+      "status": "downloaded",
+      "bytes": 245523,
+      "sha256": "a71ce5a999cb439cd10eb27ed395421813960c58b05836761dc1b589ce91228a",
+      "compatMapName": "cd_chrono_hecklvl.map"
+    },
+    {
+      "name": "heckrvr.map",
+      "url": "https://gameres.chronodivide.com/map/heckrvr.map",
+      "status": "downloaded",
+      "bytes": 245324,
+      "sha256": "d02f8e425d1ff1be830464aa617a6158e56f444aba8a7833791237b7cb04a21b",
+      "compatMapName": "cd_chrono_heckrvr.map"
+    },
+    {
+      "name": "hecktvt.map",
+      "url": "https://gameres.chronodivide.com/map/hecktvt.map",
+      "status": "downloaded",
+      "bytes": 245375,
+      "sha256": "db1980063c3706918262c8be9edbb614d4bd87c7a292518e57b8d9e9220874ea",
+      "compatMapName": "cd_chrono_hecktvt.map"
+    },
+    {
+      "name": "hills.map",
+      "url": "https://gameres.chronodivide.com/map/hills.map",
+      "status": "downloaded",
+      "bytes": 144458,
+      "sha256": "780d5d6e6d3c81ac0d510a5df326848dd426b3d840ac290114f44faf8eab9e9e",
+      "compatMapName": "cd_chrono_hills.map"
+    },
+    {
+      "name": "invasion.map",
+      "url": "https://gameres.chronodivide.com/map/invasion.map",
+      "status": "downloaded",
+      "bytes": 146603,
+      "sha256": "f462eccf99e4ef633f68aca5e97e623956c4c740c01828c896ac60c41bf6feb6",
+      "compatMapName": "cd_chrono_invasion.map"
+    },
+    {
+      "name": "isleland.map",
+      "url": "https://gameres.chronodivide.com/map/isleland.map",
+      "status": "downloaded",
+      "bytes": 161944,
+      "sha256": "9f81e5a1077e20d8561f4394a6ab1ce90e819c03ec1b3cdf5c0c252513c1e0dd",
+      "compatMapName": "cd_chrono_isleland.map"
+    },
+    {
+      "name": "jungleofvietnam.map",
+      "url": "https://gameres.chronodivide.com/map/jungleofvietnam.map",
+      "status": "downloaded",
+      "bytes": 187577,
+      "sha256": "29abb2d9cfaabbe45ab65a92575eb0c4f8c50fc8bf9bde2678a94e5ff4069710",
+      "compatMapName": "cd_chrono_jungleofvietnam.map"
+    },
+    {
+      "name": "kaliforn.map",
+      "url": "https://gameres.chronodivide.com/map/kaliforn.map",
+      "status": "downloaded",
+      "bytes": 152415,
+      "sha256": "882711feea410242f55593698607f707f18d812edd7ad12ec0a4e0a9ec2b6fd3",
+      "compatMapName": "cd_chrono_kaliforn.map"
+    },
+    {
+      "name": "killer.map",
+      "url": "https://gameres.chronodivide.com/map/killer.map",
+      "status": "downloaded",
+      "bytes": 186345,
+      "sha256": "00aedca824a59b738c4e9f80d5ad6644b45cf62b1dd402e10a8cc3bb42b016d8",
+      "compatMapName": "cd_chrono_killer.map"
+    },
+    {
+      "name": "lostlake.map",
+      "url": "https://gameres.chronodivide.com/map/lostlake.map",
+      "status": "downloaded",
+      "bytes": 210108,
+      "sha256": "4dc1a34301d2d877d9d856bf62692ec5bfef92d8050f8f7274a8dcab81bb501b",
+      "compatMapName": "cd_chrono_lostlake.map"
+    },
+    {
+      "name": "mojosprt.map",
+      "url": "https://gameres.chronodivide.com/map/mojosprt.map",
+      "status": "downloaded",
+      "bytes": 131177,
+      "sha256": "2e3d09bade52b5e726ba623aa0c2e7ef896bfaf55901c433dff5f695aafe1716",
+      "compatMapName": "cd_chrono_mojosprt.map"
+    },
+    {
+      "name": "mp01du.map",
+      "url": "https://gameres.chronodivide.com/map/mp01du.map",
+      "status": "downloaded",
+      "bytes": 219132,
+      "sha256": "cfbf62978942d073be7708b29d64e4b1f08c5ad57bc0aa49a2b914b8258d25c1",
+      "compatMapName": "cd_chrono_mp01du.map"
+    },
+    {
+      "name": "mp01t4.map",
+      "url": "https://gameres.chronodivide.com/map/mp01t4.map",
+      "status": "downloaded",
+      "bytes": 212899,
+      "sha256": "c43e94057d6abaec0a39899b44175259f150649e2cd39be66504bb2957f2ec67",
+      "compatMapName": "cd_chrono_mp01t4.map"
+    },
+    {
+      "name": "mp02t2.map",
+      "url": "https://gameres.chronodivide.com/map/mp02t2.map",
+      "status": "downloaded",
+      "bytes": 204050,
+      "sha256": "9ffad3f52a777452a4803b58011d5bc13f6468069092cb4889139a3b1fd85c9f",
+      "compatMapName": "cd_chrono_mp02t2.map"
+    },
+    {
+      "name": "mp03t4.map",
+      "url": "https://gameres.chronodivide.com/map/mp03t4.map",
+      "status": "downloaded",
+      "bytes": 161151,
+      "sha256": "eab7d48cdb16a5317c17323e7b9c19c5e79146dfcf7a1df5a96b359b9fb45315",
+      "compatMapName": "cd_chrono_mp03t4.map"
+    },
+    {
+      "name": "mp05du.map",
+      "url": "https://gameres.chronodivide.com/map/mp05du.map",
+      "status": "downloaded",
+      "bytes": 165687,
+      "sha256": "50b4152edfeac1084618672e5e6ee2af3d7a050cfedeb6903303f2da9be2379c",
+      "compatMapName": "cd_chrono_mp05du.map"
+    },
+    {
+      "name": "mp05mw.map",
+      "url": "https://gameres.chronodivide.com/map/mp05mw.map",
+      "status": "downloaded",
+      "bytes": 171745,
+      "sha256": "038e5c9dec9fdfa0f7e62799e56ffb60de267f34068e2592426a829498882961",
+      "compatMapName": "cd_chrono_mp05mw.map"
+    },
+    {
+      "name": "mp05t4.map",
+      "url": "https://gameres.chronodivide.com/map/mp05t4.map",
+      "status": "downloaded",
+      "bytes": 172691,
+      "sha256": "1195eff3733eb09ba11fac70f2d78430c15e8cfb70e6da2c5740972eaf8da784",
+      "compatMapName": "cd_chrono_mp05t4.map"
+    },
+    {
+      "name": "mp06mw.map",
+      "url": "https://gameres.chronodivide.com/map/mp06mw.map",
+      "status": "downloaded",
+      "bytes": 69641,
+      "sha256": "7ccb402dfc003ff823eb12b7f59185c4b6c3f2e3d750ffac13a25e2174abe41d",
+      "compatMapName": "cd_chrono_mp06mw.map"
+    },
+    {
+      "name": "mp06t2.map",
+      "url": "https://gameres.chronodivide.com/map/mp06t2.map",
+      "status": "downloaded",
+      "bytes": 70030,
+      "sha256": "bc4ca3e7f2c16080f9826d97df212b12813d96558630a01bf7d5a197bb09142d",
+      "compatMapName": "cd_chrono_mp06t2.map"
+    },
+    {
+      "name": "mp08mw.map",
+      "url": "https://gameres.chronodivide.com/map/mp08mw.map",
+      "status": "downloaded",
+      "bytes": 80564,
+      "sha256": "4980c90faa01768027a7dad554b92f21319db4ae9c33a660386980a69bd5ff2c",
+      "compatMapName": "cd_chrono_mp08mw.map"
+    },
+    {
+      "name": "mp08t2.map",
+      "url": "https://gameres.chronodivide.com/map/mp08t2.map",
+      "status": "downloaded",
+      "bytes": 81181,
+      "sha256": "7a93f7909ed5c8e4e91c665841335ecbfd504425d66ee084e0e991c7aecdc14c",
+      "compatMapName": "cd_chrono_mp08t2.map"
+    },
+    {
+      "name": "mp09du.map",
+      "url": "https://gameres.chronodivide.com/map/mp09du.map",
+      "status": "downloaded",
+      "bytes": 144772,
+      "sha256": "970ba5a43cf92813a7e75d36f52518ac9326e138a6e0926ceae41908b00b70c2",
+      "compatMapName": "cd_chrono_mp09du.map"
+    },
+    {
+      "name": "mp09t3.map",
+      "url": "https://gameres.chronodivide.com/map/mp09t3.map",
+      "status": "downloaded",
+      "bytes": 144627,
+      "sha256": "9cf2da0c7c6a0f34c36ba03b500b8f4b55f0bd047d619d7449f12282611eb6e5",
+      "compatMapName": "cd_chrono_mp09t3.map"
+    },
+    {
+      "name": "mp10s4.map",
+      "url": "https://gameres.chronodivide.com/map/mp10s4.map",
+      "status": "downloaded",
+      "bytes": 146229,
+      "sha256": "cbada2fde5d2c9c0240fd62b5ef458f901b56a72bfac6a875a913bf11c3604f7",
+      "compatMapName": "cd_chrono_mp10s4.map"
+    },
+    {
+      "name": "mp11t2.map",
+      "url": "https://gameres.chronodivide.com/map/mp11t2.map",
+      "status": "downloaded",
+      "bytes": 195965,
+      "sha256": "b84570fd81afddc88ecfd19b9a93b46c0b7007c56b94aebd2ad434db6dd19476",
+      "compatMapName": "cd_chrono_mp11t2.map"
+    },
+    {
+      "name": "mp12s4.map",
+      "url": "https://gameres.chronodivide.com/map/mp12s4.map",
+      "status": "downloaded",
+      "bytes": 194246,
+      "sha256": "1740f2445b9b6c310b6243e63714353b6eb2fe780ab8f050af7bdc71a1213d7c",
+      "compatMapName": "cd_chrono_mp12s4.map"
+    },
+    {
+      "name": "mp13du.map",
+      "url": "https://gameres.chronodivide.com/map/mp13du.map",
+      "status": "downloaded",
+      "bytes": 161563,
+      "sha256": "29e2d6791b1d1c7f9ca347c0727fdbe4743d0f5e0267827ccfdd0e7efe009a4b",
+      "compatMapName": "cd_chrono_mp13du.map"
+    },
+    {
+      "name": "mp13mw.map",
+      "url": "https://gameres.chronodivide.com/map/mp13mw.map",
+      "status": "downloaded",
+      "bytes": 161950,
+      "sha256": "c2b08c2889b683a8d9ccd4047e68d9036c1781fc870c6509a2a4ca098727a6a4",
+      "compatMapName": "cd_chrono_mp13mw.map"
+    },
+    {
+      "name": "mp13s4.map",
+      "url": "https://gameres.chronodivide.com/map/mp13s4.map",
+      "status": "downloaded",
+      "bytes": 161860,
+      "sha256": "d909803c24463a7dab561909ff7c505f0c790e0883f18b5910dc9353b7763b29",
+      "compatMapName": "cd_chrono_mp13s4.map"
+    },
+    {
+      "name": "mp14mw.map",
+      "url": "https://gameres.chronodivide.com/map/mp14mw.map",
+      "status": "downloaded",
+      "bytes": 110916,
+      "sha256": "dd0957f93284b9328ad6cd2ab0a58f500581b2c3475572061b8dc38c855f33b5",
+      "compatMapName": "cd_chrono_mp14mw.map"
+    },
+    {
+      "name": "mp14t2.map",
+      "url": "https://gameres.chronodivide.com/map/mp14t2.map",
+      "status": "downloaded",
+      "bytes": 112234,
+      "sha256": "419d7990175599152546d2baacc24667bcbf06ad9cc0943eef5d7c89ba49f926",
+      "compatMapName": "cd_chrono_mp14t2.map"
+    },
+    {
+      "name": "mp15du.map",
+      "url": "https://gameres.chronodivide.com/map/mp15du.map",
+      "status": "downloaded",
+      "bytes": 213117,
+      "sha256": "94d6d95dcb10bfd2105b1077cbd4798247cf40dbb3f0157a85f58dcbc8332f52",
+      "compatMapName": "cd_chrono_mp15du.map"
+    },
+    {
+      "name": "mp15mw.map",
+      "url": "https://gameres.chronodivide.com/map/mp15mw.map",
+      "status": "downloaded",
+      "bytes": 210498,
+      "sha256": "25a4bf27509db04d3cb284a9b651fc55d0d50ec03768baf867b59daab21487ec",
+      "compatMapName": "cd_chrono_mp15mw.map"
+    },
+    {
+      "name": "mp15s4.map",
+      "url": "https://gameres.chronodivide.com/map/mp15s4.map",
+      "status": "downloaded",
+      "bytes": 214424,
+      "sha256": "80519ec7ff69e7ec2cbe7658a4f97d9ff0e73fb618f9b66d8018996f69f402ff",
+      "compatMapName": "cd_chrono_mp15s4.map"
+    },
+    {
+      "name": "mp16mw.map",
+      "url": "https://gameres.chronodivide.com/map/mp16mw.map",
+      "status": "downloaded",
+      "bytes": 167431,
+      "sha256": "8ddec8bb57b49a2517ab2859d01f0a19615c52e2105ce899b57d37d40f3dd076",
+      "compatMapName": "cd_chrono_mp16mw.map"
+    },
+    {
+      "name": "mp16s4.map",
+      "url": "https://gameres.chronodivide.com/map/mp16s4.map",
+      "status": "downloaded",
+      "bytes": 168492,
+      "sha256": "e3c1ea395f41b4e1b9588e6834fd259949b3a5698874ee683a5e8f4056bd204b",
+      "compatMapName": "cd_chrono_mp16s4.map"
+    },
+    {
+      "name": "mp17du.map",
+      "url": "https://gameres.chronodivide.com/map/mp17du.map",
+      "status": "downloaded",
+      "bytes": 328378,
+      "sha256": "35990ea6e3bc38710bd3d85b19a168e3b9d4a4564453793a3ccfbf955363f9d4",
+      "compatMapName": "cd_chrono_mp17du.map"
+    },
+    {
+      "name": "mp17mw.map",
+      "url": "https://gameres.chronodivide.com/map/mp17mw.map",
+      "status": "downloaded",
+      "bytes": 324056,
+      "sha256": "053d30167541d45df7be0b97b4a51e670b22538ffcd80d6d471cb21aed16787f",
+      "compatMapName": "cd_chrono_mp17mw.map"
+    },
+    {
+      "name": "mp17t6.map",
+      "url": "https://gameres.chronodivide.com/map/mp17t6.map",
+      "status": "downloaded",
+      "bytes": 328564,
+      "sha256": "f5d3661f86084e4894f40706cebbdbbd7aab9604f3e135a423ed686ad8a5c230",
+      "compatMapName": "cd_chrono_mp17t6.map"
+    },
+    {
+      "name": "mp18du.map",
+      "url": "https://gameres.chronodivide.com/map/mp18du.map",
+      "status": "downloaded",
+      "bytes": 164032,
+      "sha256": "0838868be0dc5477a7c1787df2f5cc9d5794c822608e9208dbfd194431fa08e3",
+      "compatMapName": "cd_chrono_mp18du.map"
+    },
+    {
+      "name": "mp18s3.map",
+      "url": "https://gameres.chronodivide.com/map/mp18s3.map",
+      "status": "downloaded",
+      "bytes": 163276,
+      "sha256": "0970bd02317a910510ed8a6d647a8e7bbbaa26918f731c093fc25a3ec37727fc",
+      "compatMapName": "cd_chrono_mp18s3.map"
+    },
+    {
+      "name": "mp19t4.map",
+      "url": "https://gameres.chronodivide.com/map/mp19t4.map",
+      "status": "downloaded",
+      "bytes": 258780,
+      "sha256": "3fca9fe52aa3e12531d623834fa0a128bc1b867f918d6204a2f210d8568ddcee",
+      "compatMapName": "cd_chrono_mp19t4.map"
+    },
+    {
+      "name": "mp20t6.map",
+      "url": "https://gameres.chronodivide.com/map/mp20t6.map",
+      "status": "downloaded",
+      "bytes": 420041,
+      "sha256": "f769fd5a02796148f230f8687efc4abdc514edee5620a58b7dfb1ddd684e653e",
+      "compatMapName": "cd_chrono_mp20t6.map"
+    },
+    {
+      "name": "mp21s2.map",
+      "url": "https://gameres.chronodivide.com/map/mp21s2.map",
+      "status": "downloaded",
+      "bytes": 181287,
+      "sha256": "741b42f44a7f2019b57548b0157b7d37d5434031620b86139e26537a7c7f7d05",
+      "compatMapName": "cd_chrono_mp21s2.map"
+    },
+    {
+      "name": "mp22mw.map",
+      "url": "https://gameres.chronodivide.com/map/mp22mw.map",
+      "status": "downloaded",
+      "bytes": 273104,
+      "sha256": "473fcfc9b179956fdea9fec1eba7d2ae1b8c6c7c843b39afae67405269fa7f82",
+      "compatMapName": "cd_chrono_mp22mw.map"
+    },
+    {
+      "name": "mp22s8.map",
+      "url": "https://gameres.chronodivide.com/map/mp22s8.map",
+      "status": "downloaded",
+      "bytes": 275506,
+      "sha256": "9742552c2f91d443ad5d5d6dabdd7db1e3ec7d17672f8450849dddf55af51a32",
+      "compatMapName": "cd_chrono_mp22s8.map"
+    },
+    {
+      "name": "mp23mw.map",
+      "url": "https://gameres.chronodivide.com/map/mp23mw.map",
+      "status": "downloaded",
+      "bytes": 227923,
+      "sha256": "9289af186707ce1417a7d0021abf6437e3c9a3adb80fd511507d91ce03e5fa86",
+      "compatMapName": "cd_chrono_mp23mw.map"
+    },
+    {
+      "name": "mp23t4.map",
+      "url": "https://gameres.chronodivide.com/map/mp23t4.map",
+      "status": "downloaded",
+      "bytes": 229448,
+      "sha256": "3750bcd8ee5ce7a91d80fcc24fdfef2008a6cebfe1f0036a514081acbe149704",
+      "compatMapName": "cd_chrono_mp23t4.map"
+    },
+    {
+      "name": "mp24du.map",
+      "url": "https://gameres.chronodivide.com/map/mp24du.map",
+      "status": "downloaded",
+      "bytes": 120582,
+      "sha256": "dc216cf2dc6fe340f40fbfc35e29aa6f27630b7bd655645d783d1e62ef541472",
+      "compatMapName": "cd_chrono_mp24du.map"
+    },
+    {
+      "name": "mp25du.map",
+      "url": "https://gameres.chronodivide.com/map/mp25du.map",
+      "status": "downloaded",
+      "bytes": 265132,
+      "sha256": "68b395b6a52faee076354804f1f371c99785f566314b38c2baa31b182dc490b1",
+      "compatMapName": "cd_chrono_mp25du.map"
+    },
+    {
+      "name": "mp25mw.map",
+      "url": "https://gameres.chronodivide.com/map/mp25mw.map",
+      "status": "downloaded",
+      "bytes": 259754,
+      "sha256": "6e3497d84dead79f25ee1eece53301c5a3603ec2071b6c6219e61188c657ae6b",
+      "compatMapName": "cd_chrono_mp25mw.map"
+    },
+    {
+      "name": "mp25t6.map",
+      "url": "https://gameres.chronodivide.com/map/mp25t6.map",
+      "status": "downloaded",
+      "bytes": 259174,
+      "sha256": "2a031cb9b0d78fb12a84de28d3c6e68eeebd327c22261bc7e3b240930c659ecc",
+      "compatMapName": "cd_chrono_mp25t6.map"
+    },
+    {
+      "name": "mp26s6.map",
+      "url": "https://gameres.chronodivide.com/map/mp26s6.map",
+      "status": "downloaded",
+      "bytes": 244979,
+      "sha256": "52883832acc6c64d942a76b279d3a688159886dabb05b134d73fa7067f0d119a",
+      "compatMapName": "cd_chrono_mp26s6.map"
+    },
+    {
+      "name": "mp27du.map",
+      "url": "https://gameres.chronodivide.com/map/mp27du.map",
+      "status": "downloaded",
+      "bytes": 373755,
+      "sha256": "a9afed1c7eedc599e215386e30f4900890e93666b04f3e4525793cb4b804b847",
+      "compatMapName": "cd_chrono_mp27du.map"
+    },
+    {
+      "name": "mp27mw.map",
+      "url": "https://gameres.chronodivide.com/map/mp27mw.map",
+      "status": "downloaded",
+      "bytes": 370394,
+      "sha256": "e9d22f5e43509d05b8a6fbd360249e16bedf600084c7e2463771a6719e489b53",
+      "compatMapName": "cd_chrono_mp27mw.map"
+    },
+    {
+      "name": "mp27t8.map",
+      "url": "https://gameres.chronodivide.com/map/mp27t8.map",
+      "status": "downloaded",
+      "bytes": 374465,
+      "sha256": "64674a3d16a321207b1edb6e223ca87690d50ee0e293aea0c56de5b1f9b98aa4",
+      "compatMapName": "cd_chrono_mp27t8.map"
+    },
+    {
+      "name": "mp29mw.map",
+      "url": "https://gameres.chronodivide.com/map/mp29mw.map",
+      "status": "downloaded",
+      "bytes": 81331,
+      "sha256": "f54919acf9ee8ba81c395d185244decad947e1cddf3d62012a70fbddceb0ff5b",
+      "compatMapName": "cd_chrono_mp29mw.map"
+    },
+    {
+      "name": "mp29u2.map",
+      "url": "https://gameres.chronodivide.com/map/mp29u2.map",
+      "status": "downloaded",
+      "bytes": 91704,
+      "sha256": "0bc3e5c059547f8d8a8ae8d0c48cb02a9c5f2ecf626944dd2dfa5f02267be5cb",
+      "compatMapName": "cd_chrono_mp29u2.map"
+    },
+    {
+      "name": "mp30mw.map",
+      "url": "https://gameres.chronodivide.com/map/mp30mw.map",
+      "status": "downloaded",
+      "bytes": 268053,
+      "sha256": "a8ab83553c8d117eb8739e3a38911fdefb11b9863b0c6ff71668a82f2a74f0cf",
+      "compatMapName": "cd_chrono_mp30mw.map"
+    },
+    {
+      "name": "mp30s6.map",
+      "url": "https://gameres.chronodivide.com/map/mp30s6.map",
+      "status": "downloaded",
+      "bytes": 268723,
+      "sha256": "f07732d3193bd6ff6102d5ef4262b0108549adb230d9197ee1f2fe499743afe8",
+      "compatMapName": "cd_chrono_mp30s6.map"
+    },
+    {
+      "name": "mp31s2.map",
+      "url": "https://gameres.chronodivide.com/map/mp31s2.map",
+      "status": "downloaded",
+      "bytes": 127843,
+      "sha256": "e018dc82aa16ba6fe5356653f198813bcb896246a2a7558352a3be12d20be9a6",
+      "compatMapName": "cd_chrono_mp31s2.map"
+    },
+    {
+      "name": "mp32du.map",
+      "url": "https://gameres.chronodivide.com/map/mp32du.map",
+      "status": "downloaded",
+      "bytes": 200420,
+      "sha256": "d90fd1da0e7521cce0ee6e073899f3de19867bdf23f05cf2ac64f55699675885",
+      "compatMapName": "cd_chrono_mp32du.map"
+    },
+    {
+      "name": "mp32mw.map",
+      "url": "https://gameres.chronodivide.com/map/mp32mw.map",
+      "status": "downloaded",
+      "bytes": 192636,
+      "sha256": "6eb841a580cef87aca4185d187ab09d7e6cc24408967cbc836d425628f7ebd18",
+      "compatMapName": "cd_chrono_mp32mw.map"
+    },
+    {
+      "name": "mp32s8.map",
+      "url": "https://gameres.chronodivide.com/map/mp32s8.map",
+      "status": "downloaded",
+      "bytes": 194911,
+      "sha256": "df5419036db3cdfb39de5a6fb9a09c7737a60aad79dbda9431193d92ca460bc1",
+      "compatMapName": "cd_chrono_mp32s8.map"
+    },
+    {
+      "name": "mp33u4.map",
+      "url": "https://gameres.chronodivide.com/map/mp33u4.map",
+      "status": "downloaded",
+      "bytes": 142650,
+      "sha256": "527f6765e21aa79bd4da734f8991ee9879da2e97a49eeb02015ffd7e1aa8f16c",
+      "compatMapName": "cd_chrono_mp33u4.map"
+    },
+    {
+      "name": "mp34u4.map",
+      "url": "https://gameres.chronodivide.com/map/mp34u4.map",
+      "status": "downloaded",
+      "bytes": 224040,
+      "sha256": "a11379d07d0e8e317be8d7232caf11818765820e9e56029deee514aa272ec473",
+      "compatMapName": "cd_chrono_mp34u4.map"
+    },
+    {
+      "name": "newhghts.map",
+      "url": "https://gameres.chronodivide.com/map/newhghts.map",
+      "status": "downloaded",
+      "bytes": 64084,
+      "sha256": "2d8642934cfa2e4bf327d90db80f9cc3f78b10becf3e5937ab283f4c3923be28",
+      "compatMapName": "cd_chrono_newhghts.map"
+    },
+    {
+      "name": "oceansid.map",
+      "url": "https://gameres.chronodivide.com/map/oceansid.map",
+      "status": "downloaded",
+      "bytes": 175606,
+      "sha256": "16b43bee8f59ab9a92aaa71b7cf31434bc2d0111bf4302b04dfc6787aa3db609",
+      "compatMapName": "cd_chrono_oceansid.map"
+    },
+    {
+      "name": "offensedefense.map",
+      "url": "https://gameres.chronodivide.com/map/offensedefense.map",
+      "status": "downloaded",
+      "bytes": 109465,
+      "sha256": "2b0755ecbf1d4baf254b52b9a164ff0cc9d64340b7d86a02673711a1521f22f8",
+      "compatMapName": "cd_chrono_offensedefense.map"
+    },
+    {
+      "name": "ore2_startfixed.map",
+      "url": "https://gameres.chronodivide.com/map/ore2_startfixed.map",
+      "status": "downloaded",
+      "bytes": 43918,
+      "sha256": "46615699f53a8a58351298b21979868dbdd6900f5769cc0887cd80a58cef8c53",
+      "compatMapName": "cd_chrono_ore2_startfixed.map"
+    },
+    {
+      "name": "pacific.map",
+      "url": "https://gameres.chronodivide.com/map/pacific.map",
+      "status": "downloaded",
+      "bytes": 191134,
+      "sha256": "d0098ce710244210f0d9da41972c3fe4351dbccb266869e3c115ce19dc0eb37e",
+      "compatMapName": "cd_chrono_pacific.map"
+    },
+    {
+      "name": "potomac.map",
+      "url": "https://gameres.chronodivide.com/map/potomac.map",
+      "status": "downloaded",
+      "bytes": 184122,
+      "sha256": "35674581fce5f390b61d756aba55f86d7a6572d24e4f99548a12ac0272ef73e1",
+      "compatMapName": "cd_chrono_potomac.map"
+    },
+    {
+      "name": "powdrkeg.map",
+      "url": "https://gameres.chronodivide.com/map/powdrkeg.map",
+      "status": "downloaded",
+      "bytes": 324115,
+      "sha256": "12bdc90668a9321b35e97c95d82e29a8889bd3307bf6ee51dbaf239ae3dc2d73",
+      "compatMapName": "cd_chrono_powdrkeg.map"
+    },
+    {
+      "name": "rekoool_fast_6players.mpr",
+      "url": "https://gameres.chronodivide.com/map/rekoool_fast_6players.mpr",
+      "status": "downloaded",
+      "bytes": 108465,
+      "sha256": "9a8a57424261ec91cb8be9b280e6e87524582bb24472b337d3b2b7acd7233b29",
+      "compatMapName": "cd_chrono_rekoool_fast_6players.mpr"
+    },
+    {
+      "name": "rekoool_fast_8players.mpr",
+      "url": "https://gameres.chronodivide.com/map/rekoool_fast_8players.mpr",
+      "status": "downloaded",
+      "bytes": 64221,
+      "sha256": "52cfcec459afd07ab6b8f8a26314df29b2412935be70b1f287414c52c25e6689",
+      "compatMapName": "cd_chrono_rekoool_fast_8players.mpr"
+    },
+    {
+      "name": "riverram.map",
+      "url": "https://gameres.chronodivide.com/map/riverram.map",
+      "status": "downloaded",
+      "bytes": 73869,
+      "sha256": "62743584bb781bf12ec5b2582dc18845bcf5ce09e6ab2fca8083dc43d6eccb80",
+      "compatMapName": "cd_chrono_riverram.map"
+    },
+    {
+      "name": "rockets.map",
+      "url": "https://gameres.chronodivide.com/map/rockets.map",
+      "status": "downloaded",
+      "bytes": 220379,
+      "sha256": "a07e65c731e6b7ac9e9bf33d350b076795c2642ea65f4697b1e5a77cc24cf55f",
+      "compatMapName": "cd_chrono_rockets.map"
+    },
+    {
+      "name": "roulette.map",
+      "url": "https://gameres.chronodivide.com/map/roulette.map",
+      "status": "downloaded",
+      "bytes": 299880,
+      "sha256": "451437f8be5118400ae5a8aeea178a6f787f88cc4a84432e563897dd5132c0fb",
+      "compatMapName": "cd_chrono_roulette.map"
+    },
+    {
+      "name": "round.map",
+      "url": "https://gameres.chronodivide.com/map/round.map",
+      "status": "downloaded",
+      "bytes": 109584,
+      "sha256": "f3d6f916a3d192f03f969d3b1d608cef6aa57efbe1a4182af0259c57b19eba73",
+      "compatMapName": "cd_chrono_round.map"
+    },
+    {
+      "name": "seaofiso.map",
+      "url": "https://gameres.chronodivide.com/map/seaofiso.map",
+      "status": "downloaded",
+      "bytes": 150878,
+      "sha256": "e57554181d7f6f1b786cd9cbecf4dd9e7ddcba24fabca05eb56c9e90d3108644",
+      "compatMapName": "cd_chrono_seaofiso.map"
+    },
+    {
+      "name": "shrapnel.map",
+      "url": "https://gameres.chronodivide.com/map/shrapnel.map",
+      "status": "downloaded",
+      "bytes": 152795,
+      "sha256": "98f296a4d8630f6a111ed51437982dd54ea831ede23906b16397f2b924cab70b",
+      "compatMapName": "cd_chrono_shrapnel.map"
+    },
+    {
+      "name": "sinkswim_yr_port.map",
+      "url": "https://gameres.chronodivide.com/map/sinkswim_yr_port.map",
+      "status": "missing",
+      "error": "HTTPError: HTTP Error 404: Not Found"
+    },
+    {
+      "name": "tanyas.map",
+      "url": "https://gameres.chronodivide.com/map/tanyas.map",
+      "status": "downloaded",
+      "bytes": 145365,
+      "sha256": "99ea5dae5d87d1d06f935796c2edcdefd89dc038e542bb33138ae2e3676922d3",
+      "compatMapName": "cd_chrono_tanyas.map"
+    },
+    {
+      "name": "tn01mw.map",
+      "url": "https://gameres.chronodivide.com/map/tn01mw.map",
+      "status": "downloaded",
+      "bytes": 127987,
+      "sha256": "049cd509bba0f6af89a36ad2d2fa3fb9b63985ca5bb95b1cdd0710ed853ee346",
+      "compatMapName": "cd_chrono_tn01mw.map"
+    },
+    {
+      "name": "tn01t2.map",
+      "url": "https://gameres.chronodivide.com/map/tn01t2.map",
+      "status": "unexpected",
+      "bytes": 129383,
+      "sha256": "95a836a2b42728d2c7d5c606902619b98afe428cb54eaf8b489e2d83819213e3"
+    },
+    {
+      "name": "tn02mw.map",
+      "url": "https://gameres.chronodivide.com/map/tn02mw.map",
+      "status": "downloaded",
+      "bytes": 145361,
+      "sha256": "d68370d9126ba39af0deb6e188d529ad8a9c21fa88ce0d539b3804a0a95f9382",
+      "compatMapName": "cd_chrono_tn02mw.map"
+    },
+    {
+      "name": "tn02s4.map",
+      "url": "https://gameres.chronodivide.com/map/tn02s4.map",
+      "status": "downloaded",
+      "bytes": 144090,
+      "sha256": "f16962527291e7888293568bc84b36ac748f0351b3f9b4dac632c500642d1ba0",
+      "compatMapName": "cd_chrono_tn02s4.map"
+    },
+    {
+      "name": "tn04mw.map",
+      "url": "https://gameres.chronodivide.com/map/tn04mw.map",
+      "status": "downloaded",
+      "bytes": 148844,
+      "sha256": "1d7d311150d69cb0a87c73d39a437e2ff14814bbeab05301487a07ebde94a95c",
+      "compatMapName": "cd_chrono_tn04mw.map"
+    },
+    {
+      "name": "tn04t2.map",
+      "url": "https://gameres.chronodivide.com/map/tn04t2.map",
+      "status": "downloaded",
+      "bytes": 149298,
+      "sha256": "bd6804a6336c415eca0c31a7a203df1c7bf2dc19353385c66f41a2381c248c33",
+      "compatMapName": "cd_chrono_tn04t2.map"
+    },
+    {
+      "name": "tourofegypt.map",
+      "url": "https://gameres.chronodivide.com/map/tourofegypt.map",
+      "status": "downloaded",
+      "bytes": 115308,
+      "sha256": "7057c68c19d49e5af5a79dd817196f52a2faa5f699d00d14d70904ddc96d1ca8",
+      "compatMapName": "cd_chrono_tourofegypt.map"
+    },
+    {
+      "name": "tower.map",
+      "url": "https://gameres.chronodivide.com/map/tower.map",
+      "status": "downloaded",
+      "bytes": 206037,
+      "sha256": "5520e06ea097b27d2dbee6eb6d4554a5d31feb6ba800143198248f290e47d778",
+      "compatMapName": "cd_chrono_tower.map"
+    },
+    {
+      "name": "tsunami.map",
+      "url": "https://gameres.chronodivide.com/map/tsunami.map",
+      "status": "downloaded",
+      "bytes": 197168,
+      "sha256": "ae08357b983be46154368d488fb9290724190dd45c21b87d39f5350c54a1cda9",
+      "compatMapName": "cd_chrono_tsunami.map"
+    },
+    {
+      "name": "unrepent.map",
+      "url": "https://gameres.chronodivide.com/map/unrepent.map",
+      "status": "downloaded",
+      "bytes": 186927,
+      "sha256": "6bf7f9e0a90c606b9d6c8c29e12abae1921224b210db8fce47edf5fd5c385177",
+      "compatMapName": "cd_chrono_unrepent.map"
+    },
+    {
+      "name": "valley.map",
+      "url": "https://gameres.chronodivide.com/map/valley.map",
+      "status": "downloaded",
+      "bytes": 233566,
+      "sha256": "6c400db9edf2593a0331b315306d8987072264f10b9b8a5d76ce472fd2d008cc",
+      "compatMapName": "cd_chrono_valley.map"
+    },
+    {
+      "name": "xmas.map",
+      "url": "https://gameres.chronodivide.com/map/xmas.map",
+      "status": "downloaded",
+      "bytes": 112924,
+      "sha256": "6c843f5a388b5ed88d1a991299713d271a941011977165b77e8b948d415b8b39",
+      "compatMapName": "cd_chrono_xmas.map"
+    },
+    {
+      "name": "yuriplot.map",
+      "url": "https://gameres.chronodivide.com/map/yuriplot.map",
+      "status": "downloaded",
+      "bytes": 245859,
+      "sha256": "330caf903d0eb8666e32da0784df69c1bf533217312f4018e40448981edd3a53",
+      "compatMapName": "cd_chrono_yuriplot.map"
+    }
+  ]
+}

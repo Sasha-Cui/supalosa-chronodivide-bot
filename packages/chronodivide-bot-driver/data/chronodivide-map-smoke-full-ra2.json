@@ -1,0 +1,1339 @@
+{
+  "generatedAt": "2026-06-06T04:47:27.482Z",
+  "mixDir": "./data-full-ra2",
+  "downloadedCount": 133,
+  "runnableCount": 133,
+  "failedCount": 0,
+  "results": [
+    {
+      "mapName": "cd_chrono_2_divide_freezes_over_le.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_2_malibu_cliffs_le.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_2_montana_dmz_le.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_4_country_swing_le_v2.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_4_divide_freezes_over.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_4_heck_freezes_over_le.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_4_montana_dmz_le.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_6_near_ore_far.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_8_near_ore_far.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_amazon01.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_arena.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_barrel.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_bayopigs.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_bermuda.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_break.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_carville.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_cavernsofsiberia.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_countryswingfixed.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_deadman.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_death.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_disaster.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_dorado_descent_yr_port.mpr",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_dryheat.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_dunepatrolremake.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_dustbowl.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_eb1.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_eb2.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_eb3.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_eb4.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_eb5.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_goldst.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_grinder.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_hailmary.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_heckbvb.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_heckcorners.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_heckcorners_b.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_heckcorners_b_golden.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_heckgolden.mpr",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_hecklvl.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_heckrvr.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_hecktvt.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_hills.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_invasion.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_isleland.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_jungleofvietnam.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_kaliforn.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_killer.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_lostlake.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mojosprt.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp01du.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp01t4.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp02t2.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp03t4.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp05du.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp05mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp05t4.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp06mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp06t2.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp08mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp08t2.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp09du.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp09t3.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp10s4.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp11t2.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp12s4.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp13du.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp13mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp13s4.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp14mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp14t2.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp15du.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp15mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp15s4.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp16mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp16s4.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp17du.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp17mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp17t6.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp18du.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp18s3.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp19t4.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp20t6.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp21s2.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp22mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp22s8.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp23mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp23t4.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp24du.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp25du.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp25mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp25t6.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp26s6.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp27du.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp27mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp27t8.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp29mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp29u2.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp30mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp30s6.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp31s2.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp32du.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp32mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp32s8.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp33u4.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_mp34u4.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_newhghts.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_oceansid.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_offensedefense.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_ore2_startfixed.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_pacific.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_potomac.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_powdrkeg.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_rekoool_fast_6players.mpr",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_rekoool_fast_8players.mpr",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_riverram.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_rockets.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_roulette.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_round.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_seaofiso.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_shrapnel.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_tanyas.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_tn01mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_tn02mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_tn02s4.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_tn04mw.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_tn04t2.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_tourofegypt.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_tower.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_tsunami.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_unrepent.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_valley.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_xmas.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    },
+    {
+      "mapName": "cd_chrono_yuriplot.map",
+      "modes": [
+        1,
+        2,
+        4
+      ],
+      "ok": true,
+      "tick": 1
+    }
+  ]
+}

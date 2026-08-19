@@ -1,0 +1,478 @@
+{
+  "generatedAt": "2026-06-06T04:34:35.543Z",
+  "source": "CnCNet/cncnet-yr-client-package develop package/Maps/Yuri's Revenge",
+  "note": "cd_ compatibility copies normalize [Basic] GameMode to standard for Chrono Divide game-api.",
+  "results": [
+    {
+      "mapName": "cd_2_malibu_cliffs_le.map",
+      "Name": "[2] Malibu Cliffs LE",
+      "Author": "Westwood, CnCNet QM Team",
+      "GameMode": "standard",
+      "MaxPlayer": "2",
+      "MinPlayer": "2",
+      "Size": "0,0,101,128",
+      "Theater": "TEMPERATE",
+      "LocalSize": "2,4,97,118",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_2_official_tournament_map_d.map",
+      "Name": "[2] Official Tournament Map D",
+      "Author": "Instinct",
+      "GameMode": "standard",
+      "MaxPlayer": "4",
+      "MinPlayer": "2",
+      "Size": "0,0,70,76",
+      "Theater": "URBAN",
+      "LocalSize": "2,5,66,65",
+      "ok": false,
+      "error": "File \"isourb.mix\" not found"
+    },
+    {
+      "mapName": "cd_2_official_tournament_map_q.map",
+      "Name": "[2] Official Tournament Map Q",
+      "Author": "DistantQ",
+      "GameMode": "standard",
+      "MaxPlayer": "2",
+      "MinPlayer": "2",
+      "Size": "0,0,113,68",
+      "Theater": "TEMPERATE",
+      "LocalSize": "2,4,109,62",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_2_peak_of_perfection.map",
+      "Name": "[2] Peak of Perfection",
+      "GameMode": "standard",
+      "Author": "Instinct",
+      "MaxPlayer": "2",
+      "MinPlayer": "2",
+      "Size": "0,0,75,82",
+      "Theater": "TEMPERATE",
+      "LocalSize": "2,4,71,76",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_2_pinch_point_le.map",
+      "Name": "[2] Pinch Points LE",
+      "Author": "WavePY, RaVaGe (LE)",
+      "GameMode": "standard",
+      "MaxPlayer": "2",
+      "MinPlayer": "2",
+      "Size": "0,0,76,72",
+      "Theater": "TEMPERATE",
+      "LocalSize": "2,4,72,66",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_2_reconcile.map",
+      "Name": "[2] Reconcile",
+      "Author": "Dylan",
+      "GameMode": "standard",
+      "MaxPlayer": "2",
+      "MinPlayer": "2",
+      "Size": "0,0,100,90",
+      "Theater": "TEMPERATE",
+      "LocalSize": "2,4,96,82",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_2_river_rampage_le.map",
+      "Name": "[2] River Rampage LE",
+      "Author": "Westwood Studios (Remake by JaladTanagra & Lucifer)",
+      "GameMode": "standard",
+      "MaxPlayer": "2",
+      "MinPlayer": "2",
+      "Size": "0,0,69,96",
+      "Theater": "TEMPERATE",
+      "LocalSize": "3,5,64,85",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_2_sen_river.map",
+      "Name": "[2] Sen River",
+      "Author": "[RU]Polye",
+      "GameMode": "standard",
+      "MaxPlayer": "2",
+      "MinPlayer": "2",
+      "Size": "0,0,80,83",
+      "Theater": "SNOW",
+      "LocalSize": "2,4,76,77",
+      "ok": false,
+      "error": "File \"isosnow.mix\" not found"
+    },
+    {
+      "mapName": "cd_2_south_pacific.map",
+      "Name": "[2] South Pacific",
+      "GameMode": "standard",
+      "MaxPlayer": "2",
+      "MinPlayer": "2",
+      "Size": "0,0,105,95",
+      "Theater": "TEMPERATE",
+      "LocalSize": "5,4,95,85",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_2_split_level.map",
+      "Name": "[2] Split Level",
+      "Author": "kapow",
+      "GameMode": "standard",
+      "MaxPlayer": "2",
+      "MinPlayer": "2",
+      "Size": "0,0,86,86",
+      "Theater": "TEMPERATE",
+      "LocalSize": "7,7,72,72",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_2_tikal.map",
+      "Name": "[2] Tikal",
+      "GameMode": "standard",
+      "Author": "Prophet",
+      "MaxPlayer": "2",
+      "MinPlayer": "2",
+      "Size": "0,0,90,50",
+      "Theater": "TEMPERATE",
+      "LocalSize": "2,4,86,44",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_2_tiger_bay.map",
+      "Name": "[2] Tiger Bay",
+      "GameMode": "standard",
+      "MaxPlayer": "2",
+      "MinPlayer": "2",
+      "Size": "0,0,90,106",
+      "Theater": "TEMPERATE",
+      "LocalSize": "2,4,86,97",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_2_watering_hole_ra2.map",
+      "Name": "[2] Watering Hole RA2",
+      "Author": "WavePY, RaVaGe (LE)",
+      "GameMode": "standard",
+      "MaxPlayer": "2",
+      "MinPlayer": "2",
+      "Size": "0,0,80,110",
+      "Theater": "TEMPERATE",
+      "LocalSize": "2,4,76,98",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_2_yin_yang_precap.map",
+      "Name": "[2] Yin Yang (PreCaptured)",
+      "Author": "xpscinex, XKaLiBaR, Lucifier",
+      "GameMode": "standard",
+      "MaxPlayer": "2",
+      "MinPlayer": "2",
+      "Size": "0,0,83,84",
+      "Theater": "TEMPERATE",
+      "LocalSize": "2,4,79,72",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_4_country_swing_le.map",
+      "Name": "[4] Country Swing LE",
+      "Author": "Westwood / Snark edit",
+      "GameMode": "standard",
+      "MaxPlayer": "4",
+      "MinPlayer": "2",
+      "Size": "0,0,100,90",
+      "Theater": "TEMPERATE",
+      "LocalSize": "2,4,96,81",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_4_dorado_descent_v301.map",
+      "Name": "[4] Dorado Descent",
+      "Author": "Burg",
+      "GameMode": "standard",
+      "MaxPlayer": "4",
+      "MinPlayer": "2",
+      "Size": "0,0,105,118",
+      "Theater": "DESERT",
+      "LocalSize": "2,7,101,102",
+      "ok": false,
+      "error": "Unsupported theater \"Desert\""
+    },
+    {
+      "mapName": "cd_4_hammer_and_sickle_le.map",
+      "Name": "[4] Hammer and Sickle LE",
+      "Author": "Westwood, Community edit",
+      "GameMode": "standard",
+      "MaxPlayer": "4",
+      "MinPlayer": "2",
+      "Size": "0,0,100,134",
+      "Theater": "TEMPERATE",
+      "LocalSize": "3,7,93,120",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_4_jungle_of_vietnam_le.map",
+      "Name": "[4] Jungle of Vietnam LE",
+      "Author": "DistantQ / Burg",
+      "GameMode": "standard",
+      "MaxPlayer": "4",
+      "MinPlayer": "2",
+      "Size": "0,0,104,115",
+      "Theater": "TEMPERATE",
+      "LocalSize": "4,4,95,102",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_4_lake_island.map",
+      "Name": "[4] Lake Island",
+      "Author": "Snark, Burg edit",
+      "GameMode": "standard",
+      "MaxPlayer": "4",
+      "MinPlayer": "2",
+      "Size": "0,0,118,133",
+      "Theater": "TEMPERATE",
+      "LocalSize": "2,4,114,122",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_4_offense_defense_precap.map",
+      "Name": "[4] Offense Defense (PreCap)",
+      "GameMode": "standard",
+      "MaxPlayer": "4",
+      "MinPlayer": "2",
+      "Size": "0,0,80,52",
+      "Theater": "TEMPERATE",
+      "LocalSize": "2,4,76,42",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_4_parkside_gardens.map",
+      "Name": "[4] Parkside Gardens",
+      "Author": "Author Not Set",
+      "GameMode": "standard",
+      "MaxPlayer": "4",
+      "MinPlayer": "2",
+      "Size": "0,0,97,100",
+      "Theater": "URBAN",
+      "LocalSize": "3,5,91,89",
+      "ok": false,
+      "error": "File \"isourb.mix\" not found"
+    },
+    {
+      "mapName": "cd_4_red_valley.map",
+      "Name": "[2] Red Valley",
+      "Author": "Instinct",
+      "GameMode": "standard",
+      "MaxPlayer": "4",
+      "MinPlayer": "2",
+      "Size": "0,0,96,100",
+      "Theater": "DESERT",
+      "LocalSize": "3,5,90,90",
+      "ok": false,
+      "error": "Unsupported theater \"Desert\""
+    },
+    {
+      "mapName": "cd_4_river_rampage_le_2v2.map",
+      "Name": "[4] River Rampage LE (2v2)",
+      "Author": "Westwood Studios (Remake by JaladTanagra & Lucifer)",
+      "GameMode": "standard",
+      "MaxPlayer": "4",
+      "MinPlayer": "2",
+      "Size": "0,0,69,96",
+      "Theater": "TEMPERATE",
+      "LocalSize": "3,5,64,85",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_4_yin_yang_le.map",
+      "Name": "[4] Yin Yang LE",
+      "Author": "Piscinex / XKaLiBaR edit",
+      "GameMode": "standard",
+      "MaxPlayer": "4",
+      "MinPlayer": "2",
+      "Size": "0,0,83,84",
+      "Theater": "TEMPERATE",
+      "LocalSize": "2,4,79,72",
+      "ok": true,
+      "modes": [
+        1,
+        2,
+        4
+      ]
+    },
+    {
+      "mapName": "cd_2_montana_dmz_le.map",
+      "Name": "[2] Montana DMZ LE",
+      "Author": "Westwood / XKaLiBaR",
+      "GameMode": "standard",
+      "MaxPlayer": "2",
+      "MinPlayer": "2",
+      "Size": "0,0,85,105",
+      "Theater": "SNOW",
+      "LocalSize": "5,4,76,94",
+      "ok": false,
+      "error": "File \"isosnow.mix\" not found"
+    },
+    {
+      "mapName": "cd_4_montana_dmz_le.map",
+      "Name": "[4] Montana DMZ LE",
+      "Author": "Westwood / XKaLiBaR",
+      "GameMode": "standard",
+      "MaxPlayer": "4",
+      "MinPlayer": "2",
+      "Size": "0,0,85,105",
+      "Theater": "SNOW",
+      "LocalSize": "5,4,76,94",
+      "ok": false,
+      "error": "File \"isosnow.mix\" not found"
+    },
+    {
+      "mapName": "cd_4_heck_freezes_over_le.map",
+      "Name": "[4] Heck Freezes Over LE",
+      "Author": "Westwood & CncNet QM Team",
+      "GameMode": "standard",
+      "MaxPlayer": "4",
+      "MinPlayer": "2",
+      "Size": "0,0,90,110",
+      "Theater": "SNOW",
+      "LocalSize": "3,5,84,90",
+      "ok": false,
+      "error": "File \"isosnow.mix\" not found"
+    },
+    {
+      "mapName": "cd_2_divide_freezes_over_le.map",
+      "Name": "[2] Divide Freezes Over LE",
+      "Author": "DistantQ & CnCNet QM Team",
+      "GameMode": "standard",
+      "MaxPlayer": "2",
+      "MinPlayer": "2",
+      "Size": "0,0,98,116",
+      "Theater": "SNOW",
+      "LocalSize": "2,4,94,105",
+      "ok": false,
+      "error": "File \"isosnow.mix\" not found"
+    },
+    {
+      "mapName": "cd_4_divide_freezes_over.map",
+      "Name": "[4] Divide Freezes Over",
+      "Author": "DistantQ",
+      "GameMode": "standard",
+      "MaxPlayer": "4",
+      "MinPlayer": "2",
+      "Size": "0,0,98,116",
+      "Theater": "SNOW",
+      "LocalSize": "2,4,94,105",
+      "ok": false,
+      "error": "File \"isosnow.mix\" not found"
+    }
+  ],
+  "verifiedMapNames": [
+    "cd_2_malibu_cliffs_le.map",
+    "cd_2_official_tournament_map_q.map",
+    "cd_2_peak_of_perfection.map",
+    "cd_2_pinch_point_le.map",
+    "cd_2_reconcile.map",
+    "cd_2_river_rampage_le.map",
+    "cd_2_south_pacific.map",
+    "cd_2_split_level.map",
+    "cd_2_tikal.map",
+    "cd_2_tiger_bay.map",
+    "cd_2_watering_hole_ra2.map",
+    "cd_2_yin_yang_precap.map",
+    "cd_4_country_swing_le.map",
+    "cd_4_hammer_and_sickle_le.map",
+    "cd_4_jungle_of_vietnam_le.map",
+    "cd_4_lake_island.map",
+    "cd_4_offense_defense_precap.map",
+    "cd_4_river_rampage_le_2v2.map",
+    "cd_4_yin_yang_le.map"
+  ]
+}
