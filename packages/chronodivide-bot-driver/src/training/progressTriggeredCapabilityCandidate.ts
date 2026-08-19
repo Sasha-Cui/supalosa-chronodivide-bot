@@ -1,7 +1,7 @@
 import { GameApi, ObjectType, QueueType, TechnoRules, Tile } from "@chronodivide/game-api";
 import { Countries, DebugLogger } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { MissionContext, SupabotContext } from "@supalosa/chronodivide-bot/dist/bot/logic/common/context.js";
-import { Mission, MissionAction, buildStructureAtLocation, noop, releaseUnits, requestUnits } from
+import { Mission, MissionAction, buildStructureAtLocation, noop, requestUnits } from
     "@supalosa/chronodivide-bot/dist/bot/logic/mission/mission.js";
 import { MissionController } from "@supalosa/chronodivide-bot/dist/bot/logic/mission/missionController.js";
 import crypto from "node:crypto";
@@ -42,7 +42,8 @@ export const progressTriggeredAirStructures = (country: Countries): string[] => 
 
 export type ProgressTriggeredCapabilityTelemetry = {
     schemaVersion: 1;
-    event: "capability_missions_added" | "capability_structure_request" | "capability_unit_request" | "capability_unit_release";
+    event: "capability_missions_added" | "capability_structure_request" | "capability_unit_request" |
+        "capability_unit_staged" | "capability_unit_release";
     informationBoundary: "public_complete_state";
     tick: number;
     country: Countries;
@@ -53,6 +54,7 @@ export type ProgressTriggeredCapabilityTelemetry = {
     forbiddenFieldsEmitted: [];
 };
 
+export const PASSIVE_CAPABILITY_DONOR_PRIORITY = 0 as const;
 type Sink=(e:ProgressTriggeredCapabilityTelemetry)=>void;
 const placementFor=(game:GameApi,playerName:string,rulesName:string):Tile|null=>{
     const anchors=game.getVisibleUnits(playerName,"self",r=>r.type===ObjectType.Building)
@@ -95,11 +97,16 @@ class CapabilityUnitMission extends Mission {
     constructor(private country:Countries,private policy:ProgressTriggeredCapabilityPolicy,private sink:Sink,logger:DebugLogger){
         super("progressTriggeredCapabilityUnits",logger);
     }
+    private priorStagedSignature="";
     _onAiUpdate(context:MissionContext):MissionAction{
         const unitName=progressTriggeredAirUnit(this.country); const ids=this.getUnitIds().slice().sort((a,b)=>a-b);
-        if(ids.length){this.sink({schemaVersion:1,event:"capability_unit_release",informationBoundary:"public_complete_state",
-            tick:context.game.getCurrentTick(),country:this.country,unitName,targetCount:this.policy.airTargetCount as 2|4,
-            structureName:null,releasedUnitIds:ids,forbiddenFieldsEmitted:[]});return releaseUnits(ids);}
+        const signature=ids.join(",");
+        if(ids.length&&signature!==this.priorStagedSignature){
+            this.sink({schemaVersion:1,event:"capability_unit_staged",informationBoundary:"public_complete_state",
+                tick:context.game.getCurrentTick(),country:this.country,unitName,targetCount:this.policy.airTargetCount as 2|4,
+                structureName:null,releasedUnitIds:ids,forbiddenFieldsEmitted:[]});
+        }
+        this.priorStagedSignature=signature;
         const current=context.game.getVisibleUnits(context.player.name,"self",r=>r.name===unitName).length;
         if(current>=this.policy.airTargetCount)return noop();
         this.sink({schemaVersion:1,event:"capability_unit_request",informationBoundary:"public_complete_state",
@@ -107,7 +114,7 @@ class CapabilityUnitMission extends Mission {
             structureName:null,releasedUnitIds:[],forbiddenFieldsEmitted:[]});
         return requestUnits({[unitName]:this.policy.productionPriority});
     }
-    getGlobalDebugText(){return undefined;} getPriority(){return this.policy.productionPriority;} isUnitsLocked(){return false;}
+    getGlobalDebugText(){return undefined;} getPriority(){return PASSIVE_CAPABILITY_DONOR_PRIORITY;} isUnitsLocked(){return false;}
 }
 
 export const createProgressTriggeredCapabilityCandidate=(factory:BaselineFactory,name:string,country:Countries,
