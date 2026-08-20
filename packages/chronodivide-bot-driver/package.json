@@ -27,6 +27,7 @@
         "research:gate-component-ablation-technical": "node dist/training/researchComponentAblationTechnicalGate.js --es-module-specifier-resolution=node",
         "research:analyze-component-ablation": "node dist/training/researchComponentAblationAnalyzer.js --es-module-specifier-resolution=node",
         "research:analyze-hfo-literal-pilot": "node dist/training/hfoLiteralPilotAnalysis.js --es-module-specifier-resolution=node",
+        "research:diagnose-hfo-west": "node dist/training/hfoWestLossDiagnostic.js --es-module-specifier-resolution=node",
         "research:generate-development-plan": "node dist/training/researchDevelopmentPlanGenerator.js --es-module-specifier-resolution=node",
         "research:gate-development-technical": "node dist/training/researchDevelopmentTechnicalGate.js --es-module-specifier-resolution=node",
         "research:unblind-development": "node dist/training/researchDevelopmentUnblinder.js --es-module-specifier-resolution=node",
