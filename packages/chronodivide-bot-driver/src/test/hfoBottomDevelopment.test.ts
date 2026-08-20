@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
     HFO_BOTTOM_REPLICATION_ARMS,
+    HFO_KOREA_BOTTOM_DEFENSE_VARIANTS,
     HFO_BOTTOM_RETARGET_VARIANTS,
 } from "../training/hfoBottomDevelopment.js";
 
@@ -44,5 +45,28 @@ describe("HFO bottom building-retarget variants", () => {
             stallTicks: 600,
             rotationTicks: 600,
         });
+    });
+
+    it("freezes the Korea defense mechanisms", () => {
+        expect(HFO_KOREA_BOTTOM_DEFENSE_VARIANTS.map((variant) => variant.id)).toEqual([
+            "retarget_control",
+            "pillbox_2",
+            "pillbox_4",
+            "wide_guard",
+            "pillbox_2_wide_guard",
+            "pillbox_4_wide_guard",
+        ]);
+        const byId = Object.fromEntries(HFO_KOREA_BOTTOM_DEFENSE_VARIANTS.map((variant) => [variant.id, variant]));
+        expect(byId.retarget_control.botOptions.hfoBottomRetarget?.enabled).toBe(true);
+        expect(byId.pillbox_2.strategyOptions?.staticDefenseBoost?.targetCount).toBe(2);
+        expect(byId.pillbox_4.strategyOptions?.staticDefenseBoost?.targetCount).toBe(4);
+        expect(byId.wide_guard.botOptions.hfoBottomHomeGuard).toEqual({
+            enabled: true,
+            untilTick: 42_000,
+            radius: 72,
+            orderIntervalTicks: 6,
+        });
+        expect(byId.pillbox_2_wide_guard.strategyOptions?.staticDefenseBoost?.targetCount).toBe(2);
+        expect(byId.pillbox_4_wide_guard.botOptions.hfoBottomHomeGuard?.untilTick).toBe(42_000);
     });
 });

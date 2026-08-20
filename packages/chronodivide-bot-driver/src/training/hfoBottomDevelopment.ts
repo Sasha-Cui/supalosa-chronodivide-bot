@@ -1,6 +1,7 @@
 import { Bot, CreateOfflineOpts, GameApi, cdapi } from "@chronodivide/game-api";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { StrongBotOptions } from "@supalosa/chronodivide-bot/dist/bot/strongBot.js";
+import { StrongStrategyOptions } from "@supalosa/chronodivide-bot/dist/bot/strategy/strongStrategy.js";
 import { execFileSync } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
@@ -22,7 +23,7 @@ const SHA256 = /^[0-9a-f]{64}$/;
 type Winner = "candidate" | "baseline" | "draw";
 type CaseSpec = { caseIndex: number; countryOrdinal: number; country: Countries; seedOffset: number;
     requestedEngineSeed: number; candidateSlot: 0 | 1; candidateStart: string; baselineStart: string };
-type Variant = { id: string; botOptions: StrongBotOptions };
+type Variant = { id: string; botOptions: StrongBotOptions; strategyOptions?: StrongStrategyOptions };
 
 const retarget = (mode: "stalled_rotate" | "round_robin" | "top_first" | "split", ticks: number): StrongBotOptions => ({
     hfoBottomRetarget: { enabled: true, minTick: 42_000, minAttackers: 4, maxEnemyBuildings: 6,
@@ -41,18 +42,41 @@ export const HFO_BOTTOM_REPLICATION_ARMS: readonly Variant[] = [
     { id: "default", botOptions: {} },
     { id: "winner_retarget", botOptions: retarget("stalled_rotate", 600) },
 ];
-type StudyId = "screen_v1" | "replication_v2";
+const koreaDefenseVariant = (id: string, pillboxes: number, wideGuard: boolean): Variant => ({
+    id,
+    botOptions: {
+        ...retarget("stalled_rotate", 600),
+        ...(wideGuard ? { hfoBottomHomeGuard: { enabled: true, untilTick: 42_000,
+            radius: 72, orderIntervalTicks: 6 } } : {}),
+    },
+    strategyOptions: pillboxes > 0 ? { staticDefenseBoost: { enabled: true, hfoBottomOnly: true,
+        startTick: 5_400, targetCount: pillboxes, priority: 132 } } : {},
+});
+export const HFO_KOREA_BOTTOM_DEFENSE_VARIANTS: readonly Variant[] = [
+    koreaDefenseVariant("retarget_control", 0, false),
+    koreaDefenseVariant("pillbox_2", 2, false),
+    koreaDefenseVariant("pillbox_4", 4, false),
+    koreaDefenseVariant("wide_guard", 0, true),
+    koreaDefenseVariant("pillbox_2_wide_guard", 2, true),
+    koreaDefenseVariant("pillbox_4_wide_guard", 4, true),
+];
+
+type StudyId = "screen_v1" | "replication_v2" | "korea_defense_v3";
 type StudyConfig = { id: StudyId; seedBase: number; casesPerCountry: number; maxTicks: number;
-    variants: readonly Variant[] };
+    countries: readonly Countries[]; variants: readonly Variant[] };
 const STUDIES: Record<StudyId, StudyConfig> = {
     screen_v1: { id: "screen_v1", seedBase: 4_244_000_000, casesPerCountry: 2,
-        maxTicks: 90_000, variants: HFO_BOTTOM_RETARGET_VARIANTS },
+        maxTicks: 90_000, countries: COUNTRIES, variants: HFO_BOTTOM_RETARGET_VARIANTS },
     replication_v2: { id: "replication_v2", seedBase: 4_245_000_000, casesPerCountry: 5,
-        maxTicks: 90_000, variants: HFO_BOTTOM_REPLICATION_ARMS },
+        maxTicks: 90_000, countries: COUNTRIES, variants: HFO_BOTTOM_REPLICATION_ARMS },
+    korea_defense_v3: { id: "korea_defense_v3", seedBase: 4_246_000_000, casesPerCountry: 12,
+        maxTicks: 90_000, countries: [Countries.KOREA], variants: HFO_KOREA_BOTTOM_DEFENSE_VARIANTS },
 };
 const studyConfig = (): StudyConfig => {
     const id = process.env.HFO_BOTTOM_STUDY ?? "screen_v1";
-    if (id !== "screen_v1" && id !== "replication_v2") throw new Error("HFO_BOTTOM_STUDY is invalid");
+    if (id !== "screen_v1" && id !== "replication_v2" && id !== "korea_defense_v3") {
+        throw new Error("HFO_BOTTOM_STUDY is invalid");
+    }
     return STUDIES[id];
 };
 
@@ -105,14 +129,14 @@ const selectCases = async (): Promise<void> => {
     const outputPath = requiredPath("OUT_PATH"), programPath = requiredPath("PROGRAM_PATH");
     const programSha256 = requiredText("PROGRAM_SHA256", SHA256), inputs = commonInputs();
     const study = studyConfig();
-    const expectedCaseCount = study.casesPerCountry * COUNTRIES.length;
+    const expectedCaseCount = study.casesPerCountry * study.countries.length;
     if (fs.existsSync(outputPath) || sha256File(programPath) !== programSha256) throw new Error("Bottom selection drifted");
     const { repo, commit } = sourceIdentity();
     await cdapi.init(inputs.mixDir);
     const factory = await loadBaselineFactory(path.join(repo, "packages", "chronodivide-bot"));
     const cases: CaseSpec[] = [];
     let initializedGameCount = 0;
-    for (const [countryOrdinal, country] of COUNTRIES.entries()) {
+    for (const [countryOrdinal, country] of study.countries.entries()) {
         let selected = 0;
         for (let seedOffset = 0; seedOffset < MAX_OFFSETS && selected < study.casesPerCountry; seedOffset += 1) {
             const requestedEngineSeed = study.seedBase + countryOrdinal * 1_000 + seedOffset;
@@ -154,7 +178,7 @@ const loadSelection = (selectionPath: string, selectionSha256: string, inputs: R
     if (sha256File(selectionPath) !== selectionSha256) throw new Error("Bottom selection hash drifted");
     const selection = JSON.parse(fs.readFileSync(selectionPath, "utf8")) as unknown;
     const study = studyConfig();
-    const expectedCaseCount = study.casesPerCountry * COUNTRIES.length;
+    const expectedCaseCount = study.casesPerCountry * study.countries.length;
     if (!isRecord(selection) || selection.kind !== "hfo-bottom-outcome-blind-selection" ||
         selection.status !== "PASS_HFO_BOTTOM_SELECTION" || selection.complete !== true || selection.passed !== true ||
         selection.outcomeFree !== true || selection.updateCount !== 0 || selection.selectedCaseCount !== expectedCaseCount ||
@@ -169,7 +193,7 @@ const runCell = async (): Promise<void> => {
     const programPath = requiredPath("PROGRAM_PATH"), programSha256 = requiredText("PROGRAM_SHA256", SHA256);
     const selectionPath = requiredPath("SELECTION_PATH"), selectionSha256 = requiredText("SELECTION_SHA256", SHA256);
     const inputs = commonInputs();
-    const study = studyConfig(), caseCount = study.casesPerCountry * COUNTRIES.length;
+    const study = studyConfig(), caseCount = study.casesPerCountry * study.countries.length;
     const taskCount = caseCount * study.variants.length;
     if (taskIndex < 0 || taskIndex >= taskCount || process.env.SLURM_ARRAY_TASK_ID !== String(taskIndex) ||
         fs.existsSync(outputPath) || sha256File(programPath) !== programSha256) throw new Error("Bottom cell drifted");
@@ -181,7 +205,8 @@ const runCell = async (): Promise<void> => {
     await cdapi.init(inputs.mixDir);
     const factory = await loadBaselineFactory(path.join(repo, "packages", "chronodivide-bot"));
     const candidateName = `BottomDevCandidate_${taskIndex}`, baselineName = `BottomDevBaseline_${taskIndex}`;
-    const candidate = createDeployedStrongBotCandidate(candidateName, caseSpec.country, {}, variant.botOptions);
+    const candidate = createDeployedStrongBotCandidate(
+        candidateName, caseSpec.country, variant.strategyOptions ?? {}, variant.botOptions);
     const baseline = factory.create(baselineName, caseSpec.country);
     const adjudicator = new LiteralBuildingEliminationAdjudicator({ candidate: candidateName, baseline: baselineName });
     const { audit } = installLiteralEndpointInstrumentation({ candidate, baseline }, adjudicator);
@@ -267,7 +292,7 @@ const finalize = (): void => {
     const selectionSha256 = requiredText("SELECTION_SHA256", SHA256), inputs = commonInputs();
     if (fs.existsSync(outputPath)) throw new Error("Bottom finalizer exists");
     let tasks = new Map<number, string>();
-    const study = studyConfig(), caseCount = study.casesPerCountry * COUNTRIES.length;
+    const study = studyConfig(), caseCount = study.casesPerCountry * study.countries.length;
     const taskCount = caseCount * study.variants.length;
     for (let attempt = 0; attempt < 31; attempt += 1) {
         tasks = completedTasks(arrayJobId); if (tasks.size === taskCount) break;
@@ -292,14 +317,14 @@ const finalize = (): void => {
     const defaultRows = rows.filter((row) => row.variantId === "default"), defaultSummary = summarize(defaultRows);
     const variants = study.variants.map((variant, declarationIndex) => {
         const variantRows = rows.filter((row) => row.variantId === variant.id), summary = summarize(variantRows);
-        const byCountry = Object.fromEntries(COUNTRIES.map((country) =>
+        const byCountry = Object.fromEntries(study.countries.map((country) =>
             [country, summarize(variantRows.filter((row) => row.country === country))]));
         const score = (winner: Winner): number => winner === "candidate" ? 1 : winner === "draw" ? 0.5 : 0;
         const paired = variantRows.map((row) => score(row.winner) -
             score(defaultRows.find((entry) => entry.caseIndex === row.caseIndex)?.winner ?? "draw"));
         const pairedMean = paired.reduce((total, value) => total + value, 0) / paired.length;
         const pairedSd = sampleStandardDeviation(paired);
-        const pairedT = paired.length === 45 ? 1.68023 : 1.73961;
+        const pairedT = paired.length === 45 ? 1.68023 : paired.length === 12 ? 1.79588 : 1.73961;
         const pairedLower = pairedMean - pairedT * pairedSd / Math.sqrt(paired.length);
         const countryNoninferiorityCount = Object.values(byCountry).filter((entry: any) => entry.wins >= entry.losses).length;
         const countrySuperiorityCount = Object.values(byCountry).filter((entry: any) => entry.wins > entry.losses).length;
@@ -308,14 +333,18 @@ const finalize = (): void => {
         const replicationEligible = variant.id === "winner_retarget" && summary.wins > summary.losses &&
             summary.oneSided95WilsonLower > 0.5 && summary.draws < defaultSummary.draws &&
             summary.losses <= defaultSummary.losses && pairedLower > 0 &&
-            countryNoninferiorityCount === COUNTRIES.length && countrySuperiorityCount >= 7;
-        const eligible = study.id === "replication_v2" ? replicationEligible : developmentEligible;
+            countryNoninferiorityCount === study.countries.length && countrySuperiorityCount >= 7;
+        const koreaDefenseEligible = summary.wins >= 8 && summary.wins > summary.losses &&
+            summary.lossRate < defaultSummary.lossRate && pairedMean > 0;
+        const eligible = study.id === "replication_v2" ? replicationEligible :
+            study.id === "korea_defense_v3" ? koreaDefenseEligible : developmentEligible;
         return { id: variant.id, declarationIndex, summary, byCountry, pairedVersusDefault: {
             meanScoreDifference: pairedMean, sampleStandardDeviation: pairedSd,
             oneSided95TLower: pairedLower, tCritical: pairedT, degreesOfFreedom: paired.length - 1,
             improved: paired.filter((value) => value > 0).length,
             tied: paired.filter((value) => value === 0).length, worsened: paired.filter((value) => value < 0).length },
-            countryNoninferiorityCount, countrySuperiorityCount, developmentEligible, replicationEligible, eligible };
+            countryNoninferiorityCount, countrySuperiorityCount, developmentEligible, replicationEligible,
+            koreaDefenseEligible, eligible };
     });
     const ranked = [...variants].sort((left, right) => right.summary.netWins - left.summary.netWins ||
         right.summary.wins - left.summary.wins || left.summary.losses - right.summary.losses ||
@@ -326,9 +355,11 @@ const finalize = (): void => {
         : ranked[0];
     if (!winner) throw new Error("Bottom winner arm unavailable");
     const passed = winner.eligible;
-    const status = study.id === "replication_v2"
-        ? passed ? "PASS_HFO_BOTTOM_RETARGET_REPLICATION" : "FAIL_HFO_BOTTOM_RETARGET_REPLICATION"
-        : passed ? "ADVANCE_HFO_BOTTOM_RETARGET" : "NO_ELIGIBLE_HFO_BOTTOM_RETARGET";
+    const status = study.id === "replication_v2" ?
+        passed ? "PASS_HFO_BOTTOM_RETARGET_REPLICATION" : "FAIL_HFO_BOTTOM_RETARGET_REPLICATION" :
+        study.id === "korea_defense_v3" ?
+            passed ? "ADVANCE_HFO_KOREA_BOTTOM_DEFENSE" : "NO_ELIGIBLE_HFO_KOREA_BOTTOM_DEFENSE" :
+            passed ? "ADVANCE_HFO_BOTTOM_RETARGET" : "NO_ELIGIBLE_HFO_BOTTOM_RETARGET";
     const artifact = { schemaVersion: 1, kind: "hfo-bottom-development-finalizer",
         status, complete: true, passed, schedulerAccount: "pi_jss233", arrayJobId,
         finalizerJobId: process.env.SLURM_JOB_ID, sourceCommit: [...sources][0], programSha256,
