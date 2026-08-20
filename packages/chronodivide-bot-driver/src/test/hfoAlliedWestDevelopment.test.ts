@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { HFO_ALLIED_WEST_VARIANTS } from "../training/hfoAlliedWestDevelopment.js";
+import {
+    HFO_ALLIED_WEST_GUARD_VARIANTS,
+    HFO_ALLIED_WEST_VARIANTS,
+} from "../training/hfoAlliedWestDevelopment.js";
 
 describe("HFO Allied west development variants", () => {
     it("keeps the prospectively fixed declaration order", () => {
@@ -34,3 +37,28 @@ describe("HFO Allied west development variants", () => {
         });
     });
 });
+
+    it("freezes the V2 group-guard mechanisms independently", () => {
+        expect(HFO_ALLIED_WEST_GUARD_VARIANTS.map((variant) => variant.id)).toEqual([
+            "default",
+            "rush_tanks",
+            "hfo_guard_hold_9600",
+            "rush_guard_hold_9600",
+            "rush_guard_group_9600",
+            "rush_guard_hold_12000",
+        ]);
+        const byId = Object.fromEntries(HFO_ALLIED_WEST_GUARD_VARIANTS.map((variant) => [variant.id, variant]));
+        expect(byId.default.botOptions).toBeUndefined();
+        expect(byId.rush_tanks.botOptions).toBeUndefined();
+        expect(byId.hfo_guard_hold_9600.strategyOptions).toEqual({});
+        expect(byId.rush_guard_hold_9600.strategyOptions.strategicPlan?.plan).toBe("rush");
+        expect(byId.rush_guard_hold_9600.botOptions?.hfoWestHomeGuard).toMatchObject({
+            enabled: true,
+            untilTick: 9_600,
+            radius: 72,
+            engageCombatantAdvantage: 0,
+            alliedOnly: true,
+        });
+        expect(byId.rush_guard_group_9600.botOptions?.hfoWestHomeGuard?.engageCombatantAdvantage).toBe(-4);
+        expect(byId.rush_guard_hold_12000.botOptions?.hfoWestHomeGuard?.untilTick).toBe(12_000);
+    });

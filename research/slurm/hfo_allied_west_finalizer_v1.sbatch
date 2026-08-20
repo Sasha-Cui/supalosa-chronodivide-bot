@@ -30,7 +30,8 @@ cd "$REPO"
 cd "$DRIVER"
 export MODE=finalize OUT_PATH="$FINALIZER_ROOT/hfo-allied-west-development.json"
 export PROGRAM_PATH="$DRIVER/dist/training/hfoAlliedWestDevelopment.js"
-export PROTOCOL_PATH="$REPO/research/protocols/hfo-west/2026-08-20-allied-west-development-screen-v1.md"
+export PROTOCOL_PATH="${PROTOCOL_PATH:-$REPO/research/protocols/hfo-west/2026-08-20-allied-west-development-screen-v1.md}"
+export HFO_WEST_STUDY="${HFO_WEST_STUDY:-production_v1}"
 [[ "$(sha256sum "$PROGRAM_PATH"|awk '{print $1}')" == "$PROGRAM_SHA256" ]] || exit 2
 export RESULTS_ROOT ARRAY_JOB_ID PROGRAM_SHA256 PROTOCOL_SHA256 SELECTION_SHA256 MIX_DIR ASSET_MANIFEST_PATH ASSET_MANIFEST_SHA256
 "$NODE" --es-module-specifier-resolution=node "$PROGRAM_PATH"

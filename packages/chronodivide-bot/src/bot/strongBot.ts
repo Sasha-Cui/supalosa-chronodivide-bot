@@ -157,6 +157,16 @@ export type HfoBottomHomeGuardOptions = {
     orderIntervalTicks?: number;
 };
 
+export type HfoWestHomeGuardOptions = {
+    enabled?: boolean;
+    untilTick?: number;
+    radius?: number;
+    orderIntervalTicks?: number;
+    engageMinCombatants?: number;
+    engageCombatantAdvantage?: number;
+    alliedOnly?: boolean;
+};
+
 export type StrongBotOptions = {
     preserveBaselineCore?: boolean;
     forceAttack?: ForceAttackOptions;
@@ -172,6 +182,7 @@ export type StrongBotOptions = {
     hfoBottomCloseout?: HfoBottomCloseoutOptions;
     hfoBottomDemolition?: HfoBottomDemolitionOptions;
     hfoBottomHomeGuard?: HfoBottomHomeGuardOptions;
+    hfoWestHomeGuard?: HfoWestHomeGuardOptions;
     defaultMapProfiles?: boolean;
     exactMapTactics?: boolean;
 };
@@ -552,6 +563,25 @@ const DEFAULT_HFO_BOTTOM_HOME_GUARD_OPTIONS: Required<HfoBottomHomeGuardOptions>
     untilTick: HFO_BOTTOM_HOME_GUARD_UNTIL_TICK,
     radius: HFO_BOTTOM_HOME_GUARD_RADIUS,
     orderIntervalTicks: 8,
+};
+
+const HFO_WEST_HOME_GUARD_POINTS = [
+    { x: 45, y: 88 },
+    { x: 50, y: 92 },
+    { x: 43, y: 96 },
+    { x: 54, y: 97 },
+    { x: 47, y: 101 },
+    { x: 38, y: 90 },
+];
+
+const DEFAULT_HFO_WEST_HOME_GUARD_OPTIONS: Required<HfoWestHomeGuardOptions> = {
+    enabled: false,
+    untilTick: 9_600,
+    radius: 72,
+    orderIntervalTicks: 6,
+    engageMinCombatants: 4,
+    engageCombatantAdvantage: -4,
+    alliedOnly: true,
 };
 
 const RIVER_RAMPAGE_STARTS = new Set(["98,125", "128,89"]);
@@ -1237,6 +1267,7 @@ export class StrongBot extends SupalosaBot {
     private hfoBottomCloseoutOptions: Required<HfoBottomCloseoutOptions>;
     private hfoBottomDemolitionOptions: Required<HfoBottomDemolitionOptions>;
     private hfoBottomHomeGuardOptions: Required<HfoBottomHomeGuardOptions>;
+    private hfoWestHomeGuardOptions: Required<HfoWestHomeGuardOptions>;
     private lastForceAttackOrderAt = 0;
     private lastHarassOrderAt = 0;
     private lastEmergencyDefenseOrderAt = 0;
@@ -1259,6 +1290,7 @@ export class StrongBot extends SupalosaBot {
     private lastHfoSideCloseoutOrderAt = 0;
     private lastHfoBottomCriticalCleanupOrderAt = 0;
     private lastHfoBottomHomeGuardOrderAt = 0;
+    private lastHfoWestHomeGuardOrderAt = 0;
     private lastWeakStartHomeGuardOrderAt = 0;
     private lastWeakStartCloseoutOrderAt = 0;
     private lastWeakStartPressureOrderAt = 0;
@@ -1336,6 +1368,10 @@ export class StrongBot extends SupalosaBot {
             ...DEFAULT_HFO_BOTTOM_HOME_GUARD_OPTIONS,
             ...definedOptions(options.hfoBottomHomeGuard),
         };
+        this.hfoWestHomeGuardOptions = {
+            ...DEFAULT_HFO_WEST_HOME_GUARD_OPTIONS,
+            ...definedOptions(options.hfoWestHomeGuard),
+        };
     }
 
     private applyExplicitOptionOverrides(): void {
@@ -1365,6 +1401,10 @@ export class StrongBot extends SupalosaBot {
         this.hfoBottomHomeGuardOptions = {
             ...this.hfoBottomHomeGuardOptions,
             ...definedOptions(options.hfoBottomHomeGuard),
+        };
+        this.hfoWestHomeGuardOptions = {
+            ...this.hfoWestHomeGuardOptions,
+            ...definedOptions(options.hfoWestHomeGuard),
         };
     }
 
@@ -1423,6 +1463,9 @@ export class StrongBot extends SupalosaBot {
             return;
         }
         if (this.enableExactMapTactics && this.maybePeakEmergencyDefend(game)) {
+            return;
+        }
+        if (this.enableExactMapTactics && this.maybeHfoWestHomeGuard(game)) {
             return;
         }
         if (this.maybeEmergencyDefend(game)) {
@@ -2020,6 +2063,62 @@ export class StrongBot extends SupalosaBot {
             });
         }
         this.lastHfoBottomHomeGuardOrderAt = tick;
+        return true;
+    }
+
+    private maybeHfoWestHomeGuard(game: GameApi): boolean {
+        const options = this.hfoWestHomeGuardOptions;
+        if (!options.enabled || !this.isHfoWestVsEast(game)) {
+            return false;
+        }
+        const countryName = (game.getPlayerData(this.name).country as { name?: string } | undefined)?.name;
+        if (options.alliedOnly && (countryName === undefined || !ALLIED_COUNTRIES.has(countryName))) {
+            return false;
+        }
+
+        const importantOwnUnits = this.getImportantOwnUnits(game);
+        if (importantOwnUnits.length === 0) {
+            return false;
+        }
+        const radiusSquared = options.radius * options.radius;
+        const nearbyEnemies = this.getKnownEnemyCombatUnits(game)
+            .filter((unit) => this.getClosestDistanceSquared(unit, importantOwnUnits) <= radiusSquared)
+            .sort(
+                (left, right) =>
+                    this.getClosestDistanceSquared(left, importantOwnUnits) -
+                    this.getClosestDistanceSquared(right, importantOwnUnits),
+            );
+        const tick = game.getCurrentTick();
+        if (tick >= options.untilTick && nearbyEnemies.length === 0) {
+            return false;
+        }
+
+        const guardUnits = this.getMobileCombatants(game);
+        if (guardUnits.length === 0) {
+            return nearbyEnemies.length > 0 || tick < options.untilTick;
+        }
+        if (tick < this.lastHfoWestHomeGuardOrderAt + options.orderIntervalTicks) {
+            return true;
+        }
+
+        const orderedUnits = this.prepareUnitsForAttackMove(guardUnits);
+        const canEngage = nearbyEnemies.length > 0 &&
+            orderedUnits.length >= options.engageMinCombatants &&
+            orderedUnits.length >= nearbyEnemies.length + options.engageCombatantAdvantage;
+        if (canEngage) {
+            this.orderPreparedUnitsToNearestTargets(orderedUnits, nearbyEnemies, true);
+        } else {
+            orderedUnits.forEach((unit, index) => {
+                const point = HFO_WEST_HOME_GUARD_POINTS[index % HFO_WEST_HOME_GUARD_POINTS.length];
+                this.player.actions.orderUnits(
+                    [unit.id],
+                    OrderType.AttackMove,
+                    point.x,
+                    point.y,
+                );
+            });
+        }
+        this.lastHfoWestHomeGuardOrderAt = tick;
         return true;
     }
 

@@ -1,6 +1,7 @@
 import { Bot, CreateOfflineOpts, GameApi, cdapi } from "@chronodivide/game-api";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { StrongStrategyOptions } from "@supalosa/chronodivide-bot/dist/bot/strategy/strongStrategy.js";
+import { StrongBotOptions } from "@supalosa/chronodivide-bot/dist/bot/strongBot.js";
 import { execFileSync } from "node:child_process";
 import crypto from "node:crypto";
 import fs from "node:fs";
@@ -20,13 +21,13 @@ const MAP = { name: "cd_chrono_4_heck_freezes_over_le.map",
     sha256: "e4dfc736a6355e0e68d4681e4d67419516e6bb94549e2d42880c9414e95e2e8d" } as const;
 const COUNTRIES = [Countries.USA, Countries.KOREA, Countries.FRANCE, Countries.GERMANY, Countries.GREAT_BRITAIN] as const;
 const WEST_START = "39,82", EAST_START = "151,119";
-const SEED_BASE = 4_240_000_000, MAX_OFFSETS = 400, CASES_PER_COUNTRY = 4;
-const MAX_TICKS = 60_000, CASE_COUNT = 20, TASK_COUNT = 120;
+const MAX_OFFSETS = 400, CASES_PER_COUNTRY = 4;
+const CASE_COUNT = 20, TASK_COUNT = 120;
 const SHA256 = /^[0-9a-f]{64}$/;
 type Winner = "candidate" | "baseline" | "draw";
 type CaseSpec = { caseIndex: number; countryOrdinal: number; country: Countries; seedOffset: number;
     requestedEngineSeed: number; candidateSlot: 0 | 1; candidateStart: string; baselineStart: string };
-type Variant = { id: string; strategyOptions: StrongStrategyOptions };
+type Variant = { id: string; strategyOptions: StrongStrategyOptions; botOptions?: StrongBotOptions };
 
 export const HFO_ALLIED_WEST_VARIANTS: readonly Variant[] = [
     { id: "default", strategyOptions: {} },
@@ -48,6 +49,47 @@ export const HFO_ALLIED_WEST_VARIANTS: readonly Variant[] = [
     } },
 ];
 
+
+export const HFO_ALLIED_WEST_GUARD_VARIANTS: readonly Variant[] = [
+    { id: "default", strategyOptions: {} },
+    { id: "rush_tanks", strategyOptions: { strategicPlan: { enabled: true, plan: "rush" } } },
+    { id: "hfo_guard_hold_9600", strategyOptions: {}, botOptions: { hfoWestHomeGuard: {
+        enabled: true, untilTick: 9_600, radius: 72, orderIntervalTicks: 6,
+        engageMinCombatants: 4, engageCombatantAdvantage: 0, alliedOnly: true,
+    } } },
+    { id: "rush_guard_hold_9600", strategyOptions: {
+        strategicPlan: { enabled: true, plan: "rush" },
+    }, botOptions: { hfoWestHomeGuard: {
+        enabled: true, untilTick: 9_600, radius: 72, orderIntervalTicks: 6,
+        engageMinCombatants: 4, engageCombatantAdvantage: 0, alliedOnly: true,
+    } } },
+    { id: "rush_guard_group_9600", strategyOptions: {
+        strategicPlan: { enabled: true, plan: "rush" },
+    }, botOptions: { hfoWestHomeGuard: {
+        enabled: true, untilTick: 9_600, radius: 72, orderIntervalTicks: 6,
+        engageMinCombatants: 4, engageCombatantAdvantage: -4, alliedOnly: true,
+    } } },
+    { id: "rush_guard_hold_12000", strategyOptions: {
+        strategicPlan: { enabled: true, plan: "rush" },
+    }, botOptions: { hfoWestHomeGuard: {
+        enabled: true, untilTick: 12_000, radius: 72, orderIntervalTicks: 6,
+        engageMinCombatants: 4, engageCombatantAdvantage: 0, alliedOnly: true,
+    } } },
+];
+
+type StudyId = "production_v1" | "guard_v2";
+type StudyConfig = { id: StudyId; seedBase: number; maxTicks: number; variants: readonly Variant[] };
+const STUDIES: Record<StudyId, StudyConfig> = {
+    production_v1: { id: "production_v1", seedBase: 4_240_000_000, maxTicks: 60_000,
+        variants: HFO_ALLIED_WEST_VARIANTS },
+    guard_v2: { id: "guard_v2", seedBase: 4_241_000_000, maxTicks: 90_000,
+        variants: HFO_ALLIED_WEST_GUARD_VARIANTS },
+};
+const studyConfig = (): StudyConfig => {
+    const id = process.env.HFO_WEST_STUDY ?? "production_v1";
+    if (id !== "production_v1" && id !== "guard_v2") throw new Error("HFO_WEST_STUDY is invalid");
+    return STUDIES[id];
+};
 const requiredPath = (name: string): string => {
     const value = process.env[name]; if (!value) throw new Error(`${name} is required`); return path.resolve(value);
 };
@@ -99,6 +141,7 @@ const commonInputs = () => {
 const selectCases = async (): Promise<void> => {
     const outputPath = requiredPath("OUT_PATH"), programPath = requiredPath("PROGRAM_PATH");
     const programSha256 = requiredText("PROGRAM_SHA256", SHA256), inputs = commonInputs();
+    const study = studyConfig();
     if (fs.existsSync(outputPath) || sha256File(programPath) !== programSha256) throw new Error("Selection output or program drifted");
     const { repo, commit } = sourceIdentity();
     await cdapi.init(inputs.mixDir);
@@ -108,7 +151,7 @@ const selectCases = async (): Promise<void> => {
     for (const [countryOrdinal, country] of COUNTRIES.entries()) {
         let selectedForCountry = 0;
         for (let seedOffset = 0; seedOffset < MAX_OFFSETS && selectedForCountry < CASES_PER_COUNTRY; seedOffset += 1) {
-            const requestedEngineSeed = SEED_BASE + countryOrdinal * 1_000 + seedOffset;
+            const requestedEngineSeed = study.seedBase + countryOrdinal * 1_000 + seedOffset;
             for (const candidateSlot of [0, 1] as const) {
                 if (selectedForCountry >= CASES_PER_COUNTRY) break;
                 const candidateName = `HfoWestSelectCandidate_${countryOrdinal}_${seedOffset}_${candidateSlot}`;
@@ -137,7 +180,7 @@ const selectCases = async (): Promise<void> => {
         status: "PASS_HFO_ALLIED_WEST_SELECTION", complete: true, passed: true, outcomeFree: true,
         scheduler: { jobId: process.env.SLURM_JOB_ID, account: "pi_jss233" }, sourceCommit: commit,
         programSha256, protocolSha256: inputs.protocolSha256, assetManifestSha256: inputs.assetManifestSha256,
-        seedBase: SEED_BASE, maxOffsets: MAX_OFFSETS, casesPerCountry: CASES_PER_COUNTRY,
+        studyId: study.id, seedBase: study.seedBase, maxOffsets: MAX_OFFSETS, casesPerCountry: CASES_PER_COUNTRY,
         initializedGameCount, selectedCaseCount: cases.length, updateCount: 0, forbiddenOutcomeFields: [], cases };
     fs.mkdirSync(path.dirname(outputPath), { recursive: true, mode: 0o700 });
     fs.writeFileSync(outputPath, JSON.stringify(artifact, null, 2) + "\n", { flag: "wx", mode: 0o600 });
@@ -146,20 +189,23 @@ const selectCases = async (): Promise<void> => {
 
 const loadSelection = (selectionPath: string, selectionSha256: string, inputs: ReturnType<typeof commonInputs>): CaseSpec[] => {
     if (sha256File(selectionPath) !== selectionSha256) throw new Error("HFO west selection hash drifted");
+    const study = studyConfig();
     const selection = JSON.parse(fs.readFileSync(selectionPath, "utf8")) as unknown;
     if (!isRecord(selection) || selection.kind !== "hfo-allied-west-outcome-blind-selection" ||
         selection.status !== "PASS_HFO_ALLIED_WEST_SELECTION" || selection.complete !== true || selection.passed !== true ||
         selection.outcomeFree !== true || selection.updateCount !== 0 || selection.selectedCaseCount !== CASE_COUNT ||
         selection.protocolSha256 !== inputs.protocolSha256 || selection.assetManifestSha256 !== inputs.assetManifestSha256 ||
+        selection.studyId !== study.id || selection.seedBase !== study.seedBase ||
         !Array.isArray(selection.cases) || selection.cases.length !== CASE_COUNT) throw new Error("Selection manifest is ineligible");
     return selection.cases as CaseSpec[];
 };
 
 const runEpisode = async (args: { factory: Awaited<ReturnType<typeof loadBaselineFactory>>; variant: Variant;
-    caseSpec: CaseSpec; taskIndex: number }) => {
-    const { factory, variant, caseSpec, taskIndex } = args;
+    caseSpec: CaseSpec; taskIndex: number; maxTicks: number }) => {
+    const { factory, variant, caseSpec, taskIndex, maxTicks } = args;
     const candidateName = `HfoWestDevCandidate_${taskIndex}`, baselineName = `HfoWestDevBaseline_${taskIndex}`;
-    const candidate = createDeployedStrongBotCandidate(candidateName, caseSpec.country, variant.strategyOptions);
+    const candidate = createDeployedStrongBotCandidate(
+        candidateName, caseSpec.country, variant.strategyOptions, variant.botOptions ?? {});
     const baseline = factory.create(baselineName, caseSpec.country);
     const adjudicator = new LiteralBuildingEliminationAdjudicator({ candidate: candidateName, baseline: baselineName });
     const { audit } = installLiteralEndpointInstrumentation({ candidate, baseline }, adjudicator);
@@ -170,7 +216,7 @@ const runEpisode = async (args: { factory: Awaited<ReturnType<typeof loadBaselin
             const baselineStart = startKey(gameApi.getPlayerData(baselineName).startLocation);
             if (candidateStart !== WEST_START || baselineStart !== EAST_START) throw new Error("Selected HFO west start drifted");
             let terminal: any = null, failure: any = null, ticks = 0;
-            while (ticks < MAX_TICKS && !terminal && !failure) {
+            while (ticks < maxTicks && !terminal && !failure) {
                 adjudicator.beginUpdate(gameApi); await game.update(); ticks += 1;
                 const stats = game.getPlayerStats(), candidateStats = stats.find((row) => row.name === candidateName);
                 const baselineStats = stats.find((row) => row.name === baselineName);
@@ -186,7 +232,7 @@ const runEpisode = async (args: { factory: Awaited<ReturnType<typeof loadBaselin
             return { taskIndex, variantId: variant.id, caseIndex: caseSpec.caseIndex, country: caseSpec.country,
                 countryOrdinal: caseSpec.countryOrdinal, seedOffset: caseSpec.seedOffset,
                 requestedEngineSeed: caseSpec.requestedEngineSeed, candidateSlot: caseSpec.candidateSlot,
-                candidateStart, baselineStart, maxTicks: MAX_TICKS, ticks, status, winner,
+                candidateStart, baselineStart, maxTicks, ticks, status, winner,
                 terminalBuildingCounts: { candidate: buildings.filter((row) => row.owner === candidateName).length,
                     baseline: buildings.filter((row) => row.owner === baselineName).length },
                 quitAttempts: { ...audit.attempts } };
@@ -198,24 +244,25 @@ const runCell = async (): Promise<void> => {
     const outputPath = requiredPath("OUT_PATH"), programPath = requiredPath("PROGRAM_PATH");
     const selectionPath = requiredPath("SELECTION_PATH"), programSha256 = requiredText("PROGRAM_SHA256", SHA256);
     const selectionSha256 = requiredText("SELECTION_SHA256", SHA256), inputs = commonInputs();
+    const study = studyConfig();
     if (taskIndex < 0 || taskIndex >= TASK_COUNT || process.env.SLURM_ARRAY_TASK_ID !== String(taskIndex) ||
         fs.existsSync(outputPath) || sha256File(programPath) !== programSha256) throw new Error("Cell input drifted");
     const cases = loadSelection(selectionPath, selectionSha256, inputs), { repo, commit } = sourceIdentity();
     const variantIndex = Math.floor(taskIndex / CASE_COUNT), caseIndex = taskIndex % CASE_COUNT;
-    const variant = HFO_ALLIED_WEST_VARIANTS[variantIndex], caseSpec = cases[caseIndex];
+    const variant = study.variants[variantIndex], caseSpec = cases[caseIndex];
     if (!variant || !caseSpec || caseSpec.caseIndex !== caseIndex) throw new Error("Cell assignment drifted");
     await cdapi.init(inputs.mixDir);
     const factory = await loadBaselineFactory(path.join(repo, "packages", "chronodivide-bot"));
-    const result = await runEpisode({ factory, variant, caseSpec, taskIndex });
+    const result = await runEpisode({ factory, variant, caseSpec, taskIndex, maxTicks: study.maxTicks });
     const provenance = createExperimentManifest({ runId: `hfo-allied-west-dev-${taskIndex}-${process.env.SLURM_JOB_ID}`,
         mixDir: inputs.mixDir, maps: [MAP.name], effectiveConfig: { taskIndex, variantIndex, variant,
-            caseSpec, selectionSha256, maxTicks: MAX_TICKS }, baseline: factory.descriptor,
+            caseSpec, selectionSha256, studyId: study.id, maxTicks: study.maxTicks }, baseline: factory.descriptor,
         gameSeedBase: caseSpec.requestedEngineSeed });
     const artifact = { schemaVersion: 1, kind: "hfo-allied-west-development-cell",
         status: "COMPLETE_HFO_ALLIED_WEST_DEVELOPMENT_CELL", complete: true, taskIndex, variantIndex,
         variantId: variant.id, caseIndex, schedulerAccount: "pi_jss233", schedulerJobId: process.env.SLURM_JOB_ID,
         sourceCommit: commit, programSha256, protocolSha256: inputs.protocolSha256,
-        assetManifestSha256: inputs.assetManifestSha256, selectionSha256, result, provenance };
+        assetManifestSha256: inputs.assetManifestSha256, selectionSha256, studyId: study.id, result, provenance };
     fs.mkdirSync(path.dirname(outputPath), { recursive: true, mode: 0o700 });
     fs.writeFileSync(outputPath, JSON.stringify(artifact, null, 2) + "\n", { flag: "wx", mode: 0o600 });
     console.log(JSON.stringify({ status: artifact.status, taskIndex, variantId: variant.id, caseIndex }));
@@ -227,8 +274,9 @@ const summarize = (rows: any[]) => {
     const draws = rows.length - wins - losses, ticks = rows.map((row) => row.ticks).sort((a, b) => a - b);
     const statuses = Object.fromEntries([...new Set(rows.map((row) => row.status))].sort()
         .map((status) => [status, rows.filter((row) => row.status === status).length]));
+    const center = Math.floor(ticks.length / 2);
     return { games: rows.length, wins, draws, losses, netWins: wins - losses, winRate: wins / rows.length,
-        lossRate: losses / rows.length, medianTicks: (ticks[9] + ticks[10]) / 2, statuses };
+        lossRate: losses / rows.length, medianTicks: ticks.length % 2 === 0 ? (ticks[center - 1] + ticks[center]) / 2 : ticks[center], statuses };
 };
 
 const queryCompletedTasks = (arrayJobId: string): Map<number, string> => {
@@ -251,6 +299,7 @@ const finalize = (): void => {
     const selectionSha256 = requiredText("SELECTION_SHA256", SHA256), inputs = commonInputs();
     if (fs.existsSync(outputPath)) throw new Error("Finalizer output exists");
     let tasks = new Map<number, string>();
+    const study = studyConfig();
     for (let attempt = 0; attempt < 31; attempt += 1) {
         tasks = queryCompletedTasks(arrayJobId);
         if (tasks.size === TASK_COUNT) break;
@@ -265,7 +314,8 @@ const finalize = (): void => {
         if (cell.kind !== "hfo-allied-west-development-cell" ||
             cell.status !== "COMPLETE_HFO_ALLIED_WEST_DEVELOPMENT_CELL" || cell.complete !== true ||
             cell.taskIndex !== taskIndex || cell.variantIndex !== expectedVariantIndex ||
-            cell.variantId !== HFO_ALLIED_WEST_VARIANTS[expectedVariantIndex].id || cell.caseIndex !== expectedCaseIndex ||
+            cell.variantId !== study.variants[expectedVariantIndex].id || cell.caseIndex !== expectedCaseIndex ||
+            cell.studyId !== study.id ||
             String(cell.schedulerJobId) !== tasks.get(taskIndex) || cell.programSha256 !== programSha256 ||
             cell.protocolSha256 !== inputs.protocolSha256 || cell.assetManifestSha256 !== inputs.assetManifestSha256 ||
             cell.selectionSha256 !== selectionSha256) throw new Error(`Development cell ${taskIndex} drifted`);
@@ -273,7 +323,7 @@ const finalize = (): void => {
     }
     if (rows.length !== TASK_COUNT || sourceCommits.size !== 1) throw new Error("Development aggregate coverage drifted");
     const defaultRows = rows.filter((row) => row.variantId === "default");
-    const variants = HFO_ALLIED_WEST_VARIANTS.map((variant, declarationIndex) => {
+    const variants = study.variants.map((variant, declarationIndex) => {
         const variantRows = rows.filter((row) => row.variantId === variant.id), summary = summarize(variantRows);
         const byCountry = Object.fromEntries(COUNTRIES.map((country) =>
             [country, summarize(variantRows.filter((row) => row.country === country))]));
@@ -301,7 +351,7 @@ const finalize = (): void => {
         complete: true, passed: winner.eligible, schedulerAccount: "pi_jss233", arrayJobId,
         finalizerJobId: process.env.SLURM_JOB_ID, sourceCommit: [...sourceCommits][0], programSha256,
         protocolSha256: inputs.protocolSha256, assetManifestSha256: inputs.assetManifestSha256,
-        selectionSha256, launchedGameCount: rows.length, variants, ranking: ranked.map((entry) => entry.id),
+        selectionSha256, studyId: study.id, launchedGameCount: rows.length, variants, ranking: ranked.map((entry) => entry.id),
         winner, schedulerJobIds: [...tasks.values()], rows };
     fs.mkdirSync(path.dirname(outputPath), { recursive: true, mode: 0o700 });
     fs.writeFileSync(outputPath, JSON.stringify(artifact, null, 2) + "\n", { flag: "wx", mode: 0o600 });

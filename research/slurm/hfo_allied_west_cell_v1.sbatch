@@ -34,7 +34,8 @@ cd "$REPO"
 cd "$DRIVER"
 export MODE=cell TASK_INDEX OUT_PATH="$ROOT/cell.json"
 export PROGRAM_PATH="$DRIVER/dist/training/hfoAlliedWestDevelopment.js"
-export PROTOCOL_PATH="$REPO/research/protocols/hfo-west/2026-08-20-allied-west-development-screen-v1.md"
+export PROTOCOL_PATH="${PROTOCOL_PATH:-$REPO/research/protocols/hfo-west/2026-08-20-allied-west-development-screen-v1.md}"
+export HFO_WEST_STUDY="${HFO_WEST_STUDY:-production_v1}"
 [[ "$(sha256sum "$PROGRAM_PATH"|awk '{print $1}')" == "$PROGRAM_SHA256" ]] || exit 2
 export PROGRAM_SHA256 PROTOCOL_SHA256 SELECTION_PATH SELECTION_SHA256 MIX_DIR ASSET_MANIFEST_PATH ASSET_MANIFEST_SHA256
 export BASELINE_PACKAGE_ROOT="$BASELINE" REQUIRE_EXTERNAL_BASELINE=true
