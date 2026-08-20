@@ -290,6 +290,9 @@ const finalize = (): void => {
     const root = requiredPath("RESULTS_ROOT"), outputPath = requiredPath("OUT_PATH");
     const arrayJobId = requiredText("ARRAY_JOB_ID", /^\d+$/), programSha256 = requiredText("PROGRAM_SHA256", SHA256);
     const selectionSha256 = requiredText("SELECTION_SHA256", SHA256), inputs = commonInputs();
+    const cellProgramSha256 = process.env.CELL_PROGRAM_SHA256
+        ? requiredText("CELL_PROGRAM_SHA256", SHA256)
+        : programSha256;
     if (fs.existsSync(outputPath)) throw new Error("Bottom finalizer exists");
     let tasks = new Map<number, string>();
     const study = studyConfig(), caseCount = study.casesPerCountry * study.countries.length;
@@ -308,13 +311,15 @@ const finalize = (): void => {
             cell.complete !== true || cell.taskIndex !== taskIndex || cell.variantIndex !== variantIndex ||
             cell.variantId !== study.variants[variantIndex].id || cell.caseIndex !== caseIndex ||
             cell.studyId !== study.id ||
-            String(cell.schedulerJobId) !== tasks.get(taskIndex) || cell.programSha256 !== programSha256 ||
+            String(cell.schedulerJobId) !== tasks.get(taskIndex) || cell.programSha256 !== cellProgramSha256 ||
             cell.protocolSha256 !== inputs.protocolSha256 || cell.assetManifestSha256 !== inputs.assetManifestSha256 ||
             cell.selectionSha256 !== selectionSha256) throw new Error(`Bottom cell ${taskIndex} drifted`);
         sources.add(cell.sourceCommit); rows.push(cell.result);
     }
     if (rows.length !== taskCount || sources.size !== 1) throw new Error("Bottom aggregate coverage drifted");
-    const defaultRows = rows.filter((row) => row.variantId === "default"), defaultSummary = summarize(defaultRows);
+    const controlId = study.id === "korea_defense_v3" ? "retarget_control" : "default";
+    const defaultRows = rows.filter((row) => row.variantId === controlId), defaultSummary = summarize(defaultRows);
+    if (defaultRows.length !== caseCount) throw new Error(`Bottom control ${controlId} coverage drifted`);
     const variants = study.variants.map((variant, declarationIndex) => {
         const variantRows = rows.filter((row) => row.variantId === variant.id), summary = summarize(variantRows);
         const byCountry = Object.fromEntries(study.countries.map((country) =>
@@ -362,7 +367,7 @@ const finalize = (): void => {
             passed ? "ADVANCE_HFO_BOTTOM_RETARGET" : "NO_ELIGIBLE_HFO_BOTTOM_RETARGET";
     const artifact = { schemaVersion: 1, kind: "hfo-bottom-development-finalizer",
         status, complete: true, passed, schedulerAccount: "pi_jss233", arrayJobId,
-        finalizerJobId: process.env.SLURM_JOB_ID, sourceCommit: [...sources][0], programSha256,
+        finalizerJobId: process.env.SLURM_JOB_ID, sourceCommit: [...sources][0], programSha256, cellProgramSha256,
         protocolSha256: inputs.protocolSha256, assetManifestSha256: inputs.assetManifestSha256,
         selectionSha256, studyId: study.id, launchedGameCount: rows.length, variants, ranking: ranked.map((entry) => entry.id),
         winner, schedulerJobIds: [...tasks.values()], rows };
