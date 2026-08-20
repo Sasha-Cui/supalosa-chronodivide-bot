@@ -1,7 +1,7 @@
 import { ActionsApi, GameApi, ProductionApi } from "@chronodivide/game-api";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
-import { StrongBot } from "@supalosa/chronodivide-bot/dist/bot/strongBot.js";
-import { StrongStrategy } from "@supalosa/chronodivide-bot/dist/bot/strategy/strongStrategy.js";
+import { StrongBot, StrongBotOptions } from "@supalosa/chronodivide-bot/dist/bot/strongBot.js";
+import { StrongStrategy, StrongStrategyOptions } from "@supalosa/chronodivide-bot/dist/bot/strategy/strongStrategy.js";
 
 export type InspectableDeployedStrongBot = StrongBot & {
     lastGameApi: GameApi | null;
@@ -9,7 +9,12 @@ export type InspectableDeployedStrongBot = StrongBot & {
     lastPlayerProduction: ProductionApi | null;
 };
 
-export const createDeployedStrongBotCandidate = (name: string, country: Countries): InspectableDeployedStrongBot => {
+export const createDeployedStrongBotCandidate = (
+    name: string,
+    country: Countries,
+    strategyOptions: StrongStrategyOptions = {},
+    botOptions: StrongBotOptions = {},
+): InspectableDeployedStrongBot => {
     class Inspectable extends StrongBot {
         public lastGameApi: GameApi | null = null;
         public lastPlayerActions: ActionsApi | null = null;
@@ -25,5 +30,5 @@ export const createDeployedStrongBotCandidate = (name: string, country: Countrie
             super.onGameTick(game);
         }
     }
-    return new Inspectable(name, country, [], false, new StrongStrategy(), {});
+    return new Inspectable(name, country, [], false, new StrongStrategy(strategyOptions), botOptions);
 };
