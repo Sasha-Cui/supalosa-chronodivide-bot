@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { HFO_BOTTOM_RETARGET_VARIANTS } from "../training/hfoBottomDevelopment.js";
+import {
+    HFO_BOTTOM_REPLICATION_ARMS,
+    HFO_BOTTOM_RETARGET_VARIANTS,
+} from "../training/hfoBottomDevelopment.js";
 
 describe("HFO bottom building-retarget variants", () => {
     it("keeps the frozen declaration order", () => {
@@ -28,5 +31,18 @@ describe("HFO bottom building-retarget variants", () => {
         expect(byId.round_robin_600.botOptions.hfoBottomRetarget?.mode).toBe("round_robin");
         expect(byId.top_first_600.botOptions.hfoBottomRetarget?.mode).toBe("top_first");
         expect(byId.split_buildings.botOptions.hfoBottomRetarget?.mode).toBe("split");
+    });
+
+    it("freezes the V2 paired replication arms", () => {
+        expect(HFO_BOTTOM_REPLICATION_ARMS.map((variant) => variant.id)).toEqual([
+            "default",
+            "winner_retarget",
+        ]);
+        expect(HFO_BOTTOM_REPLICATION_ARMS[1].botOptions.hfoBottomRetarget).toMatchObject({
+            enabled: true,
+            mode: "stalled_rotate",
+            stallTicks: 600,
+            rotationTicks: 600,
+        });
     });
 });

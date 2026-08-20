@@ -20,7 +20,8 @@ export SLURM_JOB_ACCOUNT=pi_jss233
 [[ ! -e "$FINALIZER_ROOT" ]] || exit 2; install -d -m 0700 "$FINALIZER_ROOT"; exec >"$FINALIZER_ROOT/job.stdout.log" 2>"$FINALIZER_ROOT/job.stderr.log"
 cd "$REPO"; [[ "$(git branch --show-current)" == main && -z "$(git status --porcelain=v1 --untracked-files=no)" && "$(git rev-parse HEAD)" == "$(git rev-parse fork/main)" ]] || exit 2
 cd "$DRIVER"; export MODE=finalize OUT_PATH="$FINALIZER_ROOT/hfo-bottom-development.json" PROGRAM_PATH="$DRIVER/dist/training/hfoBottomDevelopment.js"
-export PROTOCOL_PATH="$REPO/research/protocols/hfo-bottom/2026-08-20-building-retarget-screen-v1.md"
+export PROTOCOL_PATH="${PROTOCOL_PATH:-$REPO/research/protocols/hfo-bottom/2026-08-20-building-retarget-screen-v1.md}"
+export HFO_BOTTOM_STUDY="${HFO_BOTTOM_STUDY:-screen_v1}"
 [[ "$(sha256sum "$PROGRAM_PATH"|awk '{print $1}')" == "$PROGRAM_SHA256" ]] || exit 2
 export RESULTS_ROOT ARRAY_JOB_ID PROGRAM_SHA256 PROTOCOL_SHA256 SELECTION_SHA256 MIX_DIR ASSET_MANIFEST_PATH ASSET_MANIFEST_SHA256
 "$NODE" --es-module-specifier-resolution=node "$PROGRAM_PATH"

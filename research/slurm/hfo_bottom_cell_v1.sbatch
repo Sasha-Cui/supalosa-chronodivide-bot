@@ -23,7 +23,8 @@ TASK_INDEX=${SLURM_ARRAY_TASK_ID:?}; ROOT="$RESULTS_ROOT/task-$(printf '%03d' "$
 install -d -m 0700 "$ROOT"; exec >"$ROOT/job.stdout.log" 2>"$ROOT/job.stderr.log"
 cd "$REPO"; [[ "$(git branch --show-current)" == main && -z "$(git status --porcelain=v1 --untracked-files=no)" && "$(git rev-parse HEAD)" == "$(git rev-parse fork/main)" ]] || exit 2
 cd "$DRIVER"; export MODE=cell TASK_INDEX OUT_PATH="$ROOT/cell.json" PROGRAM_PATH="$DRIVER/dist/training/hfoBottomDevelopment.js"
-export PROTOCOL_PATH="$REPO/research/protocols/hfo-bottom/2026-08-20-building-retarget-screen-v1.md"
+export PROTOCOL_PATH="${PROTOCOL_PATH:-$REPO/research/protocols/hfo-bottom/2026-08-20-building-retarget-screen-v1.md}"
+export HFO_BOTTOM_STUDY="${HFO_BOTTOM_STUDY:-screen_v1}"
 [[ "$(sha256sum "$PROGRAM_PATH"|awk '{print $1}')" == "$PROGRAM_SHA256" ]] || exit 2
 export PROGRAM_SHA256 PROTOCOL_SHA256 SELECTION_PATH SELECTION_SHA256 MIX_DIR ASSET_MANIFEST_PATH ASSET_MANIFEST_SHA256 BASELINE_PACKAGE_ROOT="$BASELINE" REQUIRE_EXTERNAL_BASELINE=true
 "$NODE" --es-module-specifier-resolution=node "$PROGRAM_PATH"
