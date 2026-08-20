@@ -83,4 +83,26 @@ describe("research ablation flags", () => {
 
         expect(detector).not.toHaveBeenCalled();
     });
+
+    it("enables the replicated west guard by default and retains explicit off controls", () => {
+        const defaultBot = new StrongBot("default-west", Countries.USA, [], false, new StrongStrategy(), {});
+        expect((defaultBot as unknown as PrivateRecord).hfoWestHomeGuardOptions).toMatchObject({
+            enabled: true,
+            untilTick: 9_600,
+            radius: 72,
+            orderIntervalTicks: 6,
+            engageMinCombatants: 4,
+            engageCombatantAdvantage: 0,
+            alliedOnly: true,
+        });
+
+        const disabledBot = new StrongBot("disabled-west", Countries.USA, [], false,
+            new StrongStrategy({ hfoAlliedWestProfile: false }), {
+                hfoWestHomeGuard: { enabled: false },
+            });
+        expect((disabledBot as unknown as PrivateRecord).hfoWestHomeGuardOptions.enabled).toBe(false);
+        expect((new StrongStrategy() as unknown as PrivateRecord).options.hfoAlliedWestProfile).toBeUndefined();
+        expect((new StrongStrategy({ hfoAlliedWestProfile: false }) as unknown as PrivateRecord)
+            .options.hfoAlliedWestProfile).toBe(false);
+    });
 });

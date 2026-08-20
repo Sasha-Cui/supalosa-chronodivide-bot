@@ -575,12 +575,12 @@ const HFO_WEST_HOME_GUARD_POINTS = [
 ];
 
 const DEFAULT_HFO_WEST_HOME_GUARD_OPTIONS: Required<HfoWestHomeGuardOptions> = {
-    enabled: false,
+    enabled: true,
     untilTick: 9_600,
     radius: 72,
     orderIntervalTicks: 6,
     engageMinCombatants: 4,
-    engageCombatantAdvantage: -4,
+    engageCombatantAdvantage: 0,
     alliedOnly: true,
 };
 

@@ -840,7 +840,9 @@ export class StrongStrategy implements Strategy {
     }
 
     onAiUpdate(context: SupabotContext, missionController: MissionController, logger: DebugLogger): Strategy {
-        if (this.options.hfoAlliedWestProfile && this.isHfoAlliedWestStart(context)) {
+        if ((this.options.defaultMapProfiles ?? true) &&
+            (this.options.hfoAlliedWestProfile ?? true) &&
+            this.isHfoAlliedWestStart(context)) {
             logger("Strong strategy profile: hfoAlliedWestWinner");
             return new StrongStrategy(
                 HFO_ALLIED_WEST_WINNER_PROFILE,
