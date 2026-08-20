@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
     HFO_BOTTOM_REPLICATION_ARMS,
     HFO_KOREA_BOTTOM_DEFENSE_VARIANTS,
+    HFO_KOREA_BOTTOM_REPLICATION_ARMS,
     HFO_BOTTOM_RETARGET_VARIANTS,
 } from "../training/hfoBottomDevelopment.js";
 
@@ -68,5 +69,19 @@ describe("HFO bottom building-retarget variants", () => {
         });
         expect(byId.pillbox_2_wide_guard.strategyOptions?.staticDefenseBoost?.targetCount).toBe(2);
         expect(byId.pillbox_4_wide_guard.botOptions.hfoBottomHomeGuard?.untilTick).toBe(42_000);
+    });
+
+    it("freezes the Korea defense replication arms", () => {
+        expect(HFO_KOREA_BOTTOM_REPLICATION_ARMS.map((variant) => variant.id)).toEqual([
+            "retarget_control",
+            "pillbox_2",
+        ]);
+        expect(HFO_KOREA_BOTTOM_REPLICATION_ARMS[1].strategyOptions?.staticDefenseBoost).toEqual({
+            enabled: true,
+            hfoBottomOnly: true,
+            startTick: 5_400,
+            targetCount: 2,
+            priority: 132,
+        });
     });
 });
