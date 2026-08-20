@@ -21,8 +21,7 @@ const MAP = { name: "cd_chrono_4_heck_freezes_over_le.map",
     sha256: "e4dfc736a6355e0e68d4681e4d67419516e6bb94549e2d42880c9414e95e2e8d" } as const;
 const COUNTRIES = [Countries.USA, Countries.KOREA, Countries.FRANCE, Countries.GERMANY, Countries.GREAT_BRITAIN] as const;
 const WEST_START = "39,82", EAST_START = "151,119";
-const MAX_OFFSETS = 400, CASES_PER_COUNTRY = 4;
-const CASE_COUNT = 20, TASK_COUNT = 120;
+const MAX_OFFSETS = 400;
 const SHA256 = /^[0-9a-f]{64}$/;
 type Winner = "candidate" | "baseline" | "draw";
 type CaseSpec = { caseIndex: number; countryOrdinal: number; country: Countries; seedOffset: number;
@@ -77,17 +76,30 @@ export const HFO_ALLIED_WEST_GUARD_VARIANTS: readonly Variant[] = [
     } } },
 ];
 
-type StudyId = "production_v1" | "guard_v2";
-type StudyConfig = { id: StudyId; seedBase: number; maxTicks: number; variants: readonly Variant[] };
+export const HFO_ALLIED_WEST_REPLICATION_ARMS: readonly Variant[] = [
+    { id: "default", strategyOptions: {} },
+    { id: "winner_conditional", strategyOptions: { hfoAlliedWestProfile: true }, botOptions: {
+        hfoWestHomeGuard: { enabled: true, untilTick: 9_600, radius: 72, orderIntervalTicks: 6,
+            engageMinCombatants: 4, engageCombatantAdvantage: 0, alliedOnly: true },
+    } },
+];
+
+type StudyId = "production_v1" | "guard_v2" | "replication_v3";
+type StudyConfig = { id: StudyId; seedBase: number; maxTicks: number; casesPerCountry: number;
+    variants: readonly Variant[] };
 const STUDIES: Record<StudyId, StudyConfig> = {
     production_v1: { id: "production_v1", seedBase: 4_240_000_000, maxTicks: 60_000,
-        variants: HFO_ALLIED_WEST_VARIANTS },
+        casesPerCountry: 4, variants: HFO_ALLIED_WEST_VARIANTS },
     guard_v2: { id: "guard_v2", seedBase: 4_241_000_000, maxTicks: 90_000,
-        variants: HFO_ALLIED_WEST_GUARD_VARIANTS },
+        casesPerCountry: 4, variants: HFO_ALLIED_WEST_GUARD_VARIANTS },
+    replication_v3: { id: "replication_v3", seedBase: 4_242_000_000, maxTicks: 90_000,
+        casesPerCountry: 10, variants: HFO_ALLIED_WEST_REPLICATION_ARMS },
 };
 const studyConfig = (): StudyConfig => {
     const id = process.env.HFO_WEST_STUDY ?? "production_v1";
-    if (id !== "production_v1" && id !== "guard_v2") throw new Error("HFO_WEST_STUDY is invalid");
+    if (id !== "production_v1" && id !== "guard_v2" && id !== "replication_v3") {
+        throw new Error("HFO_WEST_STUDY is invalid");
+    }
     return STUDIES[id];
 };
 const requiredPath = (name: string): string => {
@@ -142,6 +154,7 @@ const selectCases = async (): Promise<void> => {
     const outputPath = requiredPath("OUT_PATH"), programPath = requiredPath("PROGRAM_PATH");
     const programSha256 = requiredText("PROGRAM_SHA256", SHA256), inputs = commonInputs();
     const study = studyConfig();
+    const expectedCaseCount = study.casesPerCountry * COUNTRIES.length;
     if (fs.existsSync(outputPath) || sha256File(programPath) !== programSha256) throw new Error("Selection output or program drifted");
     const { repo, commit } = sourceIdentity();
     await cdapi.init(inputs.mixDir);
@@ -150,10 +163,10 @@ const selectCases = async (): Promise<void> => {
     let initializedGameCount = 0;
     for (const [countryOrdinal, country] of COUNTRIES.entries()) {
         let selectedForCountry = 0;
-        for (let seedOffset = 0; seedOffset < MAX_OFFSETS && selectedForCountry < CASES_PER_COUNTRY; seedOffset += 1) {
+        for (let seedOffset = 0; seedOffset < MAX_OFFSETS && selectedForCountry < study.casesPerCountry; seedOffset += 1) {
             const requestedEngineSeed = study.seedBase + countryOrdinal * 1_000 + seedOffset;
             for (const candidateSlot of [0, 1] as const) {
-                if (selectedForCountry >= CASES_PER_COUNTRY) break;
+                if (selectedForCountry >= study.casesPerCountry) break;
                 const candidateName = `HfoWestSelectCandidate_${countryOrdinal}_${seedOffset}_${candidateSlot}`;
                 const baselineName = `HfoWestSelectBaseline_${countryOrdinal}_${seedOffset}_${candidateSlot}`;
                 const candidate = createDeployedStrongBotCandidate(candidateName, country);
@@ -170,17 +183,17 @@ const selectCases = async (): Promise<void> => {
                 }
             }
         }
-        if (selectedForCountry !== CASES_PER_COUNTRY) throw new Error(`Only selected ${selectedForCountry} cases for ${country}`);
+        if (selectedForCountry !== study.casesPerCountry) throw new Error(`Only selected ${selectedForCountry} cases for ${country}`);
     }
-    if (cases.length !== CASE_COUNT || new Set(cases.map((entry) =>
-        `${entry.countryOrdinal}:${entry.requestedEngineSeed}:${entry.candidateSlot}`)).size !== CASE_COUNT) {
+    if (cases.length !== expectedCaseCount || new Set(cases.map((entry) =>
+        `${entry.countryOrdinal}:${entry.requestedEngineSeed}:${entry.candidateSlot}`)).size !== expectedCaseCount) {
         throw new Error("Outcome-blind HFO west selection coverage drifted");
     }
     const artifact = { schemaVersion: 1, kind: "hfo-allied-west-outcome-blind-selection",
         status: "PASS_HFO_ALLIED_WEST_SELECTION", complete: true, passed: true, outcomeFree: true,
         scheduler: { jobId: process.env.SLURM_JOB_ID, account: "pi_jss233" }, sourceCommit: commit,
         programSha256, protocolSha256: inputs.protocolSha256, assetManifestSha256: inputs.assetManifestSha256,
-        studyId: study.id, seedBase: study.seedBase, maxOffsets: MAX_OFFSETS, casesPerCountry: CASES_PER_COUNTRY,
+        studyId: study.id, seedBase: study.seedBase, maxOffsets: MAX_OFFSETS, casesPerCountry: study.casesPerCountry,
         initializedGameCount, selectedCaseCount: cases.length, updateCount: 0, forbiddenOutcomeFields: [], cases };
     fs.mkdirSync(path.dirname(outputPath), { recursive: true, mode: 0o700 });
     fs.writeFileSync(outputPath, JSON.stringify(artifact, null, 2) + "\n", { flag: "wx", mode: 0o600 });
@@ -190,13 +203,14 @@ const selectCases = async (): Promise<void> => {
 const loadSelection = (selectionPath: string, selectionSha256: string, inputs: ReturnType<typeof commonInputs>): CaseSpec[] => {
     if (sha256File(selectionPath) !== selectionSha256) throw new Error("HFO west selection hash drifted");
     const study = studyConfig();
+    const expectedCaseCount = study.casesPerCountry * COUNTRIES.length;
     const selection = JSON.parse(fs.readFileSync(selectionPath, "utf8")) as unknown;
     if (!isRecord(selection) || selection.kind !== "hfo-allied-west-outcome-blind-selection" ||
         selection.status !== "PASS_HFO_ALLIED_WEST_SELECTION" || selection.complete !== true || selection.passed !== true ||
-        selection.outcomeFree !== true || selection.updateCount !== 0 || selection.selectedCaseCount !== CASE_COUNT ||
+        selection.outcomeFree !== true || selection.updateCount !== 0 || selection.selectedCaseCount !== expectedCaseCount ||
         selection.protocolSha256 !== inputs.protocolSha256 || selection.assetManifestSha256 !== inputs.assetManifestSha256 ||
         selection.studyId !== study.id || selection.seedBase !== study.seedBase ||
-        !Array.isArray(selection.cases) || selection.cases.length !== CASE_COUNT) throw new Error("Selection manifest is ineligible");
+        !Array.isArray(selection.cases) || selection.cases.length !== expectedCaseCount) throw new Error("Selection manifest is ineligible");
     return selection.cases as CaseSpec[];
 };
 
@@ -245,10 +259,12 @@ const runCell = async (): Promise<void> => {
     const selectionPath = requiredPath("SELECTION_PATH"), programSha256 = requiredText("PROGRAM_SHA256", SHA256);
     const selectionSha256 = requiredText("SELECTION_SHA256", SHA256), inputs = commonInputs();
     const study = studyConfig();
-    if (taskIndex < 0 || taskIndex >= TASK_COUNT || process.env.SLURM_ARRAY_TASK_ID !== String(taskIndex) ||
+    const caseCount = study.casesPerCountry * COUNTRIES.length;
+    const taskCount = caseCount * study.variants.length;
+    if (taskIndex < 0 || taskIndex >= taskCount || process.env.SLURM_ARRAY_TASK_ID !== String(taskIndex) ||
         fs.existsSync(outputPath) || sha256File(programPath) !== programSha256) throw new Error("Cell input drifted");
     const cases = loadSelection(selectionPath, selectionSha256, inputs), { repo, commit } = sourceIdentity();
-    const variantIndex = Math.floor(taskIndex / CASE_COUNT), caseIndex = taskIndex % CASE_COUNT;
+    const variantIndex = Math.floor(taskIndex / caseCount), caseIndex = taskIndex % caseCount;
     const variant = study.variants[variantIndex], caseSpec = cases[caseIndex];
     if (!variant || !caseSpec || caseSpec.caseIndex !== caseIndex) throw new Error("Cell assignment drifted");
     await cdapi.init(inputs.mixDir);
@@ -268,6 +284,17 @@ const runCell = async (): Promise<void> => {
     console.log(JSON.stringify({ status: artifact.status, taskIndex, variantId: variant.id, caseIndex }));
 };
 
+const wilsonLower = (wins: number, games: number): number => {
+    const z = 1.6448536269514722, probability = wins / games, zSquared = z * z;
+    const denominator = 1 + zSquared / games;
+    return (probability + zSquared / (2 * games) -
+        z * Math.sqrt(probability * (1 - probability) / games + zSquared / (4 * games * games))) / denominator;
+};
+const sampleStandardDeviation = (values: number[]): number => {
+    const mean = values.reduce((total, value) => total + value, 0) / values.length;
+    return Math.sqrt(values.reduce((total, value) => total + (value - mean) ** 2, 0) / (values.length - 1));
+};
+
 const summarize = (rows: any[]) => {
     const wins = rows.filter((row) => row.winner === "candidate").length;
     const losses = rows.filter((row) => row.winner === "baseline").length;
@@ -276,7 +303,8 @@ const summarize = (rows: any[]) => {
         .map((status) => [status, rows.filter((row) => row.status === status).length]));
     const center = Math.floor(ticks.length / 2);
     return { games: rows.length, wins, draws, losses, netWins: wins - losses, winRate: wins / rows.length,
-        lossRate: losses / rows.length, medianTicks: ticks.length % 2 === 0 ? (ticks[center - 1] + ticks[center]) / 2 : ticks[center], statuses };
+        lossRate: losses / rows.length, oneSided95WilsonLower: wilsonLower(wins, rows.length),
+        medianTicks: ticks.length % 2 === 0 ? (ticks[center - 1] + ticks[center]) / 2 : ticks[center], statuses };
 };
 
 const queryCompletedTasks = (arrayJobId: string): Map<number, string> => {
@@ -300,17 +328,19 @@ const finalize = (): void => {
     if (fs.existsSync(outputPath)) throw new Error("Finalizer output exists");
     let tasks = new Map<number, string>();
     const study = studyConfig();
+    const caseCount = study.casesPerCountry * COUNTRIES.length;
+    const taskCount = caseCount * study.variants.length;
     for (let attempt = 0; attempt < 31; attempt += 1) {
         tasks = queryCompletedTasks(arrayJobId);
-        if (tasks.size === TASK_COUNT) break;
+        if (tasks.size === taskCount) break;
         if (attempt < 30) execFileSync("sleep", ["2"]);
     }
-    if (tasks.size !== TASK_COUNT) throw new Error(`Only ${tasks.size}/${TASK_COUNT} task records are complete`);
+    if (tasks.size !== taskCount) throw new Error(`Only ${tasks.size}/${taskCount} task records are complete`);
     const rows: any[] = [], sourceCommits = new Set<string>();
-    for (let taskIndex = 0; taskIndex < TASK_COUNT; taskIndex += 1) {
+    for (let taskIndex = 0; taskIndex < taskCount; taskIndex += 1) {
         const cellPath = path.join(root, `task-${String(taskIndex).padStart(3, "0")}`, "cell.json");
         const cell = JSON.parse(fs.readFileSync(cellPath, "utf8"));
-        const expectedVariantIndex = Math.floor(taskIndex / CASE_COUNT), expectedCaseIndex = taskIndex % CASE_COUNT;
+        const expectedVariantIndex = Math.floor(taskIndex / caseCount), expectedCaseIndex = taskIndex % caseCount;
         if (cell.kind !== "hfo-allied-west-development-cell" ||
             cell.status !== "COMPLETE_HFO_ALLIED_WEST_DEVELOPMENT_CELL" || cell.complete !== true ||
             cell.taskIndex !== taskIndex || cell.variantIndex !== expectedVariantIndex ||
@@ -321,8 +351,9 @@ const finalize = (): void => {
             cell.selectionSha256 !== selectionSha256) throw new Error(`Development cell ${taskIndex} drifted`);
         sourceCommits.add(cell.sourceCommit); rows.push(cell.result);
     }
-    if (rows.length !== TASK_COUNT || sourceCommits.size !== 1) throw new Error("Development aggregate coverage drifted");
+    if (rows.length !== taskCount || sourceCommits.size !== 1) throw new Error("Development aggregate coverage drifted");
     const defaultRows = rows.filter((row) => row.variantId === "default");
+    const defaultSummary = summarize(defaultRows);
     const variants = study.variants.map((variant, declarationIndex) => {
         const variantRows = rows.filter((row) => row.variantId === variant.id), summary = summarize(variantRows);
         const byCountry = Object.fromEntries(COUNTRIES.map((country) =>
@@ -333,22 +364,40 @@ const finalize = (): void => {
             const score = (winner: Winner): number => winner === "candidate" ? 1 : winner === "draw" ? 0.5 : 0;
             return score(row.winner) - score(control.winner);
         });
+        const pairedMean = paired.reduce((total, value) => total + value, 0) / paired.length;
+        const pairedSd = sampleStandardDeviation(paired);
+        const pairedT = paired.length === 50 ? 1.676550893 : 1.729132812;
+        const pairedLower = pairedMean - pairedT * pairedSd / Math.sqrt(paired.length);
         const countryNoninferiorityCount = Object.values(byCountry).filter((entry: any) => entry.wins >= entry.losses).length;
-        const eligible = summary.wins >= 11 && summary.wins > summary.losses && countryNoninferiorityCount >= 4;
+        const countrySuperiorityCount = Object.values(byCountry).filter((entry: any) => entry.wins > entry.losses).length;
+        const developmentEligible = summary.wins >= 11 && summary.wins > summary.losses && countryNoninferiorityCount >= 4;
+        const replicationEligible = variant.id === "winner_conditional" &&
+            summary.wins > summary.losses && summary.oneSided95WilsonLower > 0.5 &&
+            countrySuperiorityCount === COUNTRIES.length && pairedLower > 0 &&
+            summary.lossRate < defaultSummary.lossRate;
+        const eligible = study.id === "replication_v3" ? replicationEligible : developmentEligible;
         return { id: variant.id, declarationIndex, summary, byCountry, pairedVersusDefault: {
-            meanScoreDifference: paired.reduce((total, value) => total + value, 0) / paired.length,
+            meanScoreDifference: pairedMean, sampleStandardDeviation: pairedSd,
+            oneSided95TLower: pairedLower, tCritical: pairedT, degreesOfFreedom: paired.length - 1,
             improved: paired.filter((value) => value > 0).length, tied: paired.filter((value) => value === 0).length,
-            worsened: paired.filter((value) => value < 0).length }, countryNoninferiorityCount, eligible };
+            worsened: paired.filter((value) => value < 0).length }, countryNoninferiorityCount,
+            countrySuperiorityCount, developmentEligible, replicationEligible, eligible };
     });
     const ranked = [...variants].sort((left, right) =>
         right.summary.netWins - left.summary.netWins || right.summary.wins - left.summary.wins ||
         left.summary.losses - right.summary.losses ||
         (left.summary.statuses.tick_cap_draw ?? 0) - (right.summary.statuses.tick_cap_draw ?? 0) ||
         left.summary.medianTicks - right.summary.medianTicks || left.declarationIndex - right.declarationIndex);
-    const winner = ranked[0];
+    const winner = study.id === "replication_v3"
+        ? variants.find((entry) => entry.id === "winner_conditional")
+        : ranked[0];
+    if (!winner) throw new Error("Declared HFO Allied-west winner arm is unavailable");
+    const passed = winner.eligible;
+    const status = study.id === "replication_v3"
+        ? passed ? "PASS_HFO_ALLIED_WEST_REPLICATION" : "FAIL_HFO_ALLIED_WEST_REPLICATION"
+        : passed ? "ADVANCE_HFO_ALLIED_WEST_VARIANT" : "NO_ELIGIBLE_HFO_ALLIED_WEST_VARIANT";
     const artifact = { schemaVersion: 1, kind: "hfo-allied-west-development-finalizer",
-        status: winner.eligible ? "ADVANCE_HFO_ALLIED_WEST_VARIANT" : "NO_ELIGIBLE_HFO_ALLIED_WEST_VARIANT",
-        complete: true, passed: winner.eligible, schedulerAccount: "pi_jss233", arrayJobId,
+        status, complete: true, passed, schedulerAccount: "pi_jss233", arrayJobId,
         finalizerJobId: process.env.SLURM_JOB_ID, sourceCommit: [...sourceCommits][0], programSha256,
         protocolSha256: inputs.protocolSha256, assetManifestSha256: inputs.assetManifestSha256,
         selectionSha256, studyId: study.id, launchedGameCount: rows.length, variants, ranking: ranked.map((entry) => entry.id),

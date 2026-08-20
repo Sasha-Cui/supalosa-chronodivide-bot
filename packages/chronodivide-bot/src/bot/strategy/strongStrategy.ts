@@ -16,6 +16,7 @@ import { DefaultStrategy, DefaultStrategyOptions } from "./defaultStrategy.js";
 
 export type StrongStrategyOptions = {
     defaultMapProfiles?: boolean;
+    hfoAlliedWestProfile?: boolean;
     preserveBaselineCore?: boolean;
     base?: DefaultStrategyOptions;
     allIn?: AllInAttackMissionFactoryOptions;
@@ -53,6 +54,8 @@ const SOUTH_PACIFIC_STARTS = new Set(["57,98", "152,96"]);
 const TIKAL_STARTS = new Set(["50,119", "92,22"]);
 const SIMPLE_1V1_STARTS = new Set(["37,63", "62,39"]);
 const TIKAL_LOWER_START = "50,119";
+const HFO_STARTS = new Set(["39,82", "88,34", "88,157", "151,119"]);
+const HFO_WEST_START = "39,82";
 const ALLIED_COUNTRIES = new Set<string>([
     Countries.USA,
     Countries.KOREA,
@@ -60,6 +63,12 @@ const ALLIED_COUNTRIES = new Set<string>([
     Countries.GERMANY,
     Countries.GREAT_BRITAIN,
 ]);
+
+const HFO_ALLIED_WEST_WINNER_PROFILE: StrongStrategyOptions = {
+    base: { attackCompositionPolicy: "hfo" },
+    strategicPlan: { enabled: true, plan: "rush" },
+    hfoAlliedWestProfile: false,
+};
 
 const NAVAL_PROFILE: StrongStrategyOptions = {
     base: {
@@ -831,6 +840,13 @@ export class StrongStrategy implements Strategy {
     }
 
     onAiUpdate(context: SupabotContext, missionController: MissionController, logger: DebugLogger): Strategy {
+        if (this.options.hfoAlliedWestProfile && this.isHfoAlliedWestStart(context)) {
+            logger("Strong strategy profile: hfoAlliedWestWinner");
+            return new StrongStrategy(
+                HFO_ALLIED_WEST_WINNER_PROFILE,
+                this.buildingEliminationTelemetrySink,
+            ).onAiUpdate(context, missionController, logger);
+        }
         if ((this.options.defaultMapProfiles ?? true) && !hasExplicitProfileOptions(this.options)) {
             if (this.isSimple1v1Map(context)) {
                 logger("Strong strategy profile: simpleInfantry");
@@ -924,6 +940,12 @@ export class StrongStrategy implements Strategy {
         }
         this.buildingEliminationFactory.maybeCreateMissions(context, missionController, logger);
         return this;
+    }
+
+    private isHfoAlliedWestStart(context: SupabotContext): boolean {
+        const countryName = (context.game.getPlayerData(context.player.name).country as { name?: string } | undefined)?.name;
+        return countryName !== undefined && ALLIED_COUNTRIES.has(countryName) &&
+            this.isKnownStartProfile(context, HFO_STARTS, HFO_WEST_START);
     }
 
     private isRiverRampageLowerStart(context: SupabotContext): boolean {

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
     HFO_ALLIED_WEST_GUARD_VARIANTS,
+    HFO_ALLIED_WEST_REPLICATION_ARMS,
     HFO_ALLIED_WEST_VARIANTS,
 } from "../training/hfoAlliedWestDevelopment.js";
 
@@ -36,7 +37,6 @@ describe("HFO Allied west development variants", () => {
             },
         });
     });
-});
 
     it("freezes the V2 group-guard mechanisms independently", () => {
         expect(HFO_ALLIED_WEST_GUARD_VARIANTS.map((variant) => variant.id)).toEqual([
@@ -61,4 +61,23 @@ describe("HFO Allied west development variants", () => {
         });
         expect(byId.rush_guard_group_9600.botOptions?.hfoWestHomeGuard?.engageCombatantAdvantage).toBe(-4);
         expect(byId.rush_guard_hold_12000.botOptions?.hfoWestHomeGuard?.untilTick).toBe(12_000);
+
     });
+    it("replicates the winner through a conditional profile", () => {
+        expect(HFO_ALLIED_WEST_REPLICATION_ARMS.map((variant) => variant.id)).toEqual([
+            "default",
+            "winner_conditional",
+        ]);
+        const winner = HFO_ALLIED_WEST_REPLICATION_ARMS[1];
+        expect(winner.strategyOptions).toEqual({ hfoAlliedWestProfile: true });
+        expect(winner.botOptions?.hfoWestHomeGuard).toEqual({
+            enabled: true,
+            untilTick: 9_600,
+            radius: 72,
+            orderIntervalTicks: 6,
+            engageMinCombatants: 4,
+            engageCombatantAdvantage: 0,
+            alliedOnly: true,
+        });
+    });
+});
