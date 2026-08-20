@@ -167,6 +167,19 @@ export type HfoWestHomeGuardOptions = {
     alliedOnly?: boolean;
 };
 
+export type HfoBottomRetargetMode = "stalled_rotate" | "round_robin" | "top_first" | "split";
+export type HfoBottomRetargetOptions = {
+    enabled?: boolean;
+    minTick?: number;
+    minAttackers?: number;
+    maxEnemyBuildings?: number;
+    maxEnemyCombatants?: number;
+    orderIntervalTicks?: number;
+    rotationTicks?: number;
+    stallTicks?: number;
+    mode?: HfoBottomRetargetMode;
+};
+
 export type StrongBotOptions = {
     preserveBaselineCore?: boolean;
     forceAttack?: ForceAttackOptions;
@@ -184,6 +197,7 @@ export type StrongBotOptions = {
     hfoBottomHomeGuard?: HfoBottomHomeGuardOptions;
     hfoWestHomeGuard?: HfoWestHomeGuardOptions;
     defaultMapProfiles?: boolean;
+    hfoBottomRetarget?: HfoBottomRetargetOptions;
     exactMapTactics?: boolean;
 };
 
@@ -582,6 +596,18 @@ const DEFAULT_HFO_WEST_HOME_GUARD_OPTIONS: Required<HfoWestHomeGuardOptions> = {
     engageMinCombatants: 4,
     engageCombatantAdvantage: 0,
     alliedOnly: true,
+};
+
+const DEFAULT_HFO_BOTTOM_RETARGET_OPTIONS: Required<HfoBottomRetargetOptions> = {
+    enabled: false,
+    minTick: 42_000,
+    minAttackers: 4,
+    maxEnemyBuildings: 6,
+    maxEnemyCombatants: 4,
+    orderIntervalTicks: 6,
+    rotationTicks: 600,
+    stallTicks: 600,
+    mode: "stalled_rotate",
 };
 
 const RIVER_RAMPAGE_STARTS = new Set(["98,125", "128,89"]);
@@ -1268,6 +1294,7 @@ export class StrongBot extends SupalosaBot {
     private hfoBottomDemolitionOptions: Required<HfoBottomDemolitionOptions>;
     private hfoBottomHomeGuardOptions: Required<HfoBottomHomeGuardOptions>;
     private hfoWestHomeGuardOptions: Required<HfoWestHomeGuardOptions>;
+    private hfoBottomRetargetOptions: Required<HfoBottomRetargetOptions>;
     private lastForceAttackOrderAt = 0;
     private lastHarassOrderAt = 0;
     private lastEmergencyDefenseOrderAt = 0;
@@ -1291,6 +1318,12 @@ export class StrongBot extends SupalosaBot {
     private lastHfoBottomCriticalCleanupOrderAt = 0;
     private lastHfoBottomHomeGuardOrderAt = 0;
     private lastHfoWestHomeGuardOrderAt = 0;
+    private lastHfoBottomRetargetOrderAt = 0;
+    private lastHfoBottomRetargetRotationAt = 0;
+    private lastHfoBottomRetargetProgressAt = 0;
+    private lastHfoBottomRetargetBuildingCount = Number.POSITIVE_INFINITY;
+    private lastHfoBottomRetargetHitPoints = Number.POSITIVE_INFINITY;
+    private hfoBottomRetargetIndex = 0;
     private lastWeakStartHomeGuardOrderAt = 0;
     private lastWeakStartCloseoutOrderAt = 0;
     private lastWeakStartPressureOrderAt = 0;
@@ -1372,6 +1405,10 @@ export class StrongBot extends SupalosaBot {
             ...DEFAULT_HFO_WEST_HOME_GUARD_OPTIONS,
             ...definedOptions(options.hfoWestHomeGuard),
         };
+        this.hfoBottomRetargetOptions = {
+            ...DEFAULT_HFO_BOTTOM_RETARGET_OPTIONS,
+            ...definedOptions(options.hfoBottomRetarget),
+        };
     }
 
     private applyExplicitOptionOverrides(): void {
@@ -1406,6 +1443,10 @@ export class StrongBot extends SupalosaBot {
             ...this.hfoWestHomeGuardOptions,
             ...definedOptions(options.hfoWestHomeGuard),
         };
+        this.hfoBottomRetargetOptions = {
+            ...this.hfoBottomRetargetOptions,
+            ...definedOptions(options.hfoBottomRetarget),
+        };
     }
 
     override onGameStart(game: GameApi): void {
@@ -1432,6 +1473,9 @@ export class StrongBot extends SupalosaBot {
     override onGameTick(game: GameApi): void {
         this.lastGameApi = game;
         super.onGameTick(game);
+        if (this.enableExactMapTactics && this.maybeHfoBottomRetarget(game)) {
+            return;
+        }
         if (this.enableExactMapTactics && this.maybeHfoBottomCriticalCleanup(game)) {
             return;
         }
@@ -2589,6 +2633,80 @@ export class StrongBot extends SupalosaBot {
             guard.pressureDirectAttackKnownTargets ?? false,
         );
         this.lastWeakStartPressureOrderAt = tick;
+        return true;
+    }
+
+    private maybeHfoBottomRetarget(game: GameApi): boolean {
+        const options = this.hfoBottomRetargetOptions;
+        const tick = game.getCurrentTick();
+        if (!options.enabled || tick < options.minTick || !this.isHfoBottomVsTop(game)) {
+            return false;
+        }
+        const enemyBuildings = [...this.getKnownEnemyBuildings(game)];
+        const enemyCombatants = this.getKnownEnemyCombatUnits(game);
+        if (enemyBuildings.length === 0 || enemyBuildings.length > options.maxEnemyBuildings ||
+            enemyCombatants.length > options.maxEnemyCombatants) {
+            return false;
+        }
+        const attackers = this.getMobileCombatants(game).filter((unit) =>
+            unit.rules.name !== "DOG" && unit.rules.name !== "ADOG");
+        if (attackers.length < options.minAttackers) {
+            return false;
+        }
+
+        const buildingHitPoints = enemyBuildings.reduce((total, unit) => total + unit.hitPoints, 0);
+        const established = Number.isFinite(this.lastHfoBottomRetargetBuildingCount);
+        const madeProgress = !established ||
+            enemyBuildings.length < this.lastHfoBottomRetargetBuildingCount ||
+            buildingHitPoints < this.lastHfoBottomRetargetHitPoints;
+        if (madeProgress) {
+            this.lastHfoBottomRetargetProgressAt = tick;
+            if (established && enemyBuildings.length < this.lastHfoBottomRetargetBuildingCount) {
+                this.hfoBottomRetargetIndex = 0;
+            }
+        }
+        this.lastHfoBottomRetargetBuildingCount = enemyBuildings.length;
+        this.lastHfoBottomRetargetHitPoints = buildingHitPoints;
+
+        const sortedBuildings = enemyBuildings.sort((left, right) => {
+            if (options.mode === "top_first") {
+                const topDifference = Number(this.isHfoTopPocketTarget(right)) - Number(this.isHfoTopPocketTarget(left));
+                if (topDifference !== 0) return topDifference;
+            }
+            const weightDifference = this.getHfoLateMopUpTargetWeight(right) - this.getHfoLateMopUpTargetWeight(left);
+            if (weightDifference !== 0) return weightDifference;
+            return left.id - right.id;
+        });
+
+        if (options.mode === "round_robin" &&
+            tick >= this.lastHfoBottomRetargetRotationAt + options.rotationTicks) {
+            this.hfoBottomRetargetIndex = (this.hfoBottomRetargetIndex + 1) % sortedBuildings.length;
+            this.lastHfoBottomRetargetRotationAt = tick;
+        } else if ((options.mode === "stalled_rotate" || options.mode === "top_first") &&
+            tick >= this.lastHfoBottomRetargetProgressAt + options.stallTicks) {
+            this.hfoBottomRetargetIndex = (this.hfoBottomRetargetIndex + 1) % sortedBuildings.length;
+            this.lastHfoBottomRetargetRotationAt = tick;
+            this.lastHfoBottomRetargetProgressAt = tick;
+        }
+
+        if (tick < this.lastHfoBottomRetargetOrderAt + options.orderIntervalTicks) {
+            return true;
+        }
+        const preparedAttackers = this.prepareUnitsForAttackMove(attackers);
+        if (preparedAttackers.length === 0) {
+            return true;
+        }
+        if (options.mode === "split") {
+            this.orderPreparedUnitsToNearestTargets(preparedAttackers, sortedBuildings, true);
+        } else {
+            const target = sortedBuildings[this.hfoBottomRetargetIndex % sortedBuildings.length];
+            this.player.actions.orderUnits(
+                preparedAttackers.map((unit) => unit.id),
+                OrderType.Attack,
+                target.id,
+            );
+        }
+        this.lastHfoBottomRetargetOrderAt = tick;
         return true;
     }
 

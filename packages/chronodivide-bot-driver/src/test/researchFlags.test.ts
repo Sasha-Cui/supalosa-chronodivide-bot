@@ -95,6 +95,7 @@ describe("research ablation flags", () => {
             engageCombatantAdvantage: 0,
             alliedOnly: true,
         });
+        expect((defaultBot as unknown as PrivateRecord).hfoBottomRetargetOptions.enabled).toBe(false);
 
         const disabledBot = new StrongBot("disabled-west", Countries.USA, [], false,
             new StrongStrategy({ hfoAlliedWestProfile: false }), {
