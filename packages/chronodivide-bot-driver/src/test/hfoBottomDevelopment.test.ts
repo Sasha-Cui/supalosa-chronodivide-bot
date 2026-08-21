@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
     HFO_BOTTOM_REPLICATION_ARMS,
+    HFO_BOTTOM_ALL_COUNTRY_REPLICATION_SPEC,
     HFO_KOREA_BOTTOM_DEFENSE_VARIANTS,
     HFO_KOREA_BOTTOM_REPLICATION_ARMS,
     HFO_BOTTOM_RETARGET_VARIANTS,
@@ -45,6 +46,14 @@ describe("HFO bottom building-retarget variants", () => {
             mode: "stalled_rotate",
             stallTicks: 600,
             rotationTicks: 600,
+        });
+    });
+
+    it("freezes the V5 all-country sample", () => {
+        expect(HFO_BOTTOM_ALL_COUNTRY_REPLICATION_SPEC).toEqual({
+            seedBase: 4_248_000_000,
+            casesPerCountry: 30,
+            maxTicks: 90_000,
         });
     });
 
