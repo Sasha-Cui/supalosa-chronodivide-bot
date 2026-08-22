@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
     HFO_BOTTOM_REPLICATION_ARMS,
     HFO_BOTTOM_ALL_COUNTRY_REPLICATION_SPEC,
+    HFO_BOTTOM_RETARGET_SAFETY_SPEC,
+    HFO_BOTTOM_RETARGET_SAFETY_VARIANTS,
     HFO_KOREA_BOTTOM_DEFENSE_VARIANTS,
     HFO_KOREA_BOTTOM_REPLICATION_ARMS,
     HFO_BOTTOM_RETARGET_VARIANTS,
@@ -55,6 +57,30 @@ describe("HFO bottom building-retarget variants", () => {
             casesPerCountry: 30,
             maxTicks: 90_000,
         });
+    });
+
+    it("freezes the V6 safety margins and sample", () => {
+        expect(HFO_BOTTOM_RETARGET_SAFETY_SPEC).toEqual({
+            seedBase: 4_249_000_000,
+            casesPerCountry: 8,
+            maxTicks: 90_000,
+        });
+        expect(HFO_BOTTOM_RETARGET_SAFETY_VARIANTS.map((variant) => variant.id)).toEqual([
+            "default",
+            "current_retarget",
+            "advantage_2",
+            "advantage_4",
+            "zero_enemy_combatants",
+        ]);
+        const byId = Object.fromEntries(HFO_BOTTOM_RETARGET_SAFETY_VARIANTS.map((variant) =>
+            [variant.id, variant]));
+        expect(byId.current_retarget.botOptions.hfoBottomRetarget).toMatchObject({
+            combatantAdvantage: 0,
+            maxEnemyCombatants: 4,
+        });
+        expect(byId.advantage_2.botOptions.hfoBottomRetarget?.combatantAdvantage).toBe(2);
+        expect(byId.advantage_4.botOptions.hfoBottomRetarget?.combatantAdvantage).toBe(4);
+        expect(byId.zero_enemy_combatants.botOptions.hfoBottomRetarget?.maxEnemyCombatants).toBe(0);
     });
 
     it("freezes the Korea defense mechanisms", () => {
