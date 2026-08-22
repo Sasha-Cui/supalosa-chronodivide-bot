@@ -24,12 +24,13 @@ type Winner = "candidate" | "baseline" | "draw";
 type CaseSpec = { caseIndex: number; countryOrdinal: number; country: Countries; seedOffset: number;
     requestedEngineSeed: number; candidateSlot: 0 | 1; candidateStart: string; baselineStart: string };
 type Variant = { id: string; botOptions: StrongBotOptions; strategyOptions?: StrongStrategyOptions };
-type RetargetSafety = { combatantAdvantage?: number; maxEnemyCombatants?: number };
+type RetargetSafety = { combatantAdvantage?: number; maxEnemyCombatants?: number; activationStallTicks?: number };
 
 const retarget = (mode: "stalled_rotate" | "round_robin" | "top_first" | "split", ticks: number,
     safety: RetargetSafety = {}): StrongBotOptions => ({
     hfoBottomRetarget: { enabled: true, minTick: 42_000, minAttackers: 4, maxEnemyBuildings: 6,
         combatantAdvantage: safety.combatantAdvantage ?? 0, maxEnemyCombatants: safety.maxEnemyCombatants ?? 4,
+        activationStallTicks: safety.activationStallTicks ?? 0,
         orderIntervalTicks: 6, rotationTicks: ticks, stallTicks: ticks, mode },
 });
 export const HFO_BOTTOM_RETARGET_VARIANTS: readonly Variant[] = [
@@ -51,6 +52,13 @@ export const HFO_BOTTOM_RETARGET_SAFETY_VARIANTS: readonly Variant[] = [
     { id: "advantage_2", botOptions: retarget("stalled_rotate", 600, { combatantAdvantage: 2 }) },
     { id: "advantage_4", botOptions: retarget("stalled_rotate", 600, { combatantAdvantage: 4 }) },
     { id: "zero_enemy_combatants", botOptions: retarget("stalled_rotate", 600, { maxEnemyCombatants: 0 }) },
+];
+export const HFO_BOTTOM_ACTIVATION_STALL_VARIANTS: readonly Variant[] = [
+    { id: "default", botOptions: {} },
+    { id: "current_retarget", botOptions: retarget("stalled_rotate", 600) },
+    { id: "activation_stall_600", botOptions: retarget("stalled_rotate", 600, { activationStallTicks: 600 }) },
+    { id: "activation_stall_1200", botOptions: retarget("stalled_rotate", 600, { activationStallTicks: 1_200 }) },
+    { id: "activation_stall_2400", botOptions: retarget("stalled_rotate", 600, { activationStallTicks: 2_400 }) },
 ];
 const koreaDefenseVariant = (id: string, pillboxes: number, wideGuard: boolean): Variant => ({
     id,
@@ -84,9 +92,14 @@ export const HFO_BOTTOM_RETARGET_SAFETY_SPEC = {
     casesPerCountry: 8,
     maxTicks: 90_000,
 } as const;
+export const HFO_BOTTOM_ACTIVATION_STALL_SPEC = {
+    seedBase: 4_250_000_000,
+    casesPerCountry: 8,
+    maxTicks: 90_000,
+} as const;
 
 type StudyId = "screen_v1" | "replication_v2" | "korea_defense_v3" | "korea_replication_v4" |
-    "all_country_replication_v5" | "safety_screen_v6";
+    "all_country_replication_v5" | "safety_screen_v6" | "activation_stall_screen_v7";
 type StudyConfig = { id: StudyId; seedBase: number; casesPerCountry: number; maxTicks: number;
     countries: readonly Countries[]; variants: readonly Variant[] };
 const STUDIES: Record<StudyId, StudyConfig> = {
@@ -104,11 +117,15 @@ const STUDIES: Record<StudyId, StudyConfig> = {
     safety_screen_v6: { id: "safety_screen_v6",
         ...HFO_BOTTOM_RETARGET_SAFETY_SPEC,
         countries: COUNTRIES, variants: HFO_BOTTOM_RETARGET_SAFETY_VARIANTS },
+    activation_stall_screen_v7: { id: "activation_stall_screen_v7",
+        ...HFO_BOTTOM_ACTIVATION_STALL_SPEC,
+        countries: COUNTRIES, variants: HFO_BOTTOM_ACTIVATION_STALL_VARIANTS },
 };
 const studyConfig = (): StudyConfig => {
     const id = process.env.HFO_BOTTOM_STUDY ?? "screen_v1";
     if (id !== "screen_v1" && id !== "replication_v2" && id !== "korea_defense_v3" &&
-        id !== "korea_replication_v4" && id !== "all_country_replication_v5" && id !== "safety_screen_v6") {
+        id !== "korea_replication_v4" && id !== "all_country_replication_v5" && id !== "safety_screen_v6" &&
+        id !== "activation_stall_screen_v7") {
         throw new Error("HFO_BOTTOM_STUDY is invalid");
     }
     return STUDIES[id];
@@ -388,20 +405,34 @@ const finalize = (): void => {
             summary.oneSided95WilsonLower > 0.5 && summary.draws < defaultSummary.draws &&
             summary.losses <= defaultSummary.losses && pairedLower > 0 &&
             countryNoninferiorityCount === study.countries.length && countrySuperiorityCount >= 8;
+        const activationStallEligible = variant.id.startsWith("activation_stall_") &&
+            summary.wins > summary.losses && summary.oneSided95WilsonLower > 0.5 &&
+            summary.draws < defaultSummary.draws && summary.losses <= defaultSummary.losses && pairedLower > 0 &&
+            countryNoninferiorityCount === study.countries.length && countrySuperiorityCount >= 8;
         const eligible = study.id === "replication_v2" ? replicationEligible :
             study.id === "korea_defense_v3" ? koreaDefenseEligible :
             study.id === "korea_replication_v4" ? koreaReplicationEligible :
             study.id === "all_country_replication_v5" ? allCountryReplicationEligible :
-            study.id === "safety_screen_v6" ? safetyScreenEligible : developmentEligible;
+            study.id === "safety_screen_v6" ? safetyScreenEligible :
+            study.id === "activation_stall_screen_v7" ? activationStallEligible : developmentEligible;
         return { id: variant.id, declarationIndex, summary, byCountry, pairedVersusDefault: {
             meanScoreDifference: pairedMean, sampleStandardDeviation: pairedSd,
             oneSided95TLower: pairedLower, tCritical: pairedT, degreesOfFreedom: paired.length - 1,
             improved: paired.filter((value) => value > 0).length,
             tied: paired.filter((value) => value === 0).length, worsened: paired.filter((value) => value < 0).length },
             countryNoninferiorityCount, countrySuperiorityCount, developmentEligible, replicationEligible,
-            koreaDefenseEligible, koreaReplicationEligible, allCountryReplicationEligible, safetyScreenEligible, eligible };
+            koreaDefenseEligible, koreaReplicationEligible, allCountryReplicationEligible, safetyScreenEligible,
+            activationStallEligible, eligible };
     });
     const ranked = [...variants].sort((left, right) => {
+        if (study.id === "activation_stall_screen_v7") {
+            return left.summary.losses - right.summary.losses ||
+                left.pairedVersusDefault.worsened - right.pairedVersusDefault.worsened ||
+                right.summary.wins - left.summary.wins ||
+                left.summary.draws - right.summary.draws ||
+                right.pairedVersusDefault.meanScoreDifference - left.pairedVersusDefault.meanScoreDifference ||
+                left.declarationIndex - right.declarationIndex;
+        }
         if (study.id === "safety_screen_v6") {
             return left.summary.losses - right.summary.losses ||
                 right.summary.wins - left.summary.wins ||
@@ -421,7 +452,9 @@ const finalize = (): void => {
             ? variants.find((entry) => entry.id === "pillbox_2")
             : study.id === "safety_screen_v6"
                 ? ranked.find((entry) => entry.safetyScreenEligible) ?? ranked[0]
-                : ranked[0];
+                : study.id === "activation_stall_screen_v7"
+                    ? ranked.find((entry) => entry.activationStallEligible) ?? ranked[0]
+                    : ranked[0];
     if (!winner) throw new Error("Bottom winner arm unavailable");
     const passed = winner.eligible;
     const status = study.id === "replication_v2" ?
@@ -436,6 +469,8 @@ const finalize = (): void => {
                 "FAIL_HFO_KOREA_BOTTOM_DEFENSE_REPLICATION" :
         study.id === "safety_screen_v6" ?
             passed ? "ADVANCE_HFO_BOTTOM_RETARGET_SAFETY" : "NO_ELIGIBLE_HFO_BOTTOM_RETARGET_SAFETY" :
+        study.id === "activation_stall_screen_v7" ?
+            passed ? "ADVANCE_HFO_BOTTOM_RETARGET_ACTIVATION_STALL" : "NO_ELIGIBLE_HFO_BOTTOM_RETARGET_ACTIVATION_STALL" :
             passed ? "ADVANCE_HFO_BOTTOM_RETARGET" : "NO_ELIGIBLE_HFO_BOTTOM_RETARGET";
     const artifact = { schemaVersion: 1, kind: "hfo-bottom-development-finalizer",
         status, complete: true, passed, schedulerAccount: "pi_jss233", arrayJobId,

@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+    HFO_BOTTOM_ACTIVATION_STALL_SPEC,
+    HFO_BOTTOM_ACTIVATION_STALL_VARIANTS,
     HFO_BOTTOM_REPLICATION_ARMS,
     HFO_BOTTOM_ALL_COUNTRY_REPLICATION_SPEC,
     HFO_BOTTOM_RETARGET_SAFETY_SPEC,
@@ -81,6 +83,27 @@ describe("HFO bottom building-retarget variants", () => {
         expect(byId.advantage_2.botOptions.hfoBottomRetarget?.combatantAdvantage).toBe(2);
         expect(byId.advantage_4.botOptions.hfoBottomRetarget?.combatantAdvantage).toBe(4);
         expect(byId.zero_enemy_combatants.botOptions.hfoBottomRetarget?.maxEnemyCombatants).toBe(0);
+    });
+
+    it("freezes the V7 activation-stall arms and sample", () => {
+        expect(HFO_BOTTOM_ACTIVATION_STALL_SPEC).toEqual({
+            seedBase: 4_250_000_000,
+            casesPerCountry: 8,
+            maxTicks: 90_000,
+        });
+        expect(HFO_BOTTOM_ACTIVATION_STALL_VARIANTS.map((variant) => variant.id)).toEqual([
+            "default",
+            "current_retarget",
+            "activation_stall_600",
+            "activation_stall_1200",
+            "activation_stall_2400",
+        ]);
+        const byId = Object.fromEntries(HFO_BOTTOM_ACTIVATION_STALL_VARIANTS.map((variant) =>
+            [variant.id, variant]));
+        expect(byId.current_retarget.botOptions.hfoBottomRetarget?.activationStallTicks).toBe(0);
+        expect(byId.activation_stall_600.botOptions.hfoBottomRetarget?.activationStallTicks).toBe(600);
+        expect(byId.activation_stall_1200.botOptions.hfoBottomRetarget?.activationStallTicks).toBe(1_200);
+        expect(byId.activation_stall_2400.botOptions.hfoBottomRetarget?.activationStallTicks).toBe(2_400);
     });
 
     it("freezes the Korea defense mechanisms", () => {
