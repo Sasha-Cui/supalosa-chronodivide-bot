@@ -106,4 +106,19 @@ describe("research ablation flags", () => {
         expect((new StrongStrategy({ hfoAlliedWestProfile: false }) as unknown as PrivateRecord)
             .options.hfoAlliedWestProfile).toBe(false);
     });
+
+    it("keeps retarget safety neutral by default and accepts explicit margins", () => {
+        const defaultBot = new StrongBot("default-retarget", Countries.IRAQ, [], false, new StrongStrategy(), {});
+        expect((defaultBot as unknown as PrivateRecord).hfoBottomRetargetOptions).toMatchObject({
+            enabled: false,
+            combatantAdvantage: 0,
+        });
+        const safetyBot = new StrongBot("safe-retarget", Countries.IRAQ, [], false, new StrongStrategy(), {
+            hfoBottomRetarget: { enabled: true, combatantAdvantage: 4 },
+        });
+        expect((safetyBot as unknown as PrivateRecord).hfoBottomRetargetOptions).toMatchObject({
+            enabled: true,
+            combatantAdvantage: 4,
+        });
+    });
 });

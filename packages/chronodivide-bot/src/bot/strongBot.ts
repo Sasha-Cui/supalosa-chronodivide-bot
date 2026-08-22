@@ -172,6 +172,7 @@ export type HfoBottomRetargetOptions = {
     enabled?: boolean;
     minTick?: number;
     minAttackers?: number;
+    combatantAdvantage?: number;
     maxEnemyBuildings?: number;
     maxEnemyCombatants?: number;
     orderIntervalTicks?: number;
@@ -602,6 +603,7 @@ const DEFAULT_HFO_BOTTOM_RETARGET_OPTIONS: Required<HfoBottomRetargetOptions> = 
     enabled: false,
     minTick: 42_000,
     minAttackers: 4,
+    combatantAdvantage: 0,
     maxEnemyBuildings: 6,
     maxEnemyCombatants: 4,
     orderIntervalTicks: 6,
@@ -2650,7 +2652,8 @@ export class StrongBot extends SupalosaBot {
         }
         const attackers = this.getMobileCombatants(game).filter((unit) =>
             unit.rules.name !== "DOG" && unit.rules.name !== "ADOG");
-        if (attackers.length < options.minAttackers) {
+        if (attackers.length < options.minAttackers ||
+            attackers.length < enemyCombatants.length + options.combatantAdvantage) {
             return false;
         }
 
