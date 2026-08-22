@@ -173,6 +173,7 @@ export type HfoBottomRetargetOptions = {
     minTick?: number;
     minAttackers?: number;
     combatantAdvantage?: number;
+    activationStallTicks?: number;
     maxEnemyBuildings?: number;
     maxEnemyCombatants?: number;
     orderIntervalTicks?: number;
@@ -604,6 +605,7 @@ const DEFAULT_HFO_BOTTOM_RETARGET_OPTIONS: Required<HfoBottomRetargetOptions> = 
     minTick: 42_000,
     minAttackers: 4,
     combatantAdvantage: 0,
+    activationStallTicks: 0,
     maxEnemyBuildings: 6,
     maxEnemyCombatants: 4,
     orderIntervalTicks: 6,
@@ -1326,6 +1328,7 @@ export class StrongBot extends SupalosaBot {
     private lastHfoBottomRetargetBuildingCount = Number.POSITIVE_INFINITY;
     private lastHfoBottomRetargetHitPoints = Number.POSITIVE_INFINITY;
     private hfoBottomRetargetIndex = 0;
+    private hfoBottomRetargetActivated = false;
     private lastWeakStartHomeGuardOrderAt = 0;
     private lastWeakStartCloseoutOrderAt = 0;
     private lastWeakStartPressureOrderAt = 0;
@@ -2670,6 +2673,12 @@ export class StrongBot extends SupalosaBot {
         }
         this.lastHfoBottomRetargetBuildingCount = enemyBuildings.length;
         this.lastHfoBottomRetargetHitPoints = buildingHitPoints;
+        if (!this.hfoBottomRetargetActivated) {
+            if (tick < this.lastHfoBottomRetargetProgressAt + options.activationStallTicks) {
+                return false;
+            }
+            this.hfoBottomRetargetActivated = true;
+        }
 
         const sortedBuildings = enemyBuildings.sort((left, right) => {
             if (options.mode === "top_first") {

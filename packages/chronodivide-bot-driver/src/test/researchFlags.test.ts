@@ -112,13 +112,41 @@ describe("research ablation flags", () => {
         expect((defaultBot as unknown as PrivateRecord).hfoBottomRetargetOptions).toMatchObject({
             enabled: false,
             combatantAdvantage: 0,
+            activationStallTicks: 0,
         });
         const safetyBot = new StrongBot("safe-retarget", Countries.IRAQ, [], false, new StrongStrategy(), {
-            hfoBottomRetarget: { enabled: true, combatantAdvantage: 4 },
+            hfoBottomRetarget: { enabled: true, combatantAdvantage: 4, activationStallTicks: 1_200 },
         });
         expect((safetyBot as unknown as PrivateRecord).hfoBottomRetargetOptions).toMatchObject({
             enabled: true,
             combatantAdvantage: 4,
+            activationStallTicks: 1_200,
         });
+    });
+    it("waits for pre-activation building stagnation", () => {
+
+        const bot = new StrongBot("stall-retarget", Countries.IRAQ, [], false, new StrongStrategy(), {
+            hfoBottomRetarget: { enabled: true, activationStallTicks: 1_200 },
+        });
+        const record = bot as unknown as PrivateRecord;
+        let tick = 42_000;
+        const orderUnits = vi.fn();
+        record.isHfoBottomVsTop = vi.fn(() => true);
+        record.getKnownEnemyBuildings = vi.fn(() => [{ id: 10, hitPoints: 100 }]);
+        record.getKnownEnemyCombatUnits = vi.fn(() => []);
+        record.getMobileCombatants = vi.fn(() => [1, 2, 3, 4].map((id) => ({ id, rules: { name: "HTNK" } })));
+        record.getHfoLateMopUpTargetWeight = vi.fn(() => 0);
+        record.prepareUnitsForAttackMove = vi.fn((units) => units);
+        record.context = { player: { actions: { orderUnits } } };
+        const game = { getCurrentTick: () => tick } as GameApi;
+
+        expect(record.maybeHfoBottomRetarget(game)).toBe(false);
+        expect(record.hfoBottomRetargetActivated).toBe(false);
+        tick = 43_199;
+        expect(record.maybeHfoBottomRetarget(game)).toBe(false);
+        tick = 43_200;
+        expect(record.maybeHfoBottomRetarget(game)).toBe(true);
+        expect(record.hfoBottomRetargetActivated).toBe(true);
+        expect(orderUnits).toHaveBeenCalledOnce();
     });
 });
