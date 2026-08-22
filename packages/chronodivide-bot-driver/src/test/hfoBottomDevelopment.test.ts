@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
     HFO_BOTTOM_ACTIVATION_STALL_SPEC,
     HFO_BOTTOM_ACTIVATION_STALL_VARIANTS,
+    HFO_BOTTOM_ACTIVATION_STALL_REPLICATION_ARMS,
+    HFO_BOTTOM_ACTIVATION_STALL_REPLICATION_SPEC,
     HFO_BOTTOM_REPLICATION_ARMS,
     HFO_BOTTOM_ALL_COUNTRY_REPLICATION_SPEC,
     HFO_BOTTOM_RETARGET_SAFETY_SPEC,
@@ -104,6 +106,25 @@ describe("HFO bottom building-retarget variants", () => {
         expect(byId.activation_stall_600.botOptions.hfoBottomRetarget?.activationStallTicks).toBe(600);
         expect(byId.activation_stall_1200.botOptions.hfoBottomRetarget?.activationStallTicks).toBe(1_200);
         expect(byId.activation_stall_2400.botOptions.hfoBottomRetarget?.activationStallTicks).toBe(2_400);
+    });
+    it("freezes the V8 activation-stall replication", () => {
+        expect(HFO_BOTTOM_ACTIVATION_STALL_REPLICATION_SPEC).toEqual({
+            seedBase: 4_251_000_000,
+            casesPerCountry: 30,
+            maxTicks: 90_000,
+        });
+        expect(HFO_BOTTOM_ACTIVATION_STALL_REPLICATION_ARMS.map((variant) => variant.id)).toEqual([
+            "default",
+            "current_retarget",
+            "winner_activation_stall_1200",
+        ]);
+        const winner = HFO_BOTTOM_ACTIVATION_STALL_REPLICATION_ARMS[2].botOptions.hfoBottomRetarget;
+        expect(winner).toMatchObject({
+            enabled: true,
+            activationStallTicks: 1_200,
+            stallTicks: 600,
+            rotationTicks: 600,
+        });
     });
 
     it("freezes the Korea defense mechanisms", () => {

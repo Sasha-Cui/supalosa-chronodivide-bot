@@ -60,6 +60,11 @@ export const HFO_BOTTOM_ACTIVATION_STALL_VARIANTS: readonly Variant[] = [
     { id: "activation_stall_1200", botOptions: retarget("stalled_rotate", 600, { activationStallTicks: 1_200 }) },
     { id: "activation_stall_2400", botOptions: retarget("stalled_rotate", 600, { activationStallTicks: 2_400 }) },
 ];
+export const HFO_BOTTOM_ACTIVATION_STALL_REPLICATION_ARMS: readonly Variant[] = [
+    { id: "default", botOptions: {} },
+    { id: "current_retarget", botOptions: retarget("stalled_rotate", 600) },
+    { id: "winner_activation_stall_1200", botOptions: retarget("stalled_rotate", 600, { activationStallTicks: 1_200 }) },
+];
 const koreaDefenseVariant = (id: string, pillboxes: number, wideGuard: boolean): Variant => ({
     id,
     botOptions: {
@@ -97,9 +102,14 @@ export const HFO_BOTTOM_ACTIVATION_STALL_SPEC = {
     casesPerCountry: 8,
     maxTicks: 90_000,
 } as const;
+export const HFO_BOTTOM_ACTIVATION_STALL_REPLICATION_SPEC = {
+    seedBase: 4_251_000_000,
+    casesPerCountry: 30,
+    maxTicks: 90_000,
+} as const;
 
 type StudyId = "screen_v1" | "replication_v2" | "korea_defense_v3" | "korea_replication_v4" |
-    "all_country_replication_v5" | "safety_screen_v6" | "activation_stall_screen_v7";
+    "all_country_replication_v5" | "safety_screen_v6" | "activation_stall_screen_v7" | "activation_stall_replication_v8";
 type StudyConfig = { id: StudyId; seedBase: number; casesPerCountry: number; maxTicks: number;
     countries: readonly Countries[]; variants: readonly Variant[] };
 const STUDIES: Record<StudyId, StudyConfig> = {
@@ -120,12 +130,15 @@ const STUDIES: Record<StudyId, StudyConfig> = {
     activation_stall_screen_v7: { id: "activation_stall_screen_v7",
         ...HFO_BOTTOM_ACTIVATION_STALL_SPEC,
         countries: COUNTRIES, variants: HFO_BOTTOM_ACTIVATION_STALL_VARIANTS },
+    activation_stall_replication_v8: { id: "activation_stall_replication_v8",
+        ...HFO_BOTTOM_ACTIVATION_STALL_REPLICATION_SPEC,
+        countries: COUNTRIES, variants: HFO_BOTTOM_ACTIVATION_STALL_REPLICATION_ARMS },
 };
 const studyConfig = (): StudyConfig => {
     const id = process.env.HFO_BOTTOM_STUDY ?? "screen_v1";
     if (id !== "screen_v1" && id !== "replication_v2" && id !== "korea_defense_v3" &&
         id !== "korea_replication_v4" && id !== "all_country_replication_v5" && id !== "safety_screen_v6" &&
-        id !== "activation_stall_screen_v7") {
+        id !== "activation_stall_screen_v7" && id !== "activation_stall_replication_v8") {
         throw new Error("HFO_BOTTOM_STUDY is invalid");
     }
     return STUDIES[id];
@@ -372,13 +385,27 @@ const finalize = (): void => {
         "retarget_control" : "default";
     const defaultRows = rows.filter((row) => row.variantId === controlId), defaultSummary = summarize(defaultRows);
     if (defaultRows.length !== caseCount) throw new Error(`Bottom control ${controlId} coverage drifted`);
+    const score = (winner: Winner): number => winner === "candidate" ? 1 : winner === "draw" ? 0.5 : 0;
+    const currentRetargetRows = rows.filter((row) => row.variantId === "current_retarget");
+    const currentRetargetSummary = currentRetargetRows.length === caseCount ? summarize(currentRetargetRows) : null;
+    const currentRetargetWorsened = currentRetargetSummary ? currentRetargetRows.filter((row) =>
+        score(row.winner) < score(defaultRows.find((entry) => entry.caseIndex === row.caseIndex)?.winner ?? "draw"))
+        .length : null;
+
     const variants = study.variants.map((variant, declarationIndex) => {
         const variantRows = rows.filter((row) => row.variantId === variant.id), summary = summarize(variantRows);
         const byCountry = Object.fromEntries(study.countries.map((country) =>
             [country, summarize(variantRows.filter((row) => row.country === country))]));
-        const score = (winner: Winner): number => winner === "candidate" ? 1 : winner === "draw" ? 0.5 : 0;
         const paired = variantRows.map((row) => score(row.winner) -
             score(defaultRows.find((entry) => entry.caseIndex === row.caseIndex)?.winner ?? "draw"));
+        const versusCurrent = currentRetargetSummary ? variantRows.map((row) => score(row.winner) -
+            score(currentRetargetRows.find((entry) => entry.caseIndex === row.caseIndex)?.winner ?? "draw")) : null;
+        const pairedVersusCurrent = versusCurrent ? {
+            meanScoreDifference: versusCurrent.reduce((total, value) => total + value, 0) / versusCurrent.length,
+            improved: versusCurrent.filter((value) => value > 0).length,
+            tied: versusCurrent.filter((value) => value === 0).length,
+            worsened: versusCurrent.filter((value) => value < 0).length,
+        } : null;
         const pairedMean = paired.reduce((total, value) => total + value, 0) / paired.length;
         const pairedSd = sampleStandardDeviation(paired);
         const pairedT = paired.length === 270 ? 1.65065 : paired.length === 72 ? 1.66660 :
@@ -409,20 +436,29 @@ const finalize = (): void => {
             summary.wins > summary.losses && summary.oneSided95WilsonLower > 0.5 &&
             summary.draws < defaultSummary.draws && summary.losses <= defaultSummary.losses && pairedLower > 0 &&
             countryNoninferiorityCount === study.countries.length && countrySuperiorityCount >= 8;
+        const activationStallReplicationEligible = variant.id === "winner_activation_stall_1200" &&
+            currentRetargetSummary !== null && currentRetargetWorsened !== null &&
+            summary.wins > summary.losses && summary.oneSided95WilsonLower > 0.5 &&
+            summary.draws < defaultSummary.draws && summary.losses <= defaultSummary.losses &&
+            summary.losses <= currentRetargetSummary.losses && pairedLower > 0 &&
+            paired.filter((value) => value < 0).length <= currentRetargetWorsened &&
+            countryNoninferiorityCount === study.countries.length && countrySuperiorityCount >= 8;
+
         const eligible = study.id === "replication_v2" ? replicationEligible :
             study.id === "korea_defense_v3" ? koreaDefenseEligible :
             study.id === "korea_replication_v4" ? koreaReplicationEligible :
             study.id === "all_country_replication_v5" ? allCountryReplicationEligible :
             study.id === "safety_screen_v6" ? safetyScreenEligible :
-            study.id === "activation_stall_screen_v7" ? activationStallEligible : developmentEligible;
-        return { id: variant.id, declarationIndex, summary, byCountry, pairedVersusDefault: {
+            study.id === "activation_stall_screen_v7" ? activationStallEligible :
+            study.id === "activation_stall_replication_v8" ? activationStallReplicationEligible : developmentEligible;
+        return { id: variant.id, declarationIndex, summary, byCountry, pairedVersusCurrent, pairedVersusDefault: {
             meanScoreDifference: pairedMean, sampleStandardDeviation: pairedSd,
             oneSided95TLower: pairedLower, tCritical: pairedT, degreesOfFreedom: paired.length - 1,
             improved: paired.filter((value) => value > 0).length,
             tied: paired.filter((value) => value === 0).length, worsened: paired.filter((value) => value < 0).length },
             countryNoninferiorityCount, countrySuperiorityCount, developmentEligible, replicationEligible,
             koreaDefenseEligible, koreaReplicationEligible, allCountryReplicationEligible, safetyScreenEligible,
-            activationStallEligible, eligible };
+            activationStallEligible, activationStallReplicationEligible, eligible };
     });
     const ranked = [...variants].sort((left, right) => {
         if (study.id === "activation_stall_screen_v7") {
@@ -454,7 +490,9 @@ const finalize = (): void => {
                 ? ranked.find((entry) => entry.safetyScreenEligible) ?? ranked[0]
                 : study.id === "activation_stall_screen_v7"
                     ? ranked.find((entry) => entry.activationStallEligible) ?? ranked[0]
-                    : ranked[0];
+                    : study.id === "activation_stall_replication_v8"
+                        ? variants.find((entry) => entry.id === "winner_activation_stall_1200")
+                        : ranked[0];
     if (!winner) throw new Error("Bottom winner arm unavailable");
     const passed = winner.eligible;
     const status = study.id === "replication_v2" ?
@@ -471,12 +509,15 @@ const finalize = (): void => {
             passed ? "ADVANCE_HFO_BOTTOM_RETARGET_SAFETY" : "NO_ELIGIBLE_HFO_BOTTOM_RETARGET_SAFETY" :
         study.id === "activation_stall_screen_v7" ?
             passed ? "ADVANCE_HFO_BOTTOM_RETARGET_ACTIVATION_STALL" : "NO_ELIGIBLE_HFO_BOTTOM_RETARGET_ACTIVATION_STALL" :
+        study.id === "activation_stall_replication_v8" ?
+            passed ? "PASS_HFO_BOTTOM_ACTIVATION_STALL_REPLICATION" : "FAIL_HFO_BOTTOM_ACTIVATION_STALL_REPLICATION" :
             passed ? "ADVANCE_HFO_BOTTOM_RETARGET" : "NO_ELIGIBLE_HFO_BOTTOM_RETARGET";
     const artifact = { schemaVersion: 1, kind: "hfo-bottom-development-finalizer",
         status, complete: true, passed, schedulerAccount: "pi_jss233", arrayJobId,
         finalizerJobId: process.env.SLURM_JOB_ID, sourceCommit: [...sources][0], programSha256, cellProgramSha256,
         protocolSha256: inputs.protocolSha256, assetManifestSha256: inputs.assetManifestSha256,
-        selectionSha256, studyId: study.id, launchedGameCount: rows.length, variants, ranking: ranked.map((entry) => entry.id),
+        selectionSha256, studyId: study.id, launchedGameCount: rows.length, variants,
+        calibration: { currentRetargetSummary, currentRetargetWorsened }, ranking: ranked.map((entry) => entry.id),
         winner, schedulerJobIds: [...tasks.values()], rows };
     fs.mkdirSync(path.dirname(outputPath), { recursive: true, mode: 0o700 });
     fs.writeFileSync(outputPath, JSON.stringify(artifact, null, 2) + "\n", { flag: "wx", mode: 0o600 });
