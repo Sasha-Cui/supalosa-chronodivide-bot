@@ -19,7 +19,7 @@ const OPPOSITE: Record<typeof STARTS[number], typeof STARTS[number]> = {
     "39,82": "151,119", "151,119": "39,82", "88,34": "88,157", "88,157": "88,34",
 };
 export const HFO_BOTTOM_RETARGET_ISOLATION_SPEC = {
-    seedBase: 4_252_000_000, maxOffsets: 400, maxTicks: 24_000, snapshotInterval: 600,
+    seedBase: 4_253_000_000, maxOffsets: 400, maxTicks: 36_000, snapshotInterval: 600,
     caseCount: 36, activeCaseCount: 9, inactiveCaseCount: 27,
 } as const;
 const { seedBase: SEED_BASE, maxOffsets: MAX_OFFSETS, maxTicks: MAX_TICKS,

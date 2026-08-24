@@ -7,9 +7,9 @@ import {
 describe("HFO bottom retarget activation isolation", () => {
     it("freezes the complete country-start trace matrix", () => {
         expect(HFO_BOTTOM_RETARGET_ISOLATION_SPEC).toEqual({
-            seedBase: 4_252_000_000,
+            seedBase: 4_253_000_000,
             maxOffsets: 400,
-            maxTicks: 24_000,
+            maxTicks: 36_000,
             snapshotInterval: 600,
             caseCount: 36,
             activeCaseCount: 9,
