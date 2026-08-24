@@ -11,6 +11,8 @@ import {
     HFO_KOREA_BOTTOM_DEFENSE_VARIANTS,
     HFO_SOVIET_WEST_RETARGET_SPEC,
     HFO_SOVIET_WEST_RETARGET_VARIANTS,
+    HFO_SOVIET_WEST_EARLY_SPEC,
+    HFO_SOVIET_WEST_EARLY_VARIANTS,
     HFO_KOREA_BOTTOM_REPLICATION_ARMS,
     HFO_BOTTOM_RETARGET_VARIANTS,
 } from "../training/hfoBottomDevelopment.js";
@@ -128,6 +130,7 @@ describe("HFO bottom building-retarget variants", () => {
             rotationTicks: 600,
         });
     });
+
     it("freezes the Soviet-west retarget screen", () => {
         expect(HFO_SOVIET_WEST_RETARGET_SPEC).toEqual({
             seedBase: 4_254_000_000,
@@ -148,6 +151,28 @@ describe("HFO bottom building-retarget variants", () => {
         expect(byId.activation_stall_1200.botOptions.hfoWestRetarget?.activationStallTicks).toBe(1_200);
         expect(byId.activation_stall_2400.botOptions.hfoWestRetarget?.activationStallTicks).toBe(2_400);
         expect(byId.activation_stall_1200.botOptions.hfoWestRetarget?.sovietOnly).toBe(true);
+    });
+    it("freezes the Soviet-west early-retarget screen", () => {
+        expect(HFO_SOVIET_WEST_EARLY_SPEC).toEqual({
+            seedBase: 4_255_000_000,
+            casesPerCountry: 10,
+            maxTicks: 90_000,
+            candidateStart: "39,82",
+            baselineStart: "151,119",
+        });
+        expect(HFO_SOVIET_WEST_EARLY_VARIANTS.map((variant) => variant.id)).toEqual([
+            "default",
+            "current_42000",
+            "early_18000",
+            "early_24000",
+            "early_30000",
+        ]);
+        const byId = Object.fromEntries(HFO_SOVIET_WEST_EARLY_VARIANTS.map((variant) =>
+            [variant.id, variant]));
+        expect(byId.current_42000.botOptions.hfoWestRetarget?.minTick).toBe(42_000);
+        expect(byId.early_18000.botOptions.hfoWestRetarget?.minTick).toBe(18_000);
+        expect(byId.early_24000.botOptions.hfoWestRetarget?.minTick).toBe(24_000);
+        expect(byId.early_30000.botOptions.hfoWestRetarget?.minTick).toBe(30_000);
     });
 
     it("freezes the Korea defense mechanisms", () => {
