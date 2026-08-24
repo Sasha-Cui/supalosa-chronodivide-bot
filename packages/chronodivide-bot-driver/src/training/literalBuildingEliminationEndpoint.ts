@@ -1,5 +1,4 @@
-import { ApiEvent, ApiEventType, GameApi, ObjectType } from "@chronodivide/game-api";
-import { InspectableBaselineBot } from "../benchmark/baselineLoader.js";
+import { ActionsApi, ApiEvent, ApiEventType, GameApi, ObjectType } from "@chronodivide/game-api";
 
 export const LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION = 5 as const;
 export const LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256 =
@@ -470,8 +469,14 @@ export type QuitSuppressionAudit = {
     forwarded: EndpointCounts;
 };
 
+type LiteralEndpointInstrumentedBot = {
+    lastPlayerActions: ActionsApi | null;
+    onGameStart(game: GameApi): void;
+    onGameEvent: (...args: any[]) => void;
+};
+
 export const installLiteralEndpointInstrumentation = (
-    bots: Record<EndpointSide, InspectableBaselineBot>,
+    bots: Record<EndpointSide, LiteralEndpointInstrumentedBot>,
     adjudicator: LiteralBuildingEliminationAdjudicator,
 ): { audit: QuitSuppressionAudit } => {
     const audit: QuitSuppressionAudit = {
@@ -495,11 +500,11 @@ export const installLiteralEndpointInstrumentation = (
             });
         };
         const originalEvent = bot.onGameEvent.bind(bot);
-        bot.onGameEvent = (event: ApiEvent): void => {
+        bot.onGameEvent = (event: ApiEvent, ...args: unknown[]): void => {
             // The engine dispatches the same public event stream to both bots;
             // the adjudicator deduplicates the symmetric observations.
             adjudicator.observe(event);
-            originalEvent(event);
+            originalEvent(event, ...args);
         };
     }
     return { audit };
