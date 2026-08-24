@@ -17,6 +17,7 @@ import { DefaultStrategy, DefaultStrategyOptions } from "./defaultStrategy.js";
 export type StrongStrategyOptions = {
     defaultMapProfiles?: boolean;
     hfoAlliedWestProfile?: boolean;
+    hfoSovietWestProfile?: boolean;
     preserveBaselineCore?: boolean;
     base?: DefaultStrategyOptions;
     allIn?: AllInAttackMissionFactoryOptions;
@@ -63,11 +64,23 @@ const ALLIED_COUNTRIES = new Set<string>([
     Countries.GERMANY,
     Countries.GREAT_BRITAIN,
 ]);
+const SOVIET_COUNTRIES = new Set<string>([
+    Countries.LIBYA,
+    Countries.IRAQ,
+    Countries.CUBA,
+    Countries.RUSSIA,
+]);
 
 const HFO_ALLIED_WEST_WINNER_PROFILE: StrongStrategyOptions = {
     base: { attackCompositionPolicy: "hfo" },
     strategicPlan: { enabled: true, plan: "rush" },
     hfoAlliedWestProfile: false,
+};
+const HFO_SOVIET_WEST_WINNER_PROFILE: StrongStrategyOptions = {
+    base: { attackCompositionPolicy: "hfo" },
+    strategicPlan: { enabled: true, plan: "rush" },
+    hfoAlliedWestProfile: false,
+    hfoSovietWestProfile: false,
 };
 
 const NAVAL_PROFILE: StrongStrategyOptions = {
@@ -849,6 +862,15 @@ export class StrongStrategy implements Strategy {
                 this.buildingEliminationTelemetrySink,
             ).onAiUpdate(context, missionController, logger);
         }
+        if ((this.options.defaultMapProfiles ?? true) &&
+            (this.options.hfoSovietWestProfile ?? false) &&
+            this.isHfoSovietWestStart(context)) {
+            logger("Strong strategy profile: hfoSovietWestWinner");
+            return new StrongStrategy(
+                HFO_SOVIET_WEST_WINNER_PROFILE,
+                this.buildingEliminationTelemetrySink,
+            ).onAiUpdate(context, missionController, logger);
+        }
         if ((this.options.defaultMapProfiles ?? true) && !hasExplicitProfileOptions(this.options)) {
             if (this.isSimple1v1Map(context)) {
                 logger("Strong strategy profile: simpleInfantry");
@@ -947,6 +969,12 @@ export class StrongStrategy implements Strategy {
     private isHfoAlliedWestStart(context: SupabotContext): boolean {
         const countryName = (context.game.getPlayerData(context.player.name).country as { name?: string } | undefined)?.name;
         return countryName !== undefined && ALLIED_COUNTRIES.has(countryName) &&
+            this.isKnownStartProfile(context, HFO_STARTS, HFO_WEST_START);
+    }
+
+    private isHfoSovietWestStart(context: SupabotContext): boolean {
+        const countryName = (context.game.getPlayerData(context.player.name).country as { name?: string } | undefined)?.name;
+        return countryName !== undefined && SOVIET_COUNTRIES.has(countryName) &&
             this.isKnownStartProfile(context, HFO_STARTS, HFO_WEST_START);
     }
 

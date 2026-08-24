@@ -105,8 +105,11 @@ describe("research ablation flags", () => {
         expect((disabledBot as unknown as PrivateRecord).hfoWestHomeGuardOptions.enabled).toBe(false);
         expect((disabledBot as unknown as PrivateRecord).hfoBottomRetargetOptions.enabled).toBe(false);
         expect((new StrongStrategy() as unknown as PrivateRecord).options.hfoAlliedWestProfile).toBeUndefined();
+        expect((new StrongStrategy() as unknown as PrivateRecord).options.hfoSovietWestProfile).toBeUndefined();
         expect((new StrongStrategy({ hfoAlliedWestProfile: false }) as unknown as PrivateRecord)
             .options.hfoAlliedWestProfile).toBe(false);
+        expect((new StrongStrategy({ hfoSovietWestProfile: true }) as unknown as PrivateRecord)
+            .options.hfoSovietWestProfile).toBe(true);
     });
 
     it("enables the replicated bottom retarget and accepts explicit margins", () => {
