@@ -601,11 +601,11 @@ const DEFAULT_HFO_WEST_HOME_GUARD_OPTIONS: Required<HfoWestHomeGuardOptions> = {
 };
 
 const DEFAULT_HFO_BOTTOM_RETARGET_OPTIONS: Required<HfoBottomRetargetOptions> = {
-    enabled: false,
+    enabled: true,
     minTick: 42_000,
     minAttackers: 4,
     combatantAdvantage: 0,
-    activationStallTicks: 0,
+    activationStallTicks: 1_200,
     maxEnemyBuildings: 6,
     maxEnemyCombatants: 4,
     orderIntervalTicks: 6,

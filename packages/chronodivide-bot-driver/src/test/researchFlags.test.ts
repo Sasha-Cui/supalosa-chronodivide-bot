@@ -95,24 +95,26 @@ describe("research ablation flags", () => {
             engageCombatantAdvantage: 0,
             alliedOnly: true,
         });
-        expect((defaultBot as unknown as PrivateRecord).hfoBottomRetargetOptions.enabled).toBe(false);
+        expect((defaultBot as unknown as PrivateRecord).hfoBottomRetargetOptions.enabled).toBe(true);
 
         const disabledBot = new StrongBot("disabled-west", Countries.USA, [], false,
             new StrongStrategy({ hfoAlliedWestProfile: false }), {
                 hfoWestHomeGuard: { enabled: false },
+                hfoBottomRetarget: { enabled: false },
             });
         expect((disabledBot as unknown as PrivateRecord).hfoWestHomeGuardOptions.enabled).toBe(false);
+        expect((disabledBot as unknown as PrivateRecord).hfoBottomRetargetOptions.enabled).toBe(false);
         expect((new StrongStrategy() as unknown as PrivateRecord).options.hfoAlliedWestProfile).toBeUndefined();
         expect((new StrongStrategy({ hfoAlliedWestProfile: false }) as unknown as PrivateRecord)
             .options.hfoAlliedWestProfile).toBe(false);
     });
 
-    it("keeps retarget safety neutral by default and accepts explicit margins", () => {
+    it("enables the replicated bottom retarget and accepts explicit margins", () => {
         const defaultBot = new StrongBot("default-retarget", Countries.IRAQ, [], false, new StrongStrategy(), {});
         expect((defaultBot as unknown as PrivateRecord).hfoBottomRetargetOptions).toMatchObject({
-            enabled: false,
+            enabled: true,
             combatantAdvantage: 0,
-            activationStallTicks: 0,
+            activationStallTicks: 1_200,
         });
         const safetyBot = new StrongBot("safe-retarget", Countries.IRAQ, [], false, new StrongStrategy(), {
             hfoBottomRetarget: { enabled: true, combatantAdvantage: 4, activationStallTicks: 1_200 },
@@ -124,7 +126,6 @@ describe("research ablation flags", () => {
         });
     });
     it("waits for pre-activation building stagnation", () => {
-
         const bot = new StrongBot("stall-retarget", Countries.IRAQ, [], false, new StrongStrategy(), {
             hfoBottomRetarget: { enabled: true, activationStallTicks: 1_200 },
         });
