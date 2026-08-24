@@ -15,6 +15,8 @@ import {
     HFO_SOVIET_WEST_EARLY_VARIANTS,
     HFO_SOVIET_WEST_FACTORIAL_SPEC,
     HFO_SOVIET_WEST_FACTORIAL_VARIANTS,
+    HFO_SOVIET_WEST_REPLICATION_SPEC,
+    HFO_SOVIET_WEST_REPLICATION_ARMS,
     HFO_KOREA_BOTTOM_REPLICATION_ARMS,
     HFO_BOTTOM_RETARGET_VARIANTS,
 } from "../training/hfoBottomDevelopment.js";
@@ -197,6 +199,30 @@ describe("HFO bottom building-retarget variants", () => {
         expect(byId.guard_only.botOptions.hfoWestHomeGuard?.alliedOnly).toBe(false);
         expect(byId.rush_guard.strategyOptions?.base?.attackCompositionPolicy).toBe("hfo");
         expect(byId.rush_guard.botOptions.hfoWestHomeGuard?.enabled).toBe(true);
+    });
+    it("freezes the Soviet-west rush-guard replication", () => {
+        expect(HFO_SOVIET_WEST_REPLICATION_SPEC).toEqual({
+            seedBase: 4_257_000_000,
+            casesPerCountry: 30,
+            maxTicks: 90_000,
+            candidateStart: "39,82",
+            baselineStart: "151,119",
+        });
+        expect(HFO_SOVIET_WEST_REPLICATION_ARMS.map((variant) => variant.id)).toEqual([
+            "default",
+            "winner_rush_guard",
+        ]);
+        const winner = HFO_SOVIET_WEST_REPLICATION_ARMS[1];
+        expect(winner.strategyOptions).toEqual({
+            hfoAlliedWestProfile: false,
+            base: { attackCompositionPolicy: "hfo" },
+            strategicPlan: { enabled: true, plan: "rush" },
+        });
+        expect(winner.botOptions.hfoWestHomeGuard).toEqual({
+            enabled: true, untilTick: 9_600, radius: 72, orderIntervalTicks: 6,
+            engageMinCombatants: 4, engageCombatantAdvantage: 0, alliedOnly: false,
+        });
+        expect(winner.botOptions.hfoWestRetarget).toBeUndefined();
     });
 
     it("freezes the Korea defense mechanisms", () => {
