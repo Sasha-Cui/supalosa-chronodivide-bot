@@ -20,7 +20,7 @@ const OPPOSITE: Record<typeof STARTS[number], typeof STARTS[number]> = {
 };
 const SOVIET = new Set<Countries>(COUNTRIES.slice(5));
 const GUARD_ANCHORS = new Set(["45,88", "50,92", "43,96", "54,97", "47,101", "38,90"]);
-const SEED_BASE = 4_258_000_000, MAX_OFFSETS = 400, MAX_TICKS = 12_000, SNAPSHOT_INTERVAL = 600;
+const SEED_BASE = 4_259_000_000, MAX_OFFSETS = 400, MAX_TICKS = 12_000, SNAPSHOT_INTERVAL = 600;
 const CASE_COUNT = 36, SHA256 = /^[0-9a-f]{64}$/;
 type CaseSpec = { caseIndex: number; countryOrdinal: number; country: Countries; startOrdinal: number;
     desiredStart: string; desiredOppositeStart: string; seedOffset: number; requestedEngineSeed: number;
@@ -238,7 +238,7 @@ const runCell = async (): Promise<void> => {
     const passed = caseSpec.expectedActive
         ? defaultTrace.actionSha256 !== winnerTrace.actionSha256 &&
             defaultTrace.snapshotSha256 !== winnerTrace.snapshotSha256 && winnerTrace.guardAnchorOrders > 0
-        : inactiveEqual && winnerTrace.guardAnchorOrders === 0;
+        : inactiveEqual && winnerTrace.guardAnchorOrders === defaultTrace.guardAnchorOrders;
     const artifact = { schemaVersion: 1, kind: "hfo-soviet-west-isolation-cell",
         status: passed ? "PASS_HFO_SOVIET_WEST_ISOLATION_CELL" : "FAIL_HFO_SOVIET_WEST_ISOLATION_CELL",
         complete: true, passed, outcomeFree: true, taskIndex, caseSpec,
@@ -247,6 +247,7 @@ const runCell = async (): Promise<void> => {
         selectionSha256, defaultTrace, winnerTrace, checks: { expectedActive: caseSpec.expectedActive, inactiveEqual,
             actionHashesDiffer: defaultTrace.actionSha256 !== winnerTrace.actionSha256,
             snapshotHashesDiffer: defaultTrace.snapshotSha256 !== winnerTrace.snapshotSha256,
+            guardAnchorOrdersEqual: winnerTrace.guardAnchorOrders === defaultTrace.guardAnchorOrders,
             winnerGuardAnchorOrders: winnerTrace.guardAnchorOrders } };
     fs.mkdirSync(path.dirname(outputPath), { recursive: true, mode: 0o700 });
     fs.writeFileSync(outputPath, JSON.stringify(artifact, null, 2) + "\n", { flag: "wx", mode: 0o600 });

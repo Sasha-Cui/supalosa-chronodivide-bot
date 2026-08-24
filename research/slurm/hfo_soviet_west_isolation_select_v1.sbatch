@@ -26,7 +26,7 @@ cd "$REPO"; [[ "$(git branch --show-current)" == main && -z "$(git status --porc
 [[ "$(git rev-parse HEAD)" == "$(git rev-parse fork/main)" ]] || exit 2
 cd "$DRIVER"; export MODE=select OUT_PATH="$RESULTS_ROOT/selection.json"
 export PROGRAM_PATH="$DRIVER/dist/training/hfoSovietWestIsolation.js"
-export PROTOCOL_PATH="$REPO/research/protocols/hfo-west/2026-08-24-soviet-rush-guard-activation-isolation-v5.md"
+export PROTOCOL_PATH="$REPO/research/protocols/hfo-west/2026-08-24-soviet-rush-guard-activation-isolation-v6.md"
 [[ "$(sha256sum "$PROGRAM_PATH"|awk '{print $1}')" == "$PROGRAM_SHA256" ]] || exit 2
 export PROGRAM_SHA256 PROTOCOL_SHA256 MIX_DIR ASSET_MANIFEST_PATH ASSET_MANIFEST_SHA256
 export BASELINE_PACKAGE_ROOT="$BASELINE" REQUIRE_EXTERNAL_BASELINE=true
