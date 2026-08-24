@@ -25,7 +25,7 @@ country/start cell. Require 36 unique cases, nine expected-active bottom cells,
 
 ## Trace arms
 
-Each cell runs two same-seed arms for 600 ticks:
+Each cell runs two same-seed arms for 24,000 ticks:
 
 1. `disabled`: bottom retarget explicitly disabled.
 2. `exposure_enabled`: the same controller with a time-compressed technical
