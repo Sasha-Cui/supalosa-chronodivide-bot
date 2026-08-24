@@ -13,6 +13,8 @@ import {
     HFO_SOVIET_WEST_RETARGET_VARIANTS,
     HFO_SOVIET_WEST_EARLY_SPEC,
     HFO_SOVIET_WEST_EARLY_VARIANTS,
+    HFO_SOVIET_WEST_FACTORIAL_SPEC,
+    HFO_SOVIET_WEST_FACTORIAL_VARIANTS,
     HFO_KOREA_BOTTOM_REPLICATION_ARMS,
     HFO_BOTTOM_RETARGET_VARIANTS,
 } from "../training/hfoBottomDevelopment.js";
@@ -152,6 +154,7 @@ describe("HFO bottom building-retarget variants", () => {
         expect(byId.activation_stall_2400.botOptions.hfoWestRetarget?.activationStallTicks).toBe(2_400);
         expect(byId.activation_stall_1200.botOptions.hfoWestRetarget?.sovietOnly).toBe(true);
     });
+
     it("freezes the Soviet-west early-retarget screen", () => {
         expect(HFO_SOVIET_WEST_EARLY_SPEC).toEqual({
             seedBase: 4_255_000_000,
@@ -173,6 +176,27 @@ describe("HFO bottom building-retarget variants", () => {
         expect(byId.early_18000.botOptions.hfoWestRetarget?.minTick).toBe(18_000);
         expect(byId.early_24000.botOptions.hfoWestRetarget?.minTick).toBe(24_000);
         expect(byId.early_30000.botOptions.hfoWestRetarget?.minTick).toBe(30_000);
+    });
+    it("freezes the Soviet-west rush-guard factorial", () => {
+        expect(HFO_SOVIET_WEST_FACTORIAL_SPEC).toEqual({
+            seedBase: 4_256_000_000,
+            casesPerCountry: 10,
+            maxTicks: 90_000,
+            candidateStart: "39,82",
+            baselineStart: "151,119",
+        });
+        expect(HFO_SOVIET_WEST_FACTORIAL_VARIANTS.map((variant) => variant.id)).toEqual([
+            "default",
+            "rush_only",
+            "guard_only",
+            "rush_guard",
+        ]);
+        const byId = Object.fromEntries(HFO_SOVIET_WEST_FACTORIAL_VARIANTS.map((variant) =>
+            [variant.id, variant]));
+        expect(byId.rush_only.strategyOptions?.strategicPlan?.plan).toBe("rush");
+        expect(byId.guard_only.botOptions.hfoWestHomeGuard?.alliedOnly).toBe(false);
+        expect(byId.rush_guard.strategyOptions?.base?.attackCompositionPolicy).toBe("hfo");
+        expect(byId.rush_guard.botOptions.hfoWestHomeGuard?.enabled).toBe(true);
     });
 
     it("freezes the Korea defense mechanisms", () => {

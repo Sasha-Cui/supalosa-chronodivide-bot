@@ -85,6 +85,20 @@ export const HFO_SOVIET_WEST_EARLY_VARIANTS: readonly Variant[] = [
     { id: "early_24000", botOptions: westRetarget(24_000, 1_200) },
     { id: "early_30000", botOptions: westRetarget(30_000, 1_200) },
 ];
+const sovietWestFactorialVariant = (id: string, rush: boolean, guard: boolean): Variant => ({
+    id,
+    strategyOptions: rush ? { hfoAlliedWestProfile: false, base: { attackCompositionPolicy: "hfo" },
+        strategicPlan: { enabled: true, plan: "rush" } } : {},
+    botOptions: guard ? { hfoWestHomeGuard: { enabled: true, untilTick: 9_600, radius: 72,
+        orderIntervalTicks: 6, engageMinCombatants: 4, engageCombatantAdvantage: 0, alliedOnly: false } } : {},
+});
+export const HFO_SOVIET_WEST_FACTORIAL_VARIANTS: readonly Variant[] = [
+    { id: "default", botOptions: {} },
+    sovietWestFactorialVariant("rush_only", true, false),
+    sovietWestFactorialVariant("guard_only", false, true),
+    sovietWestFactorialVariant("rush_guard", true, true),
+];
+
 const koreaDefenseVariant = (id: string, pillboxes: number, wideGuard: boolean): Variant => ({
     id,
     botOptions: {
@@ -135,9 +149,13 @@ export const HFO_SOVIET_WEST_EARLY_SPEC = {
     seedBase: 4_255_000_000, casesPerCountry: 10, maxTicks: 90_000,
     candidateStart: WEST, baselineStart: EAST,
 } as const;
+export const HFO_SOVIET_WEST_FACTORIAL_SPEC = {
+    seedBase: 4_256_000_000, casesPerCountry: 10, maxTicks: 90_000,
+    candidateStart: WEST, baselineStart: EAST,
+} as const;
 
 type StudyId = "screen_v1" | "replication_v2" | "korea_defense_v3" | "korea_replication_v4" |
-    "all_country_replication_v5" | "safety_screen_v6" | "activation_stall_screen_v7" | "activation_stall_replication_v8" | "soviet_west_screen_v1" | "soviet_west_early_screen_v2";
+    "all_country_replication_v5" | "safety_screen_v6" | "activation_stall_screen_v7" | "activation_stall_replication_v8" | "soviet_west_screen_v1" | "soviet_west_early_screen_v2" | "soviet_west_factorial_v3";
 type StudyConfig = { id: StudyId; seedBase: number; casesPerCountry: number; maxTicks: number;
     countries: readonly Countries[]; variants: readonly Variant[]; candidateStart?: string; baselineStart?: string };
 const STUDIES: Record<StudyId, StudyConfig> = {
@@ -165,13 +183,16 @@ const STUDIES: Record<StudyId, StudyConfig> = {
         countries: SOVIET_COUNTRIES, variants: HFO_SOVIET_WEST_RETARGET_VARIANTS },
     soviet_west_early_screen_v2: { id: "soviet_west_early_screen_v2", ...HFO_SOVIET_WEST_EARLY_SPEC,
         countries: SOVIET_COUNTRIES, variants: HFO_SOVIET_WEST_EARLY_VARIANTS },
+    soviet_west_factorial_v3: { id: "soviet_west_factorial_v3", ...HFO_SOVIET_WEST_FACTORIAL_SPEC,
+        countries: SOVIET_COUNTRIES, variants: HFO_SOVIET_WEST_FACTORIAL_VARIANTS },
 };
 const studyConfig = (): StudyConfig => {
     const id = process.env.HFO_BOTTOM_STUDY ?? "screen_v1";
     if (id !== "screen_v1" && id !== "replication_v2" && id !== "korea_defense_v3" &&
         id !== "korea_replication_v4" && id !== "all_country_replication_v5" && id !== "safety_screen_v6" &&
         id !== "activation_stall_screen_v7" && id !== "activation_stall_replication_v8" &&
-        id !== "soviet_west_screen_v1" && id !== "soviet_west_early_screen_v2") {
+        id !== "soviet_west_screen_v1" && id !== "soviet_west_early_screen_v2" &&
+        id !== "soviet_west_factorial_v3") {
         throw new Error("HFO_BOTTOM_STUDY is invalid");
     }
     return STUDIES[id];
@@ -493,6 +514,10 @@ const finalize = (): void => {
             summary.oneSided95WilsonLower > 0.5 && summary.draws < defaultSummary.draws &&
             summary.losses <= defaultSummary.losses && pairedLower > 0 &&
             countryNoninferiorityCount === study.countries.length && countrySuperiorityCount >= 3;
+        const sovietWestFactorialEligible = variant.id !== "default" && summary.wins > summary.losses &&
+            summary.oneSided95WilsonLower > 0.5 && summary.draws < defaultSummary.draws &&
+            summary.losses <= defaultSummary.losses && pairedLower > 0 &&
+            countryNoninferiorityCount === study.countries.length && countrySuperiorityCount >= 3;
 
         const eligible = study.id === "replication_v2" ? replicationEligible :
             study.id === "korea_defense_v3" ? koreaDefenseEligible :
@@ -502,7 +527,8 @@ const finalize = (): void => {
             study.id === "activation_stall_screen_v7" ? activationStallEligible :
             study.id === "activation_stall_replication_v8" ? activationStallReplicationEligible :
             study.id === "soviet_west_screen_v1" ? sovietWestEligible :
-            study.id === "soviet_west_early_screen_v2" ? sovietWestEarlyEligible : developmentEligible;
+            study.id === "soviet_west_early_screen_v2" ? sovietWestEarlyEligible :
+            study.id === "soviet_west_factorial_v3" ? sovietWestFactorialEligible : developmentEligible;
         return { id: variant.id, declarationIndex, summary, byCountry, pairedVersusCurrent, pairedVersusDefault: {
             meanScoreDifference: pairedMean, sampleStandardDeviation: pairedSd,
             oneSided95TLower: pairedLower, tCritical: pairedT, degreesOfFreedom: paired.length - 1,
@@ -510,10 +536,12 @@ const finalize = (): void => {
             tied: paired.filter((value) => value === 0).length, worsened: paired.filter((value) => value < 0).length },
             countryNoninferiorityCount, countrySuperiorityCount, developmentEligible, replicationEligible,
             koreaDefenseEligible, koreaReplicationEligible, allCountryReplicationEligible, safetyScreenEligible,
-            activationStallEligible, activationStallReplicationEligible, sovietWestEligible, sovietWestEarlyEligible, eligible };
+            activationStallEligible, activationStallReplicationEligible, sovietWestEligible, sovietWestEarlyEligible,
+            sovietWestFactorialEligible, eligible };
     });
     const ranked = [...variants].sort((left, right) => {
-        if (study.id === "activation_stall_screen_v7" || study.id === "soviet_west_screen_v1" || study.id === "soviet_west_early_screen_v2") {
+        if (study.id === "activation_stall_screen_v7" || study.id === "soviet_west_screen_v1" ||
+            study.id === "soviet_west_early_screen_v2" || study.id === "soviet_west_factorial_v3") {
             return left.summary.losses - right.summary.losses ||
                 left.pairedVersusDefault.worsened - right.pairedVersusDefault.worsened ||
                 right.summary.wins - left.summary.wins ||
@@ -548,7 +576,9 @@ const finalize = (): void => {
                             ? ranked.find((entry) => entry.sovietWestEligible) ?? ranked[0]
                             : study.id === "soviet_west_early_screen_v2"
                                 ? ranked.find((entry) => entry.sovietWestEarlyEligible) ?? ranked[0]
-                                : ranked[0];
+                                : study.id === "soviet_west_factorial_v3"
+                                    ? ranked.find((entry) => entry.sovietWestFactorialEligible) ?? ranked[0]
+                                    : ranked[0];
     if (!winner) throw new Error("Bottom winner arm unavailable");
     const passed = winner.eligible;
     const status = study.id === "replication_v2" ?
@@ -571,6 +601,8 @@ const finalize = (): void => {
             passed ? "ADVANCE_HFO_SOVIET_WEST_RETARGET" : "NO_ELIGIBLE_HFO_SOVIET_WEST_RETARGET" :
         study.id === "soviet_west_early_screen_v2" ?
             passed ? "ADVANCE_HFO_SOVIET_WEST_EARLY_RETARGET" : "NO_ELIGIBLE_HFO_SOVIET_WEST_EARLY_RETARGET" :
+        study.id === "soviet_west_factorial_v3" ?
+            passed ? "ADVANCE_HFO_SOVIET_WEST_FACTORIAL" : "NO_ELIGIBLE_HFO_SOVIET_WEST_FACTORIAL" :
             passed ? "ADVANCE_HFO_BOTTOM_RETARGET" : "NO_ELIGIBLE_HFO_BOTTOM_RETARGET";
     const artifact = { schemaVersion: 1, kind: "hfo-bottom-development-finalizer",
         status, complete: true, passed, schedulerAccount: "pi_jss233", arrayJobId,
