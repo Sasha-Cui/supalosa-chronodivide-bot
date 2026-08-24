@@ -90,8 +90,18 @@ const settings = (candidate: Bot, baseline: Bot, slot: 0 | 1): CreateOfflineOpts
 };
 
 const assertExternalBaseline = (descriptor: unknown): void => {
-    if (!isRecord(descriptor) || descriptor.kind !== "external-package" || descriptor.gitCommit !== BASELINE_COMMIT ||
-        descriptor.trackedDirty !== false) throw new Error("Confirmatory baseline drifted");
+    if (!isRecord(descriptor) || descriptor.kind !== "external-package" ||
+        typeof descriptor.packageRoot !== "string") throw new Error("Confirmatory baseline descriptor drifted");
+    const packageRoot = path.resolve(descriptor.packageRoot);
+    const repo = execFileSync("git", ["-C", packageRoot, "rev-parse", "--show-toplevel"],
+        { encoding: "utf8" }).trim();
+    const commit = execFileSync("git", ["-C", repo, "rev-parse", "HEAD"], { encoding: "utf8" }).trim();
+    const trackedStatus = execFileSync("git", ["-C", repo, "status", "--short", "--untracked-files=no"],
+        { encoding: "utf8" }).trim();
+    if (commit !== BASELINE_COMMIT || trackedStatus !== "" ||
+        packageRoot !== path.join(repo, "packages", "chronodivide-bot")) {
+        throw new Error("Confirmatory external baseline drifted");
+    }
 };
 
 const selectCases = async (): Promise<void> => {
