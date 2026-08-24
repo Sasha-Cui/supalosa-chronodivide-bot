@@ -125,6 +125,24 @@ describe("research ablation flags", () => {
             activationStallTicks: 1_200,
         });
     });
+
+    it("keeps Soviet-west retarget opt-in and country-restricted", () => {
+        const defaultBot = new StrongBot("default-west-retarget", Countries.IRAQ, [], false, new StrongStrategy(), {});
+        expect((defaultBot as unknown as PrivateRecord).hfoWestRetargetOptions).toMatchObject({
+            enabled: false,
+            sovietOnly: true,
+            activationStallTicks: 1_200,
+        });
+        const enabledBot = new StrongBot("enabled-west-retarget", Countries.IRAQ, [], false, new StrongStrategy(), {
+            hfoWestRetarget: { enabled: true, activationStallTicks: 2_400 },
+        });
+        expect((enabledBot as unknown as PrivateRecord).hfoWestRetargetOptions).toMatchObject({
+            enabled: true,
+            sovietOnly: true,
+            activationStallTicks: 2_400,
+        });
+    });
+
     it("waits for pre-activation building stagnation", () => {
         const bot = new StrongBot("stall-retarget", Countries.IRAQ, [], false, new StrongStrategy(), {
             hfoBottomRetarget: { enabled: true, activationStallTicks: 1_200 },

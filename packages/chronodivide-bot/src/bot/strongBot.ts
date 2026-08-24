@@ -181,6 +181,10 @@ export type HfoBottomRetargetOptions = {
     stallTicks?: number;
     mode?: HfoBottomRetargetMode;
 };
+export type HfoWestRetargetOptions = HfoBottomRetargetOptions & {
+    sovietOnly?: boolean;
+};
+
 
 export type StrongBotOptions = {
     preserveBaselineCore?: boolean;
@@ -200,6 +204,7 @@ export type StrongBotOptions = {
     hfoWestHomeGuard?: HfoWestHomeGuardOptions;
     defaultMapProfiles?: boolean;
     hfoBottomRetarget?: HfoBottomRetargetOptions;
+    hfoWestRetarget?: HfoWestRetargetOptions;
     exactMapTactics?: boolean;
 };
 
@@ -613,6 +618,10 @@ const DEFAULT_HFO_BOTTOM_RETARGET_OPTIONS: Required<HfoBottomRetargetOptions> = 
     stallTicks: 600,
     mode: "stalled_rotate",
 };
+const DEFAULT_HFO_WEST_RETARGET_OPTIONS: Required<HfoWestRetargetOptions> = {
+    ...DEFAULT_HFO_BOTTOM_RETARGET_OPTIONS, enabled: false, sovietOnly: true,
+};
+
 
 const RIVER_RAMPAGE_STARTS = new Set(["98,125", "128,89"]);
 const RIVER_RAMPAGE_LOWER_START = "98,125";
@@ -1298,6 +1307,7 @@ export class StrongBot extends SupalosaBot {
     private hfoBottomDemolitionOptions: Required<HfoBottomDemolitionOptions>;
     private hfoBottomHomeGuardOptions: Required<HfoBottomHomeGuardOptions>;
     private hfoWestHomeGuardOptions: Required<HfoWestHomeGuardOptions>;
+    private hfoWestRetargetOptions: Required<HfoWestRetargetOptions>;
     private hfoBottomRetargetOptions: Required<HfoBottomRetargetOptions>;
     private lastForceAttackOrderAt = 0;
     private lastHarassOrderAt = 0;
@@ -1328,6 +1338,13 @@ export class StrongBot extends SupalosaBot {
     private lastHfoBottomRetargetBuildingCount = Number.POSITIVE_INFINITY;
     private lastHfoBottomRetargetHitPoints = Number.POSITIVE_INFINITY;
     private hfoBottomRetargetIndex = 0;
+    private lastHfoWestRetargetOrderAt = 0;
+    private lastHfoWestRetargetRotationAt = 0;
+    private lastHfoWestRetargetProgressAt = 0;
+    private lastHfoWestRetargetBuildingCount = Number.POSITIVE_INFINITY;
+    private lastHfoWestRetargetHitPoints = Number.POSITIVE_INFINITY;
+    private hfoWestRetargetIndex = 0;
+    private hfoWestRetargetActivated = false;
     private hfoBottomRetargetActivated = false;
     private lastWeakStartHomeGuardOrderAt = 0;
     private lastWeakStartCloseoutOrderAt = 0;
@@ -1414,6 +1431,10 @@ export class StrongBot extends SupalosaBot {
             ...DEFAULT_HFO_BOTTOM_RETARGET_OPTIONS,
             ...definedOptions(options.hfoBottomRetarget),
         };
+        this.hfoWestRetargetOptions = {
+            ...DEFAULT_HFO_WEST_RETARGET_OPTIONS,
+            ...definedOptions(options.hfoWestRetarget),
+        };
     }
 
     private applyExplicitOptionOverrides(): void {
@@ -1452,6 +1473,10 @@ export class StrongBot extends SupalosaBot {
             ...this.hfoBottomRetargetOptions,
             ...definedOptions(options.hfoBottomRetarget),
         };
+        this.hfoWestRetargetOptions = {
+            ...this.hfoWestRetargetOptions,
+            ...definedOptions(options.hfoWestRetarget),
+        };
     }
 
     override onGameStart(game: GameApi): void {
@@ -1479,6 +1504,9 @@ export class StrongBot extends SupalosaBot {
         this.lastGameApi = game;
         super.onGameTick(game);
         if (this.enableExactMapTactics && this.maybeHfoBottomRetarget(game)) {
+            return;
+        }
+        if (this.enableExactMapTactics && this.maybeHfoWestRetarget(game)) {
             return;
         }
         if (this.enableExactMapTactics && this.maybeHfoBottomCriticalCleanup(game)) {
@@ -2719,6 +2747,91 @@ export class StrongBot extends SupalosaBot {
             );
         }
         this.lastHfoBottomRetargetOrderAt = tick;
+        return true;
+    }
+
+    private maybeHfoWestRetarget(game: GameApi): boolean {
+        const options = this.hfoWestRetargetOptions;
+        const tick = game.getCurrentTick();
+        const countryName = (game.getPlayerData(this.name).country as { name?: string } | undefined)?.name;
+        if (options.sovietOnly && (countryName === undefined || ALLIED_COUNTRIES.has(countryName))) {
+            return false;
+        }
+        if (!options.enabled || tick < options.minTick || !this.isHfoWestVsEast(game)) {
+            return false;
+        }
+        const enemyBuildings = [...this.getKnownEnemyBuildings(game)];
+        const enemyCombatants = this.getKnownEnemyCombatUnits(game);
+        if (enemyBuildings.length === 0 || enemyBuildings.length > options.maxEnemyBuildings ||
+            enemyCombatants.length > options.maxEnemyCombatants) {
+            return false;
+        }
+        const attackers = this.getMobileCombatants(game).filter((unit) =>
+            unit.rules.name !== "DOG" && unit.rules.name !== "ADOG");
+        if (attackers.length < options.minAttackers ||
+            attackers.length < enemyCombatants.length + options.combatantAdvantage) {
+            return false;
+        }
+
+        const buildingHitPoints = enemyBuildings.reduce((total, unit) => total + unit.hitPoints, 0);
+        const established = Number.isFinite(this.lastHfoWestRetargetBuildingCount);
+        const madeProgress = !established ||
+            enemyBuildings.length < this.lastHfoWestRetargetBuildingCount ||
+            buildingHitPoints < this.lastHfoWestRetargetHitPoints;
+        if (madeProgress) {
+            this.lastHfoWestRetargetProgressAt = tick;
+            if (established && enemyBuildings.length < this.lastHfoWestRetargetBuildingCount) {
+                this.hfoWestRetargetIndex = 0;
+            }
+        }
+        this.lastHfoWestRetargetBuildingCount = enemyBuildings.length;
+        this.lastHfoWestRetargetHitPoints = buildingHitPoints;
+        if (!this.hfoWestRetargetActivated) {
+            if (tick < this.lastHfoWestRetargetProgressAt + options.activationStallTicks) {
+                return false;
+            }
+            this.hfoWestRetargetActivated = true;
+        }
+
+        const sortedBuildings = enemyBuildings.sort((left, right) => {
+            if (options.mode === "top_first") {
+                const topDifference = Number(this.isHfoTopPocketTarget(right)) - Number(this.isHfoTopPocketTarget(left));
+                if (topDifference !== 0) return topDifference;
+            }
+            const weightDifference = this.getHfoLateMopUpTargetWeight(right) - this.getHfoLateMopUpTargetWeight(left);
+            if (weightDifference !== 0) return weightDifference;
+            return left.id - right.id;
+        });
+
+        if (options.mode === "round_robin" &&
+            tick >= this.lastHfoWestRetargetRotationAt + options.rotationTicks) {
+            this.hfoWestRetargetIndex = (this.hfoWestRetargetIndex + 1) % sortedBuildings.length;
+            this.lastHfoWestRetargetRotationAt = tick;
+        } else if ((options.mode === "stalled_rotate" || options.mode === "top_first") &&
+            tick >= this.lastHfoWestRetargetProgressAt + options.stallTicks) {
+            this.hfoWestRetargetIndex = (this.hfoWestRetargetIndex + 1) % sortedBuildings.length;
+            this.lastHfoWestRetargetRotationAt = tick;
+            this.lastHfoWestRetargetProgressAt = tick;
+        }
+
+        if (tick < this.lastHfoWestRetargetOrderAt + options.orderIntervalTicks) {
+            return true;
+        }
+        const preparedAttackers = this.prepareUnitsForAttackMove(attackers);
+        if (preparedAttackers.length === 0) {
+            return true;
+        }
+        if (options.mode === "split") {
+            this.orderPreparedUnitsToNearestTargets(preparedAttackers, sortedBuildings, true);
+        } else {
+            const target = sortedBuildings[this.hfoWestRetargetIndex % sortedBuildings.length];
+            this.player.actions.orderUnits(
+                preparedAttackers.map((unit) => unit.id),
+                OrderType.Attack,
+                target.id,
+            );
+        }
+        this.lastHfoWestRetargetOrderAt = tick;
         return true;
     }
 
