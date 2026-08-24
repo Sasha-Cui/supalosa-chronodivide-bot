@@ -9,6 +9,8 @@ import {
     HFO_BOTTOM_RETARGET_SAFETY_SPEC,
     HFO_BOTTOM_RETARGET_SAFETY_VARIANTS,
     HFO_KOREA_BOTTOM_DEFENSE_VARIANTS,
+    HFO_SOVIET_WEST_RETARGET_SPEC,
+    HFO_SOVIET_WEST_RETARGET_VARIANTS,
     HFO_KOREA_BOTTOM_REPLICATION_ARMS,
     HFO_BOTTOM_RETARGET_VARIANTS,
 } from "../training/hfoBottomDevelopment.js";
@@ -125,6 +127,27 @@ describe("HFO bottom building-retarget variants", () => {
             stallTicks: 600,
             rotationTicks: 600,
         });
+    });
+    it("freezes the Soviet-west retarget screen", () => {
+        expect(HFO_SOVIET_WEST_RETARGET_SPEC).toEqual({
+            seedBase: 4_254_000_000,
+            casesPerCountry: 10,
+            maxTicks: 90_000,
+            candidateStart: "39,82",
+            baselineStart: "151,119",
+        });
+        expect(HFO_SOVIET_WEST_RETARGET_VARIANTS.map((variant) => variant.id)).toEqual([
+            "default",
+            "current_retarget",
+            "activation_stall_1200",
+            "activation_stall_2400",
+        ]);
+        const byId = Object.fromEntries(HFO_SOVIET_WEST_RETARGET_VARIANTS.map((variant) =>
+            [variant.id, variant]));
+        expect(byId.current_retarget.botOptions.hfoWestRetarget?.activationStallTicks).toBe(0);
+        expect(byId.activation_stall_1200.botOptions.hfoWestRetarget?.activationStallTicks).toBe(1_200);
+        expect(byId.activation_stall_2400.botOptions.hfoWestRetarget?.activationStallTicks).toBe(2_400);
+        expect(byId.activation_stall_1200.botOptions.hfoWestRetarget?.sovietOnly).toBe(true);
     });
 
     it("freezes the Korea defense mechanisms", () => {

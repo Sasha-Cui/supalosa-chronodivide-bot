@@ -18,7 +18,8 @@ const MAP = { name: "cd_chrono_4_heck_freezes_over_le.map",
     sha256: "e4dfc736a6355e0e68d4681e4d67419516e6bb94549e2d42880c9414e95e2e8d" } as const;
 const COUNTRIES = [Countries.USA, Countries.KOREA, Countries.FRANCE, Countries.GERMANY, Countries.GREAT_BRITAIN,
     Countries.LIBYA, Countries.IRAQ, Countries.CUBA, Countries.RUSSIA] as const;
-const BOTTOM = "88,157", TOP = "88,34", MAX_OFFSETS = 400;
+const SOVIET_COUNTRIES = [Countries.LIBYA, Countries.IRAQ, Countries.CUBA, Countries.RUSSIA] as const;
+const BOTTOM = "88,157", TOP = "88,34", WEST = "39,82", EAST = "151,119", MAX_OFFSETS = 400;
 const SHA256 = /^[0-9a-f]{64}$/;
 type Winner = "candidate" | "baseline" | "draw";
 type CaseSpec = { caseIndex: number; countryOrdinal: number; country: Countries; seedOffset: number;
@@ -33,6 +34,12 @@ const retarget = (mode: "stalled_rotate" | "round_robin" | "top_first" | "split"
         activationStallTicks: safety.activationStallTicks ?? 0,
         orderIntervalTicks: 6, rotationTicks: ticks, stallTicks: ticks, mode },
 });
+const westRetarget = (activationStallTicks: number): StrongBotOptions => ({
+    hfoWestRetarget: { enabled: true, minTick: 42_000, minAttackers: 4, combatantAdvantage: 0,
+        activationStallTicks, maxEnemyBuildings: 6, maxEnemyCombatants: 4, orderIntervalTicks: 6,
+        rotationTicks: 600, stallTicks: 600, mode: "stalled_rotate", sovietOnly: true },
+});
+
 export const HFO_BOTTOM_RETARGET_VARIANTS: readonly Variant[] = [
     { id: "default", botOptions: {} },
     { id: "stalled_rotate_600", botOptions: retarget("stalled_rotate", 600) },
@@ -64,6 +71,12 @@ export const HFO_BOTTOM_ACTIVATION_STALL_REPLICATION_ARMS: readonly Variant[] = 
     { id: "default", botOptions: {} },
     { id: "current_retarget", botOptions: retarget("stalled_rotate", 600) },
     { id: "winner_activation_stall_1200", botOptions: retarget("stalled_rotate", 600, { activationStallTicks: 1_200 }) },
+];
+export const HFO_SOVIET_WEST_RETARGET_VARIANTS: readonly Variant[] = [
+    { id: "default", botOptions: {} },
+    { id: "current_retarget", botOptions: westRetarget(0) },
+    { id: "activation_stall_1200", botOptions: westRetarget(1_200) },
+    { id: "activation_stall_2400", botOptions: westRetarget(2_400) },
 ];
 const koreaDefenseVariant = (id: string, pillboxes: number, wideGuard: boolean): Variant => ({
     id,
@@ -107,11 +120,15 @@ export const HFO_BOTTOM_ACTIVATION_STALL_REPLICATION_SPEC = {
     casesPerCountry: 30,
     maxTicks: 90_000,
 } as const;
+export const HFO_SOVIET_WEST_RETARGET_SPEC = {
+    seedBase: 4_254_000_000, casesPerCountry: 10, maxTicks: 90_000,
+    candidateStart: WEST, baselineStart: EAST,
+} as const;
 
 type StudyId = "screen_v1" | "replication_v2" | "korea_defense_v3" | "korea_replication_v4" |
-    "all_country_replication_v5" | "safety_screen_v6" | "activation_stall_screen_v7" | "activation_stall_replication_v8";
+    "all_country_replication_v5" | "safety_screen_v6" | "activation_stall_screen_v7" | "activation_stall_replication_v8" | "soviet_west_screen_v1";
 type StudyConfig = { id: StudyId; seedBase: number; casesPerCountry: number; maxTicks: number;
-    countries: readonly Countries[]; variants: readonly Variant[] };
+    countries: readonly Countries[]; variants: readonly Variant[]; candidateStart?: string; baselineStart?: string };
 const STUDIES: Record<StudyId, StudyConfig> = {
     screen_v1: { id: "screen_v1", seedBase: 4_244_000_000, casesPerCountry: 2,
         maxTicks: 90_000, countries: COUNTRIES, variants: HFO_BOTTOM_RETARGET_VARIANTS },
@@ -133,16 +150,22 @@ const STUDIES: Record<StudyId, StudyConfig> = {
     activation_stall_replication_v8: { id: "activation_stall_replication_v8",
         ...HFO_BOTTOM_ACTIVATION_STALL_REPLICATION_SPEC,
         countries: COUNTRIES, variants: HFO_BOTTOM_ACTIVATION_STALL_REPLICATION_ARMS },
+    soviet_west_screen_v1: { id: "soviet_west_screen_v1", ...HFO_SOVIET_WEST_RETARGET_SPEC,
+        countries: SOVIET_COUNTRIES, variants: HFO_SOVIET_WEST_RETARGET_VARIANTS },
 };
 const studyConfig = (): StudyConfig => {
     const id = process.env.HFO_BOTTOM_STUDY ?? "screen_v1";
     if (id !== "screen_v1" && id !== "replication_v2" && id !== "korea_defense_v3" &&
         id !== "korea_replication_v4" && id !== "all_country_replication_v5" && id !== "safety_screen_v6" &&
-        id !== "activation_stall_screen_v7" && id !== "activation_stall_replication_v8") {
+        id !== "activation_stall_screen_v7" && id !== "activation_stall_replication_v8" &&
+        id !== "soviet_west_screen_v1") {
         throw new Error("HFO_BOTTOM_STUDY is invalid");
     }
     return STUDIES[id];
 };
+const studyStarts = (study: StudyConfig): { candidateStart: string; baselineStart: string } => ({
+    candidateStart: study.candidateStart ?? BOTTOM, baselineStart: study.baselineStart ?? TOP,
+});
 
 const requiredPath = (name: string): string => {
     const value = process.env[name]; if (!value) throw new Error(`${name} is required`); return path.resolve(value);
@@ -193,6 +216,7 @@ const selectCases = async (): Promise<void> => {
     const outputPath = requiredPath("OUT_PATH"), programPath = requiredPath("PROGRAM_PATH");
     const programSha256 = requiredText("PROGRAM_SHA256", SHA256), inputs = commonInputs();
     const study = studyConfig();
+    const expectedStarts = studyStarts(study);
     const expectedCaseCount = study.casesPerCountry * study.countries.length;
     if (fs.existsSync(outputPath) || sha256File(programPath) !== programSha256) throw new Error("Bottom selection drifted");
     const { repo, commit } = sourceIdentity();
@@ -215,7 +239,7 @@ const selectCases = async (): Promise<void> => {
                     async () => ({ candidateStart: startKey(candidateApi(candidate).getPlayerData(candidateName).startLocation),
                         baselineStart: startKey(candidateApi(candidate).getPlayerData(baselineName).startLocation) }));
                 initializedGameCount += 1;
-                if (starts.candidateStart === BOTTOM && starts.baselineStart === TOP) {
+                if (starts.candidateStart === expectedStarts.candidateStart && starts.baselineStart === expectedStarts.baselineStart) {
                     cases.push({ caseIndex: cases.length, countryOrdinal, country, seedOffset,
                         requestedEngineSeed, candidateSlot, ...starts }); selected += 1;
                 }
@@ -232,6 +256,7 @@ const selectCases = async (): Promise<void> => {
         scheduler: { jobId: process.env.SLURM_JOB_ID, account: "pi_jss233" }, sourceCommit: commit,
         programSha256, protocolSha256: inputs.protocolSha256, assetManifestSha256: inputs.assetManifestSha256,
         studyId: study.id, seedBase: study.seedBase, maxOffsets: MAX_OFFSETS, casesPerCountry: study.casesPerCountry,
+        candidateStart: expectedStarts.candidateStart, baselineStart: expectedStarts.baselineStart,
         initializedGameCount, selectedCaseCount: cases.length, updateCount: 0, forbiddenOutcomeFields: [], cases };
     fs.mkdirSync(path.dirname(outputPath), { recursive: true, mode: 0o700 });
     fs.writeFileSync(outputPath, JSON.stringify(artifact, null, 2) + "\n", { flag: "wx", mode: 0o600 });
@@ -243,12 +268,15 @@ const loadSelection = (selectionPath: string, selectionSha256: string, inputs: R
     const selection = JSON.parse(fs.readFileSync(selectionPath, "utf8")) as unknown;
     const study = studyConfig();
     const expectedCaseCount = study.casesPerCountry * study.countries.length;
+    const expectedStarts = studyStarts(study);
     if (!isRecord(selection) || selection.kind !== "hfo-bottom-outcome-blind-selection" ||
         selection.status !== "PASS_HFO_BOTTOM_SELECTION" || selection.complete !== true || selection.passed !== true ||
         selection.outcomeFree !== true || selection.updateCount !== 0 || selection.selectedCaseCount !== expectedCaseCount ||
         selection.studyId !== study.id || selection.seedBase !== study.seedBase ||
         selection.protocolSha256 !== inputs.protocolSha256 || selection.assetManifestSha256 !== inputs.assetManifestSha256 ||
-        !Array.isArray(selection.cases) || selection.cases.length !== expectedCaseCount) throw new Error("Bottom selection ineligible");
+        selection.candidateStart !== expectedStarts.candidateStart || selection.baselineStart !== expectedStarts.baselineStart ||
+        !Array.isArray(selection.cases) || selection.cases.length !== expectedCaseCount || selection.cases.some((entry: any) =>
+            entry.candidateStart !== expectedStarts.candidateStart || entry.baselineStart !== expectedStarts.baselineStart)) throw new Error("Bottom selection ineligible");
     return selection.cases as CaseSpec[];
 };
 
@@ -258,6 +286,7 @@ const runCell = async (): Promise<void> => {
     const selectionPath = requiredPath("SELECTION_PATH"), selectionSha256 = requiredText("SELECTION_SHA256", SHA256);
     const inputs = commonInputs();
     const study = studyConfig(), caseCount = study.casesPerCountry * study.countries.length;
+    const expectedStarts = studyStarts(study);
     const taskCount = caseCount * study.variants.length;
     if (taskIndex < 0 || taskIndex >= taskCount || process.env.SLURM_ARRAY_TASK_ID !== String(taskIndex) ||
         fs.existsSync(outputPath) || sha256File(programPath) !== programSha256) throw new Error("Bottom cell drifted");
@@ -278,8 +307,8 @@ const runCell = async (): Promise<void> => {
         caseSpec.requestedEngineSeed,
         [{ agent: candidate, identity: "candidate" }, { agent: baseline, identity: "baseline" }], async (game) => {
             const gameApi = candidateApi(candidate);
-            if (startKey(gameApi.getPlayerData(candidateName).startLocation) !== BOTTOM ||
-                startKey(gameApi.getPlayerData(baselineName).startLocation) !== TOP) throw new Error("Bottom start drifted");
+            if (startKey(gameApi.getPlayerData(candidateName).startLocation) !== expectedStarts.candidateStart ||
+                startKey(gameApi.getPlayerData(baselineName).startLocation) !== expectedStarts.baselineStart) throw new Error("Study start drifted");
             let ticks = 0, terminal: any = null, failure: any = null;
             while (ticks < study.maxTicks && !terminal && !failure) {
                 adjudicator.beginUpdate(gameApi); await game.update(); ticks += 1;
@@ -296,7 +325,7 @@ const runCell = async (): Promise<void> => {
             const winner: Winner = terminal?.winner ?? "draw";
             return { taskIndex, variantId: variant.id, caseIndex, country: caseSpec.country,
                 requestedEngineSeed: caseSpec.requestedEngineSeed, candidateSlot: caseSpec.candidateSlot,
-                candidateStart: BOTTOM, baselineStart: TOP, maxTicks: study.maxTicks, ticks,
+                candidateStart: expectedStarts.candidateStart, baselineStart: expectedStarts.baselineStart, maxTicks: study.maxTicks, ticks,
                 status: terminal?.status ?? "tick_cap_draw", winner,
                 terminalBuildingCounts: { candidate: buildings.filter((row) => row.owner === candidateName).length,
                     baseline: buildings.filter((row) => row.owner === baselineName).length },
@@ -443,6 +472,10 @@ const finalize = (): void => {
             summary.losses <= currentRetargetSummary.losses && pairedLower > 0 &&
             paired.filter((value) => value < 0).length <= currentRetargetWorsened &&
             countryNoninferiorityCount === study.countries.length && countrySuperiorityCount >= 8;
+        const sovietWestEligible = variant.id.startsWith("activation_stall_") && summary.wins > summary.losses &&
+            summary.oneSided95WilsonLower > 0.5 && summary.draws < defaultSummary.draws &&
+            summary.losses <= defaultSummary.losses && pairedLower > 0 &&
+            countryNoninferiorityCount === study.countries.length && countrySuperiorityCount >= 3;
 
         const eligible = study.id === "replication_v2" ? replicationEligible :
             study.id === "korea_defense_v3" ? koreaDefenseEligible :
@@ -450,7 +483,8 @@ const finalize = (): void => {
             study.id === "all_country_replication_v5" ? allCountryReplicationEligible :
             study.id === "safety_screen_v6" ? safetyScreenEligible :
             study.id === "activation_stall_screen_v7" ? activationStallEligible :
-            study.id === "activation_stall_replication_v8" ? activationStallReplicationEligible : developmentEligible;
+            study.id === "activation_stall_replication_v8" ? activationStallReplicationEligible :
+            study.id === "soviet_west_screen_v1" ? sovietWestEligible : developmentEligible;
         return { id: variant.id, declarationIndex, summary, byCountry, pairedVersusCurrent, pairedVersusDefault: {
             meanScoreDifference: pairedMean, sampleStandardDeviation: pairedSd,
             oneSided95TLower: pairedLower, tCritical: pairedT, degreesOfFreedom: paired.length - 1,
@@ -458,10 +492,10 @@ const finalize = (): void => {
             tied: paired.filter((value) => value === 0).length, worsened: paired.filter((value) => value < 0).length },
             countryNoninferiorityCount, countrySuperiorityCount, developmentEligible, replicationEligible,
             koreaDefenseEligible, koreaReplicationEligible, allCountryReplicationEligible, safetyScreenEligible,
-            activationStallEligible, activationStallReplicationEligible, eligible };
+            activationStallEligible, activationStallReplicationEligible, sovietWestEligible, eligible };
     });
     const ranked = [...variants].sort((left, right) => {
-        if (study.id === "activation_stall_screen_v7") {
+        if (study.id === "activation_stall_screen_v7" || study.id === "soviet_west_screen_v1") {
             return left.summary.losses - right.summary.losses ||
                 left.pairedVersusDefault.worsened - right.pairedVersusDefault.worsened ||
                 right.summary.wins - left.summary.wins ||
@@ -492,7 +526,9 @@ const finalize = (): void => {
                     ? ranked.find((entry) => entry.activationStallEligible) ?? ranked[0]
                     : study.id === "activation_stall_replication_v8"
                         ? variants.find((entry) => entry.id === "winner_activation_stall_1200")
-                        : ranked[0];
+                        : study.id === "soviet_west_screen_v1"
+                            ? ranked.find((entry) => entry.sovietWestEligible) ?? ranked[0]
+                            : ranked[0];
     if (!winner) throw new Error("Bottom winner arm unavailable");
     const passed = winner.eligible;
     const status = study.id === "replication_v2" ?
@@ -511,6 +547,8 @@ const finalize = (): void => {
             passed ? "ADVANCE_HFO_BOTTOM_RETARGET_ACTIVATION_STALL" : "NO_ELIGIBLE_HFO_BOTTOM_RETARGET_ACTIVATION_STALL" :
         study.id === "activation_stall_replication_v8" ?
             passed ? "PASS_HFO_BOTTOM_ACTIVATION_STALL_REPLICATION" : "FAIL_HFO_BOTTOM_ACTIVATION_STALL_REPLICATION" :
+        study.id === "soviet_west_screen_v1" ?
+            passed ? "ADVANCE_HFO_SOVIET_WEST_RETARGET" : "NO_ELIGIBLE_HFO_SOVIET_WEST_RETARGET" :
             passed ? "ADVANCE_HFO_BOTTOM_RETARGET" : "NO_ELIGIBLE_HFO_BOTTOM_RETARGET";
     const artifact = { schemaVersion: 1, kind: "hfo-bottom-development-finalizer",
         status, complete: true, passed, schedulerAccount: "pi_jss233", arrayJobId,
