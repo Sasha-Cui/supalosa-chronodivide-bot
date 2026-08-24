@@ -602,7 +602,7 @@ const DEFAULT_HFO_WEST_HOME_GUARD_OPTIONS: Required<HfoWestHomeGuardOptions> = {
     orderIntervalTicks: 6,
     engageMinCombatants: 4,
     engageCombatantAdvantage: 0,
-    alliedOnly: true,
+    alliedOnly: false,
 };
 
 const DEFAULT_HFO_BOTTOM_RETARGET_OPTIONS: Required<HfoBottomRetargetOptions> = {

@@ -863,7 +863,7 @@ export class StrongStrategy implements Strategy {
             ).onAiUpdate(context, missionController, logger);
         }
         if ((this.options.defaultMapProfiles ?? true) &&
-            (this.options.hfoSovietWestProfile ?? false) &&
+            (this.options.hfoSovietWestProfile ?? true) &&
             this.isHfoSovietWestStart(context)) {
             logger("Strong strategy profile: hfoSovietWestWinner");
             return new StrongStrategy(

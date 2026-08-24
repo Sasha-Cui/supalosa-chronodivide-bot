@@ -93,7 +93,7 @@ describe("research ablation flags", () => {
             orderIntervalTicks: 6,
             engageMinCombatants: 4,
             engageCombatantAdvantage: 0,
-            alliedOnly: true,
+            alliedOnly: false,
         });
         expect((defaultBot as unknown as PrivateRecord).hfoBottomRetargetOptions.enabled).toBe(true);
 
@@ -110,6 +110,14 @@ describe("research ablation flags", () => {
             .options.hfoAlliedWestProfile).toBe(false);
         expect((new StrongStrategy({ hfoSovietWestProfile: true }) as unknown as PrivateRecord)
             .options.hfoSovietWestProfile).toBe(true);
+
+        const sovietDisabledBot = new StrongBot("disabled-soviet-west", Countries.IRAQ, [], false,
+            new StrongStrategy({ hfoSovietWestProfile: false }), {
+                hfoWestHomeGuard: { alliedOnly: true },
+            });
+        expect((sovietDisabledBot as unknown as PrivateRecord).hfoWestHomeGuardOptions.alliedOnly).toBe(true);
+        expect(((sovietDisabledBot as unknown as PrivateRecord).strategy as PrivateRecord)
+            .options.hfoSovietWestProfile).toBe(false);
     });
 
     it("enables the replicated bottom retarget and accepts explicit margins", () => {
