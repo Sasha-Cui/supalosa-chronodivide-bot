@@ -16,6 +16,7 @@ REPO=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot;
 : "${RESULTS_ROOT:?}" "${FINALIZER_ROOT:?}" "${ARRAY_JOB_ID:?}" "${PROGRAM_SHA256:?}" \
   "${PROTOCOL_SHA256:?}" "${SCRIPT_SHA256:?}" "${SELECTION_SHA256:?}" "${MIX_DIR:?}" \
   "${ASSET_MANIFEST_PATH:?}" "${ASSET_MANIFEST_SHA256:?}"
+CELL_PROGRAM_SHA256="${CELL_PROGRAM_SHA256:-$PROGRAM_SHA256}"
 [[ "$(sha256sum "$0"|awk '{print $1}')" == "$SCRIPT_SHA256" ]] || exit 2
 JOB_LINE=$(/opt/slurm/current/bin/scontrol show job -o "$SLURM_JOB_ID")
 [[ "$JOB_LINE" =~ (^|[[:space:]])Account=([^[:space:]]+) && "${BASH_REMATCH[2]}" == pi_jss233 ]] || exit 2
@@ -28,7 +29,7 @@ cd "$DRIVER"; export MODE=finalize OUT_PATH="$FINALIZER_ROOT/hfo-bottom-retarget
 export PROGRAM_PATH="$DRIVER/dist/training/hfoBottomRetargetIsolation.js"
 export PROTOCOL_PATH="$REPO/research/protocols/hfo-bottom/2026-08-24-activation-isolation-v9.md"
 [[ "$(sha256sum "$PROGRAM_PATH"|awk '{print $1}')" == "$PROGRAM_SHA256" ]] || exit 2
-export RESULTS_ROOT ARRAY_JOB_ID PROGRAM_SHA256 PROTOCOL_SHA256 SELECTION_SHA256 MIX_DIR ASSET_MANIFEST_PATH ASSET_MANIFEST_SHA256
+export RESULTS_ROOT ARRAY_JOB_ID PROGRAM_SHA256 CELL_PROGRAM_SHA256 PROTOCOL_SHA256 SELECTION_SHA256 MIX_DIR ASSET_MANIFEST_PATH ASSET_MANIFEST_SHA256
 "$NODE" --es-module-specifier-resolution=node "$PROGRAM_PATH"
 sha256sum "$OUT_PATH" >"$FINALIZER_ROOT/hfo-bottom-retarget-isolation.sha256"
 printf '%s\n' COMPLETE_HFO_BOTTOM_RETARGET_ISOLATION >"$FINALIZER_ROOT/COMPLETE"

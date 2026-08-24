@@ -259,14 +259,15 @@ const runCell = async (): Promise<void> => {
     if (!passed) process.exitCode = 2;
 };
 
-const completedTasks = (arrayJobId: string): Map<number, string> => {
+const terminalTasks = (arrayJobId: string): Map<number, string> => {
     const raw = execFileSync("/opt/slurm/current/bin/sacct",
         ["-j", arrayJobId, "-n", "-P", "-X", "--format=JobID,JobIDRaw,State,ExitCode,Account"], { encoding: "utf8" });
     const tasks = new Map<number, string>();
     for (const line of raw.split("\n").filter(Boolean)) {
         const [label, rawId, state, exitCode, account] = line.split("|");
         const match = new RegExp(`^${arrayJobId}_(\\d+)$`).exec(label);
-        if (match && state === "COMPLETED" && exitCode === "0:0" && account === "pi_jss233") {
+        const expectedTerminal = (state === "COMPLETED" && exitCode === "0:0") || (state === "FAILED" && exitCode === "2:0");
+        if (match && expectedTerminal && account === "pi_jss233") {
             tasks.set(Number(match[1]), rawId);
         }
     }
@@ -277,20 +278,24 @@ const finalize = (): void => {
     const root = requiredPath("RESULTS_ROOT"), outputPath = requiredPath("OUT_PATH");
     const arrayJobId = requiredText("ARRAY_JOB_ID", /^\d+$/), programSha256 = requiredText("PROGRAM_SHA256", SHA256);
     const selectionSha256 = requiredText("SELECTION_SHA256", SHA256), inputs = commonInputs();
+    const cellProgramSha256 = process.env.CELL_PROGRAM_SHA256
+        ? requiredText("CELL_PROGRAM_SHA256", SHA256) : programSha256;
     if (fs.existsSync(outputPath)) throw new Error("Isolation finalizer output exists");
     let tasks = new Map<number, string>();
     for (let attempt = 0; attempt < 31; attempt += 1) {
-        tasks = completedTasks(arrayJobId); if (tasks.size === CASE_COUNT) break;
+        tasks = terminalTasks(arrayJobId); if (tasks.size === CASE_COUNT) break;
         if (attempt < 30) execFileSync("sleep", ["2"]);
     }
-    if (tasks.size !== CASE_COUNT) throw new Error(`Only ${tasks.size}/${CASE_COUNT} isolation tasks are complete`);
+    if (tasks.size !== CASE_COUNT) throw new Error(`Only ${tasks.size}/${CASE_COUNT} isolation tasks are terminal`);
     const cells: any[] = [], sources = new Set<string>();
     for (let taskIndex = 0; taskIndex < CASE_COUNT; taskIndex += 1) {
         const cell = JSON.parse(fs.readFileSync(path.join(root,
             `task-${String(taskIndex).padStart(2, "0")}`, "cell.json"), "utf8"));
-        if (cell.kind !== "hfo-bottom-retarget-isolation-cell" || cell.status !== "PASS_HFO_BOTTOM_RETARGET_ISOLATION_CELL" ||
-            cell.complete !== true || cell.passed !== true || cell.outcomeFree !== true || cell.taskIndex !== taskIndex ||
-            String(cell.schedulerJobId) !== tasks.get(taskIndex) || cell.programSha256 !== programSha256 ||
+        const expectedStatus = cell.passed === true ? "PASS_HFO_BOTTOM_RETARGET_ISOLATION_CELL" :
+            cell.passed === false ? "FAIL_HFO_BOTTOM_RETARGET_ISOLATION_CELL" : null;
+        if (cell.kind !== "hfo-bottom-retarget-isolation-cell" || cell.status !== expectedStatus ||
+            cell.complete !== true || cell.outcomeFree !== true || cell.taskIndex !== taskIndex ||
+            String(cell.schedulerJobId) !== tasks.get(taskIndex) || cell.programSha256 !== cellProgramSha256 ||
             cell.protocolSha256 !== inputs.protocolSha256 || cell.assetManifestSha256 !== inputs.assetManifestSha256 ||
             cell.selectionSha256 !== selectionSha256) throw new Error(`Isolation cell ${taskIndex} drifted`);
         sources.add(cell.sourceCommit); cells.push(cell);
@@ -298,18 +303,18 @@ const finalize = (): void => {
     const active = cells.filter((cell) => cell.caseSpec.expectedActive), inactive = cells.filter((cell) => !cell.caseSpec.expectedActive);
     const countries = new Set(cells.map((cell) => cell.caseSpec.country));
     const starts = new Set(cells.map((cell) => cell.caseSpec.desiredStart));
-    const passed = active.length === 9 && inactive.length === 27 && countries.size === 9 && starts.size === 4 && sources.size === 1;
+    const passed = cells.every((cell) => cell.passed === true) && active.length === 9 && inactive.length === 27 &&
+        countries.size === 9 && starts.size === 4 && sources.size === 1;
     const artifact = { schemaVersion: 1, kind: "hfo-bottom-retarget-activation-isolation-gate",
         status: passed ? "PASS_HFO_BOTTOM_RETARGET_ACTIVATION_ISOLATION" : "FAIL_HFO_BOTTOM_RETARGET_ACTIVATION_ISOLATION",
         complete: true, passed, outcomeFree: true, schedulerAccount: "pi_jss233", arrayJobId,
-        finalizerJobId: process.env.SLURM_JOB_ID, sourceCommit: [...sources][0], programSha256,
+        finalizerJobId: process.env.SLURM_JOB_ID, sourceCommit: [...sources][0], programSha256, cellProgramSha256,
         protocolSha256: inputs.protocolSha256, assetManifestSha256: inputs.assetManifestSha256,
         selectionSha256, activeCaseCount: active.length, inactiveCaseCount: inactive.length,
         countryCount: countries.size, startCount: starts.size, schedulerJobIds: [...tasks.values()], cells };
     fs.mkdirSync(path.dirname(outputPath), { recursive: true, mode: 0o700 });
     fs.writeFileSync(outputPath, JSON.stringify(artifact, null, 2) + "\n", { flag: "wx", mode: 0o600 });
     console.log(JSON.stringify({ status: artifact.status, active: active.length, inactive: inactive.length }));
-    if (!passed) process.exitCode = 2;
 };
 
 const main = async (): Promise<void> => {
