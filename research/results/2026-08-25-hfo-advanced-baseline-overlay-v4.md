@@ -111,6 +111,28 @@ the deployed StrongBot remains 633/24/63 on balanced HFO confirmation. It does
 rule out deploying the V4 architectures behind the passed tick-1,200 opponent
 detector.
 
+## Retrospective implementation correction
+
+A post-aggregate source audit found that `preserveBaselineCore=true` constructs
+the fork's current `DefaultStrategy`, not the pinned upstream implementation.
+The two `defaultStrategy.ts` files have SHA-256 values
+`b276d1f11b6beb62e34866e2b682c57a8ef1f68acffed6d430ca68cfef85e8f6`
+and `1593463e0789a969f9fa7297df31dc6584e99d200a4b103d0c8e72bbb1965882`,
+respectively; their source diff contains 568 insertions and 17 deletions.
+Across the complete bot source tree, the fork differs from the pinned upstream
+tree by 83,343 insertions and 155 deletions, including queue, awareness,
+mission-controller, attack, defense, engineering, expansion, and scouting
+code.
+
+Consequently, the frozen V4 protocol's phrase "exact Supalosa
+`DefaultStrategy`" was not true of the in-process arms. The external control
+was exact and all reported outcomes, assignments, and hashes remain valid, but
+V4 estimates four overlays on the fork's nominal baseline-preserving mode; it
+is not an equivalence test of upstream Supalosa plus overlays. This explains
+why parameter tuning on the same wrapper is premature. V5 must first use a
+no-op lifecycle decorator around the pinned external baseline and demonstrate
+casewise equivalence before any decorator parameter is optimized.
+
 ## Prospective next step
 
 Proceed to a parameterized Advanced-specific optimizer while retaining the
