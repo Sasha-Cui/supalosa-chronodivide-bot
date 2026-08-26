@@ -10,7 +10,11 @@ import {
 } from "@chronodivide/game-api";
 import { SupalosaBot } from "./bot.js";
 import { Strategy } from "./strategy/strategy.js";
-import { StrongStrategy } from "./strategy/strongStrategy.js";
+import {
+    PeakOfPerfectionProfileScope,
+    StrongStrategy,
+    peakOfPerfectionProfileApplies,
+} from "./strategy/strongStrategy.js";
 import { Countries, isOwnedByNeutral, maxBy } from "./logic/common/utils.js";
 
 export type ForceAttackOptions = {
@@ -206,6 +210,7 @@ export type StrongBotOptions = {
     hfoBottomRetarget?: HfoBottomRetargetOptions;
     hfoWestRetarget?: HfoWestRetargetOptions;
     exactMapTactics?: boolean;
+    peakOfPerfectionProfileScope?: PeakOfPerfectionProfileScope;
 };
 
 const DEFAULT_FORCE_ATTACK_OPTIONS: Required<ForceAttackOptions> = {
@@ -1357,6 +1362,7 @@ export class StrongBot extends SupalosaBot {
     private lastOtmqFinalSweepOrderAt = 0;
     private readonly enableDefaultMapProfiles: boolean;
     private readonly enableExactMapTactics: boolean;
+    private readonly peakOfPerfectionProfileScope: PeakOfPerfectionProfileScope;
     private readonly preserveBaselineCore: boolean;
     private readonly explicitOptionOverrides: StrongBotOptions;
 
@@ -1372,6 +1378,10 @@ export class StrongBot extends SupalosaBot {
         this.explicitOptionOverrides = options;
         this.enableDefaultMapProfiles = options.defaultMapProfiles ?? true;
         this.enableExactMapTactics = options.exactMapTactics ?? true;
+        this.peakOfPerfectionProfileScope = options.peakOfPerfectionProfileScope ?? "weak_only";
+        if (!["off", "weak_only", "both"].includes(this.peakOfPerfectionProfileScope)) {
+            throw new Error(`Invalid Peak of Perfection bot profile scope: ${this.peakOfPerfectionProfileScope}`);
+        }
         this.preserveBaselineCore = options.preserveBaselineCore ?? false;
         this.forceAttackOptions = { ...DEFAULT_FORCE_ATTACK_OPTIONS, ...definedOptions(options.forceAttack) };
         this.harassOptions = { ...DEFAULT_HARASS_OPTIONS, ...definedOptions(options.harass) };
@@ -1490,7 +1500,7 @@ export class StrongBot extends SupalosaBot {
                 this.applyRiverRampageLowerProfile();
             } else if (this.isYinYangUpperStart(game)) {
                 this.applyYinYangUpperProfile();
-            } else if (this.isPeakOfPerfectionWeakStart(game)) {
+            } else if (this.shouldApplyPeakOfPerfectionProfile(game)) {
                 this.applyPeakOfPerfectionWeakProfile();
             } else if (this.isOtmqSouthwestStart(game)) {
                 this.applyOtmqSouthwestProfile();
@@ -2445,7 +2455,7 @@ export class StrongBot extends SupalosaBot {
     }
 
     private maybePeakEmergencyDefend(game: GameApi): boolean {
-        if (!this.isPeakOfPerfectionWeakStart(game)) {
+        if (!this.shouldApplyPeakOfPerfectionProfile(game)) {
             return false;
         }
         const tick = game.getCurrentTick();
@@ -2486,7 +2496,7 @@ export class StrongBot extends SupalosaBot {
 
     private maybePeakCloseout(game: GameApi): boolean {
         const tick = game.getCurrentTick();
-        if (!this.isPeakOfPerfectionWeakStart(game) || tick < 24000) {
+        if (!this.shouldApplyPeakOfPerfectionProfile(game) || tick < 24000) {
             return false;
         }
         const enemyUnits = this.getKnownEnemyUnits(game);
@@ -4351,6 +4361,20 @@ export class StrongBot extends SupalosaBot {
         }
         const playerData = game.getPlayerData(this.name);
         return this.getStartKey(playerData.startLocation) === expectedOwnStart;
+    }
+
+    private isPeakOfPerfectionMap(game: GameApi): boolean {
+        const starts = game.mapApi.getStartingLocations().map((start) => this.getStartKey(start)).sort();
+        return starts.length === PEAK_OF_PERFECTION_STARTS.size &&
+            starts.every((start) => PEAK_OF_PERFECTION_STARTS.has(start));
+    }
+
+    private shouldApplyPeakOfPerfectionProfile(game: GameApi): boolean {
+        return peakOfPerfectionProfileApplies(
+            this.peakOfPerfectionProfileScope,
+            this.isPeakOfPerfectionMap(game),
+            this.isPeakOfPerfectionWeakStart(game),
+        );
     }
 
     private isPeakOfPerfectionWeakStart(game: GameApi): boolean {

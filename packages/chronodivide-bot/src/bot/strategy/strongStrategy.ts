@@ -14,10 +14,25 @@ import { MissionController } from "../logic/mission/missionController.js";
 import { Countries, DebugLogger } from "../logic/common/utils.js";
 import { DefaultStrategy, DefaultStrategyOptions } from "./defaultStrategy.js";
 
+export type PeakOfPerfectionProfileScope = "off" | "weak_only" | "both";
+
+export const peakOfPerfectionProfileApplies = (
+    scope: PeakOfPerfectionProfileScope | undefined,
+    isPeakMap: boolean,
+    isWeakStart: boolean,
+): boolean => {
+    const resolved = scope ?? "weak_only";
+    if (resolved === "off") return false;
+    if (resolved === "both") return isPeakMap;
+    if (resolved === "weak_only") return isWeakStart;
+    throw new Error(`Invalid Peak of Perfection profile scope: ${resolved}`);
+};
+
 export type StrongStrategyOptions = {
     defaultMapProfiles?: boolean;
     hfoAlliedWestProfile?: boolean;
     hfoSovietWestProfile?: boolean;
+    peakOfPerfectionProfileScope?: PeakOfPerfectionProfileScope;
     preserveBaselineCore?: boolean;
     base?: DefaultStrategyOptions;
     allIn?: AllInAttackMissionFactoryOptions;
@@ -903,7 +918,7 @@ export class StrongStrategy implements Strategy {
                     logger,
                 );
             }
-            if (this.isPeakOfPerfectionWeakStart(context)) {
+            if (this.shouldApplyPeakOfPerfectionProfile(context)) {
                 logger("Strong strategy profile: peakOfPerfectionWeak");
                 return new StrongStrategy(
                     PEAK_OF_PERFECTION_WEAK_PROFILE,
@@ -990,6 +1005,14 @@ export class StrongStrategy implements Strategy {
         const playerData = context.game.getPlayerData(context.player.name);
         const countryName = (playerData.country as { name?: string } | undefined)?.name;
         return countryName === Countries.IRAQ && this.isKnownMapProfile(context, SIMPLE_1V1_STARTS);
+    }
+
+    private shouldApplyPeakOfPerfectionProfile(context: SupabotContext): boolean {
+        return peakOfPerfectionProfileApplies(
+            this.options.peakOfPerfectionProfileScope,
+            this.isKnownMapProfile(context, PEAK_OF_PERFECTION_STARTS),
+            this.isPeakOfPerfectionWeakStart(context),
+        );
     }
 
     private isPeakOfPerfectionWeakStart(context: SupabotContext): boolean {
