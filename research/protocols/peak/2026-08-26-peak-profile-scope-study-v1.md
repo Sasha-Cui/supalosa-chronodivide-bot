@@ -77,9 +77,10 @@ merged with its recorded seed overrides:
 - all remaining recorded numeric values are retained even when their mechanism
   is disabled, so the serialized policy exactly matches the old seed.
 
-This candidate disables automatic map-profile substitution. A second
-historical arm adds only bot/tactic scope `both`, preserving the exact
-historical macro strategy.
+The historical candidate retains the trainer's deployed bot/tactic default,
+`weak_only`; its explicit macro options prevent automatic strategy-profile
+substitution. A second historical arm changes only bot/tactic scope to `both`,
+preserving the exact historical macro strategy.
 
 ## Frozen arms
 
@@ -87,8 +88,8 @@ historical macro strategy.
 2. `strategy_both`: strategy `both`, bot/tactics `weak_only`.
 3. `bot_both`: strategy `weak_only`, bot/tactics `both`.
 4. `both_both`: strategy `both`, bot/tactics `both`.
-5. `historical_defensive_infantry`: exact historical strategy, automatic map
-   profiles off, no added Peak bot profile at `(118,73)`.
+5. `historical_defensive_infantry`: exact historical strategy and deployed
+   `weak_only` bot/tactic scope.
 6. `historical_defensive_infantry_bot_both`: the same historical strategy plus
    bot/tactic scope `both`.
 
