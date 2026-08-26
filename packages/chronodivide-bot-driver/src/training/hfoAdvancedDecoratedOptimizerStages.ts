@@ -228,7 +228,9 @@ const runCell = async (): Promise<void> => {
     const selectionPath = requiredPath("SELECTION_PATH"), selectionSha256 = requiredText("SELECTION_SHA256", SHA256);
     if (!design || taskIndex < 0 || taskIndex >= design.taskCount || process.env.SLURM_ARRAY_TASK_ID !== String(taskIndex) ||
         fs.existsSync(outputPath) || sha256File(programPath) !== programSha256) throw new Error("V5 stage cell drifted");
-    const previous = loadPrevious(stageIndex), runSpan = design.armCount * design.casesPerRun;
+    const previous = loadPrevious(stageIndex),
+        previousStageSha256 = stageIndex === 0 ? null : requiredText("PREVIOUS_SHA256", SHA256),
+        runSpan = design.armCount * design.casesPerRun;
     const runIndex = Math.floor(taskIndex / runSpan), withinRun = taskIndex % runSpan,
         armIndex = Math.floor(withinRun / design.casesPerRun), caseIndex = withinRun % design.casesPerRun;
     const configs = stageCandidates(stageIndex, runIndex, previous), candidate = configs[armIndex];
@@ -294,7 +296,8 @@ const runCell = async (): Promise<void> => {
         status: "COMPLETE_HFO_ADVANCED_V5_OPTIMIZER_CELL", complete: true, stageIndex, taskIndex, runIndex, armIndex,
         caseIndex, configSha256, schedulerAccount: "pi_jss233", schedulerJobId: process.env.SLURM_JOB_ID,
         sourceCommit: commit, programSha256, protocolSha256: inputs.protocolSha256,
-        assetManifestSha256: inputs.assetManifestSha256, selectionSha256, baselineCommit: BASELINE_COMMIT,
+        assetManifestSha256: inputs.assetManifestSha256, selectionSha256, previousStageSha256,
+        baselineCommit: BASELINE_COMMIT,
         ra2webClientCommit: RA2WEB_CLIENT_COMMIT, ra2webClientReleaseId: RA2WEB_CLIENT_RELEASE_ID,
         freezeManifestSha256: loadedAdvanced.freezeManifestSha256, advancedBundleSha256: loadedAdvanced.bundleSha256,
         result, provenance };
@@ -358,7 +361,9 @@ const finalize = (): void => {
     const programSha256 = requiredText("PROGRAM_SHA256", SHA256), selectionSha256 = requiredText("SELECTION_SHA256", SHA256),
         cellProgramSha256 = process.env.CELL_PROGRAM_SHA256 ? requiredText("CELL_PROGRAM_SHA256", SHA256) : programSha256;
     if (!design || fs.existsSync(outputPath)) throw new Error("V5 stage finalizer drifted");
-    const previous = loadPrevious(stageIndex), currentCommit = sourceIdentity().commit;
+    const previous = loadPrevious(stageIndex),
+        previousStageSha256 = stageIndex === 0 ? null : requiredText("PREVIOUS_SHA256", SHA256),
+        currentCommit = sourceIdentity().commit;
     let tasks = new Map<number, string>();
     for (let attempt = 0; attempt < 31; attempt += 1) { tasks = completedTasks(arrayJobId);
         if (tasks.size === design.taskCount) break; if (attempt < 30) execFileSync("sleep", ["2"]); }
@@ -374,7 +379,8 @@ const finalize = (): void => {
             cell.taskIndex !== taskIndex || String(cell.schedulerJobId) !== tasks.get(taskIndex) ||
             cell.sourceCommit !== currentCommit || cell.programSha256 !== cellProgramSha256 ||
             cell.protocolSha256 !== inputs.protocolSha256 || cell.assetManifestSha256 !== inputs.assetManifestSha256 ||
-            cell.selectionSha256 !== selectionSha256 || cell.baselineCommit !== BASELINE_COMMIT ||
+            cell.selectionSha256 !== selectionSha256 || cell.previousStageSha256 !== previousStageSha256 ||
+            cell.baselineCommit !== BASELINE_COMMIT ||
             cell.ra2webClientCommit !== RA2WEB_CLIENT_COMMIT || cell.ra2webClientReleaseId !== RA2WEB_CLIENT_RELEASE_ID ||
             cell.freezeManifestSha256 !== RA2WEB_FREEZE_MANIFEST_SHA256 || cell.advancedBundleSha256 !== ADVANCED_SHA256 ||
             cell.result.quitForwarded?.candidate !== 0 || cell.result.quitForwarded?.baseline !== 0)
@@ -433,7 +439,8 @@ const finalize = (): void => {
         complete: true, passed, stageIndex, schedulerAccount: "pi_jss233", arrayJobId,
         finalizerJobId: process.env.SLURM_JOB_ID, sourceCommit: currentCommit, programSha256, cellProgramSha256,
         protocolSha256: inputs.protocolSha256, assetManifestSha256: inputs.assetManifestSha256,
-        selectionSha256, baselineCommit: BASELINE_COMMIT, ra2webClientCommit: RA2WEB_CLIENT_COMMIT,
+        selectionSha256, previousStageSha256, baselineCommit: BASELINE_COMMIT,
+        ra2webClientCommit: RA2WEB_CLIENT_COMMIT,
         ra2webClientReleaseId: RA2WEB_CLIENT_RELEASE_ID, freezeManifestSha256: RA2WEB_FREEZE_MANIFEST_SHA256,
         advancedBundleSha256: ADVANCED_SHA256, launchedGameCount: rows.length, runs,
         schedulerJobIds: [...tasks.values()], rows };
