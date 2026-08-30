@@ -1,0 +1,16 @@
+{
+  "kind": "final-paper-generated-assets",
+  "outputs": {
+    "mechanism_table.tex": "b5b3770773010b28fd66c3618a8e71664cd09be637ff6cb99044ecb08479b1c2",
+    "metrics.tex": "6e0a1b9003dcee3e76f5af378dc1480a24bba863020039f8b6c48371a3df31da",
+    "peak_strata_table.tex": "4ded40674b5e052787e65b0f03cab19c198569b98d727e1d1be8b5a6c2d01124",
+    "primary_bounds_plot.tex": "79bbc021b761a75163892243b1102cb998ca6845c767f6783d94065cc60bd002",
+    "primary_results_table.tex": "63968782e67186671730e0da993a62a9a0179604ef2bd5a5710c2d39ecc6c15f",
+    "transfer_table.tex": "7525869ad5e4a225f6fbb94f3545c123bae95fe8ad9c68ea4e02ad0c7f4a10f6"
+  },
+  "schemaVersion": 1,
+  "source": {
+    "path": "research/artifacts/final_paper_evidence_v1.json",
+    "sha256": "0670bdeefab47ca68fb5fc584be6a299e777ee0d69f04cd45de7caebf32c31e3"
+  }
+}
