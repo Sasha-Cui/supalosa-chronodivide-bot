@@ -1,0 +1,3636 @@
+{
+  "advancedTransfer": {
+    "advancedBundleSha256": "81d8797b6dd1371ba2dcbd79e25df8b42254290c820159e121a82650fd97a143",
+    "arrayJobId": "23456957",
+    "candidate": {
+      "byCountry": {
+        "Africans": {
+          "draws": 6,
+          "games": 40,
+          "lossRate": 0.425,
+          "losses": 17,
+          "medianTicks": 39852.5,
+          "oneSided95WilsonLower": 0.30523413698015683,
+          "statuses": {
+            "baseline_win": 17,
+            "candidate_win": 17,
+            "engine_nonliteral_termination_draw": 4,
+            "tick_cap_draw": 2
+          },
+          "winRate": 0.425,
+          "wins": 17
+        },
+        "Alliance": {
+          "draws": 1,
+          "games": 40,
+          "lossRate": 0.925,
+          "losses": 37,
+          "medianTicks": 36925.5,
+          "oneSided95WilsonLower": 0.016686282214939493,
+          "statuses": {
+            "baseline_win": 37,
+            "candidate_win": 2,
+            "engine_nonliteral_termination_draw": 1
+          },
+          "winRate": 0.05,
+          "wins": 2
+        },
+        "Americans": {
+          "draws": 0,
+          "games": 40,
+          "lossRate": 1,
+          "losses": 40,
+          "medianTicks": 23429.5,
+          "oneSided95WilsonLower": 0,
+          "statuses": {
+            "baseline_win": 40
+          },
+          "winRate": 0,
+          "wins": 0
+        },
+        "Arabs": {
+          "draws": 5,
+          "games": 40,
+          "lossRate": 0.4,
+          "losses": 16,
+          "medianTicks": 38436,
+          "oneSided95WilsonLower": 0.35088071456388525,
+          "statuses": {
+            "baseline_win": 16,
+            "candidate_win": 19,
+            "engine_nonliteral_termination_draw": 4,
+            "tick_cap_draw": 1
+          },
+          "winRate": 0.475,
+          "wins": 19
+        },
+        "British": {
+          "draws": 1,
+          "games": 40,
+          "lossRate": 0.95,
+          "losses": 38,
+          "medianTicks": 37296.5,
+          "oneSided95WilsonLower": 0.005597209251474913,
+          "statuses": {
+            "baseline_win": 38,
+            "candidate_win": 1,
+            "engine_nonliteral_termination_draw": 1
+          },
+          "winRate": 0.025,
+          "wins": 1
+        },
+        "Confederation": {
+          "draws": 1,
+          "games": 40,
+          "lossRate": 0.6,
+          "losses": 24,
+          "medianTicks": 41084.5,
+          "oneSided95WilsonLower": 0.2608078468185922,
+          "statuses": {
+            "baseline_win": 24,
+            "candidate_win": 15,
+            "engine_nonliteral_termination_draw": 1
+          },
+          "winRate": 0.375,
+          "wins": 15
+        },
+        "French": {
+          "draws": 1,
+          "games": 40,
+          "lossRate": 0.95,
+          "losses": 38,
+          "medianTicks": 44104,
+          "oneSided95WilsonLower": 0.005597209251474913,
+          "statuses": {
+            "baseline_win": 38,
+            "candidate_win": 1,
+            "engine_nonliteral_termination_draw": 1
+          },
+          "winRate": 0.025,
+          "wins": 1
+        },
+        "Germans": {
+          "draws": 0,
+          "games": 40,
+          "lossRate": 0.85,
+          "losses": 34,
+          "medianTicks": 34670.5,
+          "oneSided95WilsonLower": 0.07960352832041785,
+          "statuses": {
+            "baseline_win": 34,
+            "candidate_win": 6
+          },
+          "winRate": 0.15,
+          "wins": 6
+        },
+        "Russians": {
+          "draws": 4,
+          "games": 40,
+          "lossRate": 0.45,
+          "losses": 18,
+          "medianTicks": 36464,
+          "oneSided95WilsonLower": 0.32790789162299216,
+          "statuses": {
+            "baseline_win": 18,
+            "candidate_win": 18,
+            "engine_nonliteral_termination_draw": 2,
+            "tick_cap_draw": 2
+          },
+          "winRate": 0.45,
+          "wins": 18
+        }
+      },
+      "byFaction": {
+        "Allied": {
+          "draws": 3,
+          "games": 200,
+          "lossRate": 0.935,
+          "losses": 187,
+          "medianTicks": 35419,
+          "oneSided95WilsonLower": 0.03012061167108867,
+          "statuses": {
+            "baseline_win": 187,
+            "candidate_win": 10,
+            "engine_nonliteral_termination_draw": 3
+          },
+          "winRate": 0.05,
+          "wins": 10
+        },
+        "Soviet": {
+          "draws": 16,
+          "games": 160,
+          "lossRate": 0.46875,
+          "losses": 75,
+          "medianTicks": 38478,
+          "oneSided95WilsonLower": 0.36851967785551004,
+          "statuses": {
+            "baseline_win": 75,
+            "candidate_win": 69,
+            "engine_nonliteral_termination_draw": 11,
+            "tick_cap_draw": 5
+          },
+          "winRate": 0.43125,
+          "wins": 69
+        }
+      },
+      "bySlot": {
+        "0": {
+          "draws": 9,
+          "games": 180,
+          "lossRate": 0.7388888888888889,
+          "losses": 133,
+          "medianTicks": 36500,
+          "oneSided95WilsonLower": 0.16554419356122138,
+          "statuses": {
+            "baseline_win": 133,
+            "candidate_win": 38,
+            "engine_nonliteral_termination_draw": 6,
+            "tick_cap_draw": 3
+          },
+          "winRate": 0.2111111111111111,
+          "wins": 38
+        },
+        "1": {
+          "draws": 10,
+          "games": 180,
+          "lossRate": 0.7166666666666667,
+          "losses": 129,
+          "medianTicks": 36541.5,
+          "oneSided95WilsonLower": 0.18061376393979214,
+          "statuses": {
+            "baseline_win": 129,
+            "candidate_win": 41,
+            "engine_nonliteral_termination_draw": 8,
+            "tick_cap_draw": 2
+          },
+          "winRate": 0.22777777777777777,
+          "wins": 41
+        }
+      },
+      "byStart": {
+        "151,119": {
+          "draws": 7,
+          "games": 90,
+          "lossRate": 0.5666666666666667,
+          "losses": 51,
+          "medianTicks": 38374,
+          "oneSided95WilsonLower": 0.27788741654961746,
+          "statuses": {
+            "baseline_win": 51,
+            "candidate_win": 32,
+            "engine_nonliteral_termination_draw": 6,
+            "tick_cap_draw": 1
+          },
+          "winRate": 0.35555555555555557,
+          "wins": 32
+        },
+        "39,82": {
+          "draws": 4,
+          "games": 90,
+          "lossRate": 0.8333333333333334,
+          "losses": 75,
+          "medianTicks": 18861.5,
+          "oneSided95WilsonLower": 0.0762161888751829,
+          "statuses": {
+            "baseline_win": 75,
+            "candidate_win": 11,
+            "engine_nonliteral_termination_draw": 4
+          },
+          "winRate": 0.12222222222222222,
+          "wins": 11
+        },
+        "88,157": {
+          "draws": 5,
+          "games": 90,
+          "lossRate": 0.5777777777777777,
+          "losses": 52,
+          "medianTicks": 39080,
+          "oneSided95WilsonLower": 0.2881420219511324,
+          "statuses": {
+            "baseline_win": 52,
+            "candidate_win": 33,
+            "engine_nonliteral_termination_draw": 4,
+            "tick_cap_draw": 1
+          },
+          "winRate": 0.36666666666666664,
+          "wins": 33
+        },
+        "88,34": {
+          "draws": 3,
+          "games": 90,
+          "lossRate": 0.9333333333333333,
+          "losses": 84,
+          "medianTicks": 50053.5,
+          "oneSided95WilsonLower": 0.013398702025270723,
+          "statuses": {
+            "baseline_win": 84,
+            "candidate_win": 3,
+            "tick_cap_draw": 3
+          },
+          "winRate": 0.03333333333333333,
+          "wins": 3
+        }
+      },
+      "clustered": {
+        "clusterCount": 36,
+        "degreesOfFreedom": 35,
+        "meanWinRate": 0.21944444444444447,
+        "oneSided95Lower": 0.1346128263063962,
+        "sampleStandardDeviation": 0.3012539929261822,
+        "tCritical": 1.68957
+      },
+      "overall": {
+        "draws": 19,
+        "games": 360,
+        "lossRate": 0.7277777777777777,
+        "losses": 262,
+        "medianTicks": 36500,
+        "oneSided95WilsonLower": 0.18573107040026168,
+        "statuses": {
+          "baseline_win": 262,
+          "candidate_win": 79,
+          "engine_nonliteral_termination_draw": 14,
+          "tick_cap_draw": 5
+        },
+        "winRate": 0.21944444444444444,
+        "wins": 79
+      }
+    },
+    "finalizerJobId": "23456958",
+    "freezeManifestSha256": "a405c0fc6d1d6541f965582c9b53be0bfd01c0c68f4d0f340e1a5ae37671aa5d",
+    "gameCount": 720,
+    "paired": {
+      "degreesOfFreedom": 359,
+      "improved": 35,
+      "meanScoreDifference": -0.2902777777777778,
+      "oneSided95Lower": -0.33891518640370966,
+      "sampleStandardDeviation": 0.5595859298403343,
+      "tCritical": 1.64913,
+      "tied": 182,
+      "worsened": 143
+    },
+    "ra2webClientCommit": "218fb800614295119e25040986b175fee4c3670f",
+    "ra2webClientReleaseId": "0.84.1-r1d35349-dd6a17b9c",
+    "sourceCommit": "11331d198aff7679b7ed9bea61d8dcf936af1bad",
+    "status": "FAIL_HFO_RA2WEB_ADVANCED_CROSSPLAY",
+    "supalosa": {
+      "byCountry": {
+        "Africans": {
+          "draws": 4,
+          "games": 40,
+          "lossRate": 0.3,
+          "losses": 12,
+          "medianTicks": 22386.5,
+          "oneSided95WilsonLower": 0.4701941555435975,
+          "statuses": {
+            "baseline_win": 12,
+            "candidate_win": 24,
+            "engine_nonliteral_termination_draw": 2,
+            "tick_cap_draw": 2
+          },
+          "winRate": 0.6,
+          "wins": 24
+        },
+        "Alliance": {
+          "draws": 3,
+          "games": 40,
+          "lossRate": 0.3,
+          "losses": 12,
+          "medianTicks": 25154.5,
+          "oneSided95WilsonLower": 0.49496948465722773,
+          "statuses": {
+            "baseline_win": 12,
+            "candidate_win": 25,
+            "engine_nonliteral_termination_draw": 3
+          },
+          "winRate": 0.625,
+          "wins": 25
+        },
+        "Americans": {
+          "draws": 2,
+          "games": 40,
+          "lossRate": 0.7,
+          "losses": 28,
+          "medianTicks": 19618,
+          "oneSided95WilsonLower": 0.15570378386291214,
+          "statuses": {
+            "baseline_win": 28,
+            "candidate_win": 10,
+            "engine_nonliteral_termination_draw": 1,
+            "tick_cap_draw": 1
+          },
+          "winRate": 0.25,
+          "wins": 10
+        },
+        "Arabs": {
+          "draws": 4,
+          "games": 40,
+          "lossRate": 0.375,
+          "losses": 15,
+          "medianTicks": 27368.5,
+          "oneSided95WilsonLower": 0.3977130421316124,
+          "statuses": {
+            "baseline_win": 15,
+            "candidate_win": 21,
+            "tick_cap_draw": 4
+          },
+          "winRate": 0.525,
+          "wins": 21
+        },
+        "British": {
+          "draws": 2,
+          "games": 40,
+          "lossRate": 0.5,
+          "losses": 20,
+          "medianTicks": 25872.5,
+          "oneSided95WilsonLower": 0.32790789162299216,
+          "statuses": {
+            "baseline_win": 20,
+            "candidate_win": 18,
+            "tick_cap_draw": 2
+          },
+          "winRate": 0.45,
+          "wins": 18
+        },
+        "Confederation": {
+          "draws": 6,
+          "games": 40,
+          "lossRate": 0.3,
+          "losses": 12,
+          "medianTicks": 25440,
+          "oneSided95WilsonLower": 0.4215725467584464,
+          "statuses": {
+            "baseline_win": 12,
+            "candidate_win": 22,
+            "engine_nonliteral_termination_draw": 2,
+            "tick_cap_draw": 4
+          },
+          "winRate": 0.55,
+          "wins": 22
+        },
+        "French": {
+          "draws": 2,
+          "games": 40,
+          "lossRate": 0.6,
+          "losses": 24,
+          "medianTicks": 28319,
+          "oneSided95WilsonLower": 0.23907371478042377,
+          "statuses": {
+            "baseline_win": 24,
+            "candidate_win": 14,
+            "engine_nonliteral_termination_draw": 1,
+            "tick_cap_draw": 1
+          },
+          "winRate": 0.35,
+          "wins": 14
+        },
+        "Germans": {
+          "draws": 3,
+          "games": 40,
+          "lossRate": 0.375,
+          "losses": 15,
+          "medianTicks": 24606.5,
+          "oneSided95WilsonLower": 0.4215725467584464,
+          "statuses": {
+            "baseline_win": 15,
+            "candidate_win": 22,
+            "engine_nonliteral_termination_draw": 1,
+            "tick_cap_draw": 2
+          },
+          "winRate": 0.55,
+          "wins": 22
+        },
+        "Russians": {
+          "draws": 4,
+          "games": 40,
+          "lossRate": 0.35,
+          "losses": 14,
+          "medianTicks": 25171,
+          "oneSided95WilsonLower": 0.4215725467584464,
+          "statuses": {
+            "baseline_win": 14,
+            "candidate_win": 22,
+            "tick_cap_draw": 4
+          },
+          "winRate": 0.55,
+          "wins": 22
+        }
+      },
+      "byFaction": {
+        "Allied": {
+          "draws": 12,
+          "games": 200,
+          "lossRate": 0.495,
+          "losses": 99,
+          "medianTicks": 24648,
+          "oneSided95WilsonLower": 0.3883149864198112,
+          "statuses": {
+            "baseline_win": 99,
+            "candidate_win": 89,
+            "engine_nonliteral_termination_draw": 6,
+            "tick_cap_draw": 6
+          },
+          "winRate": 0.445,
+          "wins": 89
+        },
+        "Soviet": {
+          "draws": 18,
+          "games": 160,
+          "lossRate": 0.33125,
+          "losses": 53,
+          "medianTicks": 25290,
+          "oneSided95WilsonLower": 0.491241427763114,
+          "statuses": {
+            "baseline_win": 53,
+            "candidate_win": 89,
+            "engine_nonliteral_termination_draw": 4,
+            "tick_cap_draw": 14
+          },
+          "winRate": 0.55625,
+          "wins": 89
+        }
+      },
+      "bySlot": {
+        "0": {
+          "draws": 14,
+          "games": 180,
+          "lossRate": 0.4166666666666667,
+          "losses": 75,
+          "medianTicks": 25098,
+          "oneSided95WilsonLower": 0.44463247787413934,
+          "statuses": {
+            "baseline_win": 75,
+            "candidate_win": 91,
+            "engine_nonliteral_termination_draw": 4,
+            "tick_cap_draw": 10
+          },
+          "winRate": 0.5055555555555555,
+          "wins": 91
+        },
+        "1": {
+          "draws": 16,
+          "games": 180,
+          "lossRate": 0.42777777777777776,
+          "losses": 77,
+          "medianTicks": 24747.5,
+          "oneSided95WilsonLower": 0.42276893789539066,
+          "statuses": {
+            "baseline_win": 77,
+            "candidate_win": 87,
+            "engine_nonliteral_termination_draw": 6,
+            "tick_cap_draw": 10
+          },
+          "winRate": 0.48333333333333334,
+          "wins": 87
+        }
+      },
+      "byStart": {
+        "151,119": {
+          "draws": 2,
+          "games": 90,
+          "lossRate": 0.2222222222222222,
+          "losses": 20,
+          "medianTicks": 25243.5,
+          "oneSided95WilsonLower": 0.6743023204676288,
+          "statuses": {
+            "baseline_win": 20,
+            "candidate_win": 68,
+            "engine_nonliteral_termination_draw": 1,
+            "tick_cap_draw": 1
+          },
+          "winRate": 0.7555555555555555,
+          "wins": 68
+        },
+        "39,82": {
+          "draws": 0,
+          "games": 90,
+          "lossRate": 1,
+          "losses": 90,
+          "medianTicks": 27248,
+          "oneSided95WilsonLower": 0,
+          "statuses": {
+            "baseline_win": 90
+          },
+          "winRate": 0,
+          "wins": 0
+        },
+        "88,157": {
+          "draws": 23,
+          "games": 90,
+          "lossRate": 0.03333333333333333,
+          "losses": 3,
+          "medianTicks": 18547.5,
+          "oneSided95WilsonLower": 0.6272753784969347,
+          "statuses": {
+            "baseline_win": 3,
+            "candidate_win": 64,
+            "engine_nonliteral_termination_draw": 6,
+            "tick_cap_draw": 17
+          },
+          "winRate": 0.7111111111111111,
+          "wins": 64
+        },
+        "88,34": {
+          "draws": 5,
+          "games": 90,
+          "lossRate": 0.43333333333333335,
+          "losses": 39,
+          "medianTicks": 25905.5,
+          "oneSided95WilsonLower": 0.42539030035934167,
+          "statuses": {
+            "baseline_win": 39,
+            "candidate_win": 46,
+            "engine_nonliteral_termination_draw": 3,
+            "tick_cap_draw": 2
+          },
+          "winRate": 0.5111111111111111,
+          "wins": 46
+        }
+      },
+      "clustered": {
+        "clusterCount": 36,
+        "degreesOfFreedom": 35,
+        "meanWinRate": 0.49444444444444446,
+        "oneSided95Lower": 0.3828279472312188,
+        "sampleStandardDeviation": 0.3963724398985267,
+        "tCritical": 1.68957
+      },
+      "overall": {
+        "draws": 30,
+        "games": 360,
+        "lossRate": 0.4222222222222222,
+        "losses": 152,
+        "medianTicks": 24898.5,
+        "oneSided95WilsonLower": 0.45130479981493327,
+        "statuses": {
+          "baseline_win": 152,
+          "candidate_win": 178,
+          "engine_nonliteral_termination_draw": 10,
+          "tick_cap_draw": 20
+        },
+        "winRate": 0.49444444444444446,
+        "wins": 178
+      }
+    }
+  },
+  "baselineCommit": "165b77a71d0cf5ebd27c65b19d0486bcbae78d0f",
+  "claimBoundary": {
+    "supported": [
+      "StrongBot reliably beats pinned Supalosa on balanced HFO across all countries, starts, and slots.",
+      "Reciprocal Peak macro profiling reliably improves the deployed control and beats pinned Supalosa on fresh balanced Peak cases.",
+      "Scoped rush/guard and progress-retarget mechanisms replicate in their declared HFO conditions and are technically inert elsewhere."
+    ],
+    "unsupported": [
+      "general RTS superiority",
+      "superiority to all opponents",
+      "a new Chrono Divide environment",
+      "a novel general-purpose optimizer",
+      "RA2Web Advanced superiority"
+    ]
+  },
+  "complete": true,
+  "frameEvidence": {
+    "arrayJobId": "24248519",
+    "finalizerJobId": "24248520",
+    "forceClearance": {
+      "eventUpdate": 18900,
+      "frameUpdates": [
+        18600,
+        18900,
+        19500
+      ],
+      "reason": "registered transition present",
+      "retained": true
+    },
+    "frameCount": 15,
+    "frames": [
+      {
+        "annotations": [
+          {
+            "kind": "opponent_building",
+            "label": "Opponent buildings: 2",
+            "unitId": 2260
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 2264
+          },
+          {
+            "height": 5,
+            "kind": "region",
+            "label": "Candidate start",
+            "width": 5,
+            "x": 116,
+            "y": 71
+          },
+          {
+            "height": 5,
+            "kind": "region",
+            "label": "Opponent start",
+            "width": 5,
+            "x": 35,
+            "y": 71
+          }
+        ],
+        "bytes": 93738,
+        "category": "Reciprocal Peak macro profile",
+        "file": "paper/figures/game_frames/peak-deployed-weak-only-u600.png",
+        "pngSha256": "d0d50ca1280bdbd7ee3f9acd75d5ccc3232af9f1101fabd2e9c198d6fec03937",
+        "policy": "peak-deployed-weak-only",
+        "stateSha256": "2c34daf32134a3ab708eba6f91b10dc0f8a220bbfd0f72c5a199651958ad3ddd",
+        "update": 600
+      },
+      {
+        "annotations": [
+          {
+            "kind": "opponent_building",
+            "label": "Opponent buildings: 3",
+            "unitId": 2260
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 2264
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 2266
+          },
+          {
+            "kind": "opponent_combatant",
+            "label": "Opponent combatant",
+            "unitId": 2267
+          },
+          {
+            "height": 5,
+            "kind": "region",
+            "label": "Candidate start",
+            "width": 5,
+            "x": 116,
+            "y": 71
+          },
+          {
+            "height": 5,
+            "kind": "region",
+            "label": "Opponent start",
+            "width": 5,
+            "x": 35,
+            "y": 71
+          }
+        ],
+        "bytes": 95690,
+        "category": "Reciprocal Peak macro profile",
+        "file": "paper/figures/game_frames/peak-deployed-weak-only-u900.png",
+        "pngSha256": "d5371ae055d86bcff927c7f57debe09a5fc80ae825620f305cf043ce0f108561",
+        "policy": "peak-deployed-weak-only",
+        "stateSha256": "de68c1903a88ff0c6c8f9a4a3df6b9b5af6eeea82812ccbd7736205345f751c0",
+        "update": 900
+      },
+      {
+        "annotations": [
+          {
+            "kind": "opponent_building",
+            "label": "Opponent buildings: 3",
+            "unitId": 2260
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 2264
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 2266
+          },
+          {
+            "kind": "candidate_force",
+            "label": "Candidate combatant",
+            "unitId": 2272
+          },
+          {
+            "kind": "opponent_combatant",
+            "label": "Opponent combatant",
+            "unitId": 2267
+          },
+          {
+            "height": 5,
+            "kind": "region",
+            "label": "Candidate start",
+            "width": 5,
+            "x": 116,
+            "y": 71
+          },
+          {
+            "height": 5,
+            "kind": "region",
+            "label": "Opponent start",
+            "width": 5,
+            "x": 35,
+            "y": 71
+          }
+        ],
+        "bytes": 99027,
+        "category": "Reciprocal Peak macro profile",
+        "file": "paper/figures/game_frames/peak-deployed-weak-only-u1500.png",
+        "pngSha256": "59dcf23f7e1f5b71bd54f8b316f7469a140740f300542da1b9f153a8274d235c",
+        "policy": "peak-deployed-weak-only",
+        "stateSha256": "d911cdc42fa49acdeec01ce7b48edef2b99b1d07381dd97f80559541aa13dd4a",
+        "update": 1500
+      },
+      {
+        "annotations": [
+          {
+            "kind": "opponent_building",
+            "label": "Opponent buildings: 2",
+            "unitId": 2260
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 2264
+          },
+          {
+            "height": 5,
+            "kind": "region",
+            "label": "Candidate start",
+            "width": 5,
+            "x": 116,
+            "y": 71
+          },
+          {
+            "height": 5,
+            "kind": "region",
+            "label": "Opponent start",
+            "width": 5,
+            "x": 35,
+            "y": 71
+          }
+        ],
+        "bytes": 95455,
+        "category": "Reciprocal Peak macro profile",
+        "file": "paper/figures/game_frames/peak-confirmed-strategy-both-u600.png",
+        "pngSha256": "04a8786ddc855647c5a6942ab41131909735c177c64fe3755f466fd1bab3192f",
+        "policy": "peak-confirmed-strategy-both",
+        "stateSha256": "2c34daf32134a3ab708eba6f91b10dc0f8a220bbfd0f72c5a199651958ad3ddd",
+        "update": 600
+      },
+      {
+        "annotations": [
+          {
+            "kind": "opponent_building",
+            "label": "Opponent buildings: 3",
+            "unitId": 2260
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 2264
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 2266
+          },
+          {
+            "kind": "candidate_force",
+            "label": "Candidate combatant",
+            "unitId": 2267
+          },
+          {
+            "kind": "opponent_combatant",
+            "label": "Opponent combatant",
+            "unitId": 2268
+          },
+          {
+            "height": 5,
+            "kind": "region",
+            "label": "Candidate start",
+            "width": 5,
+            "x": 116,
+            "y": 71
+          },
+          {
+            "height": 5,
+            "kind": "region",
+            "label": "Opponent start",
+            "width": 5,
+            "x": 35,
+            "y": 71
+          }
+        ],
+        "bytes": 100538,
+        "category": "Reciprocal Peak macro profile",
+        "file": "paper/figures/game_frames/peak-confirmed-strategy-both-u900.png",
+        "pngSha256": "3df87f8e751c12b4fc089d66e37e202917982283130b0fe1592920bc851ccc8e",
+        "policy": "peak-confirmed-strategy-both",
+        "stateSha256": "0a59fee79ee09e6ef9c6713ecf116ae1db98f53a5ba6d356862a548cb5a296ae",
+        "update": 900
+      },
+      {
+        "annotations": [
+          {
+            "kind": "opponent_building",
+            "label": "Opponent buildings: 3",
+            "unitId": 2260
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 2264
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 2266
+          },
+          {
+            "kind": "candidate_force",
+            "label": "Candidate combatant",
+            "unitId": 2267
+          },
+          {
+            "kind": "opponent_combatant",
+            "label": "Opponent combatant",
+            "unitId": 2268
+          },
+          {
+            "height": 5,
+            "kind": "region",
+            "label": "Candidate start",
+            "width": 5,
+            "x": 116,
+            "y": 71
+          },
+          {
+            "height": 5,
+            "kind": "region",
+            "label": "Opponent start",
+            "width": 5,
+            "x": 35,
+            "y": 71
+          }
+        ],
+        "bytes": 100868,
+        "category": "Reciprocal Peak macro profile",
+        "file": "paper/figures/game_frames/peak-confirmed-strategy-both-u1500.png",
+        "pngSha256": "53a2c6a6440e9559728df6da4c552cb0608c15d0d1e8fc0412b016eaf3f94367",
+        "policy": "peak-confirmed-strategy-both",
+        "stateSha256": "7f855b842c4973739feed4a469965c22d963d39e85afba8d53564a5d3338fef2",
+        "update": 1500
+      },
+      {
+        "annotations": [
+          {
+            "kind": "opponent_building",
+            "label": "Opponent buildings: 1",
+            "unitId": 3364
+          },
+          {
+            "kind": "candidate_force",
+            "label": "Candidate combatant",
+            "unitId": 3394
+          }
+        ],
+        "bytes": 98309,
+        "category": "Literal final-building elimination",
+        "file": "paper/figures/game_frames/hfo-confirmed-final-building-u19020.png",
+        "pngSha256": "1852649a28d26f407517dfe4a8bfea2d39ba0dee5e531ffb30b15d87672c672f",
+        "policy": "hfo-confirmed-final-building",
+        "stateSha256": "1827e0b7cde82c6bf602ca6dd9ed1c74e97c5e0c9ce10f0dd78d926f5f0aa085",
+        "update": 19020
+      },
+      {
+        "annotations": [
+          {
+            "kind": "opponent_building",
+            "label": "Opponent buildings: 1",
+            "unitId": 3364
+          },
+          {
+            "kind": "candidate_force",
+            "label": "Candidate combatant",
+            "unitId": 3394
+          }
+        ],
+        "bytes": 98417,
+        "category": "Literal final-building elimination",
+        "file": "paper/figures/game_frames/hfo-confirmed-final-building-u19320.png",
+        "pngSha256": "46043a3cbab08d4f40cf21aa75eeabcff0bc7df9d010066c23151bbab6126ed2",
+        "policy": "hfo-confirmed-final-building",
+        "stateSha256": "49a1a738016876dedc827b5ca826c18058aaa83cc7b26fdd684876898c7dbf3e",
+        "update": 19320
+      },
+      {
+        "annotations": [
+          {
+            "kind": "candidate_force",
+            "label": "Candidate combatant",
+            "unitId": 3288
+          },
+          {
+            "kind": "opponent_combatant",
+            "label": "Opponent combatant",
+            "unitId": 4943
+          }
+        ],
+        "bytes": 100966,
+        "category": "Literal final-building elimination",
+        "file": "paper/figures/game_frames/hfo-confirmed-final-building-u19667.png",
+        "pngSha256": "b7a4c8d2a40ff3a514433df83900255556739daa3c81aec556dde6ab5f4248ec",
+        "policy": "hfo-confirmed-final-building",
+        "stateSha256": "03f24ccfe28b11bb93d73a8f06e0699b7fb6854693ebeb90d5791045c16a3df6",
+        "update": 19667
+      },
+      {
+        "annotations": [
+          {
+            "kind": "opponent_building",
+            "label": "Opponent buildings: 1",
+            "unitId": 3364
+          },
+          {
+            "kind": "candidate_force",
+            "label": "Candidate combatant",
+            "unitId": 3330
+          },
+          {
+            "kind": "opponent_combatant",
+            "label": "Opponent combatant",
+            "unitId": 4438
+          }
+        ],
+        "bytes": 104687,
+        "category": "HFO force-clearance transition",
+        "file": "paper/figures/game_frames/hfo-confirmed-force-clearance-u18600.png",
+        "pngSha256": "efb5f908c0c2b6799e315574220cc7aab0df8927bb1dd1f7b25a35547af5f181",
+        "policy": "hfo-confirmed-force-clearance",
+        "stateSha256": "707d4c227de2e1d05b3972a73d00b38e91789b74b531fc732a2ac14bfb8bd67e",
+        "update": 18600
+      },
+      {
+        "annotations": [
+          {
+            "kind": "opponent_building",
+            "label": "Opponent buildings: 1",
+            "unitId": 3364
+          },
+          {
+            "kind": "candidate_force",
+            "label": "Candidate combatant",
+            "unitId": 3394
+          }
+        ],
+        "bytes": 99771,
+        "category": "HFO force-clearance transition",
+        "file": "paper/figures/game_frames/hfo-confirmed-force-clearance-u18900.png",
+        "pngSha256": "c8c4268e53c4a56d4f6b981720f831fd9bb316eb1750118b8cb00b4211395c6b",
+        "policy": "hfo-confirmed-force-clearance",
+        "stateSha256": "9d4cb7585828b71133bf030e02b4b01a6b7401dc25aac5a4e2c7180b46ed1a41",
+        "update": 18900
+      },
+      {
+        "annotations": [
+          {
+            "kind": "opponent_building",
+            "label": "Opponent buildings: 1",
+            "unitId": 3364
+          },
+          {
+            "kind": "candidate_force",
+            "label": "Candidate combatant",
+            "unitId": 3394
+          }
+        ],
+        "bytes": 99202,
+        "category": "HFO force-clearance transition",
+        "file": "paper/figures/game_frames/hfo-confirmed-force-clearance-u19500.png",
+        "pngSha256": "6380940b9bddc426ee2ecd9bc150dd9d16e678ad8cf243ec58f60ac29cc9c566",
+        "policy": "hfo-confirmed-force-clearance",
+        "stateSha256": "8c1d428cfe3ef9e40e9756fa803a8fd0bf58cf8e51c34ff9109b9fef9924e7f9",
+        "update": 19500
+      },
+      {
+        "annotations": [
+          {
+            "kind": "opponent_building",
+            "label": "Opponent buildings: 3",
+            "unitId": 3282
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 3303
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 3324
+          },
+          {
+            "kind": "opponent_combatant",
+            "label": "Opponent combatant",
+            "unitId": 3296
+          }
+        ],
+        "bytes": 102492,
+        "category": "HFO tick-cap limitation",
+        "file": "paper/figures/game_frames/hfo-confirmed-tick-cap-u72000.png",
+        "pngSha256": "37c14f5a9013864b3da69b5affd125552f9d7a2540e8f445df56495eaf7d8e9e",
+        "policy": "hfo-confirmed-tick-cap",
+        "stateSha256": "5179be3b87307c01a9cc4bf98bf4ecc9da2213c9bf89de54cbb678cb12372d1f",
+        "update": 72000
+      },
+      {
+        "annotations": [
+          {
+            "kind": "opponent_building",
+            "label": "Opponent buildings: 3",
+            "unitId": 3282
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 3303
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 3324
+          },
+          {
+            "kind": "opponent_combatant",
+            "label": "Opponent combatant",
+            "unitId": 3296
+          }
+        ],
+        "bytes": 102811,
+        "category": "HFO tick-cap limitation",
+        "file": "paper/figures/game_frames/hfo-confirmed-tick-cap-u81000.png",
+        "pngSha256": "8eaf280c6eb0c68f8857087f7e696330e1cfc45a87bd41c53c69524f8936b36a",
+        "policy": "hfo-confirmed-tick-cap",
+        "stateSha256": "6f12696506f72f275f7bbf3425877bcabe064813434e2bb0f29df50ea13dcc1a",
+        "update": 81000
+      },
+      {
+        "annotations": [
+          {
+            "kind": "opponent_building",
+            "label": "Opponent buildings: 3",
+            "unitId": 3282
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 3303
+          },
+          {
+            "kind": "opponent_building",
+            "label": "Opponent building",
+            "unitId": 3324
+          },
+          {
+            "kind": "opponent_combatant",
+            "label": "Opponent combatant",
+            "unitId": 3296
+          }
+        ],
+        "bytes": 102548,
+        "category": "HFO tick-cap limitation",
+        "file": "paper/figures/game_frames/hfo-confirmed-tick-cap-u90000.png",
+        "pngSha256": "36f412ed99b62a4872a626e434b3b87f22ed8be135451e74ac31d9336053b312",
+        "policy": "hfo-confirmed-tick-cap",
+        "stateSha256": "621d387ddb62afdc2c954288e6839fdf0a957e7da626f3b18bd8db6b65d7d549",
+        "update": 90000
+      }
+    ],
+    "manifestSha256": "5233530adb5d1a1fffd6c6929635d7b0ff2ed0d38c2e91366c1700b0069d2c08",
+    "omittedCategories": [
+      {
+        "category": "advanced_transfer",
+        "reason": "Protocol amendment 1 omits V1."
+      }
+    ],
+    "peakDivergenceUpdate": 900,
+    "replayCount": 9,
+    "retainedCategories": [
+      "peak_reciprocal",
+      "hfo_final_building",
+      "hfo_tick_cap",
+      "hfo_force_clearance"
+    ],
+    "sourceCommit": "c647e7100cc4332ad609bdadf148b53af0a0b53e",
+    "status": "PASS_DETERMINISTIC_GAME_FRAME_REPLAY"
+  },
+  "hfoConfirmation": {
+    "arrayJobId": "23425662",
+    "byCountry": {
+      "Africans": {
+        "draws": 2,
+        "games": 80,
+        "lossRate": 0.0625,
+        "losses": 5,
+        "medianTicks": 21010.5,
+        "oneSided95WilsonLower": 0.846147446337566,
+        "statuses": {
+          "baseline_win": 5,
+          "candidate_win": 73,
+          "engine_nonliteral_termination_draw": 1,
+          "tick_cap_draw": 1
+        },
+        "winRate": 0.9125,
+        "wins": 73
+      },
+      "Alliance": {
+        "draws": 4,
+        "games": 80,
+        "lossRate": 0.1375,
+        "losses": 11,
+        "medianTicks": 21584,
+        "oneSided95WilsonLower": 0.7309461308591066,
+        "statuses": {
+          "baseline_win": 11,
+          "candidate_win": 65,
+          "engine_nonliteral_termination_draw": 4
+        },
+        "winRate": 0.8125,
+        "wins": 65
+      },
+      "Americans": {
+        "draws": 3,
+        "games": 80,
+        "lossRate": 0.1,
+        "losses": 8,
+        "medianTicks": 21229.5,
+        "oneSided95WilsonLower": 0.7872366936885866,
+        "statuses": {
+          "baseline_win": 8,
+          "candidate_win": 69,
+          "engine_nonliteral_termination_draw": 2,
+          "tick_cap_draw": 1
+        },
+        "winRate": 0.8625,
+        "wins": 69
+      },
+      "Arabs": {
+        "draws": 2,
+        "games": 80,
+        "lossRate": 0.0125,
+        "losses": 1,
+        "medianTicks": 20994,
+        "oneSided95WilsonLower": 0.9098250448411213,
+        "statuses": {
+          "baseline_win": 1,
+          "candidate_win": 77,
+          "engine_nonliteral_termination_draw": 2
+        },
+        "winRate": 0.9625,
+        "wins": 77
+      },
+      "British": {
+        "draws": 4,
+        "games": 80,
+        "lossRate": 0.075,
+        "losses": 6,
+        "medianTicks": 21930,
+        "oneSided95WilsonLower": 0.801671451377747,
+        "statuses": {
+          "baseline_win": 6,
+          "candidate_win": 70,
+          "engine_nonliteral_termination_draw": 3,
+          "tick_cap_draw": 1
+        },
+        "winRate": 0.875,
+        "wins": 70
+      },
+      "Confederation": {
+        "draws": 2,
+        "games": 80,
+        "lossRate": 0.075,
+        "losses": 6,
+        "medianTicks": 21811,
+        "oneSided95WilsonLower": 0.831099146151965,
+        "statuses": {
+          "baseline_win": 6,
+          "candidate_win": 72,
+          "engine_nonliteral_termination_draw": 2
+        },
+        "winRate": 0.9,
+        "wins": 72
+      },
+      "French": {
+        "draws": 2,
+        "games": 80,
+        "lossRate": 0.1,
+        "losses": 8,
+        "medianTicks": 21942,
+        "oneSided95WilsonLower": 0.801671451377747,
+        "statuses": {
+          "baseline_win": 8,
+          "candidate_win": 70,
+          "engine_nonliteral_termination_draw": 2
+        },
+        "winRate": 0.875,
+        "wins": 70
+      },
+      "Germans": {
+        "draws": 4,
+        "games": 80,
+        "lossRate": 0.15,
+        "losses": 12,
+        "medianTicks": 21950,
+        "oneSided95WilsonLower": 0.7171766139381215,
+        "statuses": {
+          "baseline_win": 12,
+          "candidate_win": 64,
+          "engine_nonliteral_termination_draw": 3,
+          "tick_cap_draw": 1
+        },
+        "winRate": 0.8,
+        "wins": 64
+      },
+      "Russians": {
+        "draws": 1,
+        "games": 80,
+        "lossRate": 0.075,
+        "losses": 6,
+        "medianTicks": 21588.5,
+        "oneSided95WilsonLower": 0.846147446337566,
+        "statuses": {
+          "baseline_win": 6,
+          "candidate_win": 73,
+          "engine_nonliteral_termination_draw": 1
+        },
+        "winRate": 0.9125,
+        "wins": 73
+      }
+    },
+    "byFaction": {
+      "Allied": {
+        "draws": 17,
+        "games": 400,
+        "lossRate": 0.1125,
+        "losses": 45,
+        "medianTicks": 21860,
+        "oneSided95WilsonLower": 0.8129278692434503,
+        "statuses": {
+          "baseline_win": 45,
+          "candidate_win": 338,
+          "engine_nonliteral_termination_draw": 14,
+          "tick_cap_draw": 3
+        },
+        "winRate": 0.845,
+        "wins": 338
+      },
+      "Soviet": {
+        "draws": 7,
+        "games": 320,
+        "lossRate": 0.05625,
+        "losses": 18,
+        "medianTicks": 21417.5,
+        "oneSided95WilsonLower": 0.8935119531924971,
+        "statuses": {
+          "baseline_win": 18,
+          "candidate_win": 295,
+          "engine_nonliteral_termination_draw": 6,
+          "tick_cap_draw": 1
+        },
+        "winRate": 0.921875,
+        "wins": 295
+      }
+    },
+    "bySlot": {
+      "0": {
+        "draws": 15,
+        "games": 360,
+        "lossRate": 0.06944444444444445,
+        "losses": 25,
+        "medianTicks": 21723,
+        "oneSided95WilsonLower": 0.8586907869386567,
+        "statuses": {
+          "baseline_win": 25,
+          "candidate_win": 320,
+          "engine_nonliteral_termination_draw": 11,
+          "tick_cap_draw": 4
+        },
+        "winRate": 0.8888888888888888,
+        "wins": 320
+      },
+      "1": {
+        "draws": 9,
+        "games": 360,
+        "lossRate": 0.10555555555555556,
+        "losses": 38,
+        "medianTicks": 21645.5,
+        "oneSided95WilsonLower": 0.8374600512815844,
+        "statuses": {
+          "baseline_win": 38,
+          "candidate_win": 313,
+          "engine_nonliteral_termination_draw": 9
+        },
+        "winRate": 0.8694444444444445,
+        "wins": 313
+      }
+    },
+    "byStart": {
+      "151,119": {
+        "draws": 0,
+        "games": 180,
+        "lossRate": 0.016666666666666666,
+        "losses": 3,
+        "medianTicks": 21433,
+        "oneSided95WilsonLower": 0.9590320130995119,
+        "statuses": {
+          "baseline_win": 3,
+          "candidate_win": 177
+        },
+        "winRate": 0.9833333333333333,
+        "wins": 177
+      },
+      "39,82": {
+        "draws": 14,
+        "games": 180,
+        "lossRate": 0.07777777777777778,
+        "losses": 14,
+        "medianTicks": 19794,
+        "oneSided95WilsonLower": 0.7949457007602633,
+        "statuses": {
+          "baseline_win": 14,
+          "candidate_win": 152,
+          "engine_nonliteral_termination_draw": 14
+        },
+        "winRate": 0.8444444444444444,
+        "wins": 152
+      },
+      "88,157": {
+        "draws": 10,
+        "games": 180,
+        "lossRate": 0.18333333333333332,
+        "losses": 33,
+        "medianTicks": 43215.5,
+        "oneSided95WilsonLower": 0.7052118842762448,
+        "statuses": {
+          "baseline_win": 33,
+          "candidate_win": 137,
+          "engine_nonliteral_termination_draw": 6,
+          "tick_cap_draw": 4
+        },
+        "winRate": 0.7611111111111111,
+        "wins": 137
+      },
+      "88,34": {
+        "draws": 0,
+        "games": 180,
+        "lossRate": 0.07222222222222222,
+        "losses": 13,
+        "medianTicks": 20796.5,
+        "oneSided95WilsonLower": 0.8893126442800008,
+        "statuses": {
+          "baseline_win": 13,
+          "candidate_win": 167
+        },
+        "winRate": 0.9277777777777778,
+        "wins": 167
+      }
+    },
+    "checks": {
+      "bothFactionsWilsonLowerAboveHalf": true,
+      "bothSlotsWilsonLowerAboveHalf": true,
+      "clusterLowerAboveHalf": true,
+      "completeCoverage": true,
+      "everyCountryWinsExceedLosses": true,
+      "everyStartWilsonLowerAboveHalf": true,
+      "noInferiorCell": true,
+      "pooledWilsonLowerAboveHalf": true,
+      "pooledWinsExceedLosses": true,
+      "sevenCountryWilsonBoundsAboveHalf": true,
+      "thirtySuperiorCells": true
+    },
+    "clustered": {
+      "clusterCount": 36,
+      "degreesOfFreedom": 35,
+      "meanWinRate": 0.8791666666666663,
+      "oneSided95Lower": 0.8449463770741195,
+      "sampleStandardDeviation": 0.12152307247126834,
+      "tCritical": 1.68957
+    },
+    "countryStartCells": [
+      {
+        "country": "Americans",
+        "draws": 2,
+        "games": 20,
+        "lossRate": 0.05,
+        "losses": 1,
+        "medianTicks": 19577.5,
+        "oneSided95WilsonLower": 0.6781719243246932,
+        "start": "39,82",
+        "statuses": {
+          "baseline_win": 1,
+          "candidate_win": 17,
+          "engine_nonliteral_termination_draw": 2
+        },
+        "winRate": 0.85,
+        "wins": 17
+      },
+      {
+        "country": "Americans",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0.05,
+        "losses": 1,
+        "medianTicks": 21454,
+        "oneSided95WilsonLower": 0.8039927632259837,
+        "start": "151,119",
+        "statuses": {
+          "baseline_win": 1,
+          "candidate_win": 19
+        },
+        "winRate": 0.95,
+        "wins": 19
+      },
+      {
+        "country": "Americans",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0.05,
+        "losses": 1,
+        "medianTicks": 19264,
+        "oneSided95WilsonLower": 0.8039927632259837,
+        "start": "88,34",
+        "statuses": {
+          "baseline_win": 1,
+          "candidate_win": 19
+        },
+        "winRate": 0.95,
+        "wins": 19
+      },
+      {
+        "country": "Americans",
+        "draws": 1,
+        "games": 20,
+        "lossRate": 0.25,
+        "losses": 5,
+        "medianTicks": 43252.5,
+        "oneSided95WilsonLower": 0.5161962804075577,
+        "start": "88,157",
+        "statuses": {
+          "baseline_win": 5,
+          "candidate_win": 14,
+          "tick_cap_draw": 1
+        },
+        "winRate": 0.7,
+        "wins": 14
+      },
+      {
+        "country": "Alliance",
+        "draws": 1,
+        "games": 20,
+        "lossRate": 0.05,
+        "losses": 1,
+        "medianTicks": 19396,
+        "oneSided95WilsonLower": 0.7383369536731331,
+        "start": "39,82",
+        "statuses": {
+          "baseline_win": 1,
+          "candidate_win": 18,
+          "engine_nonliteral_termination_draw": 1
+        },
+        "winRate": 0.9,
+        "wins": 18
+      },
+      {
+        "country": "Alliance",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0,
+        "losses": 0,
+        "medianTicks": 21069.5,
+        "oneSided95WilsonLower": 0.8808421626390356,
+        "start": "151,119",
+        "statuses": {
+          "candidate_win": 20
+        },
+        "winRate": 1,
+        "wins": 20
+      },
+      {
+        "country": "Alliance",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0.2,
+        "losses": 4,
+        "medianTicks": 21755,
+        "oneSided95WilsonLower": 0.6216233141646323,
+        "start": "88,34",
+        "statuses": {
+          "baseline_win": 4,
+          "candidate_win": 16
+        },
+        "winRate": 0.8,
+        "wins": 16
+      },
+      {
+        "country": "Alliance",
+        "draws": 3,
+        "games": 20,
+        "lossRate": 0.3,
+        "losses": 6,
+        "medianTicks": 44946,
+        "oneSided95WilsonLower": 0.37220770755293486,
+        "start": "88,157",
+        "statuses": {
+          "baseline_win": 6,
+          "candidate_win": 11,
+          "engine_nonliteral_termination_draw": 3
+        },
+        "winRate": 0.55,
+        "wins": 11
+      },
+      {
+        "country": "French",
+        "draws": 1,
+        "games": 20,
+        "lossRate": 0.05,
+        "losses": 1,
+        "medianTicks": 19441,
+        "oneSided95WilsonLower": 0.7383369536731331,
+        "start": "39,82",
+        "statuses": {
+          "baseline_win": 1,
+          "candidate_win": 18,
+          "engine_nonliteral_termination_draw": 1
+        },
+        "winRate": 0.9,
+        "wins": 18
+      },
+      {
+        "country": "French",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0.05,
+        "losses": 1,
+        "medianTicks": 22040.5,
+        "oneSided95WilsonLower": 0.8039927632259837,
+        "start": "151,119",
+        "statuses": {
+          "baseline_win": 1,
+          "candidate_win": 19
+        },
+        "winRate": 0.95,
+        "wins": 19
+      },
+      {
+        "country": "French",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0.05,
+        "losses": 1,
+        "medianTicks": 21890,
+        "oneSided95WilsonLower": 0.8039927632259837,
+        "start": "88,34",
+        "statuses": {
+          "baseline_win": 1,
+          "candidate_win": 19
+        },
+        "winRate": 0.95,
+        "wins": 19
+      },
+      {
+        "country": "French",
+        "draws": 1,
+        "games": 20,
+        "lossRate": 0.25,
+        "losses": 5,
+        "medianTicks": 43219,
+        "oneSided95WilsonLower": 0.5161962804075577,
+        "start": "88,157",
+        "statuses": {
+          "baseline_win": 5,
+          "candidate_win": 14,
+          "engine_nonliteral_termination_draw": 1
+        },
+        "winRate": 0.7,
+        "wins": 14
+      },
+      {
+        "country": "Germans",
+        "draws": 3,
+        "games": 20,
+        "lossRate": 0.15,
+        "losses": 3,
+        "medianTicks": 19413.5,
+        "oneSided95WilsonLower": 0.5161962804075577,
+        "start": "39,82",
+        "statuses": {
+          "baseline_win": 3,
+          "candidate_win": 14,
+          "engine_nonliteral_termination_draw": 3
+        },
+        "winRate": 0.7,
+        "wins": 14
+      },
+      {
+        "country": "Germans",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0.05,
+        "losses": 1,
+        "medianTicks": 21550.5,
+        "oneSided95WilsonLower": 0.8039927632259837,
+        "start": "151,119",
+        "statuses": {
+          "baseline_win": 1,
+          "candidate_win": 19
+        },
+        "winRate": 0.95,
+        "wins": 19
+      },
+      {
+        "country": "Germans",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0.05,
+        "losses": 1,
+        "medianTicks": 21591,
+        "oneSided95WilsonLower": 0.8039927632259837,
+        "start": "88,34",
+        "statuses": {
+          "baseline_win": 1,
+          "candidate_win": 19
+        },
+        "winRate": 0.95,
+        "wins": 19
+      },
+      {
+        "country": "Germans",
+        "draws": 1,
+        "games": 20,
+        "lossRate": 0.35,
+        "losses": 7,
+        "medianTicks": 35448.5,
+        "oneSided95WilsonLower": 0.41855585029325865,
+        "start": "88,157",
+        "statuses": {
+          "baseline_win": 7,
+          "candidate_win": 12,
+          "tick_cap_draw": 1
+        },
+        "winRate": 0.6,
+        "wins": 12
+      },
+      {
+        "country": "British",
+        "draws": 2,
+        "games": 20,
+        "lossRate": 0.05,
+        "losses": 1,
+        "medianTicks": 19579,
+        "oneSided95WilsonLower": 0.6781719243246932,
+        "start": "39,82",
+        "statuses": {
+          "baseline_win": 1,
+          "candidate_win": 17,
+          "engine_nonliteral_termination_draw": 2
+        },
+        "winRate": 0.85,
+        "wins": 17
+      },
+      {
+        "country": "British",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0,
+        "losses": 0,
+        "medianTicks": 22032,
+        "oneSided95WilsonLower": 0.8808421626390356,
+        "start": "151,119",
+        "statuses": {
+          "candidate_win": 20
+        },
+        "winRate": 1,
+        "wins": 20
+      },
+      {
+        "country": "British",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0,
+        "losses": 0,
+        "medianTicks": 21869,
+        "oneSided95WilsonLower": 0.8808421626390356,
+        "start": "88,34",
+        "statuses": {
+          "candidate_win": 20
+        },
+        "winRate": 1,
+        "wins": 20
+      },
+      {
+        "country": "British",
+        "draws": 2,
+        "games": 20,
+        "lossRate": 0.25,
+        "losses": 5,
+        "medianTicks": 42818,
+        "oneSided95WilsonLower": 0.46651268884847175,
+        "start": "88,157",
+        "statuses": {
+          "baseline_win": 5,
+          "candidate_win": 13,
+          "engine_nonliteral_termination_draw": 1,
+          "tick_cap_draw": 1
+        },
+        "winRate": 0.65,
+        "wins": 13
+      },
+      {
+        "country": "Africans",
+        "draws": 1,
+        "games": 20,
+        "lossRate": 0.05,
+        "losses": 1,
+        "medianTicks": 20460.5,
+        "oneSided95WilsonLower": 0.7383369536731331,
+        "start": "39,82",
+        "statuses": {
+          "baseline_win": 1,
+          "candidate_win": 18,
+          "engine_nonliteral_termination_draw": 1
+        },
+        "winRate": 0.9,
+        "wins": 18
+      },
+      {
+        "country": "Africans",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0,
+        "losses": 0,
+        "medianTicks": 21123.5,
+        "oneSided95WilsonLower": 0.8808421626390356,
+        "start": "151,119",
+        "statuses": {
+          "candidate_win": 20
+        },
+        "winRate": 1,
+        "wins": 20
+      },
+      {
+        "country": "Africans",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0.1,
+        "losses": 2,
+        "medianTicks": 20245,
+        "oneSided95WilsonLower": 0.7383369536731331,
+        "start": "88,34",
+        "statuses": {
+          "baseline_win": 2,
+          "candidate_win": 18
+        },
+        "winRate": 0.9,
+        "wins": 18
+      },
+      {
+        "country": "Africans",
+        "draws": 1,
+        "games": 20,
+        "lossRate": 0.1,
+        "losses": 2,
+        "medianTicks": 43284,
+        "oneSided95WilsonLower": 0.6781719243246932,
+        "start": "88,157",
+        "statuses": {
+          "baseline_win": 2,
+          "candidate_win": 17,
+          "tick_cap_draw": 1
+        },
+        "winRate": 0.85,
+        "wins": 17
+      },
+      {
+        "country": "Arabs",
+        "draws": 1,
+        "games": 20,
+        "lossRate": 0.05,
+        "losses": 1,
+        "medianTicks": 20204.5,
+        "oneSided95WilsonLower": 0.7383369536731331,
+        "start": "39,82",
+        "statuses": {
+          "baseline_win": 1,
+          "candidate_win": 18,
+          "engine_nonliteral_termination_draw": 1
+        },
+        "winRate": 0.9,
+        "wins": 18
+      },
+      {
+        "country": "Arabs",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0,
+        "losses": 0,
+        "medianTicks": 21155.5,
+        "oneSided95WilsonLower": 0.8808421626390356,
+        "start": "151,119",
+        "statuses": {
+          "candidate_win": 20
+        },
+        "winRate": 1,
+        "wins": 20
+      },
+      {
+        "country": "Arabs",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0,
+        "losses": 0,
+        "medianTicks": 20076,
+        "oneSided95WilsonLower": 0.8808421626390356,
+        "start": "88,34",
+        "statuses": {
+          "candidate_win": 20
+        },
+        "winRate": 1,
+        "wins": 20
+      },
+      {
+        "country": "Arabs",
+        "draws": 1,
+        "games": 20,
+        "lossRate": 0,
+        "losses": 0,
+        "medianTicks": 41820,
+        "oneSided95WilsonLower": 0.8039927632259837,
+        "start": "88,157",
+        "statuses": {
+          "candidate_win": 19,
+          "engine_nonliteral_termination_draw": 1
+        },
+        "winRate": 0.95,
+        "wins": 19
+      },
+      {
+        "country": "Confederation",
+        "draws": 2,
+        "games": 20,
+        "lossRate": 0.1,
+        "losses": 2,
+        "medianTicks": 21061.5,
+        "oneSided95WilsonLower": 0.6216233141646323,
+        "start": "39,82",
+        "statuses": {
+          "baseline_win": 2,
+          "candidate_win": 16,
+          "engine_nonliteral_termination_draw": 2
+        },
+        "winRate": 0.8,
+        "wins": 16
+      },
+      {
+        "country": "Confederation",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0,
+        "losses": 0,
+        "medianTicks": 20802,
+        "oneSided95WilsonLower": 0.8808421626390356,
+        "start": "151,119",
+        "statuses": {
+          "candidate_win": 20
+        },
+        "winRate": 1,
+        "wins": 20
+      },
+      {
+        "country": "Confederation",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0.1,
+        "losses": 2,
+        "medianTicks": 20479,
+        "oneSided95WilsonLower": 0.7383369536731331,
+        "start": "88,34",
+        "statuses": {
+          "baseline_win": 2,
+          "candidate_win": 18
+        },
+        "winRate": 0.9,
+        "wins": 18
+      },
+      {
+        "country": "Confederation",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0.1,
+        "losses": 2,
+        "medianTicks": 43146.5,
+        "oneSided95WilsonLower": 0.7383369536731331,
+        "start": "88,157",
+        "statuses": {
+          "baseline_win": 2,
+          "candidate_win": 18
+        },
+        "winRate": 0.9,
+        "wins": 18
+      },
+      {
+        "country": "Russians",
+        "draws": 1,
+        "games": 20,
+        "lossRate": 0.15,
+        "losses": 3,
+        "medianTicks": 20402,
+        "oneSided95WilsonLower": 0.6216233141646323,
+        "start": "39,82",
+        "statuses": {
+          "baseline_win": 3,
+          "candidate_win": 16,
+          "engine_nonliteral_termination_draw": 1
+        },
+        "winRate": 0.8,
+        "wins": 16
+      },
+      {
+        "country": "Russians",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0,
+        "losses": 0,
+        "medianTicks": 21588.5,
+        "oneSided95WilsonLower": 0.8808421626390356,
+        "start": "151,119",
+        "statuses": {
+          "candidate_win": 20
+        },
+        "winRate": 1,
+        "wins": 20
+      },
+      {
+        "country": "Russians",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0.1,
+        "losses": 2,
+        "medianTicks": 19934,
+        "oneSided95WilsonLower": 0.7383369536731331,
+        "start": "88,34",
+        "statuses": {
+          "baseline_win": 2,
+          "candidate_win": 18
+        },
+        "winRate": 0.9,
+        "wins": 18
+      },
+      {
+        "country": "Russians",
+        "draws": 0,
+        "games": 20,
+        "lossRate": 0.05,
+        "losses": 1,
+        "medianTicks": 43283,
+        "oneSided95WilsonLower": 0.8039927632259837,
+        "start": "88,157",
+        "statuses": {
+          "baseline_win": 1,
+          "candidate_win": 19
+        },
+        "winRate": 0.95,
+        "wins": 19
+      }
+    ],
+    "finalizerJobId": "23425663",
+    "gameCount": 720,
+    "overall": {
+      "draws": 24,
+      "games": 720,
+      "lossRate": 0.0875,
+      "losses": 63,
+      "medianTicks": 21711,
+      "oneSided95WilsonLower": 0.8577544387617277,
+      "statuses": {
+        "baseline_win": 63,
+        "candidate_win": 633,
+        "engine_nonliteral_termination_draw": 20,
+        "tick_cap_draw": 4
+      },
+      "winRate": 0.8791666666666667,
+      "wins": 633
+    },
+    "selectionSha256": "7702fd3e895c4604714e3f176342a5d7445a96dbce06fbd1d3e7b6023053a247",
+    "sourceCommit": "f8d5a9961a6e1dd2746cd5c03b6b0793ba73ba02",
+    "status": "PASS_HFO_DEPLOYED_CONFIRMATORY"
+  },
+  "inputs": [
+    {
+      "id": "hfo_confirmatory",
+      "path": "hfo-confirmatory/deployed-v1-r2/finalizer/hfo-deployed-confirmatory.json",
+      "sha256": "a734acf077540793e309834f0bda7bcd4a34fde9f95d5457921303bb8d743cc8"
+    },
+    {
+      "id": "peak_development",
+      "path": "peak-profile-scope-v1/stage-0/finalizer/peak-profile-scope-stage-0.json",
+      "sha256": "ca9d9b5ba1de0c00909a6e6c59768a9fa3686b45e8cc70183572723b1ed9229d"
+    },
+    {
+      "id": "peak_replication",
+      "path": "peak-profile-scope-v1/stage-1/finalizer/peak-profile-scope-stage-1.json",
+      "sha256": "f970f197ee106408ae0842bd466b073f540cc623b8b96a41d5e838061a1b0285"
+    },
+    {
+      "id": "advanced_crossplay",
+      "path": "ra2web-opponents/hfo-crossplay-v1/finalizer/hfo-ra2web-advanced-crossplay.json",
+      "sha256": "a287271ba7f223eac669556c8ab895819a55a3c05b06a4c370a21eccb685761d"
+    },
+    {
+      "id": "allied_west_replication",
+      "path": "hfo-west/winner-replication-v3/finalizer/hfo-allied-west-development.json",
+      "sha256": "81ae77c4fd6691fe05d278c7621ba50a94c6502b0164f75b9557061c91bfee26"
+    },
+    {
+      "id": "allied_west_isolation",
+      "path": "hfo-west/activation-isolation-v1/finalizer/hfo-allied-west-isolation.json",
+      "sha256": "a4483fa3487e8da0917a19713502229b9d6449f9d3f9b741b04d540d74353820"
+    },
+    {
+      "id": "soviet_west_replication",
+      "path": "hfo-west/soviet-rush-guard-replication-v4/finalizer/hfo-bottom-development.json",
+      "sha256": "9262dfa068f51a5ccdf8f7bd024e79f3a33db6ee715d50c2d508d5bad17af74e"
+    },
+    {
+      "id": "soviet_west_isolation",
+      "path": "hfo-west/soviet-rush-guard-isolation-v6/finalizer/hfo-soviet-west-isolation.json",
+      "sha256": "73193b343c97abb98d38e97db7b5e7873193fa1c0c9766060d955ef99e07bdcf"
+    },
+    {
+      "id": "bottom_retarget_replication",
+      "path": "hfo-bottom/activation-stall-replication-v8/finalizer/hfo-bottom-development.json",
+      "sha256": "05388312522c1bf99eb57aac5aa46ccd64e2a2b5812d2511ddc9cf033fd04427"
+    },
+    {
+      "id": "bottom_retarget_isolation",
+      "path": "hfo-bottom/activation-isolation-v10/finalizer/hfo-bottom-retarget-isolation.json",
+      "sha256": "f70cfd50dc57f3e42a4244d58783b51b3cb5f571cf20f370bd882f6d6538fb07"
+    },
+    {
+      "id": "frame_replay",
+      "path": "deterministic-game-frames-v1/replay-v1/finalizer/deterministic-game-frame-manifest.json",
+      "sha256": "5233530adb5d1a1fffd6c6929635d7b0ff2ed0d38c2e91366c1700b0069d2c08"
+    }
+  ],
+  "kind": "chrono-divide-final-paper-evidence",
+  "mechanisms": {
+    "alliedWestRushGuard": {
+      "isolation": {
+        "activeCaseCount": 5,
+        "arrayJobId": "22795099",
+        "countryCount": 9,
+        "finalizerJobId": "22795100",
+        "inactiveCaseCount": 31,
+        "outcomeFree": true,
+        "sourceCommit": "7f841a94929a40b94af6d6741c16ca40c523cbf2",
+        "startCount": 4,
+        "status": "PASS_HFO_ALLIED_WEST_ACTIVATION_ISOLATION"
+      },
+      "replication": {
+        "arrayJobId": "22793528",
+        "byCountry": {
+          "Alliance": {
+            "draws": 0,
+            "games": 10,
+            "lossRate": 0.1,
+            "losses": 1,
+            "medianTicks": 19487.5,
+            "netWins": 8,
+            "oneSided95WilsonLower": 0.6522813326641418,
+            "statuses": {
+              "baseline_win": 1,
+              "candidate_win": 9
+            },
+            "winRate": 0.9,
+            "wins": 9
+          },
+          "Americans": {
+            "draws": 1,
+            "games": 10,
+            "lossRate": 0,
+            "losses": 0,
+            "medianTicks": 19328.5,
+            "netWins": 9,
+            "oneSided95WilsonLower": 0.6522813326641418,
+            "statuses": {
+              "candidate_win": 9,
+              "engine_nonliteral_termination_draw": 1
+            },
+            "winRate": 0.9,
+            "wins": 9
+          },
+          "British": {
+            "draws": 0,
+            "games": 10,
+            "lossRate": 0,
+            "losses": 0,
+            "medianTicks": 19382,
+            "netWins": 10,
+            "oneSided95WilsonLower": 0.7870580299165931,
+            "statuses": {
+              "candidate_win": 10
+            },
+            "winRate": 1,
+            "wins": 10
+          },
+          "French": {
+            "draws": 1,
+            "games": 10,
+            "lossRate": 0,
+            "losses": 0,
+            "medianTicks": 19547.5,
+            "netWins": 9,
+            "oneSided95WilsonLower": 0.6522813326641418,
+            "statuses": {
+              "candidate_win": 9,
+              "engine_nonliteral_termination_draw": 1
+            },
+            "winRate": 0.9,
+            "wins": 9
+          },
+          "Germans": {
+            "draws": 0,
+            "games": 10,
+            "lossRate": 0,
+            "losses": 0,
+            "medianTicks": 19483,
+            "netWins": 10,
+            "oneSided95WilsonLower": 0.7870580299165931,
+            "statuses": {
+              "candidate_win": 10
+            },
+            "winRate": 1,
+            "wins": 10
+          }
+        },
+        "control": {
+          "draws": 11,
+          "games": 50,
+          "losses": 38,
+          "medianTicks": 24236,
+          "oneSided95WilsonLower": 0.004474564106509852,
+          "statuses": {
+            "baseline_win": 38,
+            "candidate_win": 1,
+            "engine_nonliteral_termination_draw": 10,
+            "tick_cap_draw": 1
+          },
+          "winRate": 0.02,
+          "wins": 1
+        },
+        "controlId": "default",
+        "finalizerJobId": "22793529",
+        "gameCount": 100,
+        "paired": {
+          "degreesOfFreedom": 49,
+          "improved": 48,
+          "mean": 0.83,
+          "oneSidedLower": 0.7639289772293646,
+          "sampleStandardDeviation": 0.27866298861615946,
+          "tCritical": 1.676550893,
+          "tied": 2,
+          "worsened": 0
+        },
+        "sourceCommit": "77b47bcba969c2000aec5b16800cd3b96e04fa42",
+        "status": "PASS_HFO_ALLIED_WEST_REPLICATION",
+        "winner": {
+          "draws": 2,
+          "games": 50,
+          "losses": 1,
+          "medianTicks": 19460.5,
+          "oneSided95WilsonLower": 0.8590580535393006,
+          "statuses": {
+            "baseline_win": 1,
+            "candidate_win": 47,
+            "engine_nonliteral_termination_draw": 2
+          },
+          "winRate": 0.94,
+          "wins": 47
+        },
+        "winnerId": "winner_conditional"
+      }
+    },
+    "bottomProgressRetarget": {
+      "isolation": {
+        "activeCaseCount": 9,
+        "arrayJobId": "23403479",
+        "countryCount": 9,
+        "finalizerJobId": "23403555",
+        "inactiveCaseCount": 27,
+        "outcomeFree": true,
+        "sourceCommit": "768b2872df8b8115b9791eac3aa7b34ff70d337c",
+        "startCount": 4,
+        "status": "PASS_HFO_BOTTOM_RETARGET_ACTIVATION_ISOLATION"
+      },
+      "replication": {
+        "arrayJobId": "23381606",
+        "byCountry": {
+          "Africans": {
+            "draws": 2,
+            "games": 30,
+            "lossRate": 0.03333333333333333,
+            "losses": 1,
+            "medianTicks": 43315,
+            "netWins": 26,
+            "oneSided95WilsonLower": 0.7744975205091514,
+            "statuses": {
+              "baseline_win": 1,
+              "candidate_win": 27,
+              "engine_nonliteral_termination_draw": 2
+            },
+            "winRate": 0.9,
+            "wins": 27
+          },
+          "Alliance": {
+            "draws": 1,
+            "games": 30,
+            "lossRate": 0.26666666666666666,
+            "losses": 8,
+            "medianTicks": 37360.5,
+            "netWins": 13,
+            "oneSided95WilsonLower": 0.5506175038264008,
+            "statuses": {
+              "baseline_win": 8,
+              "candidate_win": 21,
+              "tick_cap_draw": 1
+            },
+            "winRate": 0.7,
+            "wins": 21
+          },
+          "Americans": {
+            "draws": 6,
+            "games": 30,
+            "lossRate": 0.2,
+            "losses": 6,
+            "medianTicks": 43239.5,
+            "netWins": 12,
+            "oneSided95WilsonLower": 0.4505813079491151,
+            "statuses": {
+              "baseline_win": 6,
+              "candidate_win": 18,
+              "engine_nonliteral_termination_draw": 2,
+              "tick_cap_draw": 4
+            },
+            "winRate": 0.6,
+            "wins": 18
+          },
+          "Arabs": {
+            "draws": 1,
+            "games": 30,
+            "lossRate": 0.06666666666666667,
+            "losses": 2,
+            "medianTicks": 43216,
+            "netWins": 25,
+            "oneSided95WilsonLower": 0.7744975205091514,
+            "statuses": {
+              "baseline_win": 2,
+              "candidate_win": 27,
+              "tick_cap_draw": 1
+            },
+            "winRate": 0.9,
+            "wins": 27
+          },
+          "British": {
+            "draws": 4,
+            "games": 30,
+            "lossRate": 0.26666666666666666,
+            "losses": 8,
+            "medianTicks": 43336.5,
+            "netWins": 10,
+            "oneSided95WilsonLower": 0.4505813079491151,
+            "statuses": {
+              "baseline_win": 8,
+              "candidate_win": 18,
+              "engine_nonliteral_termination_draw": 1,
+              "tick_cap_draw": 3
+            },
+            "winRate": 0.6,
+            "wins": 18
+          },
+          "Confederation": {
+            "draws": 0,
+            "games": 30,
+            "lossRate": 0.06666666666666667,
+            "losses": 2,
+            "medianTicks": 43215,
+            "netWins": 26,
+            "oneSided95WilsonLower": 0.8172844371249125,
+            "statuses": {
+              "baseline_win": 2,
+              "candidate_win": 28
+            },
+            "winRate": 0.9333333333333333,
+            "wins": 28
+          },
+          "French": {
+            "draws": 3,
+            "games": 30,
+            "lossRate": 0.36666666666666664,
+            "losses": 11,
+            "medianTicks": 35737.5,
+            "netWins": 5,
+            "oneSided95WilsonLower": 0.38706012620426217,
+            "statuses": {
+              "baseline_win": 11,
+              "candidate_win": 16,
+              "engine_nonliteral_termination_draw": 1,
+              "tick_cap_draw": 2
+            },
+            "winRate": 0.5333333333333333,
+            "wins": 16
+          },
+          "Germans": {
+            "draws": 4,
+            "games": 30,
+            "lossRate": 0.3,
+            "losses": 9,
+            "medianTicks": 43218,
+            "netWins": 8,
+            "oneSided95WilsonLower": 0.41851992055777143,
+            "statuses": {
+              "baseline_win": 9,
+              "candidate_win": 17,
+              "engine_nonliteral_termination_draw": 3,
+              "tick_cap_draw": 1
+            },
+            "winRate": 0.5666666666666667,
+            "wins": 17
+          },
+          "Russians": {
+            "draws": 2,
+            "games": 30,
+            "lossRate": 0.06666666666666667,
+            "losses": 2,
+            "medianTicks": 44100,
+            "netWins": 24,
+            "oneSided95WilsonLower": 0.7339659752662557,
+            "statuses": {
+              "baseline_win": 2,
+              "candidate_win": 26,
+              "tick_cap_draw": 2
+            },
+            "winRate": 0.8666666666666667,
+            "wins": 26
+          }
+        },
+        "control": {
+          "draws": 98,
+          "games": 270,
+          "losses": 49,
+          "medianTicks": 44505,
+          "oneSided95WilsonLower": 0.4063892740956238,
+          "statuses": {
+            "baseline_win": 49,
+            "candidate_win": 123,
+            "engine_nonliteral_termination_draw": 62,
+            "tick_cap_draw": 36
+          },
+          "winRate": 0.45555555555555555,
+          "wins": 123
+        },
+        "controlId": "default",
+        "finalizerJobId": "23381671",
+        "gameCount": 810,
+        "paired": {
+          "degreesOfFreedom": 269,
+          "improved": 77,
+          "mean": 0.1388888888888889,
+          "oneSidedLower": 0.11474285703661291,
+          "sampleStandardDeviation": 0.24036578898730446,
+          "tCritical": 1.65065,
+          "tied": 190,
+          "worsened": 3
+        },
+        "sourceCommit": "510242d8f242c5c459097f93ba9df9bb7aad2d13",
+        "status": "PASS_HFO_BOTTOM_ACTIVATION_STALL_REPLICATION",
+        "winner": {
+          "draws": 23,
+          "games": 270,
+          "losses": 49,
+          "medianTicks": 43216,
+          "oneSided95WilsonLower": 0.686910716042375,
+          "statuses": {
+            "baseline_win": 49,
+            "candidate_win": 198,
+            "engine_nonliteral_termination_draw": 9,
+            "tick_cap_draw": 14
+          },
+          "winRate": 0.7333333333333333,
+          "wins": 198
+        },
+        "winnerId": "winner_activation_stall_1200"
+      }
+    },
+    "sovietWestRushGuard": {
+      "isolation": {
+        "activeCaseCount": 4,
+        "arrayJobId": "23422247",
+        "countryCount": 9,
+        "finalizerJobId": "23422248",
+        "inactiveCaseCount": 32,
+        "outcomeFree": true,
+        "sourceCommit": "7daf1b17c4b25b447e87179ff1da099c4b55c563",
+        "startCount": 4,
+        "status": "PASS_HFO_SOVIET_WEST_ACTIVATION_ISOLATION"
+      },
+      "replication": {
+        "arrayJobId": "23420401",
+        "byCountry": {
+          "Africans": {
+            "draws": 4,
+            "games": 30,
+            "lossRate": 0.06666666666666667,
+            "losses": 2,
+            "medianTicks": 20742,
+            "netWins": 22,
+            "oneSided95WilsonLower": 0.6574890913212069,
+            "statuses": {
+              "baseline_win": 2,
+              "candidate_win": 24,
+              "engine_nonliteral_termination_draw": 4
+            },
+            "winRate": 0.8,
+            "wins": 24
+          },
+          "Arabs": {
+            "draws": 1,
+            "games": 30,
+            "lossRate": 0.06666666666666667,
+            "losses": 2,
+            "medianTicks": 20771,
+            "netWins": 25,
+            "oneSided95WilsonLower": 0.7744975205091514,
+            "statuses": {
+              "baseline_win": 2,
+              "candidate_win": 27,
+              "engine_nonliteral_termination_draw": 1
+            },
+            "winRate": 0.9,
+            "wins": 27
+          },
+          "Confederation": {
+            "draws": 3,
+            "games": 30,
+            "lossRate": 0.16666666666666666,
+            "losses": 5,
+            "medianTicks": 20636.5,
+            "netWins": 17,
+            "oneSided95WilsonLower": 0.5853850531040206,
+            "statuses": {
+              "baseline_win": 5,
+              "candidate_win": 22,
+              "engine_nonliteral_termination_draw": 3
+            },
+            "winRate": 0.7333333333333333,
+            "wins": 22
+          },
+          "Russians": {
+            "draws": 1,
+            "games": 30,
+            "lossRate": 0.13333333333333333,
+            "losses": 4,
+            "medianTicks": 20281.5,
+            "netWins": 21,
+            "oneSided95WilsonLower": 0.6950795002394407,
+            "statuses": {
+              "baseline_win": 4,
+              "candidate_win": 25,
+              "engine_nonliteral_termination_draw": 1
+            },
+            "winRate": 0.8333333333333334,
+            "wins": 25
+          }
+        },
+        "control": {
+          "draws": 43,
+          "games": 120,
+          "losses": 30,
+          "medianTicks": 27563.5,
+          "oneSided95WilsonLower": 0.3215349503451844,
+          "statuses": {
+            "baseline_win": 30,
+            "candidate_win": 47,
+            "engine_nonliteral_termination_draw": 41,
+            "tick_cap_draw": 2
+          },
+          "winRate": 0.39166666666666666,
+          "wins": 47
+        },
+        "controlId": "default",
+        "finalizerJobId": "23420522",
+        "gameCount": 240,
+        "paired": {
+          "degreesOfFreedom": 119,
+          "improved": 60,
+          "mean": 0.2833333333333333,
+          "oneSidedLower": 0.21142744662125249,
+          "sampleStandardDeviation": 0.47515293130028063,
+          "tCritical": 1.65776,
+          "tied": 46,
+          "worsened": 14
+        },
+        "sourceCommit": "d31329c0cf19bc8169e02244b9321d3213d7de7e",
+        "status": "PASS_HFO_SOVIET_WEST_RUSH_GUARD_REPLICATION",
+        "winner": {
+          "draws": 9,
+          "games": 120,
+          "losses": 13,
+          "medianTicks": 20491.5,
+          "oneSided95WilsonLower": 0.7518053848425518,
+          "statuses": {
+            "baseline_win": 13,
+            "candidate_win": 98,
+            "engine_nonliteral_termination_draw": 9
+          },
+          "winRate": 0.8166666666666667,
+          "wins": 98
+        },
+        "winnerId": "winner_rush_guard"
+      }
+    }
+  },
+  "peakStudy": {
+    "development": {
+      "arrayJobId": "23751978",
+      "candidates": [
+        {
+          "botScope": "weak_only",
+          "byCountry": {
+            "Africans": {
+              "draws": 0,
+              "games": 4,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.5965213747972954,
+              "winRate": 1,
+              "wins": 4
+            },
+            "Alliance": {
+              "draws": 0,
+              "games": 4,
+              "losses": 2,
+              "oneSided95WilsonLower": 0.18240016325464492,
+              "winRate": 0.5,
+              "wins": 2
+            },
+            "Americans": {
+              "draws": 0,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.3561680085985064,
+              "winRate": 0.75,
+              "wins": 3
+            },
+            "Arabs": {
+              "draws": 0,
+              "games": 4,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.5965213747972954,
+              "winRate": 1,
+              "wins": 4
+            },
+            "British": {
+              "draws": 0,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.3561680085985064,
+              "winRate": 0.75,
+              "wins": 3
+            },
+            "Confederation": {
+              "draws": 0,
+              "games": 4,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.5965213747972954,
+              "winRate": 1,
+              "wins": 4
+            },
+            "French": {
+              "draws": 1,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.18240016325464492,
+              "winRate": 0.5,
+              "wins": 2
+            },
+            "Germans": {
+              "draws": 0,
+              "games": 4,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.5965213747972954,
+              "winRate": 1,
+              "wins": 4
+            },
+            "Russians": {
+              "draws": 0,
+              "games": 4,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.5965213747972954,
+              "winRate": 1,
+              "wins": 4
+            }
+          },
+          "bySide": {
+            "Allied": {
+              "draws": 1,
+              "games": 20,
+              "losses": 5,
+              "oneSided95WilsonLower": 0.5161962804075577,
+              "winRate": 0.7,
+              "wins": 14
+            },
+            "Soviet": {
+              "draws": 0,
+              "games": 16,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.8553614087323906,
+              "winRate": 1,
+              "wins": 16
+            }
+          },
+          "bySlot": {
+            "0": {
+              "draws": 0,
+              "games": 18,
+              "losses": 3,
+              "oneSided95WilsonLower": 0.6481957285589156,
+              "winRate": 0.8333333333333334,
+              "wins": 15
+            },
+            "1": {
+              "draws": 1,
+              "games": 18,
+              "losses": 2,
+              "oneSided95WilsonLower": 0.6481957285589156,
+              "winRate": 0.8333333333333334,
+              "wins": 15
+            }
+          },
+          "byStart": {
+            "118,73": {
+              "draws": 1,
+              "games": 18,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.7852331161361114,
+              "winRate": 0.9444444444444444,
+              "wins": 17
+            },
+            "37,73": {
+              "draws": 0,
+              "games": 18,
+              "losses": 5,
+              "oneSided95WilsonLower": 0.528693830324016,
+              "winRate": 0.7222222222222222,
+              "wins": 13
+            }
+          },
+          "clustered": null,
+          "countryNoninferior": 9,
+          "countrySuperior": 8,
+          "eligible": true,
+          "historical": false,
+          "id": "strategy_both",
+          "overall": {
+            "draws": 1,
+            "games": 36,
+            "losses": 5,
+            "oneSided95WilsonLower": 0.708784273014728,
+            "winRate": 0.8333333333333334,
+            "wins": 30
+          },
+          "paired": {
+            "cases": 36,
+            "improved": 10,
+            "mean": 0.25,
+            "oneSidedLower": 0.15091755040754157,
+            "sampleStandardDeviation": 0.45512949491639976,
+            "tCritical": 1.30621,
+            "tied": 25,
+            "worsened": 1
+          },
+          "sideSafe": true,
+          "slotSafe": true,
+          "startSafe": true,
+          "strategyScope": "both",
+          "weakExactCount": 18
+        },
+        {
+          "botScope": "both",
+          "byCountry": {
+            "Africans": {
+              "draws": 0,
+              "games": 4,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.5965213747972954,
+              "winRate": 1,
+              "wins": 4
+            },
+            "Alliance": {
+              "draws": 0,
+              "games": 4,
+              "losses": 4,
+              "oneSided95WilsonLower": 0,
+              "winRate": 0,
+              "wins": 0
+            },
+            "Americans": {
+              "draws": 1,
+              "games": 4,
+              "losses": 2,
+              "oneSided95WilsonLower": 0.05790732119985868,
+              "winRate": 0.25,
+              "wins": 1
+            },
+            "Arabs": {
+              "draws": 0,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.3561680085985064,
+              "winRate": 0.75,
+              "wins": 3
+            },
+            "British": {
+              "draws": 0,
+              "games": 4,
+              "losses": 3,
+              "oneSided95WilsonLower": 0.05790732119985868,
+              "winRate": 0.25,
+              "wins": 1
+            },
+            "Confederation": {
+              "draws": 0,
+              "games": 4,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.5965213747972954,
+              "winRate": 1,
+              "wins": 4
+            },
+            "French": {
+              "draws": 1,
+              "games": 4,
+              "losses": 2,
+              "oneSided95WilsonLower": 0.05790732119985868,
+              "winRate": 0.25,
+              "wins": 1
+            },
+            "Germans": {
+              "draws": 1,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.18240016325464492,
+              "winRate": 0.5,
+              "wins": 2
+            },
+            "Russians": {
+              "draws": 0,
+              "games": 4,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.5965213747972954,
+              "winRate": 1,
+              "wins": 4
+            }
+          },
+          "bySide": {
+            "Allied": {
+              "draws": 3,
+              "games": 20,
+              "losses": 12,
+              "oneSided95WilsonLower": 0.12737716852035766,
+              "winRate": 0.25,
+              "wins": 5
+            },
+            "Soviet": {
+              "draws": 0,
+              "games": 16,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.7625102861984762,
+              "winRate": 0.9375,
+              "wins": 15
+            }
+          },
+          "bySlot": {
+            "0": {
+              "draws": 2,
+              "games": 18,
+              "losses": 7,
+              "oneSided95WilsonLower": 0.3192601388872444,
+              "winRate": 0.5,
+              "wins": 9
+            },
+            "1": {
+              "draws": 1,
+              "games": 18,
+              "losses": 6,
+              "oneSided95WilsonLower": 0.41977476572467876,
+              "winRate": 0.6111111111111112,
+              "wins": 11
+            }
+          },
+          "byStart": {
+            "118,73": {
+              "draws": 3,
+              "games": 18,
+              "losses": 8,
+              "oneSided95WilsonLower": 0.22658978563139714,
+              "winRate": 0.3888888888888889,
+              "wins": 7
+            },
+            "37,73": {
+              "draws": 0,
+              "games": 18,
+              "losses": 5,
+              "oneSided95WilsonLower": 0.528693830324016,
+              "winRate": 0.7222222222222222,
+              "wins": 13
+            }
+          },
+          "clustered": null,
+          "countryNoninferior": 5,
+          "countrySuperior": 5,
+          "eligible": false,
+          "historical": false,
+          "id": "bot_both",
+          "overall": {
+            "draws": 3,
+            "games": 36,
+            "losses": 13,
+            "oneSided95WilsonLower": 0.4202396719450989,
+            "winRate": 0.5555555555555556,
+            "wins": 20
+          },
+          "paired": {
+            "cases": 36,
+            "improved": 8,
+            "mean": 0,
+            "oneSidedLower": -0.13768662341628465,
+            "sampleStandardDeviation": 0.6324555320336759,
+            "tCritical": 1.30621,
+            "tied": 19,
+            "worsened": 9
+          },
+          "sideSafe": false,
+          "slotSafe": true,
+          "startSafe": false,
+          "strategyScope": "weak_only",
+          "weakExactCount": 18
+        },
+        {
+          "botScope": "both",
+          "byCountry": {
+            "Africans": {
+              "draws": 0,
+              "games": 4,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.5965213747972954,
+              "winRate": 1,
+              "wins": 4
+            },
+            "Alliance": {
+              "draws": 0,
+              "games": 4,
+              "losses": 2,
+              "oneSided95WilsonLower": 0.18240016325464492,
+              "winRate": 0.5,
+              "wins": 2
+            },
+            "Americans": {
+              "draws": 0,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.3561680085985064,
+              "winRate": 0.75,
+              "wins": 3
+            },
+            "Arabs": {
+              "draws": 0,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.3561680085985064,
+              "winRate": 0.75,
+              "wins": 3
+            },
+            "British": {
+              "draws": 0,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.3561680085985064,
+              "winRate": 0.75,
+              "wins": 3
+            },
+            "Confederation": {
+              "draws": 0,
+              "games": 4,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.5965213747972954,
+              "winRate": 1,
+              "wins": 4
+            },
+            "French": {
+              "draws": 0,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.3561680085985064,
+              "winRate": 0.75,
+              "wins": 3
+            },
+            "Germans": {
+              "draws": 0,
+              "games": 4,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.5965213747972954,
+              "winRate": 1,
+              "wins": 4
+            },
+            "Russians": {
+              "draws": 0,
+              "games": 4,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.5965213747972954,
+              "winRate": 1,
+              "wins": 4
+            }
+          },
+          "bySide": {
+            "Allied": {
+              "draws": 0,
+              "games": 20,
+              "losses": 5,
+              "oneSided95WilsonLower": 0.5677982498398755,
+              "winRate": 0.75,
+              "wins": 15
+            },
+            "Soviet": {
+              "draws": 0,
+              "games": 16,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.7625102861984762,
+              "winRate": 0.9375,
+              "wins": 15
+            }
+          },
+          "bySlot": {
+            "0": {
+              "draws": 0,
+              "games": 18,
+              "losses": 4,
+              "oneSided95WilsonLower": 0.5868786333177315,
+              "winRate": 0.7777777777777778,
+              "wins": 14
+            },
+            "1": {
+              "draws": 0,
+              "games": 18,
+              "losses": 2,
+              "oneSided95WilsonLower": 0.7136244370337036,
+              "winRate": 0.8888888888888888,
+              "wins": 16
+            }
+          },
+          "byStart": {
+            "118,73": {
+              "draws": 0,
+              "games": 18,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.7852331161361114,
+              "winRate": 0.9444444444444444,
+              "wins": 17
+            },
+            "37,73": {
+              "draws": 0,
+              "games": 18,
+              "losses": 5,
+              "oneSided95WilsonLower": 0.528693830324016,
+              "winRate": 0.7222222222222222,
+              "wins": 13
+            }
+          },
+          "clustered": null,
+          "countryNoninferior": 9,
+          "countrySuperior": 8,
+          "eligible": true,
+          "historical": false,
+          "id": "both_both",
+          "overall": {
+            "draws": 0,
+            "games": 36,
+            "losses": 6,
+            "oneSided95WilsonLower": 0.708784273014728,
+            "winRate": 0.8333333333333334,
+            "wins": 30
+          },
+          "paired": {
+            "cases": 36,
+            "improved": 9,
+            "mean": 0.2361111111111111,
+            "oneSidedLower": 0.14416648914064578,
+            "sampleStandardDeviation": 0.4223422970447263,
+            "tCritical": 1.30621,
+            "tied": 27,
+            "worsened": 0
+          },
+          "sideSafe": true,
+          "slotSafe": true,
+          "startSafe": true,
+          "strategyScope": "both",
+          "weakExactCount": 18
+        },
+        {
+          "botScope": "weak_only",
+          "byCountry": {
+            "Africans": {
+              "draws": 0,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.3561680085985064,
+              "winRate": 0.75,
+              "wins": 3
+            },
+            "Alliance": {
+              "draws": 1,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.18240016325464492,
+              "winRate": 0.5,
+              "wins": 2
+            },
+            "Americans": {
+              "draws": 0,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.3561680085985064,
+              "winRate": 0.75,
+              "wins": 3
+            },
+            "Arabs": {
+              "draws": 0,
+              "games": 4,
+              "losses": 2,
+              "oneSided95WilsonLower": 0.18240016325464492,
+              "winRate": 0.5,
+              "wins": 2
+            },
+            "British": {
+              "draws": 1,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.18240016325464492,
+              "winRate": 0.5,
+              "wins": 2
+            },
+            "Confederation": {
+              "draws": 0,
+              "games": 4,
+              "losses": 2,
+              "oneSided95WilsonLower": 0.18240016325464492,
+              "winRate": 0.5,
+              "wins": 2
+            },
+            "French": {
+              "draws": 0,
+              "games": 4,
+              "losses": 2,
+              "oneSided95WilsonLower": 0.18240016325464492,
+              "winRate": 0.5,
+              "wins": 2
+            },
+            "Germans": {
+              "draws": 1,
+              "games": 4,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.3561680085985064,
+              "winRate": 0.75,
+              "wins": 3
+            },
+            "Russians": {
+              "draws": 0,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.3561680085985064,
+              "winRate": 0.75,
+              "wins": 3
+            }
+          },
+          "bySide": {
+            "Allied": {
+              "draws": 3,
+              "games": 20,
+              "losses": 5,
+              "oneSided95WilsonLower": 0.41855585029325865,
+              "winRate": 0.6,
+              "wins": 12
+            },
+            "Soviet": {
+              "draws": 0,
+              "games": 16,
+              "losses": 6,
+              "oneSided95WilsonLower": 0.4219159873257089,
+              "winRate": 0.625,
+              "wins": 10
+            }
+          },
+          "bySlot": {
+            "0": {
+              "draws": 0,
+              "games": 18,
+              "losses": 7,
+              "oneSided95WilsonLower": 0.41977476572467876,
+              "winRate": 0.6111111111111112,
+              "wins": 11
+            },
+            "1": {
+              "draws": 3,
+              "games": 18,
+              "losses": 4,
+              "oneSided95WilsonLower": 0.41977476572467876,
+              "winRate": 0.6111111111111112,
+              "wins": 11
+            }
+          },
+          "byStart": {
+            "118,73": {
+              "draws": 0,
+              "games": 18,
+              "losses": 6,
+              "oneSided95WilsonLower": 0.4730995606916803,
+              "winRate": 0.6666666666666666,
+              "wins": 12
+            },
+            "37,73": {
+              "draws": 3,
+              "games": 18,
+              "losses": 5,
+              "oneSided95WilsonLower": 0.36852889549929546,
+              "winRate": 0.5555555555555556,
+              "wins": 10
+            }
+          },
+          "clustered": null,
+          "countryNoninferior": 9,
+          "countrySuperior": 6,
+          "eligible": false,
+          "historical": true,
+          "id": "historical_defensive_infantry",
+          "overall": {
+            "draws": 3,
+            "games": 36,
+            "losses": 11,
+            "oneSided95WilsonLower": 0.4742222620246913,
+            "winRate": 0.6111111111111112,
+            "wins": 22
+          },
+          "paired": {
+            "cases": 36,
+            "improved": 6,
+            "mean": 0.05555555555555555,
+            "oneSidedLower": -0.0337429954286277,
+            "sampleStandardDeviation": 0.41018772318777186,
+            "tCritical": 1.30621,
+            "tied": 27,
+            "worsened": 3
+          },
+          "sideSafe": true,
+          "slotSafe": true,
+          "startSafe": true,
+          "strategyScope": "weak_only",
+          "weakExactCount": 0
+        },
+        {
+          "botScope": "both",
+          "byCountry": {
+            "Africans": {
+              "draws": 0,
+              "games": 4,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.5965213747972954,
+              "winRate": 1,
+              "wins": 4
+            },
+            "Alliance": {
+              "draws": 2,
+              "games": 4,
+              "losses": 2,
+              "oneSided95WilsonLower": 0,
+              "winRate": 0,
+              "wins": 0
+            },
+            "Americans": {
+              "draws": 1,
+              "games": 4,
+              "losses": 2,
+              "oneSided95WilsonLower": 0.05790732119985868,
+              "winRate": 0.25,
+              "wins": 1
+            },
+            "Arabs": {
+              "draws": 0,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.3561680085985064,
+              "winRate": 0.75,
+              "wins": 3
+            },
+            "British": {
+              "draws": 2,
+              "games": 4,
+              "losses": 2,
+              "oneSided95WilsonLower": 0,
+              "winRate": 0,
+              "wins": 0
+            },
+            "Confederation": {
+              "draws": 2,
+              "games": 4,
+              "losses": 0,
+              "oneSided95WilsonLower": 0.18240016325464492,
+              "winRate": 0.5,
+              "wins": 2
+            },
+            "French": {
+              "draws": 0,
+              "games": 4,
+              "losses": 4,
+              "oneSided95WilsonLower": 0,
+              "winRate": 0,
+              "wins": 0
+            },
+            "Germans": {
+              "draws": 1,
+              "games": 4,
+              "losses": 2,
+              "oneSided95WilsonLower": 0.05790732119985868,
+              "winRate": 0.25,
+              "wins": 1
+            },
+            "Russians": {
+              "draws": 0,
+              "games": 4,
+              "losses": 1,
+              "oneSided95WilsonLower": 0.3561680085985064,
+              "winRate": 0.75,
+              "wins": 3
+            }
+          },
+          "bySide": {
+            "Allied": {
+              "draws": 6,
+              "games": 20,
+              "losses": 12,
+              "oneSided95WilsonLower": 0.033663223561904744,
+              "winRate": 0.1,
+              "wins": 2
+            },
+            "Soviet": {
+              "draws": 2,
+              "games": 16,
+              "losses": 2,
+              "oneSided95WilsonLower": 0.5452365088315324,
+              "winRate": 0.75,
+              "wins": 12
+            }
+          },
+          "bySlot": {
+            "0": {
+              "draws": 3,
+              "games": 18,
+              "losses": 8,
+              "oneSided95WilsonLower": 0.22658978563139714,
+              "winRate": 0.3888888888888889,
+              "wins": 7
+            },
+            "1": {
+              "draws": 5,
+              "games": 18,
+              "losses": 6,
+              "oneSided95WilsonLower": 0.22658978563139714,
+              "winRate": 0.3888888888888889,
+              "wins": 7
+            }
+          },
+          "byStart": {
+            "118,73": {
+              "draws": 5,
+              "games": 18,
+              "losses": 9,
+              "oneSided95WilsonLower": 0.10391618308452741,
+              "winRate": 0.2222222222222222,
+              "wins": 4
+            },
+            "37,73": {
+              "draws": 3,
+              "games": 18,
+              "losses": 5,
+              "oneSided95WilsonLower": 0.36852889549929546,
+              "winRate": 0.5555555555555556,
+              "wins": 10
+            }
+          },
+          "clustered": null,
+          "countryNoninferior": 4,
+          "countrySuperior": 4,
+          "eligible": false,
+          "historical": true,
+          "id": "historical_defensive_infantry_bot_both",
+          "overall": {
+            "draws": 8,
+            "games": 36,
+            "losses": 14,
+            "oneSided95WilsonLower": 0.2675335222195529,
+            "winRate": 0.3888888888888889,
+            "wins": 14
+          },
+          "paired": {
+            "cases": 36,
+            "improved": 8,
+            "mean": -0.09722222222222222,
+            "oneSidedLower": -0.2294388817828708,
+            "sampleStandardDeviation": 0.6073295697965039,
+            "tCritical": 1.30621,
+            "tied": 16,
+            "worsened": 12
+          },
+          "sideSafe": false,
+          "slotSafe": false,
+          "startSafe": false,
+          "strategyScope": "weak_only",
+          "weakExactCount": 0
+        }
+      ],
+      "champion": {
+        "id": "strategy_both",
+        "overall": {
+          "draws": 1,
+          "games": 36,
+          "losses": 5,
+          "oneSided95WilsonLower": 0.708784273014728,
+          "winRate": 0.8333333333333334,
+          "wins": 30
+        },
+        "paired": {
+          "cases": 36,
+          "improved": 10,
+          "mean": 0.25,
+          "oneSidedLower": 0.15091755040754157,
+          "sampleStandardDeviation": 0.45512949491639976,
+          "tCritical": 1.30621,
+          "tied": 25,
+          "worsened": 1
+        }
+      },
+      "control": {
+        "draws": 1,
+        "games": 36,
+        "losses": 14,
+        "oneSided95WilsonLower": 0.4470334611979001,
+        "winRate": 0.5833333333333334,
+        "wins": 21
+      },
+      "factorialEffects": {
+        "botScopeMainEffect": -0.00694444444444442,
+        "interaction": -0.01388888888888884,
+        "strategyScopeMainEffect": 0.24305555555555558
+      },
+      "finalizerJobId": "23751979",
+      "gameCount": 216,
+      "ranking": [
+        "strategy_both",
+        "both_both",
+        "historical_defensive_infantry",
+        "bot_both",
+        "historical_defensive_infantry_bot_both"
+      ],
+      "sourceCommit": "a2b75590da7d19edb2f4178a5ec30d69faabdae7",
+      "status": "PASS_PEAK_PROFILE_SCOPE_STAGE_0"
+    },
+    "replication": {
+      "arrayJobId": "24232910",
+      "candidate": {
+        "botScope": "weak_only",
+        "byCountry": {
+          "Africans": {
+            "draws": 0,
+            "games": 20,
+            "losses": 0,
+            "oneSided95WilsonLower": 0.8808421626390356,
+            "winRate": 1,
+            "wins": 20
+          },
+          "Alliance": {
+            "draws": 3,
+            "games": 20,
+            "losses": 6,
+            "oneSided95WilsonLower": 0.37220770755293486,
+            "winRate": 0.55,
+            "wins": 11
+          },
+          "Americans": {
+            "draws": 4,
+            "games": 20,
+            "losses": 3,
+            "oneSided95WilsonLower": 0.46651268884847175,
+            "winRate": 0.65,
+            "wins": 13
+          },
+          "Arabs": {
+            "draws": 0,
+            "games": 20,
+            "losses": 2,
+            "oneSided95WilsonLower": 0.7383369536731331,
+            "winRate": 0.9,
+            "wins": 18
+          },
+          "British": {
+            "draws": 2,
+            "games": 20,
+            "losses": 7,
+            "oneSided95WilsonLower": 0.37220770755293486,
+            "winRate": 0.55,
+            "wins": 11
+          },
+          "Confederation": {
+            "draws": 0,
+            "games": 20,
+            "losses": 0,
+            "oneSided95WilsonLower": 0.8808421626390356,
+            "winRate": 1,
+            "wins": 20
+          },
+          "French": {
+            "draws": 1,
+            "games": 20,
+            "losses": 7,
+            "oneSided95WilsonLower": 0.41855585029325865,
+            "winRate": 0.6,
+            "wins": 12
+          },
+          "Germans": {
+            "draws": 3,
+            "games": 20,
+            "losses": 7,
+            "oneSided95WilsonLower": 0.32740376788515596,
+            "winRate": 0.5,
+            "wins": 10
+          },
+          "Russians": {
+            "draws": 1,
+            "games": 20,
+            "losses": 0,
+            "oneSided95WilsonLower": 0.8039927632259837,
+            "winRate": 0.95,
+            "wins": 19
+          }
+        },
+        "bySide": {
+          "Allied": {
+            "draws": 13,
+            "games": 100,
+            "losses": 30,
+            "oneSided95WilsonLower": 0.48778187710971377,
+            "winRate": 0.57,
+            "wins": 57
+          },
+          "Soviet": {
+            "draws": 1,
+            "games": 80,
+            "losses": 2,
+            "oneSided95WilsonLower": 0.9098250448411213,
+            "winRate": 0.9625,
+            "wins": 77
+          }
+        },
+        "bySlot": {
+          "0": {
+            "draws": 8,
+            "games": 90,
+            "losses": 19,
+            "oneSided95WilsonLower": 0.615659864839376,
+            "winRate": 0.7,
+            "wins": 63
+          },
+          "1": {
+            "draws": 6,
+            "games": 90,
+            "losses": 13,
+            "oneSided95WilsonLower": 0.7102330699887883,
+            "winRate": 0.7888888888888889,
+            "wins": 71
+          }
+        },
+        "byStart": {
+          "118,73": {
+            "draws": 5,
+            "games": 90,
+            "losses": 6,
+            "oneSided95WilsonLower": 0.8097214083734242,
+            "winRate": 0.8777777777777778,
+            "wins": 79
+          },
+          "37,73": {
+            "draws": 9,
+            "games": 90,
+            "losses": 26,
+            "oneSided95WilsonLower": 0.524524053398336,
+            "winRate": 0.6111111111111112,
+            "wins": 55
+          }
+        },
+        "clustered": {
+          "clusterCount": 18,
+          "meanWinRate": 0.7444444444444445,
+          "oneSided95Lower": 0.6326188904015514,
+          "sampleStandardDeviation": 0.27272529212986507,
+          "tCritical": 1.73961
+        },
+        "countryNoninferior": 9,
+        "countrySuperior": 9,
+        "eligible": true,
+        "historical": false,
+        "id": "strategy_both",
+        "overall": {
+          "draws": 14,
+          "games": 180,
+          "losses": 32,
+          "oneSided95WilsonLower": 0.6876239007795026,
+          "winRate": 0.7444444444444445,
+          "wins": 134
+        },
+        "paired": {
+          "cases": 180,
+          "improved": 50,
+          "mean": 0.22777777777777777,
+          "oneSidedLower": 0.16691312009956397,
+          "sampleStandardDeviation": 0.4938793596110121,
+          "tCritical": 1.65341,
+          "tied": 121,
+          "worsened": 9
+        },
+        "sideSafe": true,
+        "slotSafe": true,
+        "startSafe": true,
+        "strategyScope": "both",
+        "weakExactCount": 90
+      },
+      "control": {
+        "draws": 16,
+        "games": 180,
+        "losses": 72,
+        "oneSided95WilsonLower": 0.450116867892222,
+        "winRate": 0.5111111111111111,
+        "wins": 92
+      },
+      "finalizerJobId": "24232911",
+      "gameCount": 360,
+      "sourceCommit": "8c73a32a18e04500dc7c52a83264460c01a13f66",
+      "status": "PASS_PEAK_PROFILE_SCOPE_STAGE_1"
+    }
+  },
+  "schemaVersion": 1,
+  "status": "PASS_FINAL_PAPER_EVIDENCE"
+}
