@@ -16,10 +16,16 @@ lockfile_sha256 = "59ad1d212f1ebe8fba5913ced9c096c97d5840c93abc76bfa863737c65894
 game_api = "0.75.0"
 typescript = "4.9.5"
 vitest = "4.0.18"
-canvas = "3.2.0"
+canvas = "3.2.3"
 install = "npm ci --ignore-scripts"
 build = "npm run build"
 test = "npm --workspace packages/chronodivide-bot-driver test -- --run"
+
+[rendering]
+modules = ["nodejs/20.13.1-GCCcore-13.3.0", "Pango/1.54.0-GCCcore-13.3.0", "giflib/5.2.1-GCCcore-13.3.0"]
+activation = "module load nodejs/20.13.1-GCCcore-13.3.0 Pango/1.54.0-GCCcore-13.3.0 giflib/5.2.1-GCCcore-13.3.0"
+native_build = "cd packages/chronodivide-bot-driver && npm rebuild canvas --build-from-source"
+verification = "npx vitest run src/test/gameStateFrameRenderer.test.ts"
 
 [compatibility]
 vite_engine_warning = true
