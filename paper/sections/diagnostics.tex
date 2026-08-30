@@ -1,83 +1,115 @@
-\section{Post-Confirmatory Diagnostics}
-\label{sec:diagnostics}
+\section{Deterministic Tactical Evidence}
+\label{sec:frames}
 
-The analyses in this section were specified or conducted after the held-out
-result. They explain and stress-test the frozen policy; they do not alter its
-selection or rescue the failed absolute gate.
+Screenshots are selected by a protocol fixed before replay. Within each
+registered category, the case is the hash-minimum eligible record and frame
+updates are fixed from public state transitions. A passive renderer reads only
+the public game API. Independent renderer-off and renderer-on runs have
+identical trajectories, endpoints, action calls, and production calls. All
+\ReplayCount{} replays and \FrameCount{} frames passed immutable hash checks.
+The images illustrate observed tactics; quantitative claims continue to rest
+on the complete replications.
 
-\subsection{Does the common-seed championship help?}
+\subsection{Reciprocal Peak profile changes the opening}
 
-The championship addressed a training-only concern: each optimizer run had
-selected its six finalists under different seeds. We therefore compared the
-champion with the five policies that each run would have selected on its own,
-using four new common seed blocks on the ten open method-v2 development
-families. The complete design contains \MechanismGameCount{} games (six
-methods, ten families, four seed blocks, and reciprocal slots).
+\begin{figure*}[t]
+\centering
+\setlength{\tabcolsep}{1pt}
+\begin{tabular}{cc}
+\includegraphics[width=.40\textwidth]{../paper/figures/game_frames/peak-deployed-weak-only-u600.png} &
+\includegraphics[width=.40\textwidth]{../paper/figures/game_frames/peak-confirmed-strategy-both-u600.png} \\
+\includegraphics[width=.40\textwidth]{../paper/figures/game_frames/peak-deployed-weak-only-u900.png} &
+\includegraphics[width=.40\textwidth]{../paper/figures/game_frames/peak-confirmed-strategy-both-u900.png} \\
+\includegraphics[width=.40\textwidth]{../paper/figures/game_frames/peak-deployed-weak-only-u1500.png} &
+\includegraphics[width=.40\textwidth]{../paper/figures/game_frames/peak-confirmed-strategy-both-u1500.png}
+\end{tabular}
+\caption{Peak, Arabs at reciprocal start $(118,73)$. Left: deployed
+\texttt{weak\_only}; right: confirmed \texttt{strategy\_both}; rows are
+updates 600, 900, and 1,500. Public states are identical at 600 and first
+diverge at update \PeakDivergenceUpdate{}. The control later loses at 9,431;
+the confirmed policy wins at 9,940. This pair visualizes profile activation,
+not a hand-selected proof of aggregate superiority.}
+\label{fig:peak-frames}
+\end{figure*}
 
-The champion scores \MechanismChampionScore{}, compared with
-\MechanismLocalAverageScore{} for the equal average of the
-five run-local policies. The difference is \MechanismEstimate{}, but its
-family-clustered 95\% interval
-[\MechanismCILower{},~\MechanismCIUpper{}] includes zero. All five pairwise
-point differences favor the champion (\MechanismPairwiseMinimum{} to
-\MechanismPairwiseMaximum{}), while every pairwise
-interval crosses zero. This evidence is consistent with common-seed selection
-being useful, but ten families do not statistically resolve the mechanism.
+The paired sequence in Figure~\ref{fig:peak-frames} separates state before and
+after the reciprocal predicate takes effect. The selected policy reuses an
+existing macro plan; the visual divergence is therefore attributable to scope
+activation in this deterministic case. The 180-case replication establishes
+whether that change is useful in general.
 
-\subsection{Which policy group matters?}
+\subsection{Clear blocking forces, then eliminate structures}
 
-\begin{figure}[t]
-  \centering
-  \input{generated/component_effects_plot}
-  \caption{Champion-minus-one-group-revert effects. Blue shows ordinary
-  family-clustered 95\% intervals; orange shows Bonferroni familywise-95\%
-  intervals. Scouting has zero endpoint difference and variance, so no
-  artificial interval is drawn.}
-  \label{fig:components}
-\end{figure}
+\begin{figure*}[t]
+\centering
+\setlength{\tabcolsep}{1pt}
+\begin{tabular}{ccc}
+\includegraphics[width=.325\textwidth]{../paper/figures/game_frames/hfo-confirmed-force-clearance-u18600.png} &
+\includegraphics[width=.325\textwidth]{../paper/figures/game_frames/hfo-confirmed-force-clearance-u18900.png} &
+\includegraphics[width=.325\textwidth]{../paper/figures/game_frames/hfo-confirmed-force-clearance-u19500.png} \\
+\includegraphics[width=.325\textwidth]{../paper/figures/game_frames/hfo-confirmed-final-building-u19020.png} &
+\includegraphics[width=.325\textwidth]{../paper/figures/game_frames/hfo-confirmed-final-building-u19320.png} &
+\includegraphics[width=.325\textwidth]{../paper/figures/game_frames/hfo-confirmed-final-building-u19667.png} \\
+\includegraphics[width=.325\textwidth]{../paper/figures/game_frames/hfo-confirmed-tick-cap-u72000.png} &
+\includegraphics[width=.325\textwidth]{../paper/figures/game_frames/hfo-confirmed-tick-cap-u81000.png} &
+\includegraphics[width=.325\textwidth]{../paper/figures/game_frames/hfo-confirmed-tick-cap-u90000.png}
+\end{tabular}
+\caption{HFO tactics and limitation. Top: one Germans west game at updates
+18,600, \ForceClearanceUpdate{}, and 19,500; selectable enemy combatants fall
+to zero at 18,900 while one building remains. Middle: the same game at 19,020,
+19,320, and its literal win at 19,667. Every enemy building is gone although
+two infantry and one engineer survive. Bottom: a distinct protocol-selected
+tick-cap draw at 72,000, 81,000, and 90,000; StrongBot retains 11 buildings but
+no mobile unit, while Supalosa retains three buildings and a combatant.}
+\label{fig:hfo-closeout}
+\label{fig:hfo-failure}
+\end{figure*}
 
-We formed five policies that each revert one group of champion settings to the
-reference: defense-radius growth, emergency defense, forced attack, scouting, or
-the joint attack-composition/strategic-plan group. A second 480-game
-common-seed panel compared all reverts with the champion on the same ten open
-families. The primary champion-minus-equal-revert-average estimate is
-\ComponentAverageEstimate{} with 95\% interval
-[\ComponentAverageCILower{},~\ComponentAverageCIUpper{}].
+Figure~\ref{fig:hfo-closeout} illustrates the decision boundary raised by
+literal adjudication. When combatants block access, removing them can be
+instrumental. Once the remaining structure is exposed, continuing to hunt all
+units would delay an already available win. The image sequence records the
+state transition; the replicated retarget studies provide the policy-level
+evidence.
 
-Figure~\ref{fig:components} reports every individual contrast. Reverting
-infantry+rush to assault/macro gives by far the largest decline:
-\StrategyEstimate{}, with ordinary 95\% interval
-[\StrategyOrdinaryLower{},~\StrategyOrdinaryUpper{}]. However, its
-prespecified five-comparison Bonferroni familywise interval is
-[\StrategyFamilywiseLower{},~\StrategyFamilywiseUpper{}], narrowly including
-zero. The defense-growth and forced-attack reverts have slightly higher point
-scores than the champion, emergency defense is near zero, and the scouting
-revert is endpoint-identical in all 80 paired games. Thus the joint strategy
-group is the dominant observed signal, but no individual component clears the
-multiplicity-controlled criterion.
+\subsection{An honest liveness failure}
 
-\subsection{Terminal army and economy pattern}
+The bottom row of Figure~\ref{fig:hfo-failure} is qualitatively different from
+a winning advantage that merely needs faster targeting: the candidate has lost
+its mobile force. The game is correctly scored as a draw and is preserved
+rather than replaced by a more attractive replay. The deployed policy is
+reliable, not infallible; its remaining failures include liveness and
+force-preservation errors.
 
-A deterministic analyzer validated and reduced all \TerminalRawRecordCount{} raw completion
-records from the confirmatory and two diagnostic panels. Across confirmatory
-pairs, the champion improves its candidate-minus-opponent terminal balance by
-\ConfirmatoryTerminalCombatantDifference{} combatants and
-\ConfirmatoryTerminalUnitDifference{} total units while holding
-\ConfirmatoryTerminalCreditReduction{} fewer credits.
-Outcome changes mechanically alter terminal snapshots, so we also examine the
-\StableDrawPairCount{} pairs that remain tick-cap draws under both methods.
-They have identical score and duration, yet the champion ends with
-\StableDrawCombatantDifference{} more relative combatants,
-\StableDrawUnitDifference{} more relative units, and
-\StableDrawCreditDifference{} relative credits.
+\subsection{Design implications}
 
-The strategy-revert panel has the same qualitative pattern: the champion has
-\StrategyTerminalCombatantDifference{} more relative combatants,
-\StrategyTerminalUnitDifference{} more relative units, and
-\StrategyTerminalCreditReduction{} fewer credits overall. These endpoints
-are consistent with converting banked
-resources into fielded combat power. They do not establish when or how that
-conversion occurred, because the preserved games contain no action trace,
-production timeline, combat log, or intermediate state trajectory. Likewise,
-endpoint identity for the scouting revert does not prove identical internal
-actions.
+The positive mechanisms share a structure: they change a small conditional
+subprogram rather than replace the complete agent. West rush/guard changes
+opening force allocation, bottom retarget changes liveness after a certified
+stall, and Peak changes one spatial-scope predicate. Exact inactive-cell traces
+matter here. Without them, a higher aggregate win rate could be caused by an
+unintended change to economy, timing, or a previously strong start. This
+suggests a useful design pattern for scripted RTS agents: treat map profiles as
+testable conditional programs with explicit activation domains.
+
+Literal victory also makes objective completion a separate control problem.
+The middle row of Figure~\ref{fig:hfo-closeout} shows why
+\emph{attack continuously} is insufficient as a specification. A policy must
+decide whether combatants currently block access, whether enough force can be
+spared from home defense, and whether destroying a reachable structure ends
+the game sooner than clearing the army. Progress-gated retargeting supplies
+memory--the building count and aggregate hit points must actually change--while
+the force and threat gates prevent a blind late-game charge. The remaining
+tick-cap case shows the missing complement: if mobile force is gone, retarget
+frequency cannot recover the game.
+
+Finally, opponent code is part of the evaluation distribution. The Advanced
+reversal is too large to describe as ordinary seed noise and survived paired
+country/start/slot control. A technically accurate opponent-style detector does
+not solve that problem unless each routed expert is itself competent. Future
+work should therefore train over multiple independent opponents or optimize a
+worst-opponent objective before adding adaptive routing. The present evidence
+supports reliable Supalosa-specific strength and exposes, rather than resolves,
+the broader robustness problem.
+
+\FloatBarrier

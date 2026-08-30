@@ -15,6 +15,7 @@
 \usepackage{booktabs}
 \usepackage{array}
 \usepackage{flushend}
+\usepackage{placeins}
 \usepackage{microtype}
 \usepackage{graphicx}
 \usepackage{siunitx}
@@ -39,13 +40,18 @@
 \AtBeginDocument{\color{ChronoInk}}
 \hypersetup{colorlinks=true,linkcolor=ChronoBlue,citecolor=ChronoBlue,urlcolor=ChronoBlue}
 
+% Keep full-width screenshot panels top-aligned on float-only pages.
+\makeatletter
+\setlength{\@fptop}{0pt}
+\setlength{\@dblfptop}{0pt}
+\makeatother
+
 \input{generated/metrics}
 
-\title{Leakage-Resistant Evaluation of Scripted RTS Agent Configuration in
-Chrono Divide}
+\title{StrongBot: Auditable Map-Profiled RTS Agent Development in Chrono Divide}
 \author{\authorname{Anonymous Author(s)}}
 \keywords{Game Artificial Intelligence, Real-time Strategy Games, Scripted
-Agents, Algorithm Configuration, Reproducible Evaluation.}
+Agents, Agent Evaluation, Reproducible Simulation.}
 \abstract{\input{abstract}}
 
 % The official style asks for uppercase section headings. Preserve star and
@@ -59,19 +65,13 @@ Agents, Algorithm Configuration, Reproducible Evaluation.}
   }%
 }
 
-% The three result/protocol tables were designed for a one-column LNCS page.
-% Give them the full two-column width without changing their scientific source.
+% Result and protocol tables use full paper width in the SCITEPRESS layout.
 \expandafter\let\expandafter\scitepresstable\csname table*\endcsname
 \expandafter\let\expandafter\endscitepresstable\csname endtable*\endcsname
 \renewenvironment{table}[1][t]{\scitepresstable[#1]}{\endscitepresstable}
 
-% Narrow SCITEPRESS columns otherwise overrun on the two multi-term estimand
-% equations. A uniform 9-point display size preserves the shared equations.
 \AtBeginEnvironment{equation}{\small}
 
-% Keep the expanded, current bibliography inside the review-page limit without
-% shrinking its text. The base article list otherwise inserts 2 pt between all
-% 30 entries, which alone consumes more than five lines of column height.
 \let\scitepressthebibliography\thebibliography
 \renewcommand{\thebibliography}[1]{%
   \scitepressthebibliography{#1}%
@@ -99,6 +99,7 @@ Agents, Algorithm Configuration, Reproducible Evaluation.}
 \input{../paper/sections/reproducibility}
 \input{../paper/sections/conclusion}
 
+\raggedend
 \bibliographystyle{apalike}
 \bibliography{references}
 \end{document}

@@ -1,101 +1,118 @@
-\section{Held-Out Results}
+\section{Results}
 \label{sec:results}
 
-All \ConfirmatoryShardCount{} confirmatory shards completed under the single
-prespecified Slurm project account, with exactly \ConfirmatoryGameCount{}
-launches and completions, no failed task,
-no additional attempt, and one irreversible unblinding. Table~\ref{tab:main}
-reports both prespecified endpoints.
+The claim-bearing evaluations contain \OutcomeGameCount{} completed policy
+games. Every reported stage satisfied its frozen launch count, identity hashes,
+and fail-closed completion rule; no outcome-bearing cell was selectively
+retried or excluded.
 
 \begin{table}[t]
 \centering
-\caption{Frozen confirmatory result on \TestFamilyCount{} sealed families.
-Win/draw/loss counts are descriptive; inference treats the map family as the
-cluster.}
-\label{tab:main}
+\caption{Primary literal-objective results. Lower bounds are one-sided 95\%
+Wilson bounds on win rate. The Peak control and reciprocal policy use the same
+180 fresh cases.}
+\label{tab:primary}
 \small
-\begin{tabular}{@{}lrrrrl@{}}
-\toprule
-Quantity & Score/effect & W & D & L & Uncertainty / decision \\
-\midrule
-Reference & \DefaultScore{} & \DefaultWins{} & \DefaultDraws{} & \DefaultLosses{} & descriptive \\
-Champion & \ChampionScore{} & \ChampionWins{} & \ChampionDraws{} & \ChampionLosses{} & descriptive \\
-Champion $-$ reference & \ImprovementEstimate{} & & & &
-95\% CI [\ImprovementCILower{}, \ImprovementCIUpper{}]; pass \\
-Champion $-$ 0.5 & \ChampionAbsoluteMargin{} & & & &
-one-sided 95\% lower \ChampionAbsoluteLower{}; fail \\
-\bottomrule
-\end{tabular}
+\input{generated/primary_results_table}
 \end{table}
 
-\subsection{Relative improvement passes}
+\subsection{RQ1: StrongBot reliably beats Supalosa on HFO}
 
-The reference scores \DefaultScore{} (\DefaultWins{} win, \DefaultDraws{} draws,
-\DefaultLosses{} losses), whereas the champion scores \ChampionScore{}
-(\ChampionWins{} wins, \ChampionDraws{} draws, \ChampionLosses{} losses). The
-equally-family-weighted champion-minus-reference estimate is
-\ImprovementEstimate{}, with clustered standard error \ImprovementSE{} and
-95\% interval [\ImprovementCILower{},~\ImprovementCIUpper{}]. Its lower endpoint
-is above zero, passing the relative gate.
-
-Figure~\ref{fig:family-effects} shows every family effect.
-\PositiveFamilyCount{} are positive, \ZeroFamilyCount{} are exactly zero, and
-none is negative at the family-average level. Effects range from
-\MinimumFamilyEffect{} to \MaximumFamilyEffect{}; thus the mean is not produced by a single
-family, although effect magnitude is heterogeneous. These points are estimates
-from 16 games per method and family, not independent confidence intervals.
+On the 720-game frozen HFO population, StrongBot records
+\HfoWins{}/\HfoDraws{}/\HfoLosses{} (Table~\ref{tab:primary}). Its literal win
+rate is \HfoWinRate{}, with one-sided Wilson lower bound \HfoWilsonLower{}.
+An equal-weight analysis over the 36 country--start cells gives a one-sided
+lower bound of \HfoClusterLower{}. Every country, physical start, participant
+side, and slot has more wins than losses. The median game lasts
+\HfoMedianUpdates{} updates; only \HfoTickCapDraws{} games reach the
+90,000-update cap. The result is therefore elimination-heavy rather than an
+artifact of awarding half credit to stalemates.
 
 \begin{figure}[t]
   \centering
-  \input{generated/family_effects_plot}
-  \caption{Champion-minus-reference score on each sealed family, ordered by
-  effect. Labels are fixed family codes. The dashed line is zero; no game-level
-  error bars are shown because the prespecified inference clusters at the
-  family level.}
-  \label{fig:family-effects}
+  \input{generated/primary_bounds_plot}
+  \caption{Literal win rates and one-sided 95\% Wilson lower bounds. HFO and
+  Peak establish the positive Supalosa results. The two Advanced rows are a
+  separate paired transfer test and expose a sharp opponent shift.}
+  \label{fig:primary-bounds}
 \end{figure}
 
-As post-confirmatory sensitivity checks, an independent Python reducer reread
-all \ConfirmatoryGameCount{} raw completion records and reproduced the point estimates, standard
-errors, and bounds exactly. A 100,000-replicate family bootstrap yielded a 95\%
-interval [\ImprovementBootstrapLower{},~\ImprovementBootstrapUpper{}], and the
-exact family sign-flip two-sided value was
-$p=\ImprovementSignFlipP{}$. These checks support robustness of the relative
-result but did not replace the frozen estimator.
+\subsection{RQ2: scoped mechanisms solve distinct failures}
 
-\subsection{Absolute superiority does not pass}
+The mechanism studies in Table~\ref{tab:mechanisms} are paired replications on
+fresh cases. Allied west rush+guard changes the control from
+\AlliedControlWdl{} to \AlliedWinnerWdl{}, with paired-score lower bound
+\AlliedPairedLower{}. The Soviet counterpart changes
+\SovietControlWdl{} to \SovietWinnerWdl{} (lower
+\textit{L}=\SovietPairedLower{}). The bottom progress-gated retarget changes
+\BottomControlWdl{} to \BottomWinnerWdl{} (lower
+\textit{L}=\BottomPairedLower{}) without increasing losses.
 
-The champion's score margin over 0.5 is \ChampionAbsoluteMargin{}, with
-family-clustered standard error \ChampionAbsoluteSE{}. Its prespecified
-one-sided 95\% lower bound is \ChampionAbsoluteLower{}, so the absolute-strength
-gate fails. Because the frozen protocol requires both gates, its joint success
-criterion also fails. \FamiliesAboveHalfCount{} family scores are above 0.5,
-\FamiliesEqualHalfCount{} equal 0.5, and \FamiliesBelowHalfCount{} fall below
-0.5. The diagnostic family-bootstrap interval for champion score,
-[\ChampionBootstrapLower{}, \ChampionBootstrapUpper{}], leads
-to the same caution. Therefore, the correct positive result is not ``StrongBot reliably
-beats Supalosa.'' It is ``the configured StrongBot robustly improves the frozen
-generic reference against pinned Supalosa on this family population.''
+The effect is not merely a broad profile change. In separate outcome-free
+gates, each mechanism changes normalized action traces in every intended-active
+cell and is exactly equal to control in \AlliedInactiveCells{},
+\SovietInactiveCells{}, and \BottomInactiveCells{} intended-inactive cells,
+respectively. These results support three local causal statements about the
+implemented policy: the west profiles create the large west improvements; the
+bottom retarget converts otherwise tied cases into wins; and the interventions
+remain isolated outside their declared conditions. They do not imply that any
+one component explains all 720 confirmation games.
 
-\subsection{The gain is mostly avoided losses}
+\subsection{RQ3: reciprocal macro scope repairs Peak}
 
-Because both methods use the same family, engine seed, opponent stream, and
-physical slot, the \ConfirmatoryGamesPerMethod{} per-method games form direct
-outcome pairs. Figure~\ref{fig:transitions} shows their transition matrix. Of
-\DefaultLosses{} reference losses, \LossToDrawPairCount{} become champion draws
-and \LossToWinPairCount{} become champion wins. \DrawToWinPairCount{} reference
-draws become wins, while \DrawToLossPairCount{} regress to losses. Overall, \ImprovedPairCount{}
-pairs improve, \RegressedPairCount{} regress, and \UnchangedPairCount{} have
-the same frozen score. The policy gains \ChampionWinGainCount{} wins and avoids
-\ChampionLossAvoidedCount{} losses relative
-to the reference, but its most common improvement is loss-to-tick-cap survival.
+The six-arm Peak screen isolated macro-strategy scope from tactical/bot scope.
+The $2\times2$ factorial estimated a +0.243 macro-scope main effect, a -0.007
+tactical-scope main effect, and a -0.014 interaction. The frozen ranking
+therefore selected \texttt{strategy\_both}: apply the existing macro profile at
+both reciprocal starts and leave tactical scope unchanged.
 
-\begin{figure}[t]
-  \centering
-  \input{generated/outcome_transitions}
-  \caption{Paired outcome transitions over \ConfirmatoryGamesPerMethod{} matched
-  family--seed--slot cells. Rows are reference outcomes; columns are champion
-  outcomes. Cell shading reflects count and all counts, including zeros, are
-  shown.}
-  \label{fig:transitions}
-\end{figure}
+On 180 sealed cases, the deployed control records
+\PeakControlWins{}/\PeakControlDraws{}/\PeakControlLosses{}, whereas the
+unchanged reciprocal policy records
+\PeakWins{}/\PeakDraws{}/\PeakLosses{}. The win rate rises from
+\PeakControlWinRate{} to \PeakWinRate{}; the new policy's Wilson lower bound is
+\PeakWilsonLower{}. Across the matched cases, \PeakImproved{} improve,
+\PeakTied{} tie, and \PeakWorsened{} worsen. The mean paired-score gain is
+\PeakPairedMean{}, with one-sided lower bound \PeakPairedLower{}. An
+equal-weight country--start analysis gives lower bound
+\PeakClusterLower{}. All nine countries, both starts, both participant sides,
+and both slots have more wins than losses under the confirmed policy.
+
+\begin{table}[t]
+\centering
+\caption{Peak reciprocal-policy replication by prespecified start, faction
+side, and participant slot. Country results are omitted for space; every one
+of the nine countries also has more wins than losses.}
+\label{tab:peak-strata}
+\small
+\input{generated/peak_strata_table}
+\end{table}
+
+The change is sharply scoped. At the already-profiled start, all
+\PeakInvariantPairs{} paired trajectories are byte-identical between control
+and candidate. The improvement arises from activating the same macro profile
+at the reciprocal start, not from retuning its parameters or perturbing the
+known start.
+
+\subsection{RQ4: strength does not transfer to Advanced}
+
+\begin{table}[t]
+\centering
+\caption{Paired HFO transfer test against the independently sourced RA2Web
+Advanced opponent. These rows use the same 360 country--start--slot cases.}
+\label{tab:advanced}
+\small
+\input{generated/transfer_table}
+\end{table}
+
+Against Advanced, StrongBot records
+\AdvancedStrongWins{}/\AdvancedStrongDraws{}/\AdvancedStrongLosses{}, while
+pinned Supalosa records
+\AdvancedSupalosaWins{}/\AdvancedSupalosaDraws{}/\AdvancedSupalosaLosses{}
+(Table~\ref{tab:advanced}). The paired-score difference is
+\AdvancedPairedMean{}, with one-sided lower bound \AdvancedPairedLower{}.
+Successive prospectively frozen overlay, order-only, and early-production
+studies improved some weak west states but produced no eligible specialist.
+We therefore retain the negative result: StrongBot is reliably stronger than
+Supalosa on the two tested Supalosa matchups, but it is not a generally
+dominant Chrono Divide bot.

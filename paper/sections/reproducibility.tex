@@ -1,76 +1,87 @@
 \section{Reproducibility, Limitations, and Release}
 \label{sec:limitations}
 
-\subsection{Execution and artifact chain}
+\subsection{Artifact and execution chain}
 
-The finalized accepted path contains \TotalGameCount{} policy games:
-\OptimizerGameCount{} in the five searches, \ChampionshipGameCount{} in the
-championship, \DevelopmentGameCount{} in fresh development,
-\ConfirmatoryGameCount{} in confirmatory evaluation, and
-\MechanismGameCount{} in each diagnostic panel. All accepted shards
-ran under the single prespecified Slurm project account; plan, event, summary,
-scheduler,
-and raw-completion counts agree, and no accepted campaign contains a technical
-failure or extra attempt. Two zero-launch campaigns and one sealed development
-campaign with a deterministic post-launch map-extension interface failure are
-retained separately. The latter was retired as an indivisible campaign; after
-a prospective interface repair, the full development protocol restarted from
-phase 1 without inspecting or pooling its outcomes.
+A compact final evidence artifact verifies eleven immutable aggregates and
+generates every numerical macro, table, and plot in this paper. It pins source,
+protocol, program, runtime, map, opponent, selection, prior-stage, aggregate,
+and screenshot-manifest hashes. The generator rejects unexpected hashes,
+missing fields, or numerical drift. Detailed result documents map each
+scientific result to exact Slurm job IDs and the sole simulation account
+\texttt{pi\_jss233}. Raw cells use atomic writes and checksums; scheduler
+accounting must match the manifest before an aggregate can be opened.
 
-Every interpreted result maps to an exact configuration, source revision,
-opponent revision, artifact hash, and Slurm job ID in an append-only registry.
-Paper macros and TikZ/PGFPlots fragments are generated from committed JSON
-artifacts. The generator pins input hashes, cross-checks overlapping
-aggregates, and emits an output manifest; tests fail on numerical drift. A
-clean artifact can therefore reproduce every table and figure without the
-private cluster paths or raw third-party assets.
+The \OutcomeGameCount{} claim-bearing games exclude outcome-blind selection,
+technical traces, and compatibility replays. Negative Advanced studies remain
+in the evidence tree, as do failed or retired protocols; they are not pooled
+with later prospective restarts. Screenshot replay is likewise separate from
+statistical evaluation. The renderer is passive, and its
+\ReplayCount{} independent replay pairs produced identical trajectories and
+endpoints with and without frame capture.
 
-The intended release includes author-owned bot changes, orchestration,
-protocols, tests, manifests, hashes, family metadata, aggregate results, and
-paper-generation code. Chrono Divide code, Supalosa code, Red Alert 2 archives,
-and downloaded map files remain under their respective rights. We will provide
-acquisition and hash-verification instructions rather than redistributing
-third-party content without permission. For double-blind review, the artifact
-will use an identity-neutral archive and contain no author-identifying URL or
-metadata.
+The review artifact will include author-written orchestration, protocols,
+tests, source patches, aggregate results, generation code, paper source, and
+the \FrameCount{} deterministic frames. Chrono Divide, original Red Alert 2
+archives, maps, the Supalosa package, and RA2Web assets remain subject to their
+respective rights. Because the StrongBot package derives from an upstream tree
+that presently has no redistribution license, we will not claim that the whole
+bot can be relicensed unilaterally. The artifact instead supplies acquisition,
+commit, and byte-hash verification instructions; a fuller release requires
+permission from the relevant authors and rights holders.
 
 \subsection{Limitations}
 
-\paragraph{One opponent and matchup.}
-Supalosa is the only independent bot and all games are Iraq mirrors. The test
-therefore estimates one pinned opponent/faction matchup, not general agent
-strength; the failed absolute gate emphasizes this boundary.
+\paragraph{Opponent scope.}
+Reliable superiority is established against one pinned Supalosa version on two
+maps. The independent Advanced result reverses direction, so the paper supports
+map-profiled opponent-specific strength, not universal bot ranking. An adaptive
+opponent detector was technically feasible, but no Advanced specialist passed
+the frozen strength gates; deploying a selector without a competent second
+expert would be cosmetic.
 
-\paragraph{Supported map population.}
-Only Temperate families passing two compatibility screens are included; Snow,
-Urban, and Desert lack complete authorized asset/runtime support. Family
-grouping is a conservative heuristic, and tick-250 compatibility is not proof
-of full behavioral fidelity to commercial Red Alert 2.
+\paragraph{Map scope.}
+The positive evidence covers HFO and Peak of Perfection. HFO has four physical
+starts and Peak two; both are evaluated across nine countries and reciprocal
+slots. This is materially broader than one map or Iraq-only play, but far from
+the full map distribution. Exact-coordinate dispatch also requires explicit
+profiles for unseen maps.
 
-\paragraph{Comparator boundary.}
-The reference is candidate 0 inside the coordinate-free research interface,
-not the fork's map-profile-enabled deployed default. This comparison isolates
-configuration within the declared generic policy class, but it does not
-estimate improvement over the deployed policy; the reference's low score can
-make the relative gain appear larger than a product-level improvement.
+\paragraph{Agent class and observability.}
+StrongBot is a deterministic layered scripted agent with access to the same
+structured full game state available through the offline bot API. It is not a
+learned policy and the experiments do not compare sample efficiency with
+reinforcement learning or program synthesis. Some interventions are defined in
+human-readable domain terms, so their contribution is engineering and
+evaluation methodology rather than a new general optimizer.
 
-\paragraph{High draw rate and endpoint.}
-The 18,000-tick cap produces many draws, all scored 0.5 regardless of terminal
-advantage. The primary gain is often survival rather than elimination. A
-different cap or outcome definition could answer a different question; neither
-was varied after results.
+\paragraph{Residual failures.}
+Four HFO games hit the 90,000-update cap. The preserved example loses all
+mobile force before three enemy buildings are eliminated. A broader policy
+would need explicit force-reconstitution and reachability reasoning, not simply
+more frequent attack orders. Peak also remains start- and side-dependent even
+though every prespecified stratum is positive.
 
-\paragraph{Algorithmic comparison.}
-Successive halving, common random numbers, and deterministic selection are
-known. Without a standard configurator or hand-tuning comparator, we claim
-neither search efficiency nor optimizer novelty. The tie term affects training
-rankings only; held-out evaluation uses game score.
+\paragraph{Causal resolution.}
+Paired component replications and inactive-cell trace equality isolate the
+declared mechanisms more strongly than aggregate win rates alone. They do not
+identify every interaction inside the inherited economy and mission system.
+The game frames are deterministic observations, not counterfactual causal
+tests.
 
-\paragraph{Adaptation and diagnostic power.}
-Method v2 followed a negative development result for method v1. Test data
-remained sealed and the new development pool was disjoint, but the final method
-should be understood as a transparently adapted research program rather than a
-single-shot preregistration. Component and championship diagnostics use only
-ten open families, with intervals spanning zero; terminal snapshots lack
-trajectories. Adding test seeds now would be post-selection without new
-families.
+\paragraph{Research adaptation.}
+The final study follows several complete negative development programs. Each
+pivot was declared prospectively with fresh cases and sealed downstream
+populations, but the overall project is not a single-shot preregistration.
+Our defense is transparent lineage, preserved negative evidence, and
+confirmation on data unavailable during selection.
+
+\subsection{Generative AI disclosure}
+
+OpenAI Codex was used under the author's direction to inspect code, implement
+and test research infrastructure, orchestrate prespecified cluster campaigns,
+reduce immutable evidence, and assist with manuscript drafting and figure
+assembly. The human author chose the research questions and protocols, reviewed
+the code and empirical interpretations, and remains responsible for every
+claim. No model-generated result, screenshot, citation, or numerical value was
+accepted without verification against the preserved artifacts.

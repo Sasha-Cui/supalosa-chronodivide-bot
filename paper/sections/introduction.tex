@@ -1,102 +1,82 @@
 \section{Introduction}
 \label{sec:introduction}
 
-Real-time strategy (RTS) games combine long horizons, partial observability,
-large action spaces, adversarial interaction, and maps that change both
-economic and tactical opportunities. Such planning challenges have motivated
-game-AI testbeds and competitions from MACO and microRTS to StarCraft
-II~\cite{elimam2026maco,ontanon2018microrts,vinyals2017sc2le,samvelyan2019smac}.
-They also make
-evaluation deceptively difficult. A bot can look stronger because it was tuned
-on the reported maps, starts in the favorable physical slot, consumes a lucky
-random stream, or is compared with a baseline loaded from the candidate's
-modified dependency tree. Repeated matches do not repair such problems if map
-families, randomness, and adaptation decisions are not the units of the design.
+Full-game real-time strategy (RTS) agents must coordinate economy, production,
+scouting, defense, force composition, movement, and terminal objective
+completion over thousands of updates. The same complexity makes evaluation
+fragile. A bot may appear stronger because it was tuned on the reported map,
+received a favorable physical start, consumed a lucky or coupled random stream,
+or faced an opponent loaded from the candidate's modified dependency tree.
+Short-game resignation is another hidden variable: it can award a nominal win
+before the literal game objective is achieved.
 
-This paper studies that problem in Chrono Divide, a ground-up browser
-reconstruction of \emph{Command \& Conquer: Red Alert 2} with an offline bot
-API~\cite{chronodivide2026,chronodivideGameApi2026,supalosa2026bot}. We
-configure StrongBot, an author-developed fork of the public Supalosa scripted
-bot, and evaluate it against a clean pinned Supalosa
-revision~\cite{supalosa2026bot}. Chrono Divide is an existing project, not an
-environment introduced here. Our contribution is an auditable way to use it
-for scripted-agent research and a bounded empirical case study of what that
-process finds. The comparator is a frozen generic StrongBot reference under
-this interface, not the deployed map-profile-enabled default.
+We study these problems in Chrono Divide, an existing ground-up browser
+reconstruction of \emph{Command \& Conquer: Red Alert 2} with a programmable
+offline bot API~\cite{chronodivide2026,chronodivideGameApi2026}. Chrono Divide
+is not introduced by this paper. We use it as a practical full-game simulation
+environment and develop StrongBot from Supalosa's public scripted
+agent~\cite{supalosa2026bot}. The research question is deliberately concrete:
+can an auditable development process produce a bot that reliably beats the
+pinned external Supalosa implementation under literal all-building elimination,
+without reducing the claim to one country, start, slot, or favorable replay?
 
-Initial exploratory runs were not paper evidence: some used wall-clock-derived
-engine randomness, permitted exact-map behavior, reused maps adaptively, lacked
-complete source snapshots, or could not tie wins to one clean baseline and
-runtime. We retained the bot, not those outcomes, as the starting point. The
-replacement design freezes
-revision-aware map families, uses outcome-free compatibility screening,
-creates family-disjoint roles before training, controls engine and
-participant-specific randomness, evaluates reciprocal physical starts, and
-fails closed on partial or selectively retried campaigns.
+Exploration revealed that one global policy was not enough. Heck Freezes Over
+(HFO) has four asymmetric physical starts. The west start required early
+rush-oriented production plus a grouped home guard; the bottom start produced
+long draws in which attack groups repeatedly failed to finish a small remaining
+base. StrongBot therefore uses narrowly scoped policy layers: country-aware west
+rush/guard profiles, a progress-gated bottom building-retarget controller, and
+late literal closeout logic. Each layer was selected on fresh cases, replicated,
+and then required to be action- and state-identical outside its declared map,
+start, and faction boundary. Only after those gates passed was the complete
+deployed bot frozen for all-country, all-start confirmation.
 
-The final training pipeline performs five run-distinct deterministic searches
-over 32 mutation-generated policies and a 28-field coordinate-free policy
-space. Successive halving uses only training families. A common-seed
-championship then compares all 30
-run-finalist policies under shared family--seed blocks and selects one champion
-without development or test access. A permissive signal gate on a fresh
-development pool authorizes one frozen evaluation over \TestFamilyCount{} sealed test
-families. Importantly, this pipeline was not the first development attempt: a
-map-conditioned selector failed on an earlier development set and was retired.
-The fixed generic-policy championship was specified afterward using training
-evidence and a disjoint fresh development pool, while test identities and
-outcomes remained sealed. We report this adaptation history rather than
-presenting method v2 as if it had been the only idea tried.
+A second map exposed a different failure. On Peak of Perfection the same macro
+profile was applied at one physical start but not its reciprocal. A frozen
+$2\times2$ scope study separated macro-strategy scope from tactical-scope
+changes. The selected change applies the existing macro profile at both starts
+while leaving the tactical layer unchanged. Fresh replication then tests
+whether this simple spatial repair generalizes across all countries and slots.
 
-This design separates two confirmatory questions from one post-confirmatory
-diagnostic question:
+We organize the empirical questions as follows:
 
 \begin{enumerate}
-  \item[RQ1.] Does the configured policy improve the frozen generic reference
-  against pinned Supalosa on unseen map families?
-  \item[RQ2.] Does the configured policy itself score reliably above 0.5
-  against that opponent under the same family-level analysis?
-  \item[RQ3.] Which paired outcome transitions and terminal-state patterns
-  accompany any improvement, and do one-group policy reverts isolate a
-  component? RQ3 is descriptive and cannot rescue either confirmatory gate.
+  \item[RQ1.] Does frozen StrongBot reliably beat pinned Supalosa on HFO under
+  balanced countries, four physical starts, both participant slots, and the
+  literal objective?
+  \item[RQ2.] Which scoped mechanisms account for the difficult HFO conditions,
+  and are they exactly inactive outside their declared conditions?
+  \item[RQ3.] Does reciprocal macro-profile scope repair Peak of Perfection on
+  fresh balanced cases?
+  \item[RQ4.] Does HFO strength transfer to an independently sourced RA2Web
+  Advanced opponent?
 \end{enumerate}
 
-The principal result is positive but narrower than a claim of a winning bot.
-Across \TestFamilyCount{} test families, the champion scores \ChampionScore{} and the frozen
-generic reference scores \DefaultScore{} against the same Supalosa revision.
-Their equally family-weighted difference is \ImprovementEstimate{} with a
-family-clustered 95\% confidence interval
-[\ImprovementCILower{},~\ImprovementCIUpper{}]. \PositiveFamilyCount{} family
-effects are positive and \ZeroFamilyCount{} are zero. However, the champion
-records only \ChampionWins{} wins in \ConfirmatoryGamesPerMethod{} games and
-many matches reach the tick cap. Its
-prespecified one-sided lower confidence bound for score above 0.5 is
-\ChampionAbsoluteLower{}. Consequently, the frozen joint criterion fails even
-though the relative endpoint passes, and the experiment does \emph{not}
-establish that StrongBot reliably beats Supalosa. The most faithful takeaway is
-that configuration robustly improves the prospectively frozen generic reference
-against this opponent, mainly by turning losses into survival or wins.
+The answer is strong but bounded. StrongBot wins 633 of 720 HFO games, with
+pooled and country-by-start lower bounds above 0.84. The Peak reciprocal policy
+wins 134 of 180 fresh games and improves the prior deployed control by 0.228
+paired score with one-sided lower bound 0.167. Every Peak country, start, side,
+and slot has more wins than losses. The independently sourced Advanced
+opponent breaks the result: StrongBot wins only 79 of 360 paired cases, worse
+than pinned Supalosa against the same opponent. We report that failure as a
+main external-validity result rather than hiding it.
 
-Our contributions are threefold:
+The contributions are:
 
-\begin{enumerate}
-  \item We contribute a leakage-resistant Chrono Divide evaluation protocol
-  organized as an evidence contract: map-family lineage, compatibility,
-  physical starts, participant random streams, comparator identities, sealed
-  outcomes, and attempt accounting are fixed jointly before a campaign is
-  admitted as evidence.
-  \item We implement a reproducible training-only configuration pipeline:
-  five run-distinct mutation-generated candidate pools screened by successive
-  halving, followed by a common-seed championship over their finalists. The
-  optimizer components are established techniques; their use is an engineering
-  contribution, not a new general algorithm.
-  \item We provide held-out evidence of a large, family-consistent improvement
-  over the frozen reference, report the failed absolute-strength endpoint, and
-  triangulate the effect with paired transitions, terminal states,
-  optimizer-selection diagnostics, and component reverts.
-\end{enumerate}
+\begin{itemize}
+  \item a reproducible use of Chrono Divide for full-game, literal-objective
+  agent evaluation, with isolated randomness, reciprocal starts, an external
+  pinned opponent, immutable manifests, and fail-closed scheduler accounting;
+  \item StrongBot, a layered scripted policy with replicated west rush/guard
+  and progress-gated building-retarget mechanisms, followed by a 720-game
+  balanced confirmation against Supalosa;
+  \item a factorial and replicated diagnosis of reciprocal spatial-profile
+  scope on Peak of Perfection; and
+  \item deterministic, non-cherry-picked state-frame evidence plus an
+  independently sourced opponent test that clearly bounds the claim.
+\end{itemize}
 
-The scope is deliberately finite: one independently authored opponent, an
-Iraq mirror matchup, a pinned simulator, and a supported Temperate map-family
-population. We make no claim about other opponents, factions, game versions,
-RTS titles, ladder play, or human competition.
+We do not claim a new game environment, a general RTS solution, a novel
+general-purpose optimizer, or superiority to all opponents. The contribution is
+the agent, the scoped mechanisms, and an evidence contract that makes both
+positive and negative results auditable.

@@ -13,7 +13,7 @@ export TZ := UTC
 all: main
 
 assets:
-	cd ../paper && $(PYTHON) scripts/generate_assets.py
+	cd ../paper && $(PYTHON) scripts/generate_final_assets.py
 	mkdir -p generated
 	cp ../paper/generated/*.tex generated/
 	cp ../paper/references.bib references.bib
@@ -51,8 +51,8 @@ check: test check-generated main metadata
 
 submission-check: check
 	$(PYTHON) scripts/check_submission.py \
-		--expected-pages 11 \
-		--expected-characters 39210 \
+		--expected-pages 12 \
+		--expected-characters 35460 \
 		build/main.pdf build/submission_metadata.json
 
 clean:

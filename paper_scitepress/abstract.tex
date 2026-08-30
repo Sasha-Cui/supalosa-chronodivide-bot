@@ -1,26 +1,22 @@
-Scripted game-agent gains can reflect map memorization, favorable starts,
-uncontrolled randomness, or contaminated baselines. We present a
-leakage-resistant evaluation protocol and reproducible configuration pipeline
-for StrongBot in Chrono Divide, an existing browser reconstruction of
-\emph{Command \& Conquer: Red Alert 2}.
-Revision-aware map families, outcome-free compatibility screens, an isolated
-pinned opponent, participant-specific random streams, reciprocal starts,
-sealed tests, and provenance commitments form a joint evidence contract: a
-campaign is admitted only if every commitment matches its frozen
-plan. Five \OptimizerCandidateCount{}-policy deterministic searches with
-successive halving use training families; a common-seed championship selects one
-coordinate-free policy. In \ConfirmatoryGameCount{} games over
-\TestFamilyCount{} sealed families, the champion scores \ChampionScore{} versus
-\DefaultScore{} for a frozen generic reference. The
-equal-family improvement is \ImprovementEstimate{}
-(family-clustered 95\% CI
-[\ImprovementCILower{},~\ImprovementCIUpper{}]);
-\PositiveFamilyCount{} family effects are positive and \ZeroFamilyCount{} are
-zero. The prespecified joint objective fails: the absolute-strength
-gate's one-sided 95\%
-lower bound for the champion's margin above 0.5 is
-\ChampionAbsoluteLower{}. Improvement primarily replaces losses with survival
-or wins. The study establishes improvement within this policy class, not
-superiority over Supalosa, the deployed default, other opponents or matchups.
-The contract makes the result bounded and auditable. An identity-neutral
-artifact regenerates every table and figure.
+Full-game real-time strategy (RTS) agents are easy to overstate:
+apparent strength can come from favorable starts, map-specific tuning, coupled
+randomness, modified opponents, or proxy wins. We use the existing Chrono
+Divide browser reconstruction of \emph{Red Alert 2} as a deterministic headless
+testbed and develop StrongBot, a scripted derivative of the public Supalosa
+bot. StrongBot combines start-scoped rush and home-guard profiles,
+progress-gated building retargeting, and literal all-building elimination.
+Primary evaluations pin the external opponent, isolate participant randomness,
+balance nine countries, physical starts, and participant slots, suppress
+resignation symmetrically, and bind outcomes to source, runtime, seeds, and
+scheduler records. On 720 fresh Heck Freezes Over games, StrongBot records
+\HfoWins{}/\HfoDraws{}/\HfoLosses{} (win rate \HfoWinRate{}; one-sided 95\%
+Wilson lower bound \HfoWilsonLower{}; country-by-start lower bound
+\HfoClusterLower{}). On Peak of Perfection, a factorial screen isolates
+reciprocal macro-profile scope; the unchanged winner records
+\PeakWins{}/\PeakDraws{}/\PeakLosses{} on 180 fresh cases versus
+\PeakControlWins{}/\PeakControlDraws{}/\PeakControlLosses{} for the deployed
+control, with paired lower improvement \PeakPairedLower{}. Against an
+independently sourced RA2Web Advanced bot, StrongBot falls to
+\AdvancedStrongWins{}/\AdvancedStrongDraws{}/\AdvancedStrongLosses{}. The
+bounded contribution is reliable superiority over pinned Supalosa on two maps,
+replicated scoped mechanisms, and an explicit cross-opponent limit.

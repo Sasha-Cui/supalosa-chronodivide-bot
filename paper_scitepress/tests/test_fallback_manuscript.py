@@ -13,6 +13,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 FALLBACK = ROOT / "paper_scitepress"
+SECTIONS = (
+    "introduction",
+    "related_work",
+    "environment",
+    "protocol",
+    "results",
+    "diagnostics",
+    "reproducibility",
+    "conclusion",
+)
 
 
 def contains_sha256_window(text: str, length: int, digest: str) -> bool:
@@ -34,105 +44,76 @@ def load_submission_checker():
     return module
 
 
+def metadata() -> dict[str, object]:
+    completed = subprocess.run(
+        [
+            sys.executable,
+            str(FALLBACK / "scripts" / "export_submission_metadata.py"),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(completed.stdout)
+
+
 class FallbackManuscriptTest(unittest.TestCase):
     def test_reuses_every_authoritative_main_section(self) -> None:
         source = (FALLBACK / "main.tex").read_text()
-        expected = [
-            "introduction",
-            "related_work",
-            "environment",
-            "protocol",
-            "results",
-            "diagnostics",
-            "reproducibility",
-            "conclusion",
-        ]
-        for stem in expected:
+        for stem in SECTIONS:
             self.assertIn(rf"\input{{../paper/sections/{stem}}}", source)
         self.assertNotIn(r"\input{../paper/sections/abstract}", source)
 
     def test_main_paper_has_no_dangling_supplement_reference(self) -> None:
         section_root = ROOT / "paper" / "sections"
-        sections = (
-            "introduction",
-            "related_work",
-            "environment",
-            "protocol",
-            "results",
-            "diagnostics",
-            "reproducibility",
-            "conclusion",
-        )
         source = "\n".join(
-            (section_root / f"{stem}.tex").read_text() for stem in sections
+            (section_root / f"{stem}.tex").read_text() for stem in SECTIONS
         )
         self.assertNotIn("supplement", source.lower())
 
-    def test_abstract_is_within_official_word_bounds(self) -> None:
+    def test_abstract_is_within_official_word_bounds_and_claim_boundary(self) -> None:
         source = (FALLBACK / "abstract.tex").read_text()
-        completed = subprocess.run(
-            [
-                sys.executable,
-                str(FALLBACK / "scripts" / "export_submission_metadata.py"),
-            ],
-            check=True,
-            capture_output=True,
-            text=True,
-        )
-        word_count = json.loads(completed.stdout)["abstractWordCount"]
-        self.assertGreaterEqual(word_count, 70)
-        self.assertLessEqual(word_count, 200)
-        self.assertIn("joint", source.lower())
-        self.assertIn("fails", source.lower())
-        self.assertIn(
-            "campaign is admitted only if every commitment matches its frozen plan",
-            " ".join(source.split()),
-        )
+        exported = metadata()
+        self.assertGreaterEqual(exported["abstractWordCount"], 70)
+        self.assertLessEqual(exported["abstractWordCount"], 200)
+        for value in ("633/24/63", "134/14/32", "92/16/72", "79/19/262"):
+            self.assertIn(value, exported["abstract"])
+        self.assertIn("bounded contribution", exported["abstract"].lower())
+        self.assertIn(r"\HfoWins{}", source)
+        self.assertIn(r"\AdvancedStrongLosses{}", source)
 
-    def test_submission_metadata_is_plain_and_deterministic(self) -> None:
-        script = FALLBACK / "scripts" / "export_submission_metadata.py"
+    def test_submission_metadata_is_plain_deterministic_and_current(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             first = Path(directory) / "first.json"
             second = Path(directory) / "second.json"
+            script = FALLBACK / "scripts" / "export_submission_metadata.py"
             for output in (first, second):
                 subprocess.run(
                     [sys.executable, str(script), "--output", str(output)],
                     check=True,
                 )
             self.assertEqual(first.read_bytes(), second.read_bytes())
-            metadata = json.loads(first.read_text(encoding="utf-8"))
+            exported = json.loads(first.read_text(encoding="utf-8"))
 
-        self.assertEqual(metadata["paperClass"], "Regular paper")
-        self.assertEqual(metadata["area"], "Agents")
+        self.assertEqual(exported["paperClass"], "Regular paper")
+        self.assertEqual(exported["area"], "Agents")
         self.assertEqual(
-            metadata["topics"],
-            [
-                "Agent Models and Architectures",
-                "Simulation",
-                "Task Planning and Execution",
-            ],
+            exported["title"],
+            "StrongBot: Auditable Map-Profiled RTS Agent Development in Chrono Divide",
         )
         self.assertEqual(
-            metadata["title"],
-            "Leakage-Resistant Evaluation of Scripted RTS Agent Configuration in "
-            "Chrono Divide",
-        )
-        self.assertEqual(metadata["abstractWordCount"], 193)
-        self.assertIn("0.336", metadata["abstract"])
-        self.assertIn("-0.021", metadata["abstract"])
-        self.assertNotRegex(metadata["abstract"], r"[\\{}]")
-        self.assertEqual(
-            metadata["keywords"],
+            exported["keywords"],
             [
                 "Game Artificial Intelligence",
                 "Real-time Strategy Games",
                 "Scripted Agents",
-                "Algorithm Configuration",
-                "Reproducible Evaluation",
+                "Agent Evaluation",
+                "Reproducible Simulation",
             ],
         )
-        self.assertEqual(len(metadata["sourceSha256"]), 3)
-        for digest in metadata["sourceSha256"].values():
+        self.assertNotRegex(exported["abstract"], r"[\\{}]")
+        self.assertEqual(len(exported["sourceSha256"]), 3)
+        for digest in exported["sourceSha256"].values():
             self.assertRegex(digest, r"^[0-9a-f]{64}$")
 
     def test_review_sources_are_anonymous(self) -> None:
@@ -156,11 +137,25 @@ class FallbackManuscriptTest(unittest.TestCase):
             self.assertFalse(contains_sha256_window(text, length, digest))
 
     def test_headline_values_are_generated_not_duplicated(self) -> None:
-        text = (FALLBACK / "main.tex").read_text() + (FALLBACK / "abstract.tex").read_text()
-        for literal in ("0.535", "0.199", "0.336", "0.215", "0.457", "8,704"):
-            self.assertNotIn(literal, text)
-        self.assertIn(r"\ImprovementEstimate{}", text)
-        self.assertIn(r"\ChampionAbsoluteLower{}", text)
+        source = (FALLBACK / "main.tex").read_text() + (
+            FALLBACK / "abstract.tex"
+        ).read_text()
+        for literal in ("633", "134", "262", "87.92", "0.167"):
+            self.assertNotIn(literal, source)
+        for macro in (
+            r"\HfoWins{}",
+            r"\PeakWins{}",
+            r"\PeakPairedLower{}",
+            r"\AdvancedStrongLosses{}",
+        ):
+            self.assertIn(macro, source)
+
+    def test_all_registered_frames_are_used_once(self) -> None:
+        diagnostics = (ROOT / "paper" / "sections" / "diagnostics.tex").read_text()
+        frames = sorted((ROOT / "paper" / "figures" / "game_frames").glob("*.png"))
+        self.assertEqual(len(frames), 15)
+        for frame in frames:
+            self.assertEqual(diagnostics.count(frame.name), 1)
 
     def test_keywords_target_game_agent_reviewers(self) -> None:
         source = (FALLBACK / "main.tex").read_text()
@@ -171,26 +166,22 @@ class FallbackManuscriptTest(unittest.TestCase):
             "game artificial intelligence",
             "real-time strategy games",
             "scripted agents",
-            "algorithm configuration",
-            "reproducible evaluation",
+            "agent evaluation",
+            "reproducible simulation",
         ):
             self.assertIn(required, keywords)
-        self.assertNotIn("distribution shift", keywords)
 
     def test_bibliography_fit_does_not_shrink_reference_text(self) -> None:
         source = (FALLBACK / "main.tex").read_text()
-        self.assertIn(
-            r"\renewcommand{\thebibliography}[1]",
-            source,
-        )
-        bibliography_hook = source.split(
+        self.assertIn(r"\renewcommand{\thebibliography}[1]", source)
+        hook = source.split(
             r"\renewcommand{\thebibliography}[1]", maxsplit=1
         )[1].split(r"\begin{document}", maxsplit=1)[0]
-        self.assertIn(r"\setlength{\itemsep}{0pt}", bibliography_hook)
-        self.assertNotIn(r"\footnotesize", bibliography_hook)
-        self.assertNotIn(r"\scriptsize", bibliography_hook)
+        self.assertIn(r"\setlength{\itemsep}{0pt}", hook)
+        self.assertNotIn(r"\footnotesize", hook)
+        self.assertNotIn(r"\scriptsize", hook)
 
-    def test_vendor_files_match_the_official_archive(self) -> None:
+    def test_vendor_files_match_official_archive(self) -> None:
         manifest = [
             line
             for line in (FALLBACK / "VENDOR_SHA256SUMS").read_text().splitlines()
@@ -262,26 +253,16 @@ class FallbackManuscriptTest(unittest.TestCase):
 
     def test_submission_checker_binds_metadata_and_exact_character_count(self) -> None:
         checker = load_submission_checker()
-        metadata = json.loads(
-            subprocess.run(
-                [
-                    sys.executable,
-                    str(FALLBACK / "scripts" / "export_submission_metadata.py"),
-                ],
-                check=True,
-                capture_output=True,
-                text=True,
-            ).stdout
-        )
+        exported = metadata()
         pdf_text = "\n".join(
             [
                 "Anonymous Author(s)",
-                metadata["title"],
-                metadata["abstract"],
-                " ".join(metadata["keywords"]),
+                exported["title"],
+                exported["abstract"],
+                " ".join(exported["keywords"]),
             ]
         )
-        checker.validate_metadata_binding(metadata, pdf_text)
+        checker.validate_metadata_binding(exported, pdf_text)
         count = sum(not character.isspace() for character in pdf_text)
         self.assertEqual(
             checker.validate_text(

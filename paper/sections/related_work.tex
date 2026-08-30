@@ -1,95 +1,58 @@
 \section{Related Work}
 \label{sec:related}
 
-\paragraph{Configuring scripted RTS agents.}
-Evolutionary optimization of hand-authored game-bot parameters is established
-practice. Fern{\'a}ndez-Ares et al. optimized rule-system constants for Planet
-Wars~\cite{fernandezAres2011optimizing}; Young and Hawes evolved StarCraft goal
-priorities~\cite{young2012goal}; Othman et al. optimized XML-configured tactical
-behavior~\cite{othman2012starcraft}; and Liu et al. evolved microbehavior
-parameters and examined transfer to unseen combat scenarios
-\cite{liu2016microbehaviors}. Ouessai et al. used a genetic algorithm to
-configure parametric action-preselection heuristics for specific $\mu$RTS
-map--opponent settings, then evaluated the resulting agent against several
-agents on those maps~\cite{ouessai2022evolving}. Mora et al. showed
-specifically that noisy RTS fitness requires repeated combats, multiple maps,
-and incumbent
-reevaluation~\cite{mora2012noisy}. Recent \emph{Tales of Tribute} work likewise
-compares evolutionary training modes for a 20-weight bot
-\cite{castejon2026tales}. These studies establish scripted-bot tuning and
-mutation search; our distinction is family-disjoint held-out evaluation.
+\paragraph{RTS research environments and complete agents.}
+RTS games are established testbeds for long-horizon planning and multi-agent
+control. microRTS offers a compact configurable platform for search and
+programmatic policies~\cite{ontanon2018microrts,marino2021programmatic};
+StarCraft II and SMAC support large-scale learning and coordination
+experiments~\cite{vinyals2017sc2le,samvelyan2019smac}. Complete scripted RTS
+agents commonly decompose play into economic, strategic, and tactical modules
+rather than solve one monolithic control problem
+\cite{young2012goal,othman2012starcraft}. Chrono Divide occupies a different
+engineering point: it reconstructs a commercial-scale RTS in TypeScript and
+exposes a JavaScript bot API. We do not claim its creation; we contribute a
+controlled research harness and a substantially stronger scripted bot within
+that existing system.
 
-The closest conceptual precedents specialize by map: Mari{\~n}o et al.
-synthesized map-specific programmatic $\mu$RTS strategies from a
-domain-specific language~\cite{marino2021programmatic}, while
-Fern{\'a}ndez-Ares et al. selected evolved policies from online map
-characterization~\cite{fernandezAres2012map}. Later programmatic-strategy work
-strengthened synthesis with learned sketches, bilevel feature--program search,
-opponent-set selection, and semantic-space neighborhoods
-\cite{medeiros2022sketches,aleixo2023bilevel,moraes2023opponents,moraes2024semantic}.
-Our initial method followed map conditioning and failed its development gate.
-The final paper instead
-studies one generic policy, disabling exact-map profiles, coordinates,
-orientation branches, and map signatures. We make no synthesis or optimizer
-claim; the distinction is family-disjoint, provenance-bound evaluation.
+The closest environment-oriented precedent is Generally Genius, which supplies
+a Generals.io agent-development and data-collection framework and uses it to
+diagnose quadrant-dependent path bias in a scripted bot
+\cite{bhatia2023generally}. Our Peak experiment addresses a related directional
+failure, but separates physical-start scope into a factorial design, validates
+the selected repair on disjoint cases, and requires exact inactivity on the
+already-profiled start.
 
-\paragraph{Algorithm configuration.}
-Sequential model-based algorithm configuration and irace formalize tuning
-across problem-instance sets and separate tuning from unseen evaluation
-instances~\cite{hutter2011smac,lopezIbanez2016irace}. The N-tuple bandit
-evolutionary algorithm is particularly relevant to discrete game-agent
-configuration~\cite{lucas2018ntbea}, and direct game-agent
-comparisons have found model-based configurators competitive while exposing
-parameter interactions~\cite{lucas2019model}. Hyperband allocates increasing
-resources to a shrinking candidate set~\cite{li2018hyperband}; our fixed
-successive-halving schedule uses the same general resource-allocation idea.
-Best-practice reviews warn that configurator comparisons are easily distorted
-by scenario construction, over-tuning, and unequal budgets
-\cite{eggensperger2019pitfalls}. We therefore do not claim optimizer
-superiority: the study includes no standard configurator or hand-tuning
-baseline. The training algorithm is a fixed, inexpensive mechanism for
-producing one policy whose evaluation can be audited.
+\paragraph{Script and parameter optimization.}
+Automatic configuration and programmatic strategy search have long been used
+for game agents~\cite{fernandezAres2011optimizing,mora2012noisy,%
+fernandezAres2012map}. Recent work synthesizes or searches programmatic
+strategies in microRTS~\cite{marino2021programmatic,medeiros2022sketches,%
+aleixo2023bilevel,moraes2023opponents,moraes2024semantic}, while action
+pre-selection parameters have also been evolved for map--opponent settings
+\cite{ouessai2022evolving}. General configurators such as SMAC, irace, NTBEA,
+and successive halving provide established search machinery
+\cite{hutter2011smac,lopezIbanez2016irace,lucas2018ntbea,li2018hyperband}.
+Accordingly, we do not claim a new optimizer. The paper focuses on a
+human-interpretable layered policy and on prospective replication and
+activation-isolation gates that prevent a local improvement from silently
+changing other conditions.
 
-\paragraph{Generalization and statistical evaluation.}
-CoinRun and Procgen demonstrated that game agents can overfit even sizable
-sets of levels and motivated explicit training--test distributions
-\cite{cobbe2019coinrun,cobbe2020procgen}. The General Video Game AI learning
-track likewise trains on visible levels and evaluates hidden ones; Balla et al.
-show that the choice of training levels and environment stochasticity
-materially affect generalization~\cite{balla2020generalisation}. Held-out level
-evaluation is therefore established. Chrono Divide adds a different data
-problem: its maps are not procedural independent draws, because exact copies
-and revisions can coexist. We consequently split at a conservatively
-constructed family level rather than at a filename level. The inferential unit
-is also the family, not each correlated match.
-Agarwal et al. showed how point estimates from a few tasks or runs can reverse
-under uncertainty-aware analysis~\cite{agarwal2021precipice}. We use balanced
-family estimands, family-clustered intervals, and diagnostic family bootstrap
-and sign-flip analyses.
+\paragraph{Evaluation, generalization, and uncertainty.}
+RL and game-agent results can be unstable across seeds, implementations, and
+task instances~\cite{henderson2018matters,agarwal2021precipice}. Procgen and
+related work make held-out environment generalization an explicit target
+\cite{cobbe2019coinrun,cobbe2020procgen}; algorithm-configuration research
+similarly warns that repeated tuning can overfit a finite instance set
+\cite{eggensperger2019pitfalls}. We use common random numbers to compare
+policies under matched simulation inputs~\cite{schruben2011crn}, but isolate
+participant streams so one bot's random calls cannot shift the other's.
+Country, physical start, and participant slot are explicit strata, and
+country-by-start cells are the conservative cluster for HFO.
 
-Protocol variation can change conclusions even within one standardized game
-platform: Machado et al. audit divergent Arcade Learning Environment practices
-and introduce controlled stochasticity~\cite{machado2018ale}, while Henderson
-et al. document sensitivity to environment nondeterminism, random seeds, and
-reporting choices in deep reinforcement learning~\cite{henderson2018matters}.
-Our policies are scripted rather than learned this way, but these evaluation
-threats transfer to stochastic head-to-head simulation. We therefore pin the
-runtime and expose the simulator and participant random streams rather than
-treating repeat count alone as reproducibility.
-
-Bhatia et al. used a Generals.io development and data-collection framework to
-find quadrant-dependent performance in a scripted bot, linked the pattern to a
-direction-biased path-selection rule, and evaluated a repair
-\cite{bhatia2023generally}. Our reciprocal slots target this class of physical-
-start confound; family blocking and sealed access address distinct threats.
-
-Shared seeds and reciprocal starts act as paired simulation controls. Common
-random numbers are a classical variance-reduction design for comparing
-policies under matched stochastic inputs~\cite{schruben2011crn}. In our
-setting, an engine stream alone is insufficient because bot callbacks also
-consume randomness. We therefore isolate participant-specific streams so an
-extra draw by StrongBot cannot shift Supalosa's randomness. Prior work
-motivates the individual controls; our contribution is their binding as one
-executable campaign-admission rule for a real scripted RTS codebase. It joins
-deterministic pairing, baseline isolation, family leakage control, scheduler
-provenance, and negative gates rather than claiming novelty for any component.
+Our cross-opponent experiment addresses another generalization axis: an agent
+can dominate the opponent it was developed against while regressing against a
+behaviorally distinct bot. We treat the Advanced result as a limitation of the
+policy, not as evidence that the independent opponent is globally stronger.
+This distinction is essential for scripted agents, whose interpretable rules
+can still overfit an opponent's characteristic build order and attack timing.

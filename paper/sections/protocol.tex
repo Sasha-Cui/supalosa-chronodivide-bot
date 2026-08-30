@@ -1,158 +1,129 @@
-\section{Configuration and Evaluation Protocol}
-\label{sec:protocol}
+\section{StrongBot and Experimental Method}
+\label{sec:method}
 
-\subsection{Coordinate-free policy space}
+\subsection{Layered policy}
 
-The research interface exposes 28 StrongBot fields covering attack
-composition, strategic plan, attack gates, defense radius, scouting, engineer
-targets, static defense, all-in behavior, forced attacks, and emergency
-defense. Each field has a finite declared choice set. The interface disables
-default map profiles, exact-map tactics, coordinate routes, placement anchors,
-orientation gates, and map signatures. A policy is one canonical JSON object
-whose SHA-256 is its identity. Thus every search candidate receives game state
-but no family ID or map-specific configuration. This shared coordinate-free
-envelope defines the comparison. The fork's deployed default is not admissible
-because its built-in profiles and exact-map tactics encode map identity; no
-result estimates performance relative to that policy.
+StrongBot retains Supalosa's base-building, economy, scouting, defense, and
+attack-mission machinery, then dispatches narrow policy layers from public map
+and start state. The dispatch is deterministic and uses exact start-location
+signatures rather than a learned map classifier.
 
-Each of five run indices deterministically creates 32 distinct policies.
-Candidate 0 is the prospectively frozen generic reference (labeled
-\texttt{default} in the immutable artifacts). Candidates 1--8 anchor each
-alternative attack composition; candidates 9--17 anchor each alternative
-strategic plan. Every non-reference candidate receives 6--14 additional
-hash-ranked mutations over the declared fields. Generation reads no gameplay
-outcome and fails on a duplicate policy hash.
+\paragraph{West rush and home guard.}
+On HFO west, the baseline often attacks before protecting its exposed base or
+banks resources behind a slow macro plan. The selected Allied and Soviet
+profiles use rush planning with HFO force composition and a grouped home guard.
+The guard reserves a local force around fixed home anchors during the opening;
+the remaining force can attack. Allied and Soviet permissions are separate so
+one faction's profile cannot alter the other's behavior.
 
-\subsection{Five successive-halving searches}
+\paragraph{Progress-gated building retarget.}
+HFO bottom produced long advantages that failed to close. After update 42,000,
+the controller becomes eligible only when at most six enemy buildings and four
+enemy combatants remain, at least four non-dog attackers are available, and
+the attacking force is noninferior. It tracks both enemy building count and
+aggregate building hit points. If neither improves for 1,200 updates, the
+controller activates; after another 600-update stall it rotates to a
+deterministically ranked building and reissues attack orders. Progress resets
+the stall clock. This is a liveness repair with explicit safety conditions, not
+an unconditional attack-everything rule.
 
-Each run uses a hash-ranked nested schedule of 6, 12, and all 22 training
-families, with start-count strata represented before rank filling. One new
-engine-seed block is assigned per family and stage, and every policy--family
-block has two reciprocal slots. Table~\ref{tab:search-budget} gives the exact
-launched budget.
+\paragraph{Literal closeout.}
+Late-game routines distinguish selectable combatants from buildings, retain
+home defense when threats remain, and direct surplus combatants toward
+remaining structures. The objective is not to destroy every enemy unit. If
+the final building is eliminated first, the game is already won; if blocking
+forces prevent access, they may need to be cleared before the building strike.
 
-\begin{table}[t]
+\paragraph{Peak reciprocal macro scope.}
+The Peak macro profile was originally applied only at start \texttt{(37,73)}.
+The confirmed policy applies the same immutable macro profile at both exact
+Peak starts. Bot/tactical scope remains \texttt{weak\_only}. Thus the selected
+change is one predicate: the reciprocal start receives an existing strategy,
+not a newly tuned parameter set.
+
+\begin{algorithm}[t]
+\DontPrintSemicolon
+\KwIn{public state $s$, update $u$, exact map/start, country}
+$p \leftarrow$ frozen map--start--country profile\;
+\If{Peak and either registered reciprocal start}{
+  set only $p.\texttt{strategyScope}\leftarrow\texttt{both}$\;
+}
+run inherited economy, production, defense, and mission update under $p$\;
+\If{HFO west}{
+  use the faction-specific rush plan and reserve the grouped home guard\;
+}
+\If{HFO bottom, $u\geq42{,}000$, and force/building safety gates pass}{
+  update building-count and building-hit-point progress clocks\;
+  \If{no progress for 1,200 updates}{
+    activate building retarget; rotate after each further 600-update stall\;
+  }
+}
+\If{late game and opponent buildings remain}{
+  retain required home defense and send surplus combatants to ranked structures\;
+}
+\caption{StrongBot's deterministic policy composition. Every branch is scoped
+by immutable public map/start/faction state; no opponent identity or hidden
+engine field enters dispatch.}
+\label{alg:strongbot}
+\end{algorithm}
+
+\subsection{Prospective development gates}
+
+Each mechanism follows the same sequence:
+
+\begin{enumerate}
+  \item freeze candidate arms, seed namespace, strata, endpoint, uncertainty,
+  and advancement rule before new outcomes;
+  \item select exact starts without updating the game or writing W/D/L;
+  \item run every paired cell once and inspect only the complete aggregate;
+  \item replicate the unchanged winner on fresh cases; and
+  \item run an outcome-free activation-isolation gate, requiring a changed
+  action trace in every intended-active country--start cell and exact
+  action/state/production equality in every intended-inactive cell.
+\end{enumerate}
+
+Table~\ref{tab:mechanisms} reports the final replicated screens. The paired
+lower column is the prespecified one-sided 95\% t lower bound on W/D/L score
+difference. Inactive exact is the number of non-target country--start cells
+with identical normalized traces.
+
+\begin{table*}[t]
 \centering
-\caption{Frozen successive-halving allocation. Every entry is a counted game;
-there is no rejected-start or in-run retry.}
-\label{tab:search-budget}
+\caption{Replicated scoped mechanisms and outcome-free isolation. Controls and
+winners use the same cases and random streams.}
+\label{tab:mechanisms}
 \small
-\begin{tabular}{@{}lrrrr@{}}
-\toprule
-Stage & Policies & Families & Slots & Games/run \\
-\midrule
-0 & 32 & 6  & 2 & 384 \\
-1 & 12 & 12 & 2 & 288 \\
-2 & 6  & 22 & 2 & 264 \\
-\midrule
-Total per run & & & & 936 \\
-Five runs & & & & \OptimizerGameCount{} \\
-\bottomrule
-\end{tabular}
-\end{table}
+\input{generated/mechanism_table}
+\end{table*}
 
-Successive-halving reduction uses game score plus a bounded terminal tie term.
-For each of credits, units, buildings, combatants, harvesters, factories,
-refineries, and construction yards, define
+Allied west improves from \AlliedControlWdl{} to \AlliedWinnerWdl{}
+(\AlliedPairedLower{} lower bound) and is exact in
+\AlliedInactiveCells{} inactive cells. Soviet west improves from
+\SovietControlWdl{} to \SovietWinnerWdl{} (\SovietPairedLower{}) with
+\SovietInactiveCells{} inactive cells. Bottom retarget improves
+\BottomControlWdl{} to \BottomWinnerWdl{} (\BottomPairedLower{}) while holding
+losses at 49 and remaining exact in \BottomInactiveCells{} inactive cells.
+These studies authorize deployment; they are not substitutes for the complete
+HFO confirmation.
 
-\begin{equation}
-a_k=\frac{x_k-y_k}{|x_k|+|y_k|+c_k},\qquad
-A=\frac{1}{8}\sum_k a_k,\qquad U=Y+0.04A,
-\end{equation}
+\subsection{Final evaluations and uncertainty}
 
-where $c_k=1000$ for credits and 1 otherwise. Since $A\in[-1,1]$, the tie term
-cannot reverse the ordering loss $<$ draw $<$ win in an individual game.
-Policies rank by equally family-weighted mean $U$, mean $Y$, worst-family mean
-$U$, and policy hash. Stage 0 retains 12 policies; stage 1 retains 6; and stage
-2 outputs six finalists per run. Evaluation claims use $Y$ only.
+The frozen HFO confirmation contains 720 fresh games: ten cases in each of
+$9$ countries $\times 4$ candidate starts $\times 2$ participant slots.
+We report pooled W/D/L, one-sided 95\% Wilson lower bounds for win rates, and an
+equal-weight country-by-start mean with Student-t lower bound over 36 cells.
+Country, start, side, and slot strata were prespecified.
 
-\subsection{Common-seed championship}
+Peak Stage~0 tests six frozen arms on 36 development cases. Four arms form a
+$2\times2$ factorial of macro scope and bot/tactical scope; two reproduce a
+historical defensive-infantry candidate. Eligible arms must improve paired
+score, reduce losses, be positive at both starts/sides/slots, be noninferior in
+every country, and be trajectory-identical at the already-profiled start.
+Exactly one arm is selected by a fixed ranking. Replication compares that
+unchanged arm with deployed control on 180 fresh cases, five per
+country--start--slot cell. Its final gate additionally requires pooled,
+paired, and 18-cell country-by-start lower bounds above their nulls.
 
-The five runs yield 30 unique finalists whose bytes are frozen. The
-championship compares them on the training families under seeds that were not
-used by the searches. Stage A evaluates all 30 policies on all 22 families
-with one common seed block and reciprocal starts (1,320 games), retaining six.
-Stage B evaluates those six with three additional common seed blocks per
-family (792 games). The final ranking pools both stages and is lexicographic by
-equally family-weighted score, mean of the five lowest family scores,
-worst-family score, and policy hash. Terminal material cannot select the
-champion. All policies within
-a family--stage cell share the engine seed and opponent stream, so differences
-are paired rather than confounded by run-specific randomness.
-
-The selected policy differs from the reference in only seven stored fields
-(Table~\ref{tab:policy}). The forced-attack combatant threshold is inactive
-because forced attack is disabled, leaving six operational setting changes.
-
-\begin{table}[t]
-\centering
-\caption{Stored differences between the frozen generic reference and the
-champion. All other research-policy fields are identical.}
-\label{tab:policy}
-\small
-\begin{tabular}{@{}lll@{}}
-\toprule
-Field & Reference & Champion \\
-\midrule
-Attack composition & assault & infantry \\
-Strategic plan & macro & rush \\
-Defense-radius growth/tick & 0.00045 & 0.00010 \\
-Emergency-defense radius & 48 & 64 \\
-Forced attack & enabled & disabled \\
-Forced-attack minimum & 10 & 4 (inactive) \\
-Scout cooldown (ticks) & 120 & 45 \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\subsection{Development adaptation and test freeze}
-
-An earlier method selected among run finalists from three structural map
-features. On the original 12-family development role, its
-conditioned-minus-global estimate was $-0.025$; a training-only leave-one-family
-audit also showed no positive response-surface gain. The method was retired
-without opening test identities or outcomes. Method v2 removed conditioning and
-used the common-seed championship to address a different training-only issue:
-finalists from independent runs had not been compared under common randomness.
-
-To avoid reusing the development evidence that motivated this change, method
-v2 used an outcome-free pool of the four original reserves and seven review
-families. A technical adjudicator admitted reviews only if both reciprocal
-passive probes reached tick 250, starts were valid, and warnings belonged to a
-predeclared nonfatal set. A hash rank fixed ten primaries and one substitute.
-The three-phase gate comprised 32 repeated fresh-process games, 88 full-pool
-compatibility games, and 320 outcome-bearing signal games. Its single
-unblinding required positive one-sided 80\% lower bounds for both
-champion-minus-reference and champion-minus-0.5. Both passed; this was a
-permissive futility screen, not confirmatory evidence.
-
-Only then were the champion, reference, source/runtime commitments, test analysis,
-and attempt budget frozen. The confirmatory schedule crossed all 16 test
-families, eight new seed blocks, two methods, and two reciprocal slots, for
-\ConfirmatoryGameCount{} games in 128 indivisible shards.
-
-\subsection{Estimands and uncertainty}
-
-For family $f$, seed block $b$, and slot $s$, let
-
-\begin{equation}
-d_{fbs}=Y_{\mathrm{champion},fbs}-Y_{\mathrm{reference},fbs},
-\qquad D_{fb}=\frac{d_{fb0}+d_{fb1}}{2}.
-\end{equation}
-
-The primary estimand is the equal-family mean of the 128 balanced $D_{fb}$
-values. Let $e_{fb}=D_{fb}-\widehat\Delta$, $G=16$, and $N=128$. The frozen
-family-cluster variance is
-
-\begin{equation}
-\widehat V(\widehat\Delta)=
-\frac{G}{G-1}\frac{\sum_f\left(\sum_b e_{fb}\right)^2}{N^2}.
-\label{eq:cluster}
-\end{equation}
-
-The primary relative gate requires the two-sided 95\% Student-$t_{15}$ interval
-to lie above zero. A distinct absolute gate applies the same estimator to
-reciprocal champion scores and requires the one-sided 95\% lower bound for
-champion score minus 0.5 to exceed zero. Both gates and all results were
-specified before test opening; the frozen protocol requires both gates for
-joint success.
+The Advanced experiment pairs StrongBot and pinned Supalosa against the same
+frozen independent opponent on 360 fresh HFO cases each. It tests transfer; it
+does not participate in candidate selection.
