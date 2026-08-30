@@ -16,6 +16,12 @@ import { DefaultStrategy, DefaultStrategyOptions } from "./defaultStrategy.js";
 
 export type PeakOfPerfectionProfileScope = "off" | "weak_only" | "both";
 
+export const CONFIRMED_PEAK_OF_PERFECTION_STRATEGY_SCOPE: PeakOfPerfectionProfileScope = "both";
+
+export const resolvePeakOfPerfectionStrategyScope = (
+    scope: PeakOfPerfectionProfileScope | undefined,
+): PeakOfPerfectionProfileScope => scope ?? CONFIRMED_PEAK_OF_PERFECTION_STRATEGY_SCOPE;
+
 export const peakOfPerfectionProfileApplies = (
     scope: PeakOfPerfectionProfileScope | undefined,
     isPeakMap: boolean,
@@ -1009,7 +1015,7 @@ export class StrongStrategy implements Strategy {
 
     private shouldApplyPeakOfPerfectionProfile(context: SupabotContext): boolean {
         return peakOfPerfectionProfileApplies(
-            this.options.peakOfPerfectionProfileScope,
+            resolvePeakOfPerfectionStrategyScope(this.options.peakOfPerfectionProfileScope),
             this.isKnownMapProfile(context, PEAK_OF_PERFECTION_STARTS),
             this.isPeakOfPerfectionWeakStart(context),
         );
