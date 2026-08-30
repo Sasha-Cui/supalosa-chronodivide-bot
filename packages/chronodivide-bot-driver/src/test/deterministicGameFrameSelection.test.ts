@@ -27,7 +27,7 @@ const hfoAggregate = () => {
         };
     });
     return {
-        kind: "hfo-deployed-confirmatory-final",
+        kind: "hfo-deployed-confirmatory-finalizer",
         complete: true,
         passed: true,
         sourceCommit: HFO_SOURCE,

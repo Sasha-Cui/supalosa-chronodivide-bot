@@ -61,7 +61,7 @@ const selectSmallest = <T extends { selectionInput: string }>(rows: T[]): T & { 
 };
 
 const validateHfo = (aggregate: Aggregate): void => {
-    if (aggregate.kind !== "hfo-deployed-confirmatory-final" || aggregate.complete !== true ||
+    if (aggregate.kind !== "hfo-deployed-confirmatory-finalizer" || aggregate.complete !== true ||
         aggregate.passed !== true || aggregate.sourceCommit !== HFO_SOURCE ||
         aggregate.baselineCommit !== BASELINE_COMMIT || aggregate.launchedGameCount !== 720 ||
         aggregate.overall?.wins !== 633 || aggregate.overall?.draws !== 24 || aggregate.overall?.losses !== 63 ||
