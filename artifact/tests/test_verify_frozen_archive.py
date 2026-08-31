@@ -19,14 +19,14 @@ class VerifyFrozenArchiveTest(unittest.TestCase):
         identity = MODULE.load_identity(ROOT)
         self.assertEqual(
             identity["reviewedManuscriptSourceGitCommit"],
-            "ccc0c101de207a7100fd553e15efc4fa18108a35",
+            "f7b64f35cca53a5cf5e304b2dc77d1c5a435cd28",
         )
         summary = MODULE.verify_current_source(ROOT, identity)
         self.assertEqual(
             summary["sha256"],
-            "39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437",
+            "9cf9509eb24871578d3b25ebb11667b83f1a809ddda72aa84bb7cf4df9520c34",
         )
-        self.assertEqual(summary["sizeBytes"], 103324)
+        self.assertEqual(summary["sizeBytes"], 1_320_516)
         self.assertEqual(summary["immutableFileCount"], 60)
 
         with tempfile.TemporaryDirectory() as directory:
