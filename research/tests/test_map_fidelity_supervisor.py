@@ -893,7 +893,11 @@ class SupervisorFixture(unittest.TestCase):
             max_attempts=1,
         )
         summary = supervisor.run()
-        self.assertEqual(summary["completedCount"], 3)
+        self.assertEqual(
+            summary["completedCount"],
+            3,
+            json.dumps(summary, indent=2, sort_keys=True),
+        )
         intent = json.loads(
             (
                 supervisor.family_directory(0)
