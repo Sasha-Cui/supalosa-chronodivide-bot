@@ -1,84 +1,76 @@
-# Chrono Divide scripted-agent configuration: anonymous review artifact
+# StrongBot in Chrono Divide: anonymous review artifact
 
-This artifact regenerates every numeric macro, table, and figure fragment used
-by the accompanying anonymous manuscript. It contains aggregate evidence only;
-it cannot launch Chrono Divide games or retrain the bot.
+This artifact regenerates every numeric macro, table, and plot used by the
+accompanying anonymous manuscript and includes all 15 protocol-selected game
+frames. It contains aggregate evidence only; it cannot launch Chrono Divide
+games, retrain the bot, or reproduce proprietary runtime assets.
 
 ## Contents
 
-- `paper/`: anonymous LNCS paper and supplement source, bibliography,
-  deterministic generator, generated fragments, and unit tests. This is the
-  secondary SCAG submission format.
-- `paper_scitepress/`: the exact anonymous SCITEPRESS/ICAART candidate source,
-  official vendored template files, generated fragments, build checks, and
-  format-specific unit tests.
-- `research/artifacts/`: eight sanitized frozen JSON inputs used by the paper.
-- `artifact_hashes.json`: SHA-256 allowlist for those sanitized inputs.
-- `MANIFEST.json`: SHA-256 inventory of every other immutable file in this
-  package.
-- `verify_manifest.py`: self-contained verifier for `MANIFEST.json`.
-- `THIRD_PARTY.md`: precise inclusion, exclusion, and licensing boundary.
+- `paper/sections/`: the eight authoritative current manuscript sections.
+- `paper/figures/game_frames/`: 15 immutable deterministic PNGs.
+- `paper/scripts/generate_final_assets.py`: the hash-pinned asset generator.
+- `paper/generated/`: the six regenerated TeX assets plus their manifest.
+- `paper_scitepress/`: the exact anonymous SCITEPRESS candidate, official
+  vendored style files, metadata exporter, and build checks.
+- `research/artifacts/`: one sanitized frozen JSON input for all reported
+  results and frame identities.
+- `artifact_hashes.json`: the sanitized evidence SHA-256.
+- `MANIFEST.json` and `verify_manifest.py`: package-wide integrity controls.
+- `THIRD_PARTY.md`: inclusion, exclusion, and licensing boundary.
 
-The scheduler account and project source commit fields are replaced with
-`REDACTED_FOR_DOUBLE_BLIND`. Scientific values, family IDs, job IDs, evidence
-commitments, design counts, estimates, confidence intervals, and descriptive
-records are unchanged.
+Source revision fields are replaced with `REDACTED_FOR_DOUBLE_BLIND`.
+Scientific values, opponent and runtime hashes, seed populations, design
+counts, exact job IDs, estimates, uncertainty bounds, and screenshot hashes
+are otherwise unchanged.
 
 ## Claim-to-evidence map
 
-The package manifest establishes file integrity; the records below establish
-the manuscript values. This map is the fastest path from a reviewer question
-to the frozen aggregate that answers it. Field names are listed so a reviewer
-can inspect the JSON directly without reverse-engineering the generator.
-
 | Manuscript question | Frozen record | Primary fields |
 | --- | --- | --- |
-| Which map population was eligible, and how were family-disjoint roles committed? | `research/artifacts/supported_temperate_families_v1.json` and `research/artifacts/family_role_commitments_v1.json` | `targetCount`, `finalSplit`, `roleCounts`, `roleCommitments`, `outcomeBlind` |
-| What are the two prespecified confirmatory results and their decision boundaries? | `research/artifacts/method_v2_confirmatory_result_v1.json` | `design`, `prespecifiedImprovement`, `prespecifiedChampionAbsolute`, `claimBoundary` |
-| Is the relative result spread across held-out families rather than driven by one family? | `research/artifacts/method_v2_confirmatory_family_diagnostics_v1.json` | `families`, `aggregateChecks` |
-| Does the common-seed championship outperform run-local selection on the open diagnostic pool? | `research/artifacts/method_v2_mechanism_ablation_result_v1.json` | `mechanismContrast`, `pairwiseChampionMinusLocal`, `claimBoundary` |
-| Which policy-group reverts change the endpoint, and which intervals cross zero? | `research/artifacts/method_v2_component_ablation_result_v1.json` | `primaryComponentContrast`, `pairwiseChampionMinusAblation`, `claimBoundary` |
-| What terminal-state patterns accompany the score changes, and what is not identified causally? | `research/artifacts/method_v2_terminal_state_analysis_v1.json` | `confirmatory`, `component`, `interpretationBoundary` |
-| Do accepted games, allocations, exclusions, and stage totals reconcile? | `research/artifacts/accepted_compute_accounting_v1.json` | `accounting`, `stageBreakdown`, `checks`, `exclusions` |
+| What supports HFO 633/24/63 and its pooled and clustered lower bounds? | `research/artifacts/final_paper_evidence_v1.json` | `hfoConfirmation.overall`, `hfoConfirmation.clustered`, `hfoConfirmation.byCountry`, `hfoConfirmation.byStart`, `hfoConfirmation.byFaction`, `hfoConfirmation.bySlot` |
+| Which HFO interventions replicated and remained inactive elsewhere? | same record | `mechanisms.*.replication`, `mechanisms.*.isolation` |
+| What selected and confirmed the Peak 134/14/32 policy over 92/16/72 control? | same record | `peakStudy.development`, `peakStudy.replication` |
+| What bounds cross-opponent transfer? | same record | `advancedTransfer.candidate`, `advancedTransfer.supalosa`, `advancedTransfer.paired` |
+| How were screenshots selected and hash-bound? | same record | `frameEvidence.frames`, `frameEvidence.forceClearance`, `frameEvidence.peakDivergenceUpdate` |
+| Which claims are supported or explicitly unsupported? | same record | `claimBoundary` |
 
-The confirmatory result record is the authority for RQ1 and RQ2. The family,
-mechanism, component, and terminal-state records are sensitivity or
-post-confirmatory diagnostics; they cannot rescue the failed absolute-strength
-gate. All eight records are hash-pinned by `artifact_hashes.json`, and the
-generator fails rather than silently accepting a changed value.
+The record is a compact reduction of eleven immutable completed aggregates.
+It contains no raw game rows or private cluster paths. Its input hash is
+pinned in the copied generator, which fails instead of accepting drift.
 
-## Verify and reproduce the manuscript assets
+## Verify and reproduce
 
-Python 3.10 or newer is sufficient for asset generation and tests:
+Python 3.10 or newer is sufficient for verification and asset regeneration:
 
 ```bash
 python3 verify_manifest.py
-python3 paper/scripts/generate_assets.py
-python3 -m unittest \
-  paper.tests.test_generate_assets \
-  paper_scitepress.tests.test_fallback_manuscript -v
+python3 paper/scripts/generate_final_assets.py
+python3 -m unittest paper_scitepress.tests.test_fallback_manuscript -v
 python3 verify_manifest.py
 ```
 
-The commands must leave the hashes in `paper/generated/asset_manifest.json`
-unchanged. To compile the PDFs, use a TeX Live distribution with Springer
-`llncs`, TikZ/PGFPlots, and BibTeX. Build both submission formats:
+With TeX Live 2024, compile and validate the exact review manuscript:
 
 ```bash
-make -C paper main supplement
 make -C paper_scitepress check
 ```
 
-Expected output is an 18-page `paper/build/main.pdf`, a five-page
-`paper/build/supplement.pdf`, and an 11-page A4
-`paper_scitepress/build/main.pdf`. The LNCS non-reference main-paper content
-ends on page 15. PDF byte hashes may vary across TeX distributions; the package
-manifest and committed generated-fragment hashes are the portable
-reproducibility checks.
+With Poppler 25.x also available, run the deep PDF check:
+
+```bash
+make -C paper_scitepress submission-check
+```
+
+Expected output is a 12-page A4 `paper_scitepress/build/main.pdf` with a
+190-word expanded abstract. PDF bytes may vary across TeX distributions; the
+package manifest and generated-asset hashes are the portable invariants.
 
 ## Scope
 
-The artifact supports the reported aggregate study only. It does not establish
-that StrongBot reliably beats Supalosa, and it does not support claims about
-other opponents, factions, theaters, simulators, RTS games, ladder play, or
-humans. See `THIRD_PARTY.md` for omitted software and assets.
+The artifact supports reliable superiority over pinned Supalosa on balanced
+Heck Freezes Over (633/24/63) and replicated Peak of Perfection
+(134/14/32 versus 92/16/72 deployed control), the three scoped HFO mechanism
+replications, and the negative RA2Web Advanced transfer. It does not introduce
+Chrono Divide, establish superiority to all opponents, provide a generally
+robust map policy, or support a novel general-purpose optimizer claim.

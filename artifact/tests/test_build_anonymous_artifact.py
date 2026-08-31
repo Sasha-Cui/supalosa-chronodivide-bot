@@ -19,31 +19,68 @@ MODULE = importlib.util.module_from_spec(SPEC)
 SPEC.loader.exec_module(MODULE)
 
 
+def walk(value):
+    if isinstance(value, dict):
+        for key, child in value.items():
+            yield key, child
+            yield from walk(child)
+    elif isinstance(value, list):
+        for child in value:
+            yield from walk(child)
+
+
 class BuildAnonymousArtifactTest(unittest.TestCase):
-    def test_package_is_sanitized_and_self_consistent(self) -> None:
+    def test_package_is_sanitized_current_and_self_consistent(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             package = Path(directory) / MODULE.PACKAGE_NAME
             MODULE.build_package(REPO, package)
 
             self.assertFalse((package / "packages").exists())
             self.assertFalse((package / ".git").exists())
+            self.assertFalse((package / "paper" / "main.tex").exists())
+            self.assertFalse((package / "paper" / "sections" / "supplement.tex").exists())
+            self.assertFalse((package / "paper" / "scripts" / "generate_assets.py").exists())
             self.assertTrue((package / "paper_scitepress" / "main.tex").is_file())
-            self.assertFalse((package / "paper" / "build").exists())
             self.assertFalse((package / "paper_scitepress" / "build").exists())
-            confirmatory = json.loads(
-                (package / "research" / "artifacts" / "method_v2_confirmatory_result_v1.json").read_text()
+
+            artifact_paths = sorted(
+                (package / "research" / "artifacts").glob("*.json")
             )
-            self.assertEqual(confirmatory["scheduler"]["account"], MODULE.REDACTED)
-            self.assertEqual(confirmatory["sourceGitCommit"], MODULE.REDACTED)
-            compute = json.loads(
-                (package / "research" / "artifacts" / "accepted_compute_accounting_v1.json").read_text()
+            self.assertEqual(
+                [path.name for path in artifact_paths],
+                [MODULE.EVIDENCE_NAME],
             )
-            self.assertEqual(compute["evidence"]["account"], MODULE.REDACTED)
-            self.assertEqual(compute["accounting"]["allocationCount"], 562)
-            metrics = (package / "paper" / "generated" / "metrics.tex").read_text()
-            self.assertIn(r"\newcommand{\ImprovementEstimate}{0.336}", metrics)
-            self.assertIn(r"\newcommand{\ChampionAbsoluteLower}{-0.021}", metrics)
-            self.assertIn(r"\newcommand{\AcceptedCoreHours}{288.72}", metrics)
+            evidence = json.loads(artifact_paths[0].read_text(encoding="utf-8"))
+            self.assertEqual(evidence["status"], "PASS_FINAL_PAPER_EVIDENCE")
+            self.assertEqual(
+                (
+                    evidence["hfoConfirmation"]["overall"]["wins"],
+                    evidence["hfoConfirmation"]["overall"]["draws"],
+                    evidence["hfoConfirmation"]["overall"]["losses"],
+                ),
+                (633, 24, 63),
+            )
+            self.assertEqual(
+                (
+                    evidence["peakStudy"]["replication"]["candidate"]["overall"]["wins"],
+                    evidence["peakStudy"]["replication"]["candidate"]["overall"]["draws"],
+                    evidence["peakStudy"]["replication"]["candidate"]["overall"]["losses"],
+                ),
+                (134, 14, 32),
+            )
+            for key, child in walk(evidence):
+                if key in MODULE.REDACTED_KEYS:
+                    self.assertEqual(child, MODULE.REDACTED)
+
+            generated = package / "paper" / "generated"
+            self.assertEqual(
+                {path.name for path in generated.glob("*.tex")},
+                set(MODULE.CURRENT_ASSETS),
+            )
+            metrics = (generated / "metrics.tex").read_text(encoding="utf-8")
+            self.assertIn(r"\newcommand{\HfoWins}{633}", metrics)
+            self.assertIn(r"\newcommand{\PeakWins}{134}", metrics)
+            self.assertIn(r"\newcommand{\AdvancedStrongLosses}{262}", metrics)
             self.assertEqual(
                 metrics,
                 (package / "paper_scitepress" / "generated" / "metrics.tex").read_text(),
@@ -52,6 +89,16 @@ class BuildAnonymousArtifactTest(unittest.TestCase):
                 (package / "paper" / "references.bib").read_bytes(),
                 (package / "paper_scitepress" / "references.bib").read_bytes(),
             )
+
+            frames = sorted(
+                (package / "paper" / "figures" / "game_frames").glob("*.png")
+            )
+            self.assertEqual(len(frames), 15)
+            for row in evidence["frameEvidence"]["frames"]:
+                path = package / row["file"]
+                self.assertEqual(path.stat().st_size, row["bytes"])
+                self.assertEqual(hashlib.sha256(path.read_bytes()).hexdigest(), row["pngSha256"])
+
             metadata_run = subprocess.run(
                 [
                     sys.executable,
@@ -69,58 +116,30 @@ class BuildAnonymousArtifactTest(unittest.TestCase):
             )
             self.assertEqual(metadata_run.returncode, 0, metadata_run.stderr)
             submission_metadata = json.loads(metadata_run.stdout)
-            self.assertEqual(submission_metadata["abstractWordCount"], 193)
+            self.assertEqual(submission_metadata["abstractWordCount"], 190)
+            self.assertEqual(
+                submission_metadata["title"],
+                "StrongBot: Auditable Map-Profiled RTS Agent Development in Chrono Divide",
+            )
             self.assertNotIn("\\", submission_metadata["abstract"])
 
-            aggregate_inputs = sorted(
-                (package / "research" / "artifacts").glob("*.json")
-            )
-            self.assertEqual(len(aggregate_inputs), 8)
-            review_readme = (package / "README.md").read_text()
-            self.assertIn(
-                "eight sanitized frozen JSON inputs",
-                review_readme,
-            )
-            self.assertIn(
-                "Expected output is an 18-page",
-                review_readme,
-            )
-            self.assertIn(
-                "11-page A4",
-                review_readme,
-            )
-            self.assertIn(
-                "ends on page 15",
-                review_readme,
-            )
-            self.assertIn(
-                "python3 verify_manifest.py",
-                review_readme,
-            )
+            review_readme = (package / "README.md").read_text(encoding="utf-8")
+            self.assertIn("one sanitized frozen JSON input", review_readme)
+            self.assertIn("633/24/63", review_readme)
+            self.assertIn("134/14/32", review_readme)
+            self.assertIn("12-page A4", review_readme)
+            self.assertIn("python3 verify_manifest.py", review_readme)
             self.assertIn("## Claim-to-evidence map", review_readme)
-            self.assertIn(
-                "cannot rescue the failed absolute-strength gate",
-                " ".join(review_readme.split()),
+            reference = (
+                chr(96)
+                + f"research/artifacts/{MODULE.EVIDENCE_NAME}"
+                + chr(96)
             )
-            for aggregate_input in aggregate_inputs:
-                reference = f"`research/artifacts/{aggregate_input.name}`"
-                self.assertEqual(
-                    review_readme.count(reference),
-                    1,
-                    f"claim map must link {aggregate_input.name} exactly once",
-                )
+            self.assertEqual(review_readme.count(reference), 1)
             self.assertIn(
-                "eight sanitized aggregate JSON records",
+                "one sanitized aggregate JSON record",
                 " ".join((package / "THIRD_PARTY.md").read_text().split()),
             )
-            package_text = "\n".join(
-                path.read_text(encoding="utf-8")
-                for path in sorted(package.rglob("*"))
-                if path.is_file()
-                and path.name != "MANIFEST.json"
-                and path.suffix not in {".pyc"}
-            )
-            self.assertNotIn("Bouchet", package_text)
 
             manifest = json.loads((package / "MANIFEST.json").read_text())
             for relative, expected in manifest["files"].items():
@@ -139,7 +158,7 @@ class BuildAnonymousArtifactTest(unittest.TestCase):
                 verification.stdout,
             )
 
-    def test_archive_is_deterministic_and_contains_no_git_tree(self) -> None:
+    def test_archive_is_deterministic_and_contains_only_review_sources(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             first = root / "first.tar.gz"
@@ -151,8 +170,9 @@ class BuildAnonymousArtifactTest(unittest.TestCase):
                 names = archive.getnames()
             self.assertFalse(any("/.git/" in name for name in names))
             self.assertFalse(any("/packages/" in name for name in names))
+            self.assertFalse(any(name.endswith("/paper/main.tex") for name in names))
+            self.assertFalse(any(name.endswith("/paper/sections/supplement.tex") for name in names))
             self.assertTrue(any(name.endswith("/paper_scitepress/main.tex") for name in names))
-            self.assertFalse(any("/paper/build/" in name for name in names))
             self.assertFalse(any("/paper_scitepress/build/" in name for name in names))
 
 

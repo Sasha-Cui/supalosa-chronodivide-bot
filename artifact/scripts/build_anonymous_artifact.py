@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Build a deterministic, identity-neutral manuscript review artifact."""
+"""Build a deterministic, identity-neutral final-study review artifact."""
 
 from __future__ import annotations
 
 import argparse
+import contextlib
 import gzip
 import hashlib
 import importlib.util
@@ -19,6 +20,26 @@ from typing import Any
 
 PACKAGE_NAME = "chrono-divide-review-artifact"
 REDACTED = "REDACTED_FOR_DOUBLE_BLIND"
+EVIDENCE_NAME = "final_paper_evidence_v1.json"
+EVIDENCE_SHA256 = "0670bdeefab47ca68fb5fc584be6a299e777ee0d69f04cd45de7caebf32c31e3"
+CURRENT_SECTIONS = (
+    "introduction.tex",
+    "related_work.tex",
+    "environment.tex",
+    "protocol.tex",
+    "results.tex",
+    "diagnostics.tex",
+    "reproducibility.tex",
+    "conclusion.tex",
+)
+CURRENT_ASSETS = (
+    "metrics.tex",
+    "mechanism_table.tex",
+    "peak_strata_table.tex",
+    "primary_bounds_plot.tex",
+    "primary_results_table.tex",
+    "transfer_table.tex",
+)
 DENIED_TEXT = (
     "Sasha Cui",
     "sasha.z.cui@gmail.com",
@@ -29,15 +50,20 @@ DENIED_TEXT = (
     "Yale University",
     "Bouchet",
 )
-REDACTED_KEYS = {"sourceGitCommit"}
+REDACTED_KEYS = {"sourceCommit", "sourceGitCommit"}
 
 
 def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def load_generator(path: Path):
-    spec = importlib.util.spec_from_file_location("artifact_generate_assets", path)
+def require(condition: bool, message: str) -> None:
+    if not condition:
+        raise ValueError(message)
+
+
+def load_module(path: Path, name: str):
+    spec = importlib.util.spec_from_file_location(name, path)
     if spec is None or spec.loader is None:
         raise RuntimeError(f"cannot import {path}")
     module = importlib.util.module_from_spec(spec)
@@ -52,74 +78,126 @@ def load_generator(path: Path):
 
 def sanitize_payload(value: Any) -> Any:
     if isinstance(value, dict):
-        sanitized = {}
-        for key, child in value.items():
-            if key in REDACTED_KEYS:
-                sanitized[key] = REDACTED
-            elif key in {"account", "schedulerAccount"} and child == "pi_jss233":
-                sanitized[key] = REDACTED
-            else:
-                sanitized[key] = sanitize_payload(child)
-        return sanitized
+        return {
+            key: REDACTED if key in REDACTED_KEYS else sanitize_payload(child)
+            for key, child in value.items()
+        }
     if isinstance(value, list):
         return [sanitize_payload(child) for child in value]
+    if value == "pi_jss233":
+        return REDACTED
     return value
 
 
-def copy_manuscripts(repo_root: Path, package_root: Path) -> None:
-    for directory in ("paper", "paper_scitepress"):
-        shutil.copytree(
-            repo_root / directory,
-            package_root / directory,
-            ignore=shutil.ignore_patterns("build", "__pycache__", "*.pyc"),
+def copy_file(source: Path, target: Path) -> None:
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(source, target)
+
+
+def copy_review_sources(
+    repo_root: Path,
+    package_root: Path,
+    evidence: dict[str, Any],
+) -> None:
+    for name in CURRENT_SECTIONS:
+        copy_file(
+            repo_root / "paper" / "sections" / name,
+            package_root / "paper" / "sections" / name,
         )
-
-
-def sync_scitepress_assets(package_root: Path) -> None:
-    source_generated = package_root / "paper" / "generated"
-    target_generated = package_root / "paper_scitepress" / "generated"
-    target_generated.mkdir(parents=True, exist_ok=True)
-    for source in sorted(source_generated.glob("*.tex")):
-        shutil.copyfile(source, target_generated / source.name)
-    shutil.copyfile(
+    copy_file(
+        repo_root / "paper" / "references.bib",
         package_root / "paper" / "references.bib",
-        package_root / "paper_scitepress" / "references.bib",
+    )
+    copy_file(
+        repo_root / "paper" / "scripts" / "generate_final_assets.py",
+        package_root / "paper" / "scripts" / "generate_final_assets.py",
+    )
+
+    frames = evidence["frameEvidence"]["frames"]
+    require(len(frames) == 15, "expected exactly 15 final frame records")
+    seen: set[str] = set()
+    for row in frames:
+        relative = row["file"]
+        require(
+            relative.startswith("paper/figures/game_frames/")
+            and relative.endswith(".png")
+            and relative not in seen,
+            f"invalid or duplicate frame path: {relative}",
+        )
+        seen.add(relative)
+        source = repo_root / relative
+        require(source.is_file(), f"missing frame: {relative}")
+        require(source.stat().st_size == row["bytes"], f"frame size drift: {relative}")
+        require(sha256(source) == row["pngSha256"], f"frame hash drift: {relative}")
+        copy_file(source, package_root / relative)
+
+    shutil.copytree(
+        repo_root / "paper_scitepress",
+        package_root / "paper_scitepress",
+        ignore=shutil.ignore_patterns(
+            "build",
+            "generated",
+            "references.bib",
+            "__pycache__",
+            "*.pyc",
+        ),
     )
 
 
-def write_sanitized_artifacts(
+def write_sanitized_evidence(
     repo_root: Path,
     package_root: Path,
-    filenames: list[str],
-) -> dict[str, str]:
-    target_dir = package_root / "research" / "artifacts"
-    target_dir.mkdir(parents=True)
-    hashes: dict[str, str] = {}
-    for filename in sorted(filenames):
-        source = repo_root / "research" / "artifacts" / filename
-        payload = sanitize_payload(json.loads(source.read_text(encoding="utf-8")))
-        target = target_dir / filename
-        target.write_text(
-            json.dumps(payload, indent=2, sort_keys=True) + "\n",
-            encoding="utf-8",
-        )
-        hashes[filename] = sha256(target)
-    return hashes
+) -> tuple[str, str]:
+    source = repo_root / "research" / "artifacts" / EVIDENCE_NAME
+    require(sha256(source) == EVIDENCE_SHA256, "final evidence hash drifted")
+    payload = json.loads(source.read_text(encoding="utf-8"))
+    require(
+        payload["status"] == "PASS_FINAL_PAPER_EVIDENCE"
+        and payload["complete"] is True,
+        "final evidence is incomplete",
+    )
+    target = package_root / "research" / "artifacts" / EVIDENCE_NAME
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(
+        json.dumps(sanitize_payload(payload), indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    return EVIDENCE_SHA256, sha256(target)
 
 
-def replace_generator_hashes(
+def replace_generator_hash(
     generator_path: Path,
-    original_hashes: dict[str, str],
-    sanitized_hashes: dict[str, str],
+    original_hash: str,
+    sanitized_hash: str,
 ) -> None:
     text = generator_path.read_text(encoding="utf-8")
-    for filename in sorted(original_hashes):
-        original = original_hashes[filename]
-        sanitized = sanitized_hashes[filename]
-        if text.count(original) != 1:
-            raise ValueError(f"expected one pinned hash for {filename}")
-        text = text.replace(original, sanitized)
-    generator_path.write_text(text, encoding="utf-8")
+    require(text.count(original_hash) == 1, "expected one pinned final-evidence hash")
+    generator_path.write_text(
+        text.replace(original_hash, sanitized_hash),
+        encoding="utf-8",
+    )
+
+
+def regenerate_assets(package_root: Path) -> None:
+    generator = load_module(
+        package_root / "paper" / "scripts" / "generate_final_assets.py",
+        "artifact_generate_final_assets",
+    )
+    with contextlib.redirect_stdout(io.StringIO()):
+        require(generator.main() == 0, "final paper asset generation failed")
+
+    source_generated = package_root / "paper" / "generated"
+    observed = {path.name for path in source_generated.glob("*.tex")}
+    require(observed == set(CURRENT_ASSETS), f"unexpected generated assets: {sorted(observed)}")
+
+    target_generated = package_root / "paper_scitepress" / "generated"
+    target_generated.mkdir(parents=True, exist_ok=True)
+    for name in CURRENT_ASSETS:
+        copy_file(source_generated / name, target_generated / name)
+    copy_file(
+        package_root / "paper" / "references.bib",
+        package_root / "paper_scitepress" / "references.bib",
+    )
 
 
 def write_manifest(package_root: Path) -> dict[str, str]:
@@ -167,33 +245,34 @@ def build_package(repo_root: Path, package_root: Path) -> dict[str, str]:
         raise FileExistsError(package_root)
     package_root.mkdir(parents=True)
 
-    source_generator = repo_root / "paper" / "scripts" / "generate_assets.py"
-    source_module = load_generator(source_generator)
-    filenames = sorted(source_module.EXPECTED_ARTIFACT_HASHES)
-
-    copy_manuscripts(repo_root, package_root)
-    sanitized_hashes = write_sanitized_artifacts(repo_root, package_root, filenames)
-    copied_generator = package_root / "paper" / "scripts" / "generate_assets.py"
-    replace_generator_hashes(
-        copied_generator,
-        dict(source_module.EXPECTED_ARTIFACT_HASHES),
-        sanitized_hashes,
+    evidence_path = repo_root / "research" / "artifacts" / EVIDENCE_NAME
+    evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+    copy_review_sources(repo_root, package_root, evidence)
+    original_hash, sanitized_hash = write_sanitized_evidence(repo_root, package_root)
+    replace_generator_hash(
+        package_root / "paper" / "scripts" / "generate_final_assets.py",
+        original_hash,
+        sanitized_hash,
     )
+    regenerate_assets(package_root)
 
-    shutil.copyfile(repo_root / "artifact" / "templates" / "REVIEW_README.md", package_root / "README.md")
-    shutil.copyfile(repo_root / "artifact" / "THIRD_PARTY.md", package_root / "THIRD_PARTY.md")
-    shutil.copyfile(
+    copy_file(
+        repo_root / "artifact" / "templates" / "REVIEW_README.md",
+        package_root / "README.md",
+    )
+    copy_file(
+        repo_root / "artifact" / "THIRD_PARTY.md",
+        package_root / "THIRD_PARTY.md",
+    )
+    copy_file(
         repo_root / "artifact" / "scripts" / "verify_package_manifest.py",
         package_root / "verify_manifest.py",
     )
     (package_root / "artifact_hashes.json").write_text(
-        json.dumps(sanitized_hashes, indent=2, sort_keys=True) + "\n",
+        json.dumps({EVIDENCE_NAME: sanitized_hash}, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",
     )
 
-    copied_module = load_generator(copied_generator)
-    copied_module.generate_all(package_root, package_root / "paper" / "generated")
-    sync_scitepress_assets(package_root)
     anonymity_scan(package_root)
     return write_manifest(package_root)
 
