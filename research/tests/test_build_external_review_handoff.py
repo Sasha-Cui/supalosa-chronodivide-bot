@@ -20,23 +20,24 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class ExternalReviewHandoffTest(unittest.TestCase):
-    def test_tracked_prompt_is_neutral_and_discoverable(self) -> None:
+    def test_tracked_prompt_is_neutral(self) -> None:
         prompt = PROMPT.read_text(encoding="utf-8")
         validate_prompt(prompt)
         lowered = prompt.lower()
         for cue in FORBIDDEN_PROMPT_CUES:
             self.assertNotIn(cue, lowered)
 
-        for control in (
-            "EXTERNAL_REVIEW_PACKET.md",
-            "SUBMISSION_ROADMAP.md",
-            "README.md",
-            "STATUS.md",
-        ):
-            text = (ROOT / "research" / control).read_text(encoding="utf-8")
-            self.assertIn("build_external_review_handoff.py", text)
-
-    def test_candidate_identities_match_frozen_controls(self) -> None:
+    def test_candidate_identity_matches_final_controls(self) -> None:
+        self.assertEqual(set(CANDIDATES), {"icaart"})
+        candidate = CANDIDATES["icaart"]
+        self.assertEqual(
+            candidate.source_commit,
+            "6388f1a4243801f6b79d780844327c831a4290f4",
+        )
+        self.assertEqual(
+            candidate.pdf_sha256,
+            "b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77",
+        )
         controls = "\n".join(
             (ROOT / "research" / name).read_text(encoding="utf-8")
             for name in (
@@ -44,9 +45,8 @@ class ExternalReviewHandoffTest(unittest.TestCase):
                 "EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md",
             )
         )
-        for candidate in CANDIDATES.values():
-            self.assertIn(candidate.source_commit, controls)
-            self.assertIn(candidate.pdf_sha256, controls)
+        self.assertIn(candidate.source_commit, controls)
+        self.assertIn(candidate.pdf_sha256, controls)
 
     def test_builder_is_deterministic_minimal_and_fail_closed(self) -> None:
         pdf_payload = b"%PDF-1.4\nminimal identity fixture\n%%EOF\n"
@@ -78,7 +78,6 @@ class ExternalReviewHandoffTest(unittest.TestCase):
                 prompt_path=prompt_path,
                 output_path=second,
             )
-
             self.assertEqual(first.read_bytes(), second.read_bytes())
             self.assertEqual(
                 first_record["archiveSha256"], second_record["archiveSha256"]

@@ -1,24 +1,20 @@
-# Independent cold-read packet
+# Independent cold-read protocol
 
-Prepared: **2026-08-11**
+Updated: **2026-08-30**
 
-This protocol is for the final human review that the authors cannot replace
-with another internal audit. It tests whether the manuscript communicates its
-actual bounded claim without repository context or author coaching.
+This protocol measures whether the final anonymous paper communicates its
+actual contribution without author coaching. It is not a scientific
+replication and does not authorize new gameplay.
 
-## Frozen handoff identity
+## Frozen handoff
 
-Use exactly one venue-formatted PDF in a review; do not ask the same reader to
-compare formats.
-
-| Candidate | Source commit | PDF SHA-256 |
+| Candidate | Reviewed source | PDF SHA-256 |
 | --- | --- | --- |
-| LNCS / SCAG | `ccc0c101de207a7100fd553e15efc4fa18108a35` | `efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3` |
-| SCITEPRESS / ICAART | `ccc0c101de207a7100fd553e15efc4fa18108a35` | `98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07` |
+| SCITEPRESS / ICAART | `6388f1a4243801f6b79d780844327c831a4290f4` | `b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77` |
 
-Record the selected hash before sending. If it does not match, stop and locate
-the drift rather than asking the reader to review an unidentified build.
-Build the unprimed handoff with:
+The deterministic two-member Phase-A ZIP is 1,360,106 bytes with SHA-256 `5dd556a61a5371ada52fd8ae6d5ad30329f1fe1ad093a534b36c46f21b719ca7`.
+
+Build the unprimed deterministic handoff with:
 
 ```bash
 python3 research/scripts/build_external_review_handoff.py \
@@ -26,117 +22,78 @@ python3 research/scripts/build_external_review_handoff.py \
   --output tmp/external-review/icaart-phase-a.zip
 ```
 
-The builder refuses PDF-hash drift and emits a deterministic archive containing
-only `anonymous-paper.pdf` and the neutral
-`EXTERNAL_REVIEW_PHASE_A_PROMPT.txt`. Its JSON output records the candidate,
-source identity, PDF hash, archive hash, and member list for the author's
-private log. Inspect the two archive members before sending. Do not add this
-packet, the targeted Phase-B questions, or a response template to the Phase-A
-archive.
-
-Before sending, copy `EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md` into the private
-submission record. Use that copy to lock Phase A, hash the returned responses,
-score the four claim boundaries, and classify every requested change.
+The builder fails on PDF drift and includes only `anonymous-paper.pdf` and
+`review-prompt.txt`. Inspect both members before sending. Copy
+`EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md` into a private submission record; never
+commit the reader's identity or completed response.
 
 ## Phase A: unprimed venue-style review
 
-Send only the anonymous main PDF. Do not initially send the repository,
-supplement, reviewer audit, result registry, or an explanation of the intended
-takeaway. Do not send the targeted questions below yet: they reveal that a
-stronger endpoint fails and that the comparator differs from the deployed
-default, which would coach the read.
+Send only the ZIP. Do not send the repository, artifact, intended takeaway,
+scorecard, or questions below. Ask the reader to spend at most 45 minutes.
+Preserve and hash the returned review before any discussion.
 
-Ask the reader to spend at most 45 minutes on a normal regular-paper review.
-For an ICAART-calibrated pass, give only this neutral prompt:
-
-> Review this anonymous regular paper for relevance, originality, technical
-> quality, significance, and presentation. Summarize its main claim, assign a
-> 1--5 score with one-sentence justification for each criterion, identify the
-> strongest acceptance and rejection arguments, list required versus optional
-> revisions, and vote accept, borderline, or reject with confidence.
-
-The reader must return and timestamp this review before receiving Phase B.
-Preserve it verbatim. A missing claim boundary in Phase A is evidence about the
-paper even if the reader later answers a targeted question correctly.
+The neutral prompt asks for ICAART's five criteria: relevance, originality,
+technical quality, significance, and presentation; strongest acceptance and
+rejection arguments; required and optional revisions; and an
+accept/borderline/reject vote with confidence.
 
 ## Phase B: targeted comprehension audit
 
-Only after locking the unprimed review, ask the reader to answer these before
-discussing the paper with an author:
+Only after Phase A is locked, ask:
 
-1. In one sentence, what is the paper's principal claim?
-2. What result is positive, and what stronger result explicitly fails?
-3. What are the units of training/test separation and statistical inference?
-4. Did the authors inspect or adapt to the sealed test outcomes before the
-   confirmatory evaluation? Explain the method-v1/method-v2 sequence as you
-   understood it.
-5. Is the contribution primarily a new algorithm, a new environment, a bot,
-   an evaluation protocol, or an empirical case study?
-6. What do the component reverts and terminal snapshots establish, and what do
-   they not establish?
-7. Name the two most serious threats to generalization.
-8. Which paragraph, table, figure, or term was hardest to understand?
-9. If reviewing for the selected venue, would you vote accept, borderline, or
-   reject? Give the strongest reason for and against acceptance.
-10. Identify every sentence that sounds stronger than the evidence.
-11. Why is the frozen reference not the deployed StrongBot default, and what
-    limitation follows from that choice?
+1. What is the principal contribution in one sentence?
+2. What do the HFO 633/24/63 result and its two lower bounds establish?
+3. What changed on Peak, what are the control and candidate W/D/L counts, and
+   what does the paired lower bound mean?
+4. Which three HFO mechanisms were replicated, and what does exact
+   inactive-cell trace equality add?
+5. What is the literal game objective, and why can enemy units remain alive at
+   a valid win?
+6. What does the RA2Web Advanced result establish and rule out?
+7. Is the work a learned policy, a novel optimizer, a new environment, a
+   scripted agent, an evaluation method, or an empirical study?
+8. How were countries, starts, participant slots, retries, and randomness
+   controlled?
+9. Are the screenshots statistical evidence? How were their cases selected?
+10. Name the two strongest acceptance and rejection arguments.
+11. Identify any sentence or caption that sounds stronger than the evidence.
+12. Would you vote accept, borderline, or reject at ICAART, and why?
 
-Do not correct the reader during this questionnaire. A mistaken answer is
-evidence of a manuscript communication failure, not a reader failure.
+Do not correct the reader while they answer. A misunderstanding is evidence
+about the manuscript.
 
 ## Separate visual pass
 
-A second reader, or the same reader on a later pass, should inspect only the
-title, abstract, figures, tables, captions, and conclusion. Ask whether those
-elements alone communicate all of the following:
+Ask a second reader, or conduct a separately timestamped later pass, to inspect
+only the title, abstract, tables, figures, captions, and conclusion. Those
+elements should communicate:
 
-- configured champion versus frozen-generic-reference improvement: 0.336 with a
-  family-clustered 95% interval [0.215, 0.457];
-- no comparison with the map-profile-enabled deployed StrongBot default;
-- absolute superiority over Supalosa not established;
-- 16 sealed map families and family-level inference;
-- the gain is mostly avoided losses/tick-cap survival;
-- one opponent, one faction mirror, one simulator version; and
-- diagnostic, not causal, component and terminal-state evidence.
+- reliable Supalosa superiority on balanced HFO and replicated Peak;
+- scoped, interpretable mechanisms rather than a general learned algorithm;
+- literal all-building victory and only four HFO tick-cap draws;
+- the negative Advanced transfer and bounded opponent scope;
+- protocol-selected, illustrative rather than inferential screenshots; and
+- existing-environment and established-optimizer boundaries.
 
 ## Pass criteria
 
-The manuscript passes the cold read only if the reader reports all four core
-boundaries. At least core boundaries 1--3 should appear independently in the
-unprimed Phase A review; Phase B checks all four precisely:
+Record each boundary as `unprompted`, `phase_b_only`, or `missing_or_wrong`.
+The paper passes only if boundaries 1--3 appear unprompted and all six are
+correct by the end of Phase B:
 
-1. the positive claim is champion versus the frozen generic StrongBot reference,
-   not champion versus Supalosa or the deployed StrongBot default;
-2. Chrono Divide is an existing environment, not introduced by the paper;
-3. the configuration routine uses established techniques and is not claimed as
-   a novel optimizer; and
-4. the component/terminal analyses are post-confirmatory and non-causal.
+1. StrongBot reliably beats pinned Supalosa on HFO and the confirmed Peak
+   policy improves control and wins reliably on fresh cases.
+2. This does not imply general opponent or map superiority; Advanced reverses
+   the result.
+3. Chrono Divide is an existing environment.
+4. StrongBot is a layered scripted agent and no general optimizer novelty is
+   claimed.
+5. The mechanism evidence is paired and scope-isolated, but does not identify
+   every inherited-system interaction.
+6. Screenshots are deterministic observations selected prospectively, not
+   substitutes for aggregate evidence.
 
-If a boundary appears only after its Phase B prompt, diagnose the corresponding
-entry point before editing; do not assume that prompting repaired the paper.
-Any wording change must be claim-preserving. A request for a new
-outcome-bearing analysis should be recorded as future work, not executed on the
-opened family population.
-
-After both phases are locked, the supplement may be provided for a separate
-reproducibility check. Do not let successful artifact use retroactively change
-the unprimed manuscript review.
-
-## Response record
-
-Store the completed responses privately with:
-
-- review date and manuscript commit/hash;
-- reader's relevant background, without naming them in the anonymous paper;
-- Phase A and Phase B timestamps, time spent, and whether the supplement was
-  consulted afterward;
-- the five criterion scores, overall vote, confidence, and verbatim review;
-- each misunderstanding and the exact source edit made in response; and
-- whether the four boundaries appeared unprompted or only after Phase B.
-
-Use the private copy of `EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md` for this record;
-do not commit reviewer identity, correspondence, or completed answers.
-
-After any edit, rerun the paper tests, citation/anonymity scan, page-limit check,
-and full rendered-PDF inspection before changing the submission hashes.
+Classify requested edits as `paper_revision`, `future_prospective_study`, or
+`no_change_with_reason`. Never answer a request for breadth by running post-hoc
+games on opened populations.

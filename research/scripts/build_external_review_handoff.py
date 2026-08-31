@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build an identity-checked, unprimed Phase-A review handoff."""
+"""Build an identity-checked, unprimed ICAART Phase-A review handoff."""
 
 from __future__ import annotations
 
@@ -26,17 +26,10 @@ class Candidate:
 
 CANDIDATES = {
     "icaart": Candidate(
-        source_commit="ccc0c101de207a7100fd553e15efc4fa18108a35",
+        source_commit="6388f1a4243801f6b79d780844327c831a4290f4",
         pdf_path=ROOT / "paper_scitepress" / "build" / "main.pdf",
         pdf_sha256=(
-            "98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07"
-        ),
-    ),
-    "scag": Candidate(
-        source_commit="ccc0c101de207a7100fd553e15efc4fa18108a35",
-        pdf_path=ROOT / "paper" / "build" / "main.pdf",
-        pdf_sha256=(
-            "efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3"
+            "b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77"
         ),
     ),
 }
@@ -46,14 +39,15 @@ FORBIDDEN_PROMPT_CUES = (
     "strongbot",
     "supalosa",
     "chrono divide",
-    "deployed default",
-    "absolute gate",
-    "relative gate",
-    "method v1",
-    "method v2",
-    "0.535",
-    "0.336",
-    "sealed famil",
+    "heck freezes over",
+    "peak of perfection",
+    "ra2web",
+    "map-profile",
+    "633",
+    "134",
+    "advanced transfer",
+    "literal building",
+    "optimizer novelty",
 )
 
 
@@ -124,32 +118,19 @@ def build_handoff(
         temporary_path = Path(stream.name)
 
     try:
-        with ZipFile(
-            temporary_path,
-            mode="w",
-            compression=ZIP_STORED,
-        ) as archive:
-            archive.writestr(
-                archive_info(ARCHIVE_MEMBERS[0]),
-                pdf_payload,
-                compress_type=ZIP_STORED,
-            )
-            archive.writestr(
-                archive_info(ARCHIVE_MEMBERS[1]),
-                prompt_payload,
-                compress_type=ZIP_STORED,
-            )
+        with ZipFile(temporary_path, mode="w", compression=ZIP_STORED) as archive:
+            archive.writestr(archive_info(ARCHIVE_MEMBERS[0]), pdf_payload)
+            archive.writestr(archive_info(ARCHIVE_MEMBERS[1]), prompt_payload)
+
         archive_payload = temporary_path.read_bytes()
         with ZipFile(temporary_path) as archive:
             observed_members = tuple(archive.namelist())
             if observed_members != ARCHIVE_MEMBERS:
-                raise RuntimeError(
-                    f"unexpected archive members: {observed_members!r}"
-                )
+                raise RuntimeError(f"unexpected archive members: {observed_members!r}")
             if archive.read(ARCHIVE_MEMBERS[0]) != pdf_payload:
-                raise RuntimeError("archived PDF differs from the validated input")
+                raise RuntimeError("archived PDF differs from validated input")
             if archive.read(ARCHIVE_MEMBERS[1]) != prompt_payload:
-                raise RuntimeError("archived prompt differs from the validated input")
+                raise RuntimeError("archived prompt differs from validated input")
 
         if output_path.exists() and not replace:
             raise FileExistsError(f"output appeared during build: {output_path}")
@@ -172,12 +153,11 @@ def parse_args() -> argparse.Namespace:
         "--candidate",
         choices=sorted(CANDIDATES),
         default="icaart",
-        help="venue-formatted PDF to package (default: icaart)",
     )
     parser.add_argument(
         "--output",
         type=Path,
-        help="output ZIP (default: tmp/external-review/<candidate>-phase-a.zip)",
+        help="output ZIP (default: tmp/external-review/icaart-phase-a.zip)",
     )
     parser.add_argument(
         "--replace",

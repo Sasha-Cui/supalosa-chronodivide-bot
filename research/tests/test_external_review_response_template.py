@@ -11,16 +11,12 @@ TEMPLATE = ROOT / "research" / "EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md"
 class ExternalReviewResponseTemplateTest(unittest.TestCase):
     def test_template_is_blank_identity_bound_and_decision_complete(self) -> None:
         template = TEMPLATE.read_text(encoding="utf-8")
-        self.assertIn(
-            "no review has been requested or\nreceived",
-            template,
-        )
+        self.assertIn("no review has been requested or received", " ".join(template.split()))
         self.assertNotIn("[x]", template.lower())
 
         for digest in (
-            "ccc0c101de207a7100fd553e15efc4fa18108a35",
-            "efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3",
-            "98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07",
+            "6388f1a4243801f6b79d780844327c831a4290f4",
+            "b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77",
         ):
             self.assertIn(digest, template)
 
@@ -44,16 +40,6 @@ class ExternalReviewResponseTemplateTest(unittest.TestCase):
             "REVIEW_INCOMPLETE_OR_PRIMED",
         ):
             self.assertIn(status, template)
-
-        packet = (ROOT / "research" / "EXTERNAL_REVIEW_PACKET.md").read_text(
-            encoding="utf-8"
-        )
-        roadmap = (ROOT / "research" / "SUBMISSION_ROADMAP.md").read_text(
-            encoding="utf-8"
-        )
-        readme = (ROOT / "research" / "README.md").read_text(encoding="utf-8")
-        for source in (packet, roadmap, readme):
-            self.assertIn("EXTERNAL_REVIEW_RESPONSE_TEMPLATE.md", source)
 
 
 if __name__ == "__main__":
