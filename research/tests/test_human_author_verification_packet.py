@@ -16,29 +16,18 @@ class HumanAuthorVerificationPacketTest(unittest.TestCase):
             encoding="utf-8"
         )
         keys = re.findall(r"^@[A-Za-z]+\{([^,]+),", bibliography, re.MULTILINE)
-        self.assertEqual(len(keys), 34)
+        self.assertEqual(len(keys), 30)
         for key in keys:
-            self.assertIn(f"`{key}`", packet, key)
+            rendered = chr(96) + key + chr(96)
+            self.assertIn(rendered, packet, key)
 
         required_paths = (
-            "research/artifacts/method_v2_confirmatory_result_v1.json",
-            "research/artifacts/method_v2_confirmatory_family_diagnostics_v1.json",
-            "research/artifacts/accepted_compute_accounting_v1.json",
-            "research/artifacts/method_v2_mechanism_ablation_result_v1.json",
-            "research/artifacts/method_v2_component_ablation_result_v1.json",
-            "research/artifacts/method_v2_terminal_state_analysis_v1.json",
-            "research/artifacts/family_role_commitments_v1.json",
+            "research/artifacts/final_paper_evidence_v1.json",
             "research/RESULT_REGISTRY.tsv",
-            "research/EMPIRICAL_COMPLETION_AUDIT.md",
-            "research/CONFIRMATORY_PROTOCOL.md",
-            "research/METHOD_V2_DEVELOPMENT_AMENDMENT_1.md",
-            "research/ANONYMITY_RELEASE_RISK.md",
-            "research/AUTHORSHIP_AND_AI_POLICY.md",
-            "research/CITATION_INTEGRITY_AUDIT.md",
             "research/SUBSTANTIVE_CITATION_AUDIT.md",
-            "research/ORIGINALITY_AND_NOVELTY_SCREEN.md",
             "research/ARTIFACT_CLEANROOM_REPRODUCTION.md",
             "research/CONTACT_TEMPLATES.md",
+            "research/ICAART_RULING_RESPONSE_TEMPLATE.md",
             "artifact/THIRD_PARTY.md",
         )
         for relative in required_paths:
@@ -56,9 +45,14 @@ class HumanAuthorVerificationPacketTest(unittest.TestCase):
         ):
             self.assertIn(heading, packet)
 
+        for identity in (
+            "6388f1a4243801f6b79d780844327c831a4290f4",
+            "b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77",
+            "acbff70447321a43e753fab57f33858fa9797d4105970d627918aa69f08eb6e3",
+        ):
+            self.assertIn(identity, packet)
+
         self.assertNotIn("[x]", packet.lower())
-        self.assertIn("git rev-parse 92a4c87", packet)
-        self.assertNotIn("git rev-parse 853e2ff", packet)
         self.assertIn("template only; human verification not yet complete", packet)
 
 

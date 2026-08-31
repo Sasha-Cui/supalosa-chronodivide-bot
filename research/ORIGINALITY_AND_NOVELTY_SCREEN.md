@@ -1,96 +1,64 @@
 # Originality and closest-work screen
 
-Verified: **2026-08-11**
+Verified: **2026-08-30**
 
 ## Scope and candidate identity
 
-This is a limited, machine-assisted screen of the submission candidate at:
+This bounded machine-assisted screen covers reviewed source
+`6388f1a4243801f6b79d780844327c831a4290f4` and PDF SHA-256
+`b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77`.
 
-- reviewed source commit:
-  `ccc0c101de207a7100fd553e15efc4fa18108a35`;
-- LNCS PDF SHA-256:
-  `efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3`;
-- ICAART PDF SHA-256:
-  `98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07`.
+It asks whether a closer public precedent changes the paper's novelty boundary
+and whether distinctive phrases have an unexplained external verbatim match.
+It cannot establish the absence of unattributed overlap and has no proprietary
+similarity database, unindexed corpus, or private manuscripts. Human source
+reading and the venue's similarity check remain mandatory.
 
-It asks two bounded questions:
+## Novelty boundary
 
-1. Did a current scholarly search reveal a materially closer precedent that
-   changes the paper's novelty boundary?
-2. Did exact searches for distinctive manuscript phrases return an external
-   verbatim match that needs source investigation?
+The paper does not claim a new environment, learned general policy, or
+general-purpose optimizer. Its original package is:
 
-This screen cannot establish the absence of unattributed overlap. It has no
-access to a proprietary similarity database, unindexed publications, private
-manuscripts, paywalled full-text corpora, or all historical versions of web
-pages. Human source reading and a venue-provided similarity report, if one is
-available, remain the relevant pre-submission controls.
+1. StrongBot's scoped west rush/guard, progress-gated retarget, and literal
+   closeout layers in the existing Chrono Divide system;
+2. fresh paired mechanism replications with exact inactive-cell trace equality;
+3. a factorial and sealed replication of reciprocal map-profile scope on Peak;
+4. all-country/all-start literal-objective HFO confirmation;
+5. prospective deterministic screenshot selection and renderer
+   noninterference; and
+6. an independent opponent reversal that explicitly bounds the positive claim.
 
-## Closest-work search
+## Closest work checked
 
-Searches covered combinations of `programmatic strategies`, `microRTS`,
-`real-time strategy`, `program synthesis`, `map-independent`, `opponent`,
-`semantic space`, `automatic configuration`, `action pre-selection`,
-`starting position`, `strength estimation`, `evaluation`, and publication years
-2012--2026. The 2024 and 2025 AIIDE proceedings were also screened by title
-and abstract for game-agent evaluation and RTS work. Candidate
-records were checked against primary publisher or proceedings pages rather
-than secondary summaries.
-
-| Work checked | Relationship to this paper | Disposition |
+| Work | Relationship | Boundary |
 | --- | --- | --- |
-| Mariño et al. (2021), [Programmatic Strategies for Real-Time Strategy Games](https://doi.org/10.1609/aaai.v35i1.16114) | Synthesizes map-specific $\mu$RTS programs. | Already cited; establishes that map-specific program synthesis is prior art. |
-| Medeiros et al. (2022), [What Can We Learn Even from the Weakest?](https://doi.org/10.1609/aaai.v36i7.20744) | Learns sketches that guide programmatic-strategy synthesis. | Already cited; does not overlap the family-disjoint evaluation claim. |
-| Aleixo and Lelis (2023), [Show Me the Way!](https://doi.org/10.1609/aaai.v37i4.25626) | Uses bilevel feature--program search to guide synthesis. | Already cited; confirms that search guidance is not claimed as novel here. |
-| Ouessai et al. (2022), [Evolving Action Pre-Selection Parameters for MCTS in Real-Time Strategy Games](https://doi.org/10.1016/j.entcom.2022.100493) | Evolves parametric action-preselection heuristics for particular $\mu$RTS map--opponent settings and compares the resulting agent on those maps. | Added in `92a4c87`; closest automatic RTS configuration precedent found, but it does not use the present family-disjoint held-out estimand. |
-| Moraes et al. (2023), [Choosing Well Your Opponents](https://doi.org/10.24963/ijcai.2023/539) | Selects reference-strategy sets to guide synthesis and evaluates in $\mu$RTS. | Added in `5ed5dad`; closest recent opponent-guidance precedent, but it is a synthesis method rather than a leakage-control protocol. |
-| Moraes and Lelis (2024), [Searching for Programmatic Policies in Semantic Spaces](https://doi.org/10.24963/ijcai.2024/662) | Searches library-induced semantic neighborhoods for sample-efficient synthesis in $\mu$RTS. | Added in `5ed5dad`; current synthesis precedent, but methodologically distinct from finite parameter configuration and held-out evaluation. |
-| Bhatia et al. (2023), [Generally Genius](https://doi.org/10.1609/aiide.v19i1.27536) | Uses a Generals.io development/data framework to identify quadrant-dependent performance in a scripted bot, connect it to direction-biased path selection, and evaluate a repair. | Added in this refresh; directly motivates reciprocal physical starts, but does not construct family-disjoint roles or seal adaptation from evaluation. |
-| Kuboki et al. (2025), [Policies of Multiple Skill Levels for Better Strength Estimation in Games](https://doi.org/10.1609/aiide.v21i1.36812) | Estimates human Go and chess skill levels from learned strength scores and policy features using few matches. | Checked but not added: it estimates player ratings rather than comparing scripted policies under a held-out simulator design. |
-| Barriga et al. (2014), [Building Placement Optimization in Real-Time Strategy Games](https://doi.org/10.1609/aiide.v10i2.12735) | Evolves StarCraft building layouts in SparCraft scenarios and reports sensitivity to the similarity between predicted training attackers and evaluated attackers. | Checked but not added: it is an optimization case study, not an evaluation protocol or general-policy configuration precedent. |
-| Wang et al. (2026), [TowerMind](https://doi.org/10.1609/aaai.v40i31.39818) | Introduces a tower-defense learning environment and benchmark for language-model agents. | Checked but not added: it is relevant to the environment landscape, but the present paper neither introduces Chrono Divide nor evaluates language-model agents. |
-| Yang and Ontañón (2018), [Learning Map-Independent Evaluation Functions for RTS Games](https://doi.org/10.1109/CIG.2018.8490369) | Learns evaluation functions intended to transfer across maps. | Checked but not added: it concerns learned state evaluation, not scripted-policy configuration or family-level leakage control. |
+| Fernandez-Ares et al. (2012), adaptive RTS bots via map characterization | Selects specialized policies from map features. | Prior map adaptation; not the present exact-scope replication/isolation design. |
+| Ouessai et al. (2022), evolving MCTS action-preselection parameters | Configures an RTS agent for map--opponent settings. | Closest automatic configuration precedent; no claim of optimizer novelty here. |
+| Marino et al. (2021), Medeiros et al. (2022), and Aleixo and Lelis (2023) | Synthesize or guide programmatic microRTS policies. | Prior program search; StrongBot is a hand-structured scripted derivative. |
+| Moraes et al. (2023, 2024) | Opponent-guided and semantic-space programmatic policy search. | Motivates opponent breadth; distinct from this paired evaluation. |
+| Bhatia et al. (2023), Generally Genius | Diagnoses quadrant-dependent behavior in a scripted game agent and evaluates a repair. | Closest directional-bias diagnosis; Peak adds reciprocal factorial isolation and sealed replication. |
+| Supalosa public bot and RA2Web bot repositories | Public Chrono Divide bot implementations. | Software baselines, not scholarly claims of this study's evaluation method. |
+| Planet Wars RTS 2026 competition repository | Headless RTS evaluation across agent/opponent settings. | Relevant current public platform, but not a Chrono Divide or scoped-mechanism paper. |
+| Recent LLM RTS harnesses found in public search | Fixed-seed or replayable model-agent games. | Different agent class and research question; not cited as scholarly closest work. |
 
-No archival publication specifically studying a Chrono Divide bot was located
-in the queried scholarly and public-project indexes. That is a search result,
-not a universal literature-gap claim. The manuscript therefore continues to
-claim an integrated empirical workflow, not priority over every reproducible
-game-agent evaluation pipeline.
+No archival Chrono Divide bot paper or a closer combination of literal
+all-building adjudication, paired mechanism isolation, reciprocal map-profile
+replication, and deterministic frame provenance was located. This is a bounded
+search result, not a universal literature-gap claim.
 
 ## Distinctive-phrase screen
 
-The following exact quoted strings were searched in a public web index. No
-external result containing the complete quoted string was observed on
-2026-08-11; partial-term and generic `fail closed` results were unrelated.
-
-- `turn an otherwise ambiguous tuning result into bounded, auditable evidence`
-- `revision-aware map families, outcome-free compatibility screening`
-- `fails closed on partial or selectively retried campaigns`
-- `provenance-bound, family-disjoint evaluation workflow`
-- `identity-keyed random streams, sealed outcomes`
-- `complete scheduler provenance, and honest negative gates`
-- `participant-specific streams so an extra draw by StrongBot`
-- `reusable result is the evidence contract`
-
-These phrases were selected from the abstract, introduction, related work, and
-conclusion because they are more discriminative than standard terminology such
-as `common random numbers`, `successive halving`, or `family-clustered
-confidence interval`. Matches to the repository's own project documents would
-be expected reuse within one research record and were not treated as
-independent external sources.
+Exact public searches on 2026-08-30 for `progress-gated building retarget` and
+`map-profiled RTS strength` returned no external exact-phrase match. Broader
+queries returned the Supalosa repository and unrelated RTS/agent projects.
+Matches to this project's own public repository would be expected reuse within
+one research record and are not independent sources.
 
 ## Disposition
 
-Across the closest-work passes, the search justified four citation additions
-and no scientific-claim change. The updated paper classifies
-opponent-set guidance and semantic-space neighborhoods as prior synthesis work,
-and map--opponent-specific action-preselection evolution as prior automatic RTS
-configuration. It now also distinguishes prior data-driven diagnosis of
-starting-position bias from the present reciprocal, family-disjoint,
-provenance-bound evaluation for one scripted Chrono Divide agent and one pinned
-opponent. No returned exact-phrase result triggered a source-attribution repair.
-
-Before submission, the author must still read all 34 primary sources, complete
-`HUMAN_AUTHOR_VERIFICATION_PACKET.md`, check any venue-generated similarity
-report, and investigate every flagged passage rather than relying on this
-screen.
+The screen supports the current modest novelty statement: a strong
+Chrono Divide scripted bot plus an unusually auditable, scope-isolated
+full-game evaluation. It does not support priority over all RTS agent
+development, general learning novelty, universal bot strength, or a paradigm
+shift. No empirical claim changed. The 30-source proposition audit and private
+human verification remain required before submission.

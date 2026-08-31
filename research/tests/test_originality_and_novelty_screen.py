@@ -12,21 +12,21 @@ class OriginalityAndNoveltyScreenTest(unittest.TestCase):
     def test_screen_is_bound_to_current_candidate_and_honest_limits(self) -> None:
         screen = SCREEN.read_text(encoding="utf-8")
         for identity in (
-            "ccc0c101de207a7100fd553e15efc4fa18108a35",
-            "efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3",
-            "98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07",
+            "6388f1a4243801f6b79d780844327c831a4290f4",
+            "b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77",
         ):
             self.assertIn(identity, screen)
 
         for boundary in (
             "cannot establish the absence of unattributed overlap",
-            "proprietary similarity database",
-            "Human source reading",
+            "proprietary",
+            "Human source",
             "not a universal literature-gap claim",
+            "does not claim a new environment",
         ):
             self.assertIn(boundary, screen)
 
-    def test_screen_records_closest_work_and_phrase_queries(self) -> None:
+    def test_screen_records_current_closest_work_and_phrase_queries(self) -> None:
         screen = SCREEN.read_text(encoding="utf-8")
         bibliography = (ROOT / "paper" / "references.bib").read_text(
             encoding="utf-8"
@@ -36,6 +36,7 @@ class OriginalityAndNoveltyScreenTest(unittest.TestCase):
         )
 
         for key in (
+            "fernandezAres2012map",
             "moraes2023opponents",
             "moraes2024semantic",
             "ouessai2022evolving",
@@ -44,15 +45,13 @@ class OriginalityAndNoveltyScreenTest(unittest.TestCase):
             self.assertIn(f"{{{key},", bibliography)
             self.assertIn(key, related)
 
-        self.assertIn(
-            "turn an otherwise ambiguous tuning result into bounded, auditable evidence",
-            screen,
-        )
-        self.assertIn("reusable result is the evidence contract", screen)
-        self.assertIn("Policies of Multiple Skill Levels", screen)
-        self.assertIn("Building Placement Optimization", screen)
-        self.assertIn("TowerMind", screen)
-        self.assertIn("No returned exact-phrase result", screen)
+        for phrase in (
+            "progress-gated building retarget",
+            "map-profiled RTS strength",
+            "Planet Wars RTS",
+            "no external exact-phrase match",
+        ):
+            self.assertIn(phrase, screen)
 
 
 if __name__ == "__main__":
