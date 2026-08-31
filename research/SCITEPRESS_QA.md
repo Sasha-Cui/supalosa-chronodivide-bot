@@ -5,16 +5,16 @@ Prepared: **2026-08-30**
 ## Frozen candidate
 
 - Title: **StrongBot: Auditable Map-Profiled RTS Agent Development in Chrono Divide**.
-- Reviewed source commit: `f7b64f35cca53a5cf5e304b2dc77d1c5a435cd28`.
+- Reviewed source commit: `aebbf4e56c9c31728e5c480d6915bf0bba64d269`.
 - Final evidence artifact SHA-256:
   `0670bdeefab47ca68fb5fc584be6a299e777ee0d69f04cd45de7caebf32c31e3`.
-- PDF: 12 A4 pages; 1,356,716 bytes.
+- PDF: 12 A4 pages; 1,357,220 bytes.
 - PDF SHA-256:
-  `bb4bb1127a19a7e8e1c2dec934b8c2a076de907f9570e1c635edaab8e7154b4d`.
+  `345b6bfc2b07f0f5ce18f2f0ae3816d76f58999494db90fbfb61e0c6af25abb4`.
 - Portal metadata SHA-256:
   `ec0c2877d3921978e4d460c41ada94fe2a774d60d5a22ad8946eea728bb3fd8d`.
 - Expanded abstract: 190 words.
-- Poppler 25 extracted length: 35,465 non-whitespace characters.
+- Poppler 25 extracted length: 35,543 non-whitespace characters.
 - Fonts: seven, all embedded with Unicode maps.
 
 The PDF is a deterministic build product and is not tracked in Git. These hashes

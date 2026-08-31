@@ -32,12 +32,12 @@ country, start, faction side, and participant slot.
   in Chrono Divide**.
 - Final paper evidence: `research/artifacts/final_paper_evidence_v1.json`,
   SHA-256 `0670bdeefab47ca68fb5fc584be6a299e777ee0d69f04cd45de7caebf32c31e3`.
-- SCITEPRESS candidate: 12 A4 pages, 190-word abstract, 35,465
+- SCITEPRESS candidate: 12 A4 pages, 190-word abstract, 35,543
   non-whitespace characters.
 - PDF SHA-256:
-  `bb4bb1127a19a7e8e1c2dec934b8c2a076de907f9570e1c635edaab8e7154b4d`.
-- Anonymous artifact: 60 immutable files, 1,320,516 bytes, SHA-256
-  `9cf9509eb24871578d3b25ebb11667b83f1a809ddda72aa84bb7cf4df9520c34`.
+  `345b6bfc2b07f0f5ce18f2f0ae3816d76f58999494db90fbfb61e0c6af25abb4`.
+- Anonymous artifact: 60 immutable files, 1,320,744 bytes, SHA-256
+  `90961b36d0d6e839f6d0c0b45b22fe76a1751b54f05454e2435810cff16f7756`.
 - Git-free artifact build reproduces the PDF and metadata exactly.
 
 ## Claim boundary

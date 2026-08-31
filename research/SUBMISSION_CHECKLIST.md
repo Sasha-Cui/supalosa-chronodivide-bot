@@ -28,7 +28,7 @@ Updated: **2026-08-30**
 - [x] Screenshots illustrate Peak activation, force clearance, final-building
       victory with surviving personnel, and an honest tick-cap failure.
 - [x] Identity-neutral generative-AI disclosure is included.
-- [x] SCITEPRESS build passes at 12 A4 pages and 35,465 characters.
+- [x] SCITEPRESS build passes at 12 A4 pages and 35,543 characters.
 - [x] All 12 pages were visually inspected; no actionable layout defect remains.
 
 ## Anonymous review artifact
@@ -43,7 +43,7 @@ Updated: **2026-08-30**
 - [x] A Git-free extraction reproduces the production PDF and portal metadata
       byte for byte.
 - [x] Frozen archive SHA-256 is
-      `9cf9509eb24871578d3b25ebb11667b83f1a809ddda72aa84bb7cf4df9520c34`.
+      `90961b36d0d6e839f6d0c0b45b22fe76a1751b54f05454e2435810cff16f7756`.
 
 ## Human actions before upload
 
