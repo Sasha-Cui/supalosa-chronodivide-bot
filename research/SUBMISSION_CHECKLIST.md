@@ -1,189 +1,74 @@
-# Submission freeze checklist
+# Final submission checklist
 
-Prepared: **2026-08-11**
+Updated: **2026-08-30**
 
-Use a private copy of this checklist for author names, emails, ORCIDs,
-conflicts, and submission credentials. Do not commit identifying metadata to
-the anonymous branch during review.
+## Empirical and claim freeze
 
-## Target and policy rulings
+- [x] HFO confirmation is 633W/24D/63L over 720 all-country, all-start,
+      both-slot games.
+- [x] HFO pooled Wilson lower bound is 85.78% and country-by-start lower bound
+      is 84.49%.
+- [x] Peak replication is 134W/14D/32L over 180 fresh cases versus
+      92W/16D/72L control; paired lower improvement is 0.167.
+- [x] Allied west, Soviet west, and bottom-retarget mechanisms have fresh
+      paired replications and outcome-free inactive-cell equality.
+- [x] RA2Web Advanced transfer is reported negatively: StrongBot 79/19/262
+      versus pinned Supalosa 178/30/152 on paired cases.
+- [x] All 15 deterministic frames follow the frozen selection/replay protocol.
+- [x] No claim introduces Chrono Divide, claims optimizer novelty, universal
+      dominance, or hides the Advanced failure.
+- [x] No further gameplay is required for this submission.
 
-- [ ] Exactly one archival target is selected by 2026-08-25; ICAART is the
-      operational primary candidate pending its four written rulings.
-- [ ] If SCAG is selected, its chairs confirm the application/evaluation
-      contribution is in scope.
-- [ ] If ICAART is selected, the secretariat confirms the author qualifies and
-      provides the procedure and confirmation timing for its publicly
-      documented exceptional remote route, and confirms that the standard
-      early Speaker fee (EUR 620 member / EUR 680 nonmember) applies.
-- [ ] If SCAG is selected, its chairs confirm fully remote presentation is
-      permitted.
-- [ ] If SCAG is selected, its chairs rule on the previously public named
-      repository under double-blind
-      review.
-- [ ] If ICAART is selected, the secretariat rules on the previously public
-      named implementation repository and any required visibility change.
-- [ ] The selected venue rules on the recorded beyond-copy-editing use of
-      OpenAI Codex and specifies any required disclosure and citation.
-- [x] Anonymous supplement and reviewer artifact together fit SCAG's official
-      10 MB supplementary-material field; every essential detail remains in
-      the main paper.
-- [ ] Deadline, timezone, page limit, review model, and registration requirement
-      reverified from the official call on the upload date.
-- [ ] Final PDF and portal fields are uploaded and downloaded for inspection
-      before the paper deadline; no post-deadline correction is assumed.
-- [ ] No simultaneous submission to an incompatible archival venue.
-- [ ] At the initial upload, archive the submitted identity and activate the
-      under-review confidentiality embargo: do not provide the manuscript,
-      confidential reviews, or rebuttal text to a public generative-AI service
-      until the official selection result.
-- [ ] Human author completes the evidence, citation, code, and line-by-line
-      verification in `HUMAN_AUTHOR_VERIFICATION_PACKET.md` under the policy in
-      `AUTHORSHIP_AND_AI_POLICY.md`; retain a private signed record tied to the
-      manuscript commit and PDF hash.
+## Manuscript and PDF
 
-## Frozen paper identity
+- [x] Title, 190-word abstract, keywords, and all eight sections are current.
+- [x] The literal all-building objective and resignation suppression are clear.
+- [x] Policy pseudocode and exact scoped mechanisms are described.
+- [x] Primary and stratum uncertainty is reported.
+- [x] Screenshots illustrate Peak activation, force clearance, final-building
+      victory with surviving personnel, and an honest tick-cap failure.
+- [x] Identity-neutral generative-AI disclosure is included.
+- [x] SCITEPRESS build passes at 12 A4 pages and 35,465 characters.
+- [x] All 12 pages were visually inspected; no actionable layout defect remains.
 
-- Title: **Leakage-Resistant Evaluation of Scripted RTS Agent Configuration in
-  Chrono Divide**
-- Anonymous manuscript source commit:
-  `ccc0c101de207a7100fd553e15efc4fa18108a35`
-- Main PDF: 18 pages total; non-reference material ends on page 15.
-- Main PDF SHA-256:
-  `efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3`
-- Supplement: 5 pages.
-- Supplement PDF SHA-256:
-  `7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56`
-- Deterministic anonymous artifact SHA-256:
-  `39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437`
-- Anonymous artifact size: 103,324 bytes; 60 immutable manifested files.
+## Anonymous review artifact
 
-These PDF hashes identify the current inspected build and will change when TeX
-metadata or source is rebuilt. After any accepted editorial change, update the
-commit and all three hashes together; never mix files from different freezes.
+- [x] Explicit allowlist excludes legacy paper sources and obsolete assets.
+- [x] No bot source, runtime, maps, MIX files, raw rows, or private logs are
+      packaged.
+- [x] One sanitized final evidence JSON regenerates all six TeX assets.
+- [x] Exactly 15 hash-verified frames are packaged.
+- [x] The 60-file manifest passes before and after regeneration.
+- [x] Two archive builds are byte-identical.
+- [x] A Git-free extraction reproduces the production PDF and portal metadata
+      byte for byte.
+- [x] Frozen archive SHA-256 is
+      `9cf9509eb24871578d3b25ebb11667b83f1a809ddda72aa84bb7cf4df9520c34`.
 
-## ICAART primary-candidate identity
+## Human actions before upload
 
-- [x] Separate SCITEPRESS source committed at
-      `e1b10b5e5648a3c4e7c032bbffcf01f098da682f`; the current reviewed source is
-      `ccc0c101de207a7100fd553e15efc4fa18108a35` and changes no frozen empirical
-      artifact.
-- [x] PDF is 11 A4 pages, with a 193-word expanded abstract and 39,210 extracted
-      non-whitespace characters.
-- [x] PDF SHA-256 is
-      `98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07`.
-- [x] Two pinned Bouchet builds are byte-identical; all 11 pages, metadata, fonts,
-      anonymity tokens, tables, plots, equations, and references were checked.
-- [x] ICAART reviewer assignment is frozen to **Agents** with the call topics
-      **Agent Models and Architectures**, **Simulation**, and **Task Planning
-      and Execution**, if those exact choices are offered in PRIMORIS.
-- [x] The PDF keywords are exactly **Game Artificial Intelligence**,
-      **Real-time Strategy Games**, **Scripted Agents**, **Algorithm
-      Configuration**, and **Reproducible Evaluation**.
-- [x] `make -C paper_scitepress metadata` deterministically exports the exact
-      plain-text portal title, expanded 193-word abstract, keywords, area, and
-      ordered topics with source hashes; no LaTeX macro needs manual expansion.
-- [x] Portal metadata JSON SHA-256 is
-      `285af4e101ea36d6e5190a3c0ceb5d4a52ded5e56f96210b1295360bb077e4ca`.
-- [x] `ICAART_REBUTTAL_EVIDENCE_PACKET.md` maps 12 likely objections to exact
-      pages, frozen aggregates, and claim boundaries without adding empirical
-      analysis or confidential review content.
-- [ ] Immediately before upload, verify the packet's four bound identities and
-      retain a private offline copy for human-only rebuttal preparation under
-      `AUTHORSHIP_AND_AI_POLICY.md`.
-- [ ] ICAART confirms author eligibility, request procedure, confirmation
-      timing, and use of the published standard Speaker fee for the documented
-      exceptional live-online route.
-- [ ] ICAART specifies whether the named code repository must be private during
-      review and whether prior public visibility affects eligibility.
-- [ ] ICAART specifies where the required AI acknowledgment and affected-
-      section system citation belong in the double-blind review version.
-- [ ] ICAART specifies whether PRIMORIS accepts the identity-neutral aggregate
-      artifact as a supplementary file or anonymous link, including any size
-      limit; if it does not, reviewer-facing prose does not imply access.
-- [ ] If ICAART is selected, apply only the approved disclosure and
-      claim-preserving edits, then repeat `SCITEPRESS_QA.md` before upload.
+- [ ] Select the exact ICAART 2027 submission stage and reverify its deadline
+      and AOE timezone on the upload date.
+- [ ] Obtain written confirmation for remote presentation if attendance is
+      required.
+- [ ] Ask the secretariat where the accurate generative-AI disclosure belongs
+      under double-blind review.
+- [ ] Decide how to handle the already public named repository during
+      double-blind review.
+- [ ] Prepare author names/order, affiliations, ORCIDs, funding, conflicts, and
+      corresponding-author details outside the anonymous repository.
+- [ ] Contact the Supalosa and Chrono Divide authors with the finished paper;
+      retain any release or citation guidance.
+- [ ] Obtain permission before publicly redistributing the combined bot or
+      game-derived image assets beyond the review process.
+- [ ] Upload the PDF and artifact, download both, and compare hashes/rendering.
+- [ ] Record submission ID, confirmation email, uploaded filenames, and hashes
+      in a private submission record.
 
-## Scientific consistency
+## Go/no-go
 
-- [x] Abstract, RQ1, results, and conclusion report champion-minus-reference as
-      the positive confirmatory claim.
-- [x] Abstract, RQ2, results, and conclusion report the failed absolute gate.
-- [x] Abstract, introduction, protocol, results, and conclusion explicitly
-      report that failure of the absolute gate also fails the frozen joint
-      two-gate criterion.
-- [x] Exactly 512 confirmatory games, 16 sealed families, and 256 games per
-      method are reported consistently.
-- [x] Improvement is 0.33594; family-clustered 95% CI is [0.21456, 0.45732].
-- [x] Champion score is 0.53516; one-sided lower margin above 0.5 is -0.02117.
-- [x] W/D/L counts are reference 1/100/155 and champion 47/180/29.
-- [x] Fourteen family effects are positive, two zero, and none negative.
-- [x] Component and terminal-state evidence is labeled post-confirmatory and
-      non-causal.
-- [x] No claim introduces Chrono Divide, a novel optimizer, reliable Supalosa
-      superiority, broad game-AI dominance, or a paradigm shift.
-- [x] The frozen generic reference is not described as StrongBot's shipped or
-      deployed map-profile-enabled default.
-- [x] The protocol explains why that deployed default is outside the shared
-      coordinate-free interface, and the limitations state that no deployed-
-      default improvement is estimated.
-- [x] No new outcome-bearing evidence from the opened family population has
-      been added.
-
-## Reproducibility and anonymity
-
-- [x] `make -C paper check main supplement` passes in a clean committed export.
-- [x] Anonymous artifact self-verifier checks all 60 immutable files and rejects
-      missing, changed, or unexpected entries.
-- [x] `python3 artifact/scripts/verify_frozen_archive.py` rebuilds the archive
-      from current source and rejects both source drift and a stale ignored
-      distribution file against `artifact/FROZEN_IDENTITY.json`.
-- [x] A fresh Git-free extraction on an independent macOS toolchain passed all
-      22 then-packaged tests and rebuilt the 18-page paper, 5-page supplement, and
-      exact 11-page SCITEPRESS candidate without actionable warnings.
-- [x] A second fresh Git-free extraction using the production Python and TeX
-      toolchain verifies the manifest before and after regeneration and
-      reproduces all three production PDF hashes exactly; see
-      `ARTIFACT_CLEANROOM_REPRODUCTION.md`.
-- [x] Main, supplement, and SCITEPRESS PDFs have been rendered after the last
-      edit; no clipping, overlap, invisible text, or illegible plot label.
-- [x] No author name, NetID, institution, scheduler account, private path,
-      personal email, or named repository URL appears in review files.
-- [x] PDF metadata and archive member metadata are checked separately from
-      visible text; PDF author/title fields are empty and archive ownership and
-      timestamps are normalized.
-- [ ] Submission-system fields are checked separately at upload time.
-- [ ] Any required generative-AI disclosure is accurate, venue-approved, and
-      does not falsely characterize the recorded assistance as copy editing.
-- [ ] The submitted archive hash matches the retained local archive exactly.
-
-## Rights and release boundary
-
-- [x] Anonymous artifact contains no StrongBot/Supalosa bot packages, maps, MIX
-      archives, Chrono Divide runtime, Red Alert 2 assets, or private raw logs.
-- [x] `THIRD_PARTY.md` accompanies the artifact.
-- [ ] Supalosa's written permission/license is retained before any public
-      redistribution of the combined bot.
-- [ ] Chrono Divide acquisition, version, citation, and permitted redistribution
-      language follow the maintainer's written guidance.
-- [x] Public code/data availability statements distinguish aggregate
-      reproducibility from full match replay.
-
-## Human review and upload
-
-- [ ] Independent cold reader completed
-      [`EXTERNAL_REVIEW_PACKET.md`](EXTERNAL_REVIEW_PACKET.md).
-- [ ] Reader completed and timestamped the unprimed venue-style review before
-      receiving the targeted comprehension questions.
-- [ ] Reader identified the principal relative claim, failed absolute endpoint,
-      and non-novel environment/optimizer framing without coaching; all four
-      core boundaries were correct after the separate comprehension audit.
-- [x] A separate visual/caption pass found no misleading standalone element.
-- [ ] Author list/order, affiliations, acknowledgements, funding, conflicts,
-      and corresponding-author details are prepared privately; title, abstract,
-      keywords, area, and topics match `ICAART_REVIEWER_ASSIGNMENT_AUDIT.md`
-      if ICAART is selected.
-- [ ] Uploaded files were downloaded from the venue and compared with the local
-      hashes/rendering.
-- [ ] Submission ID, confirmation email, exact uploaded files, hashes, and chair
-      rulings are stored in the private submission record.
+**Go for a lower-tier agent/game-AI venue or workshop, subject to the human
+policy and rights checks above.** The paper now has two positive map results,
+replicated mechanisms, literal-objective evaluation, uncertainty, deterministic
+visual evidence, and a candid cross-opponent failure. It should not be sold as
+a paradigm shift or a generally robust learned agent.
