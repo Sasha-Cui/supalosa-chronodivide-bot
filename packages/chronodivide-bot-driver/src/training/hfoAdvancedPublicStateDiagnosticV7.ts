@@ -20,6 +20,8 @@ const BASELINE_COMMIT = "165b77a71d0cf5ebd27c65b19d0486bcbae78d0f";
 const ADVANCED_SHA256 = "81d8797b6dd1371ba2dcbd79e25df8b42254290c820159e121a82650fd97a143";
 export const V7_LEGACY_SELECTION_SHA256 =
     "9e2945997fe49d8f8677acc8287b416408f19e2a4175bd7ff2a53e86fc5b8402" as const;
+export const V7_ORIGINAL_PROTOCOL_SHA256 =
+    "436759ec7aea62744a378f480434399e58c5aff96b0576f33a48e9126eb5be3c" as const;
 const SHA256 = /^[0-9a-f]{64}$/;
 const WEST = "39,82", EAST = "151,119";
 const SNAPSHOT_INTERVAL = 300, SNAPSHOT_HORIZON = 30_000, MAX_UPDATES = 90_000;
@@ -345,7 +347,7 @@ const loadV7Selection = (file: string, hash: string, inputs: ReturnType<typeof c
     if (sha256File(file) !== hash) throw new Error("V7 selection hash drifted");
     const value = JSON.parse(fs.readFileSync(file, "utf8"));
     if (value.kind !== "hfo-advanced-v7-development-selection" || value.complete !== true || value.passed !== true ||
-        value.outcomeFree !== true || value.updateCount !== 0 || value.protocolSha256 !== inputs.protocolSha256 ||
+        value.outcomeFree !== true || value.updateCount !== 0 || value.protocolSha256 !== V7_ORIGINAL_PROTOCOL_SHA256 ||
         value.assetManifestSha256 !== inputs.assetManifestSha256 || value.legacySelectionSha256 !== V7_LEGACY_SELECTION_SHA256 ||
         value.baselineCommit !== BASELINE_COMMIT || value.ra2webClientCommit !== RA2WEB_CLIENT_COMMIT ||
         value.ra2webClientReleaseId !== RA2WEB_CLIENT_RELEASE_ID || value.freezeManifestSha256 !== RA2WEB_FREEZE_MANIFEST_SHA256 ||
