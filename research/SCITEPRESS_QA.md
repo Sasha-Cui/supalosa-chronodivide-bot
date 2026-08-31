@@ -5,16 +5,16 @@ Prepared: **2026-08-30**
 ## Frozen candidate
 
 - Title: **StrongBot: Auditable Map-Profiled RTS Agent Development in Chrono Divide**.
-- Reviewed source commit: `aebbf4e56c9c31728e5c480d6915bf0bba64d269`.
+- Reviewed source commit: `6388f1a4243801f6b79d780844327c831a4290f4`.
 - Final evidence artifact SHA-256:
   `0670bdeefab47ca68fb5fc584be6a299e777ee0d69f04cd45de7caebf32c31e3`.
-- PDF: 12 A4 pages; 1,357,220 bytes.
+- PDF: 12 A4 pages; 1,359,280 bytes.
 - PDF SHA-256:
-  `345b6bfc2b07f0f5ce18f2f0ae3816d76f58999494db90fbfb61e0c6af25abb4`.
+  `b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77`.
 - Portal metadata SHA-256:
   `ec0c2877d3921978e4d460c41ada94fe2a774d60d5a22ad8946eea728bb3fd8d`.
 - Expanded abstract: 190 words.
-- Poppler 25 extracted length: 35,543 non-whitespace characters.
+- Poppler 25 extracted length: 36,004 non-whitespace characters.
 - Fonts: seven, all embedded with Unicode maps.
 
 The PDF is a deterministic build product and is not tracked in Git. These hashes
@@ -32,7 +32,9 @@ python3 -m unittest \
 make -C paper_scitepress submission-check
 ```
 
-passed. The checks enforce:
+passed. The complete research discovery suite also passed 143/143 tests after
+the citation, venue-policy, cold-review, and frozen-identity controls were
+updated. The checks enforce:
 
 - the immutable final evidence hash and all primary HFO, Peak, mechanism,
   Advanced, and frame values;
@@ -55,7 +57,9 @@ tactics/limitation panel, policy pseudocode, all five tables, the uncertainty
 plot, the AI disclosure, conclusion, and complete bibliography. No text or
 figure is clipped, invisible, overlapped, or outside the page. The final
 anonymity edit changed only the allocation wording and retained the inspected
-12-page layout.
+12-page layout. The added paired/country-start inference paragraph on page 5
+was inspected at original resolution; its notation and column transition are
+legible.
 
 ## Claim and anonymity boundary
 

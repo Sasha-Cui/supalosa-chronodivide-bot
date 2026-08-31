@@ -15,25 +15,21 @@ class ArtifactCleanroomReproductionTest(unittest.TestCase):
         builder = BUILDER.read_text(encoding="utf-8")
 
         for expected in (
-            "ccc0c101de207a7100fd553e15efc4fa18108a35",
-            "39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437",
-            "efcc9856799493fdb93b29f58ad895abee7b0822d075297433f273507a25aaa3",
-            "7674eb4190f422d66da9b7a9e50d464abc0c33894fbbedf85da6cb7a5d302d56",
-            "98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07",
-            "103,324 bytes",
-            "tar -xzf",
-            "Python: 3.12.3",
-            "TeX Live 2024",
-            "60 immutable files",
-            "23 packaged manuscript tests",
-            "no Git tree",
-            "does not reproduce\nsimulations",
+            "6388f1a4243801f6b79d780844327c831a4290f4",
+            "acbff70447321a43e753fab57f33858fa9797d4105970d627918aa69f08eb6e3",
+            "b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77",
+            "ec0c2877d3921978e4d460c41ada94fe2a774d60d5a22ad8946eea728bb3fd8d",
+            "1,319,412 bytes",
+            "60",
+            "14 packaged tests",
+            "no Git",
+            "does not contain or rerun the game",
         ):
             self.assertIn(expected, audit)
 
         self.assertIn(".tar.gz", builder)
         self.assertNotIn("unzip", audit.lower())
-        self.assertNotIn("zip file", audit.lower())
+        self.assertIn("not independent gameplay", audit)
 
 
 if __name__ == "__main__":

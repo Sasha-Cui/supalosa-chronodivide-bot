@@ -28,7 +28,8 @@ Updated: **2026-08-30**
 - [x] Screenshots illustrate Peak activation, force clearance, final-building
       victory with surviving personnel, and an honest tick-cap failure.
 - [x] Identity-neutral generative-AI disclosure is included.
-- [x] SCITEPRESS build passes at 12 A4 pages and 35,543 characters.
+- [x] Automated citation audit covers all 30 cited sources at 34 placements.
+- [x] SCITEPRESS build passes at 12 A4 pages and 36,004 characters.
 - [x] All 12 pages were visually inspected; no actionable layout defect remains.
 
 ## Anonymous review artifact
@@ -43,7 +44,7 @@ Updated: **2026-08-30**
 - [x] A Git-free extraction reproduces the production PDF and portal metadata
       byte for byte.
 - [x] Frozen archive SHA-256 is
-      `90961b36d0d6e839f6d0c0b45b22fe76a1751b54f05454e2435810cff16f7756`.
+      `acbff70447321a43e753fab57f33858fa9797d4105970d627918aa69f08eb6e3`.
 
 ## Human actions before upload
 
@@ -55,6 +56,9 @@ Updated: **2026-08-30**
       under double-blind review.
 - [ ] Decide how to handle the already public named repository during
       double-blind review.
+- [ ] Complete a private copy of HUMAN_AUTHOR_VERIFICATION_PACKET.md,
+      including primary-source reading and independent numerical checks.
+- [ ] Complete and lock the unprimed external cold read.
 - [ ] Prepare author names/order, affiliations, ORCIDs, funding, conflicts, and
       corresponding-author details outside the anonymous repository.
 - [ ] Contact the Supalosa and Chrono Divide authors with the finished paper;
