@@ -34,9 +34,11 @@ No simulation is active or required for the current paper.
    - PDF and Git-free artifact QA.
 8. [`SUBMISSION_CHECKLIST.md`](SUBMISSION_CHECKLIST.md) - remaining human
    venue, rights, and upload actions.
-9. [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) - append-only experiment/job
+9. [`ICAART_UPLOAD_BUNDLE.md`](ICAART_UPLOAD_BUNDLE.md) - deterministic
+   staging of the exact PDF, portal metadata, and optional artifact.
+10. [`RESULT_REGISTRY.tsv`](RESULT_REGISTRY.tsv) - append-only experiment/job
    registry.
-10. [`FORENSIC_AUDIT.md`](FORENSIC_AUDIT.md) - original project reconstruction.
+11. [`FORENSIC_AUDIT.md`](FORENSIC_AUDIT.md) - original project reconstruction.
 
 ## Repository layout
 

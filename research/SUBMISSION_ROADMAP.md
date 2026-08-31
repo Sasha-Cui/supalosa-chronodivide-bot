@@ -55,6 +55,9 @@ Exit: successful dry run with no anonymity leak and a documented remote route.
   and final anonymity scan.
 - Compare final PDF and archive hashes with `SCITEPRESS_QA.md` and
   `FROZEN_IDENTITY.json`.
+- Run `python3 research/scripts/build_icaart_upload_bundle.py --replace` and
+  upload only the separately named files authorized by
+  `ICAART_UPLOAD_BUNDLE.md`.
 - Upload before the last day when practical.
 - Download the venue copies and compare hashes, page count, rendering, title,
   abstract, keywords, and anonymous author block.
