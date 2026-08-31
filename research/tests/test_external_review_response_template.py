@@ -15,8 +15,8 @@ class ExternalReviewResponseTemplateTest(unittest.TestCase):
         self.assertNotIn("[x]", template.lower())
 
         for digest in (
-            "4e2ba4eb599ffd37fec5d0f5da620c20dca80fa5",
-            "4b6a2d17bf20c77c46ab4f6c0f010648edcb226862008dbc386fc69a18b62e9b",
+            "75cdf7a68763007e45c737ee1773aad1cc71ded1",
+            "628482e622a19700d56de5516e2f91ea1b74c48705a879a78d6b3c77ea91f7fc",
         ):
             self.assertIn(digest, template)
 

@@ -10,9 +10,9 @@ replication and does not authorize new gameplay.
 
 | Candidate | Reviewed source | PDF SHA-256 |
 | --- | --- | --- |
-| SCITEPRESS / ICAART | `4e2ba4eb599ffd37fec5d0f5da620c20dca80fa5` | `4b6a2d17bf20c77c46ab4f6c0f010648edcb226862008dbc386fc69a18b62e9b` |
+| SCITEPRESS / ICAART | `75cdf7a68763007e45c737ee1773aad1cc71ded1` | `628482e622a19700d56de5516e2f91ea1b74c48705a879a78d6b3c77ea91f7fc` |
 
-The deterministic two-member Phase-A ZIP is 1,360,121 bytes with SHA-256 `8cc0154f0d1dae1b979fed17e6fa4bdd1a672a4050875a610c7f32282c8b989a`.
+The deterministic two-member Phase-A ZIP is 1,360,127 bytes with SHA-256 `04fa0ce37d80ec1ed66dbe08423a0eedfc76e1b3863f734dd24b04eb1d0b3b58`.
 
 Build the unprimed deterministic handoff with:
 

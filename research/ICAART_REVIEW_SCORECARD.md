@@ -4,7 +4,7 @@ Reviewed: **2026-08-30**
 
 This is an internal adversarial audit of the final anonymous candidate, not an
 independent review or acceptance guarantee. Bound PDF SHA-256:
-`4b6a2d17bf20c77c46ab4f6c0f010648edcb226862008dbc386fc69a18b62e9b`.
+`628482e622a19700d56de5516e2f91ea1b74c48705a879a78d6b3c77ea91f7fc`.
 
 ## Criterion assessment
 

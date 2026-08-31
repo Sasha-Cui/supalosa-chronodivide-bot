@@ -12,9 +12,9 @@ eight proceedings pages.
 
 Controlling review source:
 
-- source commit: `4e2ba4eb599ffd37fec5d0f5da620c20dca80fa5`;
+- source commit: `75cdf7a68763007e45c737ee1773aad1cc71ded1`;
 - PDF SHA-256:
-  `4b6a2d17bf20c77c46ab4f6c0f010648edcb226862008dbc386fc69a18b62e9b`;
+  `628482e622a19700d56de5516e2f91ea1b74c48705a879a78d6b3c77ea91f7fc`;
 - 12 A4 pages, 36,004 non-whitespace characters, 190-word abstract.
 
 Do not shorten the review submission preemptively. The full paper uses its

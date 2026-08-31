@@ -43,8 +43,10 @@ Updated: **2026-08-30**
 - [x] Two archive builds are byte-identical.
 - [x] A Git-free extraction reproduces the production PDF and portal metadata
       byte for byte.
+- [x] Deterministic upload staging verifies and separates the PDF, portal
+      metadata, and conditionally allowed reviewer artifact.
 - [x] Frozen archive SHA-256 is
-      `c72719f869e3d26183b3615398dd4e82412a02aff2c16893083c60dec368e741`.
+      `d0e49b55bc76d5d5c103378b23cbc374a9a93353e1380e0283b54421e7d249c4`.
 
 ## Human actions before upload
 

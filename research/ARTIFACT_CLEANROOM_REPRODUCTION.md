@@ -4,11 +4,11 @@ Completed: **2026-08-30**
 
 ## Frozen archive identity
 
-- Reviewed source commit: `4e2ba4eb599ffd37fec5d0f5da620c20dca80fa5`.
+- Reviewed source commit: `75cdf7a68763007e45c737ee1773aad1cc71ded1`.
 - Archive: `chrono-divide-review-artifact.tar.gz`.
-- Size: 1,319,395 bytes.
+- Size: 1,319,409 bytes.
 - SHA-256:
-  `c72719f869e3d26183b3615398dd4e82412a02aff2c16893083c60dec368e741`.
+  `d0e49b55bc76d5d5c103378b23cbc374a9a93353e1380e0283b54421e7d249c4`.
 - Immutable files: 60.
 - Archive members including directories and manifest: 74.
 - Sanitized evidence SHA-256:
@@ -40,7 +40,7 @@ fonts.
 ## Reproduced outputs
 
 - SCITEPRESS PDF SHA-256:
-  `4b6a2d17bf20c77c46ab4f6c0f010648edcb226862008dbc386fc69a18b62e9b`.
+  `628482e622a19700d56de5516e2f91ea1b74c48705a879a78d6b3c77ea91f7fc`.
 - Submission metadata SHA-256:
   `cc8f656f8ccca9fab1a614d40a80368e0bec08bcfd6fc5dee07b69edb475d127`.
 

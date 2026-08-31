@@ -5,12 +5,12 @@ Prepared: **2026-08-30**
 ## Frozen candidate
 
 - Title: **StrongBot: Auditable Map-Profiled RTS Agent Development in Chrono Divide**.
-- Reviewed source commit: `4e2ba4eb599ffd37fec5d0f5da620c20dca80fa5`.
+- Reviewed source commit: `75cdf7a68763007e45c737ee1773aad1cc71ded1`.
 - Final evidence artifact SHA-256:
   `0670bdeefab47ca68fb5fc584be6a299e777ee0d69f04cd45de7caebf32c31e3`.
-- PDF: 12 A4 pages; 1,359,295 bytes.
+- PDF: 12 A4 pages; 1,359,301 bytes.
 - PDF SHA-256:
-  `4b6a2d17bf20c77c46ab4f6c0f010648edcb226862008dbc386fc69a18b62e9b`.
+  `628482e622a19700d56de5516e2f91ea1b74c48705a879a78d6b3c77ea91f7fc`.
 - Portal metadata SHA-256:
   `cc8f656f8ccca9fab1a614d40a80368e0bec08bcfd6fc5dee07b69edb475d127`.
 - Expanded abstract: 190 words.
@@ -32,8 +32,9 @@ python3 -m unittest \
 make -C paper_scitepress submission-check
 ```
 
-passed. The complete research discovery suite passed 143/143 tests in three
-consecutive final runs after the citation, venue-policy, cold-review, and
+passed. The complete research discovery suite passed 146/146 tests after
+adding the upload-staging controls; the preceding 143-test suite also passed
+three consecutive runs after the citation, venue-policy, cold-review, and
 frozen-identity controls were updated. The checks enforce:
 
 - the immutable final evidence hash and all primary HFO, Peak, mechanism,
