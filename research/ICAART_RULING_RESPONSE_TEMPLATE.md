@@ -9,10 +9,10 @@ a private submission record before use.
 
 | Item | Frozen identity |
 | --- | --- |
-| Reviewed source | `6388f1a4243801f6b79d780844327c831a4290f4` |
-| ICAART PDF | `b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77` |
-| Anonymous artifact | `acbff70447321a43e753fab57f33858fa9797d4105970d627918aa69f08eb6e3` |
-| Portal metadata | `ec0c2877d3921978e4d460c41ada94fe2a774d60d5a22ad8946eea728bb3fd8d` |
+| Reviewed source | `4e2ba4eb599ffd37fec5d0f5da620c20dca80fa5` |
+| ICAART PDF | `4b6a2d17bf20c77c46ab4f6c0f010648edcb226862008dbc386fc69a18b62e9b` |
+| Anonymous artifact | `c72719f869e3d26183b3615398dd4e82412a02aff2c16893083c60dec368e741` |
+| Portal metadata | `cc8f656f8ccca9fab1a614d40a80368e0bec08bcfd6fc5dee07b69edb475d127` |
 
 ## Outbound record
 

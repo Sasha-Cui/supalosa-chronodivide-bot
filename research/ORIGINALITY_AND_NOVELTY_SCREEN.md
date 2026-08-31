@@ -5,8 +5,8 @@ Verified: **2026-08-30**
 ## Scope and candidate identity
 
 This bounded machine-assisted screen covers reviewed source
-`6388f1a4243801f6b79d780844327c831a4290f4` and PDF SHA-256
-`b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77`.
+`4e2ba4eb599ffd37fec5d0f5da620c20dca80fa5` and PDF SHA-256
+`4b6a2d17bf20c77c46ab4f6c0f010648edcb226862008dbc386fc69a18b62e9b`.
 
 It asks whether a closer public precedent changes the paper's novelty boundary
 and whether distinctive phrases have an unexplained external verbatim match.

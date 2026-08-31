@@ -46,9 +46,9 @@ class HumanAuthorVerificationPacketTest(unittest.TestCase):
             self.assertIn(heading, packet)
 
         for identity in (
-            "6388f1a4243801f6b79d780844327c831a4290f4",
-            "b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77",
-            "acbff70447321a43e753fab57f33858fa9797d4105970d627918aa69f08eb6e3",
+            "4e2ba4eb599ffd37fec5d0f5da620c20dca80fa5",
+            "4b6a2d17bf20c77c46ab4f6c0f010648edcb226862008dbc386fc69a18b62e9b",
+            "c72719f869e3d26183b3615398dd4e82412a02aff2c16893083c60dec368e741",
         ):
             self.assertIn(identity, packet)
 

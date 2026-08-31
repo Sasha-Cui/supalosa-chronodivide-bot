@@ -44,7 +44,7 @@ Updated: **2026-08-30**
 - [x] A Git-free extraction reproduces the production PDF and portal metadata
       byte for byte.
 - [x] Frozen archive SHA-256 is
-      `acbff70447321a43e753fab57f33858fa9797d4105970d627918aa69f08eb6e3`.
+      `c72719f869e3d26183b3615398dd4e82412a02aff2c16893083c60dec368e741`.
 
 ## Human actions before upload
 

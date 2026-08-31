@@ -7,8 +7,8 @@ Verified: **2026-08-30**
 This is a proposition-level precheck of the 30 bibliography keys used at 34
 key-by-citation placements in the eight final manuscript sections. It is bound
 to reviewed source
-`6388f1a4243801f6b79d780844327c831a4290f4` and SCITEPRESS PDF SHA-256
-`b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77`.
+`4e2ba4eb599ffd37fec5d0f5da620c20dca80fa5` and SCITEPRESS PDF SHA-256
+`4b6a2d17bf20c77c46ab4f6c0f010648edcb226862008dbc386fc69a18b62e9b`.
 
 The check compares each cited proposition with a primary paper, publisher
 record, official project/package page, or pinned repository. It **does not

@@ -16,7 +16,7 @@ It sends no message and authorizes no upload or payment.
 | Generative-AI use | responsible writing/code/figure use is permitted with tool/content disclosure and human accountability | blind-review disclosure location and citation coverage |
 | Under-review AI confidentiality | a manuscript under review must not be processed through a public AI platform | apply embargo at initial upload |
 | Double blind | author identity, personal details, acknowledgments, and identifying references must be omitted | handling of previously public named code repository |
-| Reviewer artifact | complete-paper page does not publish an attachment/link route | whether the 1,319,412-byte anonymous artifact may be supplied |
+| Reviewer artifact | complete-paper page does not publish an attachment/link route | whether the 1,319,395-byte anonymous artifact may be supplied |
 | Replacement cutoff | papers may be replaced before the deadline; no updates are accepted after that | upload and inspect early |
 
 ## Remote route
@@ -49,7 +49,7 @@ eligibility. Obtain a written ruling before changing visibility.
 
 ## Reviewer artifact
 
-The current identity-neutral tar.gz is 1,319,412 bytes and contains 60
+The current identity-neutral tar.gz is 1,319,395 bytes and contains 60
 manifested files. It excludes bot packages, maps, runtimes, raw rows, and
 private logs. This readiness does not imply ICAART accepts supplementary
 artifacts; ask for the exact PRIMORIS attachment or anonymous-link route. A

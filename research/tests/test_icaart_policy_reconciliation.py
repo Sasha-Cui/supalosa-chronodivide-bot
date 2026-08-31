@@ -27,7 +27,7 @@ class IcaartPolicyReconciliationTest(unittest.TestCase):
             self.assertIn("2027-02-23 through 2027-02-25", document)
             self.assertIn("remot", document.lower())
 
-        self.assertIn("1,319,412-byte", reconciliation)
+        self.assertIn("1,319,395-byte", reconciliation)
         self.assertIn("no updates are accepted after that", reconciliation)
         self.assertIn("public generative-AI", reconciliation)
         self.assertIn("under review", reconciliation)

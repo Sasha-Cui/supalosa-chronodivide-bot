@@ -35,9 +35,9 @@ country, start, faction side, and participant slot.
 - SCITEPRESS candidate: 12 A4 pages, 190-word abstract, 36,004
   non-whitespace characters.
 - PDF SHA-256:
-  `b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77`.
-- Anonymous artifact: 60 immutable files, 1,319,412 bytes, SHA-256
-  `acbff70447321a43e753fab57f33858fa9797d4105970d627918aa69f08eb6e3`.
+  `4b6a2d17bf20c77c46ab4f6c0f010648edcb226862008dbc386fc69a18b62e9b`.
+- Anonymous artifact: 60 immutable files, 1,319,395 bytes, SHA-256
+  `c72719f869e3d26183b3615398dd4e82412a02aff2c16893083c60dec368e741`.
 - Git-free artifact build reproduces the PDF and metadata exactly.
 
 ## Claim boundary
