@@ -21,7 +21,8 @@ Suggested recipient: `icaart.secretariat@insticc.org`.
 > exceptionally present remotely, and the presentation page documents live
 > Zoom sessions. I will be unable to attend physically. What procedure and
 > timing apply to the remote-presentation exception, and must approval be
-> obtained before submission or only before registration?
+> obtained before submission or only before registration? Please also confirm
+> the registration category and fee for an approved remote presenter.
 >
 > I would also appreciate guidance on three double-blind issues:
 >
@@ -32,6 +33,15 @@ Suggested recipient: `icaart.secretariat@insticc.org`.
 >    official Codex page. Is that acceptable for review, given that the
 >    guidelines request disclosure in acknowledgments but also require
 >    acknowledgments to be omitted for double blind?
+>
+>    Proposed review-version disclosure: "OpenAI Codex was used under the
+>    author's direction to inspect code, implement and test research
+>    infrastructure, orchestrate prespecified cluster campaigns, reduce
+>    immutable evidence, and assist with manuscript drafting and figure
+>    assembly. The human author chose the research questions and protocols,
+>    reviewed the code and empirical interpretations, and remains responsible
+>    for every claim." The paper cites the official Codex page. Please approve
+>    or amend this wording, placement, and citation coverage.
 > 2. The anonymous paper has not been posted, but a named development
 >    repository has previously been public. Must it be private during review,
 >    and does prior code visibility affect eligibility?

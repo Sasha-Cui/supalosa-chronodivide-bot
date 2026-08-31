@@ -14,10 +14,11 @@ evaluation study. It is not being positioned as a flagship ML paper.
 - First camera-ready/registration: **2026-11-27**.
 - Second regular/position-paper deadline: **2026-10-22 AOE**.
 - Workshop/special-session paper deadline: **2026-12-03 AOE**.
+- Conference: **2027-02-23 through 2027-02-25**, Valletta, Malta.
 - Review format: double blind, 10,000--50,000 non-whitespace characters.
 - Acceptance format: up to 12 pages for a full paper or 8 pages for a short
   paper.
-- Current candidate: 12 pages, 35,543 characters, 190-word abstract.
+- Current candidate: 12 pages, 36,004 characters, 190-word abstract.
 
 Official sources:
 

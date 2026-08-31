@@ -12,8 +12,8 @@ class IcaartRulingResponseTemplateTest(unittest.TestCase):
     def test_template_remains_blank_and_decision_complete(self) -> None:
         template = TEMPLATE.read_text(encoding="utf-8")
         self.assertIn(
-            "no inquiry has been sent and no ruling\nhas been received",
-            template,
+            "no inquiry has been sent and no ruling has been received",
+            " ".join(template.split()),
         )
         self.assertNotIn("[x]", template.lower())
 
@@ -24,7 +24,6 @@ class IcaartRulingResponseTemplateTest(unittest.TestCase):
             "Reviewer artifact",
             "Overall venue decision",
             "Minimal follow-up for an incomplete reply",
-            "Optional SPIKE special-session fallback",
         ):
             self.assertIn(heading, template)
 
@@ -37,29 +36,19 @@ class IcaartRulingResponseTemplateTest(unittest.TestCase):
             self.assertIn(status, template)
 
         for digest in (
-            "ccc0c101de207a7100fd553e15efc4fa18108a35",
-            "98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07",
-            "39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437",
-            "285af4e101ea36d6e5190a3c0ceb5d4a52ded5e56f96210b1295360bb077e4ca",
+            "6388f1a4243801f6b79d780844327c831a4290f4",
+            "b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77",
+            "acbff70447321a43e753fab57f33858fa9797d4105970d627918aa69f08eb6e3",
+            "ec0c2877d3921978e4d460c41ada94fe2a774d60d5a22ad8946eea728bb3fd8d",
         ):
             self.assertIn(digest, template)
 
         contacts = (ROOT / "research" / "CONTACT_TEMPLATES.md").read_text(
             encoding="utf-8"
         )
-        self.assertIn("Proposed review-version", contacts)
-        self.assertIn("EUR 620", contacts)
+        self.assertIn("Proposed review-version disclosure", contacts)
+        self.assertIn("registration", contacts.lower())
         self.assertIn("Proposed review-version wording approved", template)
-        self.assertIn("Optional ICAART SPIKE fallback inquiry", contacts)
-        self.assertIn("no simultaneous", contacts)
-
-        strategy = (ROOT / "research" / "VENUE_STRATEGY.md").read_text(
-            encoding="utf-8"
-        )
-        self.assertIn("scope unresolved", strategy)
-        self.assertIn(
-            "https://icaart.scitevents.org/SPIKE.aspx?y=2027", strategy
-        )
 
 
 if __name__ == "__main__":

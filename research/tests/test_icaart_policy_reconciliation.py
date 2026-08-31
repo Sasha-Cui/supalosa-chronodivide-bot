@@ -21,23 +21,19 @@ class IcaartPolicyReconciliationTest(unittest.TestCase):
         checklist = (ROOT / "research" / "SUBMISSION_CHECKLIST.md").read_text(
             encoding="utf-8"
         )
-        authorship = (ROOT / "research" / "AUTHORSHIP_AND_AI_POLICY.md").read_text(
-            encoding="utf-8"
-        )
 
-        self.assertIn("2027-02-23 through 2027-02-25", reconciliation)
-        self.assertIn("2027-02-23 through 2027-02-25", strategy)
-        self.assertNotIn("2027-02-23 through 2027-02-26", strategy)
-        self.assertIn("103,324-byte", reconciliation)
-        self.assertNotIn("100,837-byte", reconciliation)
-        self.assertIn("EUR 620", reconciliation)
+        for document in (reconciliation, strategy):
+            self.assertIn("2026-09-15", document)
+            self.assertIn("2027-02-23 through 2027-02-25", document)
+            self.assertIn("remot", document.lower())
+
+        self.assertIn("1,319,412-byte", reconciliation)
         self.assertIn("no updates are accepted after that", reconciliation)
-        self.assertIn("visually validated at 11\npages", roadmap)
-
-        for document in (reconciliation, strategy, checklist, authorship):
-            self.assertIn("under-review", document.lower())
-            self.assertIn("public", document.lower())
-            self.assertIn("generative-ai", document.lower())
+        self.assertIn("public generative-AI", reconciliation)
+        self.assertIn("under review", reconciliation)
+        self.assertIn("11--15 September", roadmap)
+        self.assertIn("remote", checklist.lower())
+        self.assertIn("generative-AI disclosure", checklist)
 
 
 if __name__ == "__main__":

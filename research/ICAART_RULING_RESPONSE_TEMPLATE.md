@@ -1,183 +1,92 @@
 # ICAART ruling response template
 
-Prepared: **2026-08-11**
+Status: **blank private-copy template; no inquiry has been sent and no ruling has been received**.
 
-Status: **blank private-copy template; no inquiry has been sent and no ruling
-has been received**.
-
-Do not add author names, email addresses, message headers, signatures, or
-private correspondence to this tracked file. Copy it to the private submission
-record before use.
+Do not add author identity or correspondence to this tracked file. Copy it to
+a private submission record before use.
 
 ## Evidence identity
 
 | Item | Frozen identity |
 | --- | --- |
-| Reviewed submission source | `ccc0c101de207a7100fd553e15efc4fa18108a35` |
-| ICAART PDF SHA-256 | `98500e11d7ccaa6d1c0f88f2e741b499737124cdac1565190379029bc82c4c07` |
-| Aggregate artifact SHA-256 | `39f761b1cb0b9fe587b197be9151e63f0ee1368b883cbf541f2bb86c33ea5437` |
-| Portal metadata SHA-256 | `285af4e101ea36d6e5190a3c0ceb5d4a52ded5e56f96210b1295360bb077e4ca` |
+| Reviewed source | `6388f1a4243801f6b79d780844327c831a4290f4` |
+| ICAART PDF | `b832744aa64b790044c706f3c64c797f6674b4e5549b48dc88dd49858de0cb77` |
+| Anonymous artifact | `acbff70447321a43e753fab57f33858fa9797d4105970d627918aa69f08eb6e3` |
+| Portal metadata | `ec0c2877d3921978e4d460c41ada94fe2a774d60d5a22ad8946eea728bb3fd8d` |
 
 ## Outbound record
-
-Complete these fields privately from the actual sent message:
 
 | Field | Private record |
 | --- | --- |
 | Recipient | `icaart.secretariat@insticc.org` |
-| Subject | ICAART 2027: remote, anonymity, AI disclosure, and reviewer artifact |
-| Sent timestamp and timezone | |
-| Full sent-message SHA-256 | |
-| Sender account retained | yes / no |
+| Subject | ICAART 2027 regular paper: remote presentation, AI disclosure, and anonymous artifact |
+| Sent timestamp/timezone | |
+| Sent-message SHA-256 | |
 | Delivery confirmation retained | yes / no |
-| Anonymous manuscript attached | no / requested by venue / other |
+| Manuscript attached | no / requested / other |
 
-Use the exact ICAART draft in `CONTACT_TEMPLATES.md`. If any sentence changes
-before sending, retain the actual message and hash that version; this template
-must not imply that an unsent draft was the correspondence.
-
-## Ruling extraction
-
-Copy the reply verbatim into the private record, then extract answers without
-strengthening ambiguous language.
-
-### 1. Exceptional remote presentation
+## 1. Exceptional remote presentation
 
 | Required fact | Venue answer |
 | --- | --- |
-| This author may use the exceptional remote route | yes / no / conditional / unresolved |
+| Author may use remote route | yes / no / conditional / unresolved |
 | Request procedure | |
-| Approval timing | before submission / after acceptance / other / unresolved |
-| Public default | `Speaker`; early fee EUR 620 member / EUR 680 nonmember |
-| Approved remote presentation uses that default | yes / no / other / unresolved |
-| Fee and registration deadline | |
-| Synchronous attendance requirements | |
+| Approval timing | |
+| Registration class/fee | |
+| Synchronous attendance | |
 
-Decision:
-
-- **workable** only if eligibility and a definite approval procedure are
-  stated;
-- **follow up** if the reply merely links the public online-presentation page
-  without addressing eligibility, procedure, or fee class;
-- **ICAART no-go** if travel is required or remote approval cannot be known
-  before an irreversible payment/registration commitment.
-
-### 2. Previously public named repository
+## 2. Previously public named repository
 
 | Required fact | Venue answer |
 | --- | --- |
-| Prior visibility affects eligibility | no / yes / unresolved |
-| Repository may remain public during review | yes / no / unresolved |
-| If not, required visibility-change date | |
+| Prior visibility affects eligibility | yes / no / unresolved |
+| May remain public during review | yes / no / unresolved |
+| Required visibility-change timing | |
 | Other anonymity action | |
 
-Decision:
-
-- public or temporarily private handling is workable if the prior exposure is
-  explicitly permitted;
-- make a repository private only after an explicit author decision and retain
-  the ruling and visibility timestamps;
-- **ICAART no-go** if prior lawful repository visibility itself disqualifies
-  the paper;
-- follow up if the reply discusses preprints but not the named code repository.
-
-### 3. Generative-AI disclosure
+## 3. Generative-AI disclosure
 
 | Required fact | Venue answer |
 | --- | --- |
-| Recorded beyond-copy-editing assistance is eligible | yes / no / conditional / unresolved |
-| Review-version disclosure location | |
+| Recorded assistance is eligible | yes / no / conditional / unresolved |
+| Review-version location | |
 | Required wording | |
-| Proposed review-version wording approved | yes / no / changes required / unresolved |
-| Required AI-system citation form | |
-| Sections that must carry a citation | |
-| Camera-ready change, if different | |
+| Proposed review-version wording approved | yes / no / changes / unresolved |
+| Required Codex citation coverage | |
+| Camera-ready change | |
 
-Decision:
-
-- **workable** only if the actual categories of assistance remain accurately
-  disclosed and the blind-review placement/citation instruction is explicit;
-- follow up if the reply repeats “put it in acknowledgments” without resolving
-  the instruction to omit acknowledgments during double-blind review;
-- **ICAART no-go** if eligibility depends on describing the assistance as copy
-  editing, omitting required categories, or asserting human-only drafting.
-
-### 4. Reviewer artifact
+## 4. Reviewer artifact
 
 | Required fact | Venue answer |
 | --- | --- |
 | Artifact may accompany review | yes / no / unresolved |
-| Delivery mechanism | PRIMORIS attachment / anonymous link / none / unresolved |
-| Allowed archive types | |
-| Size limit | |
-| Link-anonymity requirements | |
-
-Decision:
-
-- attachment, anonymous link, or a clear “no artifact” ruling is workable;
-- if no artifact is allowed, remove any reviewer-facing implication of access
-  while retaining the aggregate release plan;
-- follow up if the reply refers only to the 10 MB poster upload, which is not a
-  review-artifact route.
+| Delivery mechanism | PRIMORIS / anonymous link / none / unresolved |
+| Allowed type and size | |
+| Link-anonymity rule | |
 
 ## Overall venue decision
 
 Record exactly one:
 
-- `ICAART_FIRST_ROUND_WORKABLE`: remote, repository, and AI rulings are
-  workable; artifact handling is definite even if the answer is “not allowed”;
-- `FOLLOW_UP_REQUIRED`: at least one answer is generic or incomplete;
-- `ICAART_INELIGIBLE`: remote, repository, or truthful AI-disclosure
-  requirements cannot be met;
-- `NO_RESPONSE_BY_INTERNAL_DEADLINE`: no decision-complete reply by the
-  current venue-selection deadline.
-
-Private decision record:
+- `ICAART_FIRST_ROUND_WORKABLE`
+- `FOLLOW_UP_REQUIRED`
+- `ICAART_INELIGIBLE`
+- `NO_RESPONSE_BY_INTERNAL_DEADLINE`
 
     Decision:
-    Decision timestamp and timezone:
-    Reply-message SHA-256:
-    Decision maker:
-    Conditions and deadlines:
+    Timestamp:
+    Reply SHA-256:
     Required repository action:
     Required manuscript action:
     Required artifact action:
-    Next venue if ineligible:
-
-Do not mark the venue workable from silence, a public web page, an informal
-third-party opinion, or a reply that leaves one of the three eligibility
-questions unresolved.
+    Next route if ineligible:
 
 ## Minimal follow-up for an incomplete reply
 
-Send only the missing items and quote the venue's original answer accurately:
-
 > Thank you for the guidance. To make sure I follow it correctly, could you
-> please confirm the unresolved item(s) below for this specific submission?
->
-> - Remote presentation: [one missing fact].
-> - Named code repository: [one missing fact].
-> - Generative-AI disclosure: [one missing fact].
-> - Reviewer artifact: [one missing fact].
->
-> I will retain your answer with the submitted manuscript hash and follow the
-> exact procedure you specify.
+> please confirm the unresolved item(s) for this specific submission:
+> remote procedure, named repository, AI disclosure/citation, and/or reviewer
+> artifact route? I will retain and follow the exact procedure you specify.
 
-## Optional SPIKE special-session fallback
-
-ICAART now lists the SPIKE 2027 special session on AI and agent-based systems
-in competitive gaming, with a **2026-12-03** paper deadline. The first regular
-round notifies on **2026-11-13**, so a rejected regular paper could in principle
-be revised before that deadline. Neither scope nor same-year sequential
-resubmission is established by the public pages.
-
-Activate this fallback only if a written reply confirms both:
-
-1. leakage-controlled configuration and held-out evaluation of an autonomous
-   scripted RTS agent is within SPIKE's intended esports scope even though the
-   paper does not study human player performance; and
-2. a substantially revised paper may be submitted after a negative regular-
-   round decision, with no simultaneous submission, without violating ICAART's
-   originality or duplicate-submission rules.
-
-If either point is unresolved, do not treat SPIKE as an eligible fallback.
+Do not mark the venue workable from silence or a reply that leaves remote,
+repository, or truthful AI disclosure unresolved.
