@@ -24,11 +24,12 @@ The exact filenames, embedded names, start counts, hashes, and alias caveats in
 
 Primary HFO revision suite:
 
-1. HFO LE;
-2. HFO Golden;
-3. HFO Corners;
-4. HFO Corners B; and
-5. HFO Corners B Golden.
+1. original eight-start HFO;
+2. HFO LE;
+3. HFO Golden;
+4. HFO Corners;
+5. HFO Corners B; and
+6. HFO Corners B Golden.
 
 Secondary fixed-pair HFO controls are B v B, L v L, R v R, and T v T.
 
@@ -36,7 +37,8 @@ Distinct-map suite:
 
 1. Peak of Perfection, using the already completed positive result;
 2. Tour of Egypt;
-3. South Pacific; and
+3. built-in four-start South Pacific, with the named two-start revision as a
+   secondary revision control; and
 4. Pacific Heights.
 
 No listed map may be removed after outcomes. Related HFO revisions are one map
@@ -69,7 +71,8 @@ distinct physical starts.
 For a map with `S` starts:
 
 - if `S >= 4`, one complete directed-pair cycle contains
-  `9 * 2 * S * (S - 1)` cases: 216 for four starts and 540 for six starts;
+  `9 * 2 * S * (S - 1)` cases: 216 for four starts, 540 for six starts, and
+  1,008 for eight starts;
 - if `S = 2`, five independent repetitions of both directed pairs contain 180
   cases; and
 - each country/start cell is balanced over participant slot and opposing
@@ -89,7 +92,8 @@ start, opposing-start class, faction side, and slot:
 
 - 36 cases for two-start maps;
 - 72 cases for four-start maps; and
-- 108 cases for six-start maps.
+- 108 cases for six-start maps; and
+- 144 cases for eight-start maps.
 
 The remaining selected cases stay sealed. Complete-map aggregates are opened
 only after all tasks and a fail-closed finalizer complete. A screen passes only
@@ -152,7 +156,7 @@ map “dominated” unless this stricter threshold passes.
 
 Report each exact map first. Then report:
 
-1. an equal-weight average across the five primary HFO revisions;
+1. an equal-weight average across the six primary HFO revisions;
 2. an equal-weight average across distinct map families; and
 3. a hierarchical bootstrap over map, country, candidate start, and seed
    block.
@@ -175,7 +179,7 @@ is summarized for wins and the full competing-risk population.
 ## Compute envelope
 
 All simulations use CPU `day` jobs under `pi_jss233`; GPU partitions are
-prohibited. Stage 0 is at most 26 short technical tasks. Stage 1 is at most 900
-games. Confirming all new maps is approximately 2,000--3,000 games depending on
+prohibited. Stage 0 is at most 30 short technical tasks. Stage 1 is at most 1,200
+games. Confirming all new maps is approximately 3,000--5,000 games depending on
 which screens pass and which maps require adaptation. Arrays use global
 concurrency at most 64, 8 GiB per task, and immutable per-task JSON plus logs.
