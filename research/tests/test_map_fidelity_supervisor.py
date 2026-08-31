@@ -887,7 +887,7 @@ class SupervisorFixture(unittest.TestCase):
             worker_environment=source_environment,
             # This test checks environment filtering, not timeout behavior.
             # Leave enough headroom for a loaded shared login node.
-            timeout_seconds=5,
+            timeout_seconds=20,
             termination_grace_seconds=0.1,
             max_stream_bytes=1024,
             max_attempts=1,
