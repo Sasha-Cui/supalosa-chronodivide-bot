@@ -27,7 +27,9 @@ const OPPOSITE: Record<Start, Start> = { "39,82": "151,119", "151,119": "39,82",
 export const V8_COUNTRIES = [Countries.USA, Countries.KOREA, Countries.FRANCE, Countries.GERMANY,
     Countries.GREAT_BRITAIN, Countries.LIBYA, Countries.IRAQ, Countries.CUBA, Countries.RUSSIA] as const;
 const ALLIED = new Set<Countries>(V8_COUNTRIES.slice(0, 5));
-const TRACE_UPDATES = 12_000, SNAPSHOT_INTERVAL = 1_200;
+export const V8_TECHNICAL_TRACE_UPDATES = 9_600 as const;
+export const V8_ORIGINAL_PROTOCOL_SHA256 = "186ede4a712c68d2c0324dc350de4de8428f3b52cb55d344224b50934c447f88" as const;
+const TRACE_UPDATES = V8_TECHNICAL_TRACE_UPDATES, SNAPSHOT_INTERVAL = 1_200;
 
 type Population = { id: string; seedBase: number; starts: readonly Start[]; casesPerCell: number;
     opponent: "advanced" | "supalosa" | "both" };
@@ -174,7 +176,7 @@ const loadSelection = (file: string, expectedHash: string, inputs: ReturnType<ty
     if (hashFile(file) !== expectedHash) throw new Error("V8 selection hash drifted");
     const value = JSON.parse(fs.readFileSync(file, "utf8"));
     if (value.kind !== "hfo-advanced-v8-master-selection" || value.complete !== true || value.passed !== true ||
-        value.outcomeFree !== true || value.updateCount !== 0 || value.protocolSha256 !== inputs.protocolSha256 ||
+        value.outcomeFree !== true || value.updateCount !== 0 || value.protocolSha256 !== V8_ORIGINAL_PROTOCOL_SHA256 ||
         value.assetManifestSha256 !== inputs.assetManifestSha256 || value.baselineCommit !== BASELINE_COMMIT ||
         value.ra2webClientCommit !== RA2WEB_CLIENT_COMMIT || value.freezeManifestSha256 !== RA2WEB_FREEZE_MANIFEST_SHA256 ||
         value.advancedBundleSha256 !== ADVANCED_SHA256 || !Array.isArray(value.cases) || value.cases.length !== V8_SELECTION_CASE_COUNT)

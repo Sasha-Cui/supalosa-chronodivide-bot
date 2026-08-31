@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { V8_POPULATIONS, V8_SELECTION_CASE_COUNT, V8_TECHNICAL_ARMS, V8_TECHNICAL_CASE_COUNT,
+import { V8_POPULATIONS, V8_SELECTION_CASE_COUNT, V8_TECHNICAL_ARMS, V8_TECHNICAL_TRACE_UPDATES, V8_TECHNICAL_CASE_COUNT,
     V8_TECHNICAL_FIXTURE_IDS, V8_TECHNICAL_TASK_COUNT, v8PopulationCounts, v8TechnicalAssignment } from
     "../training/hfoAdvancedStateConditionedV8Technical.js";
 
@@ -31,6 +31,7 @@ describe("HFO Advanced V8 technical campaign", () => {
     it("maps all 234 tasks over six fixtures, two opponents, and one control", () => {
         expect(V8_TECHNICAL_FIXTURE_IDS).toEqual(["fallback_only", "defense", "recover", "mixed", "raid", "closeout"]);
         expect(V8_TECHNICAL_CASE_COUNT).toBe(18);
+        expect(V8_TECHNICAL_TRACE_UPDATES).toBe(9_600);
         expect(V8_TECHNICAL_ARMS).toHaveLength(13);
         expect(V8_TECHNICAL_TASK_COUNT).toBe(234);
         expect(v8TechnicalAssignment(0)).toMatchObject({ armIndex: 0, caseIndex: 0,
