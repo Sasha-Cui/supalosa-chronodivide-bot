@@ -114,6 +114,16 @@ We report pooled W/D/L, one-sided 95\% Wilson lower bounds for win rates, and an
 equal-weight country-by-start mean with Student-t lower bound over 36 cells.
 Country, start, side, and slot strata were prespecified.
 
+For a matched policy comparison, let
+$d_i=s_i^{(1)}-s_i^{(0)}$ for case score $s_i\in\{0,0.5,1\}$. The
+one-sided 95\% paired lower bound is
+$\bar d-t_{0.95,n-1}s_d/\sqrt{n}$. For an equal-weight country--start
+bound, we first average literal win indicators within each cell, then apply the
+analogous one-sided Student-$t$ bound to the 36 HFO or 18 Peak cell means,
+against null 0.5. Pooled literal win rates use one-sided Wilson bounds. Thus
+games are paired where policies share a case, while country--start cells are
+the generalization units for the reported spatial lower bounds.
+
 Peak Stage~0 tests six frozen arms on 36 development cases. Four arms form a
 $2\times2$ factorial of macro scope and bot/tactical scope; two reproduce a
 historical defensive-infantry candidate. Eligible arms must improve paired
