@@ -1,244 +1,120 @@
-# External contact templates
+# Send-ready external contact templates
 
-Prepared: **2026-08-11**
+Updated: **2026-08-30**
 
-These messages are drafts only. The repository has not sent them or contacted
-any third party.
-
-## EvoStar / EvoApplications / SCAG chairs
-
-**Subject:** EvoApplications 2027 SCAG: scope, remote presentation, and policy questions
-
-Suggested recipients: the SCAG organizers listed on the official call, with
-the EvoApplications programme chairs copied. Replace `(at)` with `@` only in
-the private message: `alberto.tonda(at)inra.fr`, `amorag(at)ugr.es`,
-`mjdiaz(at)unex.es`, and `jamal(at)uma.es`.
-
-> Dear EvoApplications/SCAG Chairs,
->
-> I am preparing a submission to the 2027 Soft Computing Applied to Games
-> session on reproducible configuration and held-out evaluation of a scripted
-> real-time-strategy agent. Before submitting, could you please clarify four
-> policy points?
->
-> 1. If the paper is accepted, may the presenting author deliver the talk fully
->    online rather than travel to Mainz? The conference site describes the event
->    as hybrid, but I could not find a definitive 2027 remote-presenter rule.
-> 2. The submission PDF and reviewer artifact will be anonymous, but development
->    source and result records have previously appeared in a named public GitHub
->    repository. Does this conflict with the double-blind policy? If so, would
->    making that repository non-public for the review period satisfy the policy,
->    or is the prior public posting itself disqualifying?
-> 3. The study applies established configuration techniques rather than proposing
->    a new evolutionary algorithm. Its contribution is a leakage-controlled,
->    reproducible evaluation protocol plus held-out evidence for a scripted game
->    agent. Is that application/evaluation emphasis within the intended SCAG
->    scope?
-> 4. OpenAI Codex has assisted beyond copy editing, including software
->    implementation, experiment orchestration, research auditing, statistical
->    cross-checks, literature triage, and manuscript drafting and revision. I
->    remain solely accountable for the work, will personally verify the primary
->    evidence and cited sources, and will make any required disclosure. The
->    published EvoStar code says that AI may enhance clarity but should not
->    produce material, whereas Springer Nature permits broader declared use with
->    human accountability. Is this project eligible for EvoApplications, and if
->    so, what disclosure do you require?
->
-> For context, the anonymous study uses five run-distinct, deterministically
-> mutation-generated 32-policy pools, successive halving, and a training-only
-> common-seed championship. Evaluation groups map revisions into disjoint
-> families and opens 16 sealed families once. The configured policy improves
-> a prospectively frozen generic StrongBot reference by 0.336
-> (family-clustered 95% CI [0.215, 0.457]) against
-> one pinned external opponent, but a separate prespecified gate does not
-> establish that it reliably beats that opponent. The paper claims an applied
-> configuration-and-evaluation workflow, not optimizer novelty or broad game-AI
-> superiority.
->
-> I plan to use the official 10 MB supplementary-material field for a separate
-> anonymous supplement and a small aggregate reproducibility artifact while
-> keeping all essential claims and methods in the main paper.
->
-> I would appreciate a written ruling before registration or submission. I am
-> happy to provide the anonymous manuscript if useful.
->
-> Best regards,
-> [author name]
-
-Retain the response with the submission records. Do not infer permission from
-the word “hybrid” alone, and do not describe the recorded AI assistance as
-copy editing.
+These are drafts only. Send them from a private account and retain replies with
+the submission record.
 
 ## ICAART secretariat
 
-**Subject:** ICAART 2027: remote, anonymity, AI disclosure, and reviewer artifact
+**Subject:** ICAART 2027 regular paper: remote presentation, AI disclosure, and anonymous artifact
 
-Suggested recipient from the official call: `icaart.secretariat(at)insticc.org`.
+Suggested recipient: `icaart.secretariat@insticc.org`.
 
 > Dear ICAART Secretariat,
 >
-> I am considering a 2027 regular-paper submission on reproducible
-> configuration and held-out evaluation of a scripted real-time-strategy
-> agent. I have prepared an anonymous 11-page version in the official
-> SCITEPRESS template. Before submitting it, could you please clarify four
-> points?
+> I have prepared a completed 12-page regular-paper submission in the official
+> SCITEPRESS format on auditable development and evaluation of a scripted
+> real-time-strategy agent.
 >
-> 1. The ICAART home page says speakers who are unable to travel may
->    exceptionally present remotely, and the presenter page documents live
->    Zoom oral and poster sessions. I will be unable to travel. What procedure
->    should I follow to request the exception, and when will it be confirmed?
->    The public registration rules say a paper uses the standard Speaker class,
->    currently EUR 620 for members or EUR 680 for nonmembers at the early rate;
->    please confirm whether that same fee applies to an approved remote speaker.
-> 2. The anonymous paper has not been posted publicly, but the author-developed
->    implementation and research records have previously been visible in a
->    named public GitHub repository. Does that code repository conflict with
->    ICAART's double-blind policy? If it must be private during review, please
->    confirm the required timing and whether its prior visibility affects
->    eligibility.
-> 3. The ICAART AI-tools policy permits disclosed writing and revision
->    assistance and expressly covers AI-generated code in its disclosure rule.
->    OpenAI Codex assisted this project with
->    software implementation, experiment orchestration, research auditing,
->    statistical cross-checks, literature triage, and manuscript drafting and
->    revision. The human author will personally verify the evidence, citations,
->    code, and final manuscript and remain fully accountable. The 2027
->    guidelines require AI-generated text to be disclosed in acknowledgments
->    and say that affected sections should cite the AI system, but the same
->    double-blind instructions require authors to omit acknowledgments. Would
->    an identity-neutral “Generative-AI Assistance Disclosure” section before
->    the references be acceptable in the review version? Proposed review-version
->    wording is: “OpenAI Codex assisted with software implementation, experiment
->    orchestration, research auditing, statistical verification, literature
->    triage, and manuscript drafting and editing. The human author reviewed the
->    primary evidence and cited sources, verified the analyses, approved the
->    final text, and takes full responsibility for the work.” Please approve or
->    amend this wording and specify its required placement and citation form,
->    including whether a single disclosure may identify all affected sections.
-> 4. I have a 103,324-byte identity-neutral aggregate artifact that regenerates
->    every reported table and figure, maps each claim to its frozen aggregate,
->    and contains no author identity, bot packages,
->    maps, game assets, or private raw logs. The public complete-paper
->    instructions describe the review PDF but do not specify supplementary
->    files or anonymous external links. May this artifact accompany the review
->    submission, and if so, should it be attached in PRIMORIS or supplied by an
->    anonymous link? Please also indicate any file-type or size restriction.
+> The ICAART home page says speakers who are unable to travel may
+> exceptionally present remotely, and the presentation page documents live
+> Zoom sessions. I will be unable to attend physically. What procedure and
+> timing apply to the remote-presentation exception, and must approval be
+> obtained before submission or only before registration?
 >
-> The paper reports a completed 8,704-game study with family-disjoint training
-> and evaluation. Its configured policy improves a prospectively frozen generic
-> StrongBot reference on 16
-> sealed map families, while a separate absolute-strength gate fails; the paper
-> does not claim a new optimizer or broad agent superiority.
+> I would also appreciate guidance on three double-blind issues:
+>
+> 1. OpenAI Codex assisted with code implementation, experiment orchestration,
+>    evidence reduction, and drafting/revision. The human author verified the
+>    evidence, code, citations, and final text and remains responsible. The
+>    paper contains an identity-neutral Generative AI Disclosure and cites the
+>    official Codex page. Is that acceptable for review, given that the
+>    guidelines request disclosure in acknowledgments but also require
+>    acknowledgments to be omitted for double blind?
+> 2. The anonymous paper has not been posted, but a named development
+>    repository has previously been public. Must it be private during review,
+>    and does prior code visibility affect eligibility?
+> 3. May a 1.32 MB identity-neutral tar.gz reviewer artifact accompany the
+>    submission? It contains aggregate evidence, tests, paper source, and
+>    deterministic figures, but no author identity, bot packages, maps, game
+>    runtime, or raw logs. If permitted, should it be attached in PRIMORIS or
+>    supplied through an anonymous link?
+>
+> The paper reports StrongBot at 633 wins, 24 draws, and 63 losses against a
+> pinned Supalosa bot on one balanced map, plus a fresh second-map replication
+> at 134/14/32 versus 92/16/72 control. It also reports a negative independent
+> opponent transfer. It claims neither a new environment nor general
+> optimizer or agent dominance.
 >
 > I would appreciate written confirmation before submission or registration.
 >
 > Best regards,
 > [author name]
 
-Retain the answer with the submission record. Public guidance already
-establishes exceptional remote support for speakers unable to travel and allows
-disclosed AI assistance in principle. The unresolved items are the remote
-exception procedure and fee confirmation, named-repository handling, and
-blind-review disclosure implementation, plus the reviewer-artifact delivery route; see
-`ICAART_POLICY_RECONCILIATION.md`. Extract the reply into a private copy of
-`ICAART_RULING_RESPONSE_TEMPLATE.md`; do not treat a generic link to the
-public pages as a decision-complete answer.
-
-### Optional ICAART SPIKE fallback inquiry
-
-Send this separately only if evaluating the SPIKE special session as a
-sequential fallback. Do not submit or promise the same paper to two tracks at
-once.
-
-**Subject:** ICAART 2027 SPIKE: scope and sequential-submission question
-
-> Dear ICAART Secretariat and SPIKE Chairs,
->
-> I am evaluating whether a completed paper could be appropriate for the
-> SPIKE 2027 special session if it is not accepted in ICAART's first regular-
-> paper round. The paper studies reproducible configuration and leakage-
-> controlled held-out evaluation of an autonomous scripted agent in a
-> competitive real-time-strategy game. It does not study human player
-> performance, audience engagement, or esports management.
->
-> Could you please clarify two points?
->
-> 1. Is this autonomous-agent configuration and evaluation contribution within
->    SPIKE's intended scope?
-> 2. Because the first regular-paper notification is November 13 and the SPIKE
->    deadline is December 3, may a substantially revised paper be submitted to
->    SPIKE only after a negative regular-round decision, with no simultaneous
->    submission? Or does ICAART prohibit same-work sequential resubmission to a
->    special session in the same year?
->
-> I would appreciate a written answer before treating SPIKE as a fallback. I am
-> happy to provide the anonymous abstract or manuscript if useful.
->
-> Best regards,
-> [author name]
-
-Do not infer scope merely because the work concerns a competitive game, and do
-not infer sequential-resubmission permission from the non-overlapping dates.
-
 ## Supalosa
 
-**Subject:** Permission and licensing for a research fork of your Chrono Divide bot
+**Subject:** StrongBot paper and permission for a research fork
 
 > Hi Supalosa,
 >
 > I am the author of StrongBot, a research fork of your
-> `supalosa-chronodivide-bot`. I now have a paper draft and a completed held-out
-> study. The result is deliberately scoped: the configured StrongBot policy
-> substantially improves a prospectively frozen generic StrongBot reference
-> against a pinned copy of
-> your bot, but the experiment does not establish that StrongBot reliably beats
-> Supalosa.
+> `supalosa-chronodivide-bot`. The paper is now ready. In a frozen 720-game
+> all-country/all-start evaluation on Heck Freezes Over, StrongBot recorded
+> 633 wins, 24 draws, and 63 losses against a pinned clean copy of your bot.
+> A separate Peak of Perfection study also improved the deployed policy from
+> 92/16/72 to 134/14/32 on fresh paired cases. I report the scope honestly:
+> StrongBot performs much worse against an independently sourced RA2Web
+> Advanced bot, so the paper does not claim universal superiority.
 >
-> I would like to release the derived bot and the author-written research
-> harness after review. Your repository currently has no license file and its
-> package metadata says `UNLICENSED`, so I have excluded all bot source from the
-> anonymous reviewer artifact and will not assign it an open-source license
-> without your permission.
+> I would like to share the paper with you and, after review, release as much
+> of the research implementation as is legally appropriate. Your repository
+> currently has no license file and its package metadata says `UNLICENSED`, so
+> the anonymous reviewer artifact excludes both bot trees and I will not assign
+> an open-source license to the derived bot without your written permission.
 >
-> Would you be willing to grant permission to redistribute the derived bot? If
-> so, please let me know your preferred license and attribution language. I can
-> provide the exact fork revision, a source diff, the paper, and the proposed
-> third-party notice. Red Alert 2 maps/assets and Chrono Divide code would remain
-> excluded under their own terms.
+> Would you be willing to grant redistribution permission for the derived bot?
+> If so, please specify the preferred license, attribution, and any conditions.
+> I can provide the exact revision, source diff, manuscript, and proposed
+> third-party notice.
 >
 > Thank you for creating and sharing the original bot.
 >
 > Best,
 > [author name]
 
-Ask for an explicit written license or permission statement, not only an
-informal expression of support.
+## Chrono Divide author or maintainer
 
-## Chrono Divide author/maintainer
-
-**Subject:** Reproducibility and citation guidance for a Chrono Divide bot paper
+**Subject:** Chrono Divide bot paper: citation, reproducibility, and figure guidance
 
 > Hi,
 >
-> I have completed a paper draft that uses Chrono Divide 0.75.0 as the simulator
-> for reproducible configuration and held-out evaluation of a scripted bot. The
-> paper clearly describes Chrono Divide as an existing independent browser
-> reconstruction of Red Alert 2; it does not claim to introduce the environment.
+> I have completed a paper that uses Chrono Divide game API 0.75.0 for
+> deterministic offline evaluation of a scripted bot. The paper explicitly
+> describes Chrono Divide as an existing independent browser reconstruction of
+> Red Alert 2; it does not claim to introduce the environment.
 >
-> For peer review I currently release only aggregate results, hashes,
-> author-written orchestration, and paper-generation code. I do not redistribute
-> Chrono Divide source/binaries, Red Alert 2 maps, MIX archives, or game assets.
-> Could you advise on the preferred scholarly citation and any permitted way to
-> pin or acquire the exact 0.75.0 runtime/API for reproduction? If you allow
-> archival redistribution of any specific runtime component, please identify
-> the applicable license and attribution.
+> The study evaluates literal all-building elimination and reports 633/24/63
+> against a pinned Supalosa bot on Heck Freezes Over, a positive fresh Peak of
+> Perfection replication, and a negative RA2Web Advanced transfer.
 >
-> I would also welcome a factual check of the short environment description once
-> the paper is ready to share. This is not a request to endorse the empirical
-> claims.
+> For anonymous review I release only aggregate evidence, author-written
+> orchestration and paper code, and 15 deterministic annotated state frames.
+> I do not redistribute Chrono Divide source or binaries, Red Alert 2 maps, MIX
+> archives, or bot bundles.
+>
+> Could you advise on:
+>
+> 1. your preferred scholarly citation for Chrono Divide and game API 0.75.0;
+> 2. the permitted way to acquire and pin that runtime for reproduction; and
+> 3. whether the deterministic annotated game-state frames may be included in
+>    the review artifact and later public paper artifact, with what attribution?
+>
+> I would also welcome a factual check of the short environment description.
+> This is not a request to endorse the empirical claims.
 >
 > Best regards,
 > [author name]
 
-Record any version, license, attribution, or acquisition instructions in the
-artifact boundary before public release.
+Ask for explicit written terms. Friendly approval without licensing language
+is not a redistribution license.
