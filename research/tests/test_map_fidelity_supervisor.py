@@ -893,11 +893,25 @@ class SupervisorFixture(unittest.TestCase):
             max_attempts=1,
         )
         summary = supervisor.run()
-        self.assertEqual(
-            summary["completedCount"],
-            3,
-            json.dumps(summary, indent=2, sort_keys=True),
-        )
+        if summary["completedCount"] != 3:
+            terminals = {}
+            for ordinal in range(3):
+                terminal_path = (
+                    supervisor.family_directory(ordinal)
+                    / "attempts/01/attempt-terminal.json"
+                )
+                terminals[str(ordinal)] = (
+                    json.loads(terminal_path.read_text(encoding="utf-8"))
+                    if terminal_path.is_file()
+                    else None
+                )
+            self.fail(
+                json.dumps(
+                    {"summary": summary, "attemptTerminals": terminals},
+                    indent=2,
+                    sort_keys=True,
+                )
+            )
         intent = json.loads(
             (
                 supervisor.family_directory(0)
