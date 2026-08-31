@@ -121,6 +121,11 @@ class FallbackManuscriptTest(unittest.TestCase):
             FALLBACK / "main.tex",
             FALLBACK / "abstract.tex",
             FALLBACK / "README.md",
+            ROOT / "paper" / "references.bib",
+            *[
+                ROOT / "paper" / "sections" / f"{stem}.tex"
+                for stem in SECTIONS
+            ],
         ]
         text = "\n".join(path.read_text() for path in paths)
         forbidden = (

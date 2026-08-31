@@ -8,8 +8,8 @@ generates every numerical macro, table, and plot in this paper. It pins source,
 protocol, program, runtime, map, opponent, selection, prior-stage, aggregate,
 and screenshot-manifest hashes. The generator rejects unexpected hashes,
 missing fields, or numerical drift. Detailed result documents map each
-scientific result to exact Slurm job IDs and the sole simulation account
-\texttt{pi\_jss233}. Raw cells use atomic writes and checksums; scheduler
+scientific result to exact Slurm job IDs and the single prespecified simulation account. Raw cells use atomic writes
+and checksums; scheduler
 accounting must match the manifest before an aggregate can be opened.
 
 The \OutcomeGameCount{} claim-bearing games exclude outcome-blind selection,

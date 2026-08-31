@@ -25,7 +25,7 @@ def require(condition: bool, message: str) -> None:
 
 
 def fmt(value: float, digits: int = 2) -> str:
-    return f"{100 * float(value):.{digits}f}\%"
+    return rf"{100 * float(value):.{digits}f}\%"
 
 
 def dec(value: float, digits: int = 3) -> str:
