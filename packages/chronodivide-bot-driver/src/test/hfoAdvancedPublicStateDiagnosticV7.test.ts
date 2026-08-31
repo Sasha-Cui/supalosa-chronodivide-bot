@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { HFO_ADVANCED_V7_ARMS, HFO_ADVANCED_V7_COUNTRIES, HFO_ADVANCED_V7_SPEC,
     V7_LEGACY_SELECTION_SHA256, actionableWindow, assertOutcomeFreeSelection, classificationAnalysis,
-    extractV7DevelopmentCases } from "../training/hfoAdvancedPublicStateDiagnosticV7.js";
+    extractV7DevelopmentCases, selectRepresentativeTraces } from "../training/hfoAdvancedPublicStateDiagnosticV7.js";
 
 const legacySelection = () => {
     const cases: any[] = []; let populationCaseIndex = 0;
@@ -18,7 +18,8 @@ const legacySelection = () => {
 };
 
 const diagnosticRow = (viable: boolean, index: number) => ({ winner: "opponent", armId: "external_supalosa",
-    country: HFO_ADVANCED_V7_COUNTRIES[index % 9], candidateSlot: index % 2, publicSnapshots: [{ update: 3_600,
+    country: HFO_ADVANCED_V7_COUNTRIES[index % 9], side: index % 2 ? "Soviet" : "Allied",
+    candidateSlot: index % 2, repeatIndex: Math.floor(index / 2) % 2, publicSnapshots: [{ update: 3_600,
         candidateCredits: viable ? 500 : 0, own: { buildings: viable ? 4 : 0, combatants: viable ? 3 : 0,
             byRole: viable ? { war_factory: 1 } : {} } }] });
 
@@ -60,7 +61,7 @@ describe("HFO Advanced V7 public-state diagnostic design", () => {
         const rows = Array.from({ length: 36 }, (_, index) => {
             const winner = index % 2 === 0 ? "candidate" : "opponent",
                 candidateCredits = winner === "candidate" ? 9_000 : 1_000;
-            return { winner, country: HFO_ADVANCED_V7_COUNTRIES[index % 9], candidateSlot: Math.floor(index / 2) % 2,
+            return { winner, country: HFO_ADVANCED_V7_COUNTRIES[index % 9], candidateSlot: Math.floor(index / 2) % 2, repeatIndex: Math.floor(index / 2) % 2,
                 publicSnapshots: [{ update: 1_200, candidateCredits, opponentCreditsPublic: 5_000,
                     own: { combatants: 8, buildings: 6, byRole: { war_factory: 1, barracks: 1, harvester: 2 } },
                     visibleEnemy: { combatants: 4 }, visibleThreatsNearProduction: { "16": 1 },
@@ -72,6 +73,22 @@ describe("HFO Advanced V7 public-state diagnostic design", () => {
         expect(result.byTick[0].leaveCountryOut.rows).toBe(36);
         expect(result.byTick[0].leaveCountryOut.balancedAccuracy).toBe(1);
         expect(result.byTick[0].leaveSlotOut.balancedAccuracy).toBe(1);
+        expect(result.byTick[0].leaveRepeatBlockOut.balancedAccuracy).toBe(1);
         expect(result.earliestPredictiveTick).toBe(1_200);
+    });
+
+    it("selects fixed representative trace quantiles for both immutable arms", () => {
+        const rows = HFO_ADVANCED_V7_ARMS.flatMap((armId) => Array.from({ length: 36 }, (_, index) => ({
+            armId, winner: index < 24 ? "opponent" : index < 30 ? "draw" : "candidate", updates: 1_000 + index,
+            populationCaseIndex: index, repeatIndex: index % 2, taskIndex: index,
+            country: HFO_ADVANCED_V7_COUNTRIES[index % 9], candidateSlot: index % 2,
+            publicTraceSha256: `${armId}-candidate-${index}`,
+            opponentPublicTraceSha256: `${armId}-opponent-${index}`,
+        }))) as any;
+        const selected = selectRepresentativeTraces(rows);
+        expect(selected.external_supalosa.map((row: any) => row.sortedIndex)).toEqual([8, 17, 26]);
+        expect(selected.deployed_strongbot.map((row: any) => row.sortedIndex)).toEqual([8, 17, 26]);
+        expect(selected.external_supalosa).toHaveLength(3);
+        expect(selected.deployed_strongbot).toHaveLength(3);
     });
 });

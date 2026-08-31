@@ -43,13 +43,16 @@ type ActionBucket = { updateBucket: number; method: string; count: number; first
     argumentSha256: string };
 type PublicSnapshot = ReturnType<typeof publicSnapshot>;
 type DiagnosticResult = { taskIndex: number; armIndex: number; armId: V7Arm; caseIndex: number;
-    populationCaseIndex: number; country: Countries; side: "Allied" | "Soviet"; candidateSlot: 0 | 1;
+    populationCaseIndex: number; repeatIndex: number; country: Countries; side: "Allied" | "Soviet"; candidateSlot: 0 | 1;
     requestedEngineSeed: number; candidateStart: string; opponentStart: string; updates: number;
     status: string; winner: Winner; publicSnapshots: PublicSnapshot[]; publicTraceSha256: string;
+    opponentPublicSnapshots: PublicSnapshot[]; opponentPublicTraceSha256: string;
     actionBuckets: ActionBucket[]; actionSha256: string; milestoneUpdates: Record<string, number | null>;
+    actionOwnershipConflicts: { applicable: false; count: 0; reason: "immutable-arms-have-no-overlay" };
     terminalBuildingCounts: { candidate: number; opponent: number };
     quitAttempts: { candidate: number; baseline: number }; quitForwarded: { candidate: number; baseline: number };
-    deterministicRepeat: null | { passed: boolean; publicTraceSha256: string; actionSha256: string;
+    deterministicRepeat: null | { passed: boolean; publicTraceSha256: string; opponentPublicTraceSha256: string;
+        actionSha256: string;
         status: string; winner: Winner; updates: number } };
 
 const requiredPath = (name: string): string => { const value = process.env[name];
@@ -212,7 +215,7 @@ const publicSnapshot = (game: GameApi, bot: InspectableCandidate, candidateName:
 };
 
 const installCandidateActionAudit = (bot: InspectableCandidate) => {
-    let currentUpdate = 0, attackUpdate: number | null = null;
+    let currentUpdate = 0, attackUpdate: number | null = null, productionUpdate: number | null = null;
     const buckets = new Map<string, { count: number; first: number; last: number; hash: crypto.Hash }>(),
         originalStart = bot.onGameStart.bind(bot), attackOrders = new Set<any>([OrderType.Attack, OrderType.AttackMove,
             (OrderType as any).ForceAttack]);
@@ -230,17 +233,20 @@ const installCandidateActionAudit = (bot: InspectableCandidate) => {
                 bucket.count += 1; bucket.last = observedUpdate; bucket.hash.update(JSON.stringify(args) + "\n");
                 buckets.set(key, bucket);
                 if (method === "orderUnits" && attackOrders.has(args[1]) && attackUpdate === null) attackUpdate = observedUpdate;
+                if (method === "queueForProduction" && productionUpdate === null) productionUpdate = observedUpdate;
                 return original(...args);
             };
         }
     };
     return { setUpdate(value: number) { currentUpdate = value; }, firstAttackUpdate: () => attackUpdate,
+        firstProductionUpdate: () => productionUpdate,
         finalize: () => [...buckets.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([key, value]) => ({
             updateBucket: Number(key.split(":")[0]), method: key.slice(key.indexOf(":") + 1), count: value.count,
             firstUpdate: value.first, lastUpdate: value.last, argumentSha256: value.hash.digest("hex") })) };
 };
 
-const milestones = (snapshots: PublicSnapshot[], firstAttackUpdate: number | null) => {
+const milestones = (snapshots: PublicSnapshot[], firstAttackUpdate: number | null,
+    firstProductionUpdate: number | null) => {
     const first = (predicate: (row: PublicSnapshot) => boolean) => snapshots.find(predicate)?.update ?? null;
     let maximumBuildings = snapshots[0]?.own.buildings ?? 0, maximumHitPoints = snapshots[0]?.own.hitPoints ?? 0,
         firstDamage: number | null = null, firstBuildingLoss: number | null = null;
@@ -253,7 +259,7 @@ const milestones = (snapshots: PublicSnapshot[], firstAttackUpdate: number | nul
     return { firstOwnCombatant: first((row) => row.own.combatants > 0),
         firstVisibleEnemy: first((row) => row.visibleEnemy.total > 0), firstVisibleEnemyCombatant:
             first((row) => row.visibleEnemy.combatants > 0), firstOwnDamage: firstDamage,
-        firstBuildingLoss, firstAttackOrder: firstAttackUpdate };
+        firstBuildingLoss, firstAttackOrder: firstAttackUpdate, firstProductionOrder: firstProductionUpdate };
 };
 
 const createCandidate = (arm: V7Arm, factory: BaselineFactory, name: string, country: Countries): InspectableCandidate => {
@@ -265,39 +271,49 @@ const runOne = async (arm: V7Arm, caseSpec: V7Case, caseIndex: number, factory: 
     advanced: ReturnType<typeof loadAdvanced>, repeat: number) => {
     const candidateName = `V7_${arm}_${caseIndex}_${repeat}`, opponentName = `V7_Advanced_${arm}_${caseIndex}_${repeat}`,
         candidate = createCandidate(arm, factory, candidateName, caseSpec.country),
-        opponent = createInspectableRa2WebBot(advanced, opponentName, caseSpec.country),
+        opponent = createInspectableRa2WebBot(advanced, opponentName, caseSpec.country) as InspectableCandidate,
         actionAudit = installCandidateActionAudit(candidate),
         adjudicator = new LiteralBuildingEliminationAdjudicator({ candidate: candidateName, baseline: opponentName }),
         { audit } = installLiteralEndpointInstrumentation({ candidate, baseline: opponent }, adjudicator);
     return withSeededOfflineGame(cdapi, settings(candidate, opponent, caseSpec.candidateSlot), caseSpec.requestedEngineSeed,
         [{ agent: candidate, identity: "candidate" }, { agent: opponent, identity: "opponent" }], async (game) => {
-            const api = candidate.lastGameApi; if (!api) throw new Error("V7 candidate GameApi unavailable");
-            if (startKey(api.getPlayerData(candidateName).startLocation) !== WEST ||
-                startKey(api.getPlayerData(opponentName).startLocation) !== EAST) throw new Error("V7 selected start drifted");
-            const snapshots: PublicSnapshot[] = [publicSnapshot(api, candidate, candidateName, opponentName)];
+            const candidateApi = candidate.lastGameApi, opponentApi = opponent.lastGameApi;
+            if (!candidateApi || !opponentApi) throw new Error("V7 participant GameApi unavailable");
+            if (startKey(candidateApi.getPlayerData(candidateName).startLocation) !== WEST ||
+                startKey(candidateApi.getPlayerData(opponentName).startLocation) !== EAST) throw new Error("V7 selected start drifted");
+            const snapshots: PublicSnapshot[] = [publicSnapshot(candidateApi, candidate, candidateName, opponentName)],
+                opponentSnapshots: PublicSnapshot[] = [publicSnapshot(opponentApi, opponent, opponentName, candidateName)];
             let updates = 0, terminal: any = null, failure: any = null;
             while (updates < MAX_UPDATES && !terminal && !failure) {
-                adjudicator.beginUpdate(api); await game.update(); updates += 1; actionAudit.setUpdate(api.getCurrentTick());
+                adjudicator.beginUpdate(candidateApi); await game.update(); updates += 1;
+                actionAudit.setUpdate(candidateApi.getCurrentTick());
                 const stats = game.getPlayerStats(), candidateStats = stats.find((row) => row.name === candidateName),
                     opponentStats = stats.find((row) => row.name === opponentName);
                 if (!candidateStats || !opponentStats) throw new Error("V7 statistics missing");
-                const endpoint = adjudicator.completeUpdate(api, { finished: game.isFinished(), defeated: {
+                const endpoint = adjudicator.completeUpdate(candidateApi, { finished: game.isFinished(), defeated: {
                     candidate: candidateStats.defeated, baseline: opponentStats.defeated } });
                 terminal = endpoint.terminal; failure = endpoint.technicalFailure;
-                if (updates <= SNAPSHOT_HORIZON && updates % SNAPSHOT_INTERVAL === 0)
-                    snapshots.push(publicSnapshot(api, candidate, candidateName, opponentName));
+                if (updates <= SNAPSHOT_HORIZON && updates % SNAPSHOT_INTERVAL === 0) {
+                    snapshots.push(publicSnapshot(candidateApi, candidate, candidateName, opponentName));
+                    opponentSnapshots.push(publicSnapshot(opponentApi, opponent, opponentName, candidateName));
+                }
             }
             if (failure) throw new Error(`V7 endpoint failure ${JSON.stringify(failure)}`);
-            if (updates <= SNAPSHOT_HORIZON && snapshots[snapshots.length - 1]?.update !== api.getCurrentTick())
-                snapshots.push(publicSnapshot(api, candidate, candidateName, opponentName));
-            const actionBuckets = actionAudit.finalize(), buildings = snapshotCombatantBuildings(api,
+            if (updates <= SNAPSHOT_HORIZON && snapshots[snapshots.length - 1]?.update !== candidateApi.getCurrentTick()) {
+                snapshots.push(publicSnapshot(candidateApi, candidate, candidateName, opponentName));
+                opponentSnapshots.push(publicSnapshot(opponentApi, opponent, opponentName, candidateName));
+            }
+            const actionBuckets = actionAudit.finalize(), buildings = snapshotCombatantBuildings(candidateApi,
                 { candidate: candidateName, baseline: opponentName }),
                 winner: Winner = terminal?.winner === "candidate" ? "candidate" :
                     terminal?.winner === "baseline" ? "opponent" : "draw";
             return { updates, status: terminal?.status ?? "tick_cap_draw", winner, snapshots,
-                publicTraceSha256: sha256Text(JSON.stringify(snapshots)), actionBuckets,
+                publicTraceSha256: sha256Text(JSON.stringify(snapshots)), opponentSnapshots,
+                opponentPublicTraceSha256: sha256Text(JSON.stringify(opponentSnapshots)), actionBuckets,
                 actionSha256: sha256Text(JSON.stringify(actionBuckets)),
-                milestoneUpdates: milestones(snapshots, actionAudit.firstAttackUpdate()),
+                milestoneUpdates: milestones(snapshots, actionAudit.firstAttackUpdate(), actionAudit.firstProductionUpdate()),
+                actionOwnershipConflicts: { applicable: false as const, count: 0 as const,
+                    reason: "immutable-arms-have-no-overlay" as const },
                 terminalBuildingCounts: { candidate: buildings.filter((row) => row.owner === candidateName).length,
                     opponent: buildings.filter((row) => row.owner === opponentName).length },
                 quitAttempts: { ...audit.attempts }, quitForwarded: { ...audit.forwarded } };
@@ -362,18 +378,24 @@ const runSmoke = async () => {
     const trace = await withSeededOfflineGame(cdapi, settings(candidate, opponent, caseSpec.candidateSlot),
         caseSpec.requestedEngineSeed, [{ agent: candidate, identity: "candidate" },
             { agent: opponent, identity: "opponent" }], async (game) => {
-            const api = candidate.lastGameApi; if (!api) throw new Error("V7 smoke GameApi unavailable");
-            if (startKey(api.getPlayerData(candidateName).startLocation) !== WEST ||
-                startKey(api.getPlayerData(opponentName).startLocation) !== EAST) throw new Error("V7 smoke start drifted");
-            const snapshots = [publicSnapshot(api, candidate, candidateName, opponentName)];
+            const candidateApi = candidate.lastGameApi, opponentApi = opponent.lastGameApi;
+            if (!candidateApi || !opponentApi) throw new Error("V7 smoke GameApi unavailable");
+            if (startKey(candidateApi.getPlayerData(candidateName).startLocation) !== WEST ||
+                startKey(candidateApi.getPlayerData(opponentName).startLocation) !== EAST) throw new Error("V7 smoke start drifted");
+            const snapshots = [publicSnapshot(candidateApi, candidate, candidateName, opponentName)],
+                opponentSnapshots = [publicSnapshot(opponentApi, opponent, opponentName, candidateName)];
             for (let update = 1; update <= 1_200; update += 1) {
-                await game.update(); actionAudit.setUpdate(api.getCurrentTick());
+                await game.update(); actionAudit.setUpdate(candidateApi.getCurrentTick());
                 if (game.isFinished()) throw new Error("V7 smoke ended before fixed horizon");
             }
-            snapshots.push(publicSnapshot(api, candidate, candidateName, opponentName));
+            snapshots.push(publicSnapshot(candidateApi, candidate, candidateName, opponentName));
+            opponentSnapshots.push(publicSnapshot(opponentApi, opponent, opponentName, candidateName));
             const actionBuckets = actionAudit.finalize();
             return { updateCount: 1_200, snapshotUpdates: snapshots.map((row) => row.update),
-                publicTraceSha256: sha256Text(JSON.stringify(snapshots)), actionSha256: sha256Text(JSON.stringify(actionBuckets)),
+                opponentSnapshotUpdates: opponentSnapshots.map((row) => row.update),
+                publicTraceSha256: sha256Text(JSON.stringify(snapshots)),
+                opponentPublicTraceSha256: sha256Text(JSON.stringify(opponentSnapshots)),
+                actionSha256: sha256Text(JSON.stringify(actionBuckets)),
                 actionBucketCount: actionBuckets.length, suppressedQuitAttempts: candidateQuit.value + opponentQuit.value };
         });
     const artifact = { schemaVersion: 1, kind: "hfo-advanced-v7-outcome-free-smoke",
@@ -409,19 +431,24 @@ const runCell = async () => {
     const advanced = loadAdvanced(inputs.freezeRoot), firstRun = await runOne(armId, caseSpec, caseIndex, factory, advanced, 0),
         repeatRun = caseIndex === 0 ? await runOne(armId, caseSpec, caseIndex, factory, advanced, 1) : null,
         deterministicRepeat = repeatRun ? { passed: firstRun.publicTraceSha256 === repeatRun.publicTraceSha256 &&
+            firstRun.opponentPublicTraceSha256 === repeatRun.opponentPublicTraceSha256 &&
             firstRun.actionSha256 === repeatRun.actionSha256 && firstRun.status === repeatRun.status &&
             firstRun.winner === repeatRun.winner && firstRun.updates === repeatRun.updates,
-            publicTraceSha256: repeatRun.publicTraceSha256, actionSha256: repeatRun.actionSha256,
+            publicTraceSha256: repeatRun.publicTraceSha256,
+            opponentPublicTraceSha256: repeatRun.opponentPublicTraceSha256, actionSha256: repeatRun.actionSha256,
             status: repeatRun.status, winner: repeatRun.winner, updates: repeatRun.updates } : null;
     if (deterministicRepeat && !deterministicRepeat.passed) throw new Error("V7 deterministic repeat drifted");
     const result: DiagnosticResult = { taskIndex, armIndex, armId, caseIndex,
-        populationCaseIndex: caseSpec.populationCaseIndex, country: caseSpec.country,
+        populationCaseIndex: caseSpec.populationCaseIndex, repeatIndex: caseSpec.repeatIndex, country: caseSpec.country,
         side: ALLIED.has(caseSpec.country) ? "Allied" : "Soviet", candidateSlot: caseSpec.candidateSlot,
         requestedEngineSeed: caseSpec.requestedEngineSeed, candidateStart: caseSpec.candidateStart,
         opponentStart: caseSpec.opponentStart, updates: firstRun.updates, status: firstRun.status, winner: firstRun.winner,
         publicSnapshots: firstRun.snapshots, publicTraceSha256: firstRun.publicTraceSha256,
+        opponentPublicSnapshots: firstRun.opponentSnapshots,
+        opponentPublicTraceSha256: firstRun.opponentPublicTraceSha256,
         actionBuckets: firstRun.actionBuckets, actionSha256: firstRun.actionSha256,
-        milestoneUpdates: firstRun.milestoneUpdates, terminalBuildingCounts: firstRun.terminalBuildingCounts,
+        milestoneUpdates: firstRun.milestoneUpdates, actionOwnershipConflicts: firstRun.actionOwnershipConflicts,
+        terminalBuildingCounts: firstRun.terminalBuildingCounts,
         quitAttempts: firstRun.quitAttempts, quitForwarded: firstRun.quitForwarded, deterministicRepeat };
     const provenance = createExperimentManifest({ runId: `hfo-advanced-v7-${taskIndex}-${process.env.SLURM_JOB_ID}`,
         mixDir: inputs.mixDir, maps: [MAP.name], effectiveConfig: { taskIndex, armId, caseSpec, selectionSha256,
@@ -459,7 +486,7 @@ const summarizeArm = (rows: DiagnosticResult[]) => ({ games: rows.length,
 export const actionableWindow = (rows: DiagnosticResult[]) => {
     const losing = rows.filter((row) => row.winner === "opponent"), ticks = [3_600, 4_800, 6_000, 7_200, 8_400, 9_600,
         12_000, 15_000, 18_000];
-    const candidates = ticks.map((tick) => { const snapshots = losing.map((row) => {
+    const series = (subset: DiagnosticResult[]) => ticks.map((tick) => { const snapshots = subset.map((row) => {
         const eligible = row.publicSnapshots.filter((snapshot) => snapshot.update <= tick);
         return eligible[eligible.length - 1];
     }).filter((row): row is PublicSnapshot => !!row),
@@ -468,8 +495,16 @@ export const actionableWindow = (rows: DiagnosticResult[]) => {
             (row.own.combatants >= 3 || row.candidateCredits >= 500)).length;
         return { tick, losingCasesObserved: snapshots.length, viableCases: viable,
             viableFraction: snapshots.length ? viable / snapshots.length : 0 }; });
-    const selected = candidates.find((row) => row.losingCasesObserved >= 18 && row.viableFraction >= 0.75) ?? null;
-    return { losingCases: losing.length, candidates, selected, passed: selected !== null };
+    const candidates = series(losing), bySide = Object.fromEntries(["Allied", "Soviet"].map((side) =>
+        [side, series(losing.filter((row) => row.side === side))])),
+        bySlot = Object.fromEntries([0, 1].map((slot) =>
+            [String(slot), series(losing.filter((row) => row.candidateSlot === slot))])),
+        groupPass = (values: any[], tick: number) => { const row = values.find((item) => item.tick === tick);
+            return !!row && row.losingCasesObserved >= 8 && row.viableFraction >= 0.75; },
+        selected = candidates.find((row) => row.losingCasesObserved >= 18 && row.viableFraction >= 0.75 &&
+            Object.values(bySide).every((values) => groupPass(values as any[], row.tick)) &&
+            Object.values(bySlot).every((values) => groupPass(values as any[], row.tick))) ?? null;
+    return { losingCases: losing.length, candidates, bySide, bySlot, selected, passed: selected !== null };
 };
 
 type NumericFeatures = Record<string, number>;
@@ -562,14 +597,33 @@ export const classificationAnalysis = (rows: DiagnosticResult[]) => {
                 countryRows = available.map(({ row, snapshot }) => ({ group: String(row.country),
                     label: row.winner === "candidate" ? 1 as const : 0 as const, features: numericFeatures(snapshot) })),
                 slotRows = available.map(({ row, snapshot }) => ({ group: String(row.candidateSlot),
+                    label: row.winner === "candidate" ? 1 as const : 0 as const, features: numericFeatures(snapshot) })),
+                repeatRows = available.map(({ row, snapshot }) => ({ group: String(row.repeatIndex),
                     label: row.winner === "candidate" ? 1 as const : 0 as const, features: numericFeatures(snapshot) }));
-            return { tick, leaveCountryOut: groupedStump(countryRows), leaveSlotOut: groupedStump(slotRows) };
+            return { tick, leaveCountryOut: groupedStump(countryRows), leaveSlotOut: groupedStump(slotRows),
+                leaveRepeatBlockOut: groupedStump(repeatRows) };
         }), earliestPredictiveTick = byTick.find((row) =>
             (row.leaveCountryOut.balancedAccuracy ?? 0) >= 0.65 &&
             (row.leaveSlotOut.balancedAccuracy ?? 0) >= 0.65 &&
+            (row.leaveRepeatBlockOut.balancedAccuracy ?? 0) >= 0.65 &&
             row.leaveCountryOut.positives >= 3 && row.leaveCountryOut.negatives >= 3)?.tick ?? null;
     return { treeDepth: 1, outcomeJoinedOnlyAfterCompleteAggregate: true, byTick, earliestPredictiveTick };
 };
+
+const outcomeScore = (winner: Winner) => winner === "candidate" ? 1 : winner === "draw" ? 0.5 : 0;
+export const selectRepresentativeTraces = (rows: DiagnosticResult[]) => Object.fromEntries(HFO_ADVANCED_V7_ARMS.map((arm) => {
+    const ordered = rows.filter((row) => row.armId === arm).sort((left, right) =>
+        outcomeScore(left.winner) - outcomeScore(right.winner) || left.updates - right.updates ||
+        left.populationCaseIndex - right.populationCaseIndex), indices = [0.25, 0.50, 0.75].map((quantile) =>
+        Math.floor(quantile * (ordered.length - 1)));
+    if (ordered.length !== 36 || new Set(indices).size !== 3) throw new Error(`V7 representative coverage ${arm}`);
+    return [arm, indices.map((index, ordinal) => { const row = ordered[index]; return {
+        quantile: [0.25, 0.50, 0.75][ordinal], sortedIndex: index, taskIndex: row.taskIndex,
+        populationCaseIndex: row.populationCaseIndex, repeatIndex: row.repeatIndex, country: row.country,
+        candidateSlot: row.candidateSlot, winner: row.winner, updates: row.updates,
+        candidatePublicTraceSha256: row.publicTraceSha256,
+        opponentPublicTraceSha256: row.opponentPublicTraceSha256 } })];
+}));
 
 const finalize = () => {
     const root = requiredPath("RESULTS_ROOT"), out = requiredPath("OUT_PATH"),
@@ -596,21 +650,45 @@ const finalize = () => {
             cell.ra2webClientCommit !== RA2WEB_CLIENT_COMMIT || cell.freezeManifestSha256 !== RA2WEB_FREEZE_MANIFEST_SHA256 ||
             cell.advancedBundleSha256 !== ADVANCED_SHA256 || cell.result.quitForwarded?.candidate !== 0 ||
             cell.result.quitForwarded?.baseline !== 0) throw new Error(`V7 cell identity ${taskIndex}`);
-        rows.push(cell.result as DiagnosticResult);
+        const result = cell.result as DiagnosticResult;
+        assertOutcomeFreeSelection(result.publicSnapshots, `candidateTrace${taskIndex}`);
+        assertOutcomeFreeSelection(result.opponentPublicSnapshots, `opponentTrace${taskIndex}`);
+        if (!Array.isArray(result.publicSnapshots) || !Array.isArray(result.opponentPublicSnapshots) ||
+            result.publicSnapshots.length !== result.opponentPublicSnapshots.length ||
+            sha256Text(JSON.stringify(result.publicSnapshots)) !== result.publicTraceSha256 ||
+            sha256Text(JSON.stringify(result.opponentPublicSnapshots)) !== result.opponentPublicTraceSha256 ||
+            JSON.stringify(result.publicSnapshots.map((row) => row.update)) !==
+                JSON.stringify(result.opponentPublicSnapshots.map((row) => row.update)) ||
+            result.actionOwnershipConflicts?.applicable !== false || result.actionOwnershipConflicts?.count !== 0 ||
+            result.actionOwnershipConflicts?.reason !== "immutable-arms-have-no-overlay" ||
+            (result.actionBuckets.some((row) => row.method === "queueForProduction" && row.count > 0) &&
+                result.milestoneUpdates.firstProductionOrder === null)) throw new Error(`V7 telemetry ${taskIndex}`);
+        rows.push(result);
     }
     for (const arm of HFO_ADVANCED_V7_ARMS) for (const country of HFO_ADVANCED_V7_COUNTRIES)
         for (const slot of [0, 1] as const) if (rows.filter((row) => row.armId === arm && row.country === country &&
             row.candidateSlot === slot).length !== 2) throw new Error(`V7 final coverage ${arm}:${country}:${slot}`);
     const deterministic = rows.filter((row) => row.caseIndex === 0).map((row) => ({ armId: row.armId,
-        repeat: row.deterministicRepeat })), window = actionableWindow(rows), classification = classificationAnalysis(rows),
-        passed = deterministic.length === 2 && deterministic.every((row) => row.repeat?.passed === true) && window.passed,
+        repeat: row.deterministicRepeat })), window = actionableWindow(rows),
+        classificationPooled = classificationAnalysis(rows),
+        strongBotRows = rows.filter((row) => row.armId === "deployed_strongbot"),
+        classificationStrongBotOnly = classificationAnalysis(strongBotRows), representatives = selectRepresentativeTraces(rows),
+        winsByArm = Object.fromEntries(HFO_ADVANCED_V7_ARMS.map((arm) =>
+            [arm, rows.filter((row) => row.armId === arm && row.winner === "candidate").length])),
+        pooledPolicyConfounded = Object.values(winsByArm).filter((value) => value > 0).length === 1,
+        classification = { pooled: classificationPooled, strongBotOnly: classificationStrongBotOnly,
+            pooledPolicyConfounded, reason: pooledPolicyConfounded ?
+                "all candidate wins occur in one immutable policy arm" : "wins span immutable policy arms" },
+        passed = deterministic.length === 2 && deterministic.every((row) => row.repeat?.passed === true) &&
+            window.passed && pooledPolicyConfounded && Object.values(representatives).every((value: any) => value.length === 3),
         summaries = Object.fromEntries(HFO_ADVANCED_V7_ARMS.map((arm) => [arm,
             summarizeArm(rows.filter((row) => row.armId === arm))]));
     const compactRows = rows.map((row) => ({ taskIndex: row.taskIndex, armId: row.armId, caseIndex: row.caseIndex,
-        populationCaseIndex: row.populationCaseIndex, country: row.country, side: row.side,
+        populationCaseIndex: row.populationCaseIndex, repeatIndex: row.repeatIndex, country: row.country, side: row.side,
         candidateSlot: row.candidateSlot, requestedEngineSeed: row.requestedEngineSeed, updates: row.updates,
         status: row.status, winner: row.winner, publicTraceSha256: row.publicTraceSha256,
-        actionSha256: row.actionSha256, milestoneUpdates: row.milestoneUpdates,
+        opponentPublicTraceSha256: row.opponentPublicTraceSha256, actionSha256: row.actionSha256,
+        milestoneUpdates: row.milestoneUpdates, actionOwnershipConflicts: row.actionOwnershipConflicts,
         terminalBuildingCounts: row.terminalBuildingCounts, deterministicRepeat: row.deterministicRepeat }));
     const artifact = { schemaVersion: 1, kind: "hfo-advanced-v7-public-state-diagnostic",
         status: passed ? "PASS_HFO_ADVANCED_V7_PUBLIC_STATE_DIAGNOSTIC" : "FAIL_HFO_ADVANCED_V7_PUBLIC_STATE_DIAGNOSTIC",
@@ -620,7 +698,8 @@ const finalize = () => {
         selectionSha256, legacySelectionSha256: V7_LEGACY_SELECTION_SHA256, baselineCommit: BASELINE_COMMIT,
         ra2webClientCommit: RA2WEB_CLIENT_COMMIT, ra2webClientReleaseId: RA2WEB_CLIENT_RELEASE_ID,
         freezeManifestSha256: RA2WEB_FREEZE_MANIFEST_SHA256, advancedBundleSha256: ADVANCED_SHA256,
-        ...HFO_ADVANCED_V7_SPEC, summaries, deterministic, actionableWindow: window, classification, rows: compactRows };
+        ...HFO_ADVANCED_V7_SPEC, summaries, deterministic, actionableWindow: window, classification,
+        representativeTraces: representatives, rows: compactRows };
     fs.mkdirSync(path.dirname(out), { recursive: true, mode: 0o700 });
     fs.writeFileSync(out, JSON.stringify(artifact, null, 2) + "\n", { flag: "wx", mode: 0o600 });
     console.log(JSON.stringify({ status: artifact.status, passed, summaries, selectedWindow: window.selected }));
