@@ -155,6 +155,13 @@ class FallbackManuscriptTest(unittest.TestCase):
         ):
             self.assertIn(macro, source)
 
+    def test_ai_disclosure_names_and_cites_codex(self) -> None:
+        source = (ROOT / "paper" / "sections" / "reproducibility.tex").read_text()
+        self.assertIn("Generative AI disclosure", source)
+        self.assertIn("OpenAI Codex", source)
+        self.assertIn(r"\cite{openai2026codex}", source)
+        self.assertIn("human author", source.lower())
+
     def test_all_registered_frames_are_used_once(self) -> None:
         diagnostics = (ROOT / "paper" / "sections" / "diagnostics.tex").read_text()
         frames = sorted((ROOT / "paper" / "figures" / "game_frames").glob("*.png"))
