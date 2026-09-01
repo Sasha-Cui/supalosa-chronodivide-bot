@@ -14,7 +14,6 @@ import { RA2WEB_CLIENT_COMMIT, RA2WEB_CLIENT_RELEASE_ID, RA2WEB_FREEZE_MANIFEST_
     createInspectableRa2WebBot, loadRa2WebOpponent } from "./ra2WebOpponentBundle.js";
 import { CanonicalV8Policy, V8_SEARCH_SEEDS, canonicalizeV8Policy, crossoverV8Policy,
     decorateWithV8Controller, mutateV8Policy } from "./hfoAdvancedStateConditionedV8Core.js";
-import { V8_COUNTRIES, V8_SELECTION_CASE_COUNT } from "./hfoAdvancedStateConditionedV8Technical.js";
 
 const MAP = { name: "cd_chrono_4_heck_freezes_over_le.map",
     sha256: "e4dfc736a6355e0e68d4681e4d67419516e6bb94549e2d42880c9414e95e2e8d" } as const;
@@ -22,6 +21,9 @@ const BASELINE_COMMIT = "165b77a71d0cf5ebd27c65b19d0486bcbae78d0f";
 const ADVANCED_SHA256 = "81d8797b6dd1371ba2dcbd79e25df8b42254290c820159e121a82650fd97a143";
 const ORIGINAL_PROTOCOL_SHA256 = "186ede4a712c68d2c0324dc350de4de8428f3b52cb55d344224b50934c447f88";
 const SHA256 = /^[0-9a-f]{64}$/;
+const V8_SELECTION_CASE_COUNT = 1_620;
+const V8_COUNTRIES = [Countries.USA, Countries.KOREA, Countries.FRANCE, Countries.GERMANY,
+    Countries.GREAT_BRITAIN, Countries.LIBYA, Countries.IRAQ, Countries.CUBA, Countries.RUSSIA] as const;
 const MAX_UPDATES = 90_000, T_CRITICAL_90_DF17 = 1.33338;
 const ALLIED = new Set<Countries>(V8_COUNTRIES.slice(0, 5));
 export const V8_G0_RUN_COUNT = 3 as const;
