@@ -141,10 +141,12 @@ function finalize(){
         assert.ok(!tasks.has(+match[1]));tasks.set(+match[1],id);
     }
     assert.equal(tasks.size,900);assert.equal(new Set(tasks.values()).size,900);
+    fs.readdirSync(required("RESULTS_ROOT")); // Refresh the completed array directory before checking immutable outputs.
     const results=[];let runtimeIdentity=null;
     for(let i=0;i<900;i++){
         const taskRoot=path.join(required("RESULTS_ROOT"),"task-"+String(i).padStart(3,"0")),
             file=path.join(taskRoot,"cell.json"),assignment=screenAssignment(plan,i);
+        fs.readdirSync(taskRoot); // Avoid treating a stale negative lookup as a failed simulation.
         assert.equal(fs.readFileSync(path.join(taskRoot,"COMPLETE"),"utf8").trim(),"COMPLETE_MULTIMAP_SCREEN_CELL_V3");
         assert.equal(hash(read(file)),fs.readFileSync(path.join(taskRoot,"cell.sha256"),"utf8").trim().split(/\s+/)[0]);
         const cell=json(file),map=census.maps[assignment.mapIndex],spec=map.cases[assignment.mapCaseIndex];
