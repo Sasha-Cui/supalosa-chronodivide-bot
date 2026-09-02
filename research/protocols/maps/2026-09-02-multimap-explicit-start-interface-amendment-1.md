@@ -23,7 +23,9 @@ original bundle:
 
 The loader may replace only the single offline/online shared participant
 option expression `startPos:RANDOM_START_POS` with a checked optional
-participant start value. The existing engine already accepts numeric fixed
+participant start value and add an input-validation guard at the adjacent
+`humanPlayers:t.agents.map` boundary. These are the only engine expression
+changes. The existing engine already accepts numeric fixed
 start options; no spawn algorithm or unit state is changed. Reject explicit
 options in online games. Missing explicit options retain the original random
 value. Reject malformed, duplicate, negative, out-of-range, or observer
@@ -68,6 +70,10 @@ deterministic repeats, source/runtime identities, recursive prohibited-field
 checks, and Slurm account/exit/completion markers. Any mismatch fails the
 whole compatibility job. Do not inspect partial smoke JSON. This is one
 Slurm CPU job on pi_jss233, 8 GiB, two-hour limit.
+
+Exact planned counts: 26 reference initializations and 1,264 loader
+initializations (26 no-override, 26 matched-natural, 744 pair repeats, 468
+country/slot repeats); 1,290 total, each stopped after one update.
 
 ## Subsequent census remains gated
 
