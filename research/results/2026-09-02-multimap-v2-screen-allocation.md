@@ -60,4 +60,4 @@ check is bypassed. Persistent discrepancies still fail closed.
 
 Only the canonical first allocation authorizes the frozen 900-game screen.
 All competitive cells and its finalizer must complete cleanly before results
-are opened. Confirmation remains sealed and the paper remains unwritten.
+are opened. Confirmation remains sealed and the paper remains frozen.
