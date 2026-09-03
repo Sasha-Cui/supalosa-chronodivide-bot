@@ -124,8 +124,35 @@ def main():
     if digest(plan_path) != os.environ["PLAN_FILE_SHA256"]:
         raise RuntimeError("Plan mismatch")
     prepared = json.loads(plan_path.read_text())
-    if prepared["sourceCommit"] != source or prepared["plan"]["counts"]["uniqueSeeds"] != 1084:
+    if prepared["plan"]["counts"]["uniqueSeeds"] != 1084:
         raise RuntimeError("Plan identity mismatch")
+    # Planning and execution commits may differ before initialization, but every
+    # plan-defining file and map must remain byte-identical.
+    bound_paths = {
+        "protocol": REPO / "research/protocols/maps/2026-09-03-fresh-dual-endpoint-remeasurement-v1.md",
+        "amendment": REPO / "research/protocols/maps/2026-09-03-fresh-dual-endpoint-seed-amendment-a1.md",
+        "census": PROJECT / "research-evidence/multimap-v2/explicit-census-amendment-2/finalizer/multimap-selection.json",
+        "allocation": PROJECT / "research-evidence/multimap-v2/screen-amendment-3/allocation/allocation.json",
+        "core": REPO / "research/runtime/fresh-dual-endpoint-plan-v1.mjs",
+        "inputs": REPO / "research/runtime/fresh-dual-inputs-v1.mjs",
+        "loader": REPO / "research/runtime/explicit-start-loader-v1.mjs",
+        "transform": REPO / "research/runtime/explicit-start-transform-v1.mjs",
+        "assetReference": PROJECT / "research-evidence/live-building-ledger/combatant-owned-gate-v1-callback-a1/manifest.json",
+        "seedHelper": REPO / "packages/chronodivide-bot-driver/dist/benchmark/seededOfflineGame.js",
+        "package": REPO / "packages/chronodivide-bot-driver/package.json",
+        "lockfile": REPO / "packages/chronodivide-bot-driver/pnpm-lock.yaml",
+        "runtime": Path(prepared["runtime"]),
+    }
+    if set(bound_paths) != set(prepared["fileHashes"]):
+        raise RuntimeError("Unknown plan input binding")
+    for key, file in bound_paths.items():
+        if not str(file.resolve()).startswith(str(PROJECT) + "/") or digest(file) != prepared["fileHashes"][key]:
+            raise RuntimeError("Plan input changed: " + key)
+    if digest(REPO / "research/scripts/prepare-fresh-dual-study-v1.mjs") != prepared["programSha256"]:
+        raise RuntimeError("Plan generator changed")
+    for item in prepared["plan"]["maps"]:
+        if digest(Path(prepared["assets"]) / item["fileName"]) != item["sha256"]:
+            raise RuntimeError("Planned map bytes changed")
     exact_seeds = set(prepared["plan"]["uniqueSeeds"])
     if len(exact_seeds) != 1084 or not all(LOW <= s < HIGH for s in exact_seeds):
         raise RuntimeError("Planned seed set invalid")
@@ -139,7 +166,9 @@ def main():
     for root, source_mode in [(p, False) for p in METADATA_ROOTS] + [(p, True) for p in SOURCE_ROOTS]:
         if not root.is_dir() or root.is_symlink():
             errors.append({"path": str(root), "reason": "root missing or symlink"}); continue
-        for parent, directories, names in os.walk(root, followlinks=False):
+        def walk_error(error):
+            errors.append({"path": str(error.filename), "reason": type(error).__name__ + ": " + str(error)})
+        for parent, directories, names in os.walk(root, followlinks=False, onerror=walk_error):
             keep = []
             for name in sorted(directories):
                 p = Path(parent) / name
@@ -197,7 +226,7 @@ def main():
                 "sha256": digest(REPO / "packages/chronodivide-bot-driver/src/training" / n)} for n in reviewed_names]
     passed = bool(files) and not errors and not collisions
     artifact = {"kind": "fresh-dual-seed-reservation-audit-v1", "complete": True, "passed": passed, "outcomeFree": True,
-        "sourceCommit": source, "programSha256": digest(own), "scopeSha256": digest(scope), "planFileSha256": digest(plan_path),
+        "sourceCommit": source, "planningSourceCommit": prepared["sourceCommit"], "planInputBindingsVerified": True, "programSha256": digest(own), "scopeSha256": digest(scope), "planFileSha256": digest(plan_path),
         "planSha256": prepared["planSha256"], "schedulerAccount": "pi_jss233", "schedulerJobId": os.environ["SLURM_JOB_ID"],
         "reservedInterval": [LOW, HIGH], "exactPlannedSeedCount": len(exact_seeds), "exactPlannedSeeds": sorted(exact_seeds),
         "metadataRoots": [str(p) for p in METADATA_ROOTS], "sourceRoots": [str(p) for p in SOURCE_ROOTS],

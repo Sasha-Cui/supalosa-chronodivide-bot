@@ -16,19 +16,19 @@ async function main(){
  const sourceCommit=git("rev-parse","HEAD");assert.equal(sourceCommit,git("rev-parse","fork/main"));assert.equal(sourceCommit,required("SOURCE_COMMIT"));
  const programSha256=hash(read(fileURLToPath(import.meta.url)));assert.equal(programSha256,required("PROGRAM_SHA256"));
  const preparedPath=path.join(ROOT,"plan.json"),planFileSha256=hash(read(preparedPath));assert.equal(planFileSha256,required("PLAN_FILE_SHA256"));
- const prepared=json(preparedPath);assert.equal(prepared.sourceCommit,sourceCommit);assert.equal(prepared.complete,true);assert.equal(prepared.outcomeFree,true);
+ const prepared=json(preparedPath);assert.equal(prepared.complete,true);assert.equal(prepared.outcomeFree,true);
  const {plan,runtime,fileHashes,assetEntries}=loadPlanInputs();validatePlan(plan);assert.deepEqual(prepared.plan,plan);assert.deepEqual(prepared.fileHashes,fileHashes);assert.deepEqual(prepared.assetEntries,assetEntries);
  const auditDir=path.join(ROOT,"audit");fs.readdirSync(ROOT);fs.readdirSync(auditDir);
  assert.equal(read(path.join(auditDir,"COMPLETE")).toString().trim(),"COMPLETE_FRESH_DUAL_SEED_AUDIT_V1");
  const auditPath=path.join(auditDir,"seed-audit.json"),auditSha256=hash(read(auditPath));assert.equal(auditSha256,required("AUDIT_SHA256"));
  assert.equal(auditSha256,read(path.join(auditDir,"seed-audit.sha256")).toString().trim().split(/\s+/)[0]);
  const audit=json(auditPath);assert.equal(audit.complete,true);assert.equal(audit.passed,true);assert.equal(audit.outcomeFree,true);
- assert.equal(audit.sourceCommit,sourceCommit);assert.equal(audit.planFileSha256,planFileSha256);assert.equal(audit.planSha256,prepared.planSha256);
+ assert.equal(audit.sourceCommit,sourceCommit);assert.equal(audit.planningSourceCommit,prepared.sourceCommit);assert.equal(audit.planInputBindingsVerified,true);assert.equal(audit.planFileSha256,planFileSha256);assert.equal(audit.planSha256,prepared.planSha256);
  assert.equal(audit.collisions.length,0);assert.equal(audit.errors.length,0);assert.deepEqual(audit.exactPlannedSeeds,plan.uniqueSeeds);
  const ar=execFileSync("/opt/slurm/current/bin/sacct",["-X","-j",String(audit.schedulerJobId),"-n","-P","--format=JobID,Account,Partition,State,ExitCode,Restarts"],{encoding:"utf8"}).trim().split("|");
  assert.equal(ar[0],String(audit.schedulerJobId));assert.deepEqual(ar.slice(1,6),["pi_jss233","day","COMPLETED","0:0","0"]);
  const outDir=required("OUT_DIR"),jobId=required("SLURM_JOB_ID");
- const context={sourceCommit,programSha256,planFileSha256,planSha256:prepared.planSha256,auditSha256,fileHashes,
+ const context={sourceCommit,planningSourceCommit:prepared.sourceCommit,programSha256,planFileSha256,planSha256:prepared.planSha256,auditSha256,fileHashes,
   scheduler:{jobId,account:"pi_jss233",partition:"day",arrayJobId:process.env.SLURM_ARRAY_JOB_ID??null},nodeVersion:process.version};
  if(mode==="cell"){
   const blockIndex=Number(required("SLURM_ARRAY_TASK_ID"));assert.ok(Number.isInteger(blockIndex)&&blockIndex>=0&&blockIndex<16);progress.blockIndex=blockIndex;
@@ -74,7 +74,7 @@ async function main(){
   assert.equal(read(path.join(dir,"COMPLETE")).toString().trim(),"COMPLETE_FRESH_DUAL_SELECTION_CELL_V1");
   const p=path.join(dir,"selection.json"),sha=hash(read(p));assert.equal(sha,read(path.join(dir,"selection.sha256")).toString().trim().split(/\s+/)[0]);
   const a=json(p);assert.equal(a.complete,true);assert.equal(a.passed,true);assert.equal(a.outcomeFree,true);rejectOutcomeKeys(a);
-  for(const k of ["sourceCommit","programSha256","planFileSha256","planSha256","auditSha256"])assert.equal(a[k],context[k]);
+  for(const k of ["sourceCommit","planningSourceCommit","programSha256","planFileSha256","planSha256","auditSha256"])assert.equal(a[k],context[k]);
   assert.deepEqual(a.fileHashes,fileHashes);assert.deepEqual(a.block,plan.blocks[i]);assert.deepEqual(a.map,plan.maps.find(m=>m.id===a.block.mapId));
   assert.equal(a.scheduler.jobId,jobs.get(i));assert.equal(a.scheduler.account,"pi_jss233");assert.equal(a.scheduler.partition,"day");assert.equal(a.scheduler.arrayJobId,array);
   assert.equal(a.createdGameCount,a.block.caseCount);assert.equal(a.updateCalls,0);assert.equal(a.selected.length,a.block.caseCount);

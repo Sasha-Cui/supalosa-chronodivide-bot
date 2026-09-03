@@ -64,3 +64,16 @@ scope. It does not prove absence across excluded outcome files, archives,
 unrecorded ad-hoc runs, arbitrary encodings or all historical bytes. Do not
 describe it as universal freshness. A collision blocks initialization and
 requires a recorded pre-outcome amendment, not silent reseeding.
+
+## Pre-initialization execution hardening
+
+Directory traversal errors are explicit audit failures, never silently skipped.
+No audit job or game had started when this guard was added.
+
+The canonical prepared plan remains immutable even if an audit/selector-only
+fix has a newer Git commit. Record planningSourceCommit separately from the
+execution sourceCommit, require every original plan-defining file, generator,
+map and runtime binding to remain byte-identical, and preserve the exact plan
+file hash. This distinction does not permit changed seeds, assignments or
+inputs. Audit and selector execution still require one clean synchronized
+source commit and their own exact program hashes.
