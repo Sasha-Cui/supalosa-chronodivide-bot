@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import {tasks,fixtureMap,rejectCompetitiveKeys,probeChecks} from "../runtime/neutral-building-ledger-probe-v1.mjs";
+import fs from "node:fs";
+import {PROBE_RELATIVE_ROOT,tasks,fixtureMap,rejectCompetitiveKeys,probeChecks} from "../runtime/neutral-building-ledger-probe-v1.mjs";
 test("exact eight-task balanced crossed design with paired deterministic repeats",()=>{
  assert.equal(tasks.length,8);assert.equal(new Set(tasks.map(t=>t.taskIndex)).size,8);
  for(let i=0;i<8;i+=2){assert.deepEqual({...tasks[i],taskIndex:0,repeat:0},{...tasks[i+1],taskIndex:0,repeat:0});}
@@ -28,4 +29,11 @@ test("missing actions, early finish, repeated events, stale membership and wrong
   x=>{x.boundaries[0].legacyAttributionRecognized=true;},x=>{x.boundaries=[];},
  ];
  for(const mutate of variants){const x=setup(true);mutate(x);assert.ok(Object.values(probeChecks(x)).some(v=>v===false));}
+});
+
+test("program and Slurm use the same new immutable amendment root",()=>{
+ const program=fs.readFileSync(new URL("../scripts/neutral-building-ledger-probe-v1.mjs",import.meta.url),"utf8");
+ const shell=fs.readFileSync(new URL("../slurm/neutral_building_ledger_probe_v1.sbatch",import.meta.url),"utf8");
+ assert.ok(program.includes("path.join(project,PROBE_RELATIVE_ROOT)"));
+ assert.equal(shell.match(/^PROBE=(.+)$/m)[1],"/nfs/roberts/project/pi_jss233/zc362/chrono_divide/"+PROBE_RELATIVE_ROOT);
 });

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+export const PROBE_RELATIVE_ROOT="research-evidence/live-building-ledger/neutral-probe-v1-materialization-a1";
 export const tasks=Array.from({length:8},(_,taskIndex)=>({taskIndex,orientation:Math.floor(taskIndex/4),rubble:Math.floor(taskIndex/2)%2===1,repeat:taskIndex%2,seed:3100300000+Math.floor(taskIndex/4)}));
 export function fixtureMap(template,rubble){
  assert.equal(typeof rubble,"boolean");

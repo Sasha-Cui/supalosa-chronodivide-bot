@@ -5,11 +5,11 @@ import assert from "node:assert/strict";
 import {execFileSync} from "node:child_process";
 import {fileURLToPath,pathToFileURL} from "node:url";
 import {createRequire} from "node:module";
-import {tasks,fixtureMap,rejectCompetitiveKeys,probeChecks} from "../runtime/neutral-building-ledger-probe-v1.mjs";
+import {PROBE_RELATIVE_ROOT,tasks,fixtureMap,rejectCompetitiveKeys,probeChecks} from "../runtime/neutral-building-ledger-probe-v1.mjs";
 
 async function main(){
 const repo=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"../.."),project=path.dirname(repo);
-const root=path.join(project,"research-evidence/live-building-ledger/neutral-probe-v1");
+const root=path.join(project,PROBE_RELATIVE_ROOT);
 const driver=path.join(repo,"packages/chronodivide-bot-driver");
 const originalAssets=path.join(project,"private-assets/ra2/runtimes/hfo-literal-snow-regular-e0b18958");
 const protocolFile=path.join(repo,"research/protocols/maps/2026-09-03-neutral-building-lifecycle-probe-materialization-a1.md");
