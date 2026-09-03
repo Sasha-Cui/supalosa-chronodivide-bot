@@ -31,8 +31,12 @@ in these fixture maps only. Do not change their native Owner/ForbiddenHouses
 rules. Inspected rules make ENGINEER available to Americans but not Russians,
 and SENGINEER available to Russians but not Americans. The attacker is
 Americans, the owner actor Russians. Both have ten starting units and an MCV.
-Require attacker ENGINEER and MTNK, owner SENGINEER, and no owner armed
-starting units before any update; otherwise fail technically.
+Require attacker ENGINEER and MTNK and owner SENGINEER before any update.
+The owner's initial type set must be exactly SMCV plus SENGINEER; the
+attacker's allowed initial types are AMCV, MTNK, E1 and ENGINEER. Engineers'
+native DefuseKit/VirtualScanner tools are permitted; they are not an armed
+defender troop. Any other starting type fails technically. This is a
+pre-implementation clarification of the noncombatant-owner loadout guard.
 
 All other settings match A3: credits 10000, no crates/superweapons,
 shortGame=false, mcvRepacks=true, gameSpeed=6, buildOffAlly=false.
