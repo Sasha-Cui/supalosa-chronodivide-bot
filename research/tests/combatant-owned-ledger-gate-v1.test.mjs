@@ -101,3 +101,8 @@ test("replayed cleanup does not become attributed physical destruction",()=>{
  for(const index of [32,34,36,38]){const r=analyzeRecords(synthetic(tasks[index]),tasks[index],evaluate);assert.equal(r.checks.noPhysicalAttribution,true);assert.equal(r.attributionAtTransition.attackerAttributed,false);assert.equal(r.attributionAtTransition.ownerAttributed,false);}
 });
 
+test("Slurm binds the same gate root and frozen smoke capacity",()=>{
+ const shell=fs.readFileSync(new URL("../slurm/combatant_owned_ledger_gate_v1.sbatch",import.meta.url),"utf8");
+ assert.equal(shell.match(/^GATE=(.+)$/m)[1],"/nfs/roberts/project/pi_jss233/zc362/chrono_divide/"+ROOT_RELATIVE);
+ for(const text of ["#SBATCH --account=pi_jss233","#SBATCH --partition=day","#SBATCH --no-requeue","SOURCE_COMMIT","PROGRAM_SHA256","MANIFEST_SHA256","SCRIPT_SHA256"])assert.ok(shell.includes(text));
+});
