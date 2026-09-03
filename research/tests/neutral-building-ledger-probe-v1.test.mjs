@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
-import {PROBE_RELATIVE_ROOT,tasks,fixtureMap,rejectCompetitiveKeys,probeChecks} from "../runtime/neutral-building-ledger-probe-v1.mjs";
+import {PROBE_RELATIVE_ROOT,tasks,fixtureMap,rejectCompetitiveKeys,probeChecks,scriptedOrders,compactTechnicalError} from "../runtime/neutral-building-ledger-probe-v1.mjs";
 test("exact eight-task balanced crossed design with paired deterministic repeats",()=>{
  assert.equal(tasks.length,8);assert.equal(new Set(tasks.map(t=>t.taskIndex)).size,8);
  for(let i=0;i<8;i+=2){assert.deepEqual({...tasks[i],taskIndex:0,repeat:0},{...tasks[i+1],taskIndex:0,repeat:0});}
@@ -36,4 +36,21 @@ test("program and Slurm use the same new immutable amendment root",()=>{
  const shell=fs.readFileSync(new URL("../slurm/neutral_building_ledger_probe_v1.sbatch",import.meta.url),"utf8");
  assert.ok(program.includes("path.join(project,PROBE_RELATIVE_ROOT)"));
  assert.equal(shell.match(/^PROBE=(.+)$/m)[1],"/nfs/roberts/project/pi_jss233/zc362/chrono_divide/"+PROBE_RELATIVE_ROOT);
+});
+
+test("no-target deployment uses DeploySelected, never the targeted Deploy overload",()=>{
+ const orders={Deploy:9,DeploySelected:10,ForceAttack:3,Stop:11},types={Vehicle:7,Infantry:3};
+ const own=[{id:1,rules:{name:"AMCV",type:7}},{id:2,rules:{name:"MTNK",type:7}}];
+ const base={tick:0,own,targetId:5,target:{hitPoints:100},types,orders};
+ assert.deepEqual(scriptedOrders(base),[{ids:[1],type:10}]);
+ assert.deepEqual(scriptedOrders({...base,tick:119}),[]);
+ assert.deepEqual(scriptedOrders({...base,tick:120}),[]);
+ assert.deepEqual(scriptedOrders({...base,tick:300}),[{ids:[2],type:3,targetId:5}]);
+ assert.deepEqual(scriptedOrders({...base,tick:300,target:{hitPoints:0}}),[{ids:[2],type:11}]);
+ assert.deepEqual(scriptedOrders({...base,tick:300,targetId:null}),[]);
+});
+test("technical errors retain bounded stack frames and explicit simulation progress",()=>{
+ const e={message:"read obj",stack:"TypeError: read obj\n"+"x".repeat(900000)+"\n    at f (a.js:1:2)\n    at g (b.js:3:4)"};
+ const r=compactTechnicalError(e,{phase:"game-update",completedUpdates:0});
+ assert.equal(r.frames.length,2);assert.equal(r.progress.completedUpdates,0);assert.ok(JSON.stringify(r).length<500);
 });

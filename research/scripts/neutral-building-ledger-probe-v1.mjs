@@ -5,18 +5,19 @@ import assert from "node:assert/strict";
 import {execFileSync} from "node:child_process";
 import {fileURLToPath,pathToFileURL} from "node:url";
 import {createRequire} from "node:module";
-import {PROBE_RELATIVE_ROOT,tasks,fixtureMap,rejectCompetitiveKeys,probeChecks} from "../runtime/neutral-building-ledger-probe-v1.mjs";
+import {PROBE_RELATIVE_ROOT,tasks,fixtureMap,rejectCompetitiveKeys,probeChecks,scriptedOrders,compactTechnicalError} from "../runtime/neutral-building-ledger-probe-v1.mjs";
 
+const progress={phase:"startup",taskIndex:null,gameCreateRequested:false,gameCallbackEntered:false,completedUpdates:0};
 async function main(){
 const repo=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"../.."),project=path.dirname(repo);
 const root=path.join(project,PROBE_RELATIVE_ROOT);
 const driver=path.join(repo,"packages/chronodivide-bot-driver");
 const originalAssets=path.join(project,"private-assets/ra2/runtimes/hfo-literal-snow-regular-e0b18958");
-const protocolFile=path.join(repo,"research/protocols/maps/2026-09-03-neutral-building-lifecycle-probe-materialization-a1.md");
+const protocolFile=path.join(repo,"research/protocols/maps/2026-09-03-neutral-building-lifecycle-probe-deployment-a2.md");
 const hash=x=>crypto.createHash("sha256").update(x).digest("hex"),read=p=>fs.readFileSync(p),json=p=>JSON.parse(read(p));
 const git=(...a)=>execFileSync("git",a,{cwd:repo,encoding:"utf8"}).trim();
 const required=k=>{assert.ok(process.env[k],k+" required");return process.env[k];};
-const phase=process.argv[2];assert.ok(["prepare","init","trace","finalize"].includes(phase));
+const phase=process.argv[2];progress.phase=phase;assert.ok(["prepare","init","smoke","trace","finalize"].includes(phase));
 assert.equal(git("branch","--show-current"),"main");assert.equal(git("status","--porcelain"),"");
 const sourceCommit=git("rev-parse","HEAD");assert.equal(sourceCommit,git("rev-parse","fork/main"));
 const programSha256=hash(read(fileURLToPath(import.meta.url))),protocolSha256=hash(read(protocolFile));
@@ -37,14 +38,17 @@ if(phase==="prepare"){
  const template=read(path.join(driver,"data/simple-1v1-no-preview.map"));
  assert.equal(hash(template),"bd61bb9ab4412b15895c89188336ab53b03dd20879936b92aaf4418e091cf7fc");
  assert.ok(!template.toString().includes("[Structures]"));assert.ok(!template.toString().includes("[GAPOWR]"));
- const assets=path.join(root,"assets");fs.mkdirSync(assets,{recursive:true,mode:0o700});
- for(const {name} of assetEntries)fs.copyFileSync(path.join(originalAssets,name),path.join(assets,name),fs.constants.COPYFILE_EXCL);
+ const previousPath=path.join(project,"research-evidence/live-building-ledger/neutral-probe-v1-materialization-a1/manifest.json");
+ const previousManifestSha256=hash(read(previousPath));
+ assert.equal(previousManifestSha256,"1a005ed67327b38d0f95d0ae30f18440804674fca18b9d30c4d1d42728d29b3b");
+ const previous=json(previousPath),assets=previous.assets;
+ assert.deepEqual(previous.assetEntries,assetEntries);
  const maps=[false,true].map(rubble=>{
-  const name="chrono_neutral_ledger_"+Number(rubble)+".map";
-  const bytes=fixtureMap(template.toString(),rubble);
-  fs.writeFileSync(path.join(assets,name),bytes,{flag:"wx"});return {rubble,name,sha256:hash(bytes)};
+  const name="chrono_neutral_ledger_"+Number(rubble)+".map",bytes=fixtureMap(template.toString(),rubble);
+  assert.ok(fs.lstatSync(path.join(assets,name)).isFile());assert.equal(hash(read(path.join(assets,name))),hash(bytes));
+  return {rubble,name,sha256:hash(bytes)};
  });
- write(path.join(root,"manifest.json"),{kind:"neutral-building-lifecycle-probe-v1",...identity,templateSha256:hash(template),assets,assetEntries,materialization:"regular-byte-copy",maps,tasks,horizon:6000});
+ write(path.join(root,"manifest.json"),{kind:"neutral-building-lifecycle-probe-v1",...identity,templateSha256:hash(template),assets,assetEntries,materialization:"reuse-sealed-A1-regular-files",previousManifestSha256,maps,tasks,smokeTaskIndices:[0,2],horizon:6000});
  console.log(JSON.stringify({prepared:true,root,manifestSha256:hash(read(path.join(root,"manifest.json"))),...identity}));process.exit(0);
 }
 assert.equal(required("SLURM_JOB_ACCOUNT"),"pi_jss233");assert.equal(sourceCommit,required("SOURCE_COMMIT"));
@@ -57,7 +61,7 @@ assert.equal(process.version,"v20.13.1");
 const jobId=required("SLURM_JOB_ID"),out=required("OUT_PATH");
 for(const {name,sha256} of manifest.assetEntries){const file=path.join(manifest.assets,name);assert.ok(fs.lstatSync(file).isFile(),"Asset must be a regular file");assert.equal(hash(read(file)),sha256);}
 if(phase==="init"){
- const {cdapi}=await import(pathToFileURL(runtime));await cdapi.init(manifest.assets);
+ progress.phase="asset-initialization";const {cdapi}=await import(pathToFileURL(runtime));await cdapi.init(manifest.assets);progress.phase="asset-initialization-complete";
  write(out,{kind:"neutral-building-init-compatibility-a1",complete:true,passed:true,...identity,manifestSha256,jobId,schedulerAccount:"pi_jss233",gameInstances:0,updates:0,regularAssetCount:manifest.assetEntries.length});
  console.log(JSON.stringify({complete:true,passed:true,gameInstances:0,updates:0}));process.exit(0);
 }
@@ -68,8 +72,17 @@ assert.equal(hash(read(path.join(initDir,"init.json"))),read(path.join(initDir,"
 assert.equal(initArtifact.passed,true);assert.equal(initArtifact.gameInstances,0);assert.equal(initArtifact.updates,0);assert.equal(initArtifact.manifestSha256,manifestSha256);
 for(const [k,v]of Object.entries(identity))assert.equal(initArtifact[k],v);
 const prohibited=rejectCompetitiveKeys;
-if(phase==="trace"){
- const taskIndex=Number(required("SLURM_ARRAY_TASK_ID"));assert.ok(Number.isInteger(taskIndex)&&taskIndex>=0&&taskIndex<8);
+if(["trace","finalize"].includes(phase)){
+ const smokeRoot=path.join(root,"compatibility-smoke");fs.readdirSync(smokeRoot);
+ assert.equal(read(path.join(smokeRoot,"COMPLETE")).toString().trim(),"COMPLETE_NEUTRAL_LEDGER_SMOKE_A2");
+ const smokeFile=path.join(smokeRoot,"smoke.json");assert.equal(hash(read(smokeFile)),read(path.join(smokeRoot,"smoke.sha256")).toString().trim().split(/\s+/)[0]);
+ const smoke=json(smokeFile);assert.equal(smoke.passed,true);assert.equal(smoke.manifestSha256,manifestSha256);
+ for(const [k,v]of Object.entries(identity))assert.equal(smoke[k],v);
+}
+let apiInitialized=false;
+async function runTrace(taskIndex){
+ assert.ok(Number.isInteger(taskIndex)&&taskIndex>=0&&taskIndex<8);
+ Object.assign(progress,{phase:"trace-setup",taskIndex,gameCreateRequested:false,gameCallbackEntered:false,completedUpdates:0});
  const task=tasks[taskIndex],map=manifest.maps.find(m=>m.rubble===task.rubble);
  assert.equal(hash(read(path.join(manifest.assets,map.name))),map.sha256);
  const {Bot,cdapi,ObjectType,OrderType,ApiEventType}=await import(pathToFileURL(runtime));
@@ -88,20 +101,20 @@ if(phase==="trace"){
   onGameTick(api){
    this.api=api;const tick=api.getCurrentTick();
    const own=api.getVisibleUnits(this.name,"self").map(id=>api.getUnitData(id)).filter(Boolean);
-   if(tick<120&&tick%15===0){const ids=own.filter(u=>u.rules.name==="AMCV").map(u=>u.id);if(ids.length)this.player.actions.orderUnits(ids,OrderType.Deploy);}
-   if(tick>=300&&tick%30===0&&targetId!==null){
-    const ids=own.filter(u=>[ObjectType.Vehicle,ObjectType.Infantry].includes(u.rules.type)&&!["AMCV","SMCV"].includes(u.rules.name)).map(u=>u.id);
-    const target=api.getUnitData(targetId);
-    if(ids.length&&target&&target.hitPoints>0){this.player.actions.orderUnits(ids,OrderType.ForceAttack,targetId);attacks++;}
-    else if(ids.length)this.player.actions.orderUnits(ids,OrderType.Stop);
+   const target=targetId===null?null:api.getUnitData(targetId);
+   for(const request of scriptedOrders({tick,own,targetId,target,types:ObjectType,orders:OrderType})){
+    if(request.targetId!==undefined){this.player.actions.orderUnits(request.ids,request.type,request.targetId);attacks++;}
+    else this.player.actions.orderUnits(request.ids,request.type);
    }
   }
  }
  const attacker=new Scripted("FixtureAttacker","Americans"),passive=new Bot("FixturePassive","Russians");
  attacker.chronoResearchStartPos=task.orientation;passive.chronoResearchStartPos=1-task.orientation;
- await cdapi.init(manifest.assets);
+ if(!apiInitialized){progress.phase="asset-initialization";await cdapi.init(manifest.assets);apiInitialized=true;}
  const settings={online:false,agents:task.orientation===0?[attacker,passive]:[passive,attacker],mapName:map.name,gameMode:cdapi.getAvailableGameModes(map.name)[0],shortGame:false,mcvRepacks:true,cratesAppear:false,superWeapons:false,gameSpeed:6,credits:10000,unitCount:10,buildOffAlly:false};
+ progress.phase="create-game";progress.gameCreateRequested=true;
  const result=await withSeededOfflineGame(cdapi,settings,task.seed,[{agent:attacker,identity:"candidate"},{agent:passive,identity:"opponent"}],async game=>{
+  progress.gameCallbackEntered=true;progress.phase="initial-observation";
   const api=attacker.api;assert.ok(api);const starts=[{x:37,y:63},{x:62,y:39}];
   const point=v=>v.x+","+v.y;
   assert.equal(point(api.getPlayerData(attacker.name).startLocation),point(starts[task.orientation]));
@@ -114,7 +127,9 @@ if(phase==="trace"){
   trace.update(JSON.stringify(snap())+"\n");
   while(updates<manifest.horizon){
    if(game.isFinished()){earlyFinish=true;break;}
-   const pre=snap();events=[];await game.update();updates++;const post=snap();
+   progress.phase="pre-update-observation";const pre=snap();events=[];
+   progress.phase="game-update";await game.update();updates++;progress.completedUpdates=updates;
+   progress.phase="post-update-observation";const post=snap();
    trace.update(JSON.stringify({updates,post,events})+"\n");
    const de=events.filter(e=>e.type===ApiEventType.ObjectDestroy);destroyEvents+=de.length;
    if(de.length){
@@ -130,7 +145,17 @@ if(phase==="trace"){
   return {updates,attackActions:attacks,destroyEvents,traceSha256:trace.digest("hex"),boundaries,checks};
  });
  const artifact={kind:"neutral-building-lifecycle-trace-v1",complete:true,...identity,manifestSha256,task,map,jobId,schedulerAccount:"pi_jss233",nodeVersion:process.version,result};
- prohibited(artifact);write(out,artifact);console.log(JSON.stringify({complete:true,taskIndex}));
+ prohibited(artifact);progress.phase="trace-complete";return artifact;
+}
+if(phase==="smoke"){
+ assert.deepEqual(manifest.smokeTaskIndices,[0,2]);const traces=[];
+ for(const taskIndex of manifest.smokeTaskIndices)traces.push(await runTrace(taskIndex));
+ const passed=traces.every(t=>Object.values(t.result.checks).every(v=>v===true));
+ write(out,{kind:"neutral-building-lifecycle-smoke-a2",complete:true,passed,...identity,manifestSha256,jobId,schedulerAccount:"pi_jss233",traces});
+ console.log(JSON.stringify({complete:true,passed,technicalCases:2}));
+}else if(phase==="trace"){
+ const taskIndex=Number(required("SLURM_ARRAY_TASK_ID"));
+ write(out,await runTrace(taskIndex));console.log(JSON.stringify({complete:true,taskIndex}));
 }else{
  const array=required("ARRAY_JOB_ID");
  const raw=execFileSync("/opt/slurm/current/bin/sacct",["-X","-j",array,"-n","-P","--format=JobID,JobIDRaw,Account,Partition,State,ExitCode,Restarts"],{encoding:"utf8"});
@@ -155,4 +180,8 @@ if(phase==="trace"){
 }
 
 }
-main().catch(error=>{console.error(JSON.stringify({technicalError:error?.message??String(error),cause:error?.cause?.message??null}));process.exitCode=1;});
+main().catch(error=>{
+ const failure=compactTechnicalError(error,progress);console.error(JSON.stringify(failure));
+ if(process.env.OUT_PATH){const file=path.join(path.dirname(process.env.OUT_PATH),"failure.json");try{fs.writeFileSync(file,JSON.stringify(failure,null,2)+"\n",{flag:"wx",mode:0o600});}catch{}}
+ process.exitCode=1;
+});
