@@ -10,15 +10,10 @@ const initialUnits={attacker:[unit(1,"AMCV",7),unit(5,"MTNK",7),unit(6,"ENGINEER
 const row=(id,owner,rule,hp=100)=>({id,owner,rulesName:rule,hitPoints:hp,x:50,y:50});
 const basic=(owner=NEUTRAL,hp=100)=>({id:10,owner,hp,rx:50,ry:50,inWorld:true});
 function synthetic(task){
- let state={legacy:[],live:[],target:basic()},once=false;const eventsBefore=[],records=[{kind:"initial",schemaVersion:1,update:0,gameTick:0,actors:ACTORS,targetId:10,seed:task.seed,scenario:task.scenario,initialUnits,targetRules:{capturable:true,returnable:false,leaveRubble:task.rubble},state,observation:{update:0}}];
+ let state={legacy:[],live:[],target:basic()},once=false,pending=[];const eventsBefore=[],records=[{kind:"initial",schemaVersion:2,update:0,gameTick:0,actors:ACTORS,targetId:10,seed:task.seed,scenario:task.scenario,initialUnits,targetRules:{capturable:true,returnable:false,leaveRubble:task.rubble},state,observation:{update:0}}];
  for(let tick=0;tick<=1800;tick++){
-  if(tick===1800)records.push({kind:"readiness",update:1800,gameTick:1800,state,checks:readiness(state,eventsBefore,10),observation:{update:1800}});
-  const own={attacker:tick===0?initialUnits.attacker:[unit(9,"GACNST",2),...initialUnits.attacker.slice(1)],owner:tick<201?initialUnits.owner:[initialUnits.owner[0],initialUnits.owner[2]]};
-  const views=(task.orientation===0?["attacker","owner"]:["owner","attacker"]).map(role=>({role,tick,own:own[role],target:state.target,visible:tick>=120}));
-  const actions=[];
-  for(const v of views)for(const r of planActions(v,task.scenario,once)){actions.push({role:v.role,tick,...r});if(["sell","quit"].includes(r.kind))once=true;}
   let post=state,events=[];
-  if(tick===0){post={...state,legacy:[row(9,ACTORS.attacker,"GACNST")],live:[row(9,ACTORS.attacker,"GACNST")]};}
+  if(tick===15)post={...state,legacy:[row(9,ACTORS.attacker,"GACNST")],live:[row(9,ACTORS.attacker,"GACNST")]};
   if(tick===200){
    post={legacy:[row(9,ACTORS.attacker,"GACNST"),row(10,ACTORS.owner,"GAPOWR")],live:[row(9,ACTORS.attacker,"GACNST"),row(10,ACTORS.owner,"GAPOWR")],target:basic(ACTORS.owner)};
    events=[{type:0,target:10,previousOwnerName:NEUTRAL,newOwnerName:ACTORS.owner},{type:2,target:3}];
@@ -34,9 +29,14 @@ function synthetic(task){
     post={legacy:retained?[...remaining,row(10,ACTORS.owner,"GAPOWR",0)]:remaining,live:remaining,target:retained?basic(ACTORS.owner,0):null};
    }
   }
-  const f={kind:"update",update:tick+1,gameTickBefore:tick,gameTickAfter:tick+1,pre:state,post,views,actions,events,gameFinishedAfter:tick===1800&&task.scenario==="cleanup"};
+  const after=tick+1,own={attacker:after<16?initialUnits.attacker:[unit(9,"GACNST",2),...initialUnits.attacker.slice(1)],owner:after<201?initialUnits.owner:[initialUnits.owner[0],initialUnits.owner[2]]};
+  const views=(task.orientation===0?["attacker","owner"]:["owner","attacker"]).map(role=>({role,tick:after,own:own[role],target:post.target,visible:after>=120}));
+  const queued=[];
+  const ready=after===1800?{kind:"readiness",update:1800,gameTick:1800,state:post,checks:readiness(post,[...eventsBefore,...events],10),observation:{update:1800}}:null;
+  for(const v of views)for(const r of planActions(v,task.scenario,once)){queued.push({role:v.role,tick:after,...r});if(["sell","quit"].includes(r.kind))once=true;}
+  const f={kind:"update",update:after,gameTickBefore:tick,gameTickAfter:after,pre:state,post,stepRequests:pending,views,queuedActions:queued,events,gameFinishedAfter:tick===1800&&task.scenario==="cleanup"};
   if([120,300,600,1200,1799,1801].includes(f.update))f.observation={update:f.update};
-  records.push(f);if(tick<1800)eventsBefore.push(...events);state=post;
+  records.push(f);if(ready)records.push(ready);if(tick<1800)eventsBefore.push(...events);state=post;pending=queued;
  }
  records.push({kind:"stop",update:1801,reason:"target_transition",gameFinished:task.scenario==="cleanup"});return records;
 }
@@ -94,7 +94,7 @@ test("gzip payload, hashes and prohibited keys are checked before replay",()=>{
 test("stream tampering and false attribution are not accepted",()=>{
  const a=synthetic(tasks[8]);a[100].pre={legacy:[],live:[],target:null};assert.throws(()=>analyzeRecords(a,tasks[8],evaluate));
  const b=synthetic(tasks[8]);b.at(-2).events[0].attackerPlayerName=null;assert.equal(analyzeRecords(b,tasks[8],evaluate).passed,false);
- const c=synthetic(tasks[0]);c.at(-2).actions.push({role:"owner",tick:1800,kind:"quit"});assert.throws(()=>analyzeRecords(c,tasks[0],evaluate));
+ const c=synthetic(tasks[0]);c.at(-2).queuedActions.push({role:"owner",tick:1800,kind:"quit"});assert.throws(()=>analyzeRecords(c,tasks[0],evaluate));
  const d=synthetic(tasks[0]);delete d.find(r=>r.kind==="readiness").observation;assert.equal(analyzeRecords(d,tasks[0],evaluate).passed,false);
 });
 test("replayed cleanup does not become attributed physical destruction",()=>{
@@ -105,4 +105,14 @@ test("Slurm binds the same gate root and frozen smoke capacity",()=>{
  const shell=fs.readFileSync(new URL("../slurm/combatant_owned_ledger_gate_v1.sbatch",import.meta.url),"utf8");
  assert.equal(shell.match(/^GATE=(.+)$/m)[1],"/nfs/roberts/project/pi_jss233/zc362/chrono_divide/"+ROOT_RELATIVE);
  for(const text of ["#SBATCH --account=pi_jss233","#SBATCH --partition=day","#SBATCH --no-requeue","SOURCE_COMMIT","PROGRAM_SHA256","MANIFEST_SHA256","SCRIPT_SHA256"])assert.ok(shell.includes(text));
+});
+
+test("engine step precedes callbacks and queued requests bind to the next step",()=>{
+ const r=synthetic(tasks[0]),frames=r.filter(x=>x.kind==="update");
+ assert.equal(frames[0].gameTickBefore,0);assert.deepEqual(frames[0].views.map(v=>v.tick),[1,1]);assert.deepEqual(frames[0].stepRequests,[]);
+ assert.ok(frames[14].queuedActions.some(a=>a.type===ORDER.DeploySelected&&a.tick===15));
+ assert.deepEqual(frames[15].stepRequests,frames[14].queuedActions);
+ assert.equal(r.find(x=>x.kind==="readiness").update,1800);
+ const bad=structuredClone(r);bad.find(x=>x.kind==="update"&&x.update===16).stepRequests=[];assert.throws(()=>analyzeRecords(bad,tasks[0],evaluate));
+ const bad2=structuredClone(r);bad2[1].views[0].tick=0;assert.throws(()=>analyzeRecords(bad2,tasks[0],evaluate));
 });

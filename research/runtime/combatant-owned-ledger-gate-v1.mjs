@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import crypto from "node:crypto";
 import {gzipSync,gunzipSync} from "node:zlib";
 
-export const ROOT_RELATIVE="research-evidence/live-building-ledger/combatant-owned-gate-v1";
+export const ROOT_RELATIVE="research-evidence/live-building-ledger/combatant-owned-gate-v1-callback-a1";
 export const PROTOCOL_SHA256="874ace6fbf40b6570abe767290641e47732dcb32db6f021cf547ea20da5e43ee";
 export const TEMPLATE_SHA256="bd61bb9ab4412b15895c89188336ab53b03dd20879936b92aaf4418e091cf7fc";
 export const ACTORS={attacker:"OwnedFixtureAttacker",owner:"OwnedFixtureOwner"};
@@ -111,7 +111,7 @@ const validateState=state=>{
 };
 export function analyzeRecords(records,task,evaluate){
  assert.deepEqual(task,tasks[task.taskIndex]);rejectCompetitiveKeys(records);
- const initial=records[0],stop=records.at(-1);assert.equal(initial.kind,"initial");assert.equal(initial.schemaVersion,1);assert.equal(initial.update,0);assert.equal(initial.gameTick,0);
+ const initial=records[0],stop=records.at(-1);assert.equal(initial.kind,"initial");assert.equal(initial.schemaVersion,2);assert.equal(initial.update,0);assert.equal(initial.gameTick,0);
  assert.deepEqual(initial.actors,ACTORS);validateInitialUnits(initial.initialUnits);assert.equal(stop.kind,"stop");
  assert.equal(initial.seed,task.seed);assert.equal(initial.scenario,task.scenario);
  assert.deepEqual(initial.targetRules,{capturable:true,returnable:false,leaveRubble:task.rubble});
@@ -121,20 +121,20 @@ export function analyzeRecords(records,task,evaluate){
  assert.equal(records.length,2+records.filter(r=>r.kind==="update").length+records.filter(r=>r.kind==="readiness").length);
  const frames=records.filter(r=>r.kind==="update"),readies=records.filter(r=>r.kind==="readiness");
  assert.ok(frames.length<=MAX_UPDATES);assert.equal(stop.update,frames.length);
- let previous=initial.state,liveEstablished={candidate:false,baseline:false},legacyEstablished={candidate:false,baseline:false},oneOff=false;
- const preparationEvents=[],transitions=[],actions=[],evaluations=[];
+ let previous=initial.state,previousQueued=[],liveEstablished={candidate:false,baseline:false},legacyEstablished={candidate:false,baseline:false},oneOff=false;
+ const preparationEvents=[],transitions=[],actions=[],evaluations=[];const ready=readies[0];
  for(const [index,f]of frames.entries()){
   assert.equal(f.update,index+1);assert.equal(f.gameTickBefore,index);assert.equal(f.gameTickAfter,index+1);
-  assert.deepEqual(f.pre,previous);validateState(f.pre);validateState(f.post);previous=f.post;
+  assert.deepEqual(f.pre,previous);assert.deepEqual(f.stepRequests,previousQueued);validateState(f.pre);validateState(f.post);previous=f.post;
   assert.deepEqual(f.views.map(v=>v.role),task.orientation===0?["attacker","owner"]:["owner","attacker"]);
   const expected=[];
   for(const v of f.views){
-   assert.equal(v.tick,f.gameTickBefore);assert.deepEqual(v.target,f.pre.target);
+   assert.equal(v.tick,f.gameTickAfter);assert.deepEqual(v.target,f.post.target);
    assert.equal(new Set(v.own.map(u=>u.id)).size,v.own.length);assert.ok(v.own.every(u=>Number.isFinite(u.hp)));
-   const requests=planActions(v,task.scenario,oneOff);
+   const requests=v.tick===ACTION_TICK&&(!ready||!Object.values(ready.checks).every(Boolean))?[]:planActions(v,task.scenario,oneOff);
    for(const request of requests){expected.push({role:v.role,tick:v.tick,...request});if(["sell","quit"].includes(request.kind))oneOff=true;}
   }
-  assert.deepEqual(f.actions,expected);actions.push(...f.actions);
+  assert.deepEqual(f.queuedActions,expected);actions.push(...f.queuedActions);previousQueued=f.queuedActions;
   if(f.gameTickBefore<ACTION_TICK)preparationEvents.push(...f.events);
   if(isTargetTransition(f,initial.targetId))transitions.push(f);
   const common={tick:f.gameTickAfter,combatants:labels(task),events:f.events};
@@ -144,8 +144,8 @@ export function analyzeRecords(records,task,evaluate){
   const select=(e,actor)=>labels(task).candidate===ACTORS[actor]?e.candidatePhysicalWin:e.baselinePhysicalWin;
   evaluations.push({update:f.update,attackerAttributed:select(live,"attacker"),ownerAttributed:select(live,"owner"),legacyAttackerAttributed:select(legacy,"attacker"),legacyOwnerAttributed:select(legacy,"owner")});
  }
- const ready=readies[0],f=transitions[0],ev=evaluations.find(e=>e.update===f?.update);
- if(ready){assert.equal(ready.gameTick,ACTION_TICK);assert.equal(ready.update,ACTION_TICK);assert.deepEqual(ready.state,frames[ACTION_TICK]?.pre??previous);}
+ const f=transitions[0],ev=evaluations.find(e=>e.update===f?.update);
+ if(ready){assert.equal(ready.gameTick,ACTION_TICK);assert.equal(ready.update,ACTION_TICK);assert.deepEqual(ready.state,frames[ACTION_TICK-1]?.post??previous);}
  const readyChecks=ready?readiness(ready.state,preparationEvents,initial.targetId):{};
  if(ready)assert.deepEqual(ready.checks,readyChecks);
  const event=e=>f?.events.filter(x=>x.target===initial.targetId&&x.type===e)??[];
@@ -163,7 +163,7 @@ export function analyzeRecords(records,task,evaluate){
   noUnexpectedQuit:actions.filter(a=>a.kind==="quit").length===(task.scenario==="cleanup"?1:0),
   noUnexpectedSale:actions.filter(a=>a.kind==="sell").length===(task.scenario==="sale"?1:0),
   noPriorPhysicalAttribution:evaluations.filter(e=>e.update<f?.update).every(e=>!e.attackerAttributed&&!e.ownerAttributed),
-  visibilityRespected:frames.every(x=>x.actions.every(a=>![ORDER.Capture,ORDER.ForceAttack].includes(a.type)||x.views.find(v=>v.role===a.role)?.visible===true)),
+  visibilityRespected:frames.every(x=>x.queuedActions.every(a=>![ORDER.Capture,ORDER.ForceAttack].includes(a.type)||x.views.find(v=>v.role===a.role)?.visible===true)),
   nativeFinishExpected:frames.every(x=>!x.gameFinishedAfter||task.scenario==="cleanup"&&x.gameTickBefore>=ACTION_TICK),
   fixedObservationCoverage:[0,120,300,600,1200,1799,1800].every(n=>records.some(r=>r.observation?.update===n)),
  };
@@ -184,7 +184,7 @@ export function analyzeRecords(records,task,evaluate){
   if(task.scenario==="cleanup")checks.unattributedCleanup=event(3).length===1&&event(3)[0].attackerPlayerName===null&&event(2).length===1&&(!targetAfter||targetAfter.hp===0);
  }
  return {passed:Object.values(checks).every(v=>v===true),checks,updates:frames.length,stopReason:stop.reason,
-  transitionUpdate:f?.update??null,readinessChecks:readyChecks,actionCounts:{total:actions.length,attacker:actions.filter(a=>a.role==="attacker").length,owner:actions.filter(a=>a.role==="owner").length,
+  transitionUpdate:f?.update??null,readinessChecks:readyChecks,actionCounts:{total:actions.length,stepRequests:frames.reduce((sum,f)=>sum+f.stepRequests.length,0),attacker:actions.filter(a=>a.role==="attacker").length,owner:actions.filter(a=>a.role==="owner").length,
    captures:actions.filter(a=>a.type===ORDER.Capture).length,physicalAttacks:actions.filter(a=>a.type===ORDER.ForceAttack).length,sales:actions.filter(a=>a.kind==="sell").length,quits:actions.filter(a=>a.kind==="quit").length},
   attributionAtTransition:ev??null};
 }

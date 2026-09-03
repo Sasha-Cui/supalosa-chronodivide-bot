@@ -11,7 +11,7 @@ const repo=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"../.."),pr
 const root=path.join(project,ROOT_RELATIVE),read=p=>fs.readFileSync(p),json=p=>JSON.parse(read(p));
 const required=k=>{assert.ok(process.env[k],k+" required");return process.env[k];};
 const git=(...a)=>execFileSync("git",a,{cwd:repo,encoding:"utf8"}).trim();
-const progress={phase:"startup",taskIndex:null,gameCreateRequests:0,gameCallbacksEntered:0,completedUpdates:0};
+const progress={phase:"startup",taskIndex:null,gameCreateRequests:0,gameCallbacksEntered:0,completedUpdates:0,observedGameTick:0};
 const write=(file,data)=>{rejectCompetitiveKeys(data);fs.writeFileSync(file,JSON.stringify(data,null,2)+"\n",{flag:"wx",mode:0o600});};
 const sealed=(dir,name,marker)=>{
  fs.readdirSync(dir);assert.equal(read(path.join(dir,"COMPLETE")).toString().trim(),marker);
@@ -25,6 +25,7 @@ async function main(){
  const files={
   program:fileURLToPath(import.meta.url),core:path.join(repo,"research/runtime/combatant-owned-ledger-gate-v1.mjs"),
   protocol:path.join(repo,"research/protocols/maps/2026-09-03-combatant-owned-lifecycle-gate-v1.md"),
+  timingProtocol:path.join(repo,"research/protocols/maps/2026-09-03-combatant-owned-lifecycle-callback-amendment-a1.md"),
   runtime,loader:path.join(repo,"research/runtime/explicit-start-loader-v1.mjs"),transform:path.join(repo,"research/runtime/explicit-start-transform-v1.mjs"),
   seedHelper:path.join(driver,"dist/benchmark/seededOfflineGame.js"),candidate:path.join(driver,"dist/training/liveOwnedBuildingSnapshotCandidate.js"),
   legacy:path.join(driver,"dist/training/literalBuildingEliminationEndpoint.js"),package:path.join(driver,"package.json"),lockfile:path.join(driver,"pnpm-lock.yaml"),
@@ -38,33 +39,33 @@ async function main(){
  assert.equal(hash(read(a3File)),"9e3d788a97e1b078ce93b03fc20af9af065e83fe60a78fcc20ddf733a750581a");assert.equal(json(a3File).passed,true);
  const oldManifestFile=path.join(project,"research-evidence/live-building-ledger/neutral-probe-v1-materialization-a1/manifest.json");
  const oldManifestSha256=hash(read(oldManifestFile));assert.equal(oldManifestSha256,"1a005ed67327b38d0f95d0ae30f18440804674fca18b9d30c4d1d42728d29b3b");
- const oldManifest=json(oldManifestFile),identity={sourceCommit,fileHashes,parentA3Sha256:hash(read(a3File)),parentAssetManifestSha256:oldManifestSha256};
+ const firstAttemptFile=path.join(project,"research-evidence/live-building-ledger/combatant-owned-gate-v1/manifest.json");
+ const firstAttemptSha256=hash(read(firstAttemptFile));assert.equal(firstAttemptSha256,"002a0eaabb0db9fde44393c7ce85a66afcfb5585d8f5b60e702ce07d9d3b3306");
+ const firstAttempt=json(firstAttemptFile);
+ const oldManifest=json(oldManifestFile),identity={sourceCommit,fileHashes,parentA3Sha256:hash(read(a3File)),parentAssetManifestSha256:oldManifestSha256,parentFailedAttemptManifestSha256:firstAttemptSha256};
  if(mode==="prepare"){
   assert.ok(!fs.existsSync(root),"Preserve existing gate root; never prepare twice");
   const template=read(path.join(driver,"data/simple-1v1-no-preview.map"));assert.equal(hash(template),TEMPLATE_SHA256);
   for(const e of oldManifest.assetEntries){const p=path.join(oldManifest.assets,e.name);assert.ok(fs.lstatSync(p).isFile());assert.equal(hash(read(p)),e.sha256);}
-  const assets=path.join(root,"assets");fs.mkdirSync(assets,{recursive:true,mode:0o700});
-  const assetEntries=oldManifest.assetEntries.map(e=>{
-   const from=path.join(oldManifest.assets,e.name),to=path.join(assets,e.name);let materialization="hardlink";
-   try{fs.linkSync(from,to);}catch(error){if(error.code!=="EXDEV")throw error;fs.copyFileSync(from,to,fs.constants.COPYFILE_EXCL);materialization="copy";}
-   return {...e,materialization};
-  });
+  const assets=firstAttempt.assets,assetEntries=firstAttempt.assetEntries;
+  for(const e of assetEntries){const p=path.join(assets,e.name);assert.ok(fs.lstatSync(p).isFile());assert.equal(hash(read(p)),e.sha256);}
   const maps=[false,true].map(rubble=>{
    const name="chrono_owned_ledger_"+Number(rubble)+".map",bytes=fixtureMap(template.toString(),rubble);
-   fs.writeFileSync(path.join(assets,name),bytes,{flag:"wx",mode:0o600});return {name,rubble,sha256:hash(bytes)};
+   assert.equal(hash(read(path.join(assets,name))),hash(bytes));return {name,rubble,sha256:hash(bytes)};
   });
+  assert.deepEqual(maps,firstAttempt.maps);fs.mkdirSync(root,{recursive:true,mode:0o700});
   write(path.join(root,"manifest.json"),{kind:"combatant-owned-gate-v1-manifest",...identity,assets,assetEntries,maps,tasks,smokeIndices:SMOKE_INDICES,
    maxUpdates:MAX_UPDATES,actionTick:ACTION_TICK,actors:ACTORS,sourceTemplateSha256:TEMPLATE_SHA256,
    resources:{account:"pi_jss233",partition:"day",cpusPerJob:1,memoryGiB:4,maxConcurrentCells:8,cellMinutes:30,smokeMinutes:60,
-    maxTechnicalGames:45,maxGameUpdates:324000,estimatedTypicalCpuHours:1,scheduledCpuHourUpperBound:22,
-    estimatedCompressedStorageMiB:256,estimatedUncompressedStorageUpperBoundMiB:5760,assetBytesCopiedOnlyOnCrossDevice:true}});
+    maxTechnicalGames:45,cumulativeTechnicalGamesUpperBound:46,maxGameUpdates:324000,estimatedTypicalCpuHours:1,scheduledCpuHourUpperBound:22,
+    estimatedCompressedStorageMiB:256,estimatedUncompressedStorageUpperBoundMiB:5760,reusedAssetsReadOnly:true}});
   console.log(JSON.stringify({prepared:true,root,manifestSha256:hash(read(path.join(root,"manifest.json"))),...identity}));return;
  }
  assert.equal(required("SLURM_JOB_ACCOUNT"),"pi_jss233");assert.equal(process.version,"v20.13.1");
  assert.equal(sourceCommit,required("SOURCE_COMMIT"));assert.equal(fileHashes.program,required("PROGRAM_SHA256"));
  const manifestBytes=read(path.join(root,"manifest.json")),manifest=JSON.parse(manifestBytes),manifestSha256=hash(manifestBytes);
  assert.equal(manifestSha256,required("MANIFEST_SHA256"));assert.equal(manifest.sourceCommit,sourceCommit);assert.deepEqual(manifest.fileHashes,fileHashes);
- assert.equal(manifest.parentA3Sha256,identity.parentA3Sha256);assert.equal(manifest.parentAssetManifestSha256,oldManifestSha256);
+ assert.equal(manifest.parentA3Sha256,identity.parentA3Sha256);assert.equal(manifest.parentAssetManifestSha256,oldManifestSha256);assert.equal(manifest.parentFailedAttemptManifestSha256,firstAttemptSha256);
  assert.deepEqual(manifest.tasks,tasks);assert.deepEqual(manifest.smokeIndices,SMOKE_INDICES);
  for(const e of [...manifest.assetEntries,...manifest.maps]){
   const file=path.join(manifest.assets,e.name);assert.ok(fs.lstatSync(file).isFile());assert.equal(hash(read(file)),e.sha256);
@@ -98,8 +99,8 @@ async function main(){
   assert.deepEqual(analysis,a.analysis);rejectCompetitiveKeys(a);return a;
  };
  async function runCase(task,caseDir){
-  Object.assign(progress,{phase:"case-setup",taskIndex:task.taskIndex,completedUpdates:0});
-  const records=[],preparationEvents=[];let currentFrame=null,targetId=null,updates=0,stopReason="horizon",lastFinished=false,activeGame=null;
+  Object.assign(progress,{phase:"case-setup",taskIndex:task.taskIndex,completedUpdates:0,observedGameTick:0});
+  const records=[],preparationEvents=[];let currentFrame=null,pendingRequests=[],targetId=null,updates=0,stopReason="horizon",lastFinished=false,activeGame=null;
   const map=manifest.maps.find(m=>m.rubble===task.rubble);
   const ownUnits=(api,name)=>api.getVisibleUnits(name,"self").map(id=>api.getUnitData(id)).filter(Boolean).map(u=>({id:u.id,rule:u.rules.name,type:u.rules.type,hp:u.hitPoints,rx:u.tile.rx,ry:u.tile.ry})).sort((a,b)=>a.id-b.id);
   let api;
@@ -108,7 +109,7 @@ async function main(){
    return u?{id:u.id,owner:u.owner,hp:u.hitPoints,rx:u.tile.rx,ry:u.tile.ry,inWorld:true}:null;
   };
   const snapshot=()=>({legacy:endpoint.snapshotCombatantBuildings(api,labels(task)),live:snapshotLiveOwnedBuildingsCandidate(api,labels(task)),target:target()});
-  const observe=tag=>({tag,update:updates,gameTick:api.getCurrentTick(),target:target(),views:Object.fromEntries(Object.entries(ACTORS).map(([role,name])=>[role,{visible:api.getVisibleUnits(name,"hostile").includes(targetId),own:ownUnits(api,name)}]))});
+  const observe=tag=>({tag,update:api.getCurrentTick(),gameTick:api.getCurrentTick(),target:target(),views:Object.fromEntries(Object.entries(ACTORS).map(([role,name])=>[role,{visible:api.getVisibleUnits(name,"hostile").includes(targetId),own:ownUnits(api,name)}]))});
   class Actor extends Bot{
    constructor(role,country){super(ACTORS[role],country);this.role=role;this.oneOff=false;this.expected=[];}
    onGameStart(gameApi){
@@ -118,7 +119,7 @@ async function main(){
      Object.defineProperty(actionApi,method,{configurable:true,value:(...args)=>{
       const request=normalizeAction(method,args);assert.ok(currentFrame,"Action outside recorded update");
       assert.deepEqual(request,this.expected.shift(),"Non-declared actor action");
-      currentFrame.actions.push({role:this.role,tick:gameApi.getCurrentTick(),...request});
+      currentFrame.queuedActions.push({role:this.role,tick:gameApi.getCurrentTick(),...request});
       if(["sell","quit"].includes(request.kind))this.oneOff=true;
       return original(...args);
      }});
@@ -130,8 +131,15 @@ async function main(){
    }
    onGameTick(gameApi){
     assert.ok(currentFrame,"Tick outside recorded update");
-    const view={role:this.role,tick:gameApi.getCurrentTick(),own:ownUnits(gameApi,this.name),target:target(),visible:gameApi.getVisibleUnits(this.name,"hostile").includes(targetId)};
-    currentFrame.views.push(view);const requests=planActions(view,task.scenario,this.oneOff);
+    const tick=gameApi.getCurrentTick();progress.observedGameTick=tick;
+    currentFrame.post??=snapshot();
+    if(tick===ACTION_TICK&&!currentFrame.readiness){
+     const checks=readiness(currentFrame.post,[...preparationEvents,...currentFrame.events],targetId);
+     currentFrame.readiness={kind:"readiness",update:tick,gameTick:tick,state:currentFrame.post,checks,observation:observe("action_boundary")};
+    }
+    const view={role:this.role,tick,own:ownUnits(gameApi,this.name),target:target(),visible:gameApi.getVisibleUnits(this.name,"hostile").includes(targetId)};
+    currentFrame.views.push(view);
+    const requests=currentFrame.readiness&&!Object.values(currentFrame.readiness.checks).every(Boolean)?[]:planActions(view,task.scenario,this.oneOff);
     this.expected=requests.slice();for(const r of requests)dispatchAction(this.player.actions,r);
     assert.equal(this.expected.length,0);
    }
@@ -152,22 +160,20 @@ async function main(){
     assert.equal(targetUnit.rules.capturable,true);assert.equal(targetUnit.rules.returnable,false);assert.equal(targetUnit.rules.leaveRubble,task.rubble);
     assert.equal(targetUnit.tile.rx,50);assert.equal(targetUnit.tile.ry,50);
     const initialUnits={attacker:ownUnits(api,attacker.name),owner:ownUnits(api,owner.name)};validateInitialUnits(initialUnits);
-    records.push({kind:"initial",schemaVersion:1,update:0,gameTick:0,actors:ACTORS,targetId,seed:task.seed,scenario:task.scenario,initialUnits,
+    records.push({kind:"initial",schemaVersion:2,update:0,gameTick:0,actors:ACTORS,targetId,seed:task.seed,scenario:task.scenario,initialUnits,
      targetRules:{capturable:true,returnable:false,leaveRubble:targetUnit.rules.leaveRubble},state:snapshot(),observation:observe("fixed")});
     while(updates<MAX_UPDATES){
      const beforeTick=api.getCurrentTick();progress.phase="pre-observation";const pre=snapshot();
-     if(beforeTick===ACTION_TICK){
-      const checks=readiness(pre,preparationEvents,targetId);records.push({kind:"readiness",update:updates,gameTick:beforeTick,state:pre,checks,observation:observe("action_boundary")});
-      if(!Object.values(checks).every(Boolean)){stopReason="readiness_failed";break;}
-     }
      if(game.isFinished()){lastFinished=true;stopReason="unexpected_finish";break;}
-     currentFrame={kind:"update",update:updates+1,gameTickBefore:beforeTick,pre,views:[],actions:[],events:[]};
+     currentFrame={kind:"update",update:updates+1,gameTickBefore:beforeTick,pre,stepRequests:pendingRequests,views:[],queuedActions:[],events:[]};
      progress.phase="game-update";await game.update();updates++;progress.completedUpdates=updates;
-     progress.phase="post-observation";currentFrame.gameTickAfter=api.getCurrentTick();currentFrame.post=snapshot();lastFinished=game.isFinished();currentFrame.gameFinishedAfter=lastFinished;
+     progress.phase="post-observation";currentFrame.gameTickAfter=api.getCurrentTick();assert.deepEqual(currentFrame.post,snapshot());lastFinished=game.isFinished();currentFrame.gameFinishedAfter=lastFinished;
      if(currentFrame.gameTickBefore<ACTION_TICK)preparationEvents.push(...currentFrame.events);
      const transition=isTargetTransition(currentFrame,targetId);
      if([120,300,600,1200,1799].includes(updates)||transition)currentFrame.observation=observe(transition?"transition_boundary":"fixed");
-     records.push(currentFrame);currentFrame=null;
+     const readyRecord=currentFrame.readiness;delete currentFrame.readiness;
+     pendingRequests=currentFrame.queuedActions;records.push(currentFrame);if(readyRecord)records.push(readyRecord);currentFrame=null;
+     if(readyRecord&&!Object.values(readyRecord.checks).every(Boolean)){stopReason="readiness_failed";break;}
      if(transition){stopReason="target_transition";break;}
      if(lastFinished){stopReason="unexpected_finish";break;}
     }
