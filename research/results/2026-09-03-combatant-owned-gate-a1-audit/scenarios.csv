@@ -1,0 +1,6 @@
+"scenario","cases","passed","strictAttackerAttributions","strictOwnerAttributions","legacyAttackerAttributions","legacyOwnerAttributions","transitionUpdates"
+"physical_no_rubble","8","8","8","0","8","0","2045;1977"
+"physical_rubble","8","8","8","0","0","0","2045;1977"
+"capture","8","8","0","0","0","0","2146;2432"
+"sale","8","8","0","0","0","0","1854"
+"cleanup","8","8","0","0","0","0","1801"

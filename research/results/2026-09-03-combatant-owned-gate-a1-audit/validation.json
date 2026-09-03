@@ -1,0 +1,29 @@
+{
+  "complete": true,
+  "passed": true,
+  "sourceCommit": "7dc09b2ada90cb896d0de58f18f935d861cbf12c",
+  "aggregateSha256": "0f8525c2874c8fc99c04ba121687e03c76a1a3a86675b80d95b4af75c79034ba",
+  "manifestSha256": "b5416fccaef433d6d07376c49c51b987b78a11eacf6a7be2020d4ce7c43f1e0f",
+  "initSha256": "76552428d51319f2f775a4ac32ab24ce8f6bbf5ebc19adcf62369593f527c21c",
+  "smokeSha256": "d85ad561b78cb4e442d3ed764c3a9676e6cc1038fa6b93bbedb0c4ff44952ad6",
+  "auditScriptSha256": "bf7938a6ce61d6a894159434523ec492cb2e46fce55424bd2d949cb00f333288",
+  "fullCases": 40,
+  "smokeCases": 5,
+  "schedulerRecords": 43,
+  "allStreamsDecompressedAndReplayed": true,
+  "allIdentitiesAndAssetBytesChecked": true,
+  "allMarkersAndChecksumsChecked": true,
+  "allGatesRecomputed": true,
+  "allTenLabelRepeatGroupsIdentical": true,
+  "smokeMatchesFull": true,
+  "cpuSeconds": 606,
+  "fullCaseUpdates": 79728,
+  "compressedBytesFullCases": 2730928,
+  "plainBytesFullCases": 214731484,
+  "limitation": "Controlled fixtures, two countries, two reciprocal start/slot orientations, deterministic repetitions. No policy-strength or historical incidence inference; no prior score changes.",
+  "outputs": {
+    "cases.csv": "95c02859e04a58899f829438013eabc70c6ea643a1e6720dbd644395b0bedcad",
+    "scenarios.csv": "cc42bdaf03832f9b6d4bb0c5534e8840c7032e5212ca2bfee5fd8b66fe5db7cc",
+    "scheduler.csv": "2d2547c26c536e23127c4875073fbdad1f37d0777736dc4529d87dbf52dd728c"
+  }
+}
