@@ -1,0 +1,21 @@
+{
+  "complete": true,
+  "passed": true,
+  "gameInstancesCreated": 0,
+  "sourceAggregateSha256": "0f8525c2874c8fc99c04ba121687e03c76a1a3a86675b80d95b4af75c79034ba",
+  "v6Version": 6,
+  "v6SpecSha256": "3bdd0713023800a36a1f38b9726c3d2f3d83b20323dd8ca0c3af6139603eda23",
+  "v6SourceSha256": "3a84b15b9642d045099ed4eb927ef4c9116cd4183ebac30c249d008e0e64177a",
+  "v6CompiledSha256": "1ec063616a89ed6da779df1b55a34dbdc0ee5103c5b93f8f8dfc4afe940dcfca",
+  "legacyCompiledSha256": "51abc0ae861322841d03971b26c709cbea5f9a4ceed4b1b827aec205adfda578",
+  "replayerSha256": "dbd8b8a60830d1aea0a50e8201314cb1f1ed417bb3d97d5478226a9767a0355f",
+  "cases": 40,
+  "stepsReplayed": 79728,
+  "allPerUpdateEvaluationsMatch": true,
+  "duplicatePublicEventsDeduplicated": true,
+  "physicalCasesDetected": 16,
+  "negativeControlsWithoutPhysicalCredit": 24,
+  "csvSha256": "cc176a043b0accc6bae254dcd3807d8f229896d4eab2326fd83553032c665fb2",
+  "nativeCompletionLimitation": "The retained technical streams omit native defeated-side flags. Replay supplies a nonterminal engine state and checks physical decisions only; native completion/cap behavior is covered by separate synthetic truth-table tests, not inferred from these streams.",
+  "deploymentState": "Separate v6 module only; no existing competitive runner was switched and no historical result was rescored."
+}
