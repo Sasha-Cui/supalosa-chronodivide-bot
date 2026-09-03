@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-export const PROBE_RELATIVE_ROOT="research-evidence/live-building-ledger/neutral-probe-v1-deployment-a2";
+export const PROBE_RELATIVE_ROOT="research-evidence/live-building-ledger/neutral-probe-v1-scouting-a3";
 export const tasks=Array.from({length:8},(_,taskIndex)=>({taskIndex,orientation:Math.floor(taskIndex/4),rubble:Math.floor(taskIndex/2)%2===1,repeat:taskIndex%2,seed:3100300000+Math.floor(taskIndex/4)}));
 export function fixtureMap(template,rubble){
  assert.equal(typeof rubble,"boolean");
@@ -21,15 +21,19 @@ export function probeChecks({updates,earlyFinish,attacks,destroyEvents,boundarie
   candidateRecognized:b?.strictAttributionRecognized===true,legacyAsExpected:b?.legacyAttributionRecognized===!task.rubble};
 }
 
-export function scriptedOrders({tick,own,targetId,target,types,orders}){
+export function scriptedOrders({tick,own,targetId,target,targetVisible,types,orders}){
  const requests=[];
  if(tick<120&&tick%15===0){
   const ids=own.filter(u=>u.rules.name==="AMCV").map(u=>u.id);
   if(ids.length)requests.push({ids,type:orders.DeploySelected});
  }
- if(tick>=300&&tick%30===0&&targetId!==null){
+ if(tick>=180&&tick%30===0&&targetId!==null){
   const ids=own.filter(u=>[types.Vehicle,types.Infantry].includes(u.rules.type)&&!["AMCV","SMCV"].includes(u.rules.name)).map(u=>u.id);
-  if(ids.length)requests.push(target&&target.hitPoints>0?{ids,type:orders.ForceAttack,targetId}:{ids,type:orders.Stop});
+  if(ids.length){
+   if(!target||target.hitPoints<=0)requests.push({ids,type:orders.Stop});
+   else if(!targetVisible)requests.push({ids,type:orders.Move,rx:50,ry:50});
+   else if(tick>=300)requests.push({ids,type:orders.ForceAttack,targetId});
+  }
  }
  return requests;
 }

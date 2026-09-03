@@ -11,7 +11,7 @@
 set -euo pipefail
 umask 077
 REPO=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot
-PROBE=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/live-building-ledger/neutral-probe-v1-deployment-a2
+PROBE=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/live-building-ledger/neutral-probe-v1-scouting-a3
 NODE=/apps/software/2024a/software/nodejs/20.13.1-GCCcore-13.3.0/bin/node
 export PATH=/apps/software/2024a/software/nodejs/20.13.1-GCCcore-13.3.0/bin:/opt/slurm/current/bin:/usr/local/bin:/usr/bin:/bin
 export LD_LIBRARY_PATH=/apps/software/2024a/software/ICU/75.1-GCCcore-13.3.0/lib:/apps/software/system/software/GCCcore/13.3.0/lib64:/apps/software/system/software/OpenSSL/3/lib:/apps/software/2024a/software/nodejs/20.13.1-GCCcore-13.3.0/lib

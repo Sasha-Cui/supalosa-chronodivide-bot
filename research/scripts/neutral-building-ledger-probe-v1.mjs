@@ -13,7 +13,7 @@ const repo=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"../.."),pr
 const root=path.join(project,PROBE_RELATIVE_ROOT);
 const driver=path.join(repo,"packages/chronodivide-bot-driver");
 const originalAssets=path.join(project,"private-assets/ra2/runtimes/hfo-literal-snow-regular-e0b18958");
-const protocolFile=path.join(repo,"research/protocols/maps/2026-09-03-neutral-building-lifecycle-probe-deployment-a2.md");
+const protocolFile=path.join(repo,"research/protocols/maps/2026-09-03-neutral-building-lifecycle-probe-scouting-a3.md");
 const hash=x=>crypto.createHash("sha256").update(x).digest("hex"),read=p=>fs.readFileSync(p),json=p=>JSON.parse(read(p));
 const git=(...a)=>execFileSync("git",a,{cwd:repo,encoding:"utf8"}).trim();
 const required=k=>{assert.ok(process.env[k],k+" required");return process.env[k];};
@@ -93,7 +93,7 @@ async function runTrace(taskIndex){
  const {withSeededOfflineGame}=await load("benchmark/seededOfflineGame.js");
  const {snapshotCombatantBuildings,evaluateLiteralBuildingUpdate,toEndpointEvent}=await load("training/literalBuildingEliminationEndpoint.js");
  const {snapshotLiveOwnedBuildingsCandidate}=await load("training/liveOwnedBuildingSnapshotCandidate.js");
- let targetId=null,events=[],attacks=0;
+ let targetId=null,events=[],attacks=0,scoutActions=0,hiddenAttackRequests=0,firstTargetVisibleTick=null,firstAttackTick=null;
  const normalize=toEndpointEvent;
  class Scripted extends Bot{
   onGameStart(api){this.api=api;}
@@ -101,9 +101,14 @@ async function runTrace(taskIndex){
   onGameTick(api){
    this.api=api;const tick=api.getCurrentTick();
    const own=api.getVisibleUnits(this.name,"self").map(id=>api.getUnitData(id)).filter(Boolean);
-   const target=targetId===null?null:api.getUnitData(targetId);
-   for(const request of scriptedOrders({tick,own,targetId,target,types:ObjectType,orders:OrderType})){
-    if(request.targetId!==undefined){this.player.actions.orderUnits(request.ids,request.type,request.targetId);attacks++;}
+   const target=targetId===null?null:api.getGameObjectData(targetId);
+   const targetVisible=targetId!==null&&api.getVisibleUnits(this.name,"hostile").includes(targetId);
+   if(targetVisible&&firstTargetVisibleTick===null)firstTargetVisibleTick=tick;
+   for(const request of scriptedOrders({tick,own,targetId,target,targetVisible,types:ObjectType,orders:OrderType})){
+    if(request.targetId!==undefined){
+     if(!targetVisible)hiddenAttackRequests++;
+     this.player.actions.orderUnits(request.ids,request.type,request.targetId);attacks++;if(firstAttackTick===null)firstAttackTick=tick;
+    }else if(request.rx!==undefined){this.player.actions.orderUnits(request.ids,request.type,request.rx,request.ry);scoutActions++;}
     else this.player.actions.orderUnits(request.ids,request.type);
    }
   }
@@ -123,7 +128,13 @@ async function runTrace(taskIndex){
   const initial=api.getUnitData(targetId);assert.ok(initial.hitPoints>0);assert.equal(initial.rules.leaveRubble,task.rubble);assert.equal(initial.tile.rx,50);assert.equal(initial.tile.ry,50);
   const combatants={candidate:attacker.name,baseline:initial.owner};assert.notEqual(initial.owner,attacker.name);assert.notEqual(initial.owner,passive.name);
   const snap=()=>({legacy:snapshotCombatantBuildings(api,combatants),live:snapshotLiveOwnedBuildingsCandidate(api,combatants)});
-  const trace=crypto.createHash("sha256"),boundaries=[];let updates=0,earlyFinish=false,destroyEvents=0;
+  const trace=crypto.createHash("sha256"),boundaries=[],observations=[];let updates=0,earlyFinish=false,destroyEvents=0;
+  const observe=()=>{
+   const target=api.getGameObjectData(targetId),targetVisible=api.getVisibleUnits(attacker.name,"hostile").includes(targetId);
+   const own=api.getVisibleUnits(attacker.name,"self").map(id=>api.getUnitData(id)).filter(Boolean).map(u=>({id:u.id,rule:u.rules.name,type:u.rules.type,hp:u.hitPoints,rx:u.tile.rx,ry:u.tile.ry,isIdle:u.isIdle,attackState:u.attackState??null})).sort((a,b)=>a.id-b.id);
+   observations.push({updates,targetVisible,target:target?{id:target.id,hp:target.hitPoints,rx:target.tile.rx,ry:target.tile.ry}:null,own});
+  };
+  observe();
   trace.update(JSON.stringify(snap())+"\n");
   while(updates<manifest.horizon){
    if(game.isFinished()){earlyFinish=true;break;}
@@ -131,6 +142,7 @@ async function runTrace(taskIndex){
    progress.phase="game-update";await game.update();updates++;progress.completedUpdates=updates;
    progress.phase="post-update-observation";const post=snap();
    trace.update(JSON.stringify({updates,post,events})+"\n");
+   if([120,180,300,600,1200,2400,6000].includes(updates))observe();
    const de=events.filter(e=>e.type===ApiEventType.ObjectDestroy);destroyEvents+=de.length;
    if(de.length){
     const world=api.getAllUnits().includes(targetId),owned=api.getVisibleUnits(initial.owner,"self").includes(targetId),u=api.getUnitData(targetId);
@@ -142,7 +154,10 @@ async function runTrace(taskIndex){
    }
   }
   const checks=probeChecks({updates,earlyFinish,attacks,destroyEvents,boundaries,task,targetId,initialOwner:initial.owner,attackerName:attacker.name,destroyType:ApiEventType.ObjectDestroy,unspawnType:ApiEventType.ObjectUnspawn});
-  return {updates,attackActions:attacks,destroyEvents,traceSha256:trace.digest("hex"),boundaries,checks};
+  checks.visibleBeforeAttack=firstTargetVisibleTick!==null&&firstAttackTick!==null&&firstTargetVisibleTick<=firstAttackTick;
+  checks.noHiddenAttackRequest=hiddenAttackRequests===0;
+  checks.fixedObservations=observations.length===8;
+  return {updates,attackActions:attacks,scoutActions,hiddenAttackRequests,firstTargetVisibleTick,firstAttackTick,destroyEvents,traceSha256:trace.digest("hex"),boundaries,observations,checks};
  });
  const artifact={kind:"neutral-building-lifecycle-trace-v1",complete:true,...identity,manifestSha256,task,map,jobId,schedulerAccount:"pi_jss233",nodeVersion:process.version,result};
  prohibited(artifact);progress.phase="trace-complete";return artifact;

@@ -39,9 +39,9 @@ test("program and Slurm use the same new immutable amendment root",()=>{
 });
 
 test("no-target deployment uses DeploySelected, never the targeted Deploy overload",()=>{
- const orders={Deploy:9,DeploySelected:10,ForceAttack:3,Stop:11},types={Vehicle:7,Infantry:3};
+ const orders={Deploy:9,DeploySelected:10,ForceAttack:3,Stop:11,Move:0},types={Vehicle:7,Infantry:3};
  const own=[{id:1,rules:{name:"AMCV",type:7}},{id:2,rules:{name:"MTNK",type:7}}];
- const base={tick:0,own,targetId:5,target:{hitPoints:100},types,orders};
+ const base={tick:0,own,targetId:5,target:{hitPoints:100},targetVisible:true,types,orders};
  assert.deepEqual(scriptedOrders(base),[{ids:[1],type:10}]);
  assert.deepEqual(scriptedOrders({...base,tick:119}),[]);
  assert.deepEqual(scriptedOrders({...base,tick:120}),[]);
@@ -53,4 +53,14 @@ test("technical errors retain bounded stack frames and explicit simulation progr
  const e={message:"read obj",stack:"TypeError: read obj\n"+"x".repeat(900000)+"\n    at f (a.js:1:2)\n    at g (b.js:3:4)"};
  const r=compactTechnicalError(e,{phase:"game-update",completedUpdates:0});
  assert.equal(r.frames.length,2);assert.equal(r.progress.completedUpdates,0);assert.ok(JSON.stringify(r).length<500);
+});
+
+test("scout to the fixed fixture position before force-attacking a visible target",()=>{
+ const orders={DeploySelected:10,ForceAttack:3,Stop:11,Move:0},types={Vehicle:7,Infantry:3};
+ const base={tick:180,own:[{id:2,rules:{name:"MTNK",type:7}}],targetId:5,target:{hitPoints:100},targetVisible:false,types,orders};
+ assert.deepEqual(scriptedOrders(base),[{ids:[2],type:0,rx:50,ry:50}]);
+ assert.deepEqual(scriptedOrders({...base,tick:300}),[{ids:[2],type:0,rx:50,ry:50}]);
+ assert.deepEqual(scriptedOrders({...base,tick:300,targetVisible:true}),[{ids:[2],type:3,targetId:5}]);
+ assert.deepEqual(scriptedOrders({...base,tick:180,targetVisible:true}),[]);
+ assert.deepEqual(scriptedOrders({...base,tick:300,target:null}),[{ids:[2],type:11}]);
 });
