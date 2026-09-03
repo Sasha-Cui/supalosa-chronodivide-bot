@@ -1,0 +1,19 @@
+{
+  "passed": true,
+  "inputSha256": "8e760c72605cbe6c67fcc088cba5a3e460fecf53f28b4b614158abe050bef341",
+  "verifiedCells": 900,
+  "figures": [
+    "visual_figures/hfo-primary.png",
+    "visual_figures/hfo-controls.png",
+    "visual_figures/distinct-maps.png"
+  ],
+  "contrastRatios": {
+    "text": 16.293495425950333,
+    "secondary": 8.227556067356167,
+    "pass": 8.945836774192923,
+    "fail": 7.5907985127781865
+  },
+  "linkedArtifactsExist": true,
+  "noImageVariantClean": true,
+  "note": "Manual visual inspection is separate from these automated checks."
+}
