@@ -1,0 +1,27 @@
+{
+  "complete": true,
+  "passed": true,
+  "selectionSha256": "ca1641860595e7a15f1d6651e7ddc6a8f4f6f9e64382829c34d3f8f7efde7189",
+  "auditSha256": "b3efca5e170585ec4c501cb11a7589ff8ec48fb99790c6a47d77d59fc6a32e4d",
+  "planFileSha256": "bd48c7d71d7eafe236d7747646c3c5a634976213affae1cef273526ace912f2b",
+  "planSha256": "6e7ca179e9cc095be3391c2b10d0c94be51a5affdcba0bc580fbd48ca03955ca",
+  "executionSourceCommit": "85762309a400cba376367b0f7799f3fce6b11c1c",
+  "planningSourceCommit": "bf8f43ef84ea4491c74b1eccd9d4744601e316e4",
+  "programSha256": "aa956db5a82fb8145ba26ed2d3982418c5ec4042628d6c5ae4a0ccb584672cad",
+  "selectedCases": 2160,
+  "createdGames": 2160,
+  "updates": 0,
+  "selectorBlocks": 16,
+  "schedulerRecordsIncludingAudit": 18,
+  "allExactCasesAndBindingsVerified": true,
+  "allCompletionMarkersAndHashesVerified": true,
+  "noReplacements": true,
+  "noOutcomeFields": true,
+  "competitiveRunAuthorized": false,
+  "cpuSeconds": 4404,
+  "outputs": {
+    "blocks.csv": "7cd18a616e3bf89242e17e883eead53427df171ea9beefdf6a08818a1a6f8855",
+    "cases.csv": "26714aef6c0c38a76e070587c3da4065bf4888aa89c8eef310065865cdd64c42",
+    "scheduler.csv": "dff58430e08e9913c9988f11e1b2732ae89fe691be611c2fcda54a2d139891c8"
+  }
+}
