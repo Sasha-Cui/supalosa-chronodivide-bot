@@ -7,15 +7,16 @@ import {fileURLToPath,pathToFileURL} from "node:url";
 import {createRequire} from "node:module";
 import {tasks,fixtureMap,rejectCompetitiveKeys,probeChecks} from "../runtime/neutral-building-ledger-probe-v1.mjs";
 
+async function main(){
 const repo=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"../.."),project=path.dirname(repo);
 const root=path.join(project,"research-evidence/live-building-ledger/neutral-probe-v1");
 const driver=path.join(repo,"packages/chronodivide-bot-driver");
 const originalAssets=path.join(project,"private-assets/ra2/runtimes/hfo-literal-snow-regular-e0b18958");
-const protocolFile=path.join(repo,"research/protocols/maps/2026-09-03-neutral-building-lifecycle-probe-v1.md");
+const protocolFile=path.join(repo,"research/protocols/maps/2026-09-03-neutral-building-lifecycle-probe-materialization-a1.md");
 const hash=x=>crypto.createHash("sha256").update(x).digest("hex"),read=p=>fs.readFileSync(p),json=p=>JSON.parse(read(p));
 const git=(...a)=>execFileSync("git",a,{cwd:repo,encoding:"utf8"}).trim();
 const required=k=>{assert.ok(process.env[k],k+" required");return process.env[k];};
-const phase=process.argv[2];assert.ok(["prepare","trace","finalize"].includes(phase));
+const phase=process.argv[2];assert.ok(["prepare","init","trace","finalize"].includes(phase));
 assert.equal(git("branch","--show-current"),"main");assert.equal(git("status","--porcelain"),"");
 const sourceCommit=git("rev-parse","HEAD");assert.equal(sourceCommit,git("rev-parse","fork/main"));
 const programSha256=hash(read(fileURLToPath(import.meta.url))),protocolSha256=hash(read(protocolFile));
@@ -37,13 +38,13 @@ if(phase==="prepare"){
  assert.equal(hash(template),"bd61bb9ab4412b15895c89188336ab53b03dd20879936b92aaf4418e091cf7fc");
  assert.ok(!template.toString().includes("[Structures]"));assert.ok(!template.toString().includes("[GAPOWR]"));
  const assets=path.join(root,"assets");fs.mkdirSync(assets,{recursive:true,mode:0o700});
- for(const name of fs.readdirSync(originalAssets))fs.symlinkSync(path.join(originalAssets,name),path.join(assets,name));
+ for(const {name} of assetEntries)fs.copyFileSync(path.join(originalAssets,name),path.join(assets,name),fs.constants.COPYFILE_EXCL);
  const maps=[false,true].map(rubble=>{
   const name="chrono_neutral_ledger_"+Number(rubble)+".map";
   const bytes=fixtureMap(template.toString(),rubble);
   fs.writeFileSync(path.join(assets,name),bytes,{flag:"wx"});return {rubble,name,sha256:hash(bytes)};
  });
- write(path.join(root,"manifest.json"),{kind:"neutral-building-lifecycle-probe-v1",...identity,templateSha256:hash(template),assets,assetEntries,maps,tasks,horizon:6000});
+ write(path.join(root,"manifest.json"),{kind:"neutral-building-lifecycle-probe-v1",...identity,templateSha256:hash(template),assets,assetEntries,materialization:"regular-byte-copy",maps,tasks,horizon:6000});
  console.log(JSON.stringify({prepared:true,root,manifestSha256:hash(read(path.join(root,"manifest.json"))),...identity}));process.exit(0);
 }
 assert.equal(required("SLURM_JOB_ACCOUNT"),"pi_jss233");assert.equal(sourceCommit,required("SOURCE_COMMIT"));
@@ -54,6 +55,18 @@ for(const [k,v]of Object.entries(identity))assert.equal(manifest[k],v);
 assert.deepEqual(manifest.tasks,tasks);assert.deepEqual(manifest.assetEntries,assetEntries);
 assert.equal(process.version,"v20.13.1");
 const jobId=required("SLURM_JOB_ID"),out=required("OUT_PATH");
+for(const {name,sha256} of manifest.assetEntries){const file=path.join(manifest.assets,name);assert.ok(fs.lstatSync(file).isFile(),"Asset must be a regular file");assert.equal(hash(read(file)),sha256);}
+if(phase==="init"){
+ const {cdapi}=await import(pathToFileURL(runtime));await cdapi.init(manifest.assets);
+ write(out,{kind:"neutral-building-init-compatibility-a1",complete:true,passed:true,...identity,manifestSha256,jobId,schedulerAccount:"pi_jss233",gameInstances:0,updates:0,regularAssetCount:manifest.assetEntries.length});
+ console.log(JSON.stringify({complete:true,passed:true,gameInstances:0,updates:0}));process.exit(0);
+}
+const initDir=path.join(root,"compatibility-init");fs.readdirSync(initDir);
+assert.equal(read(path.join(initDir,"COMPLETE")).toString().trim(),"COMPLETE_NEUTRAL_LEDGER_INIT_A1");
+const initArtifact=json(path.join(initDir,"init.json"));
+assert.equal(hash(read(path.join(initDir,"init.json"))),read(path.join(initDir,"init.sha256")).toString().trim().split(/\s+/)[0]);
+assert.equal(initArtifact.passed,true);assert.equal(initArtifact.gameInstances,0);assert.equal(initArtifact.updates,0);assert.equal(initArtifact.manifestSha256,manifestSha256);
+for(const [k,v]of Object.entries(identity))assert.equal(initArtifact[k],v);
 const prohibited=rejectCompetitiveKeys;
 if(phase==="trace"){
  const taskIndex=Number(required("SLURM_ARRAY_TASK_ID"));assert.ok(Number.isInteger(taskIndex)&&taskIndex>=0&&taskIndex<8);
@@ -140,3 +153,6 @@ if(phase==="trace"){
  write(out,{kind:"neutral-building-lifecycle-aggregate-v1",complete:true,passed,deterministic,scope:"neutral target primitive only; not endpoint promotion",...identity,manifestSha256,scheduler:{arrayJobId:array,finalizerJobId:jobId,account:"pi_jss233",taskJobIds:Object.fromEntries(jobs)},traces});
  console.log(JSON.stringify({complete:true,passed,traceCount:8}));
 }
+
+}
+main().catch(error=>{console.error(JSON.stringify({technicalError:error?.message??String(error),cause:error?.cause?.message??null}));process.exitCode=1;});
