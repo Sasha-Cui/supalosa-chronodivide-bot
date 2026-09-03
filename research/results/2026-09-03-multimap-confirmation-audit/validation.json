@@ -1,0 +1,25 @@
+{
+  "complete": true,
+  "sourceCommit": "355770ce1dd6d5236d50776546de0a0d7cbff5ed",
+  "aggregateSha256": "59b7b217b6d6bf38759d16bb12cda8a275d3c3b37ca159aa9ed3455c8712d393",
+  "scriptSha256": "0f46a9a07974880266619456d884be772ec938e622ba0f25135a40a6e3b10887",
+  "all288CellHashesVerified": true,
+  "accountingRecords": 289,
+  "allCompletedWithoutRestart": true,
+  "allAccountPiJss233Day": true,
+  "exactAssignedCasesAndStrata": true,
+  "zeroScreenOverlap": true,
+  "sourceRuntimeProtocolBindingsVerified": true,
+  "literalCertificatesAsRunVerified": true,
+  "allFrozenStatisticsAndGatesReproduced": true,
+  "allOriginalOutcomesUnchanged": true,
+  "independentMapSuccesses": 0,
+  "measurementCaveat": "Legacy world-building ledger may retain destroyed rubble; live fixture validation is pending. This audit does not correct or rescue any score.",
+  "outputs": {
+    "maps.csv": "157949c8d1c8e02754fbfc1d7ba0bc95404335c2519d3ab5619b7d227b517a7a",
+    "strata.csv": "ade8a5301a42fe43e25893bc74378fdaef29f8109a4bfa013229ef9a0c738d23",
+    "gates.csv": "7e843204f60029d40c50d913e9ad9c664e622509a424b38e290f37b4a9e070fd",
+    "cells.csv": "0db5bf2ad11f31e6e91a580fe29fa4de791415cb95d709f951eaa5d730a47455",
+    "scheduler.csv": "16bda17c2e3b71a05c9887b5e27e554c25ff2b97719f1e223815323ef15a95c4"
+  }
+}

@@ -1,0 +1,3 @@
+"mapId","games","wins","draws","losses","winRate","scoreRate","oneSided95WilsonWinLower","medianLiteralWinUpdates","tickCapCount","clusteredOneSided95Lower","positiveCells","noninferiorCells","positive","dominanceCriteriaMet","nonliteralTerminationDrawCount"
+"hfo-lvl","144","99","3","42","0.6875","0.6979166666666666","0.6210016217848614","21110","2","0.5802050376644917","11","16","false","false","1"
+"hfo-rvr","144","89","33","22","0.6180555555555556","0.7326388888888888","0.5498616229692198","22280","30","0.47258556704713284","12","17","false","false","3"
