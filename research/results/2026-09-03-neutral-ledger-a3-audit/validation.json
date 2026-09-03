@@ -1,0 +1,34 @@
+{
+  "complete": true,
+  "passed": true,
+  "sourceCommit": "d5b475223001d61db67277f56f0f25328973a46b",
+  "aggregateSha256": "9e3d788a97e1b078ce93b03fc20af9af065e83fe60a78fcc20ddf733a750581a",
+  "manifestSha256": "26575cb72a7733c179a7f35c1c39506d84f0b062c5c55ed61faa35d0c2f0f7fb",
+  "initSha256": "0d14669e096ca39c860101073fc962dce07df0363e9fcbc87aec692e51caeeb7",
+  "smokeSha256": "6c3021f8274bd68612eabe3efbce3fbc8b6e686374a44ad80f5660102f1031a9",
+  "auditScriptSha256": "6a35cba972ec97afef106bf1c4c10ff0b6e6877796fd4800d687598e12c8e6b8",
+  "schedulerRecords": 11,
+  "exactFullStageCases": 8,
+  "allCellsAndMarkersVerified": true,
+  "allRuntimeAndAssetBytesVerified": true,
+  "allEventBoundaryAdjudicationsRecomputed": true,
+  "allStoredTechnicalChecksRecomputed": true,
+  "repeatHashesMatch": true,
+  "smokeMatchesFullStage": true,
+  "rawCellSha256": {
+    "0": "8594d3b9249e6b24f72899b9e5f0c494c449ee4033da5e121ffff6eb25403b0d",
+    "1": "66c981bc2020afa50b6e14be849f3f1e33307bd213b7c9c43b13d0c3048686c5",
+    "2": "73d31666f3f11349bcb7aa207335bbf014a16859eb6db161b35e564d25710444",
+    "3": "a21acba40f645706ea57849e47a888268638e292b6cf24f7287862aea7231b6c",
+    "4": "c6614ec18f724672392fa4dd9be574bc8b2bba9c90481f1325c7bc501691e7e4",
+    "5": "5921dc499f2cb241ba4f4547cfcc9d43381e55e1b5b60c7a9645c42ddda59f2d",
+    "6": "20aca03e5c829bf4970f573adb9f08f9e37ac2f6792a948aaaa281aca7cf03a5",
+    "7": "f06fc0948dd112fadfb484c214b40cb5f7aa42dba1be16baffeed1628e15eaa9"
+  },
+  "traceHashLimitation": "Full per-update streams were hashed during execution but not retained; their hashes are compared across repetitions, not independently rebuilt from the saved sparse observations.",
+  "scope": "Controlled neutral buildings only; no historical incidence estimate, rescoring, competitive strength result, or production endpoint promotion",
+  "outputs": {
+    "cases.csv": "05aec10465d6bd721e5004b50f09b0a545f97960c4c52363285b302bae31b726",
+    "scheduler.csv": "4254155980bff450fb929ce243c5a6451aa4878737c34442c33705aa72cd041f"
+  }
+}
