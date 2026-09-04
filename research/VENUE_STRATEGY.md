@@ -1,24 +1,28 @@
 # Venue strategy
 
-Verified from official pages on **2026-08-30**. Recheck immediately before
+Verified from official pages on **2026-09-04**. Recheck immediately before
 upload.
 
-## Primary target: ICAART 2027 regular paper
+## Primary target: SPIKE 2027 special session at ICAART
 
-ICAART is the recommended lower-tier archival target. The work fits its Agents,
-Simulation, and Task Planning/Execution areas as a completed scripted-agent and
-evaluation study. It is not being positioned as a flagship ML paper.
+SPIKE is the recommended focused, lower-tier archival target. Its stated scope
+includes AI methods, agent-based systems, game-strategy prediction, tactical
+decisions, and performance analysis in esports. The intended paper is an
+interpretable RTS-agent and evaluation study, not a flagship machine-learning
+claim and not a claim that Chrono Divide is a newly created environment.
 
-- First regular-paper deadline: **2026-09-15 AOE**.
-- First notification: **2026-11-13**.
-- First camera-ready/registration: **2026-11-27**.
-- Second regular/position-paper deadline: **2026-10-22 AOE**.
-- Workshop/special-session paper deadline: **2026-12-03 AOE**.
-- Conference: **2027-02-23 through 2027-02-25**, Valletta, Malta.
+- SPIKE paper deadline: **2026-12-03 AOE**.
+- SPIKE notification: **2026-12-21**.
+- SPIKE camera-ready/registration: **2027-01-08**.
+- Main conference: **2027-02-23 through 2027-02-25**.
+- Special-session/workshop day: **2027-02-26**, Valletta, Malta.
+- General ICAART second-stage deadline: **2026-10-22 AOE**, retained only as
+  an earlier timing fallback if all empirical milestones unexpectedly finish.
 - Review format: double blind, 10,000--50,000 non-whitespace characters.
 - Acceptance format: up to 12 pages for a full paper or 8 pages for a short
   paper.
-- Current candidate: 12 pages, 36,004 characters, 190-word abstract.
+- Current scaffold: 12 pages and 36,004 characters, but its evidence and
+  claims are stale and must not be submitted.
 
 Official sources:
 
@@ -27,6 +31,7 @@ Official sources:
 - <https://icaart.scitevents.org/home.aspx>
 - <https://icaart.scitevents.org/presentationdetails.aspx>
 - <https://icaart.scitevents.org/AiTools.aspx>
+- <https://icaart.scitevents.org/SPIKE.aspx?y=2027>
 
 ## No-travel requirement
 
@@ -36,30 +41,32 @@ live Zoom instructions for both oral and poster sessions. Remote presenters
 must attend synchronously; a prerecorded video is backup only and does not
 avoid the live no-show rule.
 
-This satisfies the user's no-physical-attendance goal in principle. Before
-submission or registration, obtain written instructions for requesting the
-exception and when approval is confirmed. If the secretariat will not confirm
-the route, use the October regular stage or a workshop only after a compatible
-remote rule is documented.
+This offers a possible no-travel route, but it is not an unconditional remote
+guarantee. Before submission or registration, obtain written instructions and
+approval for the exception. If the secretariat will not confirm synchronous
+remote presentation, do not submit to this venue; switch only to a venue with
+a documented remote route.
 
 ## Current standard assessment
 
-**Near to above the expected ICAART regular-paper standard, with reviewer
-variance.** Strengths are two positive maps, large all-country confirmation,
-fresh paired mechanism replications, literal victory semantics, uncertainty,
-deterministic tactical figures, a clean independent opponent, and a
-self-verifying artifact. Weaknesses are a scripted rather than learned policy,
-exact-coordinate map profiles, only two positive maps, one development
-opponent, and failed Advanced transfer.
+**Currently below the expected publishable standard; potentially near or above
+SPIKE after milestones M2--M5.** Existing strengths are the 633/24/63 HFO LE
+confirmation, positive Peak replication, literal victory semantics, extensive
+provenance controls, and a reproducible simulator pipeline. Current blockers
+are failed Advanced transfer, no reliable all-map result, map-specific
+profiles, unequal observation use, a stale paper, and incomplete release and
+figure rights. RA2Web is an external behavior shift but shares Supalosa
+ancestry; it is not a clean independent algorithm family.
 
 Likely reviewer concerns:
 
-| Concern | Answer already in the paper |
+| Concern | Evidence required before submission |
 | --- | --- |
 | Hand engineering rather than ML | Agree; claim an interpretable scripted-agent and evaluation contribution, not a learned policy or optimizer novelty. |
-| Map overfitting | Balanced starts/countries/slots, fresh Peak replication, exact inactive-cell traces, and an explicit exact-coordinate limitation. |
-| Opponent overfitting | Report the Advanced reversal as a main result; do not claim universal strength. |
-| Screenshots are cherry-picked | Hash-minimum prospective selection, fixed updates, passive renderer, and immutable PNG hashes. |
+| Map overfitting | Reliable per-map gates over all 15 physical maps, equal-topology-family reporting, profile activation logs, and development-unused transfer maps. |
+| Opponent overfitting | A frozen specialist/router that passes Supalosa and Advanced, plus Standard and Sea/Land robustness with shared-ancestry disclosure. |
+| Hidden-state advantage | Native API-full-state and symmetric observation-firewall results reported side by side. |
+| Screenshots are cherry-picked | Result-independent replay selection, authentic client frames where rights permit, immutable hashes, and clearly separate evaluator schematics. |
 | Victory is a proxy | Literal destruction of all enemy buildings and symmetric resignation suppression. |
 | Reproducibility is blocked by game rights | Release aggregate evidence and author-written tooling; provide acquisition/hash instructions; do not redistribute unlicensed bot/runtime/assets. |
 
@@ -74,10 +81,10 @@ recorded assistance as grammar correction.
 
 ## Fallbacks
 
-1. **ICAART second regular stage, 2026-10-22:** same fit and format if policy
-   answers arrive too late for September.
-2. **ICAART workshop/special session, 2026-12-03:** lower bar and appropriate
-   only after a named workshop publishes a compatible scope and remote route.
+1. **ICAART second regular stage, 2026-10-22:** same format, but only if all
+   empirical milestones finish early and written remote approval is obtained.
+2. **Another named workshop/special session:** only after it publishes a
+   compatible scope, deadline, archival status, and remote route.
 3. **Entertainment Computing:** rolling no-travel archival journal fallback if
    no conference route confirms remote presentation.
 
