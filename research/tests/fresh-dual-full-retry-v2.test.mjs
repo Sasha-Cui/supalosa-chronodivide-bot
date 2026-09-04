@@ -19,7 +19,8 @@ test("full retry binds the failed V1 population and corrected analysis", () => {
     assert.match(runner, /assert\.deepEqual\(assignments, v1Manifest\.value\.assignments\)/);
     assert.match(runner, /analyzeFreshDualRowsV2\(rows\)/);
     assert.match(runner, /fresh-dual-analysis-v2\.mjs/);
-    assert.match(runner, /execution-v2-full-retry/);
+    assert.match(runner, /execution-v2-full-retry-a1/);
+    assert.match(runner, /fresh-dual-full-retry-v2-amendment-a1\.md/);
     assert.match(runner, /v1CombinedWithV2: false/);
 });
 
@@ -35,8 +36,8 @@ test("Slurm replacement is CPU-only, non-requeueing, and excludes incident nodes
 });
 
 test("replacement uses exclusive V2 markers and output paths", () => {
-    assert.match(slurm, /execution-v2-full-retry\/cells/);
-    assert.match(slurm, /execution-v2-full-retry\/finalizer/);
+    assert.match(slurm, /execution-v2-full-retry-a1\/cells/);
+    assert.match(slurm, /execution-v2-full-retry-a1\/finalizer/);
     assert.match(slurm, /COMPLETE_FRESH_DUAL_COMPETITIVE_CELL_V2/);
     assert.match(slurm, /COMPLETE_FRESH_DUAL_COMPETITIVE_AGGREGATE_V2/);
     assert.match(runner, /COMPLETE_FRESH_DUAL_COMPETITIVE_MANIFEST_V2/);

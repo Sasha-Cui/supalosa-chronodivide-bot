@@ -23,7 +23,7 @@ import {
     validateFreshDualFrozenPolicyInputs,
 } from "../runtime/fresh-dual-runtime-freeze-validator-v1.mjs";
 
-const ROOT = path.join(STUDY_ROOT, "execution-v2-full-retry");
+const ROOT = path.join(STUDY_ROOT, "execution-v2-full-retry-a1");
 const MANIFEST_DIR = path.join(ROOT, "manifest");
 const MANIFEST_FILE = path.join(MANIFEST_DIR, "manifest.json");
 const A2_DIR = path.join(STUDY_ROOT, "execution-v1/compressed-canaries-a2/finalizer");
@@ -197,9 +197,13 @@ const main = async () => {
     if (mode === "prepare") {
         assert.ok(!fs.existsSync(ROOT), "Preserve an existing competitive study");
         const policy = validateFreshDualFrozenPolicyInputs();
-        const protocol = path.join(
+        const baseProtocol = path.join(
             REPO,
             "research/protocols/maps/2026-09-04-fresh-dual-full-retry-v2.md",
+        );
+        const amendment = path.join(
+            REPO,
+            "research/protocols/maps/2026-09-04-fresh-dual-full-retry-v2-amendment-a1.md",
         );
         fs.mkdirSync(MANIFEST_DIR, { recursive: true, mode: 0o700 });
         const assignments = plan.games.map((assignment, gameIndex) => {
@@ -220,7 +224,8 @@ const main = async () => {
             complete: true,
             passed: true,
             sourceCommit,
-            protocolSha256: hash(read(protocol)),
+            protocolSha256: hash(read(amendment)),
+            baseProtocolSha256: hash(read(baseProtocol)),
             planFileSha256: hash(read(path.join(STUDY_ROOT, "plan.json"))),
             planSha256: json(path.join(STUDY_ROOT, "plan.json")).planSha256,
             selectionSha256: selection.sha256,
@@ -235,7 +240,7 @@ const main = async () => {
                 assignmentsExact: true,
                 v1CombinedWithV2: false,
                 candidateSourceGitTree: candidateSourceTree,
-                v1CandidateSourceGitTree,
+                v1CandidateSourceGitTree: v1CandidateSourceTree,
                 candidateRuntimeTreeSha256: policy.frozen.candidatePolicy.runtimeTree.sha256,
                 externalSupalosaRuntimeTreeSha256: policy.frozen.externalSupalosa.runtimeTree.sha256,
             },

@@ -32,11 +32,11 @@ PHASE="${1:?cell or finalize}"
 if [[ "$PHASE" == cell ]]; then
     INDEX="${SLURM_ARRAY_TASK_ID:?}"
     [[ "$INDEX" =~ ^[0-9]+$ && "$INDEX" -ge 0 && "$INDEX" -lt 2700 ]]
-    DIR="$STUDY/execution-v2-full-retry/cells/game-$(printf '%04d' "$INDEX")"
+    DIR="$STUDY/execution-v2-full-retry-a1/cells/game-$(printf '%04d' "$INDEX")"
     MARKER=COMPLETE_FRESH_DUAL_COMPETITIVE_CELL_V2
 elif [[ "$PHASE" == finalize ]]; then
     : "${ARRAY_JOB_ID:?}"
-    DIR="$STUDY/execution-v2-full-retry/finalizer"
+    DIR="$STUDY/execution-v2-full-retry-a1/finalizer"
     MARKER=COMPLETE_FRESH_DUAL_COMPETITIVE_AGGREGATE_V2
 else
     exit 2
