@@ -3,7 +3,8 @@ import { createHash } from "node:crypto";
 import fs from "node:fs";
 import { finished as streamFinished } from "node:stream";
 import { once } from "node:events";
-import { createGzip, gunzipSync } from "node:zlib";
+import { createGzip, createGunzip, gunzipSync } from "node:zlib";
+import { createInterface } from "node:readline";
 import {
     BuildingLedgerRow,
     EndpointEngineState,
@@ -283,25 +284,42 @@ export const decodeFreshDualLedgerSync = (compressed: Buffer): FreshDualLedgerRe
     return value.trimEnd().split("\n").map((line) => JSON.parse(line) as FreshDualLedgerRecord);
 };
 
-export const verifyFreshDualLedgerRecords = (
-    records: FreshDualLedgerRecord[],
-): { updates: number; complete: boolean; aborted: boolean; final: FreshDualLedgerFinal | null } => {
-    if (records.length < 2 || records[0].kind !== "header") throw new Error("Ledger header missing");
-    const header = records[0];
-    if (header.schemaVersion !== 1 || header.initialTick !== 0) throw new Error("Ledger header invalid");
-    let tick = 0;
-    let snapshots = clone(header.initial);
-    let engine = clone(header.initialEngine);
-    let state = clone(header.initialState);
-    let established = {
+class FreshDualLedgerRecordVerifier {
+    private header: HeaderRecord | null = null;
+    private tick = 0;
+    private snapshots: FreshDualSnapshots | null = null;
+    private engine: EndpointEngineState | null = null;
+    private state: PassiveDualEndpointState | null = null;
+    private established = {
         v5: { candidate: false, baseline: false },
         v6: { candidate: false, baseline: false },
     };
-    let final: FreshDualLedgerFinal | null = null;
-    let aborted = false;
-    for (const record of records.slice(1)) {
+    private final: FreshDualLedgerFinal | null = null;
+    private aborted = false;
+    private records = 0;
+
+    accept(record: FreshDualLedgerRecord): void {
+        if (this.final || this.aborted) throw new Error("Ledger contains records after its terminal marker");
+        this.records += 1;
+        if (!this.header) {
+            if (record.kind !== "header" || record.schemaVersion !== 1 || record.initialTick !== 0) {
+                throw new Error("Ledger header invalid");
+            }
+            this.header = clone(record);
+            this.tick = 0;
+            this.snapshots = clone(record.initial);
+            this.engine = clone(record.initialEngine);
+            this.state = clone(record.initialState);
+            return;
+        }
+        const header = this.header;
+        const state = this.state as PassiveDualEndpointState;
+        const snapshots = this.snapshots as FreshDualSnapshots;
+        const engine = this.engine as EndpointEngineState;
         if (record.kind === "step") {
-            if (record.tick !== tick + 1 || !allEqual(record.pre, snapshots)) throw new Error("Ledger step continuity failed");
+            if (record.tick !== this.tick + 1 || !allEqual(record.pre, snapshots)) {
+                throw new Error("Ledger step continuity failed");
+            }
             const events = deduplicateEndpointEvents(record.events);
             if (state.v5.firstResult === null && state.v5.technicalFailure === null) {
                 const evaluation = evaluateLiteralBuildingUpdate({
@@ -310,9 +328,9 @@ export const verifyFreshDualLedgerRecords = (
                     pre: record.pre.legacy,
                     post: record.post.legacy,
                     events,
-                    establishedBeforeUpdate: established.v5,
+                    establishedBeforeUpdate: this.established.v5,
                 });
-                established.v5 = evaluation.establishedAfterUpdate;
+                this.established.v5 = evaluation.establishedAfterUpdate;
                 const result = classifyLiteralEndpointCompletion({ evaluation, engine: record.engine });
                 if (result.terminal) state.v5.firstResult = result.terminal;
                 if (result.technicalFailure) state.v5.technicalFailure = result.technicalFailure;
@@ -324,9 +342,9 @@ export const verifyFreshDualLedgerRecords = (
                     pre: record.pre.live,
                     post: record.post.live,
                     events,
-                    establishedBeforeUpdate: established.v6,
+                    establishedBeforeUpdate: this.established.v6,
                 });
-                established.v6 = evaluation.establishedAfterUpdate;
+                this.established.v6 = evaluation.establishedAfterUpdate;
                 const result = v6Result(classifyLiteralEndpointCompletion({ evaluation, engine: record.engine }));
                 if (result.terminal) state.v6.firstResult = result.terminal;
                 if (result.technicalFailure) state.v6.technicalFailure = result.technicalFailure;
@@ -335,61 +353,138 @@ export const verifyFreshDualLedgerRecords = (
                 (state.v6.firstResult !== null || state.v6.technicalFailure !== null);
             state.failed = state.v5.technicalFailure !== null || state.v6.technicalFailure !== null;
             if (!allEqual(state, record.dualState)) throw new Error("Ledger endpoint replay diverged");
-            tick = record.tick;
-            snapshots = clone(record.post);
-            engine = clone(record.engine);
+            this.tick = record.tick;
+            this.snapshots = clone(record.post);
+            this.engine = clone(record.engine);
         } else if (record.kind === "stable") {
-            if (record.fromTick !== tick + 1 || record.toTick < record.fromTick) throw new Error("Stable run continuity failed");
+            if (record.fromTick !== this.tick + 1 || record.toTick < record.fromTick) {
+                throw new Error("Stable run continuity failed");
+            }
             if (record.snapshotsSha256 !== sha256(canonical(snapshots)) ||
                 !allEqual(record.engine, engine) || !allEqual(record.dualState, state)) {
                 throw new Error("Stable run state drifted");
             }
-            tick = record.toTick;
+            this.tick = record.toTick;
         } else if (record.kind === "final") {
-            if (final || aborted || record.value.updates !== tick ||
+            if (record.value.updates !== this.tick ||
                 (record.value.stopReason !== "tick_cap" && !allEqual(record.value.dualState, state))) {
                 throw new Error("Ledger final record drifted");
             }
-            final = clone(record.value);
+            this.final = clone(record.value);
         } else if (record.kind === "abort") {
-            if (final || aborted || record.tick !== tick) throw new Error("Ledger abort record drifted");
-            aborted = true;
+            if (record.tick !== this.tick) throw new Error("Ledger abort record drifted");
+            this.aborted = true;
         } else {
             throw new Error("Unexpected second ledger header");
         }
     }
-    if ((final === null) === !aborted) throw new Error("Ledger requires exactly one final or abort record");
-    if (final?.stopReason === "tick_cap") {
-        if (tick !== header.frozenLimit || final.updates !== tick) throw new Error("Ledger cap tick drifted");
-        const capped = clone(state);
-        if (capped.v5.firstResult === null && capped.v5.technicalFailure === null) {
-            capped.v5.firstResult = {
-                endpointVersion: LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION,
-                endpointSha256: LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256,
-                tick,
-                status: "tick_cap_draw",
-                winner: "draw",
-            };
+
+    finish(): {
+        updates: number;
+        records: number;
+        complete: boolean;
+        aborted: boolean;
+        final: FreshDualLedgerFinal | null;
+    } {
+        if (!this.header || this.records < 2 || (this.final === null) === !this.aborted) {
+            throw new Error("Ledger requires one header and exactly one final or abort record");
         }
-        if (capped.v6.firstResult === null && capped.v6.technicalFailure === null) {
-            capped.v6.firstResult = {
-                endpointVersion: LIVE_OWNED_ENDPOINT_VERSION,
-                endpointSha256: LIVE_OWNED_ENDPOINT_SHA256,
-                endpoint: LIVE_OWNED_ENDPOINT,
-                tick,
-                status: "tick_cap_draw",
-                winner: "draw",
-            };
+        const header = this.header;
+        const state = this.state as PassiveDualEndpointState;
+        if (this.final?.stopReason === "tick_cap") {
+            if (this.tick !== header.frozenLimit || this.final.updates !== this.tick) {
+                throw new Error("Ledger cap tick drifted");
+            }
+            const capped = clone(state);
+            if (capped.v5.firstResult === null && capped.v5.technicalFailure === null) {
+                capped.v5.firstResult = {
+                    endpointVersion: LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION,
+                    endpointSha256: LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256,
+                    tick: this.tick,
+                    status: "tick_cap_draw",
+                    winner: "draw",
+                };
+            }
+            if (capped.v6.firstResult === null && capped.v6.technicalFailure === null) {
+                capped.v6.firstResult = {
+                    endpointVersion: LIVE_OWNED_ENDPOINT_VERSION,
+                    endpointSha256: LIVE_OWNED_ENDPOINT_SHA256,
+                    endpoint: LIVE_OWNED_ENDPOINT,
+                    tick: this.tick,
+                    status: "tick_cap_draw",
+                    winner: "draw",
+                };
+            }
+            capped.complete = true;
+            capped.failed = capped.v5.technicalFailure !== null || capped.v6.technicalFailure !== null;
+            if (!allEqual(capped, this.final.dualState)) throw new Error("Ledger cap replay diverged");
+        } else if (this.final && !allEqual(this.final.dualState, state)) {
+            throw new Error("Ledger final endpoint state diverged");
         }
-        capped.complete = true;
-        capped.failed = capped.v5.technicalFailure !== null || capped.v6.technicalFailure !== null;
-        if (!allEqual(capped, final.dualState)) throw new Error("Ledger cap replay diverged");
-    } else if (final && !allEqual(final.dualState, state)) {
-        throw new Error("Ledger final endpoint state diverged");
+        if (this.final && (this.final.quitSuppression.forwarded.candidate !== 0 ||
+            this.final.quitSuppression.forwarded.baseline !== 0)) {
+            throw new Error("Ledger contains a forwarded resignation");
+        }
+        return {
+            updates: this.tick,
+            records: this.records,
+            complete: this.final !== null,
+            aborted: this.aborted,
+            final: clone(this.final),
+        };
     }
-    if (final && (final.quitSuppression.forwarded.candidate !== 0 ||
-        final.quitSuppression.forwarded.baseline !== 0)) {
-        throw new Error("Ledger contains a forwarded resignation");
+}
+
+export const verifyFreshDualLedgerRecords = (
+    records: FreshDualLedgerRecord[],
+): ReturnType<FreshDualLedgerRecordVerifier["finish"]> => {
+    const verifier = new FreshDualLedgerRecordVerifier();
+    for (const record of records) verifier.accept(record);
+    return verifier.finish();
+};
+
+export const verifyFreshDualLedgerFile = async (
+    file: string,
+    expected: FreshDualLedgerMetadata,
+): Promise<ReturnType<FreshDualLedgerRecordVerifier["finish"]>> => {
+    if (expected.encoding !== "gzip-jsonl-v1" || expected.file !== file) {
+        throw new Error("Ledger file metadata drifted");
     }
-    return { updates: tick, complete: final !== null, aborted, final };
+    const stat = fs.lstatSync(file);
+    if (!stat.isFile() || stat.isSymbolicLink() || stat.size !== expected.gzipBytes) {
+        throw new Error("Ledger file is not an exact regular-file match");
+    }
+    const compressedHash = createHash("sha256");
+    const plainHash = createHash("sha256");
+    let compressedBytes = 0;
+    let plainBytes = 0;
+    let lastPlainByte: number | null = null;
+    const input = fs.createReadStream(file);
+    input.on("data", (chunk: Buffer) => {
+        compressedHash.update(chunk);
+        compressedBytes += chunk.length;
+    });
+    const gunzip = createGunzip();
+    gunzip.on("data", (chunk: Buffer) => {
+        plainHash.update(chunk);
+        plainBytes += chunk.length;
+        if (chunk.length) lastPlainByte = chunk[chunk.length - 1];
+    });
+    input.pipe(gunzip);
+    const lines = createInterface({ input: gunzip, crlfDelay: Infinity });
+    const verifier = new FreshDualLedgerRecordVerifier();
+    let recordCount = 0;
+    for await (const line of lines) {
+        if (!line.length) throw new Error("Ledger contains an empty JSONL record");
+        verifier.accept(JSON.parse(line) as FreshDualLedgerRecord);
+        recordCount += 1;
+    }
+    if (lastPlainByte !== 10) throw new Error("Ledger JSONL is not newline terminated");
+    if (compressedBytes !== expected.gzipBytes || plainBytes !== expected.plainBytes ||
+        compressedHash.digest("hex") !== expected.gzipSha256 ||
+        plainHash.digest("hex") !== expected.plainSha256 ||
+        recordCount !== expected.records) {
+        throw new Error("Ledger streaming checksum or count drifted");
+    }
+    return verifier.finish();
 };

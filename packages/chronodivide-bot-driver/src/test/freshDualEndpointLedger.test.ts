@@ -17,6 +17,7 @@ import {
 import {
     FreshDualEndpointLedgerWriter,
     decodeFreshDualLedgerSync,
+    verifyFreshDualLedgerFile,
     verifyFreshDualLedgerRecords,
 } from "../training/freshDualEndpointLedger.js";
 
@@ -112,6 +113,17 @@ describe("fresh dual endpoint ledger", () => {
                 aborted: false,
                 final: { stopReason: "tick_cap" },
             });
+            expect(await verifyFreshDualLedgerFile(file, metadata)).toMatchObject({
+                updates: 3,
+                records: 4,
+                complete: true,
+                aborted: false,
+                final: { stopReason: "tick_cap" },
+            });
+            await expect(verifyFreshDualLedgerFile(file, {
+                ...metadata,
+                plainSha256: "0".repeat(64),
+            })).rejects.toThrow("checksum or count drifted");
         } finally {
             fs.rmSync(directory, { recursive: true, force: true });
         }
