@@ -1,0 +1,32 @@
+{
+  "complete": true,
+  "passed": true,
+  "outcomeBlind": true,
+  "manifestSha256": "0aedc3165fcb9434ba9f7f2fe5865cd4e8dddfbd4010ad67230285f49a5715ee",
+  "aggregateSha256": "e4796e2e8d1fec4038473dfa444bf9728b27a58d3fcdb3c187198cbba7ec4186",
+  "policyFreezeSha256": "be47027c8526daa961500a1ca2acc3c04dd1a487460d4dec78361faa03ece649",
+  "executionSourceCommit": "f5317fbe94ba274de680f0d5a79a792ebb3fe5a2",
+  "auditSourceCommit": "76ab6b398ed24a9da730994b88c93e8f0a07eb93",
+  "programSha256": "db737033ce110f1e1f4e2a09e29acf6cf601648700e51b0111e5d26d5c5eb133",
+  "schedulerRecords": 5,
+  "configurations": 4,
+  "technicalGames": 8,
+  "simulationUpdates": 48000,
+  "publicWorldSnapshots": 48008,
+  "compressedTraceRecords": 48024,
+  "tracesStreamVerified": 8,
+  "totalPlainBytes": 6568564,
+  "totalGzipBytes": 2099350,
+  "exactWorldPairs": 4,
+  "exactActionPairs": 4,
+  "exactPlainTracePairs": 4,
+  "exactGzipTracePairs": 4,
+  "exactQuitPairs": 4,
+  "zeroForwardedResignations": true,
+  "competitiveRunAuthorized": true,
+  "cpuSeconds": 2880,
+  "outputs": {
+    "pairs.csv": "0c09e6a143c591f3f25fddc9f55e09699be581f51f42410a61ada91760f1b786",
+    "scheduler.csv": "4e5ccb66c107d0a01e265f441f5143afd42cbee1cd14042e68ca719be3a6f4de"
+  }
+}
