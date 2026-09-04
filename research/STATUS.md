@@ -1,65 +1,98 @@
 # Research status
 
-Last reconciled: **2026-08-30**
+Last reconciled: **2026-09-04**
 
 ## Bottom line
 
-The empirical program is complete and the current paper is a positive, bounded
-submission candidate. Frozen StrongBot reliably beats pinned Supalosa on Heck
-Freezes Over and Peak of Perfection under literal all-building elimination.
-The same policy fails to transfer to RA2Web Advanced; that negative result is a
-main limitation. No Chrono Divide simulation job is active or needed for this
-submission.
+The empirical program is active and the current manuscript is stale. StrongBot
+has a strong positive HFO LE result and a positive Peak replication against
+pinned Supalosa, but it has not yet demonstrated reliable performance across
+the complete map suite or against RA2Web Advanced. The project is not ready for
+submission and the paper must remain frozen until the milestone ledger is
+complete.
 
-## Final results
+## Established evidence
 
 | Study | Games | StrongBot or candidate W/D/L | Comparator | Decision |
 | --- | ---: | ---: | --- | --- |
-| HFO confirmation | 720 | 633/24/63 | pinned Supalosa | pass; Wilson lower 85.78%, country-start lower 84.49% |
-| Peak replication | 180 paired cases per policy | 134/14/32 | deployed control 92/16/72 | pass; paired lower +0.167 |
-| Advanced transfer | 360 paired cases per first policy | 79/19/262 | Supalosa 178/30/152 vs same opponent | negative transfer |
-| Allied west rush+guard | 50 paired cases | 47/2/1 | 1/11/38 control | pass; paired lower +0.764 |
-| Soviet west rush+guard | 120 paired cases | 98/9/13 | 47/43/30 control | pass; paired lower +0.211 |
-| Bottom progress retarget | 270 paired cases | 198/23/49 | 123/98/49 control | pass; paired lower +0.115 |
+| HFO LE confirmation | 720 | 633/24/63 | pinned Supalosa | positive within-map evidence |
+| Peak replication | 180 paired cases per policy | 134/14/32 | deployed control 92/16/72 | positive profile-scope evidence |
+| Advanced transfer | 360 paired cases per first policy | 79/19/262 | Supalosa 178/30/152 vs same opponent | failed transfer |
 
-Every scoped mechanism also passed its outcome-free activation/isolation gate.
-The HFO confirmation has only four tick-cap draws. Peak is positive in every
-country, start, faction side, and participant slot.
+The historical HFO and Peak results predate the final composite policy,
+observation firewall, complete map suite, and corrected endpoint measurement.
+They are development evidence unless exact policy equivalence is proved.
 
-## Current paper and artifact
+## Current milestone: M0
 
-- Manuscript title: **StrongBot: Auditable Map-Profiled RTS Agent Development
-  in Chrono Divide**.
-- Final paper evidence: `research/artifacts/final_paper_evidence_v1.json`,
-  SHA-256 `0670bdeefab47ca68fb5fc584be6a299e777ee0d69f04cd45de7caebf32c31e3`.
-- SCITEPRESS candidate: 12 A4 pages, 190-word abstract, 36,004
-  non-whitespace characters.
-- PDF SHA-256:
-  `628482e622a19700d56de5516e2f91ea1b74c48705a879a78d6b3c77ea91f7fc`.
-- Anonymous artifact: 60 immutable files, 1,319,409 bytes, SHA-256
-  `d0e49b55bc76d5d5c103378b23cbc374a9a93353e1380e0283b54421e7d249c4`.
-- Git-free artifact build reproduces the PDF and metadata exactly.
+M0 requires a complete corrected endpoint remeasurement and its full
+provenance record. Execution V1 array `24734770` wrote 2,700 sealed cells but
+failed its frozen scheduler gate after two `NODE_FAIL` records. Finalizer
+`24734771` was cancelled and emitted no aggregate. No competitive outcome was
+inspected.
+
+The preserved failure and prospectively frozen replacement are:
+
+- `research/results/2026-09-04-fresh-dual-v1-scheduler-failure.md`;
+- `research/protocols/maps/2026-09-04-fresh-dual-full-retry-v2.md`;
+- `research/runtime/fresh-dual-analysis-v2.mjs`.
+
+Execution V2 must rerun all 2,700 frozen assignments under a new evidence root
+and pass 2,700/2,700 `COMPLETED 0:0` scheduler records. V1 and V2 may never be
+pooled.
+
+## Milestone ledger
+
+- **M0 — Correct endpoint evidence:** complete V2, independent recomputation,
+  provenance/observation errata, result preservation, and registration.
+- **M1 — Method technically ready:** full action-burst diagnostic, unified
+  intent arbiter, strict terminal race, and symmetric observation firewall.
+- **M2 — Development champion frozen:** repeatable positive open-development
+  evidence across 15 physical maps/five topology families and all ten HFO
+  variants against Advanced.
+- **M3 — Reliable Supalosa confirmation:** pass the single-use 10,080-game
+  all-map matrix, including every prespecified per-map adjusted lower bound.
+- **M4 — Opponent and topology breadth:** pass the frozen Advanced, Standard,
+  Sea/Land, and development-unused transfer evaluations.
+- **M5 — Submission-ready paper and artifact:** Ledger V2, independent
+  statistics, evidence-derived paper assets, rights-cleared figures, artifact
+  cold run, SCITEPRESS QA, and cold review.
+
+Milestones cannot be weakened or redefined after outcomes. A failed final gate
+returns the project to prospectively labeled development; it is not rescued by
+selective maps, countries, starts, opponents, or seeds.
 
 ## Claim boundary
 
-Supported: reliable superiority over pinned Supalosa on balanced HFO and
-replicated Peak; replicated scoped HFO mechanisms; deterministic full-game
-evidence; explicit Advanced transfer failure.
+Currently supported:
 
-Unsupported: a new Chrono Divide environment, a novel general optimizer,
-superiority to all opponents, full map generalization, or a paradigm shift in
-game AI.
+- reliable superiority over pinned Supalosa on the historical balanced HFO LE
+  population;
+- positive Peak profile-scope replication; and
+- an explicit negative Advanced transfer result.
 
-## Remaining work
+Not currently supported:
 
-Only human submission actions remain: venue-stage/deadline verification,
-remote-presentation and AI-disclosure rulings, double-blind handling of the
-public repository, author metadata, and rights-holder contact. See
-`SUBMISSION_CHECKLIST.md`.
+- reliable superiority across all 15 maps;
+- superiority to RA2Web Advanced, Standard, or Sea/Land;
+- fog-of-war parity or equal feature use;
+- ancestry-independent opponent generalization;
+- a new Chrono Divide environment, general optimizer, or paradigm shift; or
+- a submission-ready paper.
 
-## Historical note
+The corrected observation and opponent provenance boundaries are recorded in
+`research/OBSERVATION_CONTRACT_ERRATUM_V1.md` and
+`research/OPPONENT_PROVENANCE_ERRATUM_V1.md`.
 
-Older method-v2 family-configuration documents and PDFs remain in Git as
-preserved pilot history. They are superseded by the final HFO/Peak program and
-are excluded from the anonymous review artifact. Do not use their negative
-claim or old title as the current paper state.
+## Paper and venue
+
+The old 12-page SCITEPRESS PDF, `final_paper_evidence_v1`, generated tables,
+and artifact remain preserved historical outputs. Do not update their macros
+or cite them as current. After empirical completion, create a separate
+hash-bound evidence V2 and regenerate every number, table, figure, README, and
+claim.
+
+The primary target is the SPIKE 2027 special session at ICAART, submission
+deadline 2026-12-03 AOE. Remote presentation is an exception rather than an
+unconditional guarantee, so written approval is required before submission or
+registration. See `research/VENUE_STRATEGY.md`.

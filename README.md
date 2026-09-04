@@ -1,5 +1,7 @@
 # Strong Chrono Divide Bot
 
+**EA has not endorsed and does not support this product.**
+
 This repository is a fork of [Supalosa's Chrono Divide bot](https://github.com/Supalosa/supalosa-chronodivide-bot). The upstream bot is intended to be a stable opponent for Chrono Divide players. This fork is an experimental stronger-bot branch: the goal is to push the bot toward competitive ladder strength while keeping the code buildable, benchmarkable, and understandable.
 
 [Chrono Divide](https://chronodivide.com/) is a browser rebuild of Red Alert 2. It exposes a bot API, which this project uses to run offline matches, generate replays, benchmark strategies, and test stronger AI behavior.
@@ -25,14 +27,22 @@ for provenance, but they are not automatically admissible paper evidence.
 
 ## Current Status
 
-The paper study is complete and frozen. On 16 sealed Temperate map families,
-the configured StrongBot scores 0.53516 and the shipped StrongBot default scores
-0.19922 against one pinned Supalosa revision. The equally family-weighted
-improvement is 0.33594 with family-clustered 95% CI [0.21456, 0.45732]. The
-separate absolute-strength gate failed, so this repository does **not** support
-the claim that StrongBot reliably beats Supalosa. See
-[`research/STATUS.md`](research/STATUS.md) and the anonymous manuscript under
-[`paper/`](paper/) before using any result in a claim.
+The research program is active; the paper is neither complete nor frozen for
+submission. Historical evidence includes a 633W/24D/63L balanced HFO LE result
+against pinned Supalosa and a positive Peak of Perfection replication, but the
+existing manuscript predates the current literal-endpoint, multi-map,
+multi-opponent, observation-contract, and uncertainty program. RA2Web Advanced
+remains unsolved. No repository summary should be treated as a final paper
+claim until milestones M0--M5 and the hash-bound evidence V2 are complete.
+
+The current milestone and claim boundaries are maintained in the active
+research protocol and [`research/STATUS.md`](research/STATUS.md). Frozen
+historical results remain evidence, including negative findings, but may not be
+silently combined with later policies or endpoints. See
+[`research/OBSERVATION_CONTRACT_ERRATUM_V1.md`](research/OBSERVATION_CONTRACT_ERRATUM_V1.md),
+[`research/OPPONENT_PROVENANCE_ERRATUM_V1.md`](research/OPPONENT_PROVENANCE_ERRATUM_V1.md),
+and [`RIGHTS_AND_RELEASE_NOTICE.md`](RIGHTS_AND_RELEASE_NOTICE.md) before using
+the code, figures, or opponent bundles in a publication or release.
 
 The bot is not a complete ladder-ready AI. Some maps still draw, water/naval
 games often do not close, and several legacy map profiles are tuned for specific
