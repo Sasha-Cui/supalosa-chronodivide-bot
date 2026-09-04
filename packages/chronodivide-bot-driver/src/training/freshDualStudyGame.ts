@@ -38,6 +38,11 @@ import {
     installFreshDualStudyInstrumentation,
     snapshotFreshDualPublicWorld,
 } from "./freshDualStudyInstrumentation.js";
+import {
+    FreshDualCanaryTraceContext,
+    FreshDualCanaryTraceMetadata,
+    FreshDualCanaryTraceWriter,
+} from "./freshDualCanaryTrace.js";
 
 export type FreshDualInspectableBot = Bot & {
     lastGameApi: GameApi | null;
@@ -68,6 +73,7 @@ export type FreshDualCanaryResult = {
     quitSuppression: PublicActionAudit["quit"];
     requestedEngineSeed: number;
     observedStarts: { candidate: string; opponent: string };
+    compressedTrace?: FreshDualCanaryTraceMetadata;
 };
 export type FreshDualCompetitiveResult = {
     kind: "fresh-dual-competitive-cell-v1";
@@ -150,8 +156,13 @@ export const runFreshDualCanary = async (args: {
     opponent: FreshDualInspectableBot;
     expectedStarts: { candidate: string; opponent: string };
     mode: FreshDualCanaryMode;
+    traceFile?: string;
+    traceContext?: FreshDualCanaryTraceContext;
 }): Promise<FreshDualCanaryResult> => {
     if (args.spec.maxUpdates !== 6000) throw new Error("Canary horizon must be exactly 6000 updates");
+    if ((args.traceFile === undefined) !== (args.traceContext === undefined)) {
+        throw new Error("Canary trace file and context must be provided together");
+    }
     const combatants = { candidate: args.candidate.name, baseline: args.opponent.name };
     const bots = { candidate: args.candidate, baseline: args.opponent };
     setStart(args.candidate, args.spec.candidateStartOrdinal);
@@ -187,8 +198,14 @@ export const runFreshDualCanary = async (args: {
             if (instance.isFinished() || game.getCurrentTick() !== 0) {
                 throw new Error("Canary did not begin in a live tick-zero state");
             }
-            const trajectory = new PublicWorldTrajectory();
-            trajectory.observe(snapshotFreshDualPublicWorld(game, bots));
+            const trace = args.traceFile && args.traceContext
+                ? await FreshDualCanaryTraceWriter.create(args.traceFile, args.traceContext)
+                : null;
+            try {
+                const trajectory = new PublicWorldTrajectory();
+                const initialSnapshot = snapshotFreshDualPublicWorld(game, bots);
+                trajectory.observe(initialSnapshot);
+                if (trace) await trace.observe(0, initialSnapshot);
             let active = true;
             for (let update = 1; update <= args.spec.maxUpdates; update += 1) {
                 if (instance.isFinished()) throw new Error("Canary ended before its frozen horizon");
@@ -214,12 +231,22 @@ export const runFreshDualCanary = async (args: {
                     }
                 }
                 if (instance.isFinished()) throw new Error("Canary ended before its frozen horizon");
-                trajectory.observe(snapshotFreshDualPublicWorld(game, bots));
+                const snapshot = snapshotFreshDualPublicWorld(game, bots);
+                trajectory.observe(snapshot);
+                if (trace) await trace.observe(update, snapshot);
             }
             assertNoForwardedQuit(actionAudit);
             const worldTrajectory = trajectory.finish() as { sha256: string; snapshots: 6001 };
             if (worldTrajectory.snapshots !== 6001) throw new Error("Canary snapshot count drifted");
             const actions = actionAudit.finish();
+            const quitSuppression = structuredClone(actionAudit.quit);
+            const compressedTrace = trace ? await trace.finish({
+                updates: 6000,
+                observations: 6001,
+                worldTrajectory,
+                actionAudit: actions,
+                quitSuppression,
+            }) : undefined;
             return {
                 kind: "fresh-dual-noninterference-canary-cell-v1",
                 complete: true,
@@ -230,10 +257,22 @@ export const runFreshDualCanary = async (args: {
                 finalTick: game.getCurrentTick() as 6000,
                 worldTrajectory,
                 actionAudit: actions,
-                quitSuppression: structuredClone(actionAudit.quit),
+                quitSuppression,
                 requestedEngineSeed: args.spec.requestedEngineSeed,
                 observedStarts,
+                ...(compressedTrace ? { compressedTrace } : {}),
             };
+            } catch (error) {
+                recording = false;
+                if (trace) {
+                    try {
+                        await trace.abort(error);
+                    } catch {
+                        // The exclusive partial stream remains preserved evidence.
+                    }
+                }
+                throw error;
+            }
         },
     );
 };
