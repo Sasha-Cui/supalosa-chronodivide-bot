@@ -137,3 +137,94 @@ export const validateFreshDualFrozenComponents = () => {
         verifiedMaps: frozen.maps.length,
     };
 };
+const POLICY_FROZEN_FILES = Object.freeze([
+    "research/runtime/fresh-dual-endpoint-plan-v1.mjs",
+    "research/runtime/fresh-dual-inputs-v1.mjs",
+    "research/runtime/explicit-start-loader-v1.mjs",
+    "research/runtime/explicit-start-transform-v1.mjs",
+    "research/protocols/maps/2026-09-03-fresh-dual-endpoint-remeasurement-v1.md",
+    "research/protocols/maps/2026-09-03-fresh-dual-endpoint-seed-amendment-a1.md",
+    "packages/chronodivide-bot-driver/dist/benchmark/seededOfflineGame.js",
+    "packages/chronodivide-bot-driver/dist/benchmark/baselineLoader.js",
+    "packages/chronodivide-bot-driver/dist/training/deployedStrongBotCandidate.js",
+    "packages/chronodivide-bot-driver/dist/training/peakProfilePolicies.js",
+    "packages/chronodivide-bot-driver/dist/training/ra2WebOpponentBundle.js",
+    "packages/chronodivide-bot-driver/dist/training/literalBuildingEliminationEndpoint.js",
+    "packages/chronodivide-bot-driver/dist/training/liveOwnedBuildingSnapshotCandidate.js",
+    "packages/chronodivide-bot-driver/dist/training/liveOwnedBuildingEliminationEndpointV6.js",
+    "packages/chronodivide-bot-driver/dist/training/passiveDualBuildingEndpoint.js",
+    "packages/chronodivide-bot-driver/package.json",
+    "packages/chronodivide-bot-driver/pnpm-lock.yaml",
+]);
+
+export const validateFreshDualFrozenPolicyInputs = () => {
+    const bytes = read(FRESH_DUAL_FREEZE_FILE);
+    const freezeSha256 = hash(bytes);
+    assert.equal(
+        freezeSha256,
+        read(path.join(FRESH_DUAL_FREEZE_DIR, "runtime-freeze.sha256")).toString().trim().split(/\s+/)[0],
+    );
+    assert.equal(
+        read(path.join(FRESH_DUAL_FREEZE_DIR, "COMPLETE")).toString().trim(),
+        "COMPLETE_FRESH_DUAL_RUNTIME_FREEZE_V1",
+    );
+    const manifest = JSON.parse(bytes);
+    assert.equal(manifest.complete, true);
+    assert.equal(manifest.passed, true);
+    const frozen = manifest.frozen;
+    assert.equal(git(REPO, "branch", "--show-current"), "main");
+    assert.equal(git(REPO, "status", "--porcelain=v1", "--untracked-files=no"), "");
+    const currentSourceCommit = git(REPO, "rev-parse", "HEAD");
+    assert.equal(currentSourceCommit, git(REPO, "rev-parse", "fork/main"));
+    execFileSync("git", ["merge-base", "--is-ancestor", frozen.sourceCommit, currentSourceCommit], {
+        cwd: REPO,
+        stdio: "ignore",
+    });
+    for (const relative of POLICY_FROZEN_FILES) {
+        const expected = frozen.files[relative];
+        assert.match(expected, /^[0-9a-f]{64}$/, `Policy freeze lacks ${relative}`);
+        const file = path.join(REPO, relative);
+        assert.ok(fs.lstatSync(file).isFile(), `Frozen policy file missing: ${relative}`);
+        assert.equal(hash(read(file)), expected, `Frozen policy file drifted: ${relative}`);
+    }
+    const candidateTree = hashTree(frozen.candidatePolicy.runtimeTree.root);
+    const externalTree = hashTree(frozen.externalSupalosa.runtimeTree.root);
+    assert.deepEqual(candidateTree, frozen.candidatePolicy.runtimeTree);
+    assert.deepEqual(externalTree, frozen.externalSupalosa.runtimeTree);
+    assert.equal(git(frozen.externalSupalosa.repoRoot, "rev-parse", "HEAD"), frozen.externalSupalosa.commit);
+    assert.equal(git(frozen.externalSupalosa.repoRoot, "status", "--porcelain=v1"), "");
+    const requireDriver = createRequire(path.join(DRIVER, "package.json"));
+    const gameApiPath = fs.realpathSync(requireDriver.resolve("@chronodivide/game-api"));
+    assert.equal(gameApiPath, frozen.gameApi.path);
+    assert.equal(hash(read(gameApiPath)), frozen.gameApi.sha256);
+    const requireExternal = createRequire(path.join(frozen.externalSupalosa.packageRoot, "package.json"));
+    assert.equal(
+        fs.realpathSync(requireExternal.resolve("@chronodivide/game-api")),
+        frozen.gameApi.externalBaselineResolvedPath,
+    );
+    for (const entry of frozen.assets.entries) {
+        const file = path.join(ASSETS, entry.name);
+        assert.ok(fs.lstatSync(file).isFile());
+        assert.equal(hash(read(file)), entry.sha256);
+    }
+    for (const map of frozen.maps) {
+        assert.ok(fs.lstatSync(map.absolutePath).isFile());
+        assert.equal(hash(read(map.absolutePath)), map.sha256);
+    }
+    assert.equal(hash(read(frozen.ra2WebAdvanced.bundlePath)), frozen.ra2WebAdvanced.bundleSha256);
+    assert.equal(hash(read(frozen.ra2WebAdvanced.manifestPath)), frozen.ra2WebAdvanced.manifestSha256);
+    assert.equal(hash(read(path.join(ROOT, "selection/finalizer/selection.json"))), frozen.selectionSha256);
+    assert.equal(hash(read(path.join(ROOT, "audit/seed-audit.json"))), frozen.seedAuditSha256);
+    return {
+        manifest,
+        frozen,
+        freezeSha256,
+        frozenSourceCommit: frozen.sourceCommit,
+        currentSourceCommit,
+        candidateTree,
+        externalTree,
+        verifiedPolicyFiles: POLICY_FROZEN_FILES.length,
+        verifiedAssets: frozen.assets.count,
+        verifiedMaps: frozen.maps.length,
+    };
+};
