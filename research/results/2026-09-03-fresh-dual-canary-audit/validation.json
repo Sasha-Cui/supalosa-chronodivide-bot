@@ -1,0 +1,28 @@
+{
+  "complete": true,
+  "passed": true,
+  "outcomeBlind": true,
+  "aggregateSha256": "a4e9d38a91dfb9840e30041be52b83b65b564fd3d91ba06292346ad0b8107a52",
+  "freezeSha256": "be47027c8526daa961500a1ca2acc3c04dd1a487460d4dec78361faa03ece649",
+  "frozenSourceCommit": "dc17f42d76abf6e449b7ad326a04bbda67d5f650",
+  "auditSourceCommit": "d82fcbef97b898d3a8c63b296a5d372dcb252bfe",
+  "programSha256": "2b6bc00a2550b7934a2f8ed363ae5e72d501555a834088f2cdde00df2b407e37",
+  "schedulerRecords": 5,
+  "configurations": 4,
+  "technicalGames": 8,
+  "totalUpdates": 48000,
+  "publicWorldSnapshots": 48008,
+  "exactWorldPairs": 4,
+  "exactActionPairs": 4,
+  "exactQuitPairs": 4,
+  "zeroForwardedResignations": true,
+  "verifiedFrozenFiles": 23,
+  "verifiedAssets": 335,
+  "verifiedMaps": 15,
+  "competitiveRunAuthorized": true,
+  "cpuSeconds": 2051,
+  "outputs": {
+    "pairs.csv": "2a6bb4f856c52ebcc36e2d2c9075cba1759435aaef3752243301f9272da403c9",
+    "scheduler.csv": "a529181c07d22971844dc13f261d37e73befbc6b52bce9e867c9a4160d558a64"
+  }
+}
