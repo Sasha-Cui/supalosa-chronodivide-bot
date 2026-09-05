@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import bisect
 import hashlib
 import json
 import mmap
@@ -15,7 +16,17 @@ import subprocess
 PROJECT = Path("/nfs/roberts/project/pi_jss233/zc362/chrono_divide")
 REPO = PROJECT / "strong-chronodivide-bot"
 STUDY = PROJECT / "research-evidence/action-burst-diagnostic-v1"
-LOW, HIGH = 3_980_000_000, 3_981_000_000
+CANDIDATE_BASES = (
+    3_010_000_000, 3_020_000_000, 3_030_000_000, 3_040_000_000,
+    3_050_000_000, 3_060_000_000, 3_070_000_000, 3_080_000_000,
+    3_090_000_000, 3_120_000_000, 3_130_000_000, 3_140_000_000,
+    3_150_000_000, 3_160_000_000, 3_170_000_000, 3_180_000_000,
+    3_190_000_000, 3_210_000_000, 3_220_000_000, 3_230_000_000,
+    3_240_000_000, 3_250_000_000, 3_260_000_000, 3_270_000_000,
+    3_280_000_000, 3_290_000_000,
+)
+INTERVAL_SIZE = 1_000_000
+LOW, HIGH = CANDIDATE_BASES[0], CANDIDATE_BASES[0] + INTERVAL_SIZE
 ROOTS = [
     PROJECT / "research-evidence",
     REPO,
@@ -36,6 +47,7 @@ CREDENTIAL_NAME = re.compile(
 CURRENT = {
     REPO / "research/protocols/method/2026-09-05-outcome-blind-action-burst-diagnostic-v1.md",
     REPO / "research/protocols/method/2026-09-05-outcome-blind-action-burst-diagnostic-v1-amendment-a1.md",
+    REPO / "research/protocols/method/2026-09-05-outcome-blind-action-burst-diagnostic-v1-amendment-a2.md",
     REPO / "research/scripts/action_burst_seed_reservation_audit_v1.py",
     REPO / "research/tests/test_action_burst_seed_reservation_audit_v1.py",
     REPO / "research/slurm/action_burst_seed_reservation_audit_v1.sbatch",
@@ -85,33 +97,47 @@ def unsigned(value: int | None) -> int | None:
     return value if 0 <= value <= 2**32 else None
 
 
-def overlap(low: int | None, high: int | None) -> bool:
+def overlap(
+    low: int | None,
+    high: int | None,
+    candidate_low: int = LOW,
+    candidate_high: int = HIGH,
+) -> bool:
     if low is None or high is None:
         return False
     if low <= high:
-        return low < HIGH and high > LOW
-    return low < HIGH or high > LOW
+        return low < candidate_high and high > candidate_low
+    return low < candidate_high or high > candidate_low
+
+
+def candidate_for(value: int | None) -> int | None:
+    if value is None:
+        return None
+    index = bisect.bisect_right(CANDIDATE_BASES, value) - 1
+    if index >= 0 and value < CANDIDATE_BASES[index] + INTERVAL_SIZE:
+        return CANDIDATE_BASES[index]
+    return None
 
 
 def inspect_numbers(data: bytes | mmap.mmap) -> tuple[list[dict], list[dict]]:
     matches, ranges = [], []
     for token in TOKEN.finditer(data):
         value = unsigned(integer(token.group(1)))
-        if value is not None and LOW <= value < HIGH:
+        base = candidate_for(value)
+        if base is not None:
             matches.append({
                 "byteOffset": token.start(1),
                 "unsignedValue": value,
                 "signedInt32Equivalent": value - 2**32,
+                "candidateBase": base,
             })
+    raw_ranges = []
     for match in ARRAY_RANGE.finditer(data):
-        low = unsigned(integer(match.group(2)))
-        high = unsigned(integer(match.group(3)))
-        ranges.append({
+        raw_ranges.append({
             "byteOffset": match.start(),
             "key": match.group(1).decode(),
-            "low": low,
-            "high": high,
-            "overlap": overlap(low, high),
+            "low": unsigned(integer(match.group(2))),
+            "high": unsigned(integer(match.group(3))),
             "interpretation": "half-open-or-conservative-array",
         })
     for match in OBJECT_RANGE.finditer(data):
@@ -123,16 +149,22 @@ def inspect_numbers(data: bytes | mmap.mmap) -> tuple[list[dict], list[dict]]:
             exclusive = b"exclusive" in high_match.group(1).lower()
             if high is not None and not exclusive:
                 high += 1
-            ranges.append({
+            raw_ranges.append({
                 "byteOffset": match.start(),
                 "key": match.group(1).decode(),
                 "low": low,
                 "high": high,
-                "overlap": overlap(low, high),
                 "interpretation": "explicit-range-object",
             })
+    for value in raw_ranges:
+        for base in CANDIDATE_BASES:
+            if overlap(value["low"], value["high"], base, base + INTERVAL_SIZE):
+                ranges.append({
+                    **value,
+                    "overlap": True,
+                    "candidateBase": base,
+                })
     return matches, ranges
-
 
 def digest(path: Path) -> str:
     value = hashlib.sha256()
@@ -166,6 +198,7 @@ def main() -> None:
     own = Path(__file__).resolve()
     protocol = next(path for path in CURRENT if path.name.endswith("diagnostic-v1.md"))
     amendment = next(path for path in CURRENT if path.name.endswith("amendment-a1.md"))
+    amendment_a2 = next(path for path in CURRENT if path.name.endswith("amendment-a2.md"))
     if source != os.environ["SOURCE_COMMIT"]:
         raise AuditFailure("source commit mismatch")
     if digest(own) != os.environ["PROGRAM_SHA256"]:
@@ -174,9 +207,11 @@ def main() -> None:
         raise AuditFailure("protocol hash mismatch")
     if digest(amendment) != os.environ["AMENDMENT_SHA256"]:
         raise AuditFailure("amendment hash mismatch")
+    if digest(amendment_a2) != os.environ["AMENDMENT_A2_SHA256"]:
+        raise AuditFailure("amendment A2 hash mismatch")
 
     output = Path(os.environ["OUT_PATH"])
-    if output.exists() or output.parent != STUDY / "seed-audit-v1-a1" or not output.parent.is_dir():
+    if output.exists() or output.parent != STUDY / "seed-audit-v1-a2" or not output.parent.is_dir():
         raise AuditFailure("fresh in-scope output required")
 
     files: list[dict] = []
@@ -272,9 +307,35 @@ def main() -> None:
                     })
 
     files.sort(key=lambda value: value["path"])
-    passed = bool(files) and not errors and not collisions
+    collision_by_base = {base: [] for base in CANDIDATE_BASES}
+    for collision in collisions:
+        bases = {
+            token["candidateBase"] for token in collision.get("tokens", [])
+        }
+        if "range" in collision:
+            bases.add(collision["range"]["candidateBase"])
+        for base in bases:
+            collision_by_base[base].append(collision)
+    selected_base = next(
+        (base for base in CANDIDATE_BASES if not collision_by_base[base]),
+        None,
+    )
+    passed = bool(files) and not errors and selected_base is not None
+    candidate_assessments = [{
+        "base": base,
+        "interval": [base, base + INTERVAL_SIZE],
+        "signedInt32EquivalentInterval": [
+            base - 2**32, base + INTERVAL_SIZE - 2**32,
+        ],
+        "collisionRecords": len(collision_by_base[base]),
+        "collisionPaths": sorted({
+            collision["path"] for collision in collision_by_base[base]
+        }),
+        "passed": not collision_by_base[base],
+        "selected": base == selected_base,
+    } for base in CANDIDATE_BASES]
     artifact = {
-        "kind": "action-burst-seed-reservation-audit-v1-a1",
+        "kind": "action-burst-seed-reservation-audit-v1-a2",
         "complete": True,
         "passed": passed,
         "outcomeFree": True,
@@ -282,13 +343,21 @@ def main() -> None:
         "programSha256": digest(own),
         "protocolSha256": digest(protocol),
         "amendmentSha256": digest(amendment),
+        "amendmentA2Sha256": digest(amendment_a2),
         "scheduler": {
             "jobId": os.environ["SLURM_JOB_ID"],
             "account": os.environ["SLURM_JOB_ACCOUNT"],
             "partition": os.environ["SLURM_JOB_PARTITION"],
         },
-        "reservedInterval": [LOW, HIGH],
-        "signedInt32EquivalentInterval": [LOW - 2**32, HIGH - 2**32],
+        "orderedCandidateIntervals": candidate_assessments,
+        "selectedInterval": (
+            [selected_base, selected_base + INTERVAL_SIZE]
+            if selected_base is not None else None
+        ),
+        "selectedSignedInt32EquivalentInterval": (
+            [selected_base - 2**32, selected_base + INTERVAL_SIZE - 2**32]
+            if selected_base is not None else None
+        ),
         "coverageRoots": [str(path) for path in ROOTS],
         "currentStudyRootExcluded": str(STUDY),
         "currentStudySourcesExcluded": sorted(str(path) for path in CURRENT),
@@ -301,6 +370,7 @@ def main() -> None:
         "declaredRanges": declared_ranges,
         "errors": errors,
         "collisions": collisions,
+        "selectionRule": "first-zero-collision-candidate-in-frozen-order",
         "coverageLimit": (
             "Lexical scan of retained text-like files only. Dependency, asset, binary, "
             "compressed, credential-named, symlink-target, inaccessible, and off-tree "
@@ -317,7 +387,8 @@ def main() -> None:
         "scannedFiles": len(files),
         "scannedBytes": artifact["scannedBytes"],
         "errors": len(errors),
-        "collisions": len(collisions),
+        "collisionRecords": len(collisions),
+        "selectedInterval": artifact["selectedInterval"],
     }, sort_keys=True))
     if not passed:
         raise SystemExit(2)

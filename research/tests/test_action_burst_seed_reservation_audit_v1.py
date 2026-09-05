@@ -14,7 +14,7 @@ class ActionBurstSeedAuditTests(unittest.TestCase):
     def test_unsigned_signed_grouped_and_hex_tokens(self):
         signed = audit.LOW - 2**32
         values = (
-            f"{audit.LOW} {signed} 3_980_000_000 3,980,000,000 "
+            f"{audit.LOW} {signed} 3_010_000_000 3,010,000,000 "
             f"{hex(audit.LOW)}"
         ).encode()
         hits, _ = audit.inspect_numbers(values)
@@ -38,6 +38,16 @@ class ActionBurstSeedAuditTests(unittest.TestCase):
             [audit.LOW, audit.LOW + 1],
         )
 
+    def test_later_candidate_is_classified_without_matching_gap(self):
+        later = audit.CANDIDATE_BASES[-1]
+        hits, _ = audit.inspect_numbers(
+            f"{audit.HIGH + 1} {later} {later + 1}".encode()
+        )
+        self.assertEqual(
+            [(value["candidateBase"], value["unsignedValue"]) for value in hits],
+            [(later, later), (later, later + 1)],
+        )
+
     def test_declared_range_overlap_with_outside_endpoints(self):
         _, ranges = audit.inspect_numbers(
             f'{{"reservedInterval":[{audit.LOW - 1_000_000},{audit.HIGH + 1_000_000}]}}'.encode()
@@ -53,7 +63,7 @@ class ActionBurstSeedAuditTests(unittest.TestCase):
         _, outside = audit.inspect_numbers(
             f'{{"seedRange":{{"minimum":{audit.HIGH},"maximumExclusive":{audit.HIGH + 1_000_000}}}}}'.encode()
         )
-        self.assertFalse(outside[0]["overlap"])
+        self.assertEqual(outside, [])
 
     def test_wrapped_interval_is_conservatively_checked(self):
         self.assertTrue(audit.overlap(audit.LOW + 500_000, 100))
