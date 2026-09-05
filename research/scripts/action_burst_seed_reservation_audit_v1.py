@@ -15,7 +15,7 @@ import subprocess
 PROJECT = Path("/nfs/roberts/project/pi_jss233/zc362/chrono_divide")
 REPO = PROJECT / "strong-chronodivide-bot"
 STUDY = PROJECT / "research-evidence/action-burst-diagnostic-v1"
-LOW, HIGH = 4_100_000_000, 4_101_000_000
+LOW, HIGH = 3_980_000_000, 3_981_000_000
 ROOTS = [
     PROJECT / "research-evidence",
     REPO,
@@ -35,6 +35,7 @@ CREDENTIAL_NAME = re.compile(
 )
 CURRENT = {
     REPO / "research/protocols/method/2026-09-05-outcome-blind-action-burst-diagnostic-v1.md",
+    REPO / "research/protocols/method/2026-09-05-outcome-blind-action-burst-diagnostic-v1-amendment-a1.md",
     REPO / "research/scripts/action_burst_seed_reservation_audit_v1.py",
     REPO / "research/tests/test_action_burst_seed_reservation_audit_v1.py",
     REPO / "research/slurm/action_burst_seed_reservation_audit_v1.sbatch",
@@ -164,15 +165,18 @@ def main() -> None:
         raise AuditFailure("clean synchronized main required")
     own = Path(__file__).resolve()
     protocol = next(path for path in CURRENT if path.name.endswith("diagnostic-v1.md"))
+    amendment = next(path for path in CURRENT if path.name.endswith("amendment-a1.md"))
     if source != os.environ["SOURCE_COMMIT"]:
         raise AuditFailure("source commit mismatch")
     if digest(own) != os.environ["PROGRAM_SHA256"]:
         raise AuditFailure("program hash mismatch")
     if digest(protocol) != os.environ["PROTOCOL_SHA256"]:
         raise AuditFailure("protocol hash mismatch")
+    if digest(amendment) != os.environ["AMENDMENT_SHA256"]:
+        raise AuditFailure("amendment hash mismatch")
 
     output = Path(os.environ["OUT_PATH"])
-    if output.exists() or output.parent != STUDY / "seed-audit-v1" or not output.parent.is_dir():
+    if output.exists() or output.parent != STUDY / "seed-audit-v1-a1" or not output.parent.is_dir():
         raise AuditFailure("fresh in-scope output required")
 
     files: list[dict] = []
@@ -270,13 +274,14 @@ def main() -> None:
     files.sort(key=lambda value: value["path"])
     passed = bool(files) and not errors and not collisions
     artifact = {
-        "kind": "action-burst-seed-reservation-audit-v1",
+        "kind": "action-burst-seed-reservation-audit-v1-a1",
         "complete": True,
         "passed": passed,
         "outcomeFree": True,
         "sourceCommit": source,
         "programSha256": digest(own),
         "protocolSha256": digest(protocol),
+        "amendmentSha256": digest(amendment),
         "scheduler": {
             "jobId": os.environ["SLURM_JOB_ID"],
             "account": os.environ["SLURM_JOB_ACCOUNT"],

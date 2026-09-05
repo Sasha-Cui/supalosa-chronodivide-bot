@@ -14,7 +14,7 @@ class ActionBurstSeedAuditTests(unittest.TestCase):
     def test_unsigned_signed_grouped_and_hex_tokens(self):
         signed = audit.LOW - 2**32
         values = (
-            f"{audit.LOW} {signed} 4_100_000_000 4,100,000,000 "
+            f"{audit.LOW} {signed} 3_980_000_000 3,980,000,000 "
             f"{hex(audit.LOW)}"
         ).encode()
         hits, _ = audit.inspect_numbers(values)
@@ -40,23 +40,23 @@ class ActionBurstSeedAuditTests(unittest.TestCase):
 
     def test_declared_range_overlap_with_outside_endpoints(self):
         _, ranges = audit.inspect_numbers(
-            b'{"reservedInterval":[4099000000,4102000000]}'
+            f'{{"reservedInterval":[{audit.LOW - 1_000_000},{audit.HIGH + 1_000_000}]}}'.encode()
         )
         self.assertEqual(len(ranges), 1)
         self.assertTrue(ranges[0]["overlap"])
 
     def test_object_range_inclusive_upper_and_exclusive_boundary(self):
         _, inclusive = audit.inspect_numbers(
-            b'{"seedRange":{"minimum":4099999999,"maximum":4100000000}}'
+            f'{{"seedRange":{{"minimum":{audit.LOW - 1},"maximum":{audit.LOW}}}}}'.encode()
         )
         self.assertTrue(inclusive[0]["overlap"])
         _, outside = audit.inspect_numbers(
-            b'{"seedRange":{"minimum":4101000000,"maximumExclusive":4102000000}}'
+            f'{{"seedRange":{{"minimum":{audit.HIGH},"maximumExclusive":{audit.HIGH + 1_000_000}}}}}'.encode()
         )
         self.assertFalse(outside[0]["overlap"])
 
     def test_wrapped_interval_is_conservatively_checked(self):
-        self.assertTrue(audit.overlap(4_100_500_000, 100))
+        self.assertTrue(audit.overlap(audit.LOW + 500_000, 100))
 
 
 if __name__ == "__main__":
