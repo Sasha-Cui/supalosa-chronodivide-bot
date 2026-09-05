@@ -27,26 +27,28 @@ has reproduced the central, Peak, and Advanced core counts and statistics.
 The full independent output-table/action-resource audit and immutable result
 record are still required before M0 closes.
 
-## Current milestone: M0
+## Current milestone: M1
 
-Execution V2 array `24832312` and finalizer `24832313` completed cleanly:
-2,700/2,700 unique tasks are `COMPLETED 0:0` under `pi_jss233/day`, every
-ledger was replayed, and the complete aggregate is bound to source
-`d97166ec25227c291718b73db6b6ea82a8f4e456`. Execution V1 remains a preserved
-technical failure and may never be pooled with V2.
+M0 closed on 2026-09-05. Execution V2 array `24832312`, finalizer
+`24832313`, and independent audit `24920955` passed. The audit streamed all
+2,700 ledgers, independently reproduced every outcome, transition,
+map-aware endpoint-effect, and gate row, and emitted the complete action
+analysis. The immutable result is
+`research/results/2026-09-05-fresh-dual-v2-complete.md`. Ledger V2 validates
+eight canonical entries with full artifact verification and SHA-256
+`0e4e5199e5a07ee19e28bab4a8af04240670a6a7a7d7a25823df664fade77eac`.
 
-Before opening scientific fields, the complete-population action-resource
-analysis was frozen at
-`research/protocols/maps/2026-09-05-fresh-dual-complete-action-resource-audit-v1.md`
-and commit `f5c3a72`. M0 now requires the complete independent table
-recomputation, execution of that action audit, immutable result preservation,
-and Ledger V2 registration.
+M1 must now freeze and run the outcome-blind timestamped action diagnostic,
+then implement and technically validate the unified intent arbiter, certified
+final-building race, and symmetric observation firewall. No new competitive
+development outcome is authorized until those interfaces pass.
 
 ## Milestone ledger
 
-- **M0 — Correct endpoint evidence:** complete V2, independent recomputation,
-  provenance/observation errata, result preservation, and registration.
-- **M1 — Method technically ready:** full action-burst diagnostic, unified
+- **M0 — Correct endpoint evidence — complete 2026-09-05:** V2, independent
+  recomputation, action audit, provenance/observation errata, immutable result,
+  and Ledger V2 all pass.
+- **M1 — Method technically ready — current:** full action-burst diagnostic, unified
   intent arbiter, strict terminal race, and symmetric observation firewall.
 - **M2 — Development champion frozen:** repeatable positive open-development
   evidence across 15 physical maps/five topology families and all ten HFO
@@ -65,7 +67,7 @@ These are internal targets, not permission to weaken a gate:
 
 | Milestone | Target | Exit decision |
 | --- | --- | --- |
-| M0 endpoint/audit closure | 2026-09-07 | corrected evidence independently reproduces or fails closed |
+| M0 endpoint/audit closure | completed 2026-09-05 | corrected evidence independently reproduced and passed |
 | M1 technical method readiness | 2026-09-16 | timestamped diagnostic, arbiter, terminal-race certificate, and observation firewall all pass without competitive outcomes |
 | M2 development champion | 2026-10-10 | one frozen policy is positive across all 15 maps against Supalosa and all ten HFO variants against Advanced |
 | M3 Supalosa reliability | 2026-10-20 | the single-use 10,080-game all-map confirmation passes every map and stratum gate |
