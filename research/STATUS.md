@@ -23,9 +23,9 @@ complete.
 | Fresh 13-map transfer screen | 900 | complete per-map table | pinned Supalosa | descriptive only; 10/13 maps have W>L |
 
 These are finalizer results from execution V2. An independent implementation
-has reproduced the central, Peak, and Advanced core counts and statistics.
-The full independent output-table/action-resource audit and immutable result
-record are still required before M0 closes.
+reproduced every outcome, transition, endpoint-effect, and gate row, then
+completed the action-resource audit. The immutable result and Ledger V2 close
+M0.
 
 ## Current milestone: M1
 
