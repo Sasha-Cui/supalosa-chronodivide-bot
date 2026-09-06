@@ -13,7 +13,7 @@ const REPO = path.resolve(path.dirname(PROGRAM), "../..");
 const PROJECT = path.dirname(REPO);
 const DRIVER = path.join(REPO, "packages", "chronodivide-bot-driver");
 const STUDY = path.join(PROJECT, "research-evidence", "action-burst-diagnostic-v1");
-const EXECUTION = path.join(STUDY, "execution-v1-a4");
+const EXECUTION = path.join(STUDY, "execution-v1-a4-runtime-a1");
 const RUNTIME_FREEZE = path.join(
     PROJECT,
     "research-evidence",
@@ -100,7 +100,7 @@ const writeExclusive = (file, value) => {
 };
 const canonical = (value) => JSON.stringify(value);
 
-const hashTree = (rootValue) => {
+const hashTree = (rootValue, bytewise = false) => {
     const root = path.resolve(rootValue);
     const entries = [];
     const visit = (directory) => {
@@ -126,7 +126,9 @@ const hashTree = (rootValue) => {
         }
     };
     visit(root);
-    entries.sort((left, right) => left.relativePath.localeCompare(right.relativePath));
+    entries.sort((left, right) => bytewise
+        ? Buffer.compare(Buffer.from(left.relativePath), Buffer.from(right.relativePath))
+        : left.relativePath.localeCompare(right.relativePath));
     const digest = crypto.createHash("sha256");
     for (const entry of entries) {
         digest.update(entry.relativePath);
@@ -173,6 +175,10 @@ const sourceIdentity = () => {
             REPO,
             "research/protocols/method/2026-09-05-outcome-blind-action-burst-diagnostic-v1-amendment-a4.md",
         ),
+        amendmentA5: path.join(
+            REPO,
+            "research/protocols/method/2026-09-06-outcome-blind-action-burst-diagnostic-v1-amendment-a5.md",
+        ),
     };
     const protocols = {
         protocolSha256: requiredHash("PROTOCOL_SHA256"),
@@ -180,6 +186,7 @@ const sourceIdentity = () => {
         amendmentA2Sha256: requiredHash("AMENDMENT_A2_SHA256"),
         amendmentA3Sha256: requiredHash("AMENDMENT_A3_SHA256"),
         amendmentA4Sha256: requiredHash("AMENDMENT_A4_SHA256"),
+        amendmentA5Sha256: requiredHash("AMENDMENT_A5_SHA256"),
     };
     const expected = {
         protocolSha256: sha256File(protocolFiles.protocol),
@@ -187,7 +194,11 @@ const sourceIdentity = () => {
         amendmentA2Sha256: sha256File(protocolFiles.amendmentA2),
         amendmentA3Sha256: sha256File(protocolFiles.amendmentA3),
         amendmentA4Sha256: sha256File(protocolFiles.amendmentA4),
+        amendmentA5Sha256: sha256File(protocolFiles.amendmentA5),
     };
+    if (process.version !== "v20.13.1") {
+        throw new Error("Action-burst Node runtime drifted");
+    }
     exactJson(protocols, expected, "Action-burst protocol hashes drifted");
     return { sourceCommit, programSha256, protocols };
 };
@@ -240,10 +251,10 @@ const verifyRuntime = () => {
     const dependencyRoot = path.join(frozen.externalSupalosa.repoRoot, "node_modules");
     const priorityQueue = hashTree(path.join(
         dependencyRoot, "@datastructures-js", "priority-queue",
-    ));
+    ), true);
     const quadtree = hashTree(path.join(
         dependencyRoot, "@timohausmann", "quadtree-ts",
-    ));
+    ), true);
     if (
         priorityQueue.sha256 !== "1533f9343bc44506b5082a47f5d8dc81420069b9f84e83070c26ebd2cbf57cf7" ||
         quadtree.sha256 !== "af6f532a321a487d38bf6726858313d296ba90883e5c2bb2df0d290d7f932039"

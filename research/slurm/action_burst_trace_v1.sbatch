@@ -12,11 +12,22 @@
 set -euo pipefail
 umask 077
 
+NODE_RUNTIME_ROOT=/apps/software/2024a/software/nodejs/20.13.1-GCCcore-13.3.0
+ICU_RUNTIME_ROOT=/apps/software/2024a/software/ICU/75.1-GCCcore-13.3.0
+GCC_RUNTIME_ROOT=/apps/software/system/software/GCCcore/13.3.0
+OPENSSL_RUNTIME_ROOT=/apps/software/system/software/OpenSSL/3
+NODE_BIN="${NODE_RUNTIME_ROOT}/bin/node"
+export PATH="${NODE_RUNTIME_ROOT}/bin:/opt/slurm/current/bin:/usr/local/bin:/usr/bin:/bin"
+export LD_LIBRARY_PATH="${ICU_RUNTIME_ROOT}/lib:${GCC_RUNTIME_ROOT}/lib64:${OPENSSL_RUNTIME_ROOT}/lib64:${NODE_RUNTIME_ROOT}/lib"
+export TZ=UTC LC_ALL=C PYTHONHASHSEED=0 PYTHONDONTWRITEBYTECODE=1
+unset NODE_OPTIONS
+test "$("${NODE_BIN}" --version)" = "v20.13.1"
+
 : "${REPO_ROOT:?}" "${EXECUTION_ROOT:?}" "${SOURCE_COMMIT:?}"
 : "${PROGRAM_SHA256:?}" "${SCRIPT_SHA256:?}"
 : "${PROTOCOL_SHA256:?}" "${AMENDMENT_A1_SHA256:?}"
 : "${AMENDMENT_A2_SHA256:?}" "${AMENDMENT_A3_SHA256:?}"
-: "${AMENDMENT_A4_SHA256:?}" "${MANIFEST_PATH:?}" "${MANIFEST_SHA256:?}"
+: "${AMENDMENT_A4_SHA256:?}" "${AMENDMENT_A5_SHA256:?}" "${MANIFEST_PATH:?}" "${MANIFEST_SHA256:?}"
 : "${TRACE_ROLE:?}" "${BASELINE_PACKAGE_ROOT:?}"
 
 test "${SLURM_JOB_ACCOUNT:-}" = "pi_jss233"
@@ -45,4 +56,4 @@ test ! -e "${OUT_DIR}"
 
 export MODE=trace TASK_INDEX OUT_DIR
 export REQUIRE_EXTERNAL_BASELINE=true
-node --max-old-space-size=2048 research/scripts/action-burst-diagnostic-v1.mjs
+"${NODE_BIN}" --max-old-space-size=2048 research/scripts/action-burst-diagnostic-v1.mjs
