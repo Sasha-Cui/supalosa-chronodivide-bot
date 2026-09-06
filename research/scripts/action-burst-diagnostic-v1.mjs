@@ -13,7 +13,7 @@ const REPO = path.resolve(path.dirname(PROGRAM), "../..");
 const PROJECT = path.dirname(REPO);
 const DRIVER = path.join(REPO, "packages", "chronodivide-bot-driver");
 const STUDY = path.join(PROJECT, "research-evidence", "action-burst-diagnostic-v1");
-const EXECUTION = path.join(STUDY, "execution-v1-a4-runtime-a1-certificate-a1");
+const EXECUTION = path.join(STUDY, "execution-v1-a4-runtime-a1-certificate-a2");
 const RUNTIME_FREEZE = path.join(
     PROJECT,
     "research-evidence",
@@ -329,7 +329,7 @@ const prepare = () => {
     const certificateDirectory = path.dirname(SEED_CERTIFICATE);
     if (
         fs.readFileSync(path.join(certificateDirectory, "selection-certificate.sha256"), "utf8")
-            .trim().split(/\\s+/)[0] !== SEED_CERTIFICATE_SHA256 ||
+            .trim().split(/\s+/)[0] !== SEED_CERTIFICATE_SHA256 ||
         fs.readFileSync(path.join(certificateDirectory, "COMPLETE"), "utf8").trim() !==
             "COMPLETE_ACTION_BURST_SEED_CERTIFICATE_V1_A2"
     ) throw new Error("Action-burst seed certificate marker drifted");
