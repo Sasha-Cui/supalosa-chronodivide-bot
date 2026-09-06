@@ -13,7 +13,7 @@ const REPO = path.resolve(path.dirname(PROGRAM), "../..");
 const PROJECT = path.dirname(REPO);
 const DRIVER = path.join(REPO, "packages", "chronodivide-bot-driver");
 const STUDY = path.join(PROJECT, "research-evidence", "action-burst-diagnostic-v1");
-const EXECUTION = path.join(STUDY, "execution-v1-a4-runtime-a1-certificate-a2");
+const EXECUTION = path.join(STUDY, "execution-v1-a4-runtime-a1-certificate-a3");
 const RUNTIME_FREEZE = path.join(
     PROJECT,
     "research-evidence",
@@ -432,11 +432,11 @@ const startKey = (value) => String(value.x) + "," + String(value.y);
 const setStart = (bot, ordinal) => {
     bot.chronoResearchStartPos = ordinal;
 };
-const settings = (trace, map, candidate, opponent) => ({
+const settings = (trace, map, candidate, opponent, gameMode) => ({
     online: false,
     agents: trace.candidateSlot === 0 ? [candidate, opponent] : [opponent, candidate],
     mapName: map.fileName,
-    gameMode: 0,
+    gameMode,
     shortGame: false,
     mcvRepacks: true,
     cratesAppear: false,
@@ -598,6 +598,9 @@ const runTrace = async () => {
     fs.mkdirSync(directory, { recursive: true, mode: 0o700 });
     try {
         await gameApi.cdapi.init(manifest.runtime.assetsRoot);
+        const gameModes = gameApi.cdapi.getAvailableGameModes(map.fileName);
+        if (!gameModes.length) throw new Error("Action-burst assigned game mode is unavailable");
+        const gameMode = gameModes[0];
         const factory = await loadBaselineFactory(path.join(REPO, "packages", "chronodivide-bot"));
         if (factory.descriptor.kind !== "external-package") {
             throw new Error("Action-burst pinned Supalosa factory is not external");
@@ -621,7 +624,7 @@ const runTrace = async () => {
         installTimestampedActionAudit({ candidate, baseline: opponent }, audit);
         const result = await withSeededOfflineGame(
             gameApi.cdapi,
-            settings(trace, map, candidate, opponent),
+            settings(trace, map, candidate, opponent, gameMode),
             trace.requestedEngineSeed,
             [
                 { agent: candidate, identity: "candidate" },
