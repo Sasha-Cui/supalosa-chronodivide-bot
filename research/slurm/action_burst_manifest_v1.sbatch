@@ -27,6 +27,7 @@ test "$("${NODE_BIN}" --version)" = "v20.13.1"
 : "${AMENDMENT_A2_SHA256:?}" "${AMENDMENT_A3_SHA256:?}"
 : "${AMENDMENT_A4_SHA256:?}" "${AMENDMENT_A5_SHA256:?}"
 : "${AMENDMENT_A6_SHA256:?}"
+export CHRONO_GAME_API_PATH="${REPO_ROOT}/packages/chronodivide-bot-driver/node_modules/@chronodivide/game-api/dist/index.js"
 
 test "${SLURM_JOB_ACCOUNT:-}" = "pi_jss233"
 test "${SLURM_JOB_PARTITION:-}" = "day"
@@ -43,4 +44,4 @@ test ! -e "${EXECUTION_ROOT}/manifest"
 
 export MODE=prepare
 export OUT_DIR="${EXECUTION_ROOT}/manifest"
-"${NODE_BIN}" --max-old-space-size=4096 research/scripts/action-burst-diagnostic-v1.mjs
+"${NODE_BIN}" --no-warnings --experimental-loader "${REPO_ROOT}/research/runtime/explicit-start-loader-v1.mjs" --es-module-specifier-resolution=node --max-old-space-size=4096 research/scripts/action-burst-diagnostic-v1.mjs

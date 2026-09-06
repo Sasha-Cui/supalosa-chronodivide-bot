@@ -13,7 +13,7 @@ const REPO = path.resolve(path.dirname(PROGRAM), "../..");
 const PROJECT = path.dirname(REPO);
 const DRIVER = path.join(REPO, "packages", "chronodivide-bot-driver");
 const STUDY = path.join(PROJECT, "research-evidence", "action-burst-diagnostic-v1");
-const EXECUTION = path.join(STUDY, "execution-v1-a4-runtime-a1-certificate-a3");
+const EXECUTION = path.join(STUDY, "execution-v1-a4-runtime-a1-certificate-a4");
 const RUNTIME_FREEZE = path.join(
     PROJECT,
     "research-evidence",
@@ -297,6 +297,8 @@ const programFiles = () => {
         baseline: path.join(DRIVER, "dist", "benchmark", "baselineLoader.js"),
         seeded: path.join(DRIVER, "dist", "benchmark", "seededOfflineGame.js"),
         advanced: path.join(DRIVER, "dist", "training", "ra2WebOpponentBundle.js"),
+        explicitStartLoader: path.join(REPO, "research", "runtime", "explicit-start-loader-v1.mjs"),
+        explicitStartTransform: path.join(REPO, "research", "runtime", "explicit-start-transform-v1.mjs"),
         package: path.join(DRIVER, "package.json"),
         lockfile: path.join(DRIVER, "pnpm-lock.yaml"),
     };
@@ -572,6 +574,11 @@ const runTrace = async () => {
     if (directory !== expectedDirectory || fs.existsSync(directory)) {
         throw new Error("Action-burst trace output path is invalid");
     }
+    const explicitStart = globalThis[Symbol.for("chrono.research.explicit-start.v1")];
+    if (
+        !explicitStart ||
+        explicitStart.originalSha256 !== manifest.runtime.gameApiSha256
+    ) throw new Error("Action-burst explicit-start loader is unavailable");
     const trace = manifest.plan.traces[taskIndex];
     const map = manifest.plan.maps.find((value) => value.id === trace.mapId);
     if (!map) throw new Error("Action-burst assigned map is missing");
