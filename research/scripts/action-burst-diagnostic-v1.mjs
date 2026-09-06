@@ -13,7 +13,7 @@ const REPO = path.resolve(path.dirname(PROGRAM), "../..");
 const PROJECT = path.dirname(REPO);
 const DRIVER = path.join(REPO, "packages", "chronodivide-bot-driver");
 const STUDY = path.join(PROJECT, "research-evidence", "action-burst-diagnostic-v1");
-const EXECUTION = path.join(STUDY, "execution-v1-a4-runtime-a1");
+const EXECUTION = path.join(STUDY, "execution-v1-a4-runtime-a1-certificate-a1");
 const RUNTIME_FREEZE = path.join(
     PROJECT,
     "research-evidence",
@@ -25,6 +25,10 @@ const RUNTIME_FREEZE = path.join(
 const RUNTIME_FREEZE_SHA256 = "be47027c8526daa961500a1ca2acc3c04dd1a487460d4dec78361faa03ece649";
 const SEED_AUDIT = path.join(STUDY, "seed-audit-v1-a2", "seed-audit.json");
 const SEED_AUDIT_SHA256 = "ac9c2100702750270e4bc9df311fbdff62aca29a933687e44d16d18f7318a231";
+const SEED_CERTIFICATE = path.join(
+    STUDY, "seed-certificate-v1-a2", "selection-certificate.json",
+);
+const SEED_CERTIFICATE_SHA256 = "e53ce72c0fa6fbe56151cf20a11cfd414e0ca88760f02f87e92ee98d36cc3165";
 const SELECTED_INTERVAL = [3010000000, 3011000000];
 const TRACE_LIMIT = 2 * 1024 * 1024;
 const TOTAL_TRACE_LIMIT = 2 * 1024 * 1024 * 1024;
@@ -179,6 +183,10 @@ const sourceIdentity = () => {
             REPO,
             "research/protocols/method/2026-09-06-outcome-blind-action-burst-diagnostic-v1-amendment-a5.md",
         ),
+        amendmentA6: path.join(
+            REPO,
+            "research/protocols/method/2026-09-06-outcome-blind-action-burst-diagnostic-v1-amendment-a6.md",
+        ),
     };
     const protocols = {
         protocolSha256: requiredHash("PROTOCOL_SHA256"),
@@ -187,6 +195,7 @@ const sourceIdentity = () => {
         amendmentA3Sha256: requiredHash("AMENDMENT_A3_SHA256"),
         amendmentA4Sha256: requiredHash("AMENDMENT_A4_SHA256"),
         amendmentA5Sha256: requiredHash("AMENDMENT_A5_SHA256"),
+        amendmentA6Sha256: requiredHash("AMENDMENT_A6_SHA256"),
     };
     const expected = {
         protocolSha256: sha256File(protocolFiles.protocol),
@@ -195,6 +204,7 @@ const sourceIdentity = () => {
         amendmentA3Sha256: sha256File(protocolFiles.amendmentA3),
         amendmentA4Sha256: sha256File(protocolFiles.amendmentA4),
         amendmentA5Sha256: sha256File(protocolFiles.amendmentA5),
+        amendmentA6Sha256: sha256File(protocolFiles.amendmentA6),
     };
     if (process.version !== "v20.13.1") {
         throw new Error("Action-burst Node runtime drifted");
@@ -313,18 +323,33 @@ const prepare = () => {
     if (sha256File(SEED_AUDIT) !== SEED_AUDIT_SHA256) {
         throw new Error("Action-burst seed audit drifted");
     }
-    const seedAudit = json(SEED_AUDIT);
+    if (sha256File(SEED_CERTIFICATE) !== SEED_CERTIFICATE_SHA256) {
+        throw new Error("Action-burst seed certificate drifted");
+    }
+    const certificateDirectory = path.dirname(SEED_CERTIFICATE);
     if (
-        seedAudit.complete !== true ||
-        seedAudit.passed !== true ||
-        seedAudit.outcomeFree !== true ||
-        JSON.stringify(seedAudit.selectedInterval) !== JSON.stringify(SELECTED_INTERVAL) ||
-        seedAudit.errors.length !== 0 ||
-        seedAudit.orderedCandidateIntervals.find((value) => value.selected)?.base !==
-            SELECTED_INTERVAL[0] ||
-        seedAudit.orderedCandidateIntervals.find((value) => value.passed)?.base !==
-            SELECTED_INTERVAL[0]
-    ) throw new Error("Action-burst seed audit is ineligible");
+        fs.readFileSync(path.join(certificateDirectory, "selection-certificate.sha256"), "utf8")
+            .trim().split(/\\s+/)[0] !== SEED_CERTIFICATE_SHA256 ||
+        fs.readFileSync(path.join(certificateDirectory, "COMPLETE"), "utf8").trim() !==
+            "COMPLETE_ACTION_BURST_SEED_CERTIFICATE_V1_A2"
+    ) throw new Error("Action-burst seed certificate marker drifted");
+    const seedCertificate = json(SEED_CERTIFICATE);
+    const firstPassing = seedCertificate.candidateAssessments.find((value) => value.passed);
+    const selected = seedCertificate.candidateAssessments.filter((value) => value.selected);
+    if (
+        seedCertificate.complete !== true ||
+        seedCertificate.passed !== true ||
+        seedCertificate.technicalOnly !== true ||
+        seedCertificate.competitiveFieldsAbsent !== true ||
+        seedCertificate.completeAudit.path !== SEED_AUDIT ||
+        seedCertificate.completeAudit.sha256 !== SEED_AUDIT_SHA256 ||
+        seedCertificate.completeAudit.bytes !== fs.statSync(SEED_AUDIT).size ||
+        seedCertificate.candidateAssessments.length !== 26 ||
+        selected.length !== 1 ||
+        selected[0] !== firstPassing ||
+        JSON.stringify(seedCertificate.selectedInterval) !== JSON.stringify(SELECTED_INTERVAL)
+    ) throw new Error("Action-burst seed certificate is ineligible");
+    rejectActionBurstProhibitedFields(seedCertificate);
     const plan = buildActionBurstDiagnosticPlan(runtime.maps, SELECTED_INTERVAL);
     validateActionBurstDiagnosticPlan(plan);
     const files = programFiles();
@@ -343,6 +368,7 @@ const prepare = () => {
         },
         protocols: source.protocols,
         selectedSeedAuditSha256: SEED_AUDIT_SHA256,
+        selectedSeedCertificateSha256: SEED_CERTIFICATE_SHA256,
         selectedInterval: SELECTED_INTERVAL,
         runtime,
         files,
@@ -393,6 +419,7 @@ const loadManifest = () => {
         value.sourceCommit !== required("SOURCE_COMMIT") ||
         value.programSha256 !== requiredHash("PROGRAM_SHA256") ||
         value.selectedSeedAuditSha256 !== SEED_AUDIT_SHA256 ||
+        value.selectedSeedCertificateSha256 !== SEED_CERTIFICATE_SHA256 ||
         value.planSha256 !== hash(Buffer.from(JSON.stringify(value.plan)))
     ) throw new Error("Action-burst manifest header drifted");
     validateActionBurstDiagnosticPlan(value.plan);
