@@ -13,7 +13,7 @@ const REPO = path.resolve(path.dirname(PROGRAM), "../..");
 const PROJECT = path.dirname(REPO);
 const DRIVER = path.join(REPO, "packages", "chronodivide-bot-driver");
 const STUDY = path.join(PROJECT, "research-evidence", "action-burst-diagnostic-v1");
-const EXECUTION = path.join(STUDY, "execution-v1-a4-runtime-a1-certificate-a4");
+const EXECUTION = path.join(STUDY, "execution-v1-a4-runtime-a1-certificate-a5");
 const RUNTIME_FREEZE = path.join(
     PROJECT,
     "research-evidence",
