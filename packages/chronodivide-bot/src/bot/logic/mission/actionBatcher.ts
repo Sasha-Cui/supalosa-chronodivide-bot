@@ -3,6 +3,12 @@
 
 import { ActionsApi, OrderType, Vector2 } from "@chronodivide/game-api";
 import { groupBy } from "../common/utils.js";
+import {
+    withUnifiedIntentScope,
+} from "../intent/unifiedIntentActionBoundary.js";
+import {
+    UnifiedIntentScope,
+} from "../intent/unifiedIntentArbiter.js";
 
 export type SubmittedBatchableAction = {
     action: BatchableAction;
@@ -19,6 +25,7 @@ export class BatchableAction {
         private _targetId?: number,
         // If you don't want this action to be swallowed by dedupe, provide a unique nonce.
         private _nonce: number = 0,
+        private _intentScope: UnifiedIntentScope = "baseline_core",
     ) {}
 
     static noTarget(unitId: number, orderType: OrderType, nonce: number = 0) {
@@ -49,6 +56,15 @@ export class BatchableAction {
         return this._targetId;
     }
 
+    public get intentScope() {
+        return this._intentScope;
+    }
+
+    public withIntentScope(scope: UnifiedIntentScope): this {
+        this._intentScope = scope;
+        return this;
+    }
+
     public isSameAs(other: BatchableAction) {
         if (this._unitId !== other._unitId) {
             return false;
@@ -66,6 +82,9 @@ export class BatchableAction {
             return false;
         }
         return true;
+        if (this._intentScope !== other._intentScope) {
+            return false;
+        }
     }
 }
 
@@ -96,51 +115,59 @@ export class ActionBatcher {
 
     resolve(actionsApi: ActionsApi) {
         const actionsToSubmit = this.getActionsToSubmit();
-        const groupedCommands = groupBy(actionsToSubmit, (action) => action.orderType.valueOf().toString());
         const vectorToStr = (v: Vector2) => v.x + "," + v.y;
         const strToVector = (str: string) => {
             const [x, y] = str.split(",");
             return new Vector2(parseInt(x), parseInt(y));
         };
 
-        // Group by command type.
-        Object.entries(groupedCommands).forEach(([commandValue, commands]) => {
-            // i hate this
-            const commandType: OrderType = parseInt(commandValue) as OrderType;
-            // Group by command target ID.
-            const byTarget = groupBy(
-                commands.filter((command) => command.targetId !== undefined),
-                (command) => command.targetId?.toString()!,
+        const byScope = groupBy(actionsToSubmit, (action) => action.intentScope);
+        Object.entries(byScope).forEach(([scopeValue, scopedActions]) => {
+            const scope = scopeValue as UnifiedIntentScope;
+            const groupedCommands = groupBy(
+                scopedActions,
+                (action) => action.orderType.valueOf().toString(),
             );
-            Object.entries(byTarget).forEach(([targetId, unitCommands]) => {
-                actionsApi.orderUnits(
-                    unitCommands.map((command) => command.unitId),
-                    commandType,
-                    parseInt(targetId),
+            // Group by command type.
+            Object.entries(groupedCommands).forEach(([commandValue, commands]) => {
+                // i hate this
+                const commandType: OrderType = parseInt(commandValue) as OrderType;
+                // Group by command target ID.
+                const byTarget = groupBy(
+                    commands.filter((command) => command.targetId !== undefined),
+                    (command) => command.targetId?.toString()!,
                 );
+                Object.entries(byTarget).forEach(([targetId, unitCommands]) => {
+                    withUnifiedIntentScope(actionsApi, scope, () => actionsApi.orderUnits(
+                        unitCommands.map((command) => command.unitId),
+                        commandType,
+                        parseInt(targetId),
+                    ));
+                });
+                // Group by position (the vector is encoded as a string of the form "x,y")
+                const byPosition = groupBy(
+                    commands.filter((command) => command.point !== undefined),
+                    (command) => vectorToStr(command.point!),
+                );
+                Object.entries(byPosition).forEach(([point, unitCommands]) => {
+                    const vector = strToVector(point);
+                    withUnifiedIntentScope(actionsApi, scope, () => actionsApi.orderUnits(
+                        unitCommands.map((command) => command.unitId),
+                        commandType,
+                        vector.x,
+                        vector.y,
+                    ));
+                });
+                // Actions with no targets
+                const noTargets = commands.filter((command) =>
+                    command.targetId === undefined && command.point === undefined);
+                if (noTargets.length > 0) {
+                    withUnifiedIntentScope(actionsApi, scope, () => actionsApi.orderUnits(
+                        noTargets.map((action) => action.unitId),
+                        commandType,
+                    ));
+                }
             });
-            // Group by position (the vector is encoded as a string of the form "x,y")
-            const byPosition = groupBy(
-                commands.filter((command) => command.point !== undefined),
-                (command) => vectorToStr(command.point!),
-            );
-            Object.entries(byPosition).forEach(([point, unitCommands]) => {
-                const vector = strToVector(point);
-                actionsApi.orderUnits(
-                    unitCommands.map((command) => command.unitId),
-                    commandType,
-                    vector.x,
-                    vector.y,
-                );
-            });
-            // Actions with no targets
-            const noTargets = commands.filter((command) => command.targetId === undefined && command.point === undefined);
-            if (noTargets.length > 0) {
-                actionsApi.orderUnits(
-                    noTargets.map((action) => action.unitId),
-                    commandType,
-                );
-            }
         });
 
         actionsToSubmit.forEach((action) => {

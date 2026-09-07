@@ -17,13 +17,14 @@ type FakeUnit = {
 
 const game = (
     unitValues: FakeUnit[],
-    objectValues: Array<{ id: number; hitPoints?: number }> = [],
+    objectValues: Array<{ id: number; hitPoints?: number; owner?: string }> = [],
 ) => {
     const units = new Map(unitValues.map((unit) => [unit.id, unit]));
-    const objects = new Map<number, FakeUnit | { id: number; hitPoints?: number }>();
+    const objects = new Map<number, FakeUnit | { id: number; hitPoints?: number; owner?: string }>();
     unitValues.forEach((unit) => objects.set(unit.id, unit));
     objectValues.forEach((object) => objects.set(object.id, object));
     return {
+        areAlliedPlayers: (left: string, right: string) => left === right,
         getUnitData: (id: number) => units.get(id),
         getGameObjectData: (id: number) => objects.get(id),
         map: {
@@ -148,6 +149,23 @@ describe("unified intent arbiter V1", () => {
         expect(telemetry.invalidUnitIds).toBe(3);
         expect(telemetry.invalidTargets).toBe(1);
         expect(telemetry.invalidTiles).toBe(1);
+    });
+
+    it("invalidates a terminal object target after it becomes friendly", () => {
+        const view = game(owned(1), [{
+            id: 500,
+            owner: "candidate",
+            hitPoints: 100,
+        }]);
+        const arbiter = new UnifiedIntentArbiter({ totalCeiling: 75 });
+        arbiter.beginUpdate(1);
+        arbiter.withScope("terminal_objective", () => {
+            arbiter.captureOrder([1], OrderType.Attack, 500);
+        });
+        const result = collect(arbiter, view);
+        expect(result.calls).toEqual([]);
+        expect(result.telemetry.invalidTargets).toBe(1);
+        expect(result.telemetry.pendingUnitIds).toBe(0);
     });
 
     it("suppresses identical retries until the exact scope boundary", () => {

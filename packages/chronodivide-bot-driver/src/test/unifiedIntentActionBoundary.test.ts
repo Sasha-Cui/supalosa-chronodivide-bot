@@ -4,6 +4,10 @@ import {
     UnifiedIntentActionBoundary,
     withUnifiedIntentScope,
 } from "@supalosa/chronodivide-bot/dist/bot/logic/intent/unifiedIntentActionBoundary.js";
+import {
+    ActionBatcher,
+    BatchableAction,
+} from "@supalosa/chronodivide-bot/dist/bot/logic/mission/actionBatcher.js";
 
 type ActionCall = { method: string; args: unknown[] };
 
@@ -48,6 +52,7 @@ const game = (
         { id: 500 + index, owner: "opponent", hitPoints: 100 },
     ]));
     return {
+        areAlliedPlayers: (left: string, right: string) => left === right,
         getUnitData: (id: number) => units.get(id),
         getGameObjectData: (id: number) => units.get(id) ?? targets.get(id),
         map: {
@@ -142,6 +147,38 @@ describe("unified intent action boundary", () => {
         expect(telemetry.debugDropped).toBe(1);
         expect(telemetry.totalCeilingOverflow).toBe(false);
         expect(value.calls.filter((call) => call.method === "sayAll")).toEqual([]);
+    });
+
+    it("preserves BatchableAction scope through the final per-unit boundary", () => {
+        const value = actions();
+        const boundary = new UnifiedIntentActionBoundary(
+            value.api,
+            game(1),
+            "candidate",
+            { totalCeiling: 75 },
+        );
+        boundary.beginUpdate(1);
+        const batcher = new ActionBatcher(1);
+        batcher.push(BatchableAction.toPoint(
+            1,
+            OrderType.Move,
+            { x: 10, y: 11 } as any,
+        ));
+        batcher.push(BatchableAction.toTargetId(
+            1,
+            OrderType.Attack,
+            500,
+        ).withIntentScope("terminal_objective"));
+        batcher.resolve(value.api);
+        const telemetry = boundary.flush();
+
+        expect(value.calls.filter((call) => call.method === "orderUnits")).toEqual([{
+            method: "orderUnits",
+            args: [[1], OrderType.Attack, 500],
+        }]);
+        expect(telemetry.sameUnitConflicts).toBe(1);
+        expect(telemetry.winningUnitsByScope.terminal_objective).toBe(1);
+        expect(telemetry.winningUnitsByScope.baseline_core).toBe(0);
     });
 
     it("fails closed when the public action surface is incomplete", () => {

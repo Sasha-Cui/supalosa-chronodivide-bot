@@ -2722,7 +2722,11 @@ class BuildingEliminationMission extends Mission {
                     )
                         ? manageAttackMicro(attacker, currentTarget)
                         : manageMoveMicro(attacker, new Vector2(target.x, target.y));
-                context.actionBatcher.push(action);
+                context.actionBatcher.push(
+                    this.options.engagementMode === "completionRace"
+                        ? action.withIntentScope("terminal_objective")
+                        : action,
+                );
             }
             return;
         }
@@ -2746,9 +2750,14 @@ class BuildingEliminationMission extends Mission {
             sweepPoints,
         );
         for (const { attacker, target } of assignments) {
-            context.actionBatcher.push(
-                BatchableAction.toPoint(attacker.id, OrderType.AttackMove, new Vector2(target.x, target.y)),
+            const action = BatchableAction.toPoint(
+                attacker.id,
+                OrderType.AttackMove,
+                new Vector2(target.x, target.y),
             );
+            context.actionBatcher.push(this.options.engagementMode === "completionRace"
+                ? action.withIntentScope("terminal_objective")
+                : action);
         }
         for (const target of sweepPoints) {
             this.lastSweepAt.set(`${target.x},${target.y}`, context.game.getCurrentTick());

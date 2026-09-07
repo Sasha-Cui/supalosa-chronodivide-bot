@@ -129,7 +129,8 @@ type LastForwarded = {
     signature: string;
 };
 
-type IntentGameView = Pick<GameApi, "getUnitData" | "getGameObjectData"> & {
+type IntentGameView = Pick<
+    GameApi, "getUnitData" | "getGameObjectData" | "areAlliedPlayers"> & {
     map: Pick<GameApi["map"], "getTile">;
 };
 
@@ -538,6 +539,15 @@ export class UnifiedIntentArbiter {
         if (intent.target.kind === "object") {
             const target = game.getGameObjectData(intent.target.objectId);
             if (!target || (target.hitPoints !== undefined && target.hitPoints <= 0)) {
+                telemetry.invalidTargets += 1;
+                return false;
+            }
+            if (
+                intent.scope === "terminal_objective" &&
+                "owner" in target &&
+                typeof target.owner === "string" &&
+                (target.owner === playerName || game.areAlliedPlayers(playerName, target.owner))
+            ) {
                 telemetry.invalidTargets += 1;
                 return false;
             }

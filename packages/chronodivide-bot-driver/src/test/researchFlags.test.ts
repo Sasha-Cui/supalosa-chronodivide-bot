@@ -29,6 +29,94 @@ describe("scheduler provenance", () => {
 });
 
 describe("research ablation flags", () => {
+    it("keeps the unified intent boundary disabled unless a frozen ceiling is explicit", () => {
+        const defaultBot = new StrongBot(
+            "default-intent",
+            Countries.IRAQ,
+            [],
+            false,
+            new StrongStrategy(),
+            {},
+        ) as unknown as PrivateRecord;
+        expect(defaultBot.intentArbiterOptions).toEqual({ enabled: false });
+        expect(defaultBot.intentActionBoundary).toBeNull();
+        expect(() => new StrongBot(
+            "invalid-intent",
+            Countries.IRAQ,
+            [],
+            false,
+            new StrongStrategy(),
+            { intentArbiter: { enabled: true } },
+        )).toThrow(/frozen total ceiling/);
+    });
+
+    it("flushes the enabled boundary through an early-return tactic", () => {
+        const superTick = vi.spyOn(SupalosaBot.prototype, "onGameTick").mockImplementation(() => undefined);
+        const bot = new StrongBot(
+            "scoped-intent",
+            Countries.IRAQ,
+            [],
+            false,
+            new StrongStrategy(),
+            { intentArbiter: { enabled: true, totalCeiling: 75 } },
+        );
+        const record = stubTickHelpers(bot);
+        record.maybeHfoBottomRetarget = vi.fn(() => true);
+        record.getKnownEnemyBuildings = vi.fn(() => []);
+        const scopes: string[] = [];
+        const telemetry = { tick: 123 };
+        record.intentActionBoundary = {
+            beginUpdate: vi.fn(),
+            withScope: vi.fn((scope: string, callback: () => unknown) => {
+                scopes.push(scope);
+                return callback();
+            }),
+            revokePending: vi.fn(),
+            flush: vi.fn(() => telemetry),
+        };
+
+        bot.onGameTick({ getCurrentTick: () => 123 } as GameApi);
+
+        expect(record.intentActionBoundary.beginUpdate).toHaveBeenCalledWith(123);
+        expect(scopes).toEqual(["baseline_core", "objective_closeout"]);
+        expect(record.intentActionBoundary.flush).toHaveBeenCalledOnce();
+        expect(record.lastUnifiedIntentTelemetry).toBe(telemetry);
+        superTick.mockRestore();
+    });
+
+    it("revokes terminal pending work immediately when the last-building identity changes", () => {
+        const bot = new StrongBot(
+            "terminal-revocation",
+            Countries.IRAQ,
+            [],
+            false,
+            new StrongStrategy(),
+            { intentArbiter: { enabled: true, totalCeiling: 75 } },
+        );
+        const record = bot as unknown as PrivateRecord;
+        const boundary = { revokePending: vi.fn() };
+        record.intentActionBoundary = boundary;
+        let buildings = [{ id: 10 }];
+        record.getKnownEnemyBuildings = vi.fn(() => buildings);
+
+        record.refreshTerminalIntentState({} as GameApi);
+        expect(boundary.revokePending).not.toHaveBeenCalled();
+        expect(record.terminalObjectiveBuildingId).toBe(10);
+
+        record.refreshTerminalIntentState({} as GameApi);
+        expect(boundary.revokePending).not.toHaveBeenCalled();
+
+        buildings = [{ id: 11 }];
+        record.refreshTerminalIntentState({} as GameApi);
+        expect(boundary.revokePending).toHaveBeenCalledTimes(1);
+        expect(record.terminalObjectiveBuildingId).toBe(11);
+
+        buildings = [{ id: 11 }, { id: 12 }];
+        record.refreshTerminalIntentState({} as GameApi);
+        expect(boundary.revokePending).toHaveBeenCalledTimes(2);
+        expect(record.terminalObjectiveBuildingId).toBeNull();
+    });
+
     it("skips exact-map tick tactics when disabled", () => {
         const superTick = vi.spyOn(SupalosaBot.prototype, "onGameTick").mockImplementation(() => undefined);
         const bot = new StrongBot(

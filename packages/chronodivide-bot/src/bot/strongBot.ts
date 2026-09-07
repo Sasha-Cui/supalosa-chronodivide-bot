@@ -16,6 +16,21 @@ import {
     peakOfPerfectionProfileApplies,
 } from "./strategy/strongStrategy.js";
 import { Countries, isOwnedByNeutral, maxBy } from "./logic/common/utils.js";
+import {
+    UnifiedIntentActionBoundary,
+} from "./logic/intent/unifiedIntentActionBoundary.js";
+import {
+    UnifiedIntentScope,
+    UnifiedIntentUpdateTelemetry,
+    UNIFIED_INTENT_TOTAL_CEILINGS,
+} from "./logic/intent/unifiedIntentArbiter.js";
+
+export type StrongBotIntentArbiterOptions = {
+    enabled?: boolean;
+    totalCeiling?: typeof UNIFIED_INTENT_TOTAL_CEILINGS[number];
+    telemetrySink?: (telemetry: UnifiedIntentUpdateTelemetry) => void;
+};
+
 
 export type ForceAttackOptions = {
     enabled?: boolean;
@@ -211,6 +226,7 @@ export type StrongBotOptions = {
     hfoWestRetarget?: HfoWestRetargetOptions;
     exactMapTactics?: boolean;
     peakOfPerfectionProfileScope?: PeakOfPerfectionProfileScope;
+    intentArbiter?: StrongBotIntentArbiterOptions;
 };
 
 const DEFAULT_FORCE_ATTACK_OPTIONS: Required<ForceAttackOptions> = {
@@ -1297,6 +1313,7 @@ export class StrongBot extends SupalosaBot {
     public lastGameApi: GameApi | null = null;
     public lastPlayerActions: ActionsApi | null = null;
     public lastPlayerProduction: ProductionApi | null = null;
+    public lastUnifiedIntentTelemetry: UnifiedIntentUpdateTelemetry | null = null;
 
     private forceAttackOptions: Required<ForceAttackOptions>;
     private harassOptions: Required<HarassOptions>;
@@ -1365,6 +1382,9 @@ export class StrongBot extends SupalosaBot {
     private readonly peakOfPerfectionProfileScope: PeakOfPerfectionProfileScope;
     private readonly preserveBaselineCore: boolean;
     private readonly explicitOptionOverrides: StrongBotOptions;
+    private readonly intentArbiterOptions: StrongBotIntentArbiterOptions;
+    private intentActionBoundary: UnifiedIntentActionBoundary | null = null;
+    private terminalObjectiveBuildingId: number | null = null;
 
     constructor(
         name: string,
@@ -1384,6 +1404,13 @@ export class StrongBot extends SupalosaBot {
         }
         this.preserveBaselineCore = options.preserveBaselineCore ?? false;
         this.forceAttackOptions = { ...DEFAULT_FORCE_ATTACK_OPTIONS, ...definedOptions(options.forceAttack) };
+        this.intentArbiterOptions = { enabled: false, ...options.intentArbiter };
+        if (
+            this.intentArbiterOptions.enabled === true &&
+            this.intentArbiterOptions.totalCeiling === undefined
+        ) {
+            throw new Error("Enabled unified intent arbiter requires a frozen total ceiling");
+        }
         this.harassOptions = { ...DEFAULT_HARASS_OPTIONS, ...definedOptions(options.harass) };
         const emergencyDefenseOverrides = definedOptions(options.emergencyDefense);
         if (options.emergencyDefense?.enabled !== undefined && emergencyDefenseOverrides.mapSignatures === undefined) {
@@ -1493,6 +1520,20 @@ export class StrongBot extends SupalosaBot {
         this.lastGameApi = game;
         this.lastPlayerActions = this.player.actions;
         this.lastPlayerProduction = this.player.production;
+        if (this.intentArbiterOptions.enabled) {
+            if (this.intentActionBoundary) {
+                throw new Error("Unified intent action boundary was installed twice");
+            }
+            this.intentActionBoundary = new UnifiedIntentActionBoundary(
+                this.player.actions,
+                game,
+                this.name,
+                {
+                    totalCeiling: this.intentArbiterOptions.totalCeiling!,
+                    telemetrySink: this.intentArbiterOptions.telemetrySink,
+                },
+            );
+        }
         if (this.enableDefaultMapProfiles) {
             if (this.isSimple1v1Map(game)) {
                 this.applySimpleInfantryProfile();
@@ -1510,109 +1551,167 @@ export class StrongBot extends SupalosaBot {
         super.onGameStart(game);
     }
 
+    private runIntentScope<T>(scope: UnifiedIntentScope, callback: () => T): T {
+        return this.intentActionBoundary
+            ? this.intentActionBoundary.withScope(scope, callback)
+            : callback();
+    }
+    private refreshTerminalIntentState(game: GameApi): void {
+        if (!this.intentActionBoundary) return;
+        const buildings = this.getKnownEnemyBuildings(game);
+        const currentId = buildings.length === 1 ? buildings[0].id : null;
+        if (
+            currentId === null ||
+            (this.terminalObjectiveBuildingId !== null &&
+                this.terminalObjectiveBuildingId !== currentId)
+        ) {
+            this.intentActionBoundary.revokePending("terminal_objective");
+        }
+        this.terminalObjectiveBuildingId = currentId;
+    }
+
+
     override onGameTick(game: GameApi): void {
         this.lastGameApi = game;
-        super.onGameTick(game);
-        if (this.enableExactMapTactics && this.maybeHfoBottomRetarget(game)) {
-            return;
+        const boundary = this.intentActionBoundary;
+        boundary?.beginUpdate(game.getCurrentTick());
+        try {
+        if (boundary) this.refreshTerminalIntentState(game);
+            this.runIntentScope("baseline_core", () => super.onGameTick(game));
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("objective_closeout", () => this.maybeHfoBottomRetarget(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("objective_closeout", () => this.maybeHfoWestRetarget(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("objective_closeout", () => this.maybeHfoBottomCriticalCleanup(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("home_guard", () => this.maybeHfoBottomHomeGuard(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("objective_closeout", () => this.maybeOtmqFinalSweep(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("objective_closeout", () => this.maybeWeakStartCloseout(game, true))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("tactical_assault", () => this.maybeWeakStartProxyAttack(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("home_guard", () => this.maybeWeakStartHomeGuard(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("objective_closeout", () => this.maybeWeakStartCloseout(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("objective_closeout", () => this.maybePeakCloseout(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("objective_closeout", () => this.maybeHfoSideCloseout(game))) {
+                return;
+            }
+            if (!this.preserveBaselineCore &&
+                this.runIntentScope("terminal_objective", () => this.maybeWonGameCloseout(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("emergency_defense", () => this.maybePeakEmergencyDefend(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("home_guard", () => this.maybeHfoWestHomeGuard(game))) {
+                return;
+            }
+            if (this.runIntentScope("emergency_defense", () => this.maybeEmergencyDefend(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("emergency_defense", () => this.maybeHfoBottomChokeIntercept(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("emergency_defense", () => this.maybeHfoBottomSiegeControl(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("tactical_assault", () => this.maybeHfoBottomTopBaseBreak(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("terminal_objective", () => this.maybeHfoBottomLastBuildingCleanup(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("terminal_objective", () => this.maybeHfoFinalBuildingAttack(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("route_sweep", () => this.maybeHfoWestSweep(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("route_sweep", () => this.maybeHfoEastSweep(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("objective_closeout", () => this.maybeHfoBottomDesperationFinish(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("objective_closeout", () => this.maybeHfoLateMopUp(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("tactical_assault", () => this.maybeHfoBottomWestExpansionAttack(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("tactical_assault", () => this.maybeHfoBottomPincer(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("tactical_assault", () => this.maybeHfoBottomDemolition(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("objective_closeout", () => this.maybeHfoBottomCloseout(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("route_sweep", () => this.maybeHfoBottomSweep(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("objective_closeout", () => this.maybeHfoCloseout(game))) {
+                return;
+            }
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("tactical_assault", () => this.maybeIslandTechAttack(game))) {
+                return;
+            }
+            this.runIntentScope("route_sweep", () => this.maybeRouteAttack(game));
+            this.runIntentScope("harassment", () => this.maybeHarvesterHarass(game));
+            this.runIntentScope("harassment", () => this.maybeHarass(game));
+            if (this.enableExactMapTactics &&
+                this.runIntentScope("tactical_assault", () => this.maybeWeakStartPressure(game))) {
+                return;
+            }
+            this.runIntentScope("tactical_assault", () => this.maybeForceAttack(game));
+        } finally {
+            if (boundary) this.lastUnifiedIntentTelemetry = boundary.flush();
         }
-        if (this.enableExactMapTactics && this.maybeHfoWestRetarget(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoBottomCriticalCleanup(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoBottomHomeGuard(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeOtmqFinalSweep(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeWeakStartCloseout(game, true)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeWeakStartProxyAttack(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeWeakStartHomeGuard(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeWeakStartCloseout(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybePeakCloseout(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoSideCloseout(game)) {
-            return;
-        }
-        if (!this.preserveBaselineCore && this.maybeWonGameCloseout(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybePeakEmergencyDefend(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoWestHomeGuard(game)) {
-            return;
-        }
-        if (this.maybeEmergencyDefend(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoBottomChokeIntercept(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoBottomSiegeControl(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoBottomTopBaseBreak(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoBottomLastBuildingCleanup(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoFinalBuildingAttack(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoWestSweep(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoEastSweep(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoBottomDesperationFinish(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoLateMopUp(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoBottomWestExpansionAttack(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoBottomPincer(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoBottomDemolition(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoBottomCloseout(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoBottomSweep(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeHfoCloseout(game)) {
-            return;
-        }
-        if (this.enableExactMapTactics && this.maybeIslandTechAttack(game)) {
-            return;
-        }
-        this.maybeRouteAttack(game);
-        this.maybeHarvesterHarass(game);
-        this.maybeHarass(game);
-        if (this.enableExactMapTactics && this.maybeWeakStartPressure(game)) {
-            return;
-        }
-        this.maybeForceAttack(game);
     }
 
     private maybeOtmqFinalSweep(game: GameApi): boolean {
