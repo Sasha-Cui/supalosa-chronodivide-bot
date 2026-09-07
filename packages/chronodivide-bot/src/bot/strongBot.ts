@@ -1570,13 +1570,12 @@ export class StrongBot extends SupalosaBot {
         this.terminalObjectiveBuildingId = currentId;
     }
 
-
     override onGameTick(game: GameApi): void {
         this.lastGameApi = game;
         const boundary = this.intentActionBoundary;
         boundary?.beginUpdate(game.getCurrentTick());
         try {
-        if (boundary) this.refreshTerminalIntentState(game);
+            if (boundary) this.refreshTerminalIntentState(game);
             this.runIntentScope("baseline_core", () => super.onGameTick(game));
             if (this.enableExactMapTactics &&
                 this.runIntentScope("objective_closeout", () => this.maybeHfoBottomRetarget(game))) {
