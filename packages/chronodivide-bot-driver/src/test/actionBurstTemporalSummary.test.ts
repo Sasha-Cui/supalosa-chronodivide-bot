@@ -45,9 +45,12 @@ describe("action-burst temporal summaries", () => {
         const all = rows.find((row) =>
             row.side === "candidate" && row.dimensionType === "all"
         )!;
+        expect(all.initializationCalls).toBe(1);
+        expect(all.liveCalls).toBe(5);
+        expect(all.liveCallsPer900).toBe(1.25);
         expect(all.calls).toBe(6);
         expect([all.quarter0, all.quarter1, all.quarter2, all.quarter3])
-            .toEqual([3, 3, 0, 0]);
+            .toEqual([4, 1, 0, 0]);
         expect(all.maxRolling900).toBe(4);
         expect(all.maxSameUpdate).toBe(2);
         expect(all.multiCallUpdates).toBe(1);
@@ -72,8 +75,8 @@ describe("action-burst temporal summaries", () => {
             event(4, "candidate", "queueForProduction", "e"),
         ]);
         expect(deriveActionBurstReserve(rows)).toEqual({
-            maximumRollingGameplayNonorder: 5,
-            protectedReserve: 9,
+            maximumRollingGameplayNonorder: 4,
+            protectedReserve: 8,
             smallestCeilingFeasible: true,
         });
     });
@@ -84,8 +87,15 @@ describe("action-burst temporal summaries", () => {
             q25: 1.75,
             q75: 3.25,
         });
-        expect(() => summarizeActionBurstEvents([
+        const terminal = summarizeActionBurstEvents([
             event(3_600, "candidate", "orderUnits", "a"),
+        ]).find((row) =>
+            row.side === "candidate" && row.dimensionType === "all"
+        )!;
+        expect(terminal.liveCalls).toBe(1);
+        expect(terminal.quarter3).toBe(1);
+        expect(() => summarizeActionBurstEvents([
+            event(3_601, "candidate", "orderUnits", "a"),
         ])).toThrow(/update drifted/);
         expect(() => summarizeActionBurstEvents([
             event(2, "candidate", "orderUnits", "a"),

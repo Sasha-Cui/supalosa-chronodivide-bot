@@ -15,6 +15,9 @@ export type ActionBurstTemporalMetrics = {
     side: ActionBurstSide;
     dimensionType: ActionBurstDimensionType;
     dimensionValue: string;
+    initializationCalls: number;
+    liveCalls: number;
+    liveCallsPer900: number;
     calls: number;
     callsPer900: number;
     quarter0: number;
@@ -88,6 +91,7 @@ const temporalMetrics = (
     horizon: number,
 ): ActionBurstTemporalMetrics => {
     const ordered = [...events].sort((left, right) => left.update - right.update);
+    const live = ordered.filter((event) => event.update > 0);
     const quarters = [0, 0, 0, 0];
     const byUpdate = new Map<number, number>();
     let duplicateSame = 0;
@@ -96,7 +100,9 @@ const temporalMetrics = (
     const last = new Map<string, number>();
     let orderUnitIds = 0;
     for (const event of ordered) {
-        quarters[Math.min(3, Math.floor(event.update / 900))] += 1;
+        if (event.update > 0) {
+            quarters[Math.min(3, Math.floor((event.update - 1) / 900))] += 1;
+        }
         byUpdate.set(event.update, (byUpdate.get(event.update) ?? 0) + 1);
         const key = event.method + "|" + event.argumentSha256;
         const sameKey = event.update + "|" + key;
@@ -111,27 +117,31 @@ const temporalMetrics = (
     let rollingIds = 0;
     let maxRolling = 0;
     let maxRollingIds = 0;
-    for (let left = 0; left < ordered.length; left += 1) {
+    for (let left = 0; left < live.length; left += 1) {
         if (right < left) {
             right = left;
             rollingIds = 0;
         }
         while (
-            right < ordered.length &&
-            ordered[right].update < ordered[left].update + 900
+            right < live.length &&
+            live[right].update < live[left].update + 900
         ) {
-            rollingIds += ordered[right].order?.unitCount ?? 0;
+            rollingIds += live[right].order?.unitCount ?? 0;
             right += 1;
         }
         maxRolling = Math.max(maxRolling, right - left);
         maxRollingIds = Math.max(maxRollingIds, rollingIds);
-        rollingIds -= ordered[left].order?.unitCount ?? 0;
+        rollingIds -= live[left].order?.unitCount ?? 0;
     }
     const calls = ordered.length;
+    const liveCalls = live.length;
     const result: ActionBurstTemporalMetrics = {
         side,
         dimensionType,
         dimensionValue,
+        initializationCalls: calls - liveCalls,
+        liveCalls,
+        liveCallsPer900: liveCalls * 900 / horizon,
         calls,
         callsPer900: calls * 900 / horizon,
         quarter0: quarters[0],
@@ -162,7 +172,7 @@ export const summarizeActionBurstEvents = (
         if (
             !Number.isSafeInteger(event.update) ||
             event.update < 0 ||
-            event.update >= horizon ||
+            event.update > horizon ||
             event.update < previous
         ) throw new Error("Action-burst event update drifted");
         previous = event.update;

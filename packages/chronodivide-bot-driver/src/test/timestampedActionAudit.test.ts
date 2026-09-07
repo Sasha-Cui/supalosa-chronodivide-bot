@@ -52,9 +52,11 @@ describe("timestamped action audit", () => {
         installTimestampedActionAudit(bots, audit);
         bots.candidate.onGameStart(game);
         bots.baseline.onGameStart(game);
+        audit.setUpdate(12);
 
         expect(bots.candidate.player.actions.orderUnits([3, 1], 7, 99)).toBe("orderUnits");
         update = 13;
+        audit.setUpdate(13);
         expect(bots.baseline.player.actions.orderUnits([4], "Move", { x: 2, y: 3 })).toBe("orderUnits");
         expect(bots.candidate.player.actions.quitGame()).toBeUndefined();
         const value = audit.finish();
@@ -105,6 +107,7 @@ describe("timestamped action audit", () => {
             const baseline = actions();
             audit.install("candidate", candidate.api as any, game as any);
             audit.install("baseline", baseline.api as any, game as any);
+            audit.setUpdate(4);
             candidate.api.orderUnits([2, 1], 3, 404);
             baseline.api.queueForProduction(2, "E1");
             return audit.finish();
@@ -139,7 +142,11 @@ describe("timestamped action audit", () => {
         audit.install("baseline", baseline.api as any, game as any);
         expect(() => candidate.api.orderUnits([1], 2, { nope: true }))
             .toThrow(/target overload/);
+        expect(() => audit.setUpdate(0)).toThrow(/logical update/);
+        audit.setUpdate(3_600);
+        expect(() => audit.setUpdate(3_599)).toThrow(/logical update/);
         audit.finish();
+        expect(() => audit.setUpdate(3_600)).toThrow(/logical update/);
         expect(() => baseline.api.sayAll("late")).toThrow(/after finalization/);
     });
 

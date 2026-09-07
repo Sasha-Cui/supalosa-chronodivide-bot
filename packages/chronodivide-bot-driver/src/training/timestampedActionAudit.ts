@@ -133,6 +133,18 @@ export class TimestampedActionAudit {
         baseline: 0,
     };
     private finished = false;
+    private logicalUpdate = 0;
+
+    setUpdate(update: number): void {
+        if (
+            this.finished ||
+            !Number.isSafeInteger(update) ||
+            update < 1 ||
+            update > 3_600 ||
+            update < this.logicalUpdate
+        ) throw new Error("Action-burst logical update drifted");
+        this.logicalUpdate = update;
+    }
 
     install(side: ActionBurstSide, actions: ActionsApi, game: GameApi): void {
         if (this.installed.has(side)) throw new Error("Action-burst side already installed: " + side);
@@ -155,7 +167,7 @@ export class TimestampedActionAudit {
                     const category = actionClass(method);
                     const forwarded = method !== "quitGame";
                     const event: ActionBurstEvent = {
-                        update: game.getCurrentTick(),
+                        update: this.logicalUpdate,
                         side,
                         method,
                         actionClass: category,

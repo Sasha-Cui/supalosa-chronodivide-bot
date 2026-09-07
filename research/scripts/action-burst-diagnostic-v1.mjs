@@ -13,7 +13,7 @@ const REPO = path.resolve(path.dirname(PROGRAM), "../..");
 const PROJECT = path.dirname(REPO);
 const DRIVER = path.join(REPO, "packages", "chronodivide-bot-driver");
 const STUDY = path.join(PROJECT, "research-evidence", "action-burst-diagnostic-v1");
-const EXECUTION = path.join(STUDY, "execution-v1-a4-runtime-a1-certificate-a5");
+const EXECUTION = path.join(STUDY, "execution-v1-a4-runtime-a1-certificate-a6");
 const RUNTIME_FREEZE = path.join(
     PROJECT,
     "research-evidence",
@@ -187,6 +187,10 @@ const sourceIdentity = () => {
             REPO,
             "research/protocols/method/2026-09-06-outcome-blind-action-burst-diagnostic-v1-amendment-a6.md",
         ),
+        amendmentA7: path.join(
+            REPO,
+            "research/protocols/method/2026-09-07-outcome-blind-action-burst-diagnostic-v1-amendment-a7.md",
+        ),
     };
     const protocols = {
         protocolSha256: requiredHash("PROTOCOL_SHA256"),
@@ -196,6 +200,7 @@ const sourceIdentity = () => {
         amendmentA4Sha256: requiredHash("AMENDMENT_A4_SHA256"),
         amendmentA5Sha256: requiredHash("AMENDMENT_A5_SHA256"),
         amendmentA6Sha256: requiredHash("AMENDMENT_A6_SHA256"),
+        amendmentA7Sha256: requiredHash("AMENDMENT_A7_SHA256"),
     };
     const expected = {
         protocolSha256: sha256File(protocolFiles.protocol),
@@ -205,6 +210,7 @@ const sourceIdentity = () => {
         amendmentA4Sha256: sha256File(protocolFiles.amendmentA4),
         amendmentA5Sha256: sha256File(protocolFiles.amendmentA5),
         amendmentA6Sha256: sha256File(protocolFiles.amendmentA6),
+        amendmentA7Sha256: sha256File(protocolFiles.amendmentA7),
     };
     if (process.version !== "v20.13.1") {
         throw new Error("Action-burst Node runtime drifted");
@@ -467,7 +473,7 @@ const eventSummary = (events) => {
         if (
             !Number.isSafeInteger(event.update) ||
             event.update < 0 ||
-            event.update >= 3600 ||
+            event.update > 3600 ||
             !["candidate", "baseline"].includes(event.side) ||
             !FRESH_DUAL_ACTION_METHODS.includes(event.method) ||
             !ACTION_CLASSES.has(event.actionClass) ||
@@ -654,6 +660,7 @@ const runTrace = async () => {
                     if (instance.isFinished()) {
                         throw new Error("Action-burst fixed technical horizon was not reached");
                     }
+                    audit.setUpdate(update);
                     await instance.update();
                     if (api.getCurrentTick() !== update || instance.isFinished()) {
                         throw new Error("Action-burst fixed technical horizon was not reached");
@@ -758,6 +765,7 @@ const groupBy = (rows, fields) => {
         JSON.stringify(left.values).localeCompare(JSON.stringify(right.values)));
 };
 const numericMetricFields = [
+    "initializationCalls", "liveCalls", "liveCallsPer900",
     "calls", "callsPer900", "quarter0", "quarter1", "quarter2", "quarter3",
     "maxRolling900", "maxSameUpdate", "multiCallUpdates",
     "duplicateSameUpdateFraction", "duplicateWithin30Fraction",
