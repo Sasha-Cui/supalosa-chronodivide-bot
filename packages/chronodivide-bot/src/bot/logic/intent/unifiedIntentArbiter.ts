@@ -83,6 +83,11 @@ export type UnifiedIntentUpdateTelemetry = {
     revokedPending: number;
     deferredUnitIds: number;
     pendingUnitIds: number;
+    productionBatches: number;
+    debugProposals: number;
+    debugCoalesced: number;
+    debugForwarded: number;
+    debugDropped: number;
     forwardedGroups: number;
     forwardedChunks: number;
     forwardedOrderCalls: number;
@@ -90,6 +95,7 @@ export type UnifiedIntentUpdateTelemetry = {
     rollingTotalCalls: number;
     rollingOrderCalls: number;
     rollingGameplayNonorderCalls: number;
+    rollingDebugCalls: number;
     gameplayReserveOverflow: boolean;
     totalCeilingOverflow: boolean;
     proposalsByScope: Record<UnifiedIntentScope, number>;
@@ -103,6 +109,11 @@ export type UnifiedIntentArbiterOptions = {
     gameplayReserve?: number;
     rollingUpdates?: number;
     maxChunk?: number;
+};
+
+export type UnifiedBestEffortDebugCall = {
+    key: string;
+    forward: () => void;
 };
 
 type HistoryRow = {
@@ -253,6 +264,11 @@ export class UnifiedIntentArbiter {
             revokedPending: 0,
             deferredUnitIds: 0,
             pendingUnitIds: 0,
+            productionBatches: 0,
+            debugProposals: 0,
+            debugCoalesced: 0,
+            debugForwarded: 0,
+            debugDropped: 0,
             forwardedGroups: 0,
             forwardedChunks: 0,
             forwardedOrderCalls: 0,
@@ -260,6 +276,7 @@ export class UnifiedIntentArbiter {
             rollingTotalCalls: 0,
             rollingOrderCalls: 0,
             rollingGameplayNonorderCalls: 0,
+            rollingDebugCalls: 0,
             gameplayReserveOverflow: false,
             totalCeilingOverflow: false,
             proposalsByScope: emptyScopeCounts(),
@@ -340,13 +357,14 @@ export class UnifiedIntentArbiter {
         this.updateOverflowFlags();
     }
 
-    recordImmediateDebug(countValue = 1): void {
-        const count = requireSafeInteger("debug count", countValue);
-        if (count < 0) throw new Error("Unified intent action count is negative");
-        const history = this.requireCurrentHistory();
-        history.debugCalls += count;
-        history.totalCalls += count;
-        this.updateOverflowFlags();
+    recordProductionBatch(): void {
+        this.requireCurrentTelemetry().productionBatches += 1;
+    }
+
+    recordDebugProposal(coalesced: boolean): void {
+        const telemetry = this.requireCurrentTelemetry();
+        telemetry.debugProposals += 1;
+        if (coalesced) telemetry.debugCoalesced += 1;
     }
 
     revokePending(scope: UnifiedIntentScope, objectTargetId?: number): number {
@@ -369,6 +387,7 @@ export class UnifiedIntentArbiter {
         game: IntentGameView,
         playerName: string,
         forward: (order: UnifiedForwardedOrder) => void,
+        debugCalls: readonly UnifiedBestEffortDebugCall[] = [],
     ): UnifiedIntentUpdateTelemetry {
         const history = this.requireCurrentHistory();
         if (this.scopeStack.length !== 0) {
@@ -471,11 +490,23 @@ export class UnifiedIntentArbiter {
                 }
             }
         }
+        for (const debug of [...debugCalls].sort((left, right) =>
+            compareCanonical(left.key, right.key))) {
+            if (this.debugBudgetAvailable()) {
+                debug.forward();
+                history.debugCalls += 1;
+                history.totalCalls += 1;
+                telemetry.debugForwarded += 1;
+            } else {
+                telemetry.debugDropped += 1;
+            }
+        }
         telemetry.pendingUnitIds = this.pending.size;
         const rolling = this.rollingCounts();
         telemetry.rollingTotalCalls = rolling.total;
         telemetry.rollingOrderCalls = rolling.order;
         telemetry.rollingGameplayNonorderCalls = rolling.gameplayNonorder;
+        telemetry.rollingDebugCalls = rolling.debug;
         this.updateOverflowFlags();
         telemetry.forwardedActionSha256 = sha256(
             forwardedRows.map((row) => JSON.stringify(row)).join("\n") +
@@ -526,14 +557,27 @@ export class UnifiedIntentArbiter {
         return rolling.total < this.options.totalCeiling &&
             rolling.order < this.options.totalCeiling - this.options.gameplayReserve;
     }
+    private debugBudgetAvailable(): boolean {
+        const rolling = this.rollingCounts();
+        return rolling.total < this.options.totalCeiling &&
+            rolling.order + rolling.debug <
+                this.options.totalCeiling - this.options.gameplayReserve;
+    }
 
-    private rollingCounts(): { total: number; order: number; gameplayNonorder: number } {
+
+    private rollingCounts(): {
+        total: number;
+        order: number;
+        gameplayNonorder: number;
+        debug: number;
+    } {
         const history = this.requireCurrentHistory();
         return [...this.history, history].reduce((result, row) => ({
             total: result.total + row.totalCalls,
             order: result.order + row.orderCalls,
             gameplayNonorder: result.gameplayNonorder + row.gameplayNonorderCalls,
-        }), { total: 0, order: 0, gameplayNonorder: 0 });
+            debug: result.debug + row.debugCalls,
+        }), { total: 0, order: 0, gameplayNonorder: 0, debug: 0 });
     }
 
     private updateOverflowFlags(): void {
