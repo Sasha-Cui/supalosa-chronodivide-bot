@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import gzip
+import hashlib
+import json
 from pathlib import Path
 import sys
 import tempfile
@@ -36,6 +38,51 @@ class UnifiedIntentGate2SeedAuditTest(unittest.TestCase):
         self.assertEqual(len(ranges), 1)
         self.assertEqual(ranges[0]["candidateBase"], 3_340_000_000)
         self.assertTrue(ranges[0]["overlap"])
+
+    def test_fast_matcher_equals_general_matcher_at_every_boundary(self) -> None:
+        for base in audit.CANDIDATE_BASES:
+            for unsigned in (
+                base,
+                base + 1,
+                base + audit.INTERVAL_SIZE - 1,
+                base + audit.INTERVAL_SIZE,
+            ):
+                signed = unsigned - 2**32
+                values = [
+                    str(unsigned), format(unsigned, ","), format(unsigned, "_"), hex(unsigned),
+                    str(signed), format(signed, ","), format(signed, "_"),
+                ]
+                for representation in values:
+                    payload = ("value=" + representation).encode()
+                    fast = audit.inspect_bytes(payload)
+                    general = audit.lexical.inspect_numbers(payload)
+                    self.assertEqual(fast, general, (base, unsigned, representation))
+
+    def test_fast_matcher_rejects_noncandidate_and_identifier_substrings(self) -> None:
+        for payload in [
+            b"outside=3329999999",
+            b"outside=3541000000",
+            b"identifier_seed3330000000suffix",
+            b"decimal=3330000000.5",
+            b"negative=-1000000000",
+            b"hex=0xffffffff",
+        ]:
+            self.assertEqual(audit.inspect_bytes(payload), ([], []))
+
+    def test_streamed_ledger_is_reconstituted_and_removed(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            ledger = root / "files.partial.jsonl"
+            rows = [
+                {"path": "/a", "bytes": 1, "sha256": "a" * 64, "gzipDecompressedBytes": None},
+                {"path": "/b", "bytes": 2, "sha256": "b" * 64, "gzipDecompressedBytes": 3},
+            ]
+            ledger.write_text("".join(json.dumps(value) + "\n" for value in rows))
+            output = root / "audit.json"
+            value = audit.write_streamed_artifact(output, {"complete": True}, ledger, 2)
+            self.assertEqual(value, hashlib.sha256(output.read_bytes()).hexdigest())
+            self.assertEqual(json.loads(output.read_text())["files"], rows)
+            self.assertFalse(ledger.exists())
 
     def test_gzip_stream_scans_across_chunk_boundaries(self) -> None:
         previous_chunk = audit.STREAM_CHUNK

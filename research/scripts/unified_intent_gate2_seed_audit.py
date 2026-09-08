@@ -9,6 +9,7 @@ import json
 import mmap
 import os
 from pathlib import Path
+import re
 import subprocess
 
 import action_burst_seed_reservation_audit_v1 as lexical
@@ -31,10 +32,14 @@ AMENDMENT = REPO / (
     "research/protocols/method/"
     "2026-09-07-unified-intent-arbiter-v1-gate-2-amendment-a1.md"
 )
+AMENDMENT_A2 = REPO / (
+    "research/protocols/method/"
+    "2026-09-08-unified-intent-arbiter-v1-gate-2-amendment-a2.md"
+)
 PROGRAM = Path(__file__).resolve()
 TEST = REPO / "research/tests/test_unified_intent_gate2_seed_audit.py"
 SLURM = REPO / "research/slurm/unified_intent_gate2_seed_audit.sbatch"
-CURRENT = {PROTOCOL, AMENDMENT, PROGRAM, TEST, SLURM}
+CURRENT = {PROTOCOL, AMENDMENT, AMENDMENT_A2, PROGRAM, TEST, SLURM}
 SKIP_DIRS = {
     ".git", "node_modules", "__pycache__", ".cache", "cache", "assets",
     "private-assets", "data", "dist", ".venv", "venv",
@@ -43,6 +48,12 @@ TEXT_SUFFIXES = set(lexical.TEXT_SUFFIXES)
 GZIP_INNER_SUFFIXES = TEXT_SUFFIXES | {".ndjson", ".jsonl"}
 STREAM_CHUNK = 4 * 1024 * 1024
 STREAM_OVERLAP = 2_048
+COARSE_TOKEN = re.compile(
+    rb"(?<![A-Za-z0-9_.])("
+    rb"(?:3[0-9_,]{9,18}|-[0-9_,]{9,18}|0[xX][0-9a-fA-F_]{8,16})"
+    rb")(?![A-Za-z0-9_.])",
+)
+
 
 lexical.CANDIDATE_BASES = CANDIDATE_BASES
 lexical.INTERVAL_SIZE = INTERVAL_SIZE
@@ -70,8 +81,57 @@ def git(*arguments: str) -> str:
     ).stdout.strip()
 
 
+def candidate_for(value: int | None) -> int | None:
+    if value is None:
+        return None
+    for base in CANDIDATE_BASES:
+        if base <= value < base + INTERVAL_SIZE:
+            return base
+    return None
+
+
 def inspect_bytes(data: bytes | mmap.mmap) -> tuple[list[dict], list[dict]]:
-    return lexical.inspect_numbers(data)
+    matches = []
+    for token in COARSE_TOKEN.finditer(data):
+        value = lexical.unsigned(lexical.integer(token.group(1)))
+        base = candidate_for(value)
+        if base is not None:
+            matches.append({
+                "byteOffset": token.start(1),
+                "unsignedValue": value,
+                "signedInt32Equivalent": value - 2**32,
+                "candidateBase": base,
+            })
+    ranges = []
+    raw_ranges = []
+    for match in lexical.ARRAY_RANGE.finditer(data):
+        raw_ranges.append({
+            "byteOffset": match.start(),
+            "key": match.group(1).decode(),
+            "low": lexical.unsigned(lexical.integer(match.group(2))),
+            "high": lexical.unsigned(lexical.integer(match.group(3))),
+            "interpretation": "half-open-or-conservative-array",
+        })
+    for match in lexical.OBJECT_RANGE.finditer(data):
+        low_match = lexical.LOW_FIELD.search(match.group(2))
+        high_match = lexical.HIGH_FIELD.search(match.group(2))
+        if low_match and high_match:
+            low = lexical.unsigned(lexical.integer(low_match.group(2)))
+            high = lexical.unsigned(lexical.integer(high_match.group(2)))
+            if high is not None and b"exclusive" not in high_match.group(1).lower():
+                high += 1
+            raw_ranges.append({
+                "byteOffset": match.start(),
+                "key": match.group(1).decode(),
+                "low": low,
+                "high": high,
+                "interpretation": "explicit-range-object",
+            })
+    for value in raw_ranges:
+        for base in CANDIDATE_BASES:
+            if lexical.overlap(value["low"], value["high"], base, base + INTERVAL_SIZE):
+                ranges.append({**value, "overlap": True, "candidateBase": base})
+    return matches, ranges
 
 
 def inspect_gzip(path: Path) -> tuple[list[dict], list[dict], int]:
@@ -155,6 +215,42 @@ def candidate_assessments(collisions: list[dict]) -> list[dict]:
         "selected": base == first,
     } for base in CANDIDATE_BASES]
 
+def write_streamed_artifact(
+    output: Path,
+    artifact: dict,
+    ledger_path: Path,
+    expected_files: int,
+) -> str:
+    if output.exists():
+        raise Gate2SeedAuditFailure("refusing to overwrite Gate 2 audit")
+    prefix = json.dumps(artifact, indent=2, sort_keys=True)
+    if not prefix.endswith("}"):
+        raise Gate2SeedAuditFailure("audit prefix is malformed")
+    written = 0
+    with output.open("x") as target:
+        target.write(prefix[:-1])
+        target.write(',\n  "files": [\n')
+        with ledger_path.open() as ledger:
+            for line in ledger:
+                value = json.loads(line)
+                if sorted(value) != [
+                    "bytes", "gzipDecompressedBytes", "path", "sha256",
+                ]:
+                    raise Gate2SeedAuditFailure("temporary ledger schema drifted")
+                if written:
+                    target.write(",\n")
+                target.write("    " + json.dumps(value, sort_keys=True))
+                written += 1
+        target.write("\n  ]\n}\n")
+    if written != expected_files or output.stat().st_size <= ledger_path.stat().st_size:
+        raise Gate2SeedAuditFailure("streamed audit file count or size drifted")
+    value = digest(output)
+    if len(value) != 64:
+        raise Gate2SeedAuditFailure("streamed audit reread failed")
+    ledger_path.unlink()
+    return value
+
+
 
 def main() -> None:
     if os.environ.get("SLURM_JOB_ACCOUNT") != "pi_jss233":
@@ -175,15 +271,23 @@ def main() -> None:
         (PROGRAM, "PROGRAM_SHA256"),
         (PROTOCOL, "PROTOCOL_SHA256"),
         (AMENDMENT, "AMENDMENT_SHA256"),
+        (AMENDMENT_A2, "AMENDMENT_A2_SHA256"),
     ]:
         if digest(path) != os.environ[environment]:
             raise Gate2SeedAuditFailure(environment + " mismatch")
 
     output = Path(os.environ["OUT_PATH"])
-    if output.parent != STUDY / "seed-audit-v1" or output.exists() or not output.parent.is_dir():
+    if output.parent != STUDY / "seed-audit-v1-a2" or output.exists() or not output.parent.is_dir():
         raise Gate2SeedAuditFailure("fresh Gate 2 audit output required")
 
-    files: list[dict] = []
+    ledger_path = output.parent / "files.partial.jsonl"
+    if ledger_path.exists():
+        raise Gate2SeedAuditFailure("temporary file ledger already exists")
+    ledger = ledger_path.open("x")
+    file_count = 0
+    total_bytes = 0
+    gzip_file_count = 0
+    gzip_decompressed_bytes = 0
     collisions: list[dict] = []
     declared_ranges: list[dict] = []
     skipped_extensions: dict[str, int] = {}
@@ -210,7 +314,7 @@ def main() -> None:
             keep = []
             for name in sorted(directories):
                 path = Path(parent) / name
-                if path == STUDY / "seed-audit-v1" or name in SKIP_DIRS or "node_modules" in name:
+                if path == STUDY / "seed-audit-v1-a2" or name in SKIP_DIRS or "node_modules" in name:
                     skipped_paths.append({"path": str(path), "reason": "output-or-bulk-tree"})
                 elif path.is_symlink():
                     skipped_symlinks.append(str(path))
@@ -267,12 +371,25 @@ def main() -> None:
                         after.st_mtime_ns,
                     ):
                         raise Gate2SeedAuditFailure("input changed while scanning")
-                    files.append({
+                    record = {
                         "path": str(path),
                         "bytes": before.st_size,
                         "sha256": file_hash,
                         "gzipDecompressedBytes": decompressed_bytes,
-                    })
+                    }
+                    ledger.write(json.dumps(record, sort_keys=True) + "\n")
+                    file_count += 1
+                    total_bytes += before.st_size
+                    if decompressed_bytes is not None:
+                        gzip_file_count += 1
+                        gzip_decompressed_bytes += decompressed_bytes
+                    if file_count % 100_000 == 0:
+                        ledger.flush()
+                        print(json.dumps({
+                            "technicalProgress": True,
+                            "files": file_count,
+                            "bytes": total_bytes,
+                        }), flush=True)
                     value: dict = {"path": str(path)}
                     if found:
                         value["tokens"] = found
@@ -293,13 +410,14 @@ def main() -> None:
                         "reason": type(error).__name__ + ": " + str(error),
                     })
 
-    files.sort(key=lambda value: value["path"])
+    ledger.flush()
+    ledger.close()
     collisions.sort(key=lambda value: (value["path"], json.dumps(value, sort_keys=True)))
     assessments = candidate_assessments(collisions)
     selected = next((value for value in assessments if value["selected"]), None)
-    passed = bool(files) and not errors and selected is not None
+    passed = file_count > 0 and not errors and selected is not None
     artifact = {
-        "kind": "unified-intent-gate2-seed-audit-v1",
+        "kind": "unified-intent-gate2-seed-audit-v1-a2",
         "complete": True,
         "passed": passed,
         "technicalOnly": True,
@@ -307,7 +425,8 @@ def main() -> None:
         "sourceCommit": source,
         "programSha256": digest(PROGRAM),
         "protocolSha256": digest(PROTOCOL),
-        "amendmentSha256": digest(AMENDMENT),
+        "amendmentA1Sha256": digest(AMENDMENT),
+        "amendmentA2Sha256": digest(AMENDMENT_A2),
         "scheduler": {
             "jobId": os.environ.get("SLURM_JOB_ID"),
             "account": os.environ.get("SLURM_JOB_ACCOUNT"),
@@ -318,17 +437,14 @@ def main() -> None:
         "selectedBase": selected["base"] if selected else None,
         "selectedInterval": selected["interval"] if selected else None,
         "totals": {
-            "files": len(files),
-            "bytes": sum(value["bytes"] for value in files),
-            "gzipFiles": sum(value["gzipDecompressedBytes"] is not None for value in files),
-            "gzipDecompressedBytes": sum(
-                value["gzipDecompressedBytes"] or 0 for value in files
-            ),
+            "files": file_count,
+            "bytes": total_bytes,
+            "gzipFiles": gzip_file_count,
+            "gzipDecompressedBytes": gzip_decompressed_bytes,
             "errors": len(errors),
             "collisionRecords": len(collisions),
             "declaredRanges": len(declared_ranges),
         },
-        "files": files,
         "collisions": collisions,
         "declaredRanges": declared_ranges,
         "errors": errors,
@@ -336,10 +452,16 @@ def main() -> None:
         "skippedPaths": sorted(skipped_paths, key=lambda value: value["path"]),
         "skippedSymlinks": sorted(skipped_symlinks),
     }
-    output.write_text(json.dumps(artifact, indent=2, sort_keys=True) + "\n")
+    artifact_sha256 = write_streamed_artifact(
+        output,
+        artifact,
+        ledger_path,
+        file_count,
+    )
     print(json.dumps({
         "complete": True,
         "passed": passed,
+        "artifactSha256": artifact_sha256,
         "files": artifact["totals"]["files"],
         "bytes": artifact["totals"]["bytes"],
         "gzipFiles": artifact["totals"]["gzipFiles"],
