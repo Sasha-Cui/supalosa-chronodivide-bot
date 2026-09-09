@@ -11,7 +11,7 @@ const REPO = path.resolve(path.dirname(PROGRAM), "../..");
 const PROJECT = path.dirname(REPO);
 const DRIVER = path.join(REPO, "packages", "chronodivide-bot-driver");
 const STUDY = path.join(PROJECT, "research-evidence", "unified-intent-arbiter-v1", "gate-2");
-const EXECUTION = path.join(STUDY, "execution-v1");
+const EXECUTION = path.join(STUDY, "execution-v1-wrapper-a1");
 const RUNTIME_FREEZE = path.join(
     PROJECT,
     "research-evidence",
@@ -215,6 +215,7 @@ const protocolFiles = {
     a3: "2026-09-09-unified-intent-arbiter-v1-gate-2-amendment-a3.md",
     a4: "2026-09-09-unified-intent-arbiter-v1-gate-2-amendment-a4.md",
     a5: "2026-09-09-unified-intent-arbiter-v1-gate-2-amendment-a5.md",
+    a6: "2026-09-09-unified-intent-arbiter-v1-gate-2-amendment-a6.md",
 };
 
 const sourceIdentity = () => {

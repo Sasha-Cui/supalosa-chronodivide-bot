@@ -27,6 +27,7 @@ test "$("${NODE_BIN}" --version)" = "v20.13.1"
 : "${PROTOCOL_GATE2_SHA256:?}" "${PROTOCOL_A1_SHA256:?}"
 : "${PROTOCOL_A2_SHA256:?}" "${PROTOCOL_A3_SHA256:?}"
 : "${PROTOCOL_A4_SHA256:?}" "${PROTOCOL_A5_SHA256:?}"
+: "${PROTOCOL_A6_SHA256:?}"
 : "${MANIFEST_PATH:?}" "${MANIFEST_SHA256:?}" "${TRACE_ROLE:?}"
 export CHRONO_GAME_API_PATH="${REPO_ROOT}/packages/chronodivide-bot-driver/node_modules/@chronodivide/game-api/dist/index.js"
 export REQUIRE_EXTERNAL_BASELINE=true
@@ -55,4 +56,4 @@ else
 fi
 test ! -e "${OUT_DIR}"
 export MODE=trace TASK_INDEX OUT_DIR
-"${NODE_BIN}" --no-warnings +  --experimental-loader "${REPO_ROOT}/research/runtime/explicit-start-loader-v1.mjs" +  --es-module-specifier-resolution=node +  --max-old-space-size=4096 +  research/scripts/unified-intent-gate2-equivalence.mjs
+"${NODE_BIN}" --no-warnings --experimental-loader "${REPO_ROOT}/research/runtime/explicit-start-loader-v1.mjs" --es-module-specifier-resolution=node --max-old-space-size=4096 research/scripts/unified-intent-gate2-equivalence.mjs
