@@ -11,7 +11,7 @@ const REPO = path.resolve(path.dirname(PROGRAM), "../..");
 const PROJECT = path.dirname(REPO);
 const DRIVER = path.join(REPO, "packages", "chronodivide-bot-driver");
 const STUDY = path.join(PROJECT, "research-evidence", "unified-intent-arbiter-v1", "gate-2");
-const EXECUTION = path.join(STUDY, "execution-v1-wrapper-a1");
+const EXECUTION = path.join(STUDY, "execution-v1-wrapper-a1-runtime-a1");
 const RUNTIME_FREEZE = path.join(
     PROJECT,
     "research-evidence",
@@ -216,6 +216,7 @@ const protocolFiles = {
     a4: "2026-09-09-unified-intent-arbiter-v1-gate-2-amendment-a4.md",
     a5: "2026-09-09-unified-intent-arbiter-v1-gate-2-amendment-a5.md",
     a6: "2026-09-09-unified-intent-arbiter-v1-gate-2-amendment-a6.md",
+    a7: "2026-09-09-unified-intent-arbiter-v1-gate-2-amendment-a7.md",
 };
 
 const sourceIdentity = () => {
@@ -303,10 +304,19 @@ const verifyRuntime = () => {
             throw new Error("Gate 2 map drifted: " + map.id);
         }
     }
+    if (
+        !Array.isArray(frozen.assets.entries) ||
+        frozen.assets.entries.length !== frozen.assets.count
+    ) throw new Error("Gate 2 asset count drifted");
     for (const entry of frozen.assets.entries) {
-        const file = path.join(frozen.assets.root, entry.relativePath);
-        if (fs.statSync(file).size !== entry.bytes || sha256File(file) !== entry.sha256) {
-            throw new Error("Gate 2 asset drifted: " + entry.relativePath);
+        if (
+            canonical(Object.keys(entry).sort()) !== canonical(["name", "sha256"]) ||
+            typeof entry.name !== "string" ||
+            !SHA256.test(entry.sha256)
+        ) throw new Error("Gate 2 asset schema drifted");
+        const file = path.join(frozen.assets.root, entry.name);
+        if (!fs.statSync(file).isFile() || sha256File(file) !== entry.sha256) {
+            throw new Error("Gate 2 asset drifted: " + entry.name);
         }
     }
     return {

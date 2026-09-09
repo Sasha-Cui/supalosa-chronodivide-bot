@@ -28,6 +28,7 @@ test "$("${NODE_BIN}" --version)" = "v20.13.1"
 : "${PROTOCOL_A2_SHA256:?}" "${PROTOCOL_A3_SHA256:?}"
 : "${PROTOCOL_A4_SHA256:?}" "${PROTOCOL_A5_SHA256:?}"
 : "${PROTOCOL_A6_SHA256:?}"
+: "${PROTOCOL_A7_SHA256:?}"
 : "${MANIFEST_PATH:?}" "${MANIFEST_SHA256:?}" "${TRACE_ROLE:?}"
 export CHRONO_GAME_API_PATH="${REPO_ROOT}/packages/chronodivide-bot-driver/node_modules/@chronodivide/game-api/dist/index.js"
 export REQUIRE_EXTERNAL_BASELINE=true
