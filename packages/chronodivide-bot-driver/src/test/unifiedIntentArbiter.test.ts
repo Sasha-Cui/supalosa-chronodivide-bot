@@ -119,10 +119,14 @@ describe("unified intent arbiter V1", () => {
                 13,
             );
         });
-        const { calls } = collect(arbiter, view);
+        const { calls, telemetry } = collect(arbiter, view);
         expect(calls.map((call) => call.unitIds.length)).toEqual([128, 128, 4]);
         expect(calls.flatMap((call) => call.unitIds))
             .toEqual(Array.from({ length: 260 }, (_, index) => index + 1));
+        expect(telemetry.maxForwardedChunkSize).toBe(128);
+        expect(telemetry.multipleForwardedUnitViolations).toBe(0);
+        expect(telemetry.forwardedValidationViolations).toBe(0);
+        expect(telemetry.partialProductionBatchViolations).toBe(0);
     });
 
     it("rejects missing, dead, foreign, invalid-target, and invalid-tile intents", () => {
@@ -255,6 +259,8 @@ describe("unified intent arbiter V1", () => {
         });
         const full = collect(exact, view).telemetry;
         expect(full.forwardedOrderCalls).toBe(40);
+        expect(full.totalCeiling).toBe(75);
+        expect(full.gameplayReserve).toBe(35);
         expect(full.rollingTotalCalls).toBe(75);
         expect(full.gameplayReserveOverflow).toBe(false);
         expect(full.totalCeilingOverflow).toBe(false);

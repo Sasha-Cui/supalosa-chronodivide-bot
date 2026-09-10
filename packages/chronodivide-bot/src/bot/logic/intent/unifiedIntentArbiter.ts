@@ -71,6 +71,8 @@ export type UnifiedForwardedOrder = {
 
 export type UnifiedIntentUpdateTelemetry = {
     tick: number;
+    totalCeiling: number;
+    gameplayReserve: number;
     proposedCalls: number;
     proposedUnitIds: number;
     sameUnitConflicts: number;
@@ -92,6 +94,10 @@ export type UnifiedIntentUpdateTelemetry = {
     forwardedChunks: number;
     forwardedOrderCalls: number;
     forwardedUnitIds: number;
+    maxForwardedChunkSize: number;
+    multipleForwardedUnitViolations: number;
+    forwardedValidationViolations: number;
+    partialProductionBatchViolations: number;
     rollingTotalCalls: number;
     rollingOrderCalls: number;
     rollingGameplayNonorderCalls: number;
@@ -254,6 +260,8 @@ export class UnifiedIntentArbiter {
         this.currentTelemetry = {
             tick,
             proposedCalls: 0,
+            totalCeiling: this.options.totalCeiling,
+            gameplayReserve: this.options.gameplayReserve,
             proposedUnitIds: 0,
             sameUnitConflicts: 0,
             invalidUnitIds: 0,
@@ -275,6 +283,10 @@ export class UnifiedIntentArbiter {
             forwardedOrderCalls: 0,
             forwardedUnitIds: 0,
             rollingTotalCalls: 0,
+            maxForwardedChunkSize: 0,
+            multipleForwardedUnitViolations: 0,
+            forwardedValidationViolations: 0,
+            partialProductionBatchViolations: 0,
             rollingOrderCalls: 0,
             rollingGameplayNonorderCalls: 0,
             rollingDebugCalls: 0,
@@ -450,6 +462,7 @@ export class UnifiedIntentArbiter {
                 right[1][0].priority - left[1][0].priority ||
                 compareCanonical(left[1][0].signature, right[1][0].signature));
         const forwardedRows: UnifiedForwardedOrder[] = [];
+        const forwardedThisUpdate = new Set<number>();
         for (const [, groupValue] of orderedGroups) {
             const group = groupValue.sort((left, right) => left.unitId - right.unitId);
             let forwardedGroup = false;
@@ -481,8 +494,16 @@ export class UnifiedIntentArbiter {
                 telemetry.forwardedChunks += 1;
                 telemetry.forwardedOrderCalls += 1;
                 telemetry.forwardedUnitIds += chunk.length;
+                telemetry.maxForwardedChunkSize = Math.max(
+                    telemetry.maxForwardedChunkSize,
+                    chunk.length,
+                );
                 telemetry.forwardedUnitsByScope[first.scope] += chunk.length;
                 for (const intent of chunk) {
+                    if (forwardedThisUpdate.has(intent.unitId)) {
+                        telemetry.multipleForwardedUnitViolations += 1;
+                    }
+                    forwardedThisUpdate.add(intent.unitId);
                     this.pending.delete(intent.unitId);
                     this.lastForwarded.set(intent.unitId, {
                         tick: history.tick,
