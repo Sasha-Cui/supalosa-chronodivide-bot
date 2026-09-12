@@ -64,6 +64,10 @@ const vitestFiles = [
     "src/test/unifiedIntentGate3Telemetry.test.ts",
     "src/test/unifiedIntentGate3DiagnosticPlan.test.ts",
     "src/test/unifiedIntentGate3B1Plan.test.ts",
+    "src/test/unifiedIntentM2Plan.test.ts",
+    "src/test/unifiedIntentM2Telemetry.test.ts",
+    "src/test/unifiedIntentM2Analysis.test.ts",
+    "src/test/literalBuildingEliminationEndpoint.test.ts",
 ];
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "chrono-intent-g3-pure-"));
 let vitest;
@@ -80,9 +84,9 @@ try {
     vitest = JSON.parse(fs.readFileSync(reportPath, "utf8"));
     if (
         vitest.success !== true ||
-        vitest.testResults.length !== 10 ||
-        vitest.numTotalTests !== 123 ||
-        vitest.numPassedTests !== 123 ||
+        vitest.testResults.length !== 14 ||
+        vitest.numTotalTests !== 146 ||
+        vitest.numPassedTests !== 146 ||
         vitest.numFailedTests !== 0 ||
         vitest.numPendingTests !== 0 ||
         vitest.numTodoTests !== 0
@@ -126,8 +130,8 @@ const artifact = {
         build: { passed: true, command: "tsc --build" },
         vitest: {
             passed: true,
-            files: 10,
-            tests: 123,
+            files: 14,
+            tests: 146,
             testFiles,
         },
         runtimeSchema: {
@@ -163,7 +167,7 @@ writeExclusive(
 console.log(JSON.stringify({
     complete: true,
     passed: true,
-    files: 10,
-    tests: 124,
+    files: 14,
+    tests: 147,
     pureGateSha256: sha256File(file),
 }));
