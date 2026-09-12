@@ -107,10 +107,11 @@ if (
     git("status", "--porcelain=v1") !== ""
 ) throw new Error("Gate 3 pure source changed during tests");
 
-const testFiles = Object.fromEntries(vitestFiles.map((relativePath) => [relativePath, {
+const testFiles = vitestFiles.map((relativePath) => ({
+    relativePath,
     sha256: sha256File(path.join(DRIVER, relativePath)),
     bytes: fs.statSync(path.join(DRIVER, relativePath)).size,
-}]));
+}));
 const runtimeSchemaPath = path.join(
     REPO,
     "research",
