@@ -59,6 +59,14 @@ describe("unified intent M2 telemetry", () => {
             totalCeilingOverflowUpdates: 1,
         })).toThrow(/invariant/);
     });
+
+    it("exposes invariant booleans only through the explicit diagnostic finish", () => {
+        const collector = new UnifiedIntentM2TelemetryCollector();
+        collector.observe(row(1, { gameplayReserveOverflow: true }));
+        const value = collector.finishDiagnostic(1);
+        expect(value.gameplayReserveOverflowUpdates).toBe(1);
+        expect(() => validateUnifiedIntentM2Telemetry(value)).toThrow(/invariant/);
+    });
 });
 
 class UnifiedIntentM2TelemetryCollectorWithOne {

@@ -17,6 +17,7 @@ import {
 import {
     UnifiedIntentM2TelemetryCollector,
     UnifiedIntentM2TelemetrySummary,
+    validateUnifiedIntentM2Telemetry,
 } from "./unifiedIntentM2Telemetry.js";
 import { UnifiedIntentUpdateTelemetry } from
     "@supalosa/chronodivide-bot/dist/bot/logic/intent/unifiedIntentArbiter.js";
@@ -40,7 +41,20 @@ export type UnifiedIntentM2EpisodeSpec = {
     requestedEngineSeed: number;
     maxUpdates: 24_000;
     enabled: boolean;
+    diagnosticOnly?: boolean;
 };
+
+export type UnifiedIntentM2TechnicalCategory =
+    | "setup_contract"
+    | "adjudicator_contract"
+    | "telemetry_schema_contract"
+    | "public_call_contract";
+
+export class UnifiedIntentM2EpisodeTechnicalError extends Error {
+    constructor(readonly technicalCategory: UnifiedIntentM2TechnicalCategory) {
+        super(technicalCategory);
+    }
+}
 
 export type UnifiedIntentM2OutcomeStatus =
     | "candidate_win"
@@ -51,7 +65,7 @@ export type UnifiedIntentM2OutcomeStatus =
 
 export type UnifiedIntentM2EpisodeResult = {
     complete: true;
-    technicalPass: true;
+    technicalPass: boolean;
     endpointVersion: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION;
     endpointSha256: typeof LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256;
     status: UnifiedIntentM2OutcomeStatus;
@@ -141,7 +155,7 @@ export const runUnifiedIntentM2Episode = async (args: {
                 !args.candidate.lastPlayerActions || !args.opponent.lastPlayerActions ||
                 !args.candidate.lastPlayerProduction || !args.opponent.lastPlayerProduction ||
                 instance.isFinished() || game.getCurrentTick() !== 0
-            ) throw new Error("Unified intent M2 episode did not initialize cleanly");
+            ) throw new UnifiedIntentM2EpisodeTechnicalError("setup_contract");
             const observedStarts = {
                 candidate: startKey(game.getPlayerData(candidateName).startLocation),
                 opponent: startKey(game.getPlayerData(opponentName).startLocation),
@@ -149,7 +163,7 @@ export const runUnifiedIntentM2Episode = async (args: {
             if (
                 observedStarts.candidate !== args.spec.candidateStart ||
                 observedStarts.opponent !== args.spec.opponentStart
-            ) throw new Error("Unified intent M2 start drifted");
+            ) throw new UnifiedIntentM2EpisodeTechnicalError("setup_contract");
             const trajectory = new UnifiedIntentGate2Trajectory();
             trajectory.observe(snapshotUnifiedIntentGate2PublicState(game, {
                 candidate: args.candidate,
@@ -168,20 +182,32 @@ export const runUnifiedIntentM2Episode = async (args: {
                 }
                 updates += 1;
                 if (game.getCurrentTick() !== updates) {
-                    throw new Error("Unified intent M2 update clock drifted");
+                    throw new UnifiedIntentM2EpisodeTechnicalError("setup_contract");
                 }
                 const currentTelemetry = args.candidate.lastUnifiedIntentTelemetry ?? null;
                 if (telemetry) {
-                    if (!currentTelemetry) throw new Error("Unified intent M2 telemetry absent");
-                    telemetry.observe(currentTelemetry);
+                    if (!currentTelemetry) {
+                        throw new UnifiedIntentM2EpisodeTechnicalError(
+                            "telemetry_schema_contract",
+                        );
+                    }
+                    try {
+                        telemetry.observe(currentTelemetry);
+                    } catch {
+                        throw new UnifiedIntentM2EpisodeTechnicalError(
+                            "telemetry_schema_contract",
+                        );
+                    }
                 } else if (currentTelemetry !== null) {
-                    throw new Error("Disabled unified intent M2 arm emitted telemetry");
+                    throw new UnifiedIntentM2EpisodeTechnicalError(
+                        "telemetry_schema_contract",
+                    );
                 }
                 const stats = instance.getPlayerStats();
                 const candidateStats = stats.find(({ name }: { name: string }) => name === candidateName);
                 const opponentStats = stats.find(({ name }: { name: string }) => name === opponentName);
                 if (!candidateStats || !opponentStats) {
-                    throw new Error("Unified intent M2 player statistics drifted");
+                    throw new UnifiedIntentM2EpisodeTechnicalError("setup_contract");
                 }
                 const completed = adjudicator.completeUpdate(game, {
                     finished: instance.isFinished(),
@@ -191,7 +217,7 @@ export const runUnifiedIntentM2Episode = async (args: {
                     },
                 });
                 if (completed.technicalFailure) {
-                    throw new Error("Unified intent M2 literal endpoint failed technically");
+                    throw new UnifiedIntentM2EpisodeTechnicalError("adjudicator_contract");
                 }
                 terminal = completed.terminal;
                 if (updates % 6_000 === 0 || terminal) {
@@ -218,18 +244,30 @@ export const runUnifiedIntentM2Episode = async (args: {
                 !["candidate_win", "baseline_win", "simultaneous_draw",
                     "engine_nonliteral_termination_draw", "tick_cap_draw"].includes(status) ||
                 !["candidate", "baseline", "draw"].includes(winner)
-            ) throw new Error("Unified intent M2 terminal schema drifted");
+            ) throw new UnifiedIntentM2EpisodeTechnicalError("adjudicator_contract");
             if (
                 actionAudit.quit.forwarded.candidate !== 0 ||
                 actionAudit.quit.forwarded.baseline !== 0
-            ) throw new Error("Unified intent M2 forwarded a resignation");
+            ) throw new UnifiedIntentM2EpisodeTechnicalError("public_call_contract");
             const actions = actionAudit.finish();
             const terminalBuildings = snapshotCombatantBuildings(game, combatants);
-            const telemetrySummary = telemetry ? telemetry.finish(updates) : null;
+            const telemetrySummary = telemetry
+                ? args.spec.diagnosticOnly
+                    ? telemetry.finishDiagnostic(updates)
+                    : telemetry.finish(updates)
+                : null;
+            let technicalPass = true;
+            if (telemetrySummary && args.spec.diagnosticOnly) {
+                try {
+                    validateUnifiedIntentM2Telemetry(telemetrySummary);
+                } catch {
+                    technicalPass = false;
+                }
+            }
             const trajectorySummary = trajectory.finish();
             return {
                 complete: true,
-                technicalPass: true,
+                technicalPass,
                 endpointVersion: LITERAL_BUILDING_ELIMINATION_ENDPOINT_VERSION,
                 endpointSha256: LITERAL_BUILDING_ELIMINATION_ENDPOINT_SHA256,
                 status,

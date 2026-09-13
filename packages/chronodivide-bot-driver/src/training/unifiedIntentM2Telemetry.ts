@@ -92,6 +92,16 @@ export class UnifiedIntentM2TelemetryCollector {
     }
 
     finish(expectedUpdates: number): UnifiedIntentM2TelemetrySummary {
+        const value = this.complete(expectedUpdates);
+        validateUnifiedIntentM2Telemetry(value);
+        return value;
+    }
+
+    finishDiagnostic(expectedUpdates: number): UnifiedIntentM2TelemetrySummary {
+        return this.complete(expectedUpdates);
+    }
+
+    private complete(expectedUpdates: number): UnifiedIntentM2TelemetrySummary {
         if (
             this.finished || !Number.isSafeInteger(expectedUpdates) || expectedUpdates < 1 ||
             this.updates !== expectedUpdates
@@ -118,7 +128,6 @@ export class UnifiedIntentM2TelemetryCollector {
             forwardedValidationViolationUpdates: this.forwardedValidationViolationUpdates,
             partialProductionBatchViolationUpdates: this.partialProductionBatchViolationUpdates,
         };
-        validateUnifiedIntentM2Telemetry(value);
         return value;
     }
 }
