@@ -48,6 +48,32 @@ describe("research ablation flags", () => {
             new StrongStrategy(),
             { intentArbiter: { enabled: true } },
         )).toThrow(/frozen total ceiling/);
+        const separated = new StrongBot(
+            "separated-intent",
+            Countries.IRAQ,
+            [],
+            false,
+            new StrongStrategy(),
+            { intentArbiter: { enabled: true, budgetMode: "separated_lanes_v2" } },
+        ) as unknown as PrivateRecord;
+        expect(separated.intentArbiterOptions).toEqual({
+            enabled: true,
+            budgetMode: "separated_lanes_v2",
+        });
+        expect(() => new StrongBot(
+            "mixed-intent",
+            Countries.IRAQ,
+            [],
+            false,
+            new StrongStrategy(),
+            {
+                intentArbiter: {
+                    enabled: true,
+                    budgetMode: "separated_lanes_v2",
+                    totalCeiling: 150,
+                } as any,
+            },
+        )).toThrow(/Separated-lane/);
     });
 
     it("flushes the enabled boundary through an early-return tactic", () => {

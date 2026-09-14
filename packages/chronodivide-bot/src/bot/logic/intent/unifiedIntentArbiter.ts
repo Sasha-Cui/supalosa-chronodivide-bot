@@ -6,6 +6,9 @@ export const UNIFIED_INTENT_GAMEPLAY_RESERVE = 35;
 export const UNIFIED_INTENT_ROLLING_UPDATES = 900;
 export const UNIFIED_INTENT_MAX_CHUNK = 128;
 export const UNIFIED_INTENT_MAX_REQUESTED_IDS = 4_096;
+export const UNIFIED_INTENT_SEPARATED_LANE_MODE = "separated_lanes_v2" as const;
+export const UNIFIED_INTENT_SEPARATED_COMMAND_CEILING = 115 as const;
+export type UnifiedIntentBudgetMode = "hard_total_v1" | typeof UNIFIED_INTENT_SEPARATED_LANE_MODE;
 
 export const UNIFIED_INTENT_SCOPES = [
     "terminal_objective",
@@ -71,6 +74,8 @@ export type UnifiedForwardedOrder = {
 
 export type UnifiedIntentUpdateTelemetry = {
     tick: number;
+    budgetMode: UnifiedIntentBudgetMode;
+    commandCeiling: number;
     totalCeiling: number;
     gameplayReserve: number;
     proposedCalls: number;
@@ -102,6 +107,8 @@ export type UnifiedIntentUpdateTelemetry = {
     rollingOrderCalls: number;
     rollingGameplayNonorderCalls: number;
     rollingDebugCalls: number;
+    rollingCommandCalls: number;
+    commandCeilingOverflow: boolean;
     gameplayReserveOverflow: boolean;
     totalCeilingOverflow: boolean;
     proposalsByScope: Record<UnifiedIntentScope, number>;
@@ -110,11 +117,32 @@ export type UnifiedIntentUpdateTelemetry = {
     forwardedActionSha256: string;
 };
 
-export type UnifiedIntentArbiterOptions = {
+export type UnifiedIntentHardTotalOptions = {
+    budgetMode?: "hard_total_v1";
     totalCeiling: typeof UNIFIED_INTENT_TOTAL_CEILINGS[number];
     gameplayReserve?: number;
     rollingUpdates?: number;
     maxChunk?: number;
+};
+export type UnifiedIntentSeparatedLaneOptions = {
+    budgetMode: typeof UNIFIED_INTENT_SEPARATED_LANE_MODE;
+    commandCeiling?: typeof UNIFIED_INTENT_SEPARATED_COMMAND_CEILING;
+    totalCeiling?: never;
+    gameplayReserve?: never;
+    rollingUpdates?: number;
+    maxChunk?: number;
+};
+export type UnifiedIntentArbiterOptions =
+    | UnifiedIntentHardTotalOptions
+    | UnifiedIntentSeparatedLaneOptions;
+
+type ResolvedUnifiedIntentArbiterOptions = {
+    budgetMode: UnifiedIntentBudgetMode;
+    commandCeiling: number;
+    totalCeiling: typeof UNIFIED_INTENT_TOTAL_CEILINGS[number];
+    gameplayReserve: number;
+    rollingUpdates: number;
+    maxChunk: number;
 };
 
 export type UnifiedBestEffortDebugCall = {
@@ -207,11 +235,32 @@ const compareIntent = (left: UnifiedUnitIntent, right: UnifiedUnitIntent): numbe
     left.sequence - right.sequence ||
     compareCanonical(left.signature, right.signature);
 
-const validateOptions = (options: UnifiedIntentArbiterOptions): Required<UnifiedIntentArbiterOptions> => {
+const validateOptions = (options: UnifiedIntentArbiterOptions): ResolvedUnifiedIntentArbiterOptions => {
+    if (options.budgetMode === UNIFIED_INTENT_SEPARATED_LANE_MODE) {
+        const resolved = {
+            budgetMode: UNIFIED_INTENT_SEPARATED_LANE_MODE,
+            commandCeiling: options.commandCeiling ?? UNIFIED_INTENT_SEPARATED_COMMAND_CEILING,
+            // Legacy telemetry fields remain populated for V1 artifact readers but
+            // do not constrain the separated essential lane.
+            totalCeiling: 150 as const,
+            gameplayReserve: UNIFIED_INTENT_GAMEPLAY_RESERVE,
+            rollingUpdates: options.rollingUpdates ?? UNIFIED_INTENT_ROLLING_UPDATES,
+            maxChunk: options.maxChunk ?? UNIFIED_INTENT_MAX_CHUNK,
+        };
+        if (
+            resolved.commandCeiling !== UNIFIED_INTENT_SEPARATED_COMMAND_CEILING ||
+            resolved.rollingUpdates !== UNIFIED_INTENT_ROLLING_UPDATES ||
+            resolved.maxChunk !== UNIFIED_INTENT_MAX_CHUNK
+        ) throw new Error("Unified intent separated-lane constants drifted");
+        return resolved;
+    }
     if (!UNIFIED_INTENT_TOTAL_CEILINGS.includes(options.totalCeiling)) {
         throw new Error("Unified intent total ceiling is not frozen");
     }
     const resolved = {
+        budgetMode: "hard_total_v1" as const,
+        commandCeiling: options.totalCeiling -
+            (options.gameplayReserve ?? UNIFIED_INTENT_GAMEPLAY_RESERVE),
         totalCeiling: options.totalCeiling,
         gameplayReserve: options.gameplayReserve ?? UNIFIED_INTENT_GAMEPLAY_RESERVE,
         rollingUpdates: options.rollingUpdates ?? UNIFIED_INTENT_ROLLING_UPDATES,
@@ -226,7 +275,7 @@ const validateOptions = (options: UnifiedIntentArbiterOptions): Required<Unified
 };
 
 export class UnifiedIntentArbiter {
-    private readonly options: Required<UnifiedIntentArbiterOptions>;
+    private readonly options: ResolvedUnifiedIntentArbiterOptions;
     private readonly history: HistoryRow[] = [];
     private readonly pending = new Map<number, UnifiedUnitIntent>();
     private readonly lastForwarded = new Map<number, LastForwarded>();
@@ -259,6 +308,8 @@ export class UnifiedIntentArbiter {
         };
         this.currentTelemetry = {
             tick,
+            budgetMode: this.options.budgetMode,
+            commandCeiling: this.options.commandCeiling,
             proposedCalls: 0,
             totalCeiling: this.options.totalCeiling,
             gameplayReserve: this.options.gameplayReserve,
@@ -290,6 +341,8 @@ export class UnifiedIntentArbiter {
             rollingOrderCalls: 0,
             rollingGameplayNonorderCalls: 0,
             rollingDebugCalls: 0,
+            rollingCommandCalls: 0,
+            commandCeilingOverflow: false,
             gameplayReserveOverflow: false,
             totalCeilingOverflow: false,
             proposalsByScope: emptyScopeCounts(),
@@ -529,6 +582,7 @@ export class UnifiedIntentArbiter {
         telemetry.rollingOrderCalls = rolling.order;
         telemetry.rollingGameplayNonorderCalls = rolling.gameplayNonorder;
         telemetry.rollingDebugCalls = rolling.debug;
+        telemetry.rollingCommandCalls = rolling.order + rolling.debug;
         this.updateOverflowFlags();
         telemetry.forwardedActionSha256 = sha256(
             forwardedRows.map((row) => JSON.stringify(row)).join("\n") +
@@ -585,11 +639,17 @@ export class UnifiedIntentArbiter {
 
     private orderBudgetAvailable(): boolean {
         const rolling = this.rollingCounts();
+        if (this.options.budgetMode === UNIFIED_INTENT_SEPARATED_LANE_MODE) {
+            return rolling.order + rolling.debug < this.options.commandCeiling;
+        }
         return rolling.total < this.options.totalCeiling &&
             rolling.order < this.options.totalCeiling - this.options.gameplayReserve;
     }
     private debugBudgetAvailable(): boolean {
         const rolling = this.rollingCounts();
+        if (this.options.budgetMode === UNIFIED_INTENT_SEPARATED_LANE_MODE) {
+            return rolling.order + rolling.debug < this.options.commandCeiling;
+        }
         return rolling.total < this.options.totalCeiling &&
             rolling.order + rolling.debug <
                 this.options.totalCeiling - this.options.gameplayReserve;
@@ -614,6 +674,13 @@ export class UnifiedIntentArbiter {
     private updateOverflowFlags(): void {
         if (!this.currentTelemetry || !this.currentHistory) return;
         const rolling = this.rollingCounts();
+        this.currentTelemetry.commandCeilingOverflow =
+            rolling.order + rolling.debug > this.options.commandCeiling;
+        if (this.options.budgetMode === UNIFIED_INTENT_SEPARATED_LANE_MODE) {
+            this.currentTelemetry.gameplayReserveOverflow = false;
+            this.currentTelemetry.totalCeilingOverflow = false;
+            return;
+        }
         this.currentTelemetry.gameplayReserveOverflow =
             rolling.gameplayNonorder > this.options.gameplayReserve;
         this.currentTelemetry.totalCeilingOverflow =

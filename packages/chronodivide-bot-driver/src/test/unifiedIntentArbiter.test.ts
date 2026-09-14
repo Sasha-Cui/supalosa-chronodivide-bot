@@ -6,6 +6,8 @@ import {
     UNIFIED_INTENT_GAMEPLAY_RESERVE,
     UNIFIED_INTENT_MAX_CHUNK,
     UNIFIED_INTENT_ROLLING_UPDATES,
+    UNIFIED_INTENT_SEPARATED_COMMAND_CEILING,
+    UNIFIED_INTENT_SEPARATED_LANE_MODE,
     UNIFIED_INTENT_SCOPE_SPECS,
 } from "@supalosa/chronodivide-bot/dist/bot/logic/intent/unifiedIntentArbiter.js";
 
@@ -57,6 +59,8 @@ describe("unified intent arbiter V1", () => {
         expect(UNIFIED_INTENT_GAMEPLAY_RESERVE).toBe(35);
         expect(UNIFIED_INTENT_ROLLING_UPDATES).toBe(900);
         expect(UNIFIED_INTENT_MAX_CHUNK).toBe(128);
+        expect(UNIFIED_INTENT_SEPARATED_LANE_MODE).toBe("separated_lanes_v2");
+        expect(UNIFIED_INTENT_SEPARATED_COMMAND_CEILING).toBe(115);
         expect(UNIFIED_INTENT_SCOPE_SPECS).toEqual({
             terminal_objective: { priority: 700, retryTicks: 1, pendingTtlTicks: 360 },
             emergency_defense: { priority: 600, retryTicks: 3, pendingTtlTicks: 90 },
@@ -73,6 +77,43 @@ describe("unified intent arbiter V1", () => {
             totalCeiling: 75,
             gameplayReserve: 34,
         })).toThrow(/constants/);
+    });
+
+    it("separates essential traffic from the hard command lane", () => {
+        const units = owned(116);
+        const targets = Array.from({ length: 116 }, (_, index) => ({
+            id: 6_000 + index,
+            hitPoints: 100,
+        }));
+        const arbiter = new UnifiedIntentArbiter({
+            budgetMode: "separated_lanes_v2",
+            commandCeiling: 115,
+        });
+        arbiter.beginUpdate(1);
+        arbiter.recordImmediateGameplayNonorder(200);
+        arbiter.withScope("tactical_assault", () => {
+            for (let index = 0; index < 116; index += 1) {
+                arbiter.captureOrder([index + 1], OrderType.Attack, 6_000 + index);
+            }
+        });
+        const { calls, telemetry } = collect(arbiter, game(units, targets));
+        expect(calls).toHaveLength(115);
+        expect(telemetry).toMatchObject({
+            budgetMode: "separated_lanes_v2",
+            commandCeiling: 115,
+            rollingOrderCalls: 115,
+            rollingCommandCalls: 115,
+            rollingGameplayNonorderCalls: 200,
+            rollingTotalCalls: 315,
+            commandCeilingOverflow: false,
+            gameplayReserveOverflow: false,
+            totalCeilingOverflow: false,
+            deferredUnitIds: 1,
+        });
+        expect(() => new UnifiedIntentArbiter({
+            budgetMode: "separated_lanes_v2",
+            commandCeiling: 114 as any,
+        })).toThrow(/separated-lane/);
     });
 
     it("chooses one highest-priority winner per unit and preserves overloads", () => {

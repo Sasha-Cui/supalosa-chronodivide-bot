@@ -20,6 +20,8 @@ const telemetry = (
     overrides: Partial<UnifiedIntentUpdateTelemetry> = {},
 ): UnifiedIntentUpdateTelemetry => ({
     tick,
+    budgetMode: "hard_total_v1",
+    commandCeiling: 40,
     totalCeiling: 75,
     gameplayReserve: 35,
     proposedCalls: 1,
@@ -51,6 +53,8 @@ const telemetry = (
     rollingOrderCalls: tick,
     rollingGameplayNonorderCalls: 0,
     rollingDebugCalls: 0,
+    rollingCommandCalls: tick,
+    commandCeilingOverflow: false,
     gameplayReserveOverflow: false,
     totalCeilingOverflow: false,
     proposalsByScope: scopes(1),

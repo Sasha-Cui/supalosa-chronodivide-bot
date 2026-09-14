@@ -22,12 +22,16 @@ import {
 import {
     UnifiedIntentScope,
     UnifiedIntentUpdateTelemetry,
+    UNIFIED_INTENT_SEPARATED_COMMAND_CEILING,
+    UNIFIED_INTENT_SEPARATED_LANE_MODE,
     UNIFIED_INTENT_TOTAL_CEILINGS,
 } from "./logic/intent/unifiedIntentArbiter.js";
 
 export type StrongBotIntentArbiterOptions = {
     enabled?: boolean;
+    budgetMode?: "hard_total_v1" | typeof UNIFIED_INTENT_SEPARATED_LANE_MODE;
     totalCeiling?: typeof UNIFIED_INTENT_TOTAL_CEILINGS[number];
+    commandCeiling?: typeof UNIFIED_INTENT_SEPARATED_COMMAND_CEILING;
     telemetrySink?: (telemetry: UnifiedIntentUpdateTelemetry) => void;
 };
 
@@ -1405,11 +1409,17 @@ export class StrongBot extends SupalosaBot {
         this.preserveBaselineCore = options.preserveBaselineCore ?? false;
         this.forceAttackOptions = { ...DEFAULT_FORCE_ATTACK_OPTIONS, ...definedOptions(options.forceAttack) };
         this.intentArbiterOptions = { enabled: false, ...options.intentArbiter };
-        if (
-            this.intentArbiterOptions.enabled === true &&
-            this.intentArbiterOptions.totalCeiling === undefined
-        ) {
-            throw new Error("Enabled unified intent arbiter requires a frozen total ceiling");
+        if (this.intentArbiterOptions.enabled === true) {
+            if (this.intentArbiterOptions.budgetMode === UNIFIED_INTENT_SEPARATED_LANE_MODE) {
+                if (
+                    this.intentArbiterOptions.totalCeiling !== undefined ||
+                    (this.intentArbiterOptions.commandCeiling !== undefined &&
+                        this.intentArbiterOptions.commandCeiling !==
+                            UNIFIED_INTENT_SEPARATED_COMMAND_CEILING)
+                ) throw new Error("Separated-lane intent arbiter options drifted");
+            } else if (this.intentArbiterOptions.totalCeiling === undefined) {
+                throw new Error("Enabled unified intent arbiter requires a frozen total ceiling");
+            }
         }
         this.harassOptions = { ...DEFAULT_HARASS_OPTIONS, ...definedOptions(options.harass) };
         const emergencyDefenseOverrides = definedOptions(options.emergencyDefense);
@@ -1528,10 +1538,18 @@ export class StrongBot extends SupalosaBot {
                 this.player.actions,
                 game,
                 this.name,
-                {
-                    totalCeiling: this.intentArbiterOptions.totalCeiling!,
-                    telemetrySink: this.intentArbiterOptions.telemetrySink,
-                },
+                this.intentArbiterOptions.budgetMode === UNIFIED_INTENT_SEPARATED_LANE_MODE
+                    ? {
+                        budgetMode: UNIFIED_INTENT_SEPARATED_LANE_MODE,
+                        commandCeiling: this.intentArbiterOptions.commandCeiling ??
+                            UNIFIED_INTENT_SEPARATED_COMMAND_CEILING,
+                        telemetrySink: this.intentArbiterOptions.telemetrySink,
+                    }
+                    : {
+                        budgetMode: "hard_total_v1",
+                        totalCeiling: this.intentArbiterOptions.totalCeiling!,
+                        telemetrySink: this.intentArbiterOptions.telemetrySink,
+                    },
             );
         }
         if (this.enableDefaultMapProfiles) {

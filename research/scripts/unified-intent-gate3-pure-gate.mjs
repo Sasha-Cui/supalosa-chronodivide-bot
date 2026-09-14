@@ -86,8 +86,8 @@ try {
     if (
         vitest.success !== true ||
         vitest.testResults.length !== 15 ||
-        vitest.numTotalTests !== 150 ||
-        vitest.numPassedTests !== 150 ||
+        vitest.numTotalTests !== 152 ||
+        vitest.numPassedTests !== 152 ||
         vitest.numFailedTests !== 0 ||
         vitest.numPendingTests !== 0 ||
         vitest.numTodoTests !== 0
@@ -133,7 +133,7 @@ const artifact = {
         vitest: {
             passed: true,
             files: 15,
-            tests: 150,
+            tests: 152,
             testFiles,
         },
         runtimeSchema: {
@@ -170,6 +170,6 @@ console.log(JSON.stringify({
     complete: true,
     passed: true,
     files: 15,
-    tests: 151,
+    tests: 153,
     pureGateSha256: sha256File(file),
 }));

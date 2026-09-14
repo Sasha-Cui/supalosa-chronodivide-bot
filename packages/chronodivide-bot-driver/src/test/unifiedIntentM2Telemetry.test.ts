@@ -13,7 +13,8 @@ const scopes = () => ({
 });
 const row = (tick: number, overrides: Partial<UnifiedIntentUpdateTelemetry> = {}):
 UnifiedIntentUpdateTelemetry => ({
-    tick, totalCeiling: 150, gameplayReserve: 35, proposedCalls: 2,
+    tick, budgetMode: "hard_total_v1", commandCeiling: 115,
+    totalCeiling: 150, gameplayReserve: 35, proposedCalls: 2,
     proposedUnitIds: 2, sameUnitConflicts: 1, invalidUnitIds: 0,
     invalidTargets: 0, invalidTiles: 0, duplicateSuppressions: 1,
     supersededPending: 0, expiredPending: 0, revokedPending: 0,
@@ -25,6 +26,7 @@ UnifiedIntentUpdateTelemetry => ({
     forwardedValidationViolations: 0, partialProductionBatchViolations: 0,
     rollingTotalCalls: tick, rollingOrderCalls: tick,
     rollingGameplayNonorderCalls: 0, rollingDebugCalls: 0,
+    rollingCommandCalls: tick, commandCeilingOverflow: false,
     gameplayReserveOverflow: false, totalCeilingOverflow: false,
     proposalsByScope: scopes(), winningUnitsByScope: scopes(),
     forwardedUnitsByScope: scopes(),

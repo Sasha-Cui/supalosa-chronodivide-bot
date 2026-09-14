@@ -149,6 +149,47 @@ describe("unified intent action boundary", () => {
         expect(value.calls.filter((call) => call.method === "sayAll")).toEqual([]);
     });
 
+    it("forwards every essential call while bounding the separated command lane", () => {
+        const value = actions();
+        const boundary = new UnifiedIntentActionBoundary(
+            value.api,
+            game(116, 116),
+            "candidate",
+            { budgetMode: "separated_lanes_v2", commandCeiling: 115 },
+        );
+        boundary.beginUpdate(1);
+        for (let index = 0; index < 200; index += 1) {
+            value.api.toggleRepairWrench(index + 1);
+        }
+        value.api.queueForProduction(QueueType.Vehicles, "MTNK", ObjectType.Vehicle, 1);
+        value.api.unqueueFromProduction(QueueType.Vehicles, "MTNK", ObjectType.Vehicle, 1);
+        boundary.withScope("tactical_assault", () => {
+            for (let index = 0; index < 116; index += 1) {
+                value.api.orderUnits([index + 1], OrderType.Attack, 500 + index);
+            }
+        });
+        value.api.sayAll("best effort");
+        const telemetry = boundary.flush();
+        expect(value.calls.filter((call) => call.method === "toggleRepairWrench"))
+            .toHaveLength(200);
+        expect(value.calls.filter((call) => call.method === "queueForProduction"))
+            .toHaveLength(1);
+        expect(value.calls.filter((call) => call.method === "unqueueFromProduction"))
+            .toHaveLength(1);
+        expect(value.calls.filter((call) => call.method === "orderUnits"))
+            .toHaveLength(115);
+        expect(value.calls.filter((call) => call.method === "sayAll")).toHaveLength(0);
+        expect(telemetry).toMatchObject({
+            budgetMode: "separated_lanes_v2",
+            commandCeiling: 115,
+            rollingCommandCalls: 115,
+            rollingGameplayNonorderCalls: 202,
+            commandCeilingOverflow: false,
+            productionBatches: 1,
+            partialProductionBatchViolations: 0,
+        });
+    });
+
     it("preserves BatchableAction scope through the final per-unit boundary", () => {
         const value = actions();
         const boundary = new UnifiedIntentActionBoundary(
