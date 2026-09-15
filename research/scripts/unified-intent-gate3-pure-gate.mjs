@@ -69,6 +69,8 @@ const vitestFiles = [
     "src/test/unifiedIntentM2Analysis.test.ts",
     "src/test/literalBuildingEliminationEndpoint.test.ts",
     "src/test/unifiedIntentM2C1Plan.test.ts",
+    "src/test/unifiedIntentV2Gate2Plan.test.ts",
+    "src/test/unifiedIntentV2Telemetry.test.ts",
 ];
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), "chrono-intent-g3-pure-"));
 let vitest;
@@ -85,9 +87,9 @@ try {
     vitest = JSON.parse(fs.readFileSync(reportPath, "utf8"));
     if (
         vitest.success !== true ||
-        vitest.testResults.length !== 15 ||
-        vitest.numTotalTests !== 152 ||
-        vitest.numPassedTests !== 152 ||
+        vitest.testResults.length !== 17 ||
+        vitest.numTotalTests !== 159 ||
+        vitest.numPassedTests !== 159 ||
         vitest.numFailedTests !== 0 ||
         vitest.numPendingTests !== 0 ||
         vitest.numTodoTests !== 0
@@ -132,8 +134,8 @@ const artifact = {
         build: { passed: true, command: "tsc --build" },
         vitest: {
             passed: true,
-            files: 15,
-            tests: 152,
+            files: 17,
+            tests: 159,
             testFiles,
         },
         runtimeSchema: {
@@ -169,7 +171,7 @@ writeExclusive(
 console.log(JSON.stringify({
     complete: true,
     passed: true,
-    files: 15,
-    tests: 153,
+    files: 17,
+    tests: 160,
     pureGateSha256: sha256File(file),
 }));
