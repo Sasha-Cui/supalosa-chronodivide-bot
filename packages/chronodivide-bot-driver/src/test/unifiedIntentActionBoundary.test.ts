@@ -184,6 +184,7 @@ describe("unified intent action boundary", () => {
             commandCeiling: 115,
             rollingCommandCalls: 115,
             rollingGameplayNonorderCalls: 202,
+            gameplayNonorderCalls: 202,
             commandCeilingOverflow: false,
             productionBatches: 1,
             partialProductionBatchViolations: 0,

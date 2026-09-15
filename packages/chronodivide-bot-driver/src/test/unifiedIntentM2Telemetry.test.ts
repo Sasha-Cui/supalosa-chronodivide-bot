@@ -26,6 +26,7 @@ UnifiedIntentUpdateTelemetry => ({
     forwardedValidationViolations: 0, partialProductionBatchViolations: 0,
     rollingTotalCalls: tick, rollingOrderCalls: tick,
     rollingGameplayNonorderCalls: 0, rollingDebugCalls: 0,
+    gameplayNonorderCalls: 0,
     rollingCommandCalls: tick, commandCeilingOverflow: false,
     gameplayReserveOverflow: false, totalCeilingOverflow: false,
     proposalsByScope: scopes(), winningUnitsByScope: scopes(),

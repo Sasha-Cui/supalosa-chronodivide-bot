@@ -104,6 +104,7 @@ describe("unified intent arbiter V1", () => {
             rollingOrderCalls: 115,
             rollingCommandCalls: 115,
             rollingGameplayNonorderCalls: 200,
+            gameplayNonorderCalls: 200,
             rollingTotalCalls: 315,
             commandCeilingOverflow: false,
             gameplayReserveOverflow: false,

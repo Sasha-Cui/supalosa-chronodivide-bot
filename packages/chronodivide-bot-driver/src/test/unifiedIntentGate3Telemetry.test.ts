@@ -50,6 +50,7 @@ const telemetry = (
     forwardedValidationViolations: 0,
     partialProductionBatchViolations: 0,
     rollingTotalCalls: tick,
+    gameplayNonorderCalls: 0,
     rollingOrderCalls: tick,
     rollingGameplayNonorderCalls: 0,
     rollingDebugCalls: 0,

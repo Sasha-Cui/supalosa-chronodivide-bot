@@ -104,6 +104,7 @@ export type UnifiedIntentUpdateTelemetry = {
     forwardedValidationViolations: number;
     partialProductionBatchViolations: number;
     rollingTotalCalls: number;
+    gameplayNonorderCalls: number;
     rollingOrderCalls: number;
     rollingGameplayNonorderCalls: number;
     rollingDebugCalls: number;
@@ -334,6 +335,7 @@ export class UnifiedIntentArbiter {
             forwardedOrderCalls: 0,
             forwardedUnitIds: 0,
             rollingTotalCalls: 0,
+            gameplayNonorderCalls: 0,
             maxForwardedChunkSize: 0,
             multipleForwardedUnitViolations: 0,
             forwardedValidationViolations: 0,
@@ -420,6 +422,7 @@ export class UnifiedIntentArbiter {
         const history = this.requireCurrentHistory();
         history.gameplayNonorderCalls += count;
         history.totalCalls += count;
+        this.requireCurrentTelemetry().gameplayNonorderCalls += count;
         this.updateOverflowFlags();
     }
 
