@@ -13,12 +13,12 @@ const active = execFileSync("/opt/slurm/current/bin/squeue", ["--noheader", "--u
     .trim().split("\n").filter((line) => line.includes(PROJECT));
 if (active.length) throw new Error("Source-bound jobs are active; do not duplicate or advance");
 fs.mkdirSync(STUDY, { recursive: true, mode: 0o700 });
-const receiptPath = (name) => path.join(STUDY, "launch-" + name + "-v1.json");
-const reservation = path.join(STUDY, "launch-" + phase + "-intent-v1.json");
+const receiptPath = (name) => path.join(STUDY, "launch-" + name + "-a1.json");
+const reservation = path.join(STUDY, "launch-" + phase + "-intent-a1.json");
 if (fs.existsSync(reservation) || fs.existsSync(receiptPath(phase))) throw new Error("Stage already attempted; reconcile receipts without resubmitting");
 const program = path.join(REPO, "research/scripts/unified-intent-v2-od1.mjs");
 const script = path.join(REPO, "research/slurm/unified_intent_v2_od1_stage.sbatch");
-const protocol = path.join(REPO, "research/protocols/method/2026-09-17-unified-intent-v2-open-development-od1.md");
+const protocol = path.join(REPO, "research/protocols/method/2026-09-17-unified-intent-v2-od1-selector-repair-a1.md");
 let env = { ...process.env, REPO_ROOT: REPO, SOURCE_COMMIT: source, PROGRAM_SHA256: fileHash(program),
     SCRIPT_SHA256: fileHash(script), PROTOCOL_SHA256: fileHash(protocol) };
 const checkPublished = (dir, kind) => {
@@ -29,11 +29,11 @@ const checkPublished = (dir, kind) => {
     return r;
 };
 if (phase !== "pure") {
-    const receipt = json(receiptPath("pure")), purePath = path.join(STUDY, "pure-v2/pure.json");
+    const receipt = json(receiptPath("pure")), purePath = path.join(STUDY, "pure-a1/pure.json");
     const value = json(purePath), digest = fileHash(purePath);
     if (receipt.sourceCommit !== source || value.sourceCommit !== source || value.scheduler.jobId !== receipt.jobId ||
-        !value.complete || !value.passed || value.tests.passed !== 208 || value.tests.od1RuntimePassed !== 14 ||
-        fs.readFileSync(path.join(STUDY, "pure-v2/COMPLETE"), "utf8") !==
+        !value.complete || !value.passed || value.tests.passed !== 213 || value.tests.od1RuntimePassed !== 16 ||
+        fs.readFileSync(path.join(STUDY, "pure-a1/COMPLETE"), "utf8") !==
             "COMPLETE_UNIFIED_INTENT_V2_OD1_PURE_V1 " + digest + " " + fs.statSync(purePath).size + "\n") {
         throw new Error("Current-source pure gate required");
     }
@@ -74,7 +74,7 @@ if (phase === "pure") {
     const pureProgram = path.join(REPO, "research/scripts/unified-intent-v2-od1-pure.mjs");
     const pureScript = path.join(REPO, "research/slurm/unified_intent_v2_od1_pure.sbatch");
     submit("pure", ["--job-name=chrono-intent-v2od1-pure", "--mem=8G", "--time=01:00:00"],
-        { ...env, OUT_DIR: path.join(STUDY, "pure-v2"), PROGRAM_SHA256: fileHash(pureProgram), SCRIPT_SHA256: fileHash(pureScript) }, pureScript);
+        { ...env, OUT_DIR: path.join(STUDY, "pure-a1"), PROGRAM_SHA256: fileHash(pureProgram), SCRIPT_SHA256: fileHash(pureScript) }, pureScript);
 } else if (phase === "prepare" || phase === "smoke") {
     submit(phase, ["--job-name=chrono-intent-v2od1-" + phase, "--mem=8G", "--time=" + (phase === "prepare" ? "08:00:00" : "04:00:00")],
         { ...env, MODE: phase }, script);

@@ -4,9 +4,9 @@ import { createRequire } from "node:module";
 import { pathToFileURL } from "node:url";
 import { execFileSync } from "node:child_process";
 import { REPO, PROJECT, DRIVER, STUDY, EXECUTION, SHA, hash, fileHash, fileIdentity, json, exact,
-    required, requiredHash, git, hashTree, schedulerIdentity, schedulerRows, technicalOnly } from "./unified-intent-v2-od1-io.mjs";
+    required, requiredHash, git, hashTree, schedulerIdentity, schedulerRows, technicalOnly, parseLaunchMarker, buildOD1RegistrationAudit } from "./unified-intent-v2-od1-io.mjs";
 
-export const PROTOCOL = path.join(REPO, "research/protocols/method/2026-09-17-unified-intent-v2-open-development-od1.md");
+export const PROTOCOL = path.join(REPO, "research/protocols/method/2026-09-17-unified-intent-v2-od1-selector-repair-a1.md");
 const RUNTIME = path.join(PROJECT, "research-evidence/fresh-dual-endpoint-v1/execution-v1/runtime-freeze/runtime-freeze.json");
 const RUNTIME_SHA = "be47027c8526daa961500a1ca2acc3c04dd1a487460d4dec78361faa03ece649";
 const CERT = path.join(PROJECT, "research-evidence/unified-intent-arbiter-v1/gate-2/seed-certificate-v1-a4/selection-certificate.json");
@@ -22,7 +22,8 @@ const moduleAt = (relative) => import(pathToFileURL(path.join(DRIVER, "dist", re
 const requireDriver = createRequire(path.join(DRIVER, "package.json"));
 export const gameApiPath = fs.realpathSync(requireDriver.resolve("@chronodivide/game-api"));
 export const api = await import(pathToFileURL(gameApiPath).href);
-export const planModule = await moduleAt("training/unifiedIntentV2OD1Plan.js");
+export const planModule = await moduleAt("training/unifiedIntentV2OD1A1Plan.js");
+const originalPlanModule = await moduleAt("training/unifiedIntentV2OD1Plan.js");
 export const episodeModule = await moduleAt("training/unifiedIntentV2OD1Episode.js");
 export const { verifyEmbeddedFreshDualLedger } = await moduleAt("training/embeddedFreshDualLedger.js");
 const { createDeployedStrongBotCandidate } = await moduleAt("training/deployedStrongBotCandidate.js");
@@ -40,6 +41,7 @@ const sourceFiles = [
     "research/runtime/explicit-start-loader-v1.mjs", "research/runtime/explicit-start-transform-v1.mjs",
     "research/slurm/unified_intent_v2_od1_pure.sbatch", "research/slurm/unified_intent_v2_od1_stage.sbatch",
     "research/protocols/method/2026-09-17-unified-intent-v2-open-development-od1.md",
+    "research/protocols/method/2026-09-17-unified-intent-v2-od1-selector-repair-a1.md",
     "research/protocols/method/2026-09-14-unified-intent-separated-lane-v2.md",
     "research/results/2026-09-17-unified-intent-v2-gate2-complete.md",
     "research/results/2026-09-15-unified-intent-separated-lane-v2-gate1.md",
@@ -81,8 +83,8 @@ export const verifyPure = () => {
         "COMPLETE_UNIFIED_INTENT_V2_OD1_PURE_V1 " + sha256 + " " + raw.length + "\n" ||
         v.kind !== "unified-intent-v2-od1-pure-v1" || !v.complete || !v.passed || !v.technicalOnly ||
         v.sourceCommit !== required("SOURCE_COMMIT") || v.programSha256 !== fileHash(PURE_PROGRAM) ||
-        v.tests.files !== 25 || v.tests.passed !== 208 || v.tests.runtimePassed !== 1 ||
-        v.tests.od1RuntimePassed !== 14 || v.scheduler.jobId !== required("PURE_JOB_ID")) throw new Error("OD1 pure binding invalid");
+        v.tests.files !== 26 || v.tests.passed !== 213 || v.tests.runtimePassed !== 1 ||
+        v.tests.od1RuntimePassed !== 16 || v.scheduler.jobId !== required("PURE_JOB_ID")) throw new Error("OD1 pure binding invalid");
     if (v.scheduler.account !== "pi_jss233" || v.scheduler.partition !== "day" ||
         v.scheduler.cpus !== 1 || v.scheduler.restarts !== 0) throw new Error("OD1 pure scheduler identity invalid");
     // Cell jobs trust the pinned prerequisite marker; control stages reconcile sacct once.
@@ -200,11 +202,40 @@ export const auditFreshSeeds = (plan) => {
             minSeed: Math.min(...seeds), maxSeed: Math.max(...seeds),
             seedsSha256: hash(JSON.stringify(seeds)), collisions: 0 });
     }
-    return { complete: true, passed: true, technicalOnly: true,
+    const abandonedRoot = path.join(STUDY, "execution-v1/manifest");
+    const failureFile = path.join(abandonedRoot, "FAILURE.json");
+    const journalFile = path.join(abandonedRoot, "COMPLETE");
+    const auditFile = path.join(STUDY, "selector-failure-audit-v1.json");
+    if (fileHash(failureFile) !== "ca726a89c6dcd00635f4eae458aafb53ea6d1fd7f9354b254860b4979aef4a2b" ||
+        fileHash(journalFile) !== "9dd5fe87d5e08e15884a0821dc8a1b41fa6f0578cb6fc7eae9a5a6854b54b9c6" ||
+        fileHash(auditFile) !== "04a7ab8f3c9ce8ceecbacc818e1d38d7ab35453b9318b57756a230d3ad85b7b3" ||
+        fs.existsSync(path.join(abandonedRoot, "record.json"))) throw new Error("OD1 abandoned predecessor evidence drifted");
+    const failure = json(failureFile), oldPlan = originalPlanModule.buildUnifiedIntentV2OD1Plan(plan.maps);
+    const abandonedLaunches = parseLaunchMarker(fs.readFileSync(journalFile, "utf8"));
+    exact(abandonedLaunches, failure.launches, "OD1 abandoned launch journal");
+    exact(abandonedLaunches, [...oldPlan.cases, ...oldPlan.canaries, oldPlan.smoke].map((c) => ({
+        role: c.role, caseIndex: c.caseIndex, arm: "disabled", mode: "zero_update",
+        requestedEngineSeed: c.requestedEngineSeed,
+    })), "OD1 abandoned frozen population");
+    if (failure.mode !== "prepare" || failure.sourceCommit !== "468dae122744505a7c46e3de1b0d13c4fa15d13a" ||
+        failure.scheduler.jobId !== "26516850" || abandonedLaunches.some((l) => requested.has(l.requestedEngineSeed))) {
+        throw new Error("OD1 A1 overlaps or misidentifies the abandoned selector");
+    }
+    const abandonedAccounting = execFileSync("/opt/slurm/current/bin/sacct", [
+        "-X", "-n", "-P", "-j", "26516850",
+        "--format=JobIDRaw,Account,Partition,State,ExitCode,AllocCPUS,Restarts",
+    ], { encoding: "utf8" }).trim();
+    if (abandonedAccounting !== "26516850|pi_jss233|day|FAILED|1:0|1|0") {
+        throw new Error("OD1 abandoned selector accounting drifted");
+    }
+    return buildOD1RegistrationAudit({
         certificate: { path: CERT, sha256: CERT_SHA, interval: [3350000000, 3351000000] },
-        inventoryRoot: PROJECT, inventoryAfterUtc: "2026-09-09T06:35:54Z",
-        inspectedRegistrationFiles: records, supportingMetadata: [fileIdentity(CERT), fileIdentity(receipt)],
-        newSeeds: { count: 905, min: Math.min(...proposed), max: Math.max(...proposed),
-            sha256: hash(JSON.stringify(proposed)) }, collisions: 0,
-        scope: "Registered post-certificate manifests only; no game, trace, or competitive payload opened." };
+        registrationRoot: PROJECT, registrationAfterUtc: "2026-09-09T06:35:54Z",
+        records, supportingMetadata: [fileIdentity(CERT), fileIdentity(receipt)],
+        proposedSeeds: proposed,
+        abandonedSelector: { jobId: "26516850", sourceCommit: failure.sourceCommit,
+            zeroUpdateInitializations: 905, advancingEpisodes: 0, accounting: abandonedAccounting,
+            failure: fileIdentity(failureFile), launchJournal: fileIdentity(journalFile),
+            independentAudit: fileIdentity(auditFile) },
+    });
 };

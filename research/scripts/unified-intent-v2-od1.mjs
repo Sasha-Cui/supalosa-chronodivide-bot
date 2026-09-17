@@ -4,6 +4,7 @@ import path from "node:path";
 import {
     REPO, STUDY, EXECUTION, hash, exact, required, requiredHash, schedulerIdentity, schedulerRows,
     reserveDirectory, publish, readPublished, technicalOnly, countFiles, recordLaunch, writeExclusive,
+    buildOD1PreparationEnvelope,
 } from "../runtime/unified-intent-v2-od1-io.mjs";
 import {
     assertSource, verifyPure, verifyRuntime, initialize, createBots, zeroSettings, auditFreshSeeds,
@@ -119,12 +120,18 @@ const runEpisode = async (definitions, cell, arm, episodeMode) => {
     let artifact;
     if (mode === "prepare") {
         const seedAudit = auditFreshSeeds(plan);
+        const envelope = buildOD1PreparationEnvelope({
+            ...common("unified-intent-v2-od1-manifest-v1"), technicalOnly: true,
+            source, runtime, pure, plan, seedAudit,
+        });
+        // The complete metadata envelope is checked before cdapi.init or any game initialization.
         const definitions = await initialize(runtime);
         const gameModes = Object.fromEntries(runtime.maps.map((map) => {
             const values = api.cdapi.getAvailableGameModes(map.fileName);
             if (!values.length) throw new Error("OD1 map game mode unavailable");
             return [map.id, values[0]];
         }));
+        technicalOnly({ gameModes });
         const observations = [];
         for (const cell of [...plan.cases, ...plan.canaries, plan.smoke]) {
             const map = runtime.maps.find((m) => m.id === cell.mapId), bots = createBots(cell, plan.arms[0], definitions);
@@ -149,8 +156,7 @@ const runEpisode = async (definitions, cell, arm, episodeMode) => {
                 candidateCountry: cell.country, opponentCountry: cell.country,
                 candidateStartOrdinal: cell.candidateStartOrdinal, opponentStartOrdinal: cell.opponentStartOrdinal });
         }
-        artifact = { ...common("unified-intent-v2-od1-manifest-v1"), technicalOnly: true,
-            source, runtime, pure, plan, seedAudit, gameModes, observations };
+        artifact = { ...envelope, gameModes, observations, launches };
         technicalOnly(artifact);
     } else if (mode === "canary") {
         const cell = plan.canaries[taskIndex], definitions = await initialize(runtime), episodes = [];
@@ -229,7 +235,8 @@ const runEpisode = async (definitions, cell, arm, episodeMode) => {
         const analysis = analyzeUnifiedIntentV2OD1(rows, plan);
         artifact = { ...common("unified-intent-v2-od1-aggregate-v1"), manifestSha256: manifest.sha256,
             canaryGateSha256: canary.sha256, smokeSha256: smoke.sha256, arrayJobId,
-            initializations: 905, canaryEpisodes: 16, smokeEpisodes: 2, competitiveEpisodes: 1800,
+            initializations: 905, priorZeroUpdateInitializations: 905, cumulativeZeroUpdateInitializations: 1810,
+            canaryEpisodes: 16, smokeEpisodes: 2, competitiveEpisodes: 1800,
             totalAdvancingEpisodes: 1818, accounting, recordIdentities, technical, rows, analysis };
         const files = countFiles(EXECUTION);
         if (files + 2 >= 2000) throw new Error("OD1 final execution file budget exceeded");

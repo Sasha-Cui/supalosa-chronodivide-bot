@@ -214,3 +214,50 @@ test("OD1 publisher preserves two-file launch journal and rejects overwrites or 
         assert.throws(() => readPublished(directory, "0".repeat(64)), /checksum/);
     } finally { fs.rmSync(directory, { recursive: true, force: true }); }
 });
+
+import {
+    buildOD1RegistrationAudit, buildOD1PreparationEnvelope,
+} from "../runtime/unified-intent-v2-od1-io.mjs";
+const registrationFixture = () => buildOD1RegistrationAudit({
+    certificate: { path: "/project/certificate.json", sha256: "a".repeat(64), interval: [3350000000, 3351000000] },
+    registrationRoot: "/project", registrationAfterUtc: "2026-09-09T06:35:54Z",
+    records: [{ path: "/project/manifest.json", sha256: "b".repeat(64), bytes: 100, cases: 900, collisions: 0 }],
+    supportingMetadata: [],
+    proposedSeeds: [...Array.from({ length: 900 }, (_, i) => 3350108000 + i),
+        3350109000, 3350109001, 3350109002, 3350109003, 3350109100],
+    abandonedSelector: { jobId: "26516850", zeroUpdateInitializations: 905, advancingEpisodes: 0 },
+});
+test("A1 real registration builder passes complete-envelope validation before any initializer", () => {
+    const seedAudit = registrationFixture();
+    assert.equal(seedAudit.registrationRoot, "/project");
+    assert.equal(seedAudit.registrationAfterUtc, "2026-09-09T06:35:54Z");
+    assert.equal(seedAudit.newSeeds.count, 905);
+    assert.equal(seedAudit.newSeeds.min, 3350108000);
+    assert.equal(seedAudit.newSeeds.max, 3350109100);
+    assert.equal("inventoryRoot" in seedAudit, false);
+    const envelope = buildOD1PreparationEnvelope({
+        kind: "unified-intent-v2-od1-manifest-v1", complete: true, passed: true, technicalOnly: true,
+        source: { sourceCommit: "a".repeat(40), files: [{ path: "/repo/file.ts", sha256: "b".repeat(64), bytes: 10 }] },
+        runtime: { maps: [{ id: "hfo-le", starts: ["1,2", "3,4"] }], assets: { entries: [] } },
+        pure: { sha256: "c".repeat(64) }, plan: { cases: [], counts: { competitiveEpisodes: 1800 } },
+        seedAudit, scheduler: { jobId: "1", account: "pi_jss233", partition: "day", cpus: 1 }, launches: [],
+    });
+    technicalOnly(envelope);
+    assert.deepEqual(envelope.gameModes, {});
+    assert.deepEqual(envelope.observations, []);
+});
+test("A1 preserves original prohibition and rejects the old metadata names before initialization", () => {
+    let initialized = false;
+    const init = () => { initialized = true; };
+    assert.throws(() => {
+        buildOD1PreparationEnvelope({ seedAudit: { ...registrationFixture(), inventoryRoot: "/project" } });
+        init();
+    }, /prohibited/);
+    assert.equal(initialized, false);
+    assert.throws(() => buildOD1PreparationEnvelope({
+        seedAudit: registrationFixture(), nested: [{ winner: "candidate" }],
+    }), /prohibited/);
+    assert.throws(() => buildOD1PreparationEnvelope({
+        seedAudit: registrationFixture(), nested: { inventoryAfterUtc: "anything" },
+    }), /prohibited/);
+});

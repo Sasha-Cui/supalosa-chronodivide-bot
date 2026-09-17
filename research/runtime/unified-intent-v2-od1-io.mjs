@@ -7,7 +7,7 @@ export const REPO = "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-c
 export const PROJECT = path.dirname(REPO);
 export const DRIVER = path.join(REPO, "packages/chronodivide-bot-driver");
 export const STUDY = path.join(PROJECT, "research-evidence/unified-intent-arbiter-v2/od1");
-export const EXECUTION = path.join(STUDY, "execution-v1");
+export const EXECUTION = path.join(STUDY, "execution-a1");
 export const SHA = /^[0-9a-f]{64}$/;
 export const MAX_PAIR_BYTES = 32 * 1024 * 1024;
 export const hash = (value) => crypto.createHash("sha256").update(value).digest("hex");
@@ -146,3 +146,29 @@ export const technicalOnly = (value) => {
 };
 export const countFiles = (directory) => fs.readdirSync(directory, { withFileTypes: true })
     .reduce((n, e) => n + (e.isDirectory() ? countFiles(path.join(directory, e.name)) : 1), 0);
+
+/** Shared by the real selector and synthetic tests; names describe registrations, not game inventory. */
+export const buildOD1RegistrationAudit = ({
+    certificate, registrationRoot, registrationAfterUtc, records, supportingMetadata, proposedSeeds, abandonedSelector,
+}) => {
+    if (proposedSeeds.length !== 905 || new Set(proposedSeeds).size !== 905 ||
+        proposedSeeds.some((s) => !Number.isSafeInteger(s) || s < 3350000000 || s >= 3351000000) ||
+        records.some((r) => r.collisions !== 0) || abandonedSelector.zeroUpdateInitializations !== 905 ||
+        abandonedSelector.advancingEpisodes !== 0) throw new Error("OD1 A1 registration audit contract failed");
+    const value = {
+        complete: true, passed: true, technicalOnly: true, certificate,
+        registrationRoot, registrationAfterUtc, inspectedRegistrationFiles: records, supportingMetadata,
+        abandonedSelector,
+        newSeeds: { count: 905, min: Math.min(...proposedSeeds), max: Math.max(...proposedSeeds),
+            sha256: hash(JSON.stringify(proposedSeeds)) },
+        collisions: 0,
+        scope: "Registration metadata and abandoned zero-update journal only; no gameplay payload opened.",
+    };
+    technicalOnly(value);
+    return value;
+};
+export const buildOD1PreparationEnvelope = (header) => {
+    const value = { ...header, gameModes: {}, observations: [] };
+    technicalOnly(value);
+    return value;
+};

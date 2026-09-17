@@ -41,7 +41,7 @@ const names = [
     "unifiedIntentGate3Telemetry", "unifiedIntentGate3DiagnosticPlan", "unifiedIntentGate3B1Plan",
     "unifiedIntentM2Plan", "unifiedIntentM2Telemetry", "unifiedIntentM2Analysis",
     "literalBuildingEliminationEndpoint", "unifiedIntentM2C1Plan", "unifiedIntentV2Gate2Plan",
-    "unifiedIntentV2Telemetry", "unifiedIntentV2OD1Plan", "embeddedFreshDualLedger",
+    "unifiedIntentV2Telemetry", "unifiedIntentV2OD1Plan", "unifiedIntentV2OD1A1Plan", "embeddedFreshDualLedger",
     "unifiedIntentV2OD1Episode", "freshDualEndpointLedger", "liveOwnedBuildingEliminationEndpointV6",
     "liveOwnedBuildingSnapshotCandidate", "passiveDualBuildingEndpoint", "freshDualStudyInstrumentation",
 ];
@@ -55,8 +55,8 @@ try {
     ], { cwd: DRIVER, encoding: "utf8", maxBuffer: 32 * 1024 * 1024 });
     exclusive("vitest.log", log);
     const results = JSON.parse(fs.readFileSync(report, "utf8"));
-    if (!results.success || results.testResults.length !== 25 || results.numTotalTests !== 208 ||
-        results.numPassedTests !== 208 || results.numFailedTests !== 0 || results.numPendingTests !== 0 ||
+    if (!results.success || results.testResults.length !== 26 || results.numTotalTests !== 213 ||
+        results.numPassedTests !== 213 || results.numFailedTests !== 0 || results.numPendingTests !== 0 ||
         results.numTodoTests !== 0) throw new Error("OD1 pure test population or results failed");
     const runtimeTest = path.join(REPO, "research/tests/unified-intent-gate2-runtime-schema.test.mjs");
     const runtime = execFileSync(process.execPath, ["--test", runtimeTest], { cwd: REPO, encoding: "utf8" });
@@ -65,12 +65,12 @@ try {
     const od1Test = path.join(REPO, "research/tests/unified-intent-v2-od1-runtime.test.mjs");
     const od1Runtime = execFileSync(process.execPath, ["--test", od1Test], { cwd: REPO, encoding: "utf8" });
     exclusive("od1-runtime.log", od1Runtime);
-    if (!/^# pass 14$/m.test(od1Runtime) || !/^# fail 0$/m.test(od1Runtime)) throw new Error("OD1 orchestration/analysis tests failed");
+    if (!/^# pass 16$/m.test(od1Runtime) || !/^# fail 0$/m.test(od1Runtime)) throw new Error("OD1 orchestration/analysis tests failed");
     assertSource();
     const artifact = {
         kind: "unified-intent-v2-od1-pure-v1", complete: true, passed: true,
         technicalOnly: true, sourceCommit: source, programSha256: programHash, scriptSha256: scriptHash,
-        tests: { build: true, files: 25, passed: 208, runtimePassed: 1, od1RuntimePassed: 14,
+        tests: { build: true, files: 26, passed: 213, runtimePassed: 1, od1RuntimePassed: 16,
             od1RuntimeTestSha256: fileHash(od1Test), od1RuntimeLogSha256: hash(od1Runtime),
             testFiles: testFiles.map((relativePath) => ({ relativePath,
                 sha256: fileHash(path.join(DRIVER, relativePath)) })),
@@ -81,7 +81,7 @@ try {
     const data = JSON.stringify(artifact, null, 2) + "\n";
     exclusive("pure.json", data);
     exclusive("COMPLETE", "COMPLETE_UNIFIED_INTENT_V2_OD1_PURE_V1 " + hash(data) + " " + Buffer.byteLength(data) + "\n");
-    console.log(JSON.stringify({ complete: true, tests: 223, sha256: hash(data) }));
+    console.log(JSON.stringify({ complete: true, tests: 230, sha256: hash(data) }));
 } catch (error) {
     exclusive("FAILED.json", JSON.stringify({ complete: false, sourceCommit: source,
         jobId: process.env.SLURM_JOB_ID, message: String(error.message),
