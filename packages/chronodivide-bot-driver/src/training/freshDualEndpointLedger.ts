@@ -284,7 +284,7 @@ export const decodeFreshDualLedgerSync = (compressed: Buffer): FreshDualLedgerRe
     return value.trimEnd().split("\n").map((line) => JSON.parse(line) as FreshDualLedgerRecord);
 };
 
-class FreshDualLedgerRecordVerifier {
+export class FreshDualLedgerRecordVerifier {
     private header: HeaderRecord | null = null;
     private tick = 0;
     private snapshots: FreshDualSnapshots | null = null;
