@@ -47,13 +47,14 @@ See `research/results/2026-09-17-unified-intent-v2-gate2-complete.md`.
 The hard-total V1 method remains rejected and its failed M2 outcomes remain
 sealed. The fresh V2 OD1 outcome protocol is frozen but has not run. It uses
 the corrected v6 primary endpoint, explicit benchmark/topology distinctions,
-and fresh disabled-versus-V2 pairs. The exact plan, bounded embedded ledger,
-and dual-observer episode adapter are implemented with 49 focused tests
-passing. The source-bound selector, orchestration and statistical finalizer
-remain to be implemented; see
-`research/notes/2026-09-17-v2-od1-implementation.md`. No OD1 games have run.
-The broader pure-test gate and simulation preflights remain mandatory.
-A technical pass is not competitive improvement and does not complete M2.
+and fresh disabled-versus-V2 pairs. The foundation pure gate `26489795`
+passed 208 tests plus the runtime check; its independent audit is preserved.
+The source-bound selector, launch journals, stage orchestration and statistical
+finalizer are now implemented, with 14 additional runtime/analysis tests
+passing. See `research/notes/2026-09-17-v2-od1-launch-implementation.md`.
+The expanded 223-check current-source gate and simulation preflights remain
+mandatory. No OD1 games have run. A technical pass is not competitive
+improvement and does not complete M2.
 
 ## Milestone ledger
 
