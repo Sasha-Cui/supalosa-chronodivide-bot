@@ -1,6 +1,6 @@
 # Research status
 
-Last reconciled: **2026-09-05**
+Last reconciled: **2026-09-17**
 
 ## Bottom line
 
@@ -27,7 +27,7 @@ reproduced every outcome, transition, endpoint-effect, and gate row, then
 completed the action-resource audit. The immutable result and Ledger V2 close
 M0.
 
-## Current milestone: M1
+## Current milestone: M1 to M2 transition
 
 M0 closed on 2026-09-05. Execution V2 array `24832312`, finalizer
 `24832313`, and independent audit `24920955` passed. The audit streamed all
@@ -38,19 +38,28 @@ analysis. The immutable result is
 eight canonical entries with full artifact verification and SHA-256
 `0e4e5199e5a07ee19e28bab4a8af04240670a6a7a7d7a25823df664fade77eac`.
 
-M1 must now freeze and run the outcome-blind timestamped action diagnostic,
-then implement and technically validate the unified intent arbiter, certified
-final-building race, and symmetric observation firewall. No new competitive
-development outcome is authorized until those interfaces pass.
+V2 full-horizon technical array `26480439` and finalizer `26480440` passed
+all 925 episodes and 25 duplicate checks. Independent audit rehashed every
+record and matched exact scheduler identities. The command cap remained 115,
+essential calls reconciled, and no competitive outcomes were retained.
+See `research/results/2026-09-17-unified-intent-v2-gate2-complete.md`.
+
+The hard-total V1 method remains rejected and its failed M2 outcomes remain
+sealed. The fresh V2 OD1 outcome protocol is frozen but has not run. It uses
+the corrected v6 primary endpoint, explicit benchmark/topology distinctions,
+and fresh disabled-versus-V2 pairs. Its observer integration and outcome
+runner must pass their prelaunch checks. A technical pass is not competitive
+improvement and does not complete M2.
 
 ## Milestone ledger
 
 - **M0 — Correct endpoint evidence — complete 2026-09-05:** V2, independent
   recomputation, action audit, provenance/observation errata, immutable result,
   and Ledger V2 all pass.
-- **M1 — Method technically ready — current:** full action-burst diagnostic, unified
-  intent arbiter, strict terminal race, and symmetric observation firewall.
-- **M2 — Development champion frozen:** repeatable positive open-development
+- **M1 — Technical readiness — V2 gate passed, OD1 integration pending:** full
+  action-burst diagnostic, separated-lane arbiter, terminal tests, and
+  observation firewall; corrected-observer integration remains a prelaunch gate.
+- **M2 — Development champion frozen — not achieved:** repeatable positive open-development
   evidence across 15 physical maps/five topology families and all ten HFO
   variants against Advanced.
 - **M3 — Reliable Supalosa confirmation:** pass the single-use 10,080-game
@@ -68,7 +77,7 @@ These are internal targets, not permission to weaken a gate:
 | Milestone | Target | Exit decision |
 | --- | --- | --- |
 | M0 endpoint/audit closure | completed 2026-09-05 | corrected evidence independently reproduced and passed |
-| M1 technical method readiness | 2026-09-16 | timestamped diagnostic, arbiter, terminal-race certificate, and observation firewall all pass without competitive outcomes |
+| M1 technical method readiness | target 2026-09-16; V2 gate passed 2026-09-17 | 925 full-horizon V2 tasks and 25 duplicates passed; corrected outcome-observer integration checks remain |
 | M2 development champion | 2026-10-10 | one frozen policy is positive across all 15 maps against Supalosa and all ten HFO variants against Advanced |
 | M3 Supalosa reliability | 2026-10-20 | the single-use 10,080-game all-map confirmation passes every map and stratum gate |
 | M4 opponent/topology breadth | 2026-11-03 | Advanced, Standard, Sea/Land, and development-unused transfer evaluations pass the claimed scope |
