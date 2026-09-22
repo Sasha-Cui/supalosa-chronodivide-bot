@@ -64,7 +64,9 @@ export type UnifiedIntentD1Plan = ReturnType<typeof buildUnifiedIntentD1Plan>;
 export type UnifiedIntentD1Case = UnifiedIntentD1Plan["cases"][number] |
     UnifiedIntentD1Plan["canaries"][number] | UnifiedIntentD1Plan["smoke"];
 export const validateUnifiedIntentD1Plan = (plan: UnifiedIntentD1Plan, frozenMaps: UnifiedIntentGate3Map[]): void => {
-    if (JSON.stringify(plan) !== JSON.stringify(buildUnifiedIntentD1Plan(frozenMaps))) {
+    // JSON encodes NaN/Infinity as null; compare the explicit unbounded ceiling before serialization.
+    if (plan?.arms?.[2]?.commandCeiling !== null ||
+        JSON.stringify(plan) !== JSON.stringify(buildUnifiedIntentD1Plan(frozenMaps))) {
         throw new Error("D1 plan differs from its frozen reconstruction");
     }
 };

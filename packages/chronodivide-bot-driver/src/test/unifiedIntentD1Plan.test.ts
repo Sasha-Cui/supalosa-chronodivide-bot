@@ -63,6 +63,13 @@ describe("D1 frozen complete three-arm definitions", () => {
         expect(new Set(advanced.map(row => row.topologyId))).toEqual(new Set(["hfo"]));
         expect(new Set(advanced.map(row => row.country + "/" + row.directionOrdinal)).size).toBe(4);
     });
+    it("rejects nonfinite ceilings before JSON can silently turn them into null", () => {
+        for (const ceiling of [Infinity, -Infinity, NaN, undefined]) {
+            const plan = structuredClone(buildUnifiedIntentD1Plan(maps())) as any;
+            plan.arms[2].commandCeiling = ceiling;
+            expect(() => validateUnifiedIntentD1Plan(plan, maps())).toThrow(/reconstruction/);
+        }
+    });
     it.each(["seed", "start", "countryOrdinal", "country", "arm", "ceiling", "count", "extra", "maps"])(
         "rejects a %s mutation even with otherwise correct counts", change => {
             const plan = structuredClone(buildUnifiedIntentD1Plan(maps())) as any;
