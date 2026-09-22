@@ -8,7 +8,10 @@ export const UNIFIED_INTENT_MAX_CHUNK = 128;
 export const UNIFIED_INTENT_MAX_REQUESTED_IDS = 4_096;
 export const UNIFIED_INTENT_SEPARATED_LANE_MODE = "separated_lanes_v2" as const;
 export const UNIFIED_INTENT_SEPARATED_COMMAND_CEILING = 115 as const;
-export type UnifiedIntentBudgetMode = "hard_total_v1" | typeof UNIFIED_INTENT_SEPARATED_LANE_MODE;
+/** Research-only D1 ablation: identical separated arbitration without command admission. */
+export const UNIFIED_INTENT_UNBOUNDED_D1_MODE = "separated_lanes_unbounded_d1" as const;
+export type UnifiedIntentBudgetMode = "hard_total_v1" | typeof UNIFIED_INTENT_SEPARATED_LANE_MODE |
+    typeof UNIFIED_INTENT_UNBOUNDED_D1_MODE;
 
 export const UNIFIED_INTENT_SCOPES = [
     "terminal_objective",
@@ -75,7 +78,7 @@ export type UnifiedForwardedOrder = {
 export type UnifiedIntentUpdateTelemetry = {
     tick: number;
     budgetMode: UnifiedIntentBudgetMode;
-    commandCeiling: number;
+    commandCeiling: number | null;
     totalCeiling: number;
     gameplayReserve: number;
     proposedCalls: number;
@@ -133,13 +136,22 @@ export type UnifiedIntentSeparatedLaneOptions = {
     rollingUpdates?: number;
     maxChunk?: number;
 };
+export type UnifiedIntentUnboundedD1Options = {
+    budgetMode: typeof UNIFIED_INTENT_UNBOUNDED_D1_MODE;
+    commandCeiling: null;
+    totalCeiling?: never;
+    gameplayReserve?: never;
+    rollingUpdates?: number;
+    maxChunk?: number;
+};
 export type UnifiedIntentArbiterOptions =
     | UnifiedIntentHardTotalOptions
-    | UnifiedIntentSeparatedLaneOptions;
+    | UnifiedIntentSeparatedLaneOptions
+    | UnifiedIntentUnboundedD1Options;
 
 type ResolvedUnifiedIntentArbiterOptions = {
     budgetMode: UnifiedIntentBudgetMode;
-    commandCeiling: number;
+    commandCeiling: number | null;
     totalCeiling: typeof UNIFIED_INTENT_TOTAL_CEILINGS[number];
     gameplayReserve: number;
     rollingUpdates: number;
@@ -237,6 +249,23 @@ const compareIntent = (left: UnifiedUnitIntent, right: UnifiedUnitIntent): numbe
     compareCanonical(left.signature, right.signature);
 
 const validateOptions = (options: UnifiedIntentArbiterOptions): ResolvedUnifiedIntentArbiterOptions => {
+    if (options.budgetMode === UNIFIED_INTENT_UNBOUNDED_D1_MODE) {
+        if (options.commandCeiling !== null || options.totalCeiling !== undefined ||
+            options.gameplayReserve !== undefined ||
+            (options.rollingUpdates ?? UNIFIED_INTENT_ROLLING_UPDATES) !== UNIFIED_INTENT_ROLLING_UPDATES ||
+            (options.maxChunk ?? UNIFIED_INTENT_MAX_CHUNK) !== UNIFIED_INTENT_MAX_CHUNK) {
+            throw new Error("Unified intent unbounded D1 options drifted");
+        }
+        return {
+            budgetMode: UNIFIED_INTENT_UNBOUNDED_D1_MODE,
+            commandCeiling: null,
+            // Same legacy fields as V2; neither constrains the essential lane.
+            totalCeiling: 150,
+            gameplayReserve: UNIFIED_INTENT_GAMEPLAY_RESERVE,
+            rollingUpdates: UNIFIED_INTENT_ROLLING_UPDATES,
+            maxChunk: UNIFIED_INTENT_MAX_CHUNK,
+        };
+    }
     if (options.budgetMode === UNIFIED_INTENT_SEPARATED_LANE_MODE) {
         const resolved = {
             budgetMode: UNIFIED_INTENT_SEPARATED_LANE_MODE,
@@ -641,17 +670,19 @@ export class UnifiedIntentArbiter {
     }
 
     private orderBudgetAvailable(): boolean {
+        if (this.options.budgetMode === UNIFIED_INTENT_UNBOUNDED_D1_MODE) return true;
         const rolling = this.rollingCounts();
         if (this.options.budgetMode === UNIFIED_INTENT_SEPARATED_LANE_MODE) {
-            return rolling.order + rolling.debug < this.options.commandCeiling;
+            return rolling.order + rolling.debug < this.options.commandCeiling!;
         }
         return rolling.total < this.options.totalCeiling &&
             rolling.order < this.options.totalCeiling - this.options.gameplayReserve;
     }
     private debugBudgetAvailable(): boolean {
+        if (this.options.budgetMode === UNIFIED_INTENT_UNBOUNDED_D1_MODE) return true;
         const rolling = this.rollingCounts();
         if (this.options.budgetMode === UNIFIED_INTENT_SEPARATED_LANE_MODE) {
-            return rolling.order + rolling.debug < this.options.commandCeiling;
+            return rolling.order + rolling.debug < this.options.commandCeiling!;
         }
         return rolling.total < this.options.totalCeiling &&
             rolling.order + rolling.debug <
@@ -678,8 +709,10 @@ export class UnifiedIntentArbiter {
         if (!this.currentTelemetry || !this.currentHistory) return;
         const rolling = this.rollingCounts();
         this.currentTelemetry.commandCeilingOverflow =
+            this.options.commandCeiling !== null &&
             rolling.order + rolling.debug > this.options.commandCeiling;
-        if (this.options.budgetMode === UNIFIED_INTENT_SEPARATED_LANE_MODE) {
+        if (this.options.budgetMode === UNIFIED_INTENT_SEPARATED_LANE_MODE ||
+            this.options.budgetMode === UNIFIED_INTENT_UNBOUNDED_D1_MODE) {
             this.currentTelemetry.gameplayReserveOverflow = false;
             this.currentTelemetry.totalCeilingOverflow = false;
             return;

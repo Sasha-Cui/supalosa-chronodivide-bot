@@ -24,14 +24,16 @@ import {
     UnifiedIntentUpdateTelemetry,
     UNIFIED_INTENT_SEPARATED_COMMAND_CEILING,
     UNIFIED_INTENT_SEPARATED_LANE_MODE,
+    UNIFIED_INTENT_UNBOUNDED_D1_MODE,
     UNIFIED_INTENT_TOTAL_CEILINGS,
 } from "./logic/intent/unifiedIntentArbiter.js";
 
 export type StrongBotIntentArbiterOptions = {
     enabled?: boolean;
-    budgetMode?: "hard_total_v1" | typeof UNIFIED_INTENT_SEPARATED_LANE_MODE;
+    budgetMode?: "hard_total_v1" | typeof UNIFIED_INTENT_SEPARATED_LANE_MODE |
+        typeof UNIFIED_INTENT_UNBOUNDED_D1_MODE;
     totalCeiling?: typeof UNIFIED_INTENT_TOTAL_CEILINGS[number];
-    commandCeiling?: typeof UNIFIED_INTENT_SEPARATED_COMMAND_CEILING;
+    commandCeiling?: typeof UNIFIED_INTENT_SEPARATED_COMMAND_CEILING | null;
     telemetrySink?: (telemetry: UnifiedIntentUpdateTelemetry) => void;
 };
 
@@ -1410,7 +1412,12 @@ export class StrongBot extends SupalosaBot {
         this.forceAttackOptions = { ...DEFAULT_FORCE_ATTACK_OPTIONS, ...definedOptions(options.forceAttack) };
         this.intentArbiterOptions = { enabled: false, ...options.intentArbiter };
         if (this.intentArbiterOptions.enabled === true) {
-            if (this.intentArbiterOptions.budgetMode === UNIFIED_INTENT_SEPARATED_LANE_MODE) {
+            if (this.intentArbiterOptions.budgetMode === UNIFIED_INTENT_UNBOUNDED_D1_MODE) {
+                if (this.intentArbiterOptions.commandCeiling !== null ||
+                    this.intentArbiterOptions.totalCeiling !== undefined) {
+                    throw new Error("Unbounded D1 intent arbiter requires an explicit null ceiling");
+                }
+            } else if (this.intentArbiterOptions.budgetMode === UNIFIED_INTENT_SEPARATED_LANE_MODE) {
                 if (
                     this.intentArbiterOptions.totalCeiling !== undefined ||
                     (this.intentArbiterOptions.commandCeiling !== undefined &&
@@ -1538,7 +1545,13 @@ export class StrongBot extends SupalosaBot {
                 this.player.actions,
                 game,
                 this.name,
-                this.intentArbiterOptions.budgetMode === UNIFIED_INTENT_SEPARATED_LANE_MODE
+                this.intentArbiterOptions.budgetMode === UNIFIED_INTENT_UNBOUNDED_D1_MODE
+                    ? {
+                        budgetMode: UNIFIED_INTENT_UNBOUNDED_D1_MODE,
+                        commandCeiling: null,
+                        telemetrySink: this.intentArbiterOptions.telemetrySink,
+                    }
+                    : this.intentArbiterOptions.budgetMode === UNIFIED_INTENT_SEPARATED_LANE_MODE
                     ? {
                         budgetMode: UNIFIED_INTENT_SEPARATED_LANE_MODE,
                         commandCeiling: this.intentArbiterOptions.commandCeiling ??
