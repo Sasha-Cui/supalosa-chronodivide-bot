@@ -1,0 +1,111 @@
+{
+  "complete": true,
+  "passed": true,
+  "independentImplementation": true,
+  "sourceCommit": "5d466599937d966b6dcc80fa2f4c9add7da767fd",
+  "aggregateSha256": "809956a766dff0f4f6b80d27ac9fffd3dc45f3acd498c96264c129ecb0c398f0",
+  "manifestSha256": "a595d73b1e06c01e4212add30d19083d6260836cf30b2a2d90fd37762ab99b67",
+  "arrayJobId": "27061644",
+  "finalizerJobId": "27061645",
+  "auditJobId": "27089677",
+  "counts": {
+    "pairs": 900,
+    "episodes": 1800,
+    "ledgers": 1800,
+    "ledgerRecords": 4423193,
+    "ledgerPlainBytes": 13360099212,
+    "ledgerGzipBytes": 163590626,
+    "maxPairBytes": 560700,
+    "executionFiles": 1816,
+    "sourceFiles": 29,
+    "assets": 335,
+    "maps": 15
+  },
+  "exactSchedulerAndLaunchReconciliation": true,
+  "independentV5V6EventReplay": true,
+  "allSummaryTablesRecomputed": true,
+  "allBootstrapDigestsMatched": true,
+  "allFrozenGatesMatched": true,
+  "bounds": {
+    "overall": {
+      "stream": "v6/benchmark/overall",
+      "clusters": 25,
+      "replicates": 200000,
+      "scoreLower90": -0.08833333333333333,
+      "literalWinLower90": -0.13444444444444445,
+      "digestsMatch": true
+    },
+    "supalosa": {
+      "stream": "v6/benchmark/supalosa",
+      "clusters": 15,
+      "replicates": 200000,
+      "scoreLower90": -0.08981481481481482,
+      "literalWinLower90": -0.1537037037037037,
+      "digestsMatch": true
+    },
+    "advanced": {
+      "stream": "v6/benchmark/advanced",
+      "clusters": 10,
+      "replicates": 200000,
+      "scoreLower90": -0.10972222222222222,
+      "literalWinLower90": -0.1388888888888889,
+      "digestsMatch": true
+    },
+    "topology": {
+      "stream": "v6/topology/overall",
+      "clusters": 5,
+      "replicates": 200000,
+      "scoreLower90": -0.07575757575757576,
+      "literalWinLower90": -0.11805555555555555,
+      "digestsMatch": true
+    },
+    "supalosaCountryDirection": {
+      "stream": "v6/country-direction/supalosa",
+      "clusters": 18,
+      "replicates": 200000,
+      "scoreLower90": -0.08518518518518518,
+      "literalWinLower90": -0.13703703703703704,
+      "digestsMatch": true
+    },
+    "advancedCountryDirection": {
+      "stream": "v6/country-direction/advanced",
+      "clusters": 18,
+      "replicates": 200000,
+      "scoreLower90": -0.09166666666666666,
+      "literalWinLower90": -0.1111111111111111,
+      "digestsMatch": true
+    }
+  },
+  "decision": {
+    "checks": {
+      "overallPairedScore": false,
+      "overallPairedLiteralWin": false,
+      "advancedPairedScore": false,
+      "advancedMoreLiteralWins": false,
+      "advancedCountryDirectionScore": false,
+      "supalosaNoninferiority": false,
+      "supalosaPositiveRecord": false,
+      "supalosaMapSafety": false,
+      "alliedNonnegative": false,
+      "sovietNonnegative": false,
+      "slot0Nonnegative": false,
+      "slot1Nonnegative": false,
+      "catastrophicTransitionSafety": true
+    },
+    "broadPositiveDevelopmentSignal": false,
+    "absoluteAdvanced": {
+      "positiveRecord": true,
+      "pooledWilsonWinAboveHalf": false
+    },
+    "absoluteAdvancedDevelopmentEligible": false,
+    "confirmation": false,
+    "deploymentAuthorized": false
+  },
+  "actionsArtifact": {
+    "sha256": "0e03ed206f1868a58d45fee5a08225d475ef547e82d5a9c9844860c5d228f03b",
+    "bytes": 1481899
+  },
+  "orderedRecordDigest": "fdf798d2259d4b3bb23f9751111523fc84316fcc8edec111378f1f5614b4e0b5",
+  "schedulerCpuHours": 307.0861111111111,
+  "limitations": "Audit reconstructs observers from retained public building/event evidence, not from rerunning the game engine. Action hashes are checksum-bound; raw public actions were not retained."
+}

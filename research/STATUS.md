@@ -1,10 +1,12 @@
 # Research status
 
-Last reconciled: **2026-09-17**
+Last reconciled: **2026-09-22**
 
 ## Bottom line
 
 The empirical program is active and the current manuscript is stale. The
+new full OD1 A1 comparison and independent audit rejected V2 arbitration;
+unchanged StrongBot remains the reference policy. The
 corrected fresh dual-endpoint execution confirms strong HFO LE performance
 against pinned Supalosa, but the frozen Peak candidate is exactly equivalent
 to its deployed control and deployed StrongBot remains substantially behind
@@ -15,11 +17,14 @@ complete.
 
 ## Established evidence
 
+Historical studies below have different populations. Compare policies only
+within the paired rows; higher score is better, and ties are bolded for both.
+
 | Study | Games | StrongBot or candidate W/D/L | Comparator | Decision |
 | --- | ---: | ---: | --- | --- |
 | Fresh HFO LE central | 720 | 642/32/46 | pinned Supalosa | superiority and dominance gates pass |
-| Fresh Peak comparison | 180 paired cases per policy | 141/12/27 | deployed control 141/12/27 | no improvement; all 180 pairs identical |
-| Fresh Advanced cross-play | 360 paired cases per policy | 74/20/266 | Supalosa 188/22/150 vs same opponent | failed absolute and paired gates |
+| Fresh Peak comparison | 180 paired cases per policy | **141/12/27** | deployed control **141/12/27** | no improvement; all 180 pairs identical |
+| Fresh Advanced cross-play | 360 paired cases per policy | 74/20/266 | Supalosa **188/22/150** vs same opponent | failed absolute and paired gates |
 | Fresh 13-map transfer screen | 900 | complete per-map table | pinned Supalosa | descriptive only; 10/13 maps have W>L |
 
 These are finalizer results from execution V2. An independent implementation
@@ -45,30 +50,49 @@ essential calls reconciled, and no competitive outcomes were retained.
 See `research/results/2026-09-17-unified-intent-v2-gate2-complete.md`.
 
 The hard-total V1 method remains rejected and its failed M2 outcomes remain
-sealed. The fresh V2 OD1 outcome protocol is frozen but has not run. It uses
-the corrected v6 primary endpoint, explicit benchmark/topology distinctions,
-and fresh disabled-versus-V2 pairs. Expanded pure gate `26505962`
-passed all 223 checks, but selector `26516850` failed publication after its
-905 zero-update callbacks because filesystem registration metadata used a
-prohibited game-inventory keyword. V1 is preserved and is not a passed gate;
-no gameplay advanced. See
-`research/results/2026-09-17-v2-od1-selector-publication-failure.md`.
+sealed. OD1 A1 now completed all 900 pairs / 1,800 games under source
+`5d466599937d966b6dcc80fa2f4c9add7da767fd`. Array `27061644`,
+finalizer `27061645`, and independent offline audit `27089677` passed
+technical integrity. The audit reconstructed both endpoints from every
+ledger, all tables and every 200,000-replicate bootstrap/gate digest.
 
-Amendment A1 was frozen at `249bdd7` before its repair or initialization.
-It changes only metadata naming/early validation and uses a complete fresh,
-disjoint selector population with the same policies and scientific gates.
-See `research/notes/2026-09-17-v2-od1-a1-implementation.md`.
-The new 230-check current-source gate and all simulation preflights remain
-mandatory. No policy improvement is claimed and M2 is not complete.
+The **scientific result is negative**. Across 900 games per policy, unchanged
+StrongBot recorded 308W/404D/188L, versus V2's 216W/471D/213L. Paired score fell
+by 0.065 overall, 0.062037 against Supalosa, and 0.069444 against Advanced.
+V2 is rejected for deployment. Both faction and slot effects were negative;
+20/25 opponent-map strata had negative point score differences. Do not
+compare this 24,000-update first-two-start population directly with historical
+90,000-update confirmation.
+
+Full audited result:
+[table-first report](https://ood-bouchet.ycrc.yale.edu/pun/sys/dashboard/files/fs//nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/research/results/2026-09-22-v2-od1-a1/REPORT.md)
+and
+[visual report](https://ood-bouchet.ycrc.yale.edu/pun/sys/dashboard/files/fs//nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/research/results/2026-09-22-v2-od1-a1/VISUAL_REPORT.md).
+
+The failed selector `26516850` and its 905 zero-update attempts remain
+preserved. A1's 905 successful initializations and 1,818 advancing episodes
+(16 canary, two smoke, 1,800 comparison) are separately accounted. The 14
+approved housekeeping path edits have been reapplied and checksum-verified
+after all jobs and independent audits finished; no edits or evidence were lost.
+
+Next is the bounded prospective command-budget diagnostic D1 at
+`research/protocols/method/2026-09-22-command-budget-diagnostic-d1.md`.
+It compares disabled, unchanged failed V2, and the same arbitration with
+budget admission removed. D1 is not implemented or run yet. Its 200 fresh
+case blocks cover all 25 strata but only the first canonical Allied/Soviet
+countries; any positive signal still needs fresh nine-country validation.
+Cap saturation in 837/900 V2 games motivates the hypothesis but does not
+establish causation. No ceiling search, deployment, or paper writing is
+authorized by the negative OD1 result.
 
 ## Milestone ledger
 
 - **M0 — Correct endpoint evidence — complete 2026-09-05:** V2, independent
   recomputation, action audit, provenance/observation errata, immutable result,
   and Ledger V2 all pass.
-- **M1 — Technical readiness — V2 gate passed, OD1 integration pending:** full
-  action-burst diagnostic, separated-lane arbiter, terminal tests, and
-  observation firewall; corrected-observer integration remains a prelaunch gate.
+- **M1 — Technical readiness — OD1 validated 2026-09-22:** full
+  paired execution and independent endpoint/statistical audit passed;
+  each new intervention still needs its own technical gates.
 - **M2 — Development champion frozen — not achieved:** repeatable positive open-development
   evidence across 15 physical maps/five topology families and all ten HFO
   variants against Advanced.
@@ -87,7 +111,7 @@ These are internal targets, not permission to weaken a gate:
 | Milestone | Target | Exit decision |
 | --- | --- | --- |
 | M0 endpoint/audit closure | completed 2026-09-05 | corrected evidence independently reproduced and passed |
-| M1 technical method readiness | target 2026-09-16; V2 gate passed 2026-09-17 | 925 full-horizon V2 tasks and 25 duplicates passed; corrected outcome-observer integration checks remain |
+| M1 technical method readiness | OD1 validated 2026-09-22 | technical readiness passed; V2 failed the scientific development gates |
 | M2 development champion | 2026-10-10 | one frozen policy is positive across all 15 maps against Supalosa and all ten HFO variants against Advanced |
 | M3 Supalosa reliability | 2026-10-20 | the single-use 10,080-game all-map confirmation passes every map and stratum gate |
 | M4 opponent/topology breadth | 2026-11-03 | Advanced, Standard, Sea/Land, and development-unused transfer evaluations pass the claimed scope |
@@ -110,7 +134,8 @@ Currently supported:
 - reliable superiority and dominance over pinned Supalosa on the fresh
   balanced HFO LE population;
 - exact equivalence of the frozen Peak candidate and deployed control; and
-- an explicit negative fresh Advanced cross-play result.
+- an explicit negative fresh Advanced cross-play result; and
+- audited rejection of V2 arbitration on the complete OD1 A1 development population.
 
 Not currently supported:
 

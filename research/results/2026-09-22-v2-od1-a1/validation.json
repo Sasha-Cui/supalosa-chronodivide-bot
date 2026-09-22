@@ -1,0 +1,12 @@
+{
+  "complete": true,
+  "passed": true,
+  "checkedFiles": 13,
+  "oodLinksExist": true,
+  "figureFollowedByTable": true,
+  "noImageReportClean": true,
+  "imageNonblank": true,
+  "darkPixels": 30830,
+  "coloredPixels": 301678,
+  "contrastAndGeometryPassed": true
+}

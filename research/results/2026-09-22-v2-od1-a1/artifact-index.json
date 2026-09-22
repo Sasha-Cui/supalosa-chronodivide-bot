@@ -1,0 +1,71 @@
+{
+  "inputAggregateSha256": "809956a766dff0f4f6b80d27ac9fffd3dc45f3acd498c96264c129ecb0c398f0",
+  "inputAuditSha256": "7ea6954787f20e430f2fcb327b65dac892ee01935ca25ae74964ba800c876fd4",
+  "files": [
+    {
+      "file": "visual_tables/populations_full_audit.csv",
+      "bytes": 698,
+      "sha256": "1bed1c254e62cb2b34aba25bf0be80a06a176244a8b5db9d6e94c5e4a2c49479"
+    },
+    {
+      "file": "visual_tables/strata_full_audit.csv",
+      "bytes": 7808,
+      "sha256": "6095809dc2a609be892dac502e2adfe399146132e8fd5e5a1a602ea1d1de80bc"
+    },
+    {
+      "file": "visual_tables/pairs_full_audit.csv",
+      "bytes": 507532,
+      "sha256": "a5c5a93402739b5eea90568256423108caa5908562ef6ed7ddf8085fdd12d70d"
+    },
+    {
+      "file": "visual_tables/scheduler_full_audit.csv",
+      "bytes": 68783,
+      "sha256": "60f8aef76c7db8efc28d78dbb18df45168cb92ec9f5e7f71e4c793482422b969"
+    },
+    {
+      "file": "visual_tables/uncertainty_full_audit.csv",
+      "bytes": 2086,
+      "sha256": "13cd15ccd02ba2a2e4ee2e4edbd238c720fa575120bbca42ce781ac2c7a985ac"
+    },
+    {
+      "file": "visual_tables/actions_descriptive_full_audit.csv",
+      "bytes": 801,
+      "sha256": "629492c00b0bb92b44a4151de2f40b628decb89afea58953a0409b6da5cdd58e"
+    },
+    {
+      "file": "visual_tables/gates_full_audit.csv",
+      "bytes": 423,
+      "sha256": "ae3fd49bca9779d1ad78aa4266102b287936bb8460f91b294b3aac6c534a71f3"
+    },
+    {
+      "file": "data/analysis.json",
+      "bytes": 925271,
+      "sha256": "64c09d7933fbe0742b69c27cd3bf593fb9d2412cff2a9cf5e6dbbdafbb23f332"
+    },
+    {
+      "file": "data/independent-audit.json",
+      "bytes": 3627,
+      "sha256": "7ea6954787f20e430f2fcb327b65dac892ee01935ca25ae74964ba800c876fd4"
+    },
+    {
+      "file": "visual_figures/map-score-difference.png",
+      "bytes": 145632,
+      "sha256": "442113d4298c001add58ed6364e24fdb0eb3744865f14075b1dc207603cfbc78"
+    },
+    {
+      "file": "VISUAL_REPORT.md",
+      "bytes": 13892,
+      "sha256": "e5c452c6fdd30fc0ffb38e9cd6a950ad51064295d5a8951b416506b237052997"
+    },
+    {
+      "file": "REPORT.md",
+      "bytes": 13921,
+      "sha256": "20f004d8302ddd23e80fbe0ee20d365eaf2eb6c5ae009a6c49dbf646a740e844"
+    },
+    {
+      "file": "figure-qa.json",
+      "bytes": 7331,
+      "sha256": "a0e480d8fdb4061316db0fc509caada26adf0a157e6157e774c24b72ce972730"
+    }
+  ]
+}

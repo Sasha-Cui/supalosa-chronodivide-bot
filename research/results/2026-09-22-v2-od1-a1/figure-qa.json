@@ -1,0 +1,374 @@
+{
+  "dimensions": {
+    "width": 1100,
+    "height": 720
+  },
+  "labels": [
+    {
+      "text": "V2 arbitration: paired score change across every tested map",
+      "left": 32,
+      "top": 14,
+      "width": 893.0263671875,
+      "height": 26
+    },
+    {
+      "text": "Enabled minus unchanged StrongBot; percentage points; higher is better",
+      "left": 32,
+      "top": 54,
+      "width": 660.55078125,
+      "height": 18
+    },
+    {
+      "text": "Pinned Supalosa",
+      "left": 456.357421875,
+      "top": 95,
+      "width": 187.28515625,
+      "height": 20
+    },
+    {
+      "text": "RA2Web Advanced",
+      "left": 774.35546875,
+      "top": 95,
+      "width": 211.2890625,
+      "height": 20
+    },
+    {
+      "text": "hfo-le",
+      "left": 32,
+      "top": 134,
+      "width": 51.662109375,
+      "height": 18
+    },
+    {
+      "text": "-6.94 pp",
+      "left": 508.041015625,
+      "top": 133,
+      "width": 83.91796875,
+      "height": 18
+    },
+    {
+      "text": "+2.78 pp",
+      "left": 834.2353515625,
+      "top": 133,
+      "width": 91.529296875,
+      "height": 18
+    },
+    {
+      "text": "peak",
+      "left": 32,
+      "top": 167,
+      "width": 43.9541015625,
+      "height": 18
+    },
+    {
+      "text": "-5.56 pp",
+      "left": 508.041015625,
+      "top": 166,
+      "width": 83.91796875,
+      "height": 18
+    },
+    {
+      "text": "Not tested",
+      "left": 826.2373046875,
+      "top": 166,
+      "width": 107.525390625,
+      "height": 18
+    },
+    {
+      "text": "hfo-original",
+      "left": 32,
+      "top": 200,
+      "width": 103.201171875,
+      "height": 18
+    },
+    {
+      "text": "-4.17 pp",
+      "left": 508.041015625,
+      "top": 199,
+      "width": 83.91796875,
+      "height": 18
+    },
+    {
+      "text": "-12.50 pp",
+      "left": 831.77880859375,
+      "top": 199,
+      "width": 96.4423828125,
+      "height": 18
+    },
+    {
+      "text": "hfo-golden",
+      "left": 32,
+      "top": 233,
+      "width": 96.9345703125,
+      "height": 18
+    },
+    {
+      "text": "-12.50 pp",
+      "left": 501.77880859375,
+      "top": 232,
+      "width": 96.4423828125,
+      "height": 18
+    },
+    {
+      "text": "-18.06 pp",
+      "left": 831.77880859375,
+      "top": 232,
+      "width": 96.4423828125,
+      "height": 18
+    },
+    {
+      "text": "hfo-corners",
+      "left": 32,
+      "top": 266,
+      "width": 102.8408203125,
+      "height": 18
+    },
+    {
+      "text": "-12.50 pp",
+      "left": 501.77880859375,
+      "top": 265,
+      "width": 96.4423828125,
+      "height": 18
+    },
+    {
+      "text": "-11.11 pp",
+      "left": 831.77880859375,
+      "top": 265,
+      "width": 96.4423828125,
+      "height": 18
+    },
+    {
+      "text": "hfo-corners-b",
+      "left": 32,
+      "top": 299,
+      "width": 120.76171875,
+      "height": 18
+    },
+    {
+      "text": "-4.17 pp",
+      "left": 508.041015625,
+      "top": 298,
+      "width": 83.91796875,
+      "height": 18
+    },
+    {
+      "text": "+9.72 pp",
+      "left": 834.2353515625,
+      "top": 298,
+      "width": 91.529296875,
+      "height": 18
+    },
+    {
+      "text": "hfo-corners-b-golden",
+      "left": 32,
+      "top": 332,
+      "width": 188.6044921875,
+      "height": 18
+    },
+    {
+      "text": "-20.83 pp",
+      "left": 501.77880859375,
+      "top": 331,
+      "width": 96.4423828125,
+      "height": 18
+    },
+    {
+      "text": "-8.33 pp",
+      "left": 838.041015625,
+      "top": 331,
+      "width": 83.91796875,
+      "height": 18
+    },
+    {
+      "text": "hfo-bvb",
+      "left": 32,
+      "top": 365,
+      "width": 69.0908203125,
+      "height": 18
+    },
+    {
+      "text": "-4.17 pp",
+      "left": 508.041015625,
+      "top": 364,
+      "width": 83.91796875,
+      "height": 18
+    },
+    {
+      "text": "-23.61 pp",
+      "left": 831.77880859375,
+      "top": 364,
+      "width": 96.4423828125,
+      "height": 18
+    },
+    {
+      "text": "hfo-lvl",
+      "left": 32,
+      "top": 398,
+      "width": 56.2412109375,
+      "height": 18
+    },
+    {
+      "text": "-19.44 pp",
+      "left": 501.77880859375,
+      "top": 397,
+      "width": 96.4423828125,
+      "height": 18
+    },
+    {
+      "text": "+4.17 pp",
+      "left": 834.2353515625,
+      "top": 397,
+      "width": 91.529296875,
+      "height": 18
+    },
+    {
+      "text": "hfo-rvr",
+      "left": 32,
+      "top": 431,
+      "width": 61.0400390625,
+      "height": 18
+    },
+    {
+      "text": "-9.72 pp",
+      "left": 508.041015625,
+      "top": 430,
+      "width": 83.91796875,
+      "height": 18
+    },
+    {
+      "text": "-1.39 pp",
+      "left": 838.041015625,
+      "top": 430,
+      "width": 83.91796875,
+      "height": 18
+    },
+    {
+      "text": "hfo-tvt",
+      "left": 32,
+      "top": 464,
+      "width": 60.3544921875,
+      "height": 18
+    },
+    {
+      "text": "+6.94 pp",
+      "left": 504.2353515625,
+      "top": 463,
+      "width": 91.529296875,
+      "height": 18
+    },
+    {
+      "text": "-11.11 pp",
+      "left": 831.77880859375,
+      "top": 463,
+      "width": 96.4423828125,
+      "height": 18
+    },
+    {
+      "text": "tour-of-egypt",
+      "left": 32,
+      "top": 497,
+      "width": 117.052734375,
+      "height": 18
+    },
+    {
+      "text": "+13.89 pp",
+      "left": 497.97314453125,
+      "top": 496,
+      "width": 104.0537109375,
+      "height": 18
+    },
+    {
+      "text": "Not tested",
+      "left": 826.2373046875,
+      "top": 496,
+      "width": 107.525390625,
+      "height": 18
+    },
+    {
+      "text": "south-pacific",
+      "left": 32,
+      "top": 530,
+      "width": 115.34765625,
+      "height": 18
+    },
+    {
+      "text": "-1.39 pp",
+      "left": 508.041015625,
+      "top": 529,
+      "width": 83.91796875,
+      "height": 18
+    },
+    {
+      "text": "Not tested",
+      "left": 826.2373046875,
+      "top": 529,
+      "width": 107.525390625,
+      "height": 18
+    },
+    {
+      "text": "south-pacific-2",
+      "left": 32,
+      "top": 563,
+      "width": 133.294921875,
+      "height": 18
+    },
+    {
+      "text": "-5.56 pp",
+      "left": 508.041015625,
+      "top": 562,
+      "width": 83.91796875,
+      "height": 18
+    },
+    {
+      "text": "Not tested",
+      "left": 826.2373046875,
+      "top": 562,
+      "width": 107.525390625,
+      "height": 18
+    },
+    {
+      "text": "pacific-heights",
+      "left": 32,
+      "top": 596,
+      "width": 131.8359375,
+      "height": 18
+    },
+    {
+      "text": "-6.94 pp",
+      "left": 508.041015625,
+      "top": 595,
+      "width": 83.91796875,
+      "height": 18
+    },
+    {
+      "text": "Not tested",
+      "left": 826.2373046875,
+      "top": 595,
+      "width": 107.525390625,
+      "height": 18
+    },
+    {
+      "text": "36 paired cases per tested cell. Point differences only; not per-map confidence intervals.",
+      "left": 32,
+      "top": 641,
+      "width": 754.1015625,
+      "height": 17
+    },
+    {
+      "text": "15 physical maps / 5 topology groups. Advanced covers HFO variants only.",
+      "left": 32,
+      "top": 671,
+      "width": 635.6533203125,
+      "height": 17
+    }
+  ],
+  "contrastRatios": {
+    "#ffffff": 17.73971700407407,
+    "#fee2e2": 14.521990846538632,
+    "#dcfce7": 16.152599053671153,
+    "#f3f4f6": 16.119468339438853
+  },
+  "contrastMinimum": 4.5,
+  "noClippedLabels": true,
+  "noOverlappingLabels": true
+}
