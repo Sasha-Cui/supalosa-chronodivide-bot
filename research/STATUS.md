@@ -79,12 +79,13 @@ Next is the bounded prospective command-budget diagnostic D1 at
 `research/protocols/method/2026-09-22-command-budget-diagnostic-d1.md`.
 It compares disabled, unchanged failed V2, and the same arbitration with
 budget admission removed. The research-only mode, exact case definitions,
-telemetry collector and episode adapter are now implemented; 282 development
-build/regression checks passed, including pre-change golden traces and synthetic
-seed isolation. The execution harness and D1 three-contrast analysis still need
-implementation and a complete current-source launch gate. **No D1 initializer,
-game simulation or Slurm stage has run.** See
-[`2026-09-22-d1-implementation-checkpoint.md`](notes/2026-09-22-d1-implementation-checkpoint.md).
+telemetry collector, episode adapter, execution harness and three-contrast
+analysis are now implemented. The 282 foundation checks and 19 new D1
+runtime/analysis checks passed in development. A complete current-source
+301-check Slurm pure gate is the next prerequisite, followed by selector,
+canary and smoke verification. **No D1 game has been initialized or advanced
+at this implementation freeze.** See
+[`2026-09-22-d1-execution-implementation.md`](notes/2026-09-22-d1-execution-implementation.md).
 Its 200 fresh case blocks cover all 25 strata but only the first canonical
 Allied/Soviet countries; any positive signal still needs fresh nine-country validation.
 Cap saturation in 837/900 V2 games motivates the hypothesis but does not
