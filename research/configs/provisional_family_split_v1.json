@@ -4,8 +4,8 @@
   "purpose": "COMPROMISED_CAPACITY_DRY_RUN_ONLY",
   "finalReuseProhibited": true,
   "capacityDryRunSeedCommitmentSha256": "8ef9b34beaf2fb7186981a6581eebf5d6f2d4429c6bb17c489c71f90361ae50f",
-  "capacityDryRunSeedFile": "/nfs/roberts/scratch/pi_jss233/zc362/chrono-divide-paper-audit/private/provisional_compromised_capacity_v1.seed",
-  "capacityDryRunAssignmentOutput": "/nfs/roberts/scratch/pi_jss233/zc362/chrono-divide-paper-audit/private/provisional_compromised_capacity_dry_run_v1.private.json",
+  "capacityDryRunSeedFile": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide/paper_audit/private/provisional_compromised_capacity_v1.seed",
+  "capacityDryRunAssignmentOutput": "/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide/paper_audit/private/provisional_compromised_capacity_dry_run_v1.private.json",
   "roleBlindFidelityTargetOutput": "research/artifacts/role_blind_fidelity_targets_v1.json",
   "targetCounts": {
     "dry_run_train_candidate": 16,

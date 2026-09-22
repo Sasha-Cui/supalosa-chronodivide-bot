@@ -6,8 +6,8 @@
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=6G
 #SBATCH --no-requeue
-#SBATCH --output=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/slurm/research-component-%A_%a.out
-#SBATCH --error=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/slurm/research-component-%A_%a.err
+#SBATCH --output=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide/paper_audit/slurm/research-component-%A_%a.out
+#SBATCH --error=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide/paper_audit/slurm/research-component-%A_%a.err
 
 set -euo pipefail
 umask 077

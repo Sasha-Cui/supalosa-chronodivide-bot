@@ -14,7 +14,7 @@ fi
 
 REPO=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot
 BASELINE=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/supalosa-chronodivide-bot
-SCRATCH=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit
+SCRATCH=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide/paper_audit
 cd "$REPO"
 
 if [[ "$(readlink -f "$BASELINE/node_modules/@chronodivide/game-api")" != "$(readlink -f "$REPO/node_modules/@chronodivide/game-api")" ]]; then

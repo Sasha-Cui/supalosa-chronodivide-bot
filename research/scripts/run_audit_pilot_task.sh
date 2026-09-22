@@ -16,7 +16,7 @@ module load nodejs/20.13.1-GCCcore-13.3.0
 
 REPO=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot
 BASELINE=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/supalosa-chronodivide-bot
-SCRATCH=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit
+SCRATCH=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide/paper_audit
 CONFIG=$REPO/research/configs/audit_pilot_v1.tsv
 cd "$REPO"
 

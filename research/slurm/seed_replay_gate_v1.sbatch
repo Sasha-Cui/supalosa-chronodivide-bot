@@ -5,8 +5,8 @@
 #SBATCH --time=00:30:00
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=4G
-#SBATCH --output=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/slurm/seed-replay-gate-v1-%j.out
-#SBATCH --error=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit/slurm/seed-replay-gate-v1-%j.err
+#SBATCH --output=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide/paper_audit/slurm/seed-replay-gate-v1-%j.out
+#SBATCH --error=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide/paper_audit/slurm/seed-replay-gate-v1-%j.err
 
 set -euo pipefail
 NODE_RUNTIME_ROOT=/apps/software/2024a/software/nodejs/20.13.1-GCCcore-13.3.0
@@ -19,7 +19,7 @@ node --version
 npm --version
 
 REPO=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot
-SCRATCH=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit
+SCRATCH=/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide/paper_audit
 SCONTROL=/opt/slurm/current/bin/scontrol
 JOB_LINE=$($SCONTROL show job -o "$SLURM_JOB_ID")
 if [[ "$JOB_LINE" =~ (^|[[:space:]])Account=([^[:space:]]+) ]]; then

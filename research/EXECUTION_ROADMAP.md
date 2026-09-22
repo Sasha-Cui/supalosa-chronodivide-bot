@@ -7,7 +7,7 @@ candidate checkout. Historical result trees, Slurm logs, checkpoint directories,
 dirty HFO snapshots, and the clean upstream source checkout remain untouched.
 New generated outputs go to the append-only scratch root:
 
-`/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide-paper-audit`
+`/nfs/roberts/scratch/pi_jss233/zc362/chrono_divide/paper_audit`
 
 The research harness refuses to overwrite a run ID and writes a manifest,
 JSONL event stream, structured failure record, and summary per run.
