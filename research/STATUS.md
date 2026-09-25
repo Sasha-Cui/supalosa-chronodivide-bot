@@ -107,6 +107,13 @@ coordination and mission completion; select one supported policy improvement
 at a time. Retained endpoint ledgers do not contain all required strategic
 telemetry. Keep unchanged StrongBot as the reference and preserve the manuscript.
 
+The prospective [S1 protocol](protocols/method/2026-09-25-strategic-diagnostic-s1.md)
+is now frozen before implementation: 200 fresh single-policy diagnostic cases,
+205 zero-update definitions, eight canary episodes and one smoke (209 advancing
+episodes total). This is observability work, not a stronger-bot claim.
+S1 instrumentation/harness implementation and every technical gate remain
+pending; no S1 initializer or game has run.
+
 ## Milestone ledger
 
 - **M0 — Correct endpoint evidence — complete 2026-09-05:** V2, independent
