@@ -1,0 +1,1568 @@
+{
+  "disabled": [
+    {
+      "stratumId": "pinned_supalosa__hfo-bvb",
+      "cases": 8,
+      "transitions": {
+        "W->W": 4,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "tick_cap_draw->tick_cap_draw": 2,
+        "candidate_win->candidate_win": 4,
+        "baseline_win->baseline_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-corners",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "tick_cap_draw->tick_cap_draw": 2,
+        "candidate_win->candidate_win": 3
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-corners-b",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 3,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "tick_cap_draw->tick_cap_draw": 3,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-corners-b-golden",
+      "cases": 8,
+      "transitions": {
+        "W->W": 4,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 1,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "candidate_win->candidate_win": 4,
+        "tick_cap_draw->tick_cap_draw": 1
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-golden",
+      "cases": 8,
+      "transitions": {
+        "W->W": 4,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "candidate_win->candidate_win": 4,
+        "tick_cap_draw->tick_cap_draw": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-le",
+      "cases": 8,
+      "transitions": {
+        "W->W": 4,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 2,
+        "candidate_win->candidate_win": 4
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-lvl",
+      "cases": 8,
+      "transitions": {
+        "W->W": 4,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 1,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "candidate_win->candidate_win": 4,
+        "tick_cap_draw->tick_cap_draw": 1
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-original",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "tick_cap_draw->tick_cap_draw": 2,
+        "candidate_win->candidate_win": 3
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-rvr",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 4,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 1
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 1,
+        "candidate_win->candidate_win": 3,
+        "tick_cap_draw->tick_cap_draw": 4
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-tvt",
+      "cases": 8,
+      "transitions": {
+        "W->W": 4,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 4,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 0
+      },
+      "statusTransitions": {
+        "tick_cap_draw->tick_cap_draw": 4,
+        "candidate_win->candidate_win": 4
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__pacific-heights",
+      "cases": 8,
+      "transitions": {
+        "W->W": 6,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 0
+      },
+      "statusTransitions": {
+        "candidate_win->candidate_win": 6,
+        "tick_cap_draw->tick_cap_draw": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__peak",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 5,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 0
+      },
+      "statusTransitions": {
+        "tick_cap_draw->tick_cap_draw": 5,
+        "candidate_win->candidate_win": 3
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__south-pacific",
+      "cases": 8,
+      "transitions": {
+        "W->W": 0,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 6,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "engine_nonliteral_termination_draw->engine_nonliteral_termination_draw": 2,
+        "tick_cap_draw->tick_cap_draw": 4,
+        "baseline_win->baseline_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__south-pacific-2",
+      "cases": 8,
+      "transitions": {
+        "W->W": 0,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 1,
+        "D->D": 5,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 4,
+        "engine_nonliteral_termination_draw->candidate_win": 1,
+        "engine_nonliteral_termination_draw->engine_nonliteral_termination_draw": 1
+      },
+      "changedFirstTick": 1
+    },
+    {
+      "stratumId": "pinned_supalosa__tour-of-egypt",
+      "cases": 8,
+      "transitions": {
+        "W->W": 1,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 1,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 6
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 6,
+        "candidate_win->candidate_win": 1,
+        "tick_cap_draw->tick_cap_draw": 1
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-bvb",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 4,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 1
+      },
+      "statusTransitions": {
+        "candidate_win->candidate_win": 3,
+        "baseline_win->baseline_win": 1,
+        "tick_cap_draw->tick_cap_draw": 4
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-corners",
+      "cases": 8,
+      "transitions": {
+        "W->W": 0,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 6,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 6
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-corners-b",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 6,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 0
+      },
+      "statusTransitions": {
+        "tick_cap_draw->tick_cap_draw": 6,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-corners-b-golden",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 4,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 4,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-golden",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 4,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 1
+      },
+      "statusTransitions": {
+        "candidate_win->candidate_win": 3,
+        "baseline_win->baseline_win": 1,
+        "tick_cap_draw->tick_cap_draw": 4
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-le",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 3,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "candidate_win->candidate_win": 2,
+        "tick_cap_draw->tick_cap_draw": 3
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-lvl",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 3,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "tick_cap_draw->tick_cap_draw": 3,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-original",
+      "cases": 8,
+      "transitions": {
+        "W->W": 4,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 2,
+        "candidate_win->candidate_win": 4
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-rvr",
+      "cases": 8,
+      "transitions": {
+        "W->W": 1,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 5,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 5,
+        "candidate_win->candidate_win": 1
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-tvt",
+      "cases": 8,
+      "transitions": {
+        "W->W": 5,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 1
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 1,
+        "candidate_win->candidate_win": 5,
+        "tick_cap_draw->tick_cap_draw": 2
+      },
+      "changedFirstTick": 0
+    }
+  ],
+  "separated_lanes_v2": [
+    {
+      "stratumId": "pinned_supalosa__hfo-bvb",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 0,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 5
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 5,
+        "candidate_win->candidate_win": 3
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-corners",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 5,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 1
+      },
+      "statusTransitions": {
+        "tick_cap_draw->tick_cap_draw": 5,
+        "candidate_win->candidate_win": 2,
+        "baseline_win->baseline_win": 1
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-corners-b",
+      "cases": 8,
+      "transitions": {
+        "W->W": 1,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 5,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 5,
+        "candidate_win->candidate_win": 1
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-corners-b-golden",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 1,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 5
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 5,
+        "candidate_win->candidate_win": 2,
+        "tick_cap_draw->tick_cap_draw": 1
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-golden",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "tick_cap_draw->tick_cap_draw": 2,
+        "candidate_win->candidate_win": 3
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-le",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 4,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 4,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-lvl",
+      "cases": 8,
+      "transitions": {
+        "W->W": 4,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 1,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "candidate_win->candidate_win": 4,
+        "tick_cap_draw->tick_cap_draw": 1
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-original",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 3,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "tick_cap_draw->tick_cap_draw": 3,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-rvr",
+      "cases": 8,
+      "transitions": {
+        "W->W": 1,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 6,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 1
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 1,
+        "tick_cap_draw->tick_cap_draw": 6,
+        "candidate_win->candidate_win": 1
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-tvt",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 5,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 0
+      },
+      "statusTransitions": {
+        "tick_cap_draw->tick_cap_draw": 5,
+        "candidate_win->candidate_win": 3
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__pacific-heights",
+      "cases": 8,
+      "transitions": {
+        "W->W": 4,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "candidate_win->candidate_win": 4,
+        "tick_cap_draw->tick_cap_draw": 2,
+        "baseline_win->baseline_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__peak",
+      "cases": 8,
+      "transitions": {
+        "W->W": 5,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 3,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 0
+      },
+      "statusTransitions": {
+        "tick_cap_draw->tick_cap_draw": 3,
+        "candidate_win->candidate_win": 5
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__south-pacific",
+      "cases": 8,
+      "transitions": {
+        "W->W": 0,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 6,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "engine_nonliteral_termination_draw->engine_nonliteral_termination_draw": 1,
+        "tick_cap_draw->tick_cap_draw": 5,
+        "baseline_win->baseline_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__south-pacific-2",
+      "cases": 8,
+      "transitions": {
+        "W->W": 0,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 7,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 1
+      },
+      "statusTransitions": {
+        "tick_cap_draw->tick_cap_draw": 7,
+        "baseline_win->baseline_win": 1
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__tour-of-egypt",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 0,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 6
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 6,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-bvb",
+      "cases": 8,
+      "transitions": {
+        "W->W": 1,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 4,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "candidate_win->candidate_win": 1,
+        "baseline_win->baseline_win": 3,
+        "tick_cap_draw->tick_cap_draw": 4
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-corners",
+      "cases": 8,
+      "transitions": {
+        "W->W": 1,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 5,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 5,
+        "candidate_win->candidate_win": 1
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-corners-b",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 6,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 0
+      },
+      "statusTransitions": {
+        "candidate_win->candidate_win": 2,
+        "tick_cap_draw->tick_cap_draw": 6
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-corners-b-golden",
+      "cases": 8,
+      "transitions": {
+        "W->W": 1,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 3,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 4
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 4,
+        "candidate_win->candidate_win": 1,
+        "tick_cap_draw->tick_cap_draw": 3
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-golden",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 3,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "tick_cap_draw->tick_cap_draw": 3,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-le",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 4,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 4,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-lvl",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 4,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 4,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-original",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 3,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "tick_cap_draw->tick_cap_draw": 3,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-rvr",
+      "cases": 8,
+      "transitions": {
+        "W->W": 0,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 6,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 6
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-tvt",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 4,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 4,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    }
+  ],
+  "separated_lanes_unbounded_d1": [
+    {
+      "stratumId": "pinned_supalosa__hfo-bvb",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "tick_cap_draw->tick_cap_draw": 2,
+        "candidate_win->candidate_win": 3,
+        "baseline_win->baseline_win": 3
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-corners",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "tick_cap_draw->tick_cap_draw": 2,
+        "candidate_win->candidate_win": 3
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-corners-b",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "candidate_win->candidate_win": 3,
+        "tick_cap_draw->tick_cap_draw": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-corners-b-golden",
+      "cases": 8,
+      "transitions": {
+        "W->W": 4,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "tick_cap_draw->tick_cap_draw": 2,
+        "candidate_win->candidate_win": 4,
+        "baseline_win->baseline_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-golden",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "tick_cap_draw->tick_cap_draw": 2,
+        "candidate_win->candidate_win": 3
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-le",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 3,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 3,
+        "candidate_win->candidate_win": 3
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-lvl",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 1,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 4
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 4,
+        "candidate_win->candidate_win": 3,
+        "tick_cap_draw->tick_cap_draw": 1
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-original",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "tick_cap_draw->tick_cap_draw": 2,
+        "candidate_win->candidate_win": 3
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-rvr",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 5,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 1
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 1,
+        "tick_cap_draw->tick_cap_draw": 5,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__hfo-tvt",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 5,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 0
+      },
+      "statusTransitions": {
+        "tick_cap_draw->tick_cap_draw": 5,
+        "candidate_win->candidate_win": 3
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__pacific-heights",
+      "cases": 8,
+      "transitions": {
+        "W->W": 6,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 0
+      },
+      "statusTransitions": {
+        "candidate_win->candidate_win": 6,
+        "tick_cap_draw->tick_cap_draw": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__peak",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 4,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 1
+      },
+      "statusTransitions": {
+        "tick_cap_draw->tick_cap_draw": 4,
+        "candidate_win->candidate_win": 3,
+        "baseline_win->baseline_win": 1
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__south-pacific",
+      "cases": 8,
+      "transitions": {
+        "W->W": 0,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 6,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "engine_nonliteral_termination_draw->engine_nonliteral_termination_draw": 1,
+        "tick_cap_draw->tick_cap_draw": 5,
+        "baseline_win->baseline_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "pinned_supalosa__south-pacific-2",
+      "cases": 8,
+      "transitions": {
+        "W->W": 0,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 1,
+        "D->D": 5,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 5,
+        "tick_cap_draw->candidate_win": 1
+      },
+      "changedFirstTick": 1
+    },
+    {
+      "stratumId": "pinned_supalosa__tour-of-egypt",
+      "cases": 8,
+      "transitions": {
+        "W->W": 1,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 1,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 6
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 6,
+        "candidate_win->candidate_win": 1,
+        "tick_cap_draw->tick_cap_draw": 1
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-bvb",
+      "cases": 8,
+      "transitions": {
+        "W->W": 3,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "candidate_win->candidate_win": 3,
+        "baseline_win->baseline_win": 3,
+        "tick_cap_draw->tick_cap_draw": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-corners",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 4,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 4,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-corners-b",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 5,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 1
+      },
+      "statusTransitions": {
+        "candidate_win->candidate_win": 2,
+        "baseline_win->baseline_win": 1,
+        "tick_cap_draw->tick_cap_draw": 5
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-corners-b-golden",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 4,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 4,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-golden",
+      "cases": 8,
+      "transitions": {
+        "W->W": 4,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 3,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 1
+      },
+      "statusTransitions": {
+        "candidate_win->candidate_win": 4,
+        "baseline_win->baseline_win": 1,
+        "tick_cap_draw->tick_cap_draw": 3
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-le",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 4
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 4,
+        "candidate_win->candidate_win": 2,
+        "tick_cap_draw->tick_cap_draw": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-lvl",
+      "cases": 8,
+      "transitions": {
+        "W->W": 2,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 3,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "tick_cap_draw->tick_cap_draw": 3,
+        "candidate_win->candidate_win": 2
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-original",
+      "cases": 8,
+      "transitions": {
+        "W->W": 4,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 2
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 2,
+        "tick_cap_draw->tick_cap_draw": 2,
+        "candidate_win->candidate_win": 4
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-rvr",
+      "cases": 8,
+      "transitions": {
+        "W->W": 0,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 5,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 3
+      },
+      "statusTransitions": {
+        "baseline_win->baseline_win": 3,
+        "tick_cap_draw->tick_cap_draw": 5
+      },
+      "changedFirstTick": 0
+    },
+    {
+      "stratumId": "ra2web_advanced__hfo-tvt",
+      "cases": 8,
+      "transitions": {
+        "W->W": 6,
+        "W->D": 0,
+        "W->L": 0,
+        "D->W": 0,
+        "D->D": 2,
+        "D->L": 0,
+        "L->W": 0,
+        "L->D": 0,
+        "L->L": 0
+      },
+      "statusTransitions": {
+        "candidate_win->candidate_win": 6,
+        "tick_cap_draw->tick_cap_draw": 2
+      },
+      "changedFirstTick": 0
+    }
+  ]
+}

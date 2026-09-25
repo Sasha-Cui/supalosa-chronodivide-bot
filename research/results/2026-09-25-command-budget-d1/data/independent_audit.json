@@ -1,0 +1,152 @@
+{
+  "kind": "unified-intent-d1-independent-audit-v2",
+  "complete": true,
+  "passed": true,
+  "sourceCommit": "18dde712dac64b2f76ec5c91c4e87a7140db78a1",
+  "auditJobId": "27472280",
+  "arrayJobId": "27365752",
+  "finalizerJobId": "27365753",
+  "aggregateSha256": "8bd48913a5353ef830b965f862876cd2d814599b7341314310b2d56caf2da14b",
+  "manifestSha256": "b677746ad35715fda936ae23635583fb383f4f0cabc76e6f11516129f19b2aa0",
+  "programManifestSha256": "0bdcbdc07a7912316721def53e8d44bcb4aa6b8d18d684c09cfaf97554e403f5",
+  "wrapperSha256": "b93f52a13beda2e9d9cf44183ee4ba8d4b99eea9d0225ef52095c0b30bbddbdc",
+  "counts": {
+    "blocks": 200,
+    "episodes": 600,
+    "ledgers": 600,
+    "ledgerRecords": 1538730,
+    "ledgerPlainBytes": 4656843200,
+    "ledgerGzipBytes": 57073138,
+    "maxTripletBytes": 788657,
+    "executionFiles": 416,
+    "sourceFiles": 42,
+    "runtimeTrees": 3,
+    "assets": 335,
+    "maps": 15,
+    "bootstrapStreams": 18,
+    "replicatesPerStream": 200000
+  },
+  "exactSchedulerAndLaunchReconciliation": true,
+  "independentV5V6EventReplay": true,
+  "allSummaryTablesRecomputed": true,
+  "allActionTablesRecomputed": true,
+  "allBootstrapDigestsMatched": true,
+  "allFrozenGatesMatched": true,
+  "sourceUnchanged": true,
+  "newGameInitializations": 0,
+  "newAdvancingEpisodes": 0,
+  "prerequisites": [
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/pure-independent-audit-v1.json",
+      "bytes": 20927,
+      "sha256": "3933381300526d7d363621c3ba9df04dd388aad9064b67d4c0d4d3f11e809c94"
+    },
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/selector-independent-audit-v1/output/audit.json",
+      "bytes": 8511,
+      "sha256": "0a23a361dcaa5a64a01e3d32979e24eca82a0dc5d1a27fa9f7c664a39cc4f4ad"
+    },
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/selector-audit-verification-v1.json",
+      "bytes": 5536,
+      "sha256": "adf981b519bee80c64486e866ce131a264b0094e930f4a784d4035a27464b845"
+    },
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/canary-independent-audit-v1/output/audit.json",
+      "bytes": 19511,
+      "sha256": "75752a60ec745f98583e420751bb4c0e0f0644f819c546a5b30ec9a05e94c0a3"
+    },
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/canary-audit-verification-v1.json",
+      "bytes": 4988,
+      "sha256": "e421d01ee1274c976d48b8b49e552f45a26825fed6c501858b126a86b9c4ad3d"
+    },
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/smoke-independent-audit-v2/output/audit.json",
+      "bytes": 9499,
+      "sha256": "c96a0fc2e885b2836799d8577b1ed45d7854d3a7805e063aabe59fed29e17c81"
+    },
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/smoke-audit-verification-v2.json",
+      "bytes": 7647,
+      "sha256": "383670b768f454d0507ce3e7f333f81ade908170ebb0a13c6d25ce1cad0b8266"
+    },
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/launch-pairs-intent-v1.json",
+      "bytes": 452,
+      "sha256": "4ada45284bf0f1f52fda5329b88c6a9546d422825a601e9b038a3444ba350e14"
+    },
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/launch-pairs-v1.json",
+      "bytes": 1309,
+      "sha256": "2170b8d9300e68e3617cc8051b03c6e685cf8b119737b2ab982dcfde7175ca55"
+    },
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/launch-pairs-finalizer-v1.json",
+      "bytes": 1404,
+      "sha256": "5f12fd51303e4ede6fa1bc4011cd362d6a3b8415b4141eb251cda3c4b0f2a858"
+    }
+  ],
+  "artifacts": {
+    "endpoints": {
+      "file": "endpoints.json",
+      "bytes": 283898,
+      "sha256": "c81c7240df958e54e5b2b29ebf9cf86c8d1fda99b7ba2cf141d1205f78bb1bc2"
+    },
+    "actions": {
+      "file": "actions.json",
+      "bytes": 2038086,
+      "sha256": "ac208f5752e570c128a52234ab55e6b3296df81725de51eed013115524139b90"
+    },
+    "statistics": {
+      "file": "statistics.json",
+      "bytes": 1767005,
+      "sha256": "f83afdb38ef46cfa531084b84adfa807dc37fdb3abdd5a9e91844ace57867ff9"
+    },
+    "inventory": {
+      "file": "inventory.json",
+      "bytes": 215918,
+      "sha256": "9c3c6dd797020ec393c6061d8de541c7145bbebc9ecdb95038087dbf9e782cfb"
+    }
+  },
+  "orderedRecordDigest": "d4711e25d9bd5573f8cf88d6d8695ed0a2331fdc83812d41edd503b2010ed220",
+  "schedulerAllocatedCpuHours": 95.10166666666667,
+  "decision": {
+    "mechanism": {
+      "overallScore": true,
+      "overallLiteralWin": true,
+      "supalosaScore": false,
+      "advancedScore": true,
+      "americansNonnegative": true,
+      "africansNonnegative": true,
+      "slot0Nonnegative": true,
+      "slot1Nonnegative": true
+    },
+    "policyImprovement": {
+      "overallScore": false,
+      "overallLiteralWin": false,
+      "advancedScore": false,
+      "advancedMoreLiteralWins": true,
+      "supalosaNoninferiority": false,
+      "supalosaPositiveRecord": true,
+      "supalosaMapSafety": false,
+      "americansNonnegative": false,
+      "africansNonnegative": false,
+      "slot0Nonnegative": false,
+      "slot1Nonnegative": false,
+      "catastrophicTransitionSafety": true
+    },
+    "absoluteAdvanced": {
+      "positiveRecord": true,
+      "pooledWilsonWinAboveHalf": false
+    },
+    "budgetRemovalDiagnosticPositive": false,
+    "improvementOverDisabled": false,
+    "absoluteAdvancedEligible": false,
+    "jointDevelopmentSignal": false,
+    "stopArbitrationPrimaryDirection": true,
+    "confirmation": false,
+    "deploymentAuthorized": false
+  },
+  "limitations": "Replay reconstructs full observer first-results and evaluations from all retained building/event ledgers, not by rerunning the engine. Public action/state and update-level telemetry digests are checksum-bound: their raw contents were not retained, so action/deferral counts are descriptive and not an independent raw-action replay. Four country/direction clusters are sensitivity only."
+}

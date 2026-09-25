@@ -1,0 +1,176 @@
+{
+  "kind": "d1-result-report-artifact-index-v1",
+  "inputArtifacts": [
+    {
+      "role": "execution-v1/finalizer/record.json",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/execution-v1/finalizer/record.json",
+      "bytes": 2762280,
+      "sha256": "8bd48913a5353ef830b965f862876cd2d814599b7341314310b2d56caf2da14b"
+    },
+    {
+      "role": "independent-audit-v2/output/audit.json",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-v2/output/audit.json",
+      "bytes": 6356,
+      "sha256": "6f9e3f0ec79965d52c1e07cd9fe532d7f8e2e87fc95e672bd22d2d70ce254c4c"
+    },
+    {
+      "role": "audit-verification-v2.json",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/audit-verification-v2.json",
+      "bytes": 7530,
+      "sha256": "96d3bb74741509a8cab86f45d6d45040c3f8ff87f0177f3bfc48a6320e3a5f79"
+    },
+    {
+      "role": "execution-v1/manifest/record.json",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/execution-v1/manifest/record.json",
+      "bytes": 227973,
+      "sha256": "b677746ad35715fda936ae23635583fb383f4f0cabc76e6f11516129f19b2aa0"
+    },
+    {
+      "role": "independent-audit-v2/output/actions.json",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-v2/output/actions.json",
+      "bytes": 2038086,
+      "sha256": "ac208f5752e570c128a52234ab55e6b3296df81725de51eed013115524139b90"
+    },
+    {
+      "role": "independent-audit-v2/output/statistics.json",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-v2/output/statistics.json",
+      "bytes": 1767005,
+      "sha256": "f83afdb38ef46cfa531084b84adfa807dc37fdb3abdd5a9e91844ace57867ff9"
+    },
+    {
+      "role": "independent-audit-v2/output/endpoints.json",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-v2/output/endpoints.json",
+      "bytes": 283898,
+      "sha256": "c81c7240df958e54e5b2b29ebf9cf86c8d1fda99b7ba2cf141d1205f78bb1bc2"
+    },
+    {
+      "role": "completion-reconciliation-v1.json",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/completion-reconciliation-v1.json",
+      "bytes": 160892,
+      "sha256": "7674cd829b5a42a46d72df45368717cd807c394bee3958b01016d063039b600f"
+    },
+    {
+      "role": "independent-audit-failure-v1.json",
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-failure-v1.json",
+      "bytes": 7971,
+      "sha256": "32eae3bb7d1f749009a23f917769c6045e78af4d108292b353d75228aa4e7d73"
+    }
+  ],
+  "files": [
+    {
+      "file": "visual_tables/populations_full_audit.csv",
+      "bytes": 10906,
+      "sha256": "82ff4a56dc6649d43c4b71b43dd0282ced9ca818847cae952383e88718ae25e9"
+    },
+    {
+      "file": "visual_tables/all_tables_full_audit.csv",
+      "bytes": 528637,
+      "sha256": "97087413f057566f4b77e4b225c8a43c3adef37ed049350b5f1a6aa7c52ebf43"
+    },
+    {
+      "file": "visual_tables/transitions_full_audit.csv",
+      "bytes": 314028,
+      "sha256": "aafe13cad714858e6819503c9290d22349e44afe597d6f0df5fccc22f5675227"
+    },
+    {
+      "file": "visual_tables/uncertainty_full_audit.csv",
+      "bytes": 18744,
+      "sha256": "ca485c32e5437d73a567c7ef9827e2e9d602a69c83b9e833ac35509708450b74"
+    },
+    {
+      "file": "visual_tables/identities_full_audit.csv",
+      "bytes": 210266,
+      "sha256": "fe6d9f900608a2a1d1a9bbf9715feb444b420f0dcf8a7baf6926d8bd74e444fe"
+    },
+    {
+      "file": "visual_tables/scheduler_full_audit.csv",
+      "bytes": 89480,
+      "sha256": "ae24c796fed44dc4929cc07159978e33d0e0f9ecea2f63f3369ca10b434173e9"
+    },
+    {
+      "file": "visual_tables/gates_full_audit.csv",
+      "bytes": 1019,
+      "sha256": "7a8a0a9fc8eb43c70289687f59ddc891d54b6c7f5684d54ea2112ecb6975a475"
+    },
+    {
+      "file": "visual_tables/actions_full_audit.csv",
+      "bytes": 634909,
+      "sha256": "5fe959ddc251afdb619e2928b0e350b52928b24cb821aa21d08af479ccb06256"
+    },
+    {
+      "file": "visual_tables/action_episodes_full_audit.csv",
+      "bytes": 792151,
+      "sha256": "9664785dc77189c46cdb0bdc216f24283adacd59da355d8bd7ca4e56df136f53"
+    },
+    {
+      "file": "visual_tables/measurement_full_audit.csv",
+      "bytes": 19968,
+      "sha256": "e637209f86861bf0d04d6a36ffa7983ef8e77b46e38303f978b15510d3cf21ba"
+    },
+    {
+      "file": "visual_tables/strata_full_audit.csv",
+      "bytes": 45488,
+      "sha256": "87bcdb12ae76f23d1c09d807f405bcefaec4b94d455efbc6a30814c971e23f30"
+    },
+    {
+      "file": "data/contract.json",
+      "bytes": 1474,
+      "sha256": "247697ac10035224cb1e901eff913e35c4cc6d4397a72e409ffc77f998a12f5a"
+    },
+    {
+      "file": "data/analysis.json",
+      "bytes": 1768035,
+      "sha256": "4bddf7265ba8d51eb1768f2fb150ddbcc7cd4268e3d509b133a6dbfc4ba37751"
+    },
+    {
+      "file": "data/action_summary.json",
+      "bytes": 896163,
+      "sha256": "3df47083270ce99206be9823ccf6814ef1451cb4cbf8f577fd43ef0903f374b0"
+    },
+    {
+      "file": "data/independent_audit.json",
+      "bytes": 6356,
+      "sha256": "6f9e3f0ec79965d52c1e07cd9fe532d7f8e2e87fc95e672bd22d2d70ce254c4c"
+    },
+    {
+      "file": "data/audit_verification.json",
+      "bytes": 7530,
+      "sha256": "96d3bb74741509a8cab86f45d6d45040c3f8ff87f0177f3bfc48a6320e3a5f79"
+    },
+    {
+      "file": "data/measurement.json",
+      "bytes": 35312,
+      "sha256": "89dd56596146ae2927c9cc2b098cb1e84bc557b7195e0849ee86076648984d68"
+    },
+    {
+      "file": "visual_tables/lineage_full_audit.csv",
+      "bytes": 27123,
+      "sha256": "985a1b0ebf994994800fad90f062af5fe07203d598e33dd182c1c1b8acd84f49"
+    },
+    {
+      "file": "visual_figures/paired-score-bounds.png",
+      "bytes": 126245,
+      "sha256": "b429cfdce3cfc5ae64cf7c2e9b5dc1326dc8f3fe520cca332dbf948f5a158772"
+    },
+    {
+      "file": "visual_figures/all-stratum-score-deltas.png",
+      "bytes": 228215,
+      "sha256": "62978fea3356a6c34ff4af3247ea369790d80cf8f5c9ae6c8ae078b943ad4cc4"
+    },
+    {
+      "file": "figure-qa.json",
+      "bytes": 35462,
+      "sha256": "bb8465dccb1ad01cacb77a8d9275ee477dd66e09a713480bc2b656c800968b71"
+    },
+    {
+      "file": "VISUAL_REPORT.md",
+      "bytes": 17214,
+      "sha256": "3993af9ec2119899a666a99b07b7a1bd34a9db142c6876efab3e09dcd1191681"
+    },
+    {
+      "file": "REPORT.md",
+      "bytes": 17166,
+      "sha256": "8c2d1b1a4772b6b818ca985f3e0f3cbdf078fa38e0372a4a597da110085aa8e1"
+    }
+  ]
+}

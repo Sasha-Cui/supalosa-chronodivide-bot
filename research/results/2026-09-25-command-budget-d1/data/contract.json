@@ -1,0 +1,67 @@
+{
+  "study": "D1",
+  "sourceCommit": "18dde712dac64b2f76ec5c91c4e87a7140db78a1",
+  "reference": "disabled",
+  "deploymentChoice": "retain unchanged StrongBot",
+  "challengers": [
+    "separated_lanes_v2",
+    "separated_lanes_unbounded_d1"
+  ],
+  "arms": [
+    {
+      "id": "disabled",
+      "enabled": false
+    },
+    {
+      "id": "separated_lanes_v2",
+      "enabled": true,
+      "budgetMode": "separated_lanes_v2",
+      "commandCeiling": 115
+    },
+    {
+      "id": "separated_lanes_unbounded_d1",
+      "enabled": true,
+      "budgetMode": "separated_lanes_unbounded_d1",
+      "commandCeiling": null
+    }
+  ],
+  "primaryEndpoint": "corrected live-owned v6",
+  "secondaryEndpoint": "passive legacy v5",
+  "horizon": 24000,
+  "seedRange": [
+    3350110000,
+    3350110199
+  ],
+  "countries": [
+    "Americans",
+    "Africans"
+  ],
+  "slots": [
+    0,
+    1
+  ],
+  "directions": [
+    0,
+    1
+  ],
+  "maps": 15,
+  "opponentMapStrata": 25,
+  "topologies": 5,
+  "countryDirectionClustersPerOpponent": 4,
+  "observationBoundary": "api_full_state",
+  "bootstrap": {
+    "domain": "unified-intent-budget-diagnostic-d1-bootstrap-v1",
+    "streams": 18,
+    "replicates": 200000,
+    "index": 20000
+  },
+  "comparisons": [
+    "unbounded_minus_v2",
+    "unbounded_minus_disabled",
+    "v2_minus_disabled"
+  ],
+  "score": "(W + 0.5 D)/N; higher is better",
+  "status": "audited negative open-development result",
+  "confirmation": false,
+  "deploymentAuthorized": false
+}

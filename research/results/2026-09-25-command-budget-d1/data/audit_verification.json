@@ -1,0 +1,172 @@
+{
+  "kind": "unified-intent-d1-audit-verification-v2",
+  "complete": true,
+  "passed": true,
+  "verifiedAt": "2026-09-25T11:04:07.046Z",
+  "sourceCommit": "18dde712dac64b2f76ec5c91c4e87a7140db78a1",
+  "audit": {
+    "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-v2/output/audit.json",
+    "bytes": 6356,
+    "sha256": "6f9e3f0ec79965d52c1e07cd9fe532d7f8e2e87fc95e672bd22d2d70ce254c4c"
+  },
+  "auditJobId": "27472280",
+  "auditAccounting": "27472280|27472280|COMPLETED|0:0|pi_jss233|day|1|0|277|03:57.848||8G|120|billing=1,cpu=1,mem=8G,node=1|billing=1,cpu=1,mem=8G,node=1\n27472280.batch|27472280.batch|COMPLETED|0:0|pi_jss233||1||277|03:57.848|352556K||||cpu=1,mem=8G,node=1\n27472280.extern|27472280.extern|COMPLETED|0:0|pi_jss233||1||277|00:00:00|||||billing=1,cpu=1,mem=8G,node=1",
+  "auditResources": {
+    "elapsedSeconds": 277,
+    "totalCpuSeconds": 237.848,
+    "maxRssKiB": 352556,
+    "cpus": 1,
+    "requestedMemGiB": 8,
+    "timeLimitHours": 2
+  },
+  "aggregate": {
+    "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/execution-v1/finalizer/record.json",
+    "bytes": 2762280,
+    "sha256": "8bd48913a5353ef830b965f862876cd2d814599b7341314310b2d56caf2da14b"
+  },
+  "manifest": {
+    "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/execution-v1/manifest/record.json",
+    "bytes": 227973,
+    "sha256": "b677746ad35715fda936ae23635583fb383f4f0cabc76e6f11516129f19b2aa0"
+  },
+  "program": {
+    "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-v2/PROGRAM.json",
+    "bytes": 3403,
+    "sha256": "0bdcbdc07a7912316721def53e8d44bcb4aa6b8d18d684c09cfaf97554e403f5"
+  },
+  "receipt": {
+    "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-v2/submission.json",
+    "bytes": 2072,
+    "sha256": "f4a4be5872e7bc61269d7a2c539f7978fdbcd7ac1b1274b49db178447a3d4f90"
+  },
+  "intent": {
+    "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-v2/submission-intent.json",
+    "bytes": 1962,
+    "sha256": "15f0e594b2b716aa867868703a420af114f2f45abe29bf4d2adc4b7dd23a734d"
+  },
+  "outputArtifacts": [
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-v2/output/endpoints.json",
+      "bytes": 283898,
+      "sha256": "c81c7240df958e54e5b2b29ebf9cf86c8d1fda99b7ba2cf141d1205f78bb1bc2"
+    },
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-v2/output/actions.json",
+      "bytes": 2038086,
+      "sha256": "ac208f5752e570c128a52234ab55e6b3296df81725de51eed013115524139b90"
+    },
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-v2/output/statistics.json",
+      "bytes": 1767005,
+      "sha256": "f83afdb38ef46cfa531084b84adfa807dc37fdb3abdd5a9e91844ace57867ff9"
+    },
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-v2/output/inventory.json",
+      "bytes": 215918,
+      "sha256": "9c3c6dd797020ec393c6061d8de541c7145bbebc9ecdb95038087dbf9e782cfb"
+    }
+  ],
+  "outputMarker": {
+    "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-v2/output/COMPLETE",
+    "bytes": 103,
+    "sha256": "b24172a271e7e7d81d8e01fa80d31ff296fa8d66b991a5bb41b2036b9858cf33"
+  },
+  "auditLogs": [
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-v2/audit-27472280.out",
+      "bytes": 370,
+      "sha256": "5b090ea6922198b8a4af91a20439d9ade7d6c75271a6e073156c8b2cd6df2373"
+    },
+    {
+      "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-v2/audit-27472280.err",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "failedAuditPreserved": {
+    "path": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/unified-intent-arbiter-v2/d1/independent-audit-failure-v1.json",
+    "bytes": 7971,
+    "sha256": "32eae3bb7d1f749009a23f917769c6045e78af4d108292b353d75228aa4e7d73"
+  },
+  "counts": {
+    "blocks": 200,
+    "episodes": 600,
+    "ledgers": 600,
+    "ledgerRecords": 1538730,
+    "ledgerPlainBytes": 4656843200,
+    "ledgerGzipBytes": 57073138,
+    "maxTripletBytes": 788657,
+    "executionFiles": 416,
+    "sourceFiles": 42,
+    "runtimeTrees": 3,
+    "assets": 335,
+    "maps": 15,
+    "bootstrapStreams": 18,
+    "replicatesPerStream": 200000
+  },
+  "runtimeTrees": [
+    {
+      "root": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/packages/chronodivide-bot/dist",
+      "files": 240,
+      "bytes": 1738850,
+      "sha256": "6aea868d868e37473cf8fe141201e03e19377df6130c001e19f100145744fe00"
+    },
+    {
+      "root": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot/packages/chronodivide-bot-driver/dist",
+      "files": 2464,
+      "bytes": 13713338,
+      "sha256": "67141dc1b8b93d218dba8610d94a95e89c424d66fc29ee0ffdce8d66a6660536"
+    },
+    {
+      "root": "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/supalosa-chronodivide-bot/packages/chronodivide-bot/dist",
+      "files": 172,
+      "bytes": 438907,
+      "sha256": "34349919500c8019f9d9b1c2b2a7e2269dd57dde6b3414216bb6336e02977199"
+    }
+  ],
+  "executionInventoryRehashed": true,
+  "rawLogsHashedNotInterpreted": true,
+  "sourceAndRuntimeRehashed": true,
+  "allIndependentOutputsMatchAggregate": true,
+  "noActiveDependentJobs": true,
+  "newGameInitializations": 0,
+  "newAdvancingEpisodes": 0,
+  "decision": {
+    "mechanism": {
+      "overallScore": true,
+      "overallLiteralWin": true,
+      "supalosaScore": false,
+      "advancedScore": true,
+      "americansNonnegative": true,
+      "africansNonnegative": true,
+      "slot0Nonnegative": true,
+      "slot1Nonnegative": true
+    },
+    "policyImprovement": {
+      "overallScore": false,
+      "overallLiteralWin": false,
+      "advancedScore": false,
+      "advancedMoreLiteralWins": true,
+      "supalosaNoninferiority": false,
+      "supalosaPositiveRecord": true,
+      "supalosaMapSafety": false,
+      "americansNonnegative": false,
+      "africansNonnegative": false,
+      "slot0Nonnegative": false,
+      "slot1Nonnegative": false,
+      "catastrophicTransitionSafety": true
+    },
+    "absoluteAdvanced": {
+      "positiveRecord": true,
+      "pooledWilsonWinAboveHalf": false
+    },
+    "budgetRemovalDiagnosticPositive": false,
+    "improvementOverDisabled": false,
+    "absoluteAdvancedEligible": false,
+    "jointDevelopmentSignal": false,
+    "stopArbitrationPrimaryDirection": true,
+    "confirmation": false,
+    "deploymentAuthorized": false
+  },
+  "interpretation": "D1 fails the frozen positive budget-removal, improvement-over-disabled and absolute-Advanced gates. Stop arbitration as the primary performance direction; unchanged deployed StrongBot retained. This is audited open-development evidence, not confirmation or paper readiness."
+}

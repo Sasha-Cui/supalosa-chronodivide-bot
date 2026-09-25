@@ -1,12 +1,14 @@
 # Research status
 
-Last reconciled: **2026-09-22**
+Last reconciled: **2026-09-25**
 
 ## Bottom line
 
 The empirical program is active and the current manuscript is stale. The
-new full OD1 A1 comparison and independent audit rejected V2 arbitration;
-unchanged StrongBot remains the reference policy. The
+complete OD1 A1 and D1 comparisons independently reject the proposed
+arbitration direction: removing the command cap did not improve unchanged
+StrongBot. The frozen D1 stopping rule now ends arbitration as the primary
+performance direction. Unchanged StrongBot remains the deployed reference. The
 corrected fresh dual-endpoint execution confirms strong HFO LE performance
 against pinned Supalosa, but the frozen Peak candidate is exactly equivalent
 to its deployed control and deployed StrongBot remains substantially behind
@@ -75,29 +77,42 @@ preserved. A1's 905 successful initializations and 1,818 advancing episodes
 approved housekeeping path edits have been reapplied and checksum-verified
 after all jobs and independent audits finished; no edits or evidence were lost.
 
-Next is the bounded prospective command-budget diagnostic D1 at
-`research/protocols/method/2026-09-22-command-budget-diagnostic-d1.md`.
-It compares disabled, unchanged failed V2, and the same arbitration with
-budget admission removed. The research-only mode, exact case definitions,
-telemetry collector, episode adapter, execution harness and three-contrast
-analysis are now implemented. The 282 foundation checks and 19 new D1
-runtime/analysis checks passed in development. A complete current-source
-301-check Slurm pure gate is the next prerequisite, followed by selector,
-canary and smoke verification. **No D1 game has been initialized or advanced
-at this implementation freeze.** See
-[`2026-09-22-d1-execution-implementation.md`](notes/2026-09-22-d1-execution-implementation.md).
-Its 200 fresh case blocks cover all 25 strata but only the first canonical
-Allied/Soviet countries; any positive signal still needs fresh nine-country validation.
-Cap saturation in 837/900 V2 games motivates the hypothesis but does not
-establish causation. No ceiling search, deployment, or paper writing is
-authorized by the negative OD1 result.
+D1 is now complete and independently audited. Its 200 matched blocks / 600
+games used all 25 strata, Americans/Africans, both slots, reciprocal first-two
+starts and a 24,000-update cap under source `18dde712`. Array `27365752` and
+finalizer `27365753` completed without restarts. Independent audit `27472280`
+replayed all 600 ledgers / 1,538,730 records / 4,656,843,200 plain bytes and
+matched all tables, action summaries, 18 named 200,000-replicate bootstrap
+streams and frozen gates. Two failed auditor attempts (smoke `27335931`,
+complete audit `27381273`) and their separately versioned repairs remain
+preserved; no game was selectively rerun or excluded.
+
+Overall W/D/L per 200 games: unchanged **70/81/49**, capped V2 49/92/59,
+unbounded D1 68/76/56. Unbounded-minus-V2 score is +0.055 overall, but its
+Supalosa lower bound is -0.008333, so the broad mechanism filter fails.
+Unbounded-minus-unchanged score is -0.0225, with lower -0.04; policy improvement
+and absolute Advanced eligibility also fail. Higher score is better; unchanged
+has the best overall score. This does not establish a successful cap explanation
+or authorize another ceiling search. M2 remains unachieved.
+
+Full [D1 table-first report](results/2026-09-25-command-budget-d1/REPORT.md)
+and [visual report](results/2026-09-25-command-budget-d1/VISUAL_REPORT.md)
+retain all three contrasts, both endpoints, every stratum/subgroup, transitions,
+uncertainty, source/job identities, failures and descriptive action diagnostics.
+The original implementation-freeze note remains historical.
+
+Next: the user-authorized strategic diagnostic, prospectively frozen before
+new instrumentation or fresh games. Measure production, composition, attack
+coordination and mission completion; select one supported policy improvement
+at a time. Retained endpoint ledgers do not contain all required strategic
+telemetry. Keep unchanged StrongBot as the reference and preserve the manuscript.
 
 ## Milestone ledger
 
 - **M0 — Correct endpoint evidence — complete 2026-09-05:** V2, independent
   recomputation, action audit, provenance/observation errata, immutable result,
   and Ledger V2 all pass.
-- **M1 — Technical readiness — OD1 validated 2026-09-22:** full
+- **M1 — Technical readiness — OD1/D1 validated through 2026-09-25:** full
   paired execution and independent endpoint/statistical audit passed;
   each new intervention still needs its own technical gates.
 - **M2 — Development champion frozen — not achieved:** repeatable positive open-development
@@ -118,7 +133,7 @@ These are internal targets, not permission to weaken a gate:
 | Milestone | Target | Exit decision |
 | --- | --- | --- |
 | M0 endpoint/audit closure | completed 2026-09-05 | corrected evidence independently reproduced and passed |
-| M1 technical method readiness | OD1 validated 2026-09-22 | technical readiness passed; V2 failed the scientific development gates |
+| M1 technical method readiness | OD1/D1 validated through 2026-09-25 | technical integrity passed; both studies failed the scientific development gates |
 | M2 development champion | 2026-10-10 | one frozen policy is positive across all 15 maps against Supalosa and all ten HFO variants against Advanced |
 | M3 Supalosa reliability | 2026-10-20 | the single-use 10,080-game all-map confirmation passes every map and stratum gate |
 | M4 opponent/topology breadth | 2026-11-03 | Advanced, Standard, Sea/Land, and development-unused transfer evaluations pass the claimed scope |
@@ -142,7 +157,8 @@ Currently supported:
   balanced HFO LE population;
 - exact equivalence of the frozen Peak candidate and deployed control; and
 - an explicit negative fresh Advanced cross-play result; and
-- audited rejection of V2 arbitration on the complete OD1 A1 development population.
+- audited rejection of V2 arbitration on the complete OD1 A1 development population; and
+- audited D1 failure to improve unchanged StrongBot after removing the command cap.
 
 Not currently supported:
 

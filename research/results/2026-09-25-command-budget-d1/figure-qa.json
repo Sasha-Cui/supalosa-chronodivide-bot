@@ -1,0 +1,1366 @@
+{
+  "complete": true,
+  "figures": [
+    {
+      "file": "visual_figures/paired-score-bounds.png",
+      "width": 1180,
+      "height": 620,
+      "minimumTextContrast": 17.73971700407407,
+      "noClippedLabels": true,
+      "noOverlappingLabels": true,
+      "labels": [
+        {
+          "text": "D1: budget removal did not beat unchanged StrongBot",
+          "left": 24,
+          "top": 13,
+          "width": 746.51953125,
+          "height": 24,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Paired score differences in percentage points; higher favors the named treatment",
+          "left": 24,
+          "top": 49,
+          "width": 655.0859375,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Contrast / population",
+          "left": 24,
+          "top": 86,
+          "width": 191.703125,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Score delta",
+          "left": 851.453125,
+          "top": 86,
+          "width": 102.546875,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "90% lower",
+          "left": 1051.1328125,
+          "top": 86,
+          "width": 93.8671875,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-16",
+          "left": 460.2001953125,
+          "top": 88,
+          "width": 19.599609375,
+          "height": 12,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-12",
+          "left": 512.3430524553571,
+          "top": 88,
+          "width": 19.599609375,
+          "height": 12,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-8",
+          "left": 568.3032924107142,
+          "top": 88,
+          "width": 11.96484375,
+          "height": 12,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-4",
+          "left": 620.4461495535713,
+          "top": 88,
+          "width": 11.96484375,
+          "height": 12,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "0",
+          "left": 674.7540457589286,
+          "top": 88,
+          "width": 7.634765625,
+          "height": 12,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "4",
+          "left": 726.8969029017858,
+          "top": 88,
+          "width": 7.634765625,
+          "height": 12,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "8",
+          "left": 779.0397600446428,
+          "top": 88,
+          "width": 7.634765625,
+          "height": 12,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "12",
+          "left": 827.365234375,
+          "top": 88,
+          "width": 15.26953125,
+          "height": 12,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Unbounded − V2 / Overall",
+          "left": 24,
+          "top": 124,
+          "width": 209.6796875,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+5.50",
+          "left": 894.5068359375,
+          "top": 122,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+2.00",
+          "left": 1089.83984375,
+          "top": 122,
+          "width": 55.16015625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Unbounded − V2 / Supalosa",
+          "left": 24,
+          "top": 167,
+          "width": 225.1328125,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+3.33",
+          "left": 894.5068359375,
+          "top": 165,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-0.83",
+          "left": 1098.4267578125,
+          "top": 165,
+          "width": 46.5732421875,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Unbounded − V2 / Advanced",
+          "left": 24,
+          "top": 210,
+          "width": 231.53125,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+8.75",
+          "left": 894.5068359375,
+          "top": 208,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+2.50",
+          "left": 1089.83984375,
+          "top": 208,
+          "width": 55.16015625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Unbounded − unchanged / Overall",
+          "left": 24,
+          "top": 253,
+          "width": 277.875,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-2.25",
+          "left": 902.1181640625,
+          "top": 251,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-4.00",
+          "left": 1098.4267578125,
+          "top": 251,
+          "width": 46.5732421875,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Unbounded − unchanged / Supalosa",
+          "left": 24,
+          "top": 296,
+          "width": 293.328125,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-3.33",
+          "left": 902.1181640625,
+          "top": 294,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-5.42",
+          "left": 1098.4267578125,
+          "top": 294,
+          "width": 46.5732421875,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Unbounded − unchanged / Advanced",
+          "left": 24,
+          "top": 339,
+          "width": 299.7265625,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-0.63",
+          "left": 902.1181640625,
+          "top": 337,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-4.38",
+          "left": 1098.4267578125,
+          "top": 337,
+          "width": 46.5732421875,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "V2 − unchanged / Overall",
+          "left": 24,
+          "top": 382,
+          "width": 206.765625,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-7.75",
+          "left": 902.1181640625,
+          "top": 380,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-10.75",
+          "left": 1086.974609375,
+          "top": 380,
+          "width": 58.025390625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "V2 − unchanged / Supalosa",
+          "left": 24,
+          "top": 425,
+          "width": 222.21875,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-6.67",
+          "left": 902.1181640625,
+          "top": 423,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-10.42",
+          "left": 1086.974609375,
+          "top": 423,
+          "width": 58.025390625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "V2 − unchanged / Advanced",
+          "left": 24,
+          "top": 468,
+          "width": 228.6171875,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-9.38",
+          "left": 902.1181640625,
+          "top": 466,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-14.38",
+          "left": 1086.974609375,
+          "top": 466,
+          "width": 58.025390625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Dots: point estimates. Left markers: one-sided 90% lower bounds, not two-sided intervals.",
+          "left": 24,
+          "top": 542,
+          "width": 723.9765625,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Different references answer different questions. Positive versus failed V2 is not improvement over unchanged.",
+          "left": 24,
+          "top": 574,
+          "width": 830.1474609375,
+          "height": 15,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        }
+      ]
+    },
+    {
+      "file": "visual_figures/all-stratum-score-deltas.png",
+      "width": 1160,
+      "height": 1010,
+      "minimumTextContrast": 13.936706755422204,
+      "noClippedLabels": true,
+      "noOverlappingLabels": true,
+      "labels": [
+        {
+          "text": "All 25 opponent-map strata: no favorable-subset selection",
+          "left": 24,
+          "top": 13,
+          "width": 792.38671875,
+          "height": 24,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Eight matched blocks per row. Point score deltas (pp); higher is better. No per-stratum intervals.",
+          "left": 24,
+          "top": 49,
+          "width": 769.953125,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Unbounded − V2",
+          "left": 409.28515625,
+          "top": 88,
+          "width": 151.4296875,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Unbounded − unchanged",
+          "left": 616.2421875,
+          "top": 88,
+          "width": 227.515625,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "V2 − unchanged",
+          "left": 901.16796875,
+          "top": 88,
+          "width": 147.6640625,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Supalosa / hfo-le",
+          "left": 24,
+          "top": 127,
+          "width": 134.1171875,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+6.25",
+          "left": 455.25341796875,
+          "top": 125,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "-6.25",
+          "left": 704.05908203125,
+          "top": 125,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "-12.50",
+          "left": 942.796875,
+          "top": 125,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "Supalosa / peak",
+          "left": 24,
+          "top": 159,
+          "width": 127.265625,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-18.75",
+          "left": 452.796875,
+          "top": 157,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "-6.25",
+          "left": 704.05908203125,
+          "top": 157,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "+12.50",
+          "left": 938.9912109375,
+          "top": 157,
+          "width": 72.017578125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "Supalosa / hfo-original",
+          "left": 24,
+          "top": 191,
+          "width": 179.9296875,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+6.25",
+          "left": 455.25341796875,
+          "top": 189,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "0.00",
+          "left": 707.79443359375,
+          "top": 189,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "-6.25",
+          "left": 949.05908203125,
+          "top": 189,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "Supalosa / hfo-golden",
+          "left": 24,
+          "top": 223,
+          "width": 174.359375,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "0.00",
+          "left": 462.79443359375,
+          "top": 221,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "-12.50",
+          "left": 697.796875,
+          "top": 221,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "-12.50",
+          "left": 942.796875,
+          "top": 221,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "Supalosa / hfo-corners",
+          "left": 24,
+          "top": 255,
+          "width": 179.609375,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-6.25",
+          "left": 459.05908203125,
+          "top": 253,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "0.00",
+          "left": 707.79443359375,
+          "top": 253,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "+6.25",
+          "left": 945.25341796875,
+          "top": 253,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "Supalosa / hfo-corners-b",
+          "left": 24,
+          "top": 287,
+          "width": 195.5390625,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+6.25",
+          "left": 455.25341796875,
+          "top": 285,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "+6.25",
+          "left": 700.25341796875,
+          "top": 285,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "0.00",
+          "left": 952.79443359375,
+          "top": 285,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "Supalosa / hfo-corners-b-golden",
+          "left": 24,
+          "top": 319,
+          "width": 255.84375,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+31.25",
+          "left": 448.9912109375,
+          "top": 317,
+          "width": 72.017578125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "+6.25",
+          "left": 700.25341796875,
+          "top": 317,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "-25.00",
+          "left": 942.796875,
+          "top": 317,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "Supalosa / hfo-bvb",
+          "left": 24,
+          "top": 351,
+          "width": 149.609375,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+12.50",
+          "left": 448.9912109375,
+          "top": 349,
+          "width": 72.017578125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "-12.50",
+          "left": 697.796875,
+          "top": 349,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "-25.00",
+          "left": 942.796875,
+          "top": 349,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "Supalosa / hfo-lvl",
+          "left": 24,
+          "top": 383,
+          "width": 138.1875,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-12.50",
+          "left": 452.796875,
+          "top": 381,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "-12.50",
+          "left": 697.796875,
+          "top": 381,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "0.00",
+          "left": 952.79443359375,
+          "top": 381,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "Supalosa / hfo-rvr",
+          "left": 24,
+          "top": 415,
+          "width": 142.453125,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+6.25",
+          "left": 455.25341796875,
+          "top": 413,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "-6.25",
+          "left": 704.05908203125,
+          "top": 413,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "-12.50",
+          "left": 942.796875,
+          "top": 413,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "Supalosa / hfo-tvt",
+          "left": 24,
+          "top": 447,
+          "width": 141.84375,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "0.00",
+          "left": 462.79443359375,
+          "top": 445,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "-6.25",
+          "left": 704.05908203125,
+          "top": 445,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "-6.25",
+          "left": 949.05908203125,
+          "top": 445,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "Supalosa / tour-of-egypt",
+          "left": 24,
+          "top": 479,
+          "width": 192.2421875,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-6.25",
+          "left": 459.05908203125,
+          "top": 477,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "0.00",
+          "left": 707.79443359375,
+          "top": 477,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "+6.25",
+          "left": 945.25341796875,
+          "top": 477,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "Supalosa / south-pacific",
+          "left": 24,
+          "top": 511,
+          "width": 190.7265625,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "0.00",
+          "left": 462.79443359375,
+          "top": 509,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "0.00",
+          "left": 707.79443359375,
+          "top": 509,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "0.00",
+          "left": 952.79443359375,
+          "top": 509,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "Supalosa / south-pacific-2",
+          "left": 24,
+          "top": 543,
+          "width": 206.6796875,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "0.00",
+          "left": 462.79443359375,
+          "top": 541,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "0.00",
+          "left": 707.79443359375,
+          "top": 541,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "0.00",
+          "left": 952.79443359375,
+          "top": 541,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "Supalosa / pacific-heights",
+          "left": 24,
+          "top": 575,
+          "width": 205.3828125,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+25.00",
+          "left": 448.9912109375,
+          "top": 573,
+          "width": 72.017578125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "0.00",
+          "left": 707.79443359375,
+          "top": 573,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "-25.00",
+          "left": 942.796875,
+          "top": 573,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "Advanced / hfo-le",
+          "left": 24,
+          "top": 607,
+          "width": 140.515625,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-12.50",
+          "left": 452.796875,
+          "top": 605,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "-6.25",
+          "left": 704.05908203125,
+          "top": 605,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "+6.25",
+          "left": 945.25341796875,
+          "top": 605,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "Advanced / hfo-original",
+          "left": 24,
+          "top": 639,
+          "width": 186.328125,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+18.75",
+          "left": 448.9912109375,
+          "top": 637,
+          "width": 72.017578125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "0.00",
+          "left": 707.79443359375,
+          "top": 637,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "-18.75",
+          "left": 942.796875,
+          "top": 637,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "Advanced / hfo-golden",
+          "left": 24,
+          "top": 671,
+          "width": 180.7578125,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+25.00",
+          "left": 448.9912109375,
+          "top": 669,
+          "width": 72.017578125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "+6.25",
+          "left": 700.25341796875,
+          "top": 669,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "-18.75",
+          "left": 942.796875,
+          "top": 669,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "Advanced / hfo-corners",
+          "left": 24,
+          "top": 703,
+          "width": 186.0078125,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+6.25",
+          "left": 455.25341796875,
+          "top": 701,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "+12.50",
+          "left": 693.9912109375,
+          "top": 701,
+          "width": 72.017578125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "+6.25",
+          "left": 945.25341796875,
+          "top": 701,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "Advanced / hfo-corners-b",
+          "left": 24,
+          "top": 735,
+          "width": 201.9375,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-6.25",
+          "left": 459.05908203125,
+          "top": 733,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "-6.25",
+          "left": 704.05908203125,
+          "top": 733,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "0.00",
+          "left": 952.79443359375,
+          "top": 733,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "Advanced / hfo-corners-b-golden",
+          "left": 24,
+          "top": 767,
+          "width": 262.2421875,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+18.75",
+          "left": 448.9912109375,
+          "top": 765,
+          "width": 72.017578125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "0.00",
+          "left": 707.79443359375,
+          "top": 765,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "-18.75",
+          "left": 942.796875,
+          "top": 765,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "Advanced / hfo-bvb",
+          "left": 24,
+          "top": 799,
+          "width": 156.0078125,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+12.50",
+          "left": 448.9912109375,
+          "top": 797,
+          "width": 72.017578125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "-12.50",
+          "left": 697.796875,
+          "top": 797,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "-25.00",
+          "left": 942.796875,
+          "top": 797,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "Advanced / hfo-lvl",
+          "left": 24,
+          "top": 831,
+          "width": 144.5859375,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-6.25",
+          "left": 459.05908203125,
+          "top": 829,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "0.00",
+          "left": 707.79443359375,
+          "top": 829,
+          "width": 44.4111328125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#edf2f7"
+        },
+        {
+          "text": "+6.25",
+          "left": 945.25341796875,
+          "top": 829,
+          "width": 59.4931640625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "Advanced / hfo-rvr",
+          "left": 24,
+          "top": 863,
+          "width": 148.8515625,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "-6.25",
+          "left": 459.05908203125,
+          "top": 861,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "-12.50",
+          "left": 697.796875,
+          "top": 861,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "-6.25",
+          "left": 949.05908203125,
+          "top": 861,
+          "width": 51.8818359375,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "Advanced / hfo-tvt",
+          "left": 24,
+          "top": 895,
+          "width": 148.2421875,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "+37.50",
+          "left": 448.9912109375,
+          "top": 893,
+          "width": 72.017578125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "+12.50",
+          "left": 693.9912109375,
+          "top": 893,
+          "width": 72.017578125,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#d1e9e5"
+        },
+        {
+          "text": "-25.00",
+          "left": 942.796875,
+          "top": 893,
+          "width": 64.40625,
+          "height": 18,
+          "foreground": "#111827",
+          "background": "#fee2e2"
+        },
+        {
+          "text": "25 benchmark strata represent five topology groups; Advanced uses one HFO topology.",
+          "left": 24,
+          "top": 937,
+          "width": 701.9921875,
+          "height": 16,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        },
+        {
+          "text": "Color indicates sign only; numbers retain magnitude. Every row remains in the pooled decisions.",
+          "left": 24,
+          "top": 968,
+          "width": 726.484375,
+          "height": 15,
+          "foreground": "#111827",
+          "background": "#ffffff"
+        }
+      ]
+    }
+  ]
+}

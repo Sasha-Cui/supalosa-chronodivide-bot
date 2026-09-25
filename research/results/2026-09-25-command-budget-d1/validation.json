@@ -1,0 +1,45 @@
+{
+  "kind": "d1-result-report-validation-v1",
+  "complete": true,
+  "passed": true,
+  "generatedArtifacts": 23,
+  "hashesVerified": true,
+  "inputHashesVerified": true,
+  "all25StrataAndThreeContrastsRetained": true,
+  "all18BootstrapStreamsRetained": true,
+  "fullPairedIdentities": 200,
+  "fullActionEpisodes": 600,
+  "allTableRows": 474,
+  "tableCounts": {
+    "populations_full_audit": 18,
+    "uncertainty_full_audit": 18,
+    "identities_full_audit": 200,
+    "scheduler_full_audit": 603,
+    "gates_full_audit": 22,
+    "action_episodes_full_audit": 600,
+    "measurement_full_audit": 75,
+    "strata_full_audit": 25
+  },
+  "oodLinksVerified": 42,
+  "noImageReportClean": true,
+  "eachFigureFollowedByTable": true,
+  "images": [
+    {
+      "file": "visual_figures/paired-score-bounds.png",
+      "width": 1180,
+      "height": 620,
+      "darkPixels": 19852,
+      "coloredPixels": 47951,
+      "minimumTextContrast": 17.73971700407407
+    },
+    {
+      "file": "visual_figures/all-stratum-score-deltas.png",
+      "width": 1160,
+      "height": 1010,
+      "darkPixels": 41533,
+      "coloredPixels": 507447,
+      "minimumTextContrast": 13.936706755422204
+    }
+  ],
+  "visualHumanOrAgentPassRequired": true
+}
