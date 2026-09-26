@@ -126,10 +126,11 @@ game runtime or CPU-cost measurement.
 The formatted current-source build and414checks passed:
 329Vitest assertions across33files plus85Node checks, including26new harness
 checks. Failed,pending,todo,skipped and cancelled counts are zero.
-Engine initialization, advancing games, full registration censuses and real
-submission calls remain zero at this documentation commit.
+At the original harness documentation commit2782478, engine initialization,
+advancing games, full registration censuses and real submission calls were zero.
+The subsequent held/cancelled request and verified repair are recorded below.
 
-Current evidence:
+Original harness evidence:
 `research-evidence/strategic-diagnostic-s1/development/harness-final-fSiJrF/result.json`
 286299bytes,SHA-256
 `c0fc111088897419b7e3bf4284fa0174746d493d7e9e3be2a6d3b1513ec1fdbe`.
@@ -160,6 +161,35 @@ Preserved earlier attempts this turn:
 No failed development run was removed. No historical D1/OD1 code, outcome,
 protocol or evidence was changed. Both pre-change golden generators/fixtures
 remain byte-identical. The original StrongBot policy and manuscript are unchanged.
+
+## Held V1 submission and exact-one-node repair
+
+Pure request27581017 was submitted under source2782478 with a hold.
+The controller rejected its scheduler snapshot because Slurm rendered the
+one-node request as NumNodes=1-1 while the parser required the literal string1.
+Its account,partition,one CPU,8GiB,two-hour limit,zero restarts,no requeue and
+repository workdir were correct. The job never started; no READY or release
+intent was created. The held request was explicitly cancelled, with
+CANCELLED/zero runtime confirmed before any source edit.
+
+The unchanged V1 freeze,intent,response,receipt and scheduler snapshot remain
+under submissions-v1/pure. Failure/cancellation evidence is
+development/held-submission-review-yEgwUR/record.json,3110bytes,
+SHA66260109f1e02a3d096a5141388bc4fda7c35994e2c00cd23cc1b1be2b706b4f.
+This was a submission-controller schema defect, not a failed executed pure gate
+or a game failure. No seeds or initializer identities were consumed.
+
+The narrow repair accepts only1 and1-1; ranges1-2,0-1 and2-2 remain rejected.
+All other resource/source/provenance guards are unchanged. The source-bound
+next attempt uses fresh pure-v2 and submissions-v2 paths. Execution-v1 remains
+unused. Schema kinds/markers remain V1 because the record schema did not change.
+Never rerun/release the cancelled job or overwrite its V1 artifacts.
+
+The post-repair formatted build and all414checks passed again, with
+26harness tests including both one-node encodings in every stage.
+Current evidence: development/harness-hold-repair-eqoKBH/result.json,
+285642bytes,SHAb79ed3ccc5594bfaedced5175474efd5fe6826be7ee5f0e3221bce032de705a8.
+The exact repair diff, source, reports and REPAIR.json remain in that directory.
 
 ## Next source-bound sequence
 

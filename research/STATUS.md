@@ -131,6 +131,13 @@ the [population checkpoint](notes/2026-09-26-s1-population-implementation.md) an
 the [runtime checkpoint](notes/2026-09-26-s1-runtime-implementation.md), then the
 current [harness checkpoint](notes/2026-09-26-s1-harness-implementation.md).
 
+The first pure request27581017 was cancelled while held and never started:
+Slurm's exact one-node interval1-1 exposed a submission-parser format defect.
+The narrow repair preserves the one-node requirement and all other guards;
+the full414development checks passed again. Its failure/intent/receipt/cancel
+evidence is preserved. Fresh pure-v2/submissions-v2 are the next technical
+namespace; no game or seed census ran in the cancelled attempt.
+
 ## Milestone ledger
 
 - **M0 — Correct endpoint evidence — complete 2026-09-05:** V2, independent
