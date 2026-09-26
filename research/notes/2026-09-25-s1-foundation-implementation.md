@@ -1,5 +1,10 @@
 # S1 foundation implementation checkpoint
 
+Follow-up: the [2026-09-26 episode checkpoint](2026-09-26-s1-episode-implementation.md)
+supersedes the adapter-pending portion below and records the later complete
+344-check development regression. This note preserves the foundation milestone
+and its earlier failures; neither milestone is a formal launch gate.
+
 Date: 2026-09-25. The prospective S1 protocol is unchanged:
 `952bca278befb716a25551d022fd3954b9ed999be375d8d9baf1253c53dc5b54`.
 

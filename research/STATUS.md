@@ -113,11 +113,14 @@ is now frozen before implementation: 200 fresh single-policy diagnostic cases,
 episodes total). This is observability work, not a stronger-bot claim.
 S1's passive foundations are implemented: current pre-change golden traces,
 a copying mission accessor, exact plan, public sampler/action windows, strict
-schema, bounded ledger and per-episode diagnostic core. The build and 331
-pure/synthetic development checks passed. The episode adapter, complete
-population analysis and provenance/execution harness remain pending, as does
-every formal S1 gate. No S1 initializer or game has run. See the
-[foundation checkpoint](notes/2026-09-25-s1-foundation-implementation.md).
+schema, bounded ledger and per-episode diagnostic core. The new episode adapter
+also passes synthetic disabled-D1 equivalence, observer noninterference and
+payload-discard checks. The formatted-source build and 344 pure/synthetic
+development checks passed. Complete population analysis, strict outer schemas
+and the provenance/execution harness remain pending, as does every formal S1
+gate. No real S1 initializer or game has run. See the
+[foundation checkpoint](notes/2026-09-25-s1-foundation-implementation.md) and
+[episode checkpoint](notes/2026-09-26-s1-episode-implementation.md).
 
 ## Milestone ledger
 
