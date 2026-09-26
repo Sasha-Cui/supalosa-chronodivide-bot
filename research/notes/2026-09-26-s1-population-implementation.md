@@ -1,5 +1,10 @@
 # S1 population analysis and result-validation checkpoint
 
+Follow-up: the [runtime checkpoint](2026-09-26-s1-runtime-implementation.md)
+records implemented storage/registration/provenance foundations and the later
+388-check development pass. Stage-envelope/runner/submission integration and
+all formal gates remain pending.
+
 Updated 2026-09-26 UTC, before any S1 engine initialization or study observation.
 The prospective S1 protocol is unchanged. This note supersedes the earlier
 population-analysis/episode-schema-pending checkpoint, not the still-missing
