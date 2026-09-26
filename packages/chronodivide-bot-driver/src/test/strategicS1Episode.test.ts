@@ -1,4 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
+import { validateS1Diagnostic, validateS1CanaryPair, validateS1Smoke } from "../training/strategicS1Results.js";
+import { syntheticS1Plan } from "./strategicS1Synthetic.js";
 import { ApiEventType, ObjectType } from "@chronodivide/game-api";
 import {
     runStrategicS1Episode,
@@ -60,7 +62,8 @@ const fixture = (mode: S1EpisodeMode = "diagnostic", eventMode: EventMode = "des
     };
     const game: any = {
         getCurrentTick: () => checked(tick),
-        getAllUnits: () => checked(units.map((u) => u.id)),
+        getAllUnits: (filter?: (rules: any) => boolean) =>
+            checked(units.filter((u) => !filter || filter(u.rules)).map((u) => u.id)),
         getUnitData: (id: number) => checked(units.find((u) => u.id === id)),
         getGameObjectData: (id: number) => checked(units.find((u) => u.id === id)),
         getVisibleUnits: (name: string, _visibility: string, filter?: (rules: any) => boolean) =>
@@ -367,5 +370,15 @@ describe("S1 episode lifecycle and technical projections (fake game only)", () =
     it("fails rather than truncates the combined artifact bound", () => {
         expect(assertS1ArtifactBytes({ a: 1 })).toBe(8);
         expect(() => assertS1ArtifactBytes({ payload: "x".repeat(S1_MAX_ARTIFACT_BYTES) })).toThrow(/byte bound/);
+    });
+    it("binds actual synthetic adapter outputs through all strict result validators", async () => {
+        const plan = syntheticS1Plan();
+        await validateS1Diagnostic(await runStrategicS1Episode(fixture()), plan.cases[0]);
+        const pair = [
+            await runStrategicS1Episode(fixture("canary_endpoint_only", "none")),
+            await runStrategicS1Episode(fixture("canary_strategic", "none")),
+        ];
+        validateS1CanaryPair(pair, plan.canaries[0]);
+        validateS1Smoke(await runStrategicS1Episode(fixture("smoke")), plan.smoke);
     });
 });
