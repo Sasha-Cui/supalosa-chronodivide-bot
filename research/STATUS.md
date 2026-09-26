@@ -1,6 +1,6 @@
 # Research status
 
-Last reconciled: **2026-09-25**
+Last reconciled: **2026-09-26**
 
 ## Bottom line
 
@@ -117,15 +117,19 @@ schema, bounded ledger and per-episode diagnostic core. The new episode adapter
 also passes synthetic disabled-D1 equivalence, observer noninterference and
 payload-discard checks. Complete descriptive population analysis and strict
 episode/cross-ledger validators are now implemented. Immutable storage, registration
-audit implementation, factory contracts and provenance checks are also written;
-the formatted-source build and 388 pure/synthetic development checks passed.
-Stage-envelope schemas, runner/finalizer, pure/submission programs and Slurm
-wrappers remain pending, as does every formal S1 gate and the actual metadata
-census. No real S1 initializer or game has run. See the
+audit implementation, factory contracts and provenance checks are connected to
+complete stage envelopes, runner/finalizers, pure/submission programs and CPU
+Slurm wrappers. The formatted-source build and414pure/synthetic development
+checks passed, including26harness checks and a complete200-case synthetic
+aggregate. Formal gates, independent gate audits and the actual metadata census
+remain pending at this documentation commit; no real S1 initializer or game has
+run. Held submissions require durable receipts and verified scheduler resources
+before release. See the
 [foundation checkpoint](notes/2026-09-25-s1-foundation-implementation.md) and
 [episode checkpoint](notes/2026-09-26-s1-episode-implementation.md), followed by
 the [population checkpoint](notes/2026-09-26-s1-population-implementation.md) and
-current [runtime checkpoint](notes/2026-09-26-s1-runtime-implementation.md).
+the [runtime checkpoint](notes/2026-09-26-s1-runtime-implementation.md), then the
+current [harness checkpoint](notes/2026-09-26-s1-harness-implementation.md).
 
 ## Milestone ledger
 
