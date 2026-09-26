@@ -42,6 +42,27 @@ export class SupalosaBot extends Bot {
         this.queueController = new QueueController();
     }
 
+    /** Research-only read. No policy code calls this accessor. */
+    public getResearchMissionSnapshot(): Array<{
+        /** Opaque identity for an observer-owned WeakMap; never serialize or dereference. */
+        handle: object;
+        name: string;
+        type: string;
+        priority: number;
+        active: boolean;
+        unitIds: number[];
+    }> | null {
+        if (!this.missionController) return null;
+        return this.missionController.getMissions().map(mission => ({
+            handle: mission,
+            name: mission.getUniqueName(),
+            type: mission.constructor.name,
+            priority: mission.getPriority(),
+            active: mission.isActive(),
+            unitIds: [...mission.getUnitIds()].sort((a, b) => a - b),
+        }));
+    }
+
     override onGameStart(game: GameApi) {
         const gameRate = game.getTickRate();
         const botApm = 300;
