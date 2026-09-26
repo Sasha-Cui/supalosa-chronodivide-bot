@@ -44,6 +44,8 @@ export const requiredHarnessFiles = [
     "research/runtime/strategic-s1-contract.mjs",
     "research/runtime/strategic-s1-provenance.mjs",
     "research/runtime/strategic-s1-stages.mjs",
+    "research/runtime/strategic-s1-gates.mjs",
+    "research/runtime/strategic-s1-tests.mjs",
     "research/scripts/strategic-s1.mjs",
     "research/scripts/strategic-s1-pure.mjs",
     "research/scripts/submit-strategic-s1.mjs",
@@ -105,7 +107,7 @@ export function configuration() {
         arbiterEnabled: false,
     };
 }
-export function assertSource(stage) {
+export function sourceSnapshot(stage) {
     const sourceCommit = required("SOURCE_COMMIT"),
         program = stage === "pure" ? PURE_PROGRAM : PROGRAM,
         script = stage === "pure" ? PURE_SCRIPT : STAGE_SCRIPT;
@@ -123,7 +125,6 @@ export function assertSource(stage) {
             fileHash(script) === requiredHash("SCRIPT_SHA256"),
         "source/protocol/program identity",
     );
-    schedulerIdentity(stage);
     return {
         sourceCommit,
         programSha256: fileHash(program),
@@ -134,6 +135,10 @@ export function assertSource(stage) {
         driverTree: hashTree(path.join(DRIVER, "dist")),
         candidateTree: hashTree(path.join(REPO, "packages/chronodivide-bot/dist")),
     };
+}
+export function assertSource(stage) {
+    schedulerIdentity(stage);
+    return sourceSnapshot(stage);
 }
 /** Read-only metadata/content verification. Never calls init/createGame or performs a seed census. */
 export function verifyRuntime() {
