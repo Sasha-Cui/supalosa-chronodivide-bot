@@ -18,7 +18,8 @@ import {
 import { PURE_PROGRAM, PURE_SCRIPT } from "./strategic-s1-provenance.mjs";
 import { VITEST_NAMES, VITEST_PASSED, NODE_TESTS, NODE_PASSED, TOTAL_PASSED } from "./strategic-s1-tests.mjs";
 import { descriptor, validateScheduler, stageRequest } from "./strategic-s1-stages.mjs";
-export const PURE_DIRECTORY = path.join(STUDY, "pure-v1");
+// V1 was cancelled while held, before execution; preserve its immutable submission.
+export const PURE_DIRECTORY = path.join(STUDY, "pure-v2");
 export const PURE_PATH = path.join(PURE_DIRECTORY, "pure.json");
 export const VERIFICATION_SCOPES = {
     pure: "independent-pure-metadata",

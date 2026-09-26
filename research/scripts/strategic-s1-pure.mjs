@@ -22,7 +22,7 @@ import { stageRequest } from "../runtime/strategic-s1-stages.mjs";
 import { verifySubmission } from "./submit-strategic-s1.mjs";
 export async function runPure() {
     const out = path.resolve(required("OUT_DIR"));
-    if (out !== path.join(STUDY, "pure-v1") || fs.existsSync(out))
+    if (out !== path.join(STUDY, "pure-v2") || fs.existsSync(out))
         throw new Error("S1 pure already attempted or wrong output");
     const before = assertSource("pure");
     verifySubmission("pure", before, verifyRuntime(), schedulerIdentity("pure"));

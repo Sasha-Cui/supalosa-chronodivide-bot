@@ -41,7 +41,7 @@ import {
 import { buildStrategicS1Plan } from "../runtime/strategic-s1-registration.mjs";
 import { makeBinding } from "../runtime/strategic-s1-stages.mjs";
 
-export const SUBMISSIONS = path.join(STUDY, "submissions-v1");
+export const SUBMISSIONS = path.join(STUDY, "submissions-v2");
 const phases = ["pure", "prepare", "canary", "smoke", "main"];
 const baseEnvironment = (stage) => ({
     REPO_ROOT: REPO,
@@ -330,7 +330,7 @@ export function validateHeldJob(text, jobId, stage) {
             get("Priority") === "0" &&
             get("Requeue") === "0" &&
             get("Restarts") === "0" &&
-            get("NumNodes") === "1" &&
+            ["1", "1-1"].includes(get("NumNodes")) &&
             get("NumCPUs") === "1" &&
             get("NumTasks") === "1" &&
             get("CPUs/Task") === "1" &&

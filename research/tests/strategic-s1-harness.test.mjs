@@ -504,14 +504,19 @@ const heldText = (stage, id) =>
     requestFor(stage).timeMinutes / 60 +
     ":00:00\n";
 test("S1 held Slurm resources must validate before READY publication or release", () => {
-    for (const stage of ["pure", "prepare", "canary", "canary-finalize", "smoke", "case", "finalize"])
+    for (const stage of ["pure", "prepare", "canary", "canary-finalize", "smoke", "case", "finalize"]) {
         validateHeldJob(heldText(stage, "9000"), "9000", stage);
+        validateHeldJob(heldText(stage, "9000").replace("NumNodes=1 ", "NumNodes=1-1 "), "9000", stage);
+    }
     const text = heldText("case", "9000");
     for (const [a, b] of [
         ["Priority=0", "Priority=1"],
         ["Requeue=0", "Requeue=1"],
         ["mem=8192M", "mem=4096M"],
         ["NumNodes=1", "NumNodes=2"],
+        ["NumNodes=1", "NumNodes=1-2"],
+        ["NumNodes=1", "NumNodes=0-1"],
+        ["NumNodes=1", "NumNodes=2-2"],
         ["TimeLimit=6:00:00", "TimeLimit=8:00:00"],
         ["JobState=PENDING", "JobState=RUNNING"],
         ["node=1", "node=1,gres/gpu=1"],
