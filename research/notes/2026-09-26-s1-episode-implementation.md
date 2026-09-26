@@ -1,5 +1,10 @@
 # S1 episode adapter implementation checkpoint
 
+Follow-up: the [population checkpoint](2026-09-26-s1-population-implementation.md)
+records complete descriptive analysis/episode validators and the later 368-check
+development pass. It supersedes those pending items below, not the provenance,
+registration, stage execution or formal gates.
+
 Updated 2026-09-26 UTC. This follows the committed passive foundations and
 the unchanged prospective S1 protocol. It is development implementation,
 not a completed formal gate, measurement study or stronger-policy claim.
