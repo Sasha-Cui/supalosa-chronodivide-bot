@@ -1,5 +1,9 @@
 # S1 execution harness implementation — 2026-09-26
 
+Follow-up: the [September28 memory-format checkpoint](2026-09-28-s1-reqmem-compatibility.md)
+records completed V2 execution, a fail-closed accounting-consumer incompatibility,
+and the verified narrow repair/new V3 technical namespace. Its415check target supersedes414 below.
+
 This checkpoint completes the production execution harness as development work.
 It does not certify a formal gate, a real initializer, a seed collision census,
 an advancing episode, or a strategic result. The frozen protocol remains

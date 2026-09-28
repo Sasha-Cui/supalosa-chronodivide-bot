@@ -1,6 +1,6 @@
 # Research status
 
-Last reconciled: **2026-09-26**
+Last reconciled: **2026-09-28 UTC**
 
 ## Bottom line
 
@@ -137,6 +137,15 @@ The narrow repair preserves the one-node requirement and all other guards;
 the full414development checks passed again. Its failure/intent/receipt/cancel
 evidence is preserved. Fresh pure-v2/submissions-v2 are the next technical
 namespace; no game or seed census ran in the cancelled attempt.
+
+Pure V2 job27581146 completed0:0 with all414checks, but its accounting consumer
+rejected valid unsuffixed8G memory output. Full evidence and the reproduced
+consumer failure are preserved; no independent gate acceptance or selector
+launch occurred. The narrow parser repair retains every resource requirement;
+the formatted build and415development checks now pass. The next current-source
+formal gate uses fresh pure-v3/submissions-v3, followed by its independent audit.
+No S1 initializer, advancing game or real census has run. See the current
+[memory-format checkpoint](notes/2026-09-28-s1-reqmem-compatibility.md).
 
 ## Milestone ledger
 
