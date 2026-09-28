@@ -41,7 +41,7 @@ import {
 import { buildStrategicS1Plan } from "../runtime/strategic-s1-registration.mjs";
 import { makeBinding } from "../runtime/strategic-s1-stages.mjs";
 
-export const SUBMISSIONS = path.join(STUDY, "submissions-v2");
+export const SUBMISSIONS = path.join(STUDY, "submissions-v3");
 const phases = ["pure", "prepare", "canary", "smoke", "main"];
 const baseEnvironment = (stage) => ({
     REPO_ROOT: REPO,
