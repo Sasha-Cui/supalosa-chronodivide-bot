@@ -200,8 +200,28 @@ test("S1 accounting expands exact200allocation rows and checks complete resource
     assert.equal(requestFor("finalize").memoryMiB, 24576);
 });
 test("S1 Slurm memory parser supports exactK/M/G/T node or CPU units", () => {
-    for (const m of ["8388608Kn", "8192Mn", "8Gn", "0.0078125Tn", "8Gc"]) assert.equal(memoryMiB(m), 8192);
-    for (const m of ["8G", "NaNGn", "-8Gn", "8Pn"]) assert.throws(() => memoryMiB(m));
+    for (const m of ["8388608K", "8192M", "8G", "0.0078125T", "8388608Kn", "8192Mn", "8Gn", "0.0078125Tn", "8Gc"])
+        assert.equal(memoryMiB(m), 8192);
+    for (const m of ["8", "8GB", "8Gx", "NaNGn", "-8Gn", "8Pn"]) assert.throws(() => memoryMiB(m));
+});
+test("S1 accepts the retained unsuffixed sacct format while preserving CPU memory time and completion gates", () => {
+    // Literal shape of job27581146's completed allocation; no scheduler call or game.
+    const row = "27581146|27581146|COMPLETED|0:0|pi_jss233|day|1|0|263|8G|120|" + REPO + "\n";
+    assert.equal(parseSchedulerRows(row, "27581146", "pure")[0].reqMem, "8G");
+    for (const memory of ["8388608K", "8192M", "0.0078125T", "8Gn", "8Gc"])
+        assert.equal(parseSchedulerRows(row.replace("|8G|", "|" + memory + "|"), "27581146", "pure").length, 1);
+    for (const [from, to] of [
+        ["|8G|", "|7G|"],
+        ["|8G|", "|9G|"],
+        ["|1|0|263|", "|2|0|263|"],
+        ["|1|0|263|", "|1|1|263|"],
+        ["|120|", "|121|"],
+        ["|0:0|", "|1:0|"],
+        ["|COMPLETED|", "|RUNNING|"],
+        ["|pi_jss233|", "|pi_btk22|"],
+        ["|day|", "|week|"],
+    ])
+        assert.throws(() => parseSchedulerRows(row.replace(from, to), "27581146", "pure"));
 });
 test("S1 metadata census is exact with no prior/current-study blanket exemptions", () => {
     const allowed = permittedRegistrations();

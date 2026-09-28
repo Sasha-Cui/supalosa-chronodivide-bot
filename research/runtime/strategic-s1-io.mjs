@@ -335,7 +335,10 @@ export function schedulerIdentity(stage, env = process.env) {
     return value;
 }
 export function memoryMiB(text) {
-    const match = /^([0-9]+(?:\.[0-9]+)?)([KMGT])([nc])$/.exec(text);
+    // sacct can omit the n/c suffix. Every accepted allocation below must still
+    // have exactly one CPU and the frozen requested memory, so these encodings
+    // denote the same budget here; malformed units and all budget drift fail.
+    const match = /^([0-9]+(?:\.[0-9]+)?)([KMGT])([nc])?$/.exec(text);
     requireTrue(match !== null, "Slurm memory unit");
     return Number(match[1]) * { K: 1 / 1024, M: 1, G: 1024, T: 1048576 }[match[2]];
 }
