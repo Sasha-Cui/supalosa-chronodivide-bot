@@ -1,4 +1,6 @@
 import { describe, it, expect, vi } from "vitest";
+import { createHash } from "node:crypto";
+import { gzipSync, gunzipSync } from "node:zlib";
 import { SupalosaBot } from "@supalosa/chronodivide-bot/dist/bot/bot.js";
 import { Countries } from "@supalosa/chronodivide-bot/dist/bot/logic/common/utils.js";
 import { buildStrategicS1Plan, validateStrategicS1Plan } from "../training/strategicS1Plan.js";
@@ -115,15 +117,90 @@ function samples(updates = 1200, alter?: (f: ReturnType<typeof world>, tick: num
     return result;
 }
 describe("S1 frozen passive foundations (synthetic, no engine)", () => {
+    it("encodes supported infinite primary and secondary speeds for both players", () => {
+        const s = samples(1200, (f) => {
+            for (const u of f.units) {
+                u.primaryWeapon = {
+                    type: 0,
+                    rules: { name: "InstantPrimary" },
+                    minRange: 0,
+                    maxRange: 6,
+                    speed: Infinity,
+                    cooldownTicks: 0,
+                };
+                u.secondaryWeapon = { ...u.primaryWeapon, type: 1, rules: { name: "InstantSecondary" } };
+            }
+        });
+        for (const row of s) {
+            validateS1Sample(row);
+            for (const u of row.units) {
+                expect(u.primaryWeapon?.speed).toBe("positive_infinity");
+                expect(u.secondaryWeapon?.speed).toBe("positive_infinity");
+                expect(u.primaryWeapon?.cooldownTicks).toBe(0);
+            }
+        }
+        expect(JSON.parse(JSON.stringify(s))).toEqual(s);
+    });
+    it("rejects malformed raw speeds and preserves all other finite-only checks", () => {
+        for (const value of [NaN, -Infinity, "positive_infinity", null, undefined, {}])
+            expect(() =>
+                samples(0, (f) => {
+                    f.units[0].primaryWeapon.speed = value;
+                }),
+            ).toThrow();
+        for (const field of ["minRange", "maxRange", "cooldownTicks"])
+            expect(() =>
+                samples(0, (f) => {
+                    f.units[0].primaryWeapon[field] = Infinity;
+                }),
+            ).toThrow();
+        const s = samples(0);
+        (s[0].units[0].primaryWeapon as any).speed = "positive_infinity_bad";
+        expect(() => validateS1Sample(s[0])).toThrow();
+        (s[0].units[0].primaryWeapon as any).speed = "positive_infinity";
+        (s[0].units[0].primaryWeapon as any).maxRange = "positive_infinity";
+        expect(() => validateS1Sample(s[0])).toThrow();
+    });
+    it("round-trips explicit infinity through V2 ledgers and rejects rehashed schema corruption", () => {
+        const s = samples(1200, (f) => {
+            f.units[0].primaryWeapon.speed = Infinity;
+        });
+        const encoded = encodeS1Ledger(s, { caseIndex: 0, requestedEngineSeed: 3350130000, maxUpdates: 24000 }, 1200, {
+            sha256: "a".repeat(64),
+            bySideAndMethod: {},
+        });
+        expect(replayS1Ledger(encoded.ledger).samples).toEqual(s);
+        expect(() =>
+            replayS1Ledger({ ...encoded.ledger, encoding: "strategic-s1-gzip-jsonl-base64-v1" } as any),
+        ).toThrow();
+        const rows = gunzipSync(Buffer.from(encoded.ledger.data, "base64"))
+            .toString()
+            .trimEnd()
+            .split("\n")
+            .map((x) => JSON.parse(x));
+        rows[1].units[0].primaryWeapon.speed = "Infinity";
+        const plain = Buffer.from(rows.map((x) => JSON.stringify(x) + "\n").join("")),
+            gzip = gzipSync(plain, { level: 9 });
+        const sha = (x: Buffer) => createHash("sha256").update(x).digest("hex");
+        const corrupted = {
+            ...encoded.ledger,
+            data: gzip.toString("base64"),
+            plainBytes: plain.length,
+            gzipBytes: gzip.length,
+            plainSha256: sha(plain),
+            gzipSha256: sha(gzip),
+        };
+        expect(() => replayS1Ledger(corrupted)).toThrow();
+    });
     it("reconstructs exactly 205 fresh definitions and 209 advancing episodes", () => {
         const p = buildStrategicS1Plan(maps());
         validateStrategicS1Plan(p);
         expect(p.cases).toHaveLength(200);
         expect(p.cases.map((c) => c.requestedEngineSeed)).toEqual(
-            Array.from({ length: 200 }, (_, i) => 3350120000 + i),
+            Array.from({ length: 200 }, (_, i) => 3350130000 + i),
         );
-        expect(p.canaries.map((c) => c.requestedEngineSeed)).toEqual([3350121000, 3350121001, 3350121002, 3350121003]);
-        expect(p.smoke.requestedEngineSeed).toBe(3350121100);
+        expect(p.canaries.map((c) => c.requestedEngineSeed)).toEqual([3350131000, 3350131001, 3350131002, 3350131003]);
+        expect(p.smoke.requestedEngineSeed).toBe(3350131100);
         expect(new Set([...p.cases, ...p.canaries, p.smoke].map((c) => c.requestedEngineSeed)).size).toBe(205);
         expect(p.counts.advancingEpisodes).toBe(209);
         expect(p.policy.arbiterEnabled).toBe(false);
@@ -376,7 +453,7 @@ describe("S1 frozen passive foundations (synthetic, no engine)", () => {
     });
     it("round-trips the complete strategic gzip ledger and reconstructed diagnostics", () => {
         const s = samples(),
-            encoded = encodeS1Ledger(s, { caseIndex: 0, requestedEngineSeed: 3350120000, maxUpdates: 24000 }, 1200, {
+            encoded = encodeS1Ledger(s, { caseIndex: 0, requestedEngineSeed: 3350130000, maxUpdates: 24000 }, 1200, {
                 sha256: "a".repeat(64),
                 bySideAndMethod: {},
             }),
@@ -387,7 +464,7 @@ describe("S1 frozen passive foundations (synthetic, no engine)", () => {
     });
     it("rejects ledger checksum, size, seed, and action-conservation drift", () => {
         const s = samples(),
-            binding = { caseIndex: 0, requestedEngineSeed: 3350120000, maxUpdates: 24000 as const },
+            binding = { caseIndex: 0, requestedEngineSeed: 3350130000, maxUpdates: 24000 as const },
             p = { sha256: "a".repeat(64), bySideAndMethod: {} };
         const { ledger } = encodeS1Ledger(s, binding, 1200, p);
         expect(() => replayS1Ledger({ ...ledger, gzipSha256: "0".repeat(64) })).toThrow();

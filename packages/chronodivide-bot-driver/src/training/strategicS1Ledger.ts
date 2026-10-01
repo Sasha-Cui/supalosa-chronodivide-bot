@@ -10,7 +10,7 @@ export const S1_LEDGER_LIMITS = {
 } as const;
 export type S1LedgerIdentity = { caseIndex: number; requestedEngineSeed: number; maxUpdates: 3600 | 24000 };
 export type S1EmbeddedLedger = {
-    encoding: "strategic-s1-gzip-jsonl-base64-v1";
+    encoding: "strategic-s1-gzip-jsonl-base64-v2";
     records: number;
     gzipBytes: number;
     plainBytes: number;
@@ -27,7 +27,7 @@ function identity(x: S1LedgerIdentity) {
     natural(x.caseIndex);
     require(x.caseIndex <= 204, "case index");
     const seed =
-        x.caseIndex < 200 ? 3350120000 + x.caseIndex : x.caseIndex < 204 ? 3350121000 + x.caseIndex - 200 : 3350121100;
+        x.caseIndex < 200 ? 3350130000 + x.caseIndex : x.caseIndex < 204 ? 3350131000 + x.caseIndex - 200 : 3350131100;
     require(x.requestedEngineSeed === seed, "seed");
     require(x.maxUpdates === (x.caseIndex >= 200 && x.caseIndex < 204 ? 3600 : 24000), "horizon");
 }
@@ -54,7 +54,7 @@ export function encodeS1Ledger(
     require(JSON.stringify(total) === JSON.stringify(expected), "public action conservation");
     const analysis = analyzeS1Episode(samples, updates),
         header = {
-            kind: "strategic-s1-header-v1",
+            kind: "strategic-s1-header-v2",
             identity: binding,
             sampleInterval: 300,
             policy: "unchanged_strongbot",
@@ -62,7 +62,7 @@ export function encodeS1Ledger(
             combatants: { candidate: "OD1Candidate", baseline: "OD1Opponent" },
         };
     const final = {
-        kind: "strategic-s1-final-v1",
+        kind: "strategic-s1-final-v2",
         updates,
         samples: samples.length,
         publicCalls: { sha256: publicCalls.sha256, bySideAndMethod: total },
@@ -75,7 +75,7 @@ export function encodeS1Ledger(
     const gzip = gzipSync(plain, { level: 9 });
     require(gzip.length <= S1_LEDGER_LIMITS.gzipBytes, "gzip byte bound");
     const ledger: S1EmbeddedLedger = {
-        encoding: "strategic-s1-gzip-jsonl-base64-v1",
+        encoding: "strategic-s1-gzip-jsonl-base64-v2",
         records: records.length,
         gzipBytes: gzip.length,
         plainBytes: plain.length,
@@ -87,7 +87,7 @@ export function encodeS1Ledger(
 }
 export function replayS1Ledger(ledger: S1EmbeddedLedger) {
     exactFields(ledger, "encoding records gzipBytes plainBytes gzipSha256 plainSha256 data");
-    require(ledger.encoding === "strategic-s1-gzip-jsonl-base64-v1", "encoding");
+    require(ledger.encoding === "strategic-s1-gzip-jsonl-base64-v2", "encoding");
     for (const k of ["records", "gzipBytes", "plainBytes"] as const) {
         natural(ledger[k]);
         require(ledger[k] > 0, "empty ledger");
@@ -115,7 +115,7 @@ export function replayS1Ledger(ledger: S1EmbeddedLedger) {
     const header = decoded.shift(),
         final = decoded.pop();
     exactFields(header, "kind identity sampleInterval policy arbiterEnabled combatants");
-    require(header.kind === "strategic-s1-header-v1" &&
+    require(header.kind === "strategic-s1-header-v2" &&
         header.sampleInterval === 300 &&
         header.policy === "unchanged_strongbot" &&
         header.arbiterEnabled === false, "header");
@@ -123,7 +123,7 @@ export function replayS1Ledger(ledger: S1EmbeddedLedger) {
         JSON.stringify({ candidate: "OD1Candidate", baseline: "OD1Opponent" }), "combatants");
     identity(header.identity);
     exactFields(final, "kind updates samples publicCalls analysisSha256");
-    require(final.kind === "strategic-s1-final-v1", "final");
+    require(final.kind === "strategic-s1-final-v2", "final");
     exactFields(final.publicCalls, "sha256 bySideAndMethod");
     require(/^[a-f0-9]{64}$/.test(final.publicCalls.sha256), "public action hash");
     validateS1Sequence(decoded, final.updates);

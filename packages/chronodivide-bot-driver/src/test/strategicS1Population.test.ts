@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { verifyEmbeddedFreshDualLedger } from "../training/embeddedFreshDualLedger.js";
 import { verifyFreshDualLedgerRecords } from "../training/freshDualEndpointLedger.js";
-import { S1Distribution, mergeS1Distributions } from "../training/strategicS1Distributions.js";
+import { S1Distribution, S1Metrics, mergeS1Distributions } from "../training/strategicS1Distributions.js";
 import { describeS1Episode } from "../training/strategicS1Descriptions.js";
 import { validateS1CanaryPair, validateS1Smoke, validateS1Diagnostic, s1Hash } from "../training/strategicS1Results.js";
 import { analyzeStrategicS1Population, S1_STATUSES } from "../training/strategicS1Population.js";
@@ -21,6 +21,66 @@ const metric = (r: ReturnType<typeof describeS1Episode>, key: string) => {
     return value;
 };
 describe("S1 complete distributions and missingness (pure synthetic records)", () => {
+    it("retains mixed finite, infinite and unavailable speed frequencies and extended summaries", () => {
+        const d = new S1Distribution("finite_or_positive_infinity");
+        d.add(0);
+        d.add(20);
+        d.add("positive_infinity", "", 3);
+        d.add(null, "absent_weapon", 2);
+        const r = d.finish();
+        expect(r.coverage).toMatchObject({
+            eligible: 7,
+            observed: 5,
+            unavailable: 2,
+            missingReasons: { absent_weapon: 2 },
+        });
+        expect(r.distribution).toMatchObject({
+            n: 5,
+            min: 0,
+            max: "positive_infinity",
+            sum: "positive_infinity",
+            median: "positive_infinity",
+            p90: "positive_infinity",
+            mean: "positive_infinity",
+            frequencies: [
+                { value: 0, count: 1 },
+                { value: 20, count: 1 },
+                { value: "positive_infinity", count: 3 },
+            ],
+        });
+        expect(JSON.parse(JSON.stringify(r))).toEqual(r);
+        const large = new S1Distribution("finite_or_positive_infinity");
+        large.add(Number.MAX_VALUE, "", 2);
+        large.add("positive_infinity");
+        expect(large.finish().distribution?.mean).toBe("positive_infinity");
+        const finiteOverflow = new S1Distribution();
+        finiteOverflow.add(Number.MAX_VALUE, "", 2);
+        expect(() => finiteOverflow.finish()).toThrow();
+    });
+    it("restricts the infinity domain to exact speed metrics and merges without dropping cases", () => {
+        const m = new S1Metrics();
+        expect(() => m.add("candidate.unit.health", "positive_infinity", "public_value", "unit")).toThrow();
+        m.add("candidate.unit.primaryWeapon.speed", "positive_infinity", "public_weapon_value", "unit");
+        expect(m.definitions.get("candidate.unit.primaryWeapon.speed")?.valueDomain).toBe(
+            "finite_or_positive_infinity",
+        );
+        const a = new S1Distribution("finite_or_positive_infinity"),
+            b = new S1Distribution("finite_or_positive_infinity");
+        a.add(20);
+        b.add("positive_infinity", "", 3);
+        b.add(null, "absent_weapon");
+        const rows = [
+            { key: "speed", ...a.finish() },
+            { key: "speed", ...b.finish() },
+        ];
+        const forward = mergeS1Distributions(rows, "finite_or_positive_infinity");
+        expect(mergeS1Distributions(rows.slice().reverse(), "finite_or_positive_infinity")).toEqual(forward);
+        expect(forward.coverage).toMatchObject({ observed: 4, unavailable: 1 });
+        expect(forward.equalCaseMeans.distribution?.n).toBe(2);
+        expect(forward.equalCaseMeans.distribution?.mean).toBe("positive_infinity");
+        expect(() => new S1Distribution().add("positive_infinity")).toThrow();
+        for (const value of [Infinity, -Infinity, NaN]) expect(() => a.add(value)).toThrow();
+    });
     it("keeps measured zero distinct from unavailable and uses fixed noninterpolated quantiles", () => {
         const d = new S1Distribution();
         [0, 10, 20, 30, 40].forEach((x) => d.add(x));
@@ -258,6 +318,28 @@ describe("S1 full 200-case population (synthetic ledger records only)", () => {
     beforeAll(async () => {
         input = plan.cases.map((c) => syntheticS1Record(c));
         result = await analyzeStrategicS1Population(plan, input);
+    }, 120000);
+    it("keeps infinite speed through the complete 200-case 72-group population", async () => {
+        const extended = input.map((original) => {
+            const r = structuredClone(original),
+                replay = replayS1Ledger(r.episode.strategicLedger);
+            for (const sample of replay.samples)
+                for (const u of sample.units) if (u.primaryWeapon) u.primaryWeapon.speed = "positive_infinity";
+            const encoded = encodeS1Ledger(replay.samples, replay.identity, r.episode.updates, r.episode.publicCall);
+            r.episode.strategicLedger = encoded.ledger;
+            r.episode.strategicAnalysisSha256 = s1Hash(encoded.analysis);
+            return r;
+        });
+        const analyzed = await analyzeStrategicS1Population(plan, extended);
+        expect(analyzed.counts.cases).toBe(200);
+        expect(analyzed.groups).toHaveLength(72);
+        const speed = analyzed.groups[0].metrics.find((x) => x.key === "candidate.unit.primaryWeapon.speed");
+        expect(speed?.distribution?.mean).toBe("positive_infinity");
+        expect(speed?.distribution?.frequencies).toEqual([
+            { value: "positive_infinity", count: speed?.coverage.observed },
+        ]);
+        expect(analyzed.cases.map((c) => c.screens)).toEqual(result.cases.map((c) => c.screens));
+        expect(JSON.parse(JSON.stringify(analyzed))).toEqual(analyzed);
     }, 120000);
     it("replays exactly 200+200 ledgers and reports every frozen grouping and endpoint status", () => {
         expect(result.counts).toMatchObject({

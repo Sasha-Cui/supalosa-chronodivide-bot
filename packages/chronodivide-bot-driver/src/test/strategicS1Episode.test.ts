@@ -28,12 +28,24 @@ vi.mock("../benchmark/seededOfflineGame.js", () => ({
     },
 }));
 type EventMode = "destroy" | "rubble" | "none" | "unexplained";
-const fixture = (mode: S1EpisodeMode = "diagnostic", eventMode: EventMode = "destroy", slot: 0 | 1 = 0) => {
+const fixture = (
+    mode: S1EpisodeMode = "diagnostic",
+    eventMode: EventMode = "destroy",
+    slot: 0 | 1 = 0,
+    weaponSpeed = 20,
+) => {
     let tick = 0,
         nativeFinished = false,
         disposed = false;
     const names = { candidate: "OD1Candidate", baseline: "OD1Opponent" };
-    const weapon = { type: 0, rules: { name: "Cannon" }, minRange: 0, maxRange: 6, speed: 20, cooldownTicks: 0 };
+    const weapon = {
+        type: 0,
+        rules: { name: "Cannon" },
+        minRange: 0,
+        maxRange: 6,
+        speed: weaponSpeed,
+        cooldownTicks: 0,
+    };
     const make = (id: number, owner: string, type: number, name: string) => ({
         id,
         owner,
@@ -195,13 +207,13 @@ const fixture = (mode: S1EpisodeMode = "diagnostic", eventMode: EventMode = "des
             opponentStart: "3,4",
             candidateStartOrdinal: 0,
             opponentStartOrdinal: 1,
-            requestedEngineSeed: canary ? 3350121000 : mode === "smoke" ? 3350121100 : 3350120000,
+            requestedEngineSeed: canary ? 3350131000 : mode === "smoke" ? 3350131100 : 3350130000,
             maxUpdates: canary ? (3600 as const) : (24000 as const),
         },
     };
 };
 function diagnostic(value: Awaited<ReturnType<typeof runStrategicS1Episode>>) {
-    if (value.kind !== "strategic-s1-diagnostic-v1") throw new Error("wrong projection");
+    if (value.kind !== "strategic-s1-diagnostic-v2") throw new Error("wrong projection");
     return value;
 }
 describe("S1 episode lifecycle and technical projections (fake game only)", () => {
@@ -278,6 +290,25 @@ describe("S1 episode lifecycle and technical projections (fake game only)", () =
             expect(JSON.stringify(value)).not.toMatch(
                 /"(winner|firstResult|evaluation|ledger|data|missions|credits|screens|actionAudit)":/,
             );
+    });
+    it("preserves canary actions, state, mission reads and RNG behavior with infinite projectile speed", async () => {
+        const a = fixture("canary_endpoint_only", "none", 0, Infinity),
+            b = fixture("canary_strategic", "none", 0, Infinity);
+        const random = vi.spyOn(Math, "random");
+        const before = random.mock.calls.length;
+        try {
+            const left = await runStrategicS1Episode(a),
+                right = await runStrategicS1Episode(b);
+            if (left.kind !== "strategic-s1-canary-v1" || right.kind !== "strategic-s1-canary-v1") throw Error("kind");
+            for (const key of ["updates", "quitSuppression", "publicCall", "publicState", "dualTrace"] as const)
+                expect(right[key]).toEqual(left[key]);
+            expect(right.strategic?.samples).toBe(13);
+            expect(b.candidate.getResearchMissionSnapshot).toHaveBeenCalledTimes(13);
+            expect(a.candidate.getResearchMissionSnapshot).not.toHaveBeenCalled();
+            expect(random.mock.calls.length).toBe(before);
+        } finally {
+            random.mockRestore();
+        }
     });
     it("smoke replays and then discards both payloads without outcome/diagnostic leakage", async () => {
         const r = await runStrategicS1Episode(fixture("smoke"));

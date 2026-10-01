@@ -81,7 +81,7 @@ export function syntheticS1Samples(updates = 1200, country = "Americans"): S1Sam
     for (let t = 300; t <= updates; t += 300) ticks.push(t);
     if (ticks[ticks.length - 1] !== updates) ticks.push(updates);
     return ticks.map((tick, i) => ({
-        kind: "strategic-s1-sample-v1",
+        kind: "strategic-s1-sample-v2",
         tick,
         periodic: tick > 0 && tick % 300 === 0,
         players: Object.fromEntries(
@@ -285,7 +285,7 @@ export function syntheticS1Record(c: StrategicS1Plan["cases"][number], outcome =
     return {
         assignment: c,
         episode: {
-            kind: "strategic-s1-diagnostic-v1",
+            kind: "strategic-s1-diagnostic-v2",
             complete: true,
             technicalPass: true,
             policy: S1_POLICY,

@@ -199,7 +199,7 @@ export async function validateS1Diagnostic(r: any, c: StrategicS1Plan["cases"][n
         r,
         "kind complete technicalPass policy caseIndex requestedEngineSeed updates observedStarts quitSuppression publicCall publicState stopReason dualState actionAudit ledger strategicLedger strategicAnalysisSha256",
     );
-    s1Require(r.kind === "strategic-s1-diagnostic-v1" && c.role === "diagnostic", "diagnostic kind/role");
+    s1Require(r.kind === "strategic-s1-diagnostic-v2" && c.role === "diagnostic", "diagnostic kind/role");
     common(r, c);
     natural(r.updates);
     s1Require(r.updates >= 1 && r.updates <= 24000 && c.maxUpdates === 24000, "horizon");

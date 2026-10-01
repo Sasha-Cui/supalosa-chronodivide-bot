@@ -1,4 +1,4 @@
-import { S1Sample, S1_ENUMS, S1_SIDES, finite, natural } from "./strategicS1Observation.js";
+import { S1Sample, S1_ENUMS, S1_SIDES, finite, natural, validateS1WeaponSpeed } from "./strategicS1Observation.js";
 import { FRESH_DUAL_ACTION_METHODS } from "./freshDualStudyInstrumentation.js";
 const require = (condition: unknown, message: string) => {
     if (!condition) throw new Error("S1 schema: " + message);
@@ -19,12 +19,13 @@ const weapon = (x: any) => {
     exactFields(x, "type rulesName minRange maxRange speed cooldownTicks");
     require([0, 1, 2].includes(x.type), "weapon type");
     str(x.rulesName);
-    for (const k of ["minRange", "maxRange", "speed", "cooldownTicks"]) finite(x[k]);
+    for (const k of ["minRange", "maxRange", "cooldownTicks"]) finite(x[k]);
+    validateS1WeaponSpeed(x.speed);
 };
 export function validateS1Sample(x: unknown): asserts x is S1Sample {
     const s = x as any;
     exactFields(s, "kind tick periodic players units unitCoverage missions window");
-    require(s.kind === "strategic-s1-sample-v1", "kind");
+    require(s.kind === "strategic-s1-sample-v2", "kind");
     natural(s.tick);
     require(s.tick <= 24000, "tick cap");
     require(s.periodic === (s.tick > 0 && s.tick % 300 === 0), "periodic marker");

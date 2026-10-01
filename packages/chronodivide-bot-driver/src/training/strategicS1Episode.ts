@@ -56,10 +56,10 @@ export async function runStrategicS1Episode(args: {
     const observed = mode !== "canary_endpoint_only";
     const seed =
         spec.caseIndex < 200
-            ? 3350120000 + spec.caseIndex
+            ? 3350130000 + spec.caseIndex
             : spec.caseIndex < 204
-            ? 3350121000 + spec.caseIndex - 200
-            : 3350121100;
+            ? 3350131000 + spec.caseIndex - 200
+            : 3350131100;
     if (
         !["diagnostic", "smoke", "canary_endpoint_only", "canary_strategic"].includes(mode) ||
         !Number.isSafeInteger(spec.caseIndex) ||
@@ -355,7 +355,7 @@ export async function runStrategicS1Episode(args: {
                     if (!replay.complete || replay.aborted) throw new Error("S1 endpoint replay incomplete");
                     equal(replay.final, final, "endpoint replay differs");
                     const result = {
-                        kind: "strategic-s1-diagnostic-v1" as const,
+                        kind: "strategic-s1-diagnostic-v2" as const,
                         complete: true as const,
                         technicalPass: true as const,
                         policy: S1_POLICY,

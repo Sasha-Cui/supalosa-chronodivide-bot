@@ -207,7 +207,10 @@ export async function analyzeStrategicS1Population(
             observedUpdates: distribution(selected.map((c) => c.updates)),
             metrics: metricDefinitions.map((d) => ({
                 key: d.key,
-                ...mergeS1Distributions(selected.map((c) => metricsByCase.get(c.assignment.caseIndex)!.get(d.key)!)),
+                ...mergeS1Distributions(
+                    selected.map((c) => metricsByCase.get(c.assignment.caseIndex)!.get(d.key)!),
+                    d.valueDomain,
+                ),
             })),
             screens,
             actions,
@@ -232,7 +235,7 @@ export async function analyzeStrategicS1Population(
         })),
     );
     return {
-        kind: "strategic-s1-population-analysis-v1" as const,
+        kind: "strategic-s1-population-analysis-v2" as const,
         complete: true as const,
         policyComparison: false as const,
         policySelectionAuthorized: false as const,

@@ -92,12 +92,20 @@ const ordered = (value: Record<string, number>) =>
 const increment = (map: Record<string, number>, key: string, n = 1) => {
     map[key] = natural((map[key] ?? 0) + n);
 };
+export const S1_POSITIVE_INFINITY = "positive_infinity" as const;
+export type S1WeaponSpeed = number | typeof S1_POSITIVE_INFINITY;
+/** Only supported positive infinity is encoded; malformed raw API values still fail. */
+export const encodeS1WeaponSpeed = (value: unknown): S1WeaponSpeed =>
+    value === Number.POSITIVE_INFINITY ? S1_POSITIVE_INFINITY : finite(value);
+export const validateS1WeaponSpeed = (value: unknown): void => {
+    if (value !== S1_POSITIVE_INFINITY) finite(value);
+};
 export type S1Weapon = {
     type: number;
     rulesName: string;
     minRange: number;
     maxRange: number;
-    speed: number;
+    speed: S1WeaponSpeed;
     cooldownTicks: number;
 };
 const weapon = (w: any): S1Weapon | null =>
@@ -108,7 +116,7 @@ const weapon = (w: any): S1Weapon | null =>
               rulesName: text(w.rules?.name),
               minRange: finite(w.minRange),
               maxRange: finite(w.maxRange),
-              speed: finite(w.speed),
+              speed: encodeS1WeaponSpeed(w.speed),
               cooldownTicks: finite(w.cooldownTicks),
           };
 export type S1Unit = {
@@ -176,7 +184,7 @@ export type S1ActionWindow = {
     events: Array<{ tick: number; event: EndpointEvent }>;
 };
 export type S1Sample = {
-    kind: "strategic-s1-sample-v1";
+    kind: "strategic-s1-sample-v2";
     tick: number;
     periodic: boolean;
     players: Record<S1Side, S1Player>;
@@ -448,7 +456,7 @@ export class S1Sampler {
                 .sort((a, b) => a.id - b.id);
         this.lastTick = tick;
         const sample: S1Sample = {
-            kind: "strategic-s1-sample-v1",
+            kind: "strategic-s1-sample-v2",
             tick,
             periodic: tick > 0 && tick % 300 === 0,
             players,
