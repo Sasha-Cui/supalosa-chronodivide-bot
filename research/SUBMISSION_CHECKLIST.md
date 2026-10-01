@@ -1,6 +1,13 @@
 # Final submission checklist
 
-Updated: **2026-08-30**
+Updated: **2026-08-30 (historical checklist)**
+
+Current disposition on2026-10-01: **not ready for submission**. The checkboxes
+below preserve August evidence V1 and do not certify current claims. Corrected
+endpoint results, observation/opponent provenance errata, negative OD1/D1 and
+the failed original S1 canary supersede the old finish-line assertion. Follow
+STATUS.md; regenerate the checklist only after accepted empirical completion
+and a separate current evidence/artifact freeze.
 
 ## Empirical and claim freeze
 

@@ -1,6 +1,6 @@
 # Research status
 
-Last reconciled: **2026-09-28 UTC**
+Last reconciled: **2026-10-01 (America/Los_Angeles)**
 
 ## Bottom line
 
@@ -107,45 +107,61 @@ coordination and mission completion; select one supported policy improvement
 at a time. Retained endpoint ledgers do not contain all required strategic
 telemetry. Keep unchanged StrongBot as the reference and preserve the manuscript.
 
-The prospective [S1 protocol](protocols/method/2026-09-25-strategic-diagnostic-s1.md)
-is now frozen before implementation: 200 fresh single-policy diagnostic cases,
-205 zero-update definitions, eight canary episodes and one smoke (209 advancing
-episodes total). This is observability work, not a stronger-bot claim.
-S1's passive foundations are implemented: current pre-change golden traces,
-a copying mission accessor, exact plan, public sampler/action windows, strict
-schema, bounded ledger and per-episode diagnostic core. The new episode adapter
-also passes synthetic disabled-D1 equivalence, observer noninterference and
-payload-discard checks. Complete descriptive population analysis and strict
-episode/cross-ledger validators are now implemented. Immutable storage, registration
-audit implementation, factory contracts and provenance checks are connected to
-complete stage envelopes, runner/finalizers, pure/submission programs and CPU
-Slurm wrappers. The formatted-source build and414pure/synthetic development
-checks passed, including26harness checks and a complete200-case synthetic
-aggregate. Formal gates, independent gate audits and the actual metadata census
-remain pending at this documentation commit; no real S1 initializer or game has
-run. Held submissions require durable receipts and verified scheduler resources
-before release. See the
-[foundation checkpoint](notes/2026-09-25-s1-foundation-implementation.md) and
-[episode checkpoint](notes/2026-09-26-s1-episode-implementation.md), followed by
-the [population checkpoint](notes/2026-09-26-s1-population-implementation.md) and
-the [runtime checkpoint](notes/2026-09-26-s1-runtime-implementation.md), then the
-current [harness checkpoint](notes/2026-09-26-s1-harness-implementation.md).
+## Current S1 checkpoint and approved completion sequence
 
-The first pure request27581017 was cancelled while held and never started:
-Slurm's exact one-node interval1-1 exposed a submission-parser format defect.
-The narrow repair preserves the one-node requirement and all other guards;
-the full414development checks passed again. Its failure/intent/receipt/cancel
-evidence is preserved. Fresh pure-v2/submissions-v2 are the next technical
-namespace; no game or seed census ran in the cancelled attempt.
+Original S1 source75280dfa passed formal pure27732444 (415 checks), independent
+pure audit27735335, selector27735502 (205 zero-update definitions) and independent
+selector audit27743385. Both authoritative prerequisite receipts are preserved
+under research-evidence/strategic-diagnostic-s1. They certify that source only.
 
-Pure V2 job27581146 completed0:0 with all414checks, but its accounting consumer
-rejected valid unsuffixed8G memory output. Full evidence and the reproduced
-consumer failure are preserved; no independent gate acceptance or selector
-launch occurred. The narrow parser repair retains every resource requirement;
-the formatted build and415development checks now pass. The next current-source
-formal gate uses fresh pure-v3/submissions-v3, followed by its independent audit.
-No S1 initializer, advancing game or real census has run. See the current
-[memory-format checkpoint](notes/2026-09-28-s1-reqmem-compatibility.md).
+Canary27748007 failed in all four observed workers. Finalizer27748008 was
+cancelled without execution. No canary pair passed; smoke and main were never
+submitted. Eight launches are consumed: four source-bound endpoint-only returns
+at3600updates and four observed failures with unknown advancing-update counts.
+The failure route is secondary-weapon speed validation. Static pinned API source
+supports positive infinity, while the original schema requires finite numbers;
+the actual rejected values and failure ticks were not retained.
+
+The immutable failure review is
+research-evidence/strategic-diagnostic-s1/canary-failure-review-v1/record.json,
+SHAe166712d4567f71f987f8c9115061a5106abb35d00adb7c838f038c141ce8876.
+All original attempts, compiled/source bytes, golden fixtures and negative
+evidence are preserved. No old selector or canary identity may be reused.
+
+On October1 the user approved the reviewed completion plan and specified JSS
+rather than BTK accounting. The
+[A1 amendment](protocols/method/2026-10-01-strategic-diagnostic-s1-amendment-a1.md)
+was committed before its repair: finite speed remains numeric; supported positive
+infinity receives an explicit lossless tag throughout samples, replay and
+statistics. All other numeric fields, scientific thresholds and gameplay remain
+unchanged. Fresh full-population seeds3350130000..199, canary3350131000..1003 and
+smoke3350131100 require the full fail-closed metadata audit before initialization.
+A1 uses research-evidence/strategic-diagnostic-s1-a1, never the old evidence roots.
+Before-init census requires12 exact paths including the old S1 manifest; its
+independent post-publication audit requires13. Prior zero-update count is2220;
+successful A1 selection would make2425. No A1 initializer or game has run.
+
+Repair verification is pending. The seven added Vitest and two added Node
+assertions target424 checks (336+88); a target is not a passing receipt.
+A1 needs fresh formal pure/independent audit, full selector/independent audit,
+all four canary pairs, smoke,200main cases and the full independent population
+audit. The latter must be implemented before launching main.
+
+The heartbeat was deleted at the user's request and remains cancelled.
+During an active source-bound job, this checkout and compiled/runtime files stay
+frozen; current execution state lives in the immutable external receipts, not
+an assumption that this documentation advances automatically.
+
+Completion remains: audited S1 diagnosis -> at most one supported synthetic
+strategy reproduction -> separately frozen fresh matched policy comparison ->
+positive replication and broad confirmation -> evidence-derived paper/artifact.
+If no actionable mechanism or positive policy is supported, retain that result
+and seek an explicit scope decision. Neither technical nor diagnostic success
+closes M2, and the old paper/submission checkboxes are historical.
+
+The foundation, episode, population, runtime, harness and memory-format notes
+remain historical implementation records. Their earlier pending-stage statements
+are superseded by the completed old-source gates and failed canary above.
 
 ## Milestone ledger
 

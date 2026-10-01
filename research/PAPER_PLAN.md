@@ -1,6 +1,13 @@
 # Final paper plan
 
-Status: **empirically complete; anonymous manuscript and review artifact pass**.
+Status: **historical August paper plan; superseded by STATUS.md and corrected results**.
+
+This file preserves the former manuscript plan and its original claims. The
+corrected September endpoint result removes the claimed Peak improvement;
+OD1/D1 reject arbitration and the current broader objective remains before M2.
+Do not treat the old empirical-completion or upload statements below as current.
+The manuscript stays frozen until the accepted completion sequence or an
+explicitly approved change of scope supports a new evidence-derived version.
 
 ## Title
 
