@@ -27,6 +27,7 @@ import {
     permittedRegistrations,
     proposedS1Seeds,
     originalS1History,
+    a1S1History,
 } from "./strategic-s1-registration.mjs";
 import { validateStrategicS1Plan } from "../../packages/chronodivide-bot-driver/dist/training/strategicS1Plan.js";
 import {
@@ -156,6 +157,7 @@ export function validateSeedAudit(a, plan) {
         "od1A1",
         "d1",
         "originalS1",
+        "a1S1",
         "priorZeroUpdateInitializations",
         "newSeeds",
         "collisions",
@@ -167,7 +169,7 @@ export function validateSeedAudit(a, plan) {
             a.passed === true &&
             a.technicalOnly === true &&
             a.collisions === 0 &&
-            a.priorZeroUpdateInitializations === 2220,
+            a.priorZeroUpdateInitializations === 2425,
         "registration completion",
     );
     exact(a.discovered, permittedRegistrations(), "registration census");
@@ -180,7 +182,7 @@ export function validateSeedAudit(a, plan) {
         "Registration/certificate/journal metadata only; no competitive payloads opened or engine initialized.",
         "census scope",
     );
-    requireTrue(a.inspectedRegistrationFiles.length === 10, "registration count");
+    requireTrue(a.inspectedRegistrationFiles.length === 11, "registration count");
     for (const [i, r] of a.inspectedRegistrationFiles.entries()) {
         fields(r, [
             "path",
@@ -281,6 +283,8 @@ export function validateSeedAudit(a, plan) {
     }
     requireTrue(a.inspectedRegistrationFiles[9].bytes === 529531, "original S1 manifest bytes");
     exact(a.originalS1, originalS1History(a.inspectedRegistrationFiles[9]), "original S1 history binding");
+    requireTrue(a.inspectedRegistrationFiles[10].bytes === 534178, "A1 S1 manifest bytes");
+    exact(a.a1S1, a1S1History(a.inspectedRegistrationFiles[10]), "A1 S1 history binding");
     const seeds = proposedS1Seeds(plan);
     exact(
         a.newSeeds,
@@ -447,8 +451,8 @@ export async function validateStage(v, stage, context, index = null) {
             v.canaryGateSha256 === context.canaryGateSha256 &&
                 v.smokeSha256 === context.smokeSha256 &&
                 v.initializations === 205 &&
-                v.priorZeroUpdateInitializations === 2220 &&
-                v.cumulativeZeroUpdateInitializations === 2425 &&
+                v.priorZeroUpdateInitializations === 2425 &&
+                v.cumulativeZeroUpdateInitializations === 2630 &&
                 v.canaryEpisodes === 8 &&
                 v.smokeEpisodes === 1 &&
                 v.diagnosticEpisodes === 200 &&

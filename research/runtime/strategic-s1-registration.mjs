@@ -81,6 +81,11 @@ export const REGISTRATIONS = [
         "3173064311d3abd927c80e87fb7acc5122a9ce06eaa4670e03954eb8696031db",
         205,
     ],
+    [
+        "strategic-diagnostic-s1-a1/execution-v1/manifest/record.json",
+        "b4812ea6ee38088f418f113a9f547aa12490afb873496f4943c889a164112e65",
+        205,
+    ],
 ].map(([relative, sha256, definitions]) => ({ path: path.join(EVIDENCE, relative), sha256, definitions }));
 export const ORIGINAL_S1_ROOT = path.join(EVIDENCE, "strategic-diagnostic-s1");
 export const ORIGINAL_S1_SOURCE = "75280dfa87f101a7865921121e1ec6fcf44a3ea5";
@@ -263,6 +268,250 @@ function auditOriginalS1(plan, metadata, manifest) {
     return history;
 }
 
+export const A1_S1_EVIDENCE = [
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/verification-pure-v1.json",
+        bytes: 995,
+        sha256: "f118a2639a590b6789ae039169fc08a41f218c4d4c1eecc5fca4357bbc05de42",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/verification-prepare-v1.json",
+        bytes: 1026,
+        sha256: "b04ccdafeded009a764cce06d60ca76c8651b8c78eae68b25f2909b092d78465",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/verification-canary-finalize-v1.json",
+        bytes: 1157,
+        sha256: "25c2746dc288958fb8adcc853235ff5072fd9bb33234177c9bace55f0f6ae287",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/execution-v1/manifest/COMPLETE",
+        bytes: 27836,
+        sha256: "f9a9a5dc6e6dcace408679af4fe9272dba0b924e10675e06b2d9da7a2b0ad0ab",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/execution-v1/canary-finalizer/record.json",
+        bytes: 19350,
+        sha256: "b0cde978c9f2b54aaf8c73fd1b07303fefad307cbdbd64a44fcdca7d0745218e",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/execution-v1/canary-finalizer/COMPLETE",
+        bytes: 86,
+        sha256: "90e1efec23635a15bc116a07835366709c94b29f5a7ed4119afab85a05b2a877",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/execution-v1/canary/task-00/record.json",
+        bytes: 3966,
+        sha256: "1f772174c081c2edaf0adebabbd06a307cc5bbcd96980d9505a25cd61ceeeb52",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/execution-v1/canary/task-00/COMPLETE",
+        bytes: 363,
+        sha256: "91cb1b739538afbf68f54824788bc593b96fc22ddac620a9e18f9e6f3ffc5ea5",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/execution-v1/canary/task-01/record.json",
+        bytes: 4026,
+        sha256: "39cceff904b77b8b3f4442b077c370c5cfa91a56452322f804e73af83f870a1c",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/execution-v1/canary/task-01/COMPLETE",
+        bytes: 363,
+        sha256: "a2fdfe9a3a65621463622ca2ac287cfcacfc1737a609825dc308671a96d198da",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/execution-v1/canary/task-02/record.json",
+        bytes: 4181,
+        sha256: "5469a6c80bb3c1952fbffd96c3ac73e64d471ce45a6ddcbeef543814e754d4ae",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/execution-v1/canary/task-02/COMPLETE",
+        bytes: 363,
+        sha256: "b4609007fe9a330911ba8bb6e268e375057b54f60d3eafb77dfbf366b99a7f2f",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/execution-v1/canary/task-03/record.json",
+        bytes: 3893,
+        sha256: "43444bcd9dc18b641ce5872c9391aad60b7783301a8f7bc613f168efc2c40968",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/execution-v1/canary/task-03/COMPLETE",
+        bytes: 363,
+        sha256: "f2cbda39178dbf38eb8d19e45460c9045bd6cc879cfd8b8bd3b17c639b017baa",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/execution-v1/smoke/FAILURE.json",
+        bytes: 899,
+        sha256: "4beac350deb13cba8567bae3e5a9683c01d67fe85d1cdd41fbee300346772dc2",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/execution-v1/smoke/COMPLETE",
+        bytes: 125,
+        sha256: "6ce2adabead1044ac9f4a08ecb0195c70d9954c3e7fa7ef063e51db26abe5c85",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/smoke-failure-review-v1/record.json",
+        bytes: 3394,
+        sha256: "a923517873ba206b312fa6a7608a426bf45b75691f198435756cc7d4ace822e2",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/smoke-failure-review-v1/source-evidence.json",
+        bytes: 3726,
+        sha256: "701365caa982c28fa45765bac20f22aba963d65a7bfe1667af94bf4be23c4dd5",
+    },
+];
+export function buildA1S1Plan(maps) {
+    const current = buildStrategicS1Plan(maps);
+    return {
+        ...current,
+        protocolSha256: "9ea76da3bb2ef960dd192f1fdaefde5ad6b5d6378867a22e6b09d49b49682bde",
+        cases: current.cases.map((c) => ({ ...c, requestedEngineSeed: 3350130000 + c.caseIndex })),
+        canaries: current.canaries.map((c, i) => ({ ...c, requestedEngineSeed: 3350131000 + i })),
+        smoke: { ...current.smoke, requestedEngineSeed: 3350131100 },
+    };
+}
+export const a1S1History = (manifest) => ({
+    sourceCommit: "9add3dc6a5467dfd523b01e4052c8dbf58527a21",
+    selectorJobId: "28018163",
+    canaryArrayJobId: "28021488",
+    canaryFinalizerJobId: "28021489",
+    failedSmokeJobId: "28024266",
+    definitions: 205,
+    zeroUpdateInitializations: 205,
+    completedCanaryEpisodes: 8,
+    completedCanaryPairs: 4,
+    canaryUpdatesEach: 3600,
+    smokeLaunchAttempts: 1,
+    smokeSeed: 3350131100,
+    smokeAdvancingUpdates: null,
+    smokeReturned: false,
+    mainSubmitted: false,
+    manifest,
+    evidence: A1_S1_EVIDENCE,
+});
+function auditA1S1(plan, metadata, manifest) {
+    const expected = buildA1S1Plan(plan.maps),
+        all = [...expected.cases, ...expected.canaries, expected.smoke];
+    requireTrue(
+        metadata.kind === "strategic-s1-manifest-v1" &&
+            metadata.complete === true &&
+            metadata.passed === true &&
+            metadata.source.sourceCommit === "9add3dc6a5467dfd523b01e4052c8dbf58527a21" &&
+            metadata.scheduler.jobId === "28018163",
+        "A1 S1 selector identity",
+    );
+    exact(metadata.plan, expected, "complete consumed A1 S1 plan");
+    const launches = all.map((c) => ({
+        role: c.role,
+        caseIndex: c.caseIndex,
+        mode: "zero_update",
+        requestedEngineSeed: c.requestedEngineSeed,
+        policy: "unchanged_strongbot",
+    }));
+    exact(metadata.launches, launches, "all A1 S1 launches");
+    exact(
+        metadata.observations,
+        all.map((c) => ({
+            caseIndex: c.caseIndex,
+            requestedEngineSeed: c.requestedEngineSeed,
+            updates: 0,
+            candidateStart: c.candidateStart,
+            opponentStart: c.opponentStart,
+            candidateCountry: c.country,
+            opponentCountry: c.country,
+            candidateStartOrdinal: c.candidateStartOrdinal,
+            opponentStartOrdinal: c.opponentStartOrdinal,
+            candidateSlot: c.candidateSlot,
+            agentOrder: c.candidateSlot === 0 ? ["OD1Candidate", "OD1Opponent"] : ["OD1Opponent", "OD1Candidate"],
+            slotVerification: "source-bound-agent-order-and-pinned-creator",
+            seedVerification: "pinned-date-now-seconds-shim-and-participant-stream-derivation",
+        })),
+        "all A1 S1 observations",
+    );
+    for (const prior of REGISTRATIONS.slice(0, 10))
+        requireTrue(
+            metadata.seedAudit.inspectedRegistrationFiles.some(
+                (r) => r.path === prior.path && r.sha256 === prior.sha256,
+            ),
+            "A1 prior-registration chain",
+        );
+    for (const d of A1_S1_EVIDENCE) {
+        const actual = checkedFile(d.path, d.sha256);
+        requireTrue(actual.bytes === d.bytes, "A1 evidence size");
+    }
+    exact(
+        fs.readFileSync(A1_S1_EVIDENCE[3].path, "utf8"),
+        launches.map((l) => "LAUNCH_S1_V1 " + JSON.stringify(l) + "\n").join("") +
+            "COMPLETE_S1_V1 " +
+            manifest.sha256 +
+            " " +
+            manifest.bytes +
+            "\n",
+        "A1 selector journal",
+    );
+    const aggregate = json(A1_S1_EVIDENCE[4].path);
+    requireTrue(
+        aggregate.complete === true &&
+            aggregate.passed === true &&
+            aggregate.configurations === 4 &&
+            aggregate.advancingEpisodes === 8 &&
+            aggregate.arrayJobId === "28021488" &&
+            aggregate.scheduler.jobId === "28021489",
+        "A1 canary aggregate",
+    );
+    requireTrue(aggregate.records.length === 4, "A1 complete canary population");
+    for (const [i, c] of expected.canaries.entries()) {
+        const record = aggregate.records[i].value;
+        exact(record.assignment, c, "A1 canary configuration");
+        const attempts = ["canary_endpoint_only", "canary_strategic"].map((mode) => ({
+            role: "canary",
+            caseIndex: c.caseIndex,
+            mode,
+            requestedEngineSeed: c.requestedEngineSeed,
+            policy: "unchanged_strongbot",
+        }));
+        exact(record.launches, attempts, "A1 canary attempts");
+        requireTrue(
+            record.episodes.length === 2 &&
+                record.episodes.every((e) => e.complete === true && e.technicalPass === true && e.updates === 3600),
+            "A1 completed episodes",
+        );
+    }
+    const smokeFolder = path.join(EVIDENCE, "strategic-diagnostic-s1-a1/execution-v1/smoke"),
+        smoke = json(path.join(smokeFolder, "FAILURE.json"));
+    requireTrue(
+        smoke.complete === false &&
+            smoke.passed === false &&
+            smoke.stage === "smoke" &&
+            smoke.jobId === "28024266" &&
+            smoke.sourceCommit === "9add3dc6a5467dfd523b01e4052c8dbf58527a21",
+        "A1 smoke failure",
+    );
+    requireTrue(!fs.existsSync(path.join(smokeFolder, "record.json")), "A1 failed smoke publication");
+    exact(
+        fs.readFileSync(path.join(smokeFolder, "COMPLETE"), "utf8"),
+        "LAUNCH_S1_V1 " +
+            JSON.stringify({
+                role: "smoke",
+                caseIndex: 204,
+                mode: "smoke",
+                requestedEngineSeed: 3350131100,
+                policy: "unchanged_strongbot",
+            }) +
+            "\n",
+        "A1 failed smoke launch",
+    );
+    const review = json(path.join(EVIDENCE, "strategic-diagnostic-s1-a1/smoke-failure-review-v1/record.json"));
+    requireTrue(
+        review.reviewComplete === true &&
+            review.smokeGatePassed === false &&
+            review.smokeAdvancingUpdates === null &&
+            review.mainSubmitted === false,
+        "A1 failure scope",
+    );
+    return a1S1History(manifest);
+}
+
 export const REGISTRATION_AFTER_UTC = "2026-09-09T06:35:54Z";
 export const permittedRegistrations = () => [...REGISTRATIONS.map((r) => r.path), CERT, GATE2_RECEIPT].sort();
 export function validateRegistrationScan(discovered) {
@@ -275,12 +524,12 @@ export function proposedS1Seeds(plan) {
     exact(
         seeds,
         [
-            ...Array.from({ length: 200 }, (_, i) => 3350130000 + i),
-            3350131000,
-            3350131001,
-            3350131002,
-            3350131003,
-            3350131100,
+            ...Array.from({ length: 200 }, (_, i) => 3350140000 + i),
+            3350141000,
+            3350141001,
+            3350141002,
+            3350141003,
+            3350141100,
         ],
         "prospective seeds",
     );
@@ -467,6 +716,7 @@ export function auditFreshSeeds(plan) {
         journal = parseOd1Journal(fs.readFileSync(journalFile, "utf8"));
     validateHistoricalPlans(plan, metadata[7], metadata[8], failure, journal);
     const originalS1 = auditOriginalS1(plan, metadata[9], records[9]);
+    const a1S1 = auditA1S1(plan, metadata[10], records[10]);
     const accounting = execFileSync(
         "/opt/slurm/current/bin/sacct",
         ["-X", "-n", "-P", "-j", "26516850", "--format=JobIDRaw,Account,Partition,State,ExitCode,AllocCPUS,Restarts"],
@@ -495,7 +745,8 @@ export function auditFreshSeeds(plan) {
         od1A1: { definitions: 905, zeroUpdateInitializations: 905, advancingEpisodes: 1818, manifest: records[7] },
         d1: { definitions: 205, zeroUpdateInitializations: 205, advancingEpisodes: 627, manifest: records[8] },
         originalS1,
-        priorZeroUpdateInitializations: 2220,
+        a1S1,
+        priorZeroUpdateInitializations: 2425,
         newSeeds: {
             count: proposed.length,
             min: Math.min(...proposed),

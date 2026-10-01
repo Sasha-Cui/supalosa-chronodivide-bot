@@ -28,6 +28,7 @@ import {
     permittedRegistrations,
     proposedS1Seeds,
     originalS1History,
+    a1S1History,
 } from "../runtime/strategic-s1-registration.mjs";
 import {
     makeBinding,
@@ -122,7 +123,15 @@ const accounting = (stage, count) =>
 const identity = (p, sha = H, bytes = 1) => ({ path: p, bytes, sha256: sha });
 function seedAudit() {
     const records = REGISTRATIONS.map((r) => ({
-        ...identity(r.path, r.sha256, r.path.includes("strategic-diagnostic-s1/execution-v1") ? 529531 : 1),
+        ...identity(
+            r.path,
+            r.sha256,
+            r.path.includes("strategic-diagnostic-s1-a1/execution-v1")
+                ? 534178
+                : r.path.includes("strategic-diagnostic-s1/execution-v1")
+                ? 529531
+                : 1,
+        ),
         definitions: r.definitions,
         distinctSeeds: r.definitions,
         minSeed: 3350000000,
@@ -166,8 +175,9 @@ function seedAudit() {
         od1A1: { definitions: 905, zeroUpdateInitializations: 905, advancingEpisodes: 1818, manifest: records[7] },
         d1: { definitions: 205, zeroUpdateInitializations: 205, advancingEpisodes: 627, manifest: records[8] },
         originalS1: originalS1History(records[9]),
-        priorZeroUpdateInitializations: 2220,
-        newSeeds: { count: 205, min: 3350130000, max: 3350131100, sha256: digest(proposedS1Seeds(plan)) },
+        a1S1: a1S1History(records[10]),
+        priorZeroUpdateInitializations: 2425,
+        newSeeds: { count: 205, min: 3350140000, max: 3350141100, sha256: digest(proposedS1Seeds(plan)) },
         collisions: 0,
         scope: "Registration/certificate/journal metadata only; no competitive payloads opened or engine initialized.",
     };
@@ -259,8 +269,8 @@ test("S1 pure inventory explicitly includes all synthetic groups and excludes en
     assert.equal(VITEST_NAMES.length, 33);
     assert.equal(new Set(VITEST_NAMES).size, 33);
     assert.ok(!VITEST_NAMES.includes("seedControl"));
-    assert.equal(VITEST_PASSED, 336);
-    assert.equal(TOTAL_PASSED, 336 + NODE_TESTS.reduce((n, v) => n + v[1], 0));
+    assert.equal(VITEST_PASSED, 340);
+    assert.equal(TOTAL_PASSED, 340 + NODE_TESTS.reduce((n, v) => n + v[1], 0));
     for (const p of requiredHarnessFiles) assert.ok(fs.existsSync(path.join(REPO, p)), p);
 });
 test("S1 complete registration envelope requires the full pinned metadata population", () => {
@@ -396,7 +406,7 @@ test("S1 complete synthetic200-case finalizer retains all72groups and frequencie
     assert.equal(v.analysis.counts.endpointReplays, 200);
     assert.equal(v.analysis.counts.strategicReplays, 200);
     assert.equal(v.totalAdvancingEpisodes, 209);
-    assert.equal(v.cumulativeZeroUpdateInitializations, 2425);
+    assert.equal(v.cumulativeZeroUpdateInitializations, 2630);
     assert.ok(r.bytes > 32 * 1024 * 1024 && r.bytes < 384 * 1024 * 1024);
     assert.equal(v.analysis.independentAudit, false);
     assert.deepEqual(s.events.slice(-4), ["files:false", "stable", "publish:finalize", "files:true"]);
@@ -611,15 +621,15 @@ test("S1 prerequisite file readers reject path traversal and symlinked ancestors
 test("S1 pure test reports reject skipped, wrong-file, failed and incomplete populations", () => {
     const report = {
         success: true,
-        numTotalTests: 336,
-        numPassedTests: 336,
+        numTotalTests: 340,
+        numPassedTests: 340,
         numFailedTests: 0,
         numPendingTests: 0,
         numTodoTests: 0,
         testResults: VITEST_NAMES.map((n, i) => ({
             name: path.join(DRIVER, "src/test/" + n + ".test.ts"),
             status: "passed",
-            assertionResults: Array.from({ length: i === 0 ? 304 : 1 }, () => ({ status: "passed" })),
+            assertionResults: Array.from({ length: i === 0 ? 308 : 1 }, () => ({ status: "passed" })),
         })),
     };
     validateVitestReport(report);

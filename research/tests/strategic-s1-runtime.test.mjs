@@ -29,6 +29,8 @@ import {
     validateHistoricalPlans,
     auditFreshSeeds,
     buildOriginalS1Plan,
+    buildA1S1Plan,
+    a1S1History,
     validateOriginalS1Metadata,
     REGISTRATIONS,
 } from "../runtime/strategic-s1-registration.mjs";
@@ -104,7 +106,7 @@ test("S1 duplicate/shifted launches fail before appending and retain the origina
     store.launch("case", 0, launch);
     const before = fs.readFileSync(path.join(d, "COMPLETE"), "utf8");
     assert.throws(() => store.launch("case", 0, launch));
-    assert.throws(() => store.launch("case", 0, { ...launch, requestedEngineSeed: 3350130999 }));
+    assert.throws(() => store.launch("case", 0, { ...launch, requestedEngineSeed: 3350140999 }));
     assert.equal(fs.readFileSync(path.join(d, "COMPLETE"), "utf8"), before);
     assert.throws(() => parseLaunchMarker(before.trimEnd()));
 });
@@ -227,8 +229,8 @@ test("S1 accepts the retained unsuffixed sacct format while preserving CPU memor
 });
 test("S1 metadata census is exact with no prior/current-study blanket exemptions", () => {
     const allowed = permittedRegistrations();
-    assert.equal(allowed.length, 12);
-    assert.equal(REGISTRATIONS.length, 10);
+    assert.equal(allowed.length, 13);
+    assert.equal(REGISTRATIONS.length, 11);
     validateRegistrationScan(allowed);
     for (const values of [
         allowed.slice(1),
@@ -240,7 +242,7 @@ test("S1 metadata census is exact with no prior/current-study blanket exemptions
 test("S1 fresh seeds and complete old canary/smoke/task registrations reject collisions", () => {
     const seeds = proposedS1Seeds(plan);
     assert.equal(seeds.length, 205);
-    assert.equal(seeds[204], 3350131100);
+    assert.equal(seeds[204], 3350141100);
     const old = { complete: true, passed: true, plan: a1Plan(plan.maps) };
     assert.equal(registeredSeeds(old, seeds, 905).length, 905);
     for (const mutate of [
@@ -276,6 +278,20 @@ test("S1 reconstructs both complete prior populations and the905failed-selector 
     bad.plan.smoke.requestedEngineSeed++;
     assert.throws(() => validateHistoricalPlans(plan, a1, bad, failure, journal));
     assert.throws(() => validateHistoricalPlans(plan, a1, d1, failure, journal.slice(0, 900)));
+});
+test("S1 A2 reserves all A1 identities and retains completed canaries and unknown failed smoke counts", () => {
+    const old = { complete: true, passed: true, plan: buildA1S1Plan(plan.maps) };
+    const fresh = proposedS1Seeds(plan),
+        prior = registeredSeeds(old, fresh, 205);
+    assert.equal(prior.length, 205);
+    assert.equal(prior[204], 3350131100);
+    assert.equal(new Set([...prior, ...fresh]).size, 410);
+    for (const seed of [3350130000, 3350131000, 3350131100]) assert.throws(() => registeredSeeds(old, [seed], 205));
+    const history = a1S1History(REGISTRATIONS[10]);
+    assert.equal(history.completedCanaryEpisodes, 8);
+    assert.equal(history.smokeAdvancingUpdates, null);
+    assert.equal(history.smokeReturned, false);
+    assert.equal(history.mainSubmitted, false);
 });
 test("S1 A1 reconstructs all original S1 definitions and rejects altered history", () => {
     const original = buildOriginalS1Plan(plan.maps),
