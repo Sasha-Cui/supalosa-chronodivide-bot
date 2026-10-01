@@ -28,6 +28,8 @@ import {
     validateRegistrationScan,
     validateHistoricalPlans,
     auditFreshSeeds,
+    buildOriginalS1Plan,
+    validateOriginalS1Metadata,
     REGISTRATIONS,
 } from "../runtime/strategic-s1-registration.mjs";
 import {
@@ -102,7 +104,7 @@ test("S1 duplicate/shifted launches fail before appending and retain the origina
     store.launch("case", 0, launch);
     const before = fs.readFileSync(path.join(d, "COMPLETE"), "utf8");
     assert.throws(() => store.launch("case", 0, launch));
-    assert.throws(() => store.launch("case", 0, { ...launch, requestedEngineSeed: 3350120999 }));
+    assert.throws(() => store.launch("case", 0, { ...launch, requestedEngineSeed: 3350130999 }));
     assert.equal(fs.readFileSync(path.join(d, "COMPLETE"), "utf8"), before);
     assert.throws(() => parseLaunchMarker(before.trimEnd()));
 });
@@ -225,8 +227,8 @@ test("S1 accepts the retained unsuffixed sacct format while preserving CPU memor
 });
 test("S1 metadata census is exact with no prior/current-study blanket exemptions", () => {
     const allowed = permittedRegistrations();
-    assert.equal(allowed.length, 11);
-    assert.equal(REGISTRATIONS.length, 9);
+    assert.equal(allowed.length, 12);
+    assert.equal(REGISTRATIONS.length, 10);
     validateRegistrationScan(allowed);
     for (const values of [
         allowed.slice(1),
@@ -238,7 +240,7 @@ test("S1 metadata census is exact with no prior/current-study blanket exemptions
 test("S1 fresh seeds and complete old canary/smoke/task registrations reject collisions", () => {
     const seeds = proposedS1Seeds(plan);
     assert.equal(seeds.length, 205);
-    assert.equal(seeds[204], 3350121100);
+    assert.equal(seeds[204], 3350131100);
     const old = { complete: true, passed: true, plan: a1Plan(plan.maps) };
     assert.equal(registeredSeeds(old, seeds, 905).length, 905);
     for (const mutate of [
@@ -274,6 +276,75 @@ test("S1 reconstructs both complete prior populations and the905failed-selector 
     bad.plan.smoke.requestedEngineSeed++;
     assert.throws(() => validateHistoricalPlans(plan, a1, bad, failure, journal));
     assert.throws(() => validateHistoricalPlans(plan, a1, d1, failure, journal.slice(0, 900)));
+});
+test("S1 A1 reconstructs all original S1 definitions and rejects altered history", () => {
+    const original = buildOriginalS1Plan(plan.maps),
+        cells = [...original.cases, ...original.canaries, original.smoke];
+    const metadata = {
+        kind: "strategic-s1-manifest-v1",
+        complete: true,
+        passed: true,
+        source: { sourceCommit: "75280dfa87f101a7865921121e1ec6fcf44a3ea5" },
+        scheduler: { jobId: "27735502" },
+        plan: original,
+        launches: cells.map((c) => ({
+            role: c.role,
+            caseIndex: c.caseIndex,
+            mode: "zero_update",
+            requestedEngineSeed: c.requestedEngineSeed,
+            policy: "unchanged_strongbot",
+        })),
+        observations: cells.map((c) => ({
+            caseIndex: c.caseIndex,
+            requestedEngineSeed: c.requestedEngineSeed,
+            updates: 0,
+            candidateStart: c.candidateStart,
+            opponentStart: c.opponentStart,
+            candidateCountry: c.country,
+            opponentCountry: c.country,
+            candidateStartOrdinal: c.candidateStartOrdinal,
+            opponentStartOrdinal: c.opponentStartOrdinal,
+            candidateSlot: c.candidateSlot,
+            agentOrder: c.candidateSlot === 0 ? ["OD1Candidate", "OD1Opponent"] : ["OD1Opponent", "OD1Candidate"],
+            slotVerification: "source-bound-agent-order-and-pinned-creator",
+            seedVerification: "pinned-date-now-seconds-shim-and-participant-stream-derivation",
+        })),
+    };
+    validateOriginalS1Metadata(plan, metadata);
+    for (const mutate of [
+        (v) => v.plan.cases.pop(),
+        (v) => v.plan.canaries[0].requestedEngineSeed++,
+        (v) => v.launches.pop(),
+        (v) => v.observations[0].updates++,
+        (v) => (v.source.sourceCommit = "0".repeat(40)),
+    ]) {
+        const bad = structuredClone(metadata);
+        mutate(bad);
+        assert.throws(() => validateOriginalS1Metadata(plan, bad));
+    }
+});
+test("S1 A1 reserves the original entire population and rejects original launch identities", () => {
+    const original = { complete: true, passed: true, plan: buildOriginalS1Plan(plan.maps) },
+        fresh = proposedS1Seeds(plan);
+    const consumed = registeredSeeds(original, fresh, 205);
+    assert.equal(consumed.length, 205);
+    assert.equal(consumed[204], 3350121100);
+    for (const seed of [3350120000, 3350121000, 3350121100])
+        assert.throws(() => registeredSeeds(original, [seed], 205));
+    assert.ok(!consumed.some((s) => fresh.includes(s)));
+    assert.throws(() =>
+        parseLaunchMarker(
+            "LAUNCH_S1_V1 " +
+                JSON.stringify({
+                    role: "canary",
+                    caseIndex: 200,
+                    mode: "canary_strategic",
+                    requestedEngineSeed: 3350121000,
+                    policy: "unchanged_strongbot",
+                }) +
+                "\n",
+        ),
+    );
 });
 test("S1 slow census cannot be run interactively or from a pure-test phase", () => {
     const previous = process.env.MODE;

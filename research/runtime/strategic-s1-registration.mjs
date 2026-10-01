@@ -76,7 +76,193 @@ export const REGISTRATIONS = [
         "b677746ad35715fda936ae23635583fb383f4f0cabc76e6f11516129f19b2aa0",
         205,
     ],
+    [
+        "strategic-diagnostic-s1/execution-v1/manifest/record.json",
+        "3173064311d3abd927c80e87fb7acc5122a9ce06eaa4670e03954eb8696031db",
+        205,
+    ],
 ].map(([relative, sha256, definitions]) => ({ path: path.join(EVIDENCE, relative), sha256, definitions }));
+export const ORIGINAL_S1_ROOT = path.join(EVIDENCE, "strategic-diagnostic-s1");
+export const ORIGINAL_S1_SOURCE = "75280dfa87f101a7865921121e1ec6fcf44a3ea5";
+export const ORIGINAL_S1_FILES = [
+    ["verification-pure-v1.json", 986, "0050ffcecbb371f3f429a089bcdce2fd9a6a01cb03eecd6dfdcba0ef5cdad6de"],
+    ["verification-prepare-v1.json", 1017, "99dfe467fcaffcbed6902138e5673fb08a91707ccb534b6efba71b66db89b070"],
+    ["execution-v1/manifest/COMPLETE", 27836, "b334df87fe666d285831711e1442fca10786f32edff934eecf7d55c285b8c098"],
+    ["canary-failure-review-v1/record.json", 19887, "e166712d4567f71f987f8c9115061a5106abb35d00adb7c838f038c141ce8876"],
+    [
+        "canary-failure-review-v1/source-evidence.json",
+        4738,
+        "5e25c7059df2157a5f80ef20beac7992a70fdc814bd05ef4f598983fa3f653de",
+    ],
+    ["execution-v1/canary/task-00/COMPLETE", 278, "f384d040c131afdf1b835427cac8f8f746ee5f8b9094b2d9e8e6c5f7ee7005ff"],
+    [
+        "execution-v1/canary/task-00/FAILURE.json",
+        895,
+        "ce12a6d166149d867c6a9a33dca263d54404c5e1392e11989a72867255ac74a9",
+    ],
+    ["execution-v1/canary/task-01/COMPLETE", 278, "087f9c4f8b94e9db7432bc84cc39fb00102e49aa53cf531995f10d5d9f9932ea"],
+    [
+        "execution-v1/canary/task-01/FAILURE.json",
+        895,
+        "c5a2c1ed6ca0ff154fffdbf47a11a337b3e701200870257c28b1c5aa5a7eb344",
+    ],
+    ["execution-v1/canary/task-02/COMPLETE", 278, "4148fd720c6a8c6ee363dbc24ccf34c65c8bd848f96b8b0f267db31b3cbd368a"],
+    [
+        "execution-v1/canary/task-02/FAILURE.json",
+        895,
+        "7da8bbefbd9707c10680aca93301f7d768e982596e24afa94ef152088312c3fe",
+    ],
+    ["execution-v1/canary/task-03/COMPLETE", 278, "35a39d6822d5e23275646bfbe31683c2732f669ff25fa34b56fcc7a95be64a7c"],
+    [
+        "execution-v1/canary/task-03/FAILURE.json",
+        895,
+        "cef27812efade52a35e10e6454f6b2d1ee3f724a546ec2791d256c67344a00b8",
+    ],
+].map(([relative, bytes, sha256]) => ({ path: path.join(ORIGINAL_S1_ROOT, relative), bytes, sha256 }));
+/** Reconstruct the original plan as immutable metadata; never use it for initialization. */
+export function buildOriginalS1Plan(maps) {
+    const current = buildStrategicS1Plan(maps);
+    return {
+        ...current,
+        kind: "strategic-diagnostic-s1-plan-v1",
+        protocolSha256: "952bca278befb716a25551d022fd3954b9ed999be375d8d9baf1253c53dc5b54",
+        cases: current.cases.map((c) => ({ ...c, requestedEngineSeed: 3350120000 + c.caseIndex })),
+        canaries: current.canaries.map((c, i) => ({ ...c, requestedEngineSeed: 3350121000 + i })),
+        smoke: { ...current.smoke, requestedEngineSeed: 3350121100 },
+    };
+}
+export const originalS1History = (manifest) => ({
+    sourceCommit: ORIGINAL_S1_SOURCE,
+    selectorJobId: "27735502",
+    canaryArrayJobId: "27748007",
+    finalizerJobId: "27748008",
+    definitions: 205,
+    zeroUpdateInitializations: 205,
+    consumption: {
+        launchAttempts: 8,
+        endpointOnlyReturned: 4,
+        endpointOnlyUpdatesEach: 3600,
+        observedEntered: 4,
+        observedCompleted: 0,
+        observedAdvancingUpdates: null,
+        completedPairs: 0,
+        finalizerStarted: false,
+        smokeOrMainSubmitted: false,
+    },
+    manifest,
+    evidence: ORIGINAL_S1_FILES,
+});
+export function validateOriginalS1Metadata(plan, metadata) {
+    const expected = buildOriginalS1Plan(plan.maps),
+        all = [...expected.cases, ...expected.canaries, expected.smoke];
+    requireTrue(
+        metadata.kind === "strategic-s1-manifest-v1" &&
+            metadata.complete === true &&
+            metadata.passed === true &&
+            metadata.source?.sourceCommit === ORIGINAL_S1_SOURCE &&
+            metadata.scheduler?.jobId === "27735502",
+        "original S1 selector identity",
+    );
+    exact(metadata.plan, expected, "complete consumed original S1 definitions");
+    exact(
+        metadata.launches,
+        all.map((c) => ({
+            role: c.role,
+            caseIndex: c.caseIndex,
+            mode: "zero_update",
+            requestedEngineSeed: c.requestedEngineSeed,
+            policy: "unchanged_strongbot",
+        })),
+        "original S1 zero-update launches",
+    );
+    exact(
+        metadata.observations,
+        all.map((c) => ({
+            caseIndex: c.caseIndex,
+            requestedEngineSeed: c.requestedEngineSeed,
+            updates: 0,
+            candidateStart: c.candidateStart,
+            opponentStart: c.opponentStart,
+            candidateCountry: c.country,
+            opponentCountry: c.country,
+            candidateStartOrdinal: c.candidateStartOrdinal,
+            opponentStartOrdinal: c.opponentStartOrdinal,
+            candidateSlot: c.candidateSlot,
+            agentOrder: c.candidateSlot === 0 ? ["OD1Candidate", "OD1Opponent"] : ["OD1Opponent", "OD1Candidate"],
+            slotVerification: "source-bound-agent-order-and-pinned-creator",
+            seedVerification: "pinned-date-now-seconds-shim-and-participant-stream-derivation",
+        })),
+        "original S1 zero-update observations",
+    );
+}
+function auditOriginalS1(plan, metadata, manifest) {
+    validateOriginalS1Metadata(plan, metadata);
+    for (const prior of REGISTRATIONS.slice(0, 9))
+        requireTrue(
+            metadata.seedAudit.inspectedRegistrationFiles.some(
+                (r) => r.path === prior.path && r.sha256 === prior.sha256,
+            ),
+            "original S1 prior-registration chain",
+        );
+    for (const d of ORIGINAL_S1_FILES) {
+        const actual = checkedFile(d.path, d.sha256);
+        requireTrue(actual.bytes === d.bytes, "original S1 evidence size");
+    }
+    const expectedJournal =
+        metadata.launches.map((l) => "LAUNCH_S1_V1 " + JSON.stringify(l) + "\n").join("") +
+        "COMPLETE_S1_V1 " +
+        manifest.sha256 +
+        " " +
+        manifest.bytes +
+        "\n";
+    exact(fs.readFileSync(ORIGINAL_S1_FILES[2].path, "utf8"), expectedJournal, "original S1 complete journal");
+    const review = json(ORIGINAL_S1_FILES[3].path),
+        history = originalS1History(manifest);
+    requireTrue(
+        review.sourceCommit === ORIGINAL_S1_SOURCE &&
+            review.reviewComplete === true &&
+            review.canaryGatePassed === false &&
+            review.arrayJobId === history.canaryArrayJobId &&
+            review.finalizerJobId === history.finalizerJobId,
+        "original S1 failure review",
+    );
+    for (const [k, value] of Object.entries(history.consumption))
+        exact(review.consumption[k], value, "original S1 consumption " + k);
+    requireTrue(
+        review.workers.length === 4 && review.finalizer[2] === "CANCELLED" && review.finalizer[10] === "0",
+        "original S1 terminal failure population",
+    );
+    for (const [i, c] of buildOriginalS1Plan(plan.maps).canaries.entries()) {
+        const worker = review.workers[i],
+            dir = path.join(ORIGINAL_S1_ROOT, "execution-v1/canary/task-" + String(i).padStart(2, "0"));
+        const launches = ["canary_endpoint_only", "canary_strategic"].map((mode) => ({
+            role: "canary",
+            caseIndex: c.caseIndex,
+            mode,
+            requestedEngineSeed: c.requestedEngineSeed,
+            policy: "unchanged_strongbot",
+        }));
+        exact(worker.launches, launches, "original canary attempts");
+        exact(
+            fs.readFileSync(path.join(dir, "COMPLETE"), "utf8"),
+            launches.map((l) => "LAUNCH_S1_V1 " + JSON.stringify(l) + "\n").join(""),
+            "original failed canary journal",
+        );
+        const failure = json(path.join(dir, "FAILURE.json"));
+        requireTrue(
+            failure.complete === false &&
+                failure.passed === false &&
+                failure.technicalOnly === true &&
+                failure.sourceCommit === ORIGINAL_S1_SOURCE &&
+                worker.allocation[2] === "FAILED" &&
+                worker.allocation[3] === "1:0",
+            "original canary failure identity",
+        );
+        requireTrue(!fs.existsSync(path.join(dir, "record.json")), "original failed canary unexpectedly published");
+    }
+    return history;
+}
+
 export const REGISTRATION_AFTER_UTC = "2026-09-09T06:35:54Z";
 export const permittedRegistrations = () => [...REGISTRATIONS.map((r) => r.path), CERT, GATE2_RECEIPT].sort();
 export function validateRegistrationScan(discovered) {
@@ -89,12 +275,12 @@ export function proposedS1Seeds(plan) {
     exact(
         seeds,
         [
-            ...Array.from({ length: 200 }, (_, i) => 3350120000 + i),
-            3350121000,
-            3350121001,
-            3350121002,
-            3350121003,
-            3350121100,
+            ...Array.from({ length: 200 }, (_, i) => 3350130000 + i),
+            3350131000,
+            3350131001,
+            3350131002,
+            3350131003,
+            3350131100,
         ],
         "prospective seeds",
     );
@@ -253,7 +439,7 @@ export function auditFreshSeeds(plan) {
         metadata.push(value);
     }
     // Cross-bind all eight older registrations to the audited D1 registration chain.
-    for (const prior of REGISTRATIONS.slice(0, -1))
+    for (const prior of REGISTRATIONS.slice(0, 8))
         requireTrue(
             metadata[8].seedAudit.inspectedRegistrationFiles.some(
                 (r) => r.path === prior.path && r.sha256 === prior.sha256,
@@ -280,6 +466,7 @@ export function auditFreshSeeds(plan) {
     const failure = json(failureFile),
         journal = parseOd1Journal(fs.readFileSync(journalFile, "utf8"));
     validateHistoricalPlans(plan, metadata[7], metadata[8], failure, journal);
+    const originalS1 = auditOriginalS1(plan, metadata[9], records[9]);
     const accounting = execFileSync(
         "/opt/slurm/current/bin/sacct",
         ["-X", "-n", "-P", "-j", "26516850", "--format=JobIDRaw,Account,Partition,State,ExitCode,AllocCPUS,Restarts"],
@@ -287,7 +474,7 @@ export function auditFreshSeeds(plan) {
     ).trim();
     exact(accounting, "26516850|pi_jss233|day|FAILED|1:0|1|0", "abandoned accounting");
     return {
-        kind: "strategic-s1-registration-audit-v1",
+        kind: "strategic-s1-registration-audit-v2",
         complete: true,
         passed: true,
         technicalOnly: true,
@@ -307,7 +494,8 @@ export function auditFreshSeeds(plan) {
         },
         od1A1: { definitions: 905, zeroUpdateInitializations: 905, advancingEpisodes: 1818, manifest: records[7] },
         d1: { definitions: 205, zeroUpdateInitializations: 205, advancingEpisodes: 627, manifest: records[8] },
-        priorZeroUpdateInitializations: 2015,
+        originalS1,
+        priorZeroUpdateInitializations: 2220,
         newSeeds: {
             count: proposed.length,
             min: Math.min(...proposed),

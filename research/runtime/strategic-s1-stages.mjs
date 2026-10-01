@@ -26,6 +26,7 @@ import {
     REGISTRATION_AFTER_UTC,
     permittedRegistrations,
     proposedS1Seeds,
+    originalS1History,
 } from "./strategic-s1-registration.mjs";
 import { validateStrategicS1Plan } from "../../packages/chronodivide-bot-driver/dist/training/strategicS1Plan.js";
 import {
@@ -154,18 +155,19 @@ export function validateSeedAudit(a, plan) {
         "abandonedSelector",
         "od1A1",
         "d1",
+        "originalS1",
         "priorZeroUpdateInitializations",
         "newSeeds",
         "collisions",
         "scope",
     ]);
     requireTrue(
-        a.kind === "strategic-s1-registration-audit-v1" &&
+        a.kind === "strategic-s1-registration-audit-v2" &&
             a.complete === true &&
             a.passed === true &&
             a.technicalOnly === true &&
             a.collisions === 0 &&
-            a.priorZeroUpdateInitializations === 2015,
+            a.priorZeroUpdateInitializations === 2220,
         "registration completion",
     );
     exact(a.discovered, permittedRegistrations(), "registration census");
@@ -178,7 +180,7 @@ export function validateSeedAudit(a, plan) {
         "Registration/certificate/journal metadata only; no competitive payloads opened or engine initialized.",
         "census scope",
     );
-    requireTrue(a.inspectedRegistrationFiles.length === 9, "registration count");
+    requireTrue(a.inspectedRegistrationFiles.length === 10, "registration count");
     for (const [i, r] of a.inspectedRegistrationFiles.entries()) {
         fields(r, [
             "path",
@@ -277,6 +279,8 @@ export function validateSeedAudit(a, plan) {
         );
         exact(a[key].manifest, a.inspectedRegistrationFiles[i], "prior manifest descriptor");
     }
+    requireTrue(a.inspectedRegistrationFiles[9].bytes === 529531, "original S1 manifest bytes");
+    exact(a.originalS1, originalS1History(a.inspectedRegistrationFiles[9]), "original S1 history binding");
     const seeds = proposedS1Seeds(plan);
     exact(
         a.newSeeds,
@@ -443,8 +447,8 @@ export async function validateStage(v, stage, context, index = null) {
             v.canaryGateSha256 === context.canaryGateSha256 &&
                 v.smokeSha256 === context.smokeSha256 &&
                 v.initializations === 205 &&
-                v.priorZeroUpdateInitializations === 2015 &&
-                v.cumulativeZeroUpdateInitializations === 2220 &&
+                v.priorZeroUpdateInitializations === 2220 &&
+                v.cumulativeZeroUpdateInitializations === 2425 &&
                 v.canaryEpisodes === 8 &&
                 v.smokeEpisodes === 1 &&
                 v.diagnosticEpisodes === 200 &&
@@ -472,7 +476,7 @@ export async function validateStage(v, stage, context, index = null) {
             );
         }
         requireTrue(
-            v.analysis.kind === "strategic-s1-population-analysis-v1" &&
+            v.analysis.kind === "strategic-s1-population-analysis-v2" &&
                 v.analysis.complete === true &&
                 v.analysis.policyComparison === false &&
                 v.analysis.policySelectionAuthorized === false &&

@@ -34,7 +34,7 @@ export const VITEST_NAMES = [
     "strategicS1Episode",
     "strategicS1Population",
 ];
-export const VITEST_PASSED = 329;
+export const VITEST_PASSED = 336;
 export const NODE_TESTS = [
     ["unified-intent-gate2-runtime-schema", 1],
     ["unified-intent-v2-od1-runtime", 16],
@@ -42,7 +42,7 @@ export const NODE_TESTS = [
     ["unified-intent-d1-analysis", 8],
     ["unified-intent-d1-golden", 1],
     ["strategic-s1-golden", 2],
-    ["strategic-s1-runtime", 21],
+    ["strategic-s1-runtime", 23],
     ["strategic-s1-harness", 26],
 ];
 export const NODE_PASSED = NODE_TESTS.reduce((n, [, count]) => n + count, 0);

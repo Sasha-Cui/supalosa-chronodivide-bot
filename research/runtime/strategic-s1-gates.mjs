@@ -20,7 +20,7 @@ import { VITEST_NAMES, VITEST_PASSED, NODE_TESTS, NODE_PASSED, TOTAL_PASSED } fr
 import { descriptor, validateScheduler, stageRequest } from "./strategic-s1-stages.mjs";
 // V1 never started; V2 passed414 checks but its accounting consumer rejected8G.
 // Preserve both attempts; V3 verifies the narrowly repaired current source.
-export const PURE_DIRECTORY = path.join(STUDY, "pure-v3");
+export const PURE_DIRECTORY = path.join(STUDY, "pure-v1");
 export const PURE_PATH = path.join(PURE_DIRECTORY, "pure.json");
 export const VERIFICATION_SCOPES = {
     pure: "independent-pure-metadata",
