@@ -209,7 +209,10 @@ export class S1ActionWindows {
     private lastObservedTick = 0;
     private finished = false;
     readonly totalBySideAndMethod: Record<string, number> = {};
-    constructor(private readonly names: Record<S1Side, string>) {
+    constructor(
+        private readonly names: Record<S1Side, string>,
+        private readonly observationClock: (game: GameApi) => number = (game) => game.getCurrentTick(),
+    ) {
         assertS1ApiEnums();
         if (names.candidate === names.baseline) fail("same combatants");
     }
@@ -241,7 +244,7 @@ export class S1ActionWindows {
         }
     }
     private record(side: S1Side, method: string, args: unknown[], game: GameApi): void {
-        const tick = natural(game.getCurrentTick());
+        const tick = natural(this.observationClock(game));
         if (this.finished || tick <= this.lastSample || tick < this.lastObservedTick)
             fail("action clock or closed observer");
         this.lastObservedTick = tick;

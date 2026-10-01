@@ -124,15 +124,16 @@ export function validateS1CanaryPair(values: any[], c: StrategicS1Plan["canaries
 export function validateS1Smoke(r: any, c: StrategicS1Plan["smoke"]) {
     exactFields(
         r,
-        "kind complete technicalPass caseIndex requestedEngineSeed policy endpointReplayPass strategicReplayPass schemaVerified sampleGridVerified windowConservation payloadDiscarded resignationSuppressed combinedBytes endpointStorage strategicStorage",
+        "kind complete technicalPass caseIndex requestedEngineSeed policy endpointReplayPass strategicReplayPass schemaVerified sampleGridVerified crossChannelVerified windowConservation payloadDiscarded resignationSuppressed combinedBytes endpointStorage strategicStorage",
     );
-    s1Require(r.kind === "strategic-s1-smoke-technical-v1" && c.role === "smoke", "smoke kind");
+    s1Require(r.kind === "strategic-s1-smoke-technical-v2" && c.role === "smoke", "smoke kind");
     common(r, c);
     for (const k of [
         "endpointReplayPass",
         "strategicReplayPass",
         "schemaVerified",
         "sampleGridVerified",
+        "crossChannelVerified",
         "windowConservation",
         "payloadDiscarded",
         "resignationSuppressed",

@@ -27,7 +27,7 @@ function identity(x: S1LedgerIdentity) {
     natural(x.caseIndex);
     require(x.caseIndex <= 204, "case index");
     const seed =
-        x.caseIndex < 200 ? 3350130000 + x.caseIndex : x.caseIndex < 204 ? 3350131000 + x.caseIndex - 200 : 3350131100;
+        x.caseIndex < 200 ? 3350140000 + x.caseIndex : x.caseIndex < 204 ? 3350141000 + x.caseIndex - 200 : 3350141100;
     require(x.requestedEngineSeed === seed, "seed");
     require(x.maxUpdates === (x.caseIndex >= 200 && x.caseIndex < 204 ? 3600 : 24000), "horizon");
 }

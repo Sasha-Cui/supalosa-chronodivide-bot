@@ -340,7 +340,7 @@ export function syntheticS1Canaries(plan: StrategicS1Plan) {
     }));
 }
 export const syntheticS1Smoke = (plan: StrategicS1Plan) => ({
-    kind: "strategic-s1-smoke-technical-v1",
+    kind: "strategic-s1-smoke-technical-v2",
     complete: true,
     technicalPass: true,
     caseIndex: 204,
@@ -350,6 +350,7 @@ export const syntheticS1Smoke = (plan: StrategicS1Plan) => ({
     strategicReplayPass: true,
     schemaVerified: true,
     sampleGridVerified: true,
+    crossChannelVerified: true,
     windowConservation: true,
     payloadDiscarded: true,
     resignationSuppressed: true,

@@ -165,7 +165,7 @@ describe("S1 frozen passive foundations (synthetic, no engine)", () => {
         const s = samples(1200, (f) => {
             f.units[0].primaryWeapon.speed = Infinity;
         });
-        const encoded = encodeS1Ledger(s, { caseIndex: 0, requestedEngineSeed: 3350130000, maxUpdates: 24000 }, 1200, {
+        const encoded = encodeS1Ledger(s, { caseIndex: 0, requestedEngineSeed: 3350140000, maxUpdates: 24000 }, 1200, {
             sha256: "a".repeat(64),
             bySideAndMethod: {},
         });
@@ -197,10 +197,10 @@ describe("S1 frozen passive foundations (synthetic, no engine)", () => {
         validateStrategicS1Plan(p);
         expect(p.cases).toHaveLength(200);
         expect(p.cases.map((c) => c.requestedEngineSeed)).toEqual(
-            Array.from({ length: 200 }, (_, i) => 3350130000 + i),
+            Array.from({ length: 200 }, (_, i) => 3350140000 + i),
         );
-        expect(p.canaries.map((c) => c.requestedEngineSeed)).toEqual([3350131000, 3350131001, 3350131002, 3350131003]);
-        expect(p.smoke.requestedEngineSeed).toBe(3350131100);
+        expect(p.canaries.map((c) => c.requestedEngineSeed)).toEqual([3350141000, 3350141001, 3350141002, 3350141003]);
+        expect(p.smoke.requestedEngineSeed).toBe(3350141100);
         expect(new Set([...p.cases, ...p.canaries, p.smoke].map((c) => c.requestedEngineSeed)).size).toBe(205);
         expect(p.counts.advancingEpisodes).toBe(209);
         expect(p.policy.arbiterEnabled).toBe(false);
@@ -453,7 +453,7 @@ describe("S1 frozen passive foundations (synthetic, no engine)", () => {
     });
     it("round-trips the complete strategic gzip ledger and reconstructed diagnostics", () => {
         const s = samples(),
-            encoded = encodeS1Ledger(s, { caseIndex: 0, requestedEngineSeed: 3350130000, maxUpdates: 24000 }, 1200, {
+            encoded = encodeS1Ledger(s, { caseIndex: 0, requestedEngineSeed: 3350140000, maxUpdates: 24000 }, 1200, {
                 sha256: "a".repeat(64),
                 bySideAndMethod: {},
             }),
@@ -464,7 +464,7 @@ describe("S1 frozen passive foundations (synthetic, no engine)", () => {
     });
     it("rejects ledger checksum, size, seed, and action-conservation drift", () => {
         const s = samples(),
-            binding = { caseIndex: 0, requestedEngineSeed: 3350130000, maxUpdates: 24000 as const },
+            binding = { caseIndex: 0, requestedEngineSeed: 3350140000, maxUpdates: 24000 as const },
             p = { sha256: "a".repeat(64), bySideAndMethod: {} };
         const { ledger } = encodeS1Ledger(s, binding, 1200, p);
         expect(() => replayS1Ledger({ ...ledger, gzipSha256: "0".repeat(64) })).toThrow();

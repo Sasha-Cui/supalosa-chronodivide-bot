@@ -16,6 +16,7 @@ import { UnifiedIntentV2InspectableBot, UnifiedIntentV2TechnicalSpec } from "./u
 import { S1ActionWindows, S1Sampler, S1Sample, S1MissionRead } from "./strategicS1Observation.js";
 import { encodeS1Ledger, replayS1Ledger } from "./strategicS1Ledger.js";
 import { S1_POLICY } from "./strategicS1Plan.js";
+import { crossCheckS1Ledgers } from "./strategicS1CrossLedger.js";
 
 export type S1EpisodeSpec = Omit<UnifiedIntentV2TechnicalSpec, "maxUpdates"> & {
     caseIndex: number;
@@ -56,10 +57,10 @@ export async function runStrategicS1Episode(args: {
     const observed = mode !== "canary_endpoint_only";
     const seed =
         spec.caseIndex < 200
-            ? 3350130000 + spec.caseIndex
+            ? 3350140000 + spec.caseIndex
             : spec.caseIndex < 204
-            ? 3350131000 + spec.caseIndex - 200
-            : 3350131100;
+            ? 3350141000 + spec.caseIndex - 200
+            : 3350141100;
     if (
         !["diagnostic", "smoke", "canary_endpoint_only", "canary_strategic"].includes(mode) ||
         !Number.isSafeInteger(spec.caseIndex) ||
@@ -96,7 +97,20 @@ export async function runStrategicS1Episode(args: {
     }
     const endpoint = new PassiveDualBuildingEndpoint(names, spec.maxUpdates);
     const actionAudit = new PublicActionAudit();
-    const windows = observed ? new S1ActionWindows(names) : null;
+    let observationPhase: "startup" | "advancing" | "between_updates" | "closed" = "startup";
+    let advancingUpdate: number | null = null;
+    const observationClock = (game: GameApi): number => {
+        const publicTick = game.getCurrentTick();
+        if (!Number.isSafeInteger(publicTick) || publicTick < 0) throw new Error("S1 callback public clock");
+        if (advancingUpdate !== null) {
+            if (publicTick !== advancingUpdate - 1 && publicTick !== advancingUpdate)
+                throw new Error("S1 callback advancing clock drift");
+            return advancingUpdate;
+        }
+        if (observationPhase === "startup" && publicTick === 0) return 0;
+        throw new Error("S1 callback outside startup or advancing update");
+    };
+    const windows = observed ? new S1ActionWindows(names, observationClock) : null;
     const sampler = observed ? new S1Sampler(names) : null;
     const samples: S1Sample[] = [];
     let publicGame: GameApi | null = null;
@@ -128,10 +142,11 @@ export async function runStrategicS1Episode(args: {
             bots,
             {
                 observe(event): void {
+                    if (observationPhase === "closed") return;
                     if (windows) {
                         const normalized = normalizeFreshDualEvents([event]);
                         if (normalized.length && !publicGame) throw new Error("S1 event before public API");
-                        for (const value of normalized) windows.observeEvent(publicGame!.getCurrentTick(), value);
+                        for (const value of normalized) windows.observeEvent(observationClock(publicGame!), value);
                     }
                     if (recording) {
                         endpoint.observe(event);
@@ -227,6 +242,7 @@ export async function runStrategicS1Episode(args: {
                         });
                     if (canary) trace();
                     capture();
+                    observationPhase = "between_updates";
                     if (!canary)
                         writer = await EmbeddedFreshDualLedgerWriter.create(
                             names,
@@ -244,10 +260,14 @@ export async function runStrategicS1Episode(args: {
                         events = [];
                         if (active) endpoint.beginUpdate(game);
                         recording = active;
+                        advancingUpdate = updates + 1;
+                        observationPhase = "advancing";
                         try {
                             await instance.update();
                         } finally {
                             recording = false;
+                            advancingUpdate = null;
+                            observationPhase = "between_updates";
                         }
                         updates++;
                         if (game.getCurrentTick() !== updates) throw new Error("S1 clock drifted");
@@ -354,6 +374,7 @@ export async function runStrategicS1Episode(args: {
                     const replay = await verifyEmbeddedFreshDualLedger(ledger);
                     if (!replay.complete || replay.aborted) throw new Error("S1 endpoint replay incomplete");
                     equal(replay.final, final, "endpoint replay differs");
+                    await crossCheckS1Ledgers(ledger, samples);
                     const result = {
                         kind: "strategic-s1-diagnostic-v2" as const,
                         complete: true as const,
@@ -378,7 +399,7 @@ export async function runStrategicS1Episode(args: {
                     const combinedBytes = assertS1ArtifactBytes(result);
                     if (mode === "smoke")
                         return {
-                            kind: "strategic-s1-smoke-technical-v1" as const,
+                            kind: "strategic-s1-smoke-technical-v2" as const,
                             complete: true as const,
                             technicalPass: true as const,
                             caseIndex: spec.caseIndex,
@@ -388,6 +409,7 @@ export async function runStrategicS1Episode(args: {
                             strategicReplayPass: true,
                             schemaVerified: true,
                             sampleGridVerified: true,
+                            crossChannelVerified: true,
                             windowConservation: true,
                             payloadDiscarded: true,
                             resignationSuppressed: true,
@@ -397,6 +419,8 @@ export async function runStrategicS1Episode(args: {
                         };
                     return result;
                 } finally {
+                    observationPhase = "closed";
+                    advancingUpdate = null;
                     recording = false;
                     windows?.uninstall();
                     writer?.dispose();
@@ -404,6 +428,8 @@ export async function runStrategicS1Episode(args: {
             },
         );
     } finally {
+        observationPhase = "closed";
+        advancingUpdate = null;
         // Also handles createGame or startup failure before the seeded body is entered.
         windows?.uninstall();
         for (const restore of restorers.reverse()) restore();

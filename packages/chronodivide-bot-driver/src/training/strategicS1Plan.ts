@@ -1,7 +1,7 @@
 import { buildUnifiedIntentD1Plan } from "./unifiedIntentD1Plan.js";
 import { UnifiedIntentGate3Map } from "./unifiedIntentGate3Plan.js";
-export const S1_SOURCE_PROTOCOL_SHA256 = "9ea76da3bb2ef960dd192f1fdaefde5ad6b5d6378867a22e6b09d49b49682bde";
-export const S1_SEEDS = { main: 3350130000, canary: 3350131000, smoke: 3350131100 } as const;
+export const S1_SOURCE_PROTOCOL_SHA256 = "650c29a674350d200f3beac622d3713449732959b5ab0d4ef6d157769d30b018";
+export const S1_SEEDS = { main: 3350140000, canary: 3350141000, smoke: 3350141100 } as const;
 export const S1_POLICY = { id: "unchanged_strongbot", arbiterEnabled: false } as const;
 export const S1_OBSERVERS = ["endpoint_only", "strategic"] as const;
 export const buildStrategicS1Plan = (maps: UnifiedIntentGate3Map[]) => {

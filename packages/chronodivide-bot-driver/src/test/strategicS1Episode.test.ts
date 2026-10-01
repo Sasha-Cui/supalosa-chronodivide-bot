@@ -37,6 +37,7 @@ const fixture = (
     let tick = 0,
         nativeFinished = false,
         disposed = false;
+    let callbackOffset = 0;
     const names = { candidate: "OD1Candidate", baseline: "OD1Opponent" };
     const weapon = {
         type: 0,
@@ -73,7 +74,7 @@ const fixture = (
         return value;
     };
     const game: any = {
-        getCurrentTick: () => checked(tick),
+        getCurrentTick: () => checked(tick - callbackOffset),
         getAllUnits: (filter?: (rules: any) => boolean) =>
             checked(units.filter((u) => !filter || filter(u.rules)).map((u) => u.id)),
         getUnitData: (id: number) => checked(units.find((u) => u.id === id)),
@@ -140,7 +141,30 @@ const fixture = (
         opponent = bot(names.baseline);
     const canary = mode.startsWith("canary"),
         caseIndex = canary ? 200 : mode === "smoke" ? 204 : 0;
-    const config = { clockJump: false, enabledTelemetry: false, quit: true };
+    const config = {
+        clockJump: false,
+        enabledTelemetry: false,
+        quit: true,
+        callbackLag: 0,
+        periodicEvents: false,
+        eventActions: false,
+        cleanupEvent: false,
+        destroyAt: 2,
+    };
+    const emit = (event: any) => {
+        callbackOffset = config.callbackLag;
+        try {
+            candidate.onGameEvent(event);
+            opponent.onGameEvent(event);
+        } finally {
+            callbackOffset = 0;
+        }
+    };
+    const originalCandidateEvent = candidate.onGameEvent;
+    candidate.onGameEvent = function (event: any) {
+        originalCandidateEvent(event);
+        if (config.eventActions && callbackOffset) this.lastPlayerActions.orderUnits([10], 0, 12, 13);
+    };
     const api = {
         createGame: vi.fn(async (options: any) => {
             expect(options).toEqual({
@@ -162,6 +186,7 @@ const fixture = (
             return {
                 isFinished: () => nativeFinished,
                 dispose: () => {
+                    if (config.cleanupEvent) emit({ type: ApiEventType.ObjectUnspawn, target: 999 });
                     disposed = true;
                 },
                 update: async () => {
@@ -172,19 +197,20 @@ const fixture = (
                         candidate.lastPlayerActions.quitGame();
                         opponent.lastPlayerActions.quitGame();
                     }
-                    if (tick === 2 && (eventMode === "destroy" || eventMode === "rubble")) {
+                    if (tick === config.destroyAt && (eventMode === "destroy" || eventMode === "rubble")) {
                         const e = {
                             type: ApiEventType.ObjectDestroy,
                             target: 2,
                             attackerInfo: { playerName: names.candidate, objId: 10, weaponName: "Cannon" },
                         };
-                        candidate.onGameEvent(e);
-                        opponent.onGameEvent(e);
+                        emit(e);
                         units =
                             eventMode === "destroy"
                                 ? units.filter((u) => u.id !== 2)
                                 : units.map((u) => (u.id === 2 ? { ...u, hitPoints: 0 } : u));
                     }
+                    if (config.periodicEvents && tick % 300 === 0)
+                        emit({ type: ApiEventType.ObjectUnspawn, target: 999 });
                     if (tick === 2 && eventMode === "unexplained") nativeFinished = true;
                 },
             };
@@ -207,7 +233,7 @@ const fixture = (
             opponentStart: "3,4",
             candidateStartOrdinal: 0,
             opponentStartOrdinal: 1,
-            requestedEngineSeed: canary ? 3350131000 : mode === "smoke" ? 3350131100 : 3350130000,
+            requestedEngineSeed: canary ? 3350141000 : mode === "smoke" ? 3350141100 : 3350140000,
             maxUpdates: canary ? (3600 as const) : (24000 as const),
         },
     };
@@ -310,11 +336,66 @@ describe("S1 episode lifecycle and technical projections (fake game only)", () =
             random.mockRestore();
         }
     });
+    it("binds lagged sample-boundary events and callback actions to the advancing update", async () => {
+        const f = fixture();
+        Object.assign(f.config, { callbackLag: 1, periodicEvents: true, eventActions: true, destroyAt: 302 });
+        const r = diagnostic(await runStrategicS1Episode(f));
+        const samples = replayS1Ledger(r.strategicLedger).samples;
+        expect(samples.map((s) => s.tick)).toEqual([0, 300, 302]);
+        expect(samples[1].window.events.map((e) => e.tick)).toEqual([300]);
+        expect(samples[2].window.events.map((e) => e.tick)).toEqual([302]);
+        await validateS1Diagnostic(r, syntheticS1Plan().cases[0]);
+        expect(f.candidate.originals.orderUnits).toHaveBeenCalledTimes(304);
+        expect(r.publicCall.bySideAndMethod["candidate.orderUnits"]).toBe(304);
+    });
+    it("keeps complete canary actions, state, mission reads and RNG equal under lagged callbacks", async () => {
+        const a = fixture("canary_endpoint_only", "none"),
+            b = fixture("canary_strategic", "none");
+        for (const f of [a, b]) Object.assign(f.config, { callbackLag: 1, periodicEvents: true, eventActions: true });
+        const random = vi.spyOn(Math, "random");
+        const before = random.mock.calls.length;
+        try {
+            const pair = [await runStrategicS1Episode(a), await runStrategicS1Episode(b)];
+            validateS1CanaryPair(pair, syntheticS1Plan().canaries[0]);
+            for (const key of ["publicCall", "publicState", "dualTrace", "quitSuppression"] as const)
+                expect((pair[0] as any)[key]).toEqual((pair[1] as any)[key]);
+            expect(b.candidate.getResearchMissionSnapshot).toHaveBeenCalledTimes(13);
+            expect(a.candidate.getResearchMissionSnapshot).not.toHaveBeenCalled();
+            expect(random.mock.calls.length).toBe(before);
+        } finally {
+            random.mockRestore();
+        }
+    });
+    it("forwards teardown events after closing research windows without changing retained episode bytes", async () => {
+        const a = fixture(),
+            b = fixture();
+        b.config.cleanupEvent = true;
+        const left = diagnostic(await runStrategicS1Episode(a));
+        const right = diagnostic(await runStrategicS1Episode(b));
+        expect(right).toEqual(left);
+        expect(b.opponent.onGameEvent).toHaveBeenCalledTimes(2);
+        expect(a.opponent.onGameEvent).toHaveBeenCalledTimes(1);
+    });
+    it("rejects contradictory lagged/future public clocks without relaxing the event-window guard", async () => {
+        for (const callbackLag of [2, -1]) {
+            const f = fixture();
+            f.config.callbackLag = callbackLag;
+            await expect(runStrategicS1Episode(f)).rejects.toThrow(/callback advancing clock drift/);
+        }
+    });
     it("smoke replays and then discards both payloads without outcome/diagnostic leakage", async () => {
         const r = await runStrategicS1Episode(fixture("smoke"));
-        expect(r.kind).toBe("strategic-s1-smoke-technical-v1");
-        if (r.kind !== "strategic-s1-smoke-technical-v1") throw new Error("kind");
-        expect(r.endpointReplayPass && r.strategicReplayPass && r.payloadDiscarded).toBe(true);
+        expect(r.kind).toBe("strategic-s1-smoke-technical-v2");
+        if (r.kind !== "strategic-s1-smoke-technical-v2") throw new Error("kind");
+        expect(r.endpointReplayPass && r.strategicReplayPass && r.crossChannelVerified && r.payloadDiscarded).toBe(
+            true,
+        );
+        const plan = syntheticS1Plan();
+        validateS1Smoke(r, plan.smoke);
+        expect(() => validateS1Smoke({ ...r, crossChannelVerified: false }, plan.smoke)).toThrow();
+        const missing: any = { ...r };
+        delete missing.crossChannelVerified;
+        expect(() => validateS1Smoke(missing, plan.smoke)).toThrow();
         expect(r.endpointStorage.gzipBytes).toBeGreaterThan(0);
         expect(r.strategicStorage.gzipBytes).toBeGreaterThan(0);
         expect(JSON.stringify(r)).not.toMatch(
