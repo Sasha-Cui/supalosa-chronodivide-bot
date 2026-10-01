@@ -10,8 +10,8 @@
 #SBATCH --no-requeue
 #SBATCH --chdir=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot
 #SBATCH --open-mode=append
-#SBATCH --output=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1/slurm/pure-%A_%a.out
-#SBATCH --error=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1/slurm/pure-%A_%a.err
+#SBATCH --output=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/slurm/pure-%A_%a.out
+#SBATCH --error=/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a1/slurm/pure-%A_%a.err
 set -euo pipefail
 umask 077
 NODE_ROOT=/apps/software/2024a/software/nodejs/20.13.1-GCCcore-13.3.0
