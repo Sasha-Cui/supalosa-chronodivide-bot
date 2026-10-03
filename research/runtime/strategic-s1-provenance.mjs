@@ -22,7 +22,7 @@ import { CERT, CERT_SHA, REGISTRATIONS } from "./strategic-s1-registration.mjs";
 import { transformExplicitStartRuntime, EXPLICIT_START_SYMBOL } from "./explicit-start-transform-v1.mjs";
 import { OD1_MAP_IDS } from "../../packages/chronodivide-bot-driver/dist/training/unifiedIntentV2OD1Plan.js";
 
-export const PROTOCOL = path.join(REPO, "research/protocols/method/2026-10-01-strategic-diagnostic-s1-amendment-a2.md");
+export const PROTOCOL = path.join(REPO, "research/protocols/method/2026-10-03-strategic-diagnostic-s1-amendment-a3.md");
 export const PROGRAM = path.join(REPO, "research/scripts/strategic-s1.mjs");
 export const PURE_PROGRAM = path.join(REPO, "research/scripts/strategic-s1-pure.mjs");
 export const STAGE_SCRIPT = path.join(REPO, "research/slurm/strategic_s1_stage.sbatch");
@@ -63,6 +63,7 @@ export const requiredHarnessFiles = [
     "research/protocols/method/2026-09-25-strategic-diagnostic-s1.md",
     "research/protocols/method/2026-10-01-strategic-diagnostic-s1-amendment-a1.md",
     "research/protocols/method/2026-10-01-strategic-diagnostic-s1-amendment-a2.md",
+    "research/protocols/method/2026-10-03-strategic-diagnostic-s1-amendment-a3.md",
     "package.json",
     "package-lock.json",
     "packages/chronodivide-bot/package.json",
@@ -127,6 +128,9 @@ export function sourceSnapshot(stage) {
             fileHash(
                 path.join(REPO, "research/protocols/method/2026-10-01-strategic-diagnostic-s1-amendment-a1.md"),
             ) === "9ea76da3bb2ef960dd192f1fdaefde5ad6b5d6378867a22e6b09d49b49682bde" &&
+            fileHash(
+                path.join(REPO, "research/protocols/method/2026-10-01-strategic-diagnostic-s1-amendment-a2.md"),
+            ) === "650c29a674350d200f3beac622d3713449732959b5ab0d4ef6d157769d30b018" &&
             requiredHash("PROTOCOL_SHA256") === PROTOCOL_SHA &&
             fileHash(program) === requiredHash("PROGRAM_SHA256") &&
             fileHash(script) === requiredHash("SCRIPT_SHA256"),

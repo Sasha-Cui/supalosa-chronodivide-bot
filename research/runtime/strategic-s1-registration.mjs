@@ -86,6 +86,11 @@ export const REGISTRATIONS = [
         "b4812ea6ee38088f418f113a9f547aa12490afb873496f4943c889a164112e65",
         205,
     ],
+    [
+        "strategic-diagnostic-s1-a2/execution-v1/manifest/record.json",
+        "690c92ecb86f72be43dffb2301226100c1b340b95e4e07bd16f104ad291b05b4",
+        205,
+    ],
 ].map(([relative, sha256, definitions]) => ({ path: path.join(EVIDENCE, relative), sha256, definitions }));
 export const ORIGINAL_S1_ROOT = path.join(EVIDENCE, "strategic-diagnostic-s1");
 export const ORIGINAL_S1_SOURCE = "75280dfa87f101a7865921121e1ec6fcf44a3ea5";
@@ -364,6 +369,7 @@ export function buildA1S1Plan(maps) {
     const current = buildStrategicS1Plan(maps);
     return {
         ...current,
+        kind: "strategic-diagnostic-s1-plan-v2",
         protocolSha256: "9ea76da3bb2ef960dd192f1fdaefde5ad6b5d6378867a22e6b09d49b49682bde",
         cases: current.cases.map((c) => ({ ...c, requestedEngineSeed: 3350130000 + c.caseIndex })),
         canaries: current.canaries.map((c, i) => ({ ...c, requestedEngineSeed: 3350131000 + i })),
@@ -512,6 +518,339 @@ function auditA1S1(plan, metadata, manifest) {
     return a1S1History(manifest);
 }
 
+export const A2_S1_EVIDENCE = [
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/verification-pure-v1.json",
+        bytes: 1115,
+        sha256: "fc453cefd4b0d825eb55c211032fb6d3ac481cb23a1bb4c52d37fb800ad181eb",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/verification-prepare-v1.json",
+        bytes: 1146,
+        sha256: "ea1f1d587c22be3f600ca164a5ce42fa20aff7481caa2eed9b763df222310853",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/verification-canary-finalize-v1.json",
+        bytes: 1157,
+        sha256: "0ef6f3c09a09b43eda89643037c2fac4f550e8329861c09251586b4572bba016",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/verification-smoke-v1.json",
+        bytes: 1132,
+        sha256: "4e3a78fa90854855e627de8dc04d2f30b5eff70db43d7acb3d35afb7a4a78d32",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/execution-v1/manifest/COMPLETE",
+        bytes: 27836,
+        sha256: "96eba3680a71fcb77aa991c256c81e17920de919d6f9760191efccc6d9cecafd",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/execution-v1/canary-finalizer/record.json",
+        bytes: 19350,
+        sha256: "be8bb8a27fd6bb02c86f3525cc6e868fd9554d6f8413b40fd2442c235dfaa970",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/execution-v1/canary-finalizer/COMPLETE",
+        bytes: 86,
+        sha256: "6f42ef2cd9ef99ba173446a9c773459e54b6ae96cb3d0c50b35fb601d58c92f8",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/execution-v1/canary/task-00/record.json",
+        bytes: 3966,
+        sha256: "60093b2fd19b00e31c61a83170e95ffbbec151788ba3518de2a7d48ac6258f84",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/execution-v1/canary/task-00/COMPLETE",
+        bytes: 363,
+        sha256: "e26991d3c00f503e40965ca7c9f1c173af0dbef9514223f18843611347ef8047",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/execution-v1/canary/task-01/record.json",
+        bytes: 4026,
+        sha256: "9dfbdc1c0db74f1fbfb4fc4c7adb8000121d0ec2c08af8ba03021950ea3da206",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/execution-v1/canary/task-01/COMPLETE",
+        bytes: 363,
+        sha256: "73f7e70f9dacbf641591b421f4da47d0b5858d3ca01d39ee0616569aed3f174c",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/execution-v1/canary/task-02/record.json",
+        bytes: 4181,
+        sha256: "c62aca8e862986cfb3d2c39a6ee62d5f017645be54096e51f11b96fd0305a304",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/execution-v1/canary/task-02/COMPLETE",
+        bytes: 363,
+        sha256: "24f0bbce7222a609745b0f9036ef42c2139551e95e6358666ec23021c9b2d0ff",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/execution-v1/canary/task-03/record.json",
+        bytes: 3893,
+        sha256: "929b9179dd7241e04fba020410cfba0df9f484617f01546b3bae5f0970683a4d",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/execution-v1/canary/task-03/COMPLETE",
+        bytes: 363,
+        sha256: "25bbd6d4584be3e1436df61d9f85260a50822fcade74e53179beef6de68e96ef",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/execution-v1/smoke/record.json",
+        bytes: 2177,
+        sha256: "f82511a499ed13264997fb72326105a91f08197be684db95016f0a52d4e9ddc8",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/execution-v1/smoke/COMPLETE",
+        bytes: 210,
+        sha256: "185e189bad850a39beeccd62c9518f787d731ba046100f672c27dd9128c3b86b",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/main-failure-review-v1/record.json",
+        bytes: 603981,
+        sha256: "76735f0159943d3ad8bee1d14729b3b110f6f94d98eaab6fc655fc168318c350",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/main-failure-review-v1/source-evidence.json",
+        bytes: 4493,
+        sha256: "f2d2dc7bcb2b54a4be360f1f80af59a8c47304aeabcb3eebc6858ca326a0ea28",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/main-failure-review-v1/accounting-expanded.txt",
+        bytes: 71967,
+        sha256: "effb8b8a575a0ed69f6d656c63736576e036d87db3343fe84568dc5dcde92997",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/main-failure-review-v1/cancel-intent.json",
+        bytes: 993,
+        sha256: "ef3771fb2cb52d285b02ab0cec4aa2a78d4c2259254d62714e8cd6f80dca19a0",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/main-failure-review-v1/cancel-response.json",
+        bytes: 85,
+        sha256: "7c4c8b778cae5a3334a1bc1049df2f1b0668296db71f536ff9f47bf83fd70bf6",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/main-failure-review-v1/INITIAL_RECONCILIATION.json",
+        bytes: 14262,
+        sha256: "a1fd35f5e03be4d88f1a76a597580f3189103fa6fbda6ea923216b30df61f806",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/CHECKPOINT_MAIN_FAILED.json",
+        bytes: 1805,
+        sha256: "d79ccc4357bda4159b9e5491422f55133ef7ec66a3340c4e82d91fed9e1b97d7",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/development/a3-preservation-BbwfZg/PRESERVED.json",
+        bytes: 298916,
+        sha256: "c6968375bfacea029eb100fbdaa4854163f4b841e2e9861b9cc9df5254d461c1",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/development/a3-preservation-BbwfZg/original-source-runtime.tar.gz",
+        bytes: 4908497,
+        sha256: "ec9ab8267ced80ce8136f8c18c4875d69e4134fbc4e7db6fb7d5ba7741dd558b",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/development/a3-numeric-contract-v1/NUMERIC_CONTRACT.json",
+        bytes: 387094,
+        sha256: "cfcd7cbdd3956451d3526b26a33bb1b40f29b7e1f7e67cac339983335ab5da0f",
+    },
+    {
+        path: "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/research-evidence/strategic-diagnostic-s1-a2/development/a3-numeric-contract-v1/CONTROLLER_VERIFIED.json",
+        bytes: 312709,
+        sha256: "c281fd75a7f547bfc8b843e852e0c5c0c19466285615bc9299d168c7c56c4786",
+    },
+];
+
+export function buildA2S1Plan(maps) {
+    const current = buildStrategicS1Plan(maps);
+    return {
+        ...current,
+        kind: "strategic-diagnostic-s1-plan-v2",
+        protocolSha256: "650c29a674350d200f3beac622d3713449732959b5ab0d4ef6d157769d30b018",
+        cases: current.cases.map((c) => ({ ...c, requestedEngineSeed: 3350140000 + c.caseIndex })),
+        canaries: current.canaries.map((c, i) => ({ ...c, requestedEngineSeed: 3350141000 + i })),
+        smoke: { ...current.smoke, requestedEngineSeed: 3350141100 },
+    };
+}
+export const a2S1History = (manifest) => ({
+    sourceCommit: "9c9b60cead62d19189e83f479241b6c20ffcf500",
+    selectorJobId: "28033147",
+    canaryArrayJobId: "28036184",
+    canaryFinalizerJobId: "28036185",
+    smokeJobId: "28038341",
+    mainArrayJobId: "28040514",
+    mainFinalizerJobId: "28040515",
+    definitions: 205,
+    zeroUpdateInitializations: 205,
+    completedCanaryEpisodes: 8,
+    completedCanaryPairs: 4,
+    canaryUpdatesEach: 3600,
+    completedSmokeTechnicalEpisodes: 1,
+    mainAllocatedCases: 200,
+    mainCompletedAllocations: 99,
+    mainFailedAllocations: 6,
+    mainCancelledAllocations: 95,
+    mainLaunchAttempts: 137,
+    allMainIdentitiesReserved: true,
+    failedOrCancelledAdvancingUpdates: null,
+    mainGatePassed: false,
+    partialCompetitivePayloadOpened: false,
+    manifest,
+    evidence: A2_S1_EVIDENCE,
+});
+export function validateA2S1Metadata(plan, m) {
+    const expected = buildA2S1Plan(plan.maps),
+        all = [...expected.cases, ...expected.canaries, expected.smoke];
+    requireTrue(
+        m.kind === "strategic-s1-manifest-v1" &&
+            m.complete === true &&
+            m.passed === true &&
+            m.source.sourceCommit === "9c9b60cead62d19189e83f479241b6c20ffcf500" &&
+            m.scheduler.jobId === "28033147",
+        "A2 selector identity",
+    );
+    exact(m.plan, expected, "complete reserved A2 plan");
+    const launches = all.map((c) => ({
+        role: c.role,
+        caseIndex: c.caseIndex,
+        mode: "zero_update",
+        requestedEngineSeed: c.requestedEngineSeed,
+        policy: "unchanged_strongbot",
+    }));
+    exact(m.launches, launches, "all A2 selector launches");
+    exact(
+        m.observations,
+        all.map((c) => ({
+            caseIndex: c.caseIndex,
+            requestedEngineSeed: c.requestedEngineSeed,
+            updates: 0,
+            candidateStart: c.candidateStart,
+            opponentStart: c.opponentStart,
+            candidateCountry: c.country,
+            opponentCountry: c.country,
+            candidateStartOrdinal: c.candidateStartOrdinal,
+            opponentStartOrdinal: c.opponentStartOrdinal,
+            candidateSlot: c.candidateSlot,
+            agentOrder: c.candidateSlot === 0 ? ["OD1Candidate", "OD1Opponent"] : ["OD1Opponent", "OD1Candidate"],
+            slotVerification: "source-bound-agent-order-and-pinned-creator",
+            seedVerification: "pinned-date-now-seconds-shim-and-participant-stream-derivation",
+        })),
+        "all A2 zero observations",
+    );
+    return { expected, launches };
+}
+function auditA2S1(plan, m, manifest) {
+    const { expected, launches } = validateA2S1Metadata(plan, m),
+        base = path.join(EVIDENCE, "strategic-diagnostic-s1-a2");
+    for (const prior of REGISTRATIONS.slice(0, 11))
+        requireTrue(
+            m.seedAudit.inspectedRegistrationFiles.some((d) => d.path === prior.path && d.sha256 === prior.sha256),
+            "A2 prior registration chain",
+        );
+    for (const d of A2_S1_EVIDENCE) {
+        const actual = checkedFile(d.path, d.sha256);
+        requireTrue(actual.bytes === d.bytes, "A2 evidence bytes");
+    }
+    exact(
+        fs.readFileSync(path.join(base, "execution-v1/manifest/COMPLETE"), "utf8"),
+        launches.map((l) => "LAUNCH_S1_V1 " + JSON.stringify(l) + "\n").join("") +
+            "COMPLETE_S1_V1 " +
+            manifest.sha256 +
+            " " +
+            manifest.bytes +
+            "\n",
+        "A2 selector journal",
+    );
+    const aggregate = json(path.join(base, "execution-v1/canary-finalizer/record.json"));
+    requireTrue(
+        aggregate.complete === true &&
+            aggregate.passed === true &&
+            aggregate.arrayJobId === "28036184" &&
+            aggregate.scheduler.jobId === "28036185" &&
+            aggregate.records.length === 4 &&
+            aggregate.advancingEpisodes === 8,
+        "A2 complete canary",
+    );
+    for (const [i, c] of expected.canaries.entries()) {
+        const r = aggregate.records[i].value;
+        exact(r.assignment, c, "A2 canary assignment");
+        requireTrue(
+            r.episodes.length === 2 &&
+                r.episodes.every((e) => e.complete === true && e.technicalPass === true && e.updates === 3600),
+            "A2 canary returns",
+        );
+    }
+    const smoke = json(path.join(base, "execution-v1/smoke/record.json"));
+    requireTrue(
+        smoke.complete === true &&
+            smoke.passed === true &&
+            smoke.scheduler.jobId === "28038341" &&
+            smoke.episode.kind === "strategic-s1-smoke-technical-v2" &&
+            smoke.episode.crossChannelVerified === true,
+        "A2 smoke cross channel proof",
+    );
+    const review = json(path.join(base, "main-failure-review-v1/record.json"));
+    requireTrue(
+        review.reviewComplete === true &&
+            review.mainGatePassed === false &&
+            review.scientificResult === false &&
+            review.partialCompetitivePayloadsOpened === false &&
+            review.launchedIdentities === 137 &&
+            review.all200MainIdentitiesReserved === true &&
+            review.workerAllocations.length === 200,
+        "A2 terminal failure scope",
+    );
+    const statuses = { COMPLETED: 0, FAILED: 0, CANCELLED: 0 };
+    for (const [i, r] of review.workerAllocations.entries()) {
+        requireTrue(
+            r[0] === "28040514_" + i && r[4] === "pi_jss233" && !["RUNNING", "PENDING", "COMPLETING"].includes(r[2]),
+            "A2 all terminal allocations",
+        );
+        if (r[2] === "COMPLETED") {
+            requireTrue(r[3] === "0:0", "A2 completed exit");
+            statuses.COMPLETED++;
+        } else if (r[2] === "FAILED") {
+            requireTrue(r[3] === "1:0", "A2 failure exit");
+            statuses.FAILED++;
+        } else {
+            requireTrue(r[2].startsWith("CANCELLED"), "A2 cancelled state");
+            statuses.CANCELLED++;
+        }
+    }
+    exact(statuses, { COMPLETED: 99, FAILED: 6, CANCELLED: 95 }, "A2 full allocation statuses");
+    requireTrue(
+        review.finalizerAllocation[0] === "28040515" &&
+            review.finalizerAllocation[2].startsWith("CANCELLED") &&
+            review.finalizerAllocation[10] === "0",
+        "A2 unused finalizer",
+    );
+    requireTrue(!fs.existsSync(path.join(base, "execution-v1/finalizer/record.json")), "A2 finalizer never published");
+    // Hash opaque artifacts/logs only. Never parse a partial competitive record.
+    for (const d of review.evidence) {
+        const actual = checkedFile(d.path, d.sha256);
+        requireTrue(actual.bytes === d.bytes, "A2 sealed artifact binding");
+    }
+    requireTrue(review.journals.length === 137, "A2 full attempted journal population");
+    for (const j of review.journals) {
+        const p = path.join(base, "execution-v1/cases/task-" + String(j.caseIndex).padStart(4, "0") + "/COMPLETE"),
+            actual = checkedFile(p, j.identity.sha256);
+        requireTrue(actual.bytes === j.identity.bytes, "A2 journal bytes");
+        const l = {
+            role: "diagnostic",
+            caseIndex: j.caseIndex,
+            mode: "diagnostic",
+            requestedEngineSeed: 3350140000 + j.caseIndex,
+            policy: "unchanged_strongbot",
+        };
+        exact(j.launches, [l], "A2 consumed main identity");
+        requireTrue(
+            fs.readFileSync(p, "utf8").startsWith("LAUNCH_S1_V1 " + JSON.stringify(l) + "\n"),
+            "A2 durable main launch",
+        );
+    }
+    return a2S1History(manifest);
+}
+
 export const REGISTRATION_AFTER_UTC = "2026-09-09T06:35:54Z";
 export const permittedRegistrations = () => [...REGISTRATIONS.map((r) => r.path), CERT, GATE2_RECEIPT].sort();
 export function validateRegistrationScan(discovered) {
@@ -524,12 +863,12 @@ export function proposedS1Seeds(plan) {
     exact(
         seeds,
         [
-            ...Array.from({ length: 200 }, (_, i) => 3350140000 + i),
-            3350141000,
-            3350141001,
-            3350141002,
-            3350141003,
-            3350141100,
+            ...Array.from({ length: 200 }, (_, i) => 3350150000 + i),
+            3350151000,
+            3350151001,
+            3350151002,
+            3350151003,
+            3350151100,
         ],
         "prospective seeds",
     );
@@ -717,6 +1056,7 @@ export function auditFreshSeeds(plan) {
     validateHistoricalPlans(plan, metadata[7], metadata[8], failure, journal);
     const originalS1 = auditOriginalS1(plan, metadata[9], records[9]);
     const a1S1 = auditA1S1(plan, metadata[10], records[10]);
+    const a2S1 = auditA2S1(plan, metadata[11], records[11]);
     const accounting = execFileSync(
         "/opt/slurm/current/bin/sacct",
         ["-X", "-n", "-P", "-j", "26516850", "--format=JobIDRaw,Account,Partition,State,ExitCode,AllocCPUS,Restarts"],
@@ -746,7 +1086,8 @@ export function auditFreshSeeds(plan) {
         d1: { definitions: 205, zeroUpdateInitializations: 205, advancingEpisodes: 627, manifest: records[8] },
         originalS1,
         a1S1,
-        priorZeroUpdateInitializations: 2425,
+        a2S1,
+        priorZeroUpdateInitializations: 2630,
         newSeeds: {
             count: proposed.length,
             min: Math.min(...proposed),
