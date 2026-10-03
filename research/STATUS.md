@@ -1,6 +1,6 @@
 # Research status
 
-Last reconciled: **2026-10-01 (America/Los_Angeles)**
+Last reconciled: **2026-10-03 (America/Los_Angeles)**
 
 ## Bottom line
 
@@ -109,59 +109,87 @@ telemetry. Keep unchanged StrongBot as the reference and preserve the manuscript
 
 ## Current S1 checkpoint and approved completion sequence
 
-Original S1 source75280dfa passed formal pure27732444 (415 checks), independent
-pure audit27735335, selector27735502 (205 zero-update definitions) and independent
-selector audit27743385. Both authoritative prerequisite receipts are preserved
-under research-evidence/strategic-diagnostic-s1. They certify that source only.
+The original S1 source75280dfa passed formal pure27732444 and independent
+audit27735335, plus selector27735502 and independent audit27743385. Its four
+observed canaries failed at the secondary-weapon speed validation route.
+Eight launches remain consumed: four source-bound endpoint-only returns at
+3600updates and four observed failures with unknown advancing-update counts.
+No original canary pair passed, and original smoke/main were never submitted.
 
-Canary27748007 failed in all four observed workers. Finalizer27748008 was
-cancelled without execution. No canary pair passed; smoke and main were never
-submitted. Eight launches are consumed: four source-bound endpoint-only returns
-at3600updates and four observed failures with unknown advancing-update counts.
-The failure route is secondary-weapon speed validation. Static pinned API source
-supports positive infinity, while the original schema requires finite numbers;
-the actual rejected values and failure ticks were not retained.
+A1 prospectively introduced lossless positive-infinite speed and fresh identities.
+Its pure/selector/canaries passed, but smoke28024266 failed the event-clock
+contract. A2 prospectively repaired the advancing-update clock and required
+endpoint/strategic cross-channel verification before smoke payload discard.
+A2 pure28032158/audit28032833, selector28033147/audit28035122,
+canaries28036184/finalizer28036185/audit28037414 and
+smoke28038341/audit28040325 passed their technical scopes.
 
-The immutable failure review is
-research-evidence/strategic-diagnostic-s1/canary-failure-review-v1/record.json,
-SHAe166712d4567f71f987f8c9115061a5106abb35d00adb7c838f038c141ce8876.
-All original attempts, compiled/source bytes, golden fixtures and negative
-evidence are preserved. No old selector or canary identity may be reused.
+A2 main28040514 failed in six workers at secondaryWeapon.maxRange validation.
+The entire dependency chain was stopped; finalizer28040515 never executed.
+All200 terminal worker allocations reconcile as99COMPLETED,6FAILED,95CANCELLED,
+with137 launch journals. All A2 identities remain reserved, including unstarted
+cancelled cases. Partial competitive records and logs remain opaque/hash-only:
+there is no complete aggregate, accepted scientific population or M2 result.
+Actual rejected values, failure ticks and failed/cancelled advancing-update
+counts were not retained and must not be invented. Static pinned API source
+separately confirms supported positive-infinite maximum range.
 
-On October1 the user approved the reviewed completion plan and specified JSS
-rather than BTK accounting. The
-[A1 amendment](protocols/method/2026-10-01-strategic-diagnostic-s1-amendment-a1.md)
-was committed before its repair: finite speed remains numeric; supported positive
-infinity receives an explicit lossless tag throughout samples, replay and
-statistics. All other numeric fields, scientific thresholds and gameplay remain
-unchanged. Fresh full-population seeds3350130000..199, canary3350131000..1003 and
-smoke3350131100 require the full fail-closed metadata audit before initialization.
-A1 uses research-evidence/strategic-diagnostic-s1-a1, never the old evidence roots.
-Before-init census requires12 exact paths including the old S1 manifest; its
-independent post-publication audit requires13. Prior zero-update count is2220;
-successful A1 selection would make2425. No A1 initializer or game has run.
+The approved [A3 prospective amendment](protocols/method/2026-10-03-strategic-diagnostic-s1-amendment-a3.md)
+was committed/pushed at7ef2f72c before implementation. Raw positive infinity in
+weapon speed or maximum range is represented as the exact positive_infinity tag;
+finite values remain numeric. Only the eight side/weapon-slot/speed-or-range
+distribution keys admit the extended domain. NaN,negative infinity,malformed
+tags,minimum range,cooldown and all unrelated numeric fields remain fail-closed.
+Raw/ledger/plan/population schemas advance toV3; smoke technicalV2 and its
+mandatory cross-channel assertion remain unchanged. Gameplay,all four diagnostic
+screens,both golden fixtures/generators and manuscript are unchanged.
 
-Repair verification is pending. The seven added Vitest and two added Node
-assertions target424 checks (336+88); a target is not a passing receipt.
-A1 needs fresh formal pure/independent audit, full selector/independent audit,
-all four canary pairs, smoke,200main cases and the full independent population
-audit. The latter must be implemented before launching main.
+A3 uses research-evidence/strategic-diagnostic-s1-a3 and fresh seeds3350150000..199,
+3350151000..1003,3350151100. The exact metadata allowlist is14 paths before
+initialization and15 after manifest publication, including all12 prior
+registrations and the complete original/A1/A2 histories. Prior zero-update
+count2630; successful A3 selector completion would make2835. No A3 initializer,
+registration census or real advancing episode has run at this checkpoint.
 
-The heartbeat was deleted at the user's request and remains cancelled.
-During an active source-bound job, this checkout and compiled/runtime files stay
-frozen; current execution state lives in the immutable external receipts, not
-an assumption that this documentation advances automatically.
+A pre-implementation numeric-contract audit28212340 passed1316 static/synthetic
+checks across22 channel families and28 pinned input files. This is a source/pinned-
+input review, not a guarantee about arbitrary future configurations or a launch
+gate. Development attempt28213653 built but failed three synthetic tests; its
+source/runtime archive,reports and failure review remain preserved. Fresh
+development28215070 completed0:0 on pi_jss233/day,one CPU/one node/8GiB/two
+hours/no GPU/no requeue/zero restarts:344Vitest assertions/33files+90Node=434
+passed,zero failed/skipped/pending/todo/cancelled. Elapsed305s,TotalCPU286.156s,
+batchMaxRSS1398520K. Controller rehashed all1064 source descriptors,89 artifact
+entries,three runtime trees and335 assets/15maps,verified both goldens and the
+immutable submission/READY/release chain. This development pass is NOT formal
+launch acceptance. Its controller record is403834bytes,SHA-256
+9c37a34829c1d9f492a203a0af80999b6f3fff311e17b41e381d65018ebdce69,
+under development/repair-check-v2/CONTROLLER_VERIFIED.json.
+
+Next: fresh current-source formal pure plus independent audit; full205-definition
+selector plus independent metadata/collision audit; all four canary pairs and
+verification; smoke and verification; full200-case main/finalizer and independent
+400-ledger reconstruction. Implement and synthetically verify the independent
+population auditor before main submission. No historical receipt certifies A3.
+Discarded technical payload checks are source-bound, not an independent replay.
+
+The user's latest instruction restores an hourly heartbeat. Unchanged healthy,
+pending or running states stay quiet; meaningful completion/failure/decision
+points are reported. During bound jobs,current source and compiled/runtime
+files remain frozen; immutable external receipts hold the execution checkpoint.
 
 Completion remains: audited S1 diagnosis -> at most one supported synthetic
 strategy reproduction -> separately frozen fresh matched policy comparison ->
 positive replication and broad confirmation -> evidence-derived paper/artifact.
-If no actionable mechanism or positive policy is supported, retain that result
+If no actionable mechanism or positive policy is supported,preserve that result
 and seek an explicit scope decision. Neither technical nor diagnostic success
-closes M2, and the old paper/submission checkboxes are historical.
+closes M2. All further simulation/build/formal audit work remains pi_jss233/day
+CPU Slurm; no selective replacements,partial outcome inspection,manuscript or
+deployment.
 
-The foundation, episode, population, runtime, harness and memory-format notes
-remain historical implementation records. Their earlier pending-stage statements
-are superseded by the completed old-source gates and failed canary above.
+The foundation,episode,population,runtime,harness and amendment checkpoint notes
+remain immutable historical implementation records. Their pending-stage prose is
+superseded by the complete external receipts and this reconciled checkpoint.
 
 ## Milestone ledger
 
