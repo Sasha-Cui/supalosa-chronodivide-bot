@@ -141,6 +141,57 @@ describe("S1 frozen passive foundations (synthetic, no engine)", () => {
         }
         expect(JSON.parse(JSON.stringify(s))).toEqual(s);
     });
+    it("encodes unbounded maximum range independently of speed for both players and slots", () => {
+        for (const [maxRange, speed] of [
+            [Infinity, 20],
+            [6, Infinity],
+            [Infinity, Infinity],
+            [6, 20],
+        ]) {
+            const rows = samples(1200, (f) => {
+                for (const u of f.units) {
+                    u.primaryWeapon = {
+                        type: 0,
+                        rules: { name: "RangePrimary" },
+                        minRange: 0,
+                        maxRange,
+                        speed,
+                        cooldownTicks: 0,
+                    };
+                    u.secondaryWeapon = { ...u.primaryWeapon, type: 1, rules: { name: "RangeSecondary" } };
+                }
+            });
+            for (const row of rows) {
+                validateS1Sample(row);
+                for (const u of row.units) {
+                    expect(u.primaryWeapon?.maxRange).toBe(maxRange === Infinity ? "positive_infinity" : maxRange);
+                    expect(u.secondaryWeapon?.maxRange).toBe(maxRange === Infinity ? "positive_infinity" : maxRange);
+                    expect(u.primaryWeapon?.speed).toBe(speed === Infinity ? "positive_infinity" : speed);
+                    expect(u.secondaryWeapon?.speed).toBe(speed === Infinity ? "positive_infinity" : speed);
+                }
+            }
+            expect(JSON.parse(JSON.stringify(rows))).toEqual(rows);
+        }
+    });
+    it("rejects malformed raw and decoded maximum ranges while keeping unrelated numbers finite", () => {
+        for (const value of [NaN, -Infinity, "positive_infinity", null, undefined, {}, true])
+            expect(() =>
+                samples(0, (f) => {
+                    f.units[0].primaryWeapon.maxRange = value;
+                }),
+            ).toThrow();
+        for (const field of ["minRange", "cooldownTicks"])
+            expect(() =>
+                samples(0, (f) => {
+                    f.units[0].primaryWeapon[field] = Infinity;
+                }),
+            ).toThrow();
+        for (const value of ["Infinity", "positive_infinity_bad", Infinity, -Infinity, NaN, null]) {
+            const row = samples(0)[0];
+            (row.units[0].primaryWeapon as any).maxRange = value;
+            expect(() => validateS1Sample(row)).toThrow();
+        }
+    });
     it("rejects malformed raw speeds and preserves all other finite-only checks", () => {
         for (const value of [NaN, -Infinity, "positive_infinity", null, undefined, {}])
             expect(() =>
@@ -148,7 +199,7 @@ describe("S1 frozen passive foundations (synthetic, no engine)", () => {
                     f.units[0].primaryWeapon.speed = value;
                 }),
             ).toThrow();
-        for (const field of ["minRange", "maxRange", "cooldownTicks"])
+        for (const field of ["minRange", "cooldownTicks"])
             expect(() =>
                 samples(0, (f) => {
                     f.units[0].primaryWeapon[field] = Infinity;
@@ -158,14 +209,15 @@ describe("S1 frozen passive foundations (synthetic, no engine)", () => {
         (s[0].units[0].primaryWeapon as any).speed = "positive_infinity_bad";
         expect(() => validateS1Sample(s[0])).toThrow();
         (s[0].units[0].primaryWeapon as any).speed = "positive_infinity";
-        (s[0].units[0].primaryWeapon as any).maxRange = "positive_infinity";
+        (s[0].units[0].primaryWeapon as any).maxRange = "positive_infinity_bad";
         expect(() => validateS1Sample(s[0])).toThrow();
     });
-    it("round-trips explicit infinity through V2 ledgers and rejects rehashed schema corruption", () => {
+    it("round-trips explicit infinity through V3 ledgers and rejects rehashed schema corruption", () => {
         const s = samples(1200, (f) => {
             f.units[0].primaryWeapon.speed = Infinity;
+            f.units[0].primaryWeapon.maxRange = Infinity;
         });
-        const encoded = encodeS1Ledger(s, { caseIndex: 0, requestedEngineSeed: 3350140000, maxUpdates: 24000 }, 1200, {
+        const encoded = encodeS1Ledger(s, { caseIndex: 0, requestedEngineSeed: 3350150000, maxUpdates: 24000 }, 1200, {
             sha256: "a".repeat(64),
             bySideAndMethod: {},
         });
@@ -191,16 +243,30 @@ describe("S1 frozen passive foundations (synthetic, no engine)", () => {
             gzipSha256: sha(gzip),
         };
         expect(() => replayS1Ledger(corrupted)).toThrow();
+        rows[1].units[0].primaryWeapon.speed = "positive_infinity";
+        rows[1].units[0].primaryWeapon.maxRange = "Infinity";
+        const rangePlain = Buffer.from(rows.map((x) => JSON.stringify(x) + "\n").join("")),
+            rangeGzip = gzipSync(rangePlain, { level: 9 });
+        expect(() =>
+            replayS1Ledger({
+                ...encoded.ledger,
+                data: rangeGzip.toString("base64"),
+                plainBytes: rangePlain.length,
+                gzipBytes: rangeGzip.length,
+                plainSha256: sha(rangePlain),
+                gzipSha256: sha(rangeGzip),
+            }),
+        ).toThrow();
     });
     it("reconstructs exactly 205 fresh definitions and 209 advancing episodes", () => {
         const p = buildStrategicS1Plan(maps());
         validateStrategicS1Plan(p);
         expect(p.cases).toHaveLength(200);
         expect(p.cases.map((c) => c.requestedEngineSeed)).toEqual(
-            Array.from({ length: 200 }, (_, i) => 3350140000 + i),
+            Array.from({ length: 200 }, (_, i) => 3350150000 + i),
         );
-        expect(p.canaries.map((c) => c.requestedEngineSeed)).toEqual([3350141000, 3350141001, 3350141002, 3350141003]);
-        expect(p.smoke.requestedEngineSeed).toBe(3350141100);
+        expect(p.canaries.map((c) => c.requestedEngineSeed)).toEqual([3350151000, 3350151001, 3350151002, 3350151003]);
+        expect(p.smoke.requestedEngineSeed).toBe(3350151100);
         expect(new Set([...p.cases, ...p.canaries, p.smoke].map((c) => c.requestedEngineSeed)).size).toBe(205);
         expect(p.counts.advancingEpisodes).toBe(209);
         expect(p.policy.arbiterEnabled).toBe(false);
@@ -453,7 +519,7 @@ describe("S1 frozen passive foundations (synthetic, no engine)", () => {
     });
     it("round-trips the complete strategic gzip ledger and reconstructed diagnostics", () => {
         const s = samples(),
-            encoded = encodeS1Ledger(s, { caseIndex: 0, requestedEngineSeed: 3350140000, maxUpdates: 24000 }, 1200, {
+            encoded = encodeS1Ledger(s, { caseIndex: 0, requestedEngineSeed: 3350150000, maxUpdates: 24000 }, 1200, {
                 sha256: "a".repeat(64),
                 bySideAndMethod: {},
             }),
@@ -464,7 +530,7 @@ describe("S1 frozen passive foundations (synthetic, no engine)", () => {
     });
     it("rejects ledger checksum, size, seed, and action-conservation drift", () => {
         const s = samples(),
-            binding = { caseIndex: 0, requestedEngineSeed: 3350140000, maxUpdates: 24000 as const },
+            binding = { caseIndex: 0, requestedEngineSeed: 3350150000, maxUpdates: 24000 as const },
             p = { sha256: "a".repeat(64), bySideAndMethod: {} };
         const { ledger } = encodeS1Ledger(s, binding, 1200, p);
         expect(() => replayS1Ledger({ ...ledger, gzipSha256: "0".repeat(64) })).toThrow();

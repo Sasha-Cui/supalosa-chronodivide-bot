@@ -57,10 +57,27 @@ describe("S1 complete distributions and missingness (pure synthetic records)", (
         finiteOverflow.add(Number.MAX_VALUE, "", 2);
         expect(() => finiteOverflow.finish()).toThrow();
     });
-    it("restricts the infinity domain to exact speed metrics and merges without dropping cases", () => {
+    it("restricts the infinity domain to exact speed and maximum-range metrics and merges without dropping cases", () => {
         const m = new S1Metrics();
         expect(() => m.add("candidate.unit.health", "positive_infinity", "public_value", "unit")).toThrow();
-        m.add("candidate.unit.primaryWeapon.speed", "positive_infinity", "public_weapon_value", "unit");
+        const allowed = ["candidate", "baseline"].flatMap((side) =>
+            ["primaryWeapon", "secondaryWeapon"].flatMap((slot) =>
+                ["speed", "maxRange"].map((field) => side + ".unit." + slot + "." + field),
+            ),
+        );
+        for (const key of allowed) m.add(key, "positive_infinity", "public_weapon_value", "unit");
+        expect(
+            [...m.definitions.values()]
+                .filter((d) => d.valueDomain === "finite_or_positive_infinity")
+                .map((d) => d.key)
+                .sort(),
+        ).toEqual(allowed.sort());
+        for (const key of [
+            "candidate.unit.primaryWeapon.minRange",
+            "baseline.unit.secondaryWeapon.cooldownTicks",
+            "candidate.unit.primaryWeapon.maxRange.extra",
+        ])
+            expect(() => m.add(key, "positive_infinity", "public_weapon_value", "unit")).toThrow();
         expect(m.definitions.get("candidate.unit.primaryWeapon.speed")?.valueDomain).toBe(
             "finite_or_positive_infinity",
         );
@@ -338,6 +355,48 @@ describe("S1 full 200-case population (synthetic ledger records only)", () => {
         expect(speed?.distribution?.frequencies).toEqual([
             { value: "positive_infinity", count: speed?.coverage.observed },
         ]);
+        expect(analyzed.cases.map((c) => c.screens)).toEqual(result.cases.map((c) => c.screens));
+        expect(JSON.parse(JSON.stringify(analyzed))).toEqual(analyzed);
+    }, 120000);
+    it("retains all eight extended weapon domains through the complete200case72group population", async () => {
+        const extended = input.map((original) => {
+            const r = structuredClone(original),
+                replay = replayS1Ledger(r.episode.strategicLedger);
+            for (const sample of replay.samples)
+                for (const u of sample.units)
+                    if (u.primaryWeapon) {
+                        u.primaryWeapon.speed = "positive_infinity";
+                        u.primaryWeapon.maxRange = "positive_infinity";
+                        u.secondaryWeapon = { ...u.primaryWeapon, type: 1, rulesName: "ExtendedSecondary" };
+                    }
+            const encoded = encodeS1Ledger(replay.samples, replay.identity, r.episode.updates, r.episode.publicCall);
+            r.episode.strategicLedger = encoded.ledger;
+            r.episode.strategicAnalysisSha256 = s1Hash(encoded.analysis);
+            return r;
+        });
+        const analyzed = await analyzeStrategicS1Population(plan, extended);
+        expect(analyzed.counts.cases).toBe(200);
+        expect(analyzed.groups).toHaveLength(72);
+        const keys = ["candidate", "baseline"].flatMap((side) =>
+            ["primaryWeapon", "secondaryWeapon"].flatMap((slot) =>
+                ["speed", "maxRange"].map((field) => side + ".unit." + slot + "." + field),
+            ),
+        );
+        expect(
+            analyzed.metricDefinitions
+                .filter((d) => d.valueDomain === "finite_or_positive_infinity")
+                .map((d) => d.key)
+                .sort(),
+        ).toEqual(keys.sort());
+        for (const key of keys) {
+            const row = analyzed.groups[0].metrics.find((m) => m.key === key);
+            expect(row).toBeDefined();
+            if (row?.distribution) expect(row.distribution.mean).toBe("positive_infinity");
+            else {
+                expect(row?.coverage.observed).toBe(0);
+                expect(row?.coverage.unavailable).toBeGreaterThan(0);
+            }
+        }
         expect(analyzed.cases.map((c) => c.screens)).toEqual(result.cases.map((c) => c.screens));
         expect(JSON.parse(JSON.stringify(analyzed))).toEqual(analyzed);
     }, 120000);

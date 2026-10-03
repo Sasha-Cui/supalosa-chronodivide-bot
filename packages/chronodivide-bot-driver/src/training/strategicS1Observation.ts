@@ -100,11 +100,14 @@ export const encodeS1WeaponSpeed = (value: unknown): S1WeaponSpeed =>
 export const validateS1WeaponSpeed = (value: unknown): void => {
     if (value !== S1_POSITIVE_INFINITY) finite(value);
 };
+export type S1WeaponMaxRange = S1WeaponSpeed;
+export const encodeS1WeaponMaxRange = encodeS1WeaponSpeed;
+export const validateS1WeaponMaxRange = validateS1WeaponSpeed;
 export type S1Weapon = {
     type: number;
     rulesName: string;
     minRange: number;
-    maxRange: number;
+    maxRange: S1WeaponMaxRange;
     speed: S1WeaponSpeed;
     cooldownTicks: number;
 };
@@ -115,7 +118,7 @@ const weapon = (w: any): S1Weapon | null =>
               type: enumNumber("weapon", w.type),
               rulesName: text(w.rules?.name),
               minRange: finite(w.minRange),
-              maxRange: finite(w.maxRange),
+              maxRange: encodeS1WeaponMaxRange(w.maxRange),
               speed: encodeS1WeaponSpeed(w.speed),
               cooldownTicks: finite(w.cooldownTicks),
           };
@@ -184,7 +187,7 @@ export type S1ActionWindow = {
     events: Array<{ tick: number; event: EndpointEvent }>;
 };
 export type S1Sample = {
-    kind: "strategic-s1-sample-v2";
+    kind: "strategic-s1-sample-v3";
     tick: number;
     periodic: boolean;
     players: Record<S1Side, S1Player>;
@@ -459,7 +462,7 @@ export class S1Sampler {
                 .sort((a, b) => a.id - b.id);
         this.lastTick = tick;
         const sample: S1Sample = {
-            kind: "strategic-s1-sample-v2",
+            kind: "strategic-s1-sample-v3",
             tick,
             periodic: tick > 0 && tick % 300 === 0,
             players,

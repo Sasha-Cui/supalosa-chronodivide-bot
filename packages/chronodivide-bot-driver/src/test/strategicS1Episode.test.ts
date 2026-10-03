@@ -33,6 +33,7 @@ const fixture = (
     eventMode: EventMode = "destroy",
     slot: 0 | 1 = 0,
     weaponSpeed = 20,
+    weaponRange = 6,
 ) => {
     let tick = 0,
         nativeFinished = false,
@@ -43,7 +44,7 @@ const fixture = (
         type: 0,
         rules: { name: "Cannon" },
         minRange: 0,
-        maxRange: 6,
+        maxRange: weaponRange,
         speed: weaponSpeed,
         cooldownTicks: 0,
     };
@@ -233,13 +234,13 @@ const fixture = (
             opponentStart: "3,4",
             candidateStartOrdinal: 0,
             opponentStartOrdinal: 1,
-            requestedEngineSeed: canary ? 3350141000 : mode === "smoke" ? 3350141100 : 3350140000,
+            requestedEngineSeed: canary ? 3350151000 : mode === "smoke" ? 3350151100 : 3350150000,
             maxUpdates: canary ? (3600 as const) : (24000 as const),
         },
     };
 };
 function diagnostic(value: Awaited<ReturnType<typeof runStrategicS1Episode>>) {
-    if (value.kind !== "strategic-s1-diagnostic-v2") throw new Error("wrong projection");
+    if (value.kind !== "strategic-s1-diagnostic-v3") throw new Error("wrong projection");
     return value;
 }
 describe("S1 episode lifecycle and technical projections (fake game only)", () => {
@@ -383,6 +384,25 @@ describe("S1 episode lifecycle and technical projections (fake game only)", () =
             await expect(runStrategicS1Episode(f)).rejects.toThrow(/callback advancing clock drift/);
         }
     });
+    it("preserves complete canary behavior with unbounded range and finite or infinite speed", async () => {
+        for (const speed of [20, Infinity]) {
+            const a = fixture("canary_endpoint_only", "none", 0, speed, Infinity),
+                b = fixture("canary_strategic", "none", 0, speed, Infinity);
+            const random = vi.spyOn(Math, "random"),
+                before = random.mock.calls.length;
+            try {
+                const pair = [await runStrategicS1Episode(a), await runStrategicS1Episode(b)];
+                validateS1CanaryPair(pair, syntheticS1Plan().canaries[0]);
+                for (const key of ["publicCall", "publicState", "dualTrace", "quitSuppression"] as const)
+                    expect((pair[0] as any)[key]).toEqual((pair[1] as any)[key]);
+                expect(b.candidate.getResearchMissionSnapshot).toHaveBeenCalledTimes(13);
+                expect(a.candidate.getResearchMissionSnapshot).not.toHaveBeenCalled();
+                expect(random.mock.calls.length).toBe(before);
+            } finally {
+                random.mockRestore();
+            }
+        }
+    }, 30000);
     it("smoke replays and then discards both payloads without outcome/diagnostic leakage", async () => {
         const r = await runStrategicS1Episode(fixture("smoke"));
         expect(r.kind).toBe("strategic-s1-smoke-technical-v2");

@@ -1,7 +1,7 @@
 import { buildUnifiedIntentD1Plan } from "./unifiedIntentD1Plan.js";
 import { UnifiedIntentGate3Map } from "./unifiedIntentGate3Plan.js";
-export const S1_SOURCE_PROTOCOL_SHA256 = "650c29a674350d200f3beac622d3713449732959b5ab0d4ef6d157769d30b018";
-export const S1_SEEDS = { main: 3350140000, canary: 3350141000, smoke: 3350141100 } as const;
+export const S1_SOURCE_PROTOCOL_SHA256 = "859f0468583837456db65a0197ca2524ce370ac8fdaae7ddc95373046ca2c65a";
+export const S1_SEEDS = { main: 3350150000, canary: 3350151000, smoke: 3350151100 } as const;
 export const S1_POLICY = { id: "unchanged_strongbot", arbiterEnabled: false } as const;
 export const S1_OBSERVERS = ["endpoint_only", "strategic"] as const;
 export const buildStrategicS1Plan = (maps: UnifiedIntentGate3Map[]) => {
@@ -14,7 +14,7 @@ export const buildStrategicS1Plan = (maps: UnifiedIntentGate3Map[]) => {
     const canaries = d1.canaries.map((c, i) => ({ ...c, requestedEngineSeed: S1_SEEDS.canary + i }));
     const smoke = { ...d1.smoke, requestedEngineSeed: S1_SEEDS.smoke };
     return {
-        kind: "strategic-diagnostic-s1-plan-v2" as const,
+        kind: "strategic-diagnostic-s1-plan-v3" as const,
         protocolSha256: S1_SOURCE_PROTOCOL_SHA256,
         maps: structuredClone(maps),
         countries: ["Americans", "Africans"],

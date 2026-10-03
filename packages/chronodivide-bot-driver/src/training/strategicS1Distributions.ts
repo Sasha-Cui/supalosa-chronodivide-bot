@@ -1,10 +1,12 @@
 import { finite, natural, S1_POSITIVE_INFINITY, S1WeaponSpeed } from "./strategicS1Observation.js";
 export type S1ValueDomain = "finite" | "finite_or_positive_infinity";
-const speedKeys = ["candidate", "baseline"].flatMap((side) =>
-    ["primaryWeapon", "secondaryWeapon"].map((slot) => side + ".unit." + slot + ".speed"),
+const extendedWeaponKeys = ["candidate", "baseline"].flatMap((side) =>
+    ["primaryWeapon", "secondaryWeapon"].flatMap((slot) =>
+        ["speed", "maxRange"].map((field) => side + ".unit." + slot + "." + field),
+    ),
 );
 export const s1MetricValueDomain = (key: string): S1ValueDomain =>
-    speedKeys.includes(key) ? "finite_or_positive_infinity" : "finite";
+    extendedWeaponKeys.includes(key) ? "finite_or_positive_infinity" : "finite";
 export type S1MetricDefinition = {
     key: string;
     unit: string;
@@ -25,7 +27,7 @@ export class S1Distribution {
         } else {
             if (value === S1_POSITIVE_INFINITY) {
                 if (this.valueDomain !== "finite_or_positive_infinity")
-                    throw new Error("S1 infinity outside speed domain");
+                    throw new Error("S1 infinity outside supported weapon domain");
             } else finite(value);
             this.values.set(value, natural((this.values.get(value) ?? 0) + count));
         }

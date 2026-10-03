@@ -235,7 +235,7 @@ export async function analyzeStrategicS1Population(
         })),
     );
     return {
-        kind: "strategic-s1-population-analysis-v2" as const,
+        kind: "strategic-s1-population-analysis-v3" as const,
         complete: true as const,
         policyComparison: false as const,
         policySelectionAuthorized: false as const,
