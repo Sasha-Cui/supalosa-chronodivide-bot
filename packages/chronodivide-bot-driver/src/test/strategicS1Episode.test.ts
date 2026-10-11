@@ -234,7 +234,7 @@ const fixture = (
             opponentStart: "3,4",
             candidateStartOrdinal: 0,
             opponentStartOrdinal: 1,
-            requestedEngineSeed: canary ? 3350151000 : mode === "smoke" ? 3350151100 : 3350150000,
+            requestedEngineSeed: canary ? 3350161000 : mode === "smoke" ? 3350161100 : 3350160000,
             maxUpdates: canary ? (3600 as const) : (24000 as const),
         },
     };

@@ -57,10 +57,10 @@ export async function runStrategicS1Episode(args: {
     const observed = mode !== "canary_endpoint_only";
     const seed =
         spec.caseIndex < 200
-            ? 3350150000 + spec.caseIndex
+            ? 3350160000 + spec.caseIndex
             : spec.caseIndex < 204
-            ? 3350151000 + spec.caseIndex - 200
-            : 3350151100;
+            ? 3350161000 + spec.caseIndex - 200
+            : 3350161100;
     if (
         !["diagnostic", "smoke", "canary_endpoint_only", "canary_strategic"].includes(mode) ||
         !Number.isSafeInteger(spec.caseIndex) ||
