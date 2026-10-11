@@ -20,6 +20,7 @@ import { VITEST_NAMES, VITEST_PASSED, NODE_TESTS, NODE_PASSED, TOTAL_PASSED } fr
 import { artifactInventory, validateVitestReport, validateNodeLog } from "../runtime/strategic-s1-gates.mjs";
 import { stageRequest } from "../runtime/strategic-s1-stages.mjs";
 import { verifySubmission } from "./submit-strategic-s1.mjs";
+import { sourceMismatchFailureFields } from "../runtime/strategic-s1-source-diagnostics.mjs";
 export async function runPure() {
     const out = path.resolve(required("OUT_DIR"));
     if (out !== path.join(STUDY, "pure-v1") || fs.existsSync(out))
@@ -118,6 +119,13 @@ export async function runPure() {
     }
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url))
-    runPure().catch(() => {
+    runPure().catch((error) => {
+        const metadata = sourceMismatchFailureFields(error);
+        if (Object.keys(metadata).length > 0) {
+            const failure = path.join(STUDY, "pure-startup-FAILURE.json");
+            writeExclusive(failure, encode({complete: false, passed: false, technicalOnly: true, stage: "pure",
+                sourceCommit: process.env.SOURCE_COMMIT ?? null, jobId: process.env.SLURM_JOB_ID ?? null,
+                errorType: String(error.name), errorMessageSha256: hash(String(error.message)), ...metadata}));
+        }
         process.exitCode = 1;
     });

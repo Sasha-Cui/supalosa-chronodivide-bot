@@ -41,6 +41,8 @@ import {
 import { buildStrategicS1Plan } from "../runtime/strategic-s1-registration.mjs";
 import { makeBinding } from "../runtime/strategic-s1-stages.mjs";
 
+import { preserveSourceMismatch, SOURCE_DIAGNOSTICS_ROOT } from "../runtime/strategic-s1-source-diagnostics.mjs";
+
 export const SUBMISSIONS = path.join(STUDY, "submissions-v1");
 const phases = ["pure", "prepare", "canary", "smoke", "main"];
 const baseEnvironment = (stage) => ({
@@ -372,7 +374,12 @@ export function verifySubmission(stage, source, runtime, scheduler, root = SUBMI
     const freeze = load(path.join(folder, "freeze.json"));
     fields(freeze, ["source", "runtime", "environment", "sourceBound"]);
     requireTrue(freeze.sourceBound === true, "submission freeze");
+    try {
     exact(freeze.source, source, "submitted source");
+    } catch (error) {
+        const diagnosticsRoot = root === SUBMISSIONS ? SOURCE_DIAGNOSTICS_ROOT : path.join(root, "startup-source-diagnostics-v1");
+        throw preserveSourceMismatch(error, freeze.source, source, stage, scheduler, diagnosticsRoot);
+    }
     exact(freeze.runtime, runtime, "submitted runtime");
     const directory = path.join(folder, final ? "finalizer" : "worker"),
         file = path.join(directory, "receipt.json"),

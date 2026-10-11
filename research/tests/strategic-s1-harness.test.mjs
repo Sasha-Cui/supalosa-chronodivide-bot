@@ -30,6 +30,7 @@ import {
     originalS1History,
     a1S1History,
     a2S1History,
+    a3S1History,
 } from "../runtime/strategic-s1-registration.mjs";
 import {
     makeBinding,
@@ -127,7 +128,9 @@ function seedAudit() {
         ...identity(
             r.path,
             r.sha256,
-            r.path.includes("strategic-diagnostic-s1-a2/execution-v1")
+            r.path.includes("strategic-diagnostic-s1-a3/execution-v1")
+                ? 548531
+                : r.path.includes("strategic-diagnostic-s1-a2/execution-v1")
                 ? 540012
                 : r.path.includes("strategic-diagnostic-s1-a1/execution-v1")
                 ? 534178
@@ -180,8 +183,9 @@ function seedAudit() {
         originalS1: originalS1History(records[9]),
         a1S1: a1S1History(records[10]),
         a2S1: a2S1History(records[11]),
-        priorZeroUpdateInitializations: 2630,
-        newSeeds: { count: 205, min: 3350150000, max: 3350151100, sha256: digest(proposedS1Seeds(plan)) },
+        a3S1: a3S1History(records[12]),
+        priorZeroUpdateInitializations: 2835,
+        newSeeds: { count: 205, min: 3350160000, max: 3350161100, sha256: digest(proposedS1Seeds(plan)) },
         collisions: 0,
         scope: "Registration/certificate/journal metadata only; no competitive payloads opened or engine initialized.",
     };
@@ -289,6 +293,8 @@ test("S1 complete registration envelope requires the full pinned metadata popula
         (a) => (a.od1A1.definitions = 900),
         (a) => (a.d1.definitions = 200),
         (a) => (a.collisions = 1),
+        (a) => (a.a3S1.historicalCauseKnown = true),
+        (a) => (a.a3S1.failedCase13SelectorInitialized = false),
         (a) => (a.newSeeds.sha256 = "b".repeat(64)),
         (a) => (a.extra = true),
     ]) {
@@ -410,7 +416,7 @@ test("S1 complete synthetic200-case finalizer retains all72groups and frequencie
     assert.equal(v.analysis.counts.endpointReplays, 200);
     assert.equal(v.analysis.counts.strategicReplays, 200);
     assert.equal(v.totalAdvancingEpisodes, 209);
-    assert.equal(v.cumulativeZeroUpdateInitializations, 2835);
+    assert.equal(v.cumulativeZeroUpdateInitializations, 3040);
     assert.ok(r.bytes > 32 * 1024 * 1024 && r.bytes < 384 * 1024 * 1024);
     assert.equal(v.analysis.independentAudit, false);
     assert.deepEqual(s.events.slice(-4), ["files:false", "stable", "publish:finalize", "files:true"]);

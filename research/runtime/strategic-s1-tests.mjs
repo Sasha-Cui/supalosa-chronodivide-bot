@@ -42,8 +42,9 @@ export const NODE_TESTS = [
     ["unified-intent-d1-analysis", 8],
     ["unified-intent-d1-golden", 1],
     ["strategic-s1-golden", 2],
-    ["strategic-s1-runtime", 25],
+    ["strategic-s1-runtime", 27],
     ["strategic-s1-harness", 26],
+    ["strategic-s1-source-diagnostics", 7],
 ];
 export const NODE_PASSED = NODE_TESTS.reduce((n, [, count]) => n + count, 0);
 export const TOTAL_PASSED = VITEST_PASSED + NODE_PASSED;

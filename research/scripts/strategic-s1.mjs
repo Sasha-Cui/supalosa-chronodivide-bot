@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from "node:fs";
+import { sourceMismatchFailureFields } from "../runtime/strategic-s1-source-diagnostics.mjs";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import {
@@ -208,8 +209,8 @@ export async function executeS1Stage(stage, index, context, services, storage = 
             accounting,
             recordIdentities,
             initializations: 205,
-            priorZeroUpdateInitializations: 2630,
-            cumulativeZeroUpdateInitializations: 2835,
+            priorZeroUpdateInitializations: 2835,
+            cumulativeZeroUpdateInitializations: 3040,
             canaryEpisodes: 8,
             smokeEpisodes: 1,
             diagnosticEpisodes: 200,
@@ -349,6 +350,7 @@ export async function main() {
             errorType: String(error.name),
             errorMessageSha256: hash(String(error.message)),
             location,
+        ...sourceMismatchFailureFields(error),
         });
         console.error(
             "S1 failed closed; inspect outcome-free failure identity/source, never partial competitive logs or payloads.",

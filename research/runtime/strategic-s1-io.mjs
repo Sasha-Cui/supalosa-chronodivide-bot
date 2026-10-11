@@ -6,9 +6,9 @@ import { execFileSync } from "node:child_process";
 export const REPO = "/nfs/roberts/project/pi_jss233/zc362/chrono_divide/strong-chronodivide-bot";
 export const PROJECT = path.dirname(REPO);
 export const DRIVER = path.join(REPO, "packages/chronodivide-bot-driver");
-export const STUDY = path.join(PROJECT, "research-evidence/strategic-diagnostic-s1-a3");
+export const STUDY = path.join(PROJECT, "research-evidence/strategic-diagnostic-s1-a4");
 export const EXECUTION = path.join(STUDY, "execution-v1");
-export const PROTOCOL_SHA = "859f0468583837456db65a0197ca2524ce370ac8fdaae7ddc95373046ca2c65a";
+export const PROTOCOL_SHA = "cf943eafdb53312a99fb2a14f9ecfa6c546d1001d99ec5c8ea2254ffef75d25e";
 export const SHA = /^[0-9a-f]{64}$/;
 export const MAX_MAIN_BYTES = 32 * 1024 * 1024;
 // Prospective aggregate engineering bound, not a change to any per-game limit.
@@ -175,10 +175,10 @@ export function parseLaunchMarker(text, expectedCompletion = null) {
         );
         const expectedSeed =
             r.caseIndex < 200
-                ? 3350150000 + r.caseIndex
+                ? 3350160000 + r.caseIndex
                 : r.caseIndex < 204
-                ? 3350151000 + r.caseIndex - 200
-                : 3350151100;
+                ? 3350161000 + r.caseIndex - 200
+                : 3350161100;
         const role = r.caseIndex < 200 ? "diagnostic" : r.caseIndex < 204 ? "canary" : "smoke";
         requireTrue(
             r.requestedEngineSeed === expectedSeed &&

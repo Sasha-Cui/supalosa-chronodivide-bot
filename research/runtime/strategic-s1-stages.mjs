@@ -29,6 +29,7 @@ import {
     originalS1History,
     a1S1History,
     a2S1History,
+    a3S1History,
 } from "./strategic-s1-registration.mjs";
 import { validateStrategicS1Plan } from "../../packages/chronodivide-bot-driver/dist/training/strategicS1Plan.js";
 import {
@@ -160,6 +161,7 @@ export function validateSeedAudit(a, plan) {
         "originalS1",
         "a1S1",
         "a2S1",
+        "a3S1",
         "priorZeroUpdateInitializations",
         "newSeeds",
         "collisions",
@@ -171,7 +173,7 @@ export function validateSeedAudit(a, plan) {
             a.passed === true &&
             a.technicalOnly === true &&
             a.collisions === 0 &&
-            a.priorZeroUpdateInitializations === 2630,
+            a.priorZeroUpdateInitializations === 2835,
         "registration completion",
     );
     exact(a.discovered, permittedRegistrations(), "registration census");
@@ -184,7 +186,7 @@ export function validateSeedAudit(a, plan) {
         "Registration/certificate/journal metadata only; no competitive payloads opened or engine initialized.",
         "census scope",
     );
-    requireTrue(a.inspectedRegistrationFiles.length === 12, "registration count");
+    requireTrue(a.inspectedRegistrationFiles.length === 13, "registration count");
     for (const [i, r] of a.inspectedRegistrationFiles.entries()) {
         fields(r, [
             "path",
@@ -289,6 +291,8 @@ export function validateSeedAudit(a, plan) {
     exact(a.a1S1, a1S1History(a.inspectedRegistrationFiles[10]), "A1 S1 history binding");
     requireTrue(a.inspectedRegistrationFiles[11].bytes === 540012, "A2 manifest bytes");
     exact(a.a2S1, a2S1History(a.inspectedRegistrationFiles[11]), "A2 terminal history binding");
+    requireTrue(a.inspectedRegistrationFiles[12].bytes === 548531, "A3 manifest bytes");
+    exact(a.a3S1, a3S1History(a.inspectedRegistrationFiles[12]), "A3 terminal unknown-cause history binding");
     const seeds = proposedS1Seeds(plan);
     exact(
         a.newSeeds,
@@ -455,8 +459,8 @@ export async function validateStage(v, stage, context, index = null) {
             v.canaryGateSha256 === context.canaryGateSha256 &&
                 v.smokeSha256 === context.smokeSha256 &&
                 v.initializations === 205 &&
-                v.priorZeroUpdateInitializations === 2630 &&
-                v.cumulativeZeroUpdateInitializations === 2835 &&
+                v.priorZeroUpdateInitializations === 2835 &&
+                v.cumulativeZeroUpdateInitializations === 3040 &&
                 v.canaryEpisodes === 8 &&
                 v.smokeEpisodes === 1 &&
                 v.diagnosticEpisodes === 200 &&

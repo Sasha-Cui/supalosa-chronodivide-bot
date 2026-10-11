@@ -34,6 +34,10 @@ import {
     buildA2S1Plan,
     validateA2S1Metadata,
     a2S1History,
+    buildA3S1Plan,
+    validateA3S1Metadata,
+    a3S1History,
+    validateA3MainReview,
     validateOriginalS1Metadata,
     REGISTRATIONS,
 } from "../runtime/strategic-s1-registration.mjs";
@@ -109,7 +113,7 @@ test("S1 duplicate/shifted launches fail before appending and retain the origina
     store.launch("case", 0, launch);
     const before = fs.readFileSync(path.join(d, "COMPLETE"), "utf8");
     assert.throws(() => store.launch("case", 0, launch));
-    assert.throws(() => store.launch("case", 0, { ...launch, requestedEngineSeed: 3350150999 }));
+    assert.throws(() => store.launch("case", 0, { ...launch, requestedEngineSeed: 3350160999 }));
     assert.equal(fs.readFileSync(path.join(d, "COMPLETE"), "utf8"), before);
     assert.throws(() => parseLaunchMarker(before.trimEnd()));
 });
@@ -232,8 +236,8 @@ test("S1 accepts the retained unsuffixed sacct format while preserving CPU memor
 });
 test("S1 metadata census is exact with no prior/current-study blanket exemptions", () => {
     const allowed = permittedRegistrations();
-    assert.equal(allowed.length, 14);
-    assert.equal(REGISTRATIONS.length, 12);
+    assert.equal(allowed.length, 15);
+    assert.equal(REGISTRATIONS.length, 13);
     validateRegistrationScan(allowed);
     for (const values of [
         allowed.slice(1),
@@ -245,7 +249,7 @@ test("S1 metadata census is exact with no prior/current-study blanket exemptions
 test("S1 fresh seeds and complete old canary/smoke/task registrations reject collisions", () => {
     const seeds = proposedS1Seeds(plan);
     assert.equal(seeds.length, 205);
-    assert.equal(seeds[204], 3350151100);
+    assert.equal(seeds[204], 3350161100);
     const old = { complete: true, passed: true, plan: a1Plan(plan.maps) };
     assert.equal(registeredSeeds(old, seeds, 905).length, 905);
     for (const mutate of [
@@ -545,4 +549,85 @@ test("S1 A3 reserves all A2 definitions and rejects altered terminal history met
     assert.equal(h.mainLaunchAttempts, 137);
     assert.equal(h.failedOrCancelledAdvancingUpdates, null);
     assert.equal(h.mainGatePassed, false);
+});
+
+test("S1 A4 reserves all A3 definitions and rejects altered terminal history metadata", () => {
+    const old = buildA3S1Plan(plan.maps),
+        cells = [...old.cases, ...old.canaries, old.smoke],
+        fresh = proposedS1Seeds(plan);
+    const m = {
+        kind: "strategic-s1-manifest-v1",
+        complete: true,
+        passed: true,
+        source: { sourceCommit: "8c0b78e2fda3ca42f8051417aa0c272344a494dd" },
+        scheduler: { jobId: "28219020" },
+        plan: old,
+        launches: cells.map((c) => ({
+            role: c.role,
+            caseIndex: c.caseIndex,
+            mode: "zero_update",
+            requestedEngineSeed: c.requestedEngineSeed,
+            policy: "unchanged_strongbot",
+        })),
+        observations: cells.map((c) => ({
+            caseIndex: c.caseIndex,
+            requestedEngineSeed: c.requestedEngineSeed,
+            updates: 0,
+            candidateStart: c.candidateStart,
+            opponentStart: c.opponentStart,
+            candidateCountry: c.country,
+            opponentCountry: c.country,
+            candidateStartOrdinal: c.candidateStartOrdinal,
+            opponentStartOrdinal: c.opponentStartOrdinal,
+            candidateSlot: c.candidateSlot,
+            agentOrder: c.candidateSlot === 0 ? ["OD1Candidate", "OD1Opponent"] : ["OD1Opponent", "OD1Candidate"],
+            slotVerification: "source-bound-agent-order-and-pinned-creator",
+            seedVerification: "pinned-date-now-seconds-shim-and-participant-stream-derivation",
+        })),
+    };
+    validateA3S1Metadata(plan, m);
+    assert.equal(registeredSeeds(m, fresh, 205).length, 205);
+    for (const seed of [3350150000, 3350151000, 3350151100]) assert.throws(() => registeredSeeds(m, [seed], 205));
+    for (const mutate of [
+        (v) => v.plan.cases.pop(),
+        (v) => v.launches.pop(),
+        (v) => v.observations[0].updates++,
+        (v) => v.plan.smoke.requestedEngineSeed++,
+    ]) {
+        const bad = structuredClone(m);
+        mutate(bad);
+        assert.throws(() => validateA3S1Metadata(plan, bad));
+    }
+    const h = a3S1History(REGISTRATIONS[12]);
+    assert.equal(h.mainCompletedAllocations, 13);
+    assert.equal(h.mainFailedAllocations, 1);
+    assert.equal(h.mainCancelledAllocations, 186);
+    assert.equal(h.mainLaunchAttempts, 42);
+    assert.equal(h.failedOrCancelledAdvancingUpdates, null);
+    assert.equal(h.mainGatePassed, false);
+    assert.equal(h.failedCase13MainInitialized, false);
+    assert.equal(h.failedCase13SelectorInitialized, true);
+    assert.equal(h.historicalCauseKnown, false);
+});
+
+test("S1 A4 terminal A3 metadata rejects incomplete accounting and invented cause/launch claims", () => {
+    const p = path.join(path.dirname(REPO), "research-evidence/strategic-diagnostic-s1-a3/main-failure-review-v1/record.json");
+    const review = JSON.parse(fs.readFileSync(p, "utf8")); // outcome-free failure/accounting metadata only
+    assert.deepEqual(validateA3MainReview(review), {COMPLETED: 13, FAILED: 1, CANCELLED: 186});
+    for (const mutate of [
+        (v) => v.workerAllocations.pop(),
+        (v) => v.workerAllocations[13][2] = "COMPLETED",
+        (v) => v.workerAllocations[0][14] += ",gres/gpu=1",
+        (v) => v.failedCase13InitializerOrGameEntered = true,
+        (v) => v.failedDifferingSourceFieldKnown = true,
+        (v) => v.cancelledAdvancingCountsKnown = true,
+        (v) => v.all205DefinitionIdentitiesReserved = false,
+        (v) => v.journals[1] = structuredClone(v.journals[0]),
+        (v) => v.finalizerAllocation[10] = "1",
+        (v) => v.partialCompetitivePayloadsOpened = true,
+        (v) => v.statusCounts.COMPLETED++,
+    ]) {
+        const bad = structuredClone(review); mutate(bad);
+        assert.throws(() => validateA3MainReview(bad));
+    }
 });
