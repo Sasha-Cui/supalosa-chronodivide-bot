@@ -1109,7 +1109,7 @@ export function buildA3S1Plan(maps) {
     return {
         ...current,
         kind: "strategic-diagnostic-s1-plan-v3",
-        protocolSha356: "859f0468583837456db65a0197ca2524ce370ac8fdaae7ddc95373046ca2c65a",
+        protocolSha256: "859f0468583837456db65a0197ca2524ce370ac8fdaae7ddc95373046ca2c65a",
         cases: current.cases.map((c) => ({ ...c, requestedEngineSeed: 3350150000 + c.caseIndex })),
         canaries: current.canaries.map((c, i) => ({ ...c, requestedEngineSeed: 3350151000 + i })),
         smoke: { ...current.smoke, requestedEngineSeed: 3350151100 },

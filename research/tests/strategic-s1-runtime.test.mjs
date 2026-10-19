@@ -551,6 +551,49 @@ test("S1 A3 reserves all A2 definitions and rejects altered terminal history met
     assert.equal(h.mainGatePassed, false);
 });
 
+test("S1 A3 historical plan retains literal protocolSha256 and rejects misspelled-key identity", () => {
+    const manifestPath = path.join(
+        path.dirname(REPO),
+        "research-evidence/strategic-diagnostic-s1-a3/execution-v1/manifest/record.json",
+    );
+    assert.equal(fs.statSync(manifestPath).size, 548531);
+    assert.equal(fileHash(manifestPath), "c4d22ac3b218d0ed6dc14034e123211b864d7b2087e1f74f9bea6b67bbc90ee3");
+    const manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8"));
+    const mapsBefore = JSON.stringify(manifest.plan.maps);
+    const currentBefore = JSON.stringify(plan);
+    const historical = buildA3S1Plan(manifest.plan.maps);
+    const a3Protocol = "859f0468583837456db65a0197ca2524ce370ac8fdaae7ddc95373046ca2c65a";
+    assert.deepEqual(Object.keys(historical), [
+        "kind", "protocolSha256", "maps", "countries", "policy",
+        "observers", "cases", "canaries", "smoke", "counts",
+    ]);
+    assert.equal(historical.protocolSha256, a3Protocol);
+    assert.equal(Object.hasOwn(historical, "protocolSha356"), false);
+    assert.equal(JSON.stringify(historical), JSON.stringify(manifest.plan));
+    assert.deepEqual(historical.cases.map((c) => c.requestedEngineSeed),
+        Array.from({ length: 200 }, (_, i) => 3350150000 + i));
+    assert.deepEqual(historical.canaries.map((c) => c.requestedEngineSeed),
+        [3350151000, 3350151001, 3350151002, 3350151003]);
+    assert.equal(historical.smoke.requestedEngineSeed, 3350151100);
+    const historicalContext = { maps: manifest.plan.maps };
+    validateA3S1Metadata(historicalContext, manifest); // Zero-update metadata only, no census/initializer.
+    for (const mutate of [
+        (v) => { v.plan.protocolSha356 = a3Protocol; },
+        (v) => {
+            v.plan.protocolSha256 = "cf943eafdb53312a99fb2a14f9ecfa6c546d1001d99ec5c8ea2254ffef75d25e";
+            v.plan.protocolSha356 = a3Protocol;
+        },
+        (v) => { delete v.plan.protocolSha256; v.plan.protocolSha356 = a3Protocol; },
+        (v) => { v.plan = Object.fromEntries(Object.entries(v.plan).reverse()); },
+    ]) {
+        const bad = structuredClone(manifest);
+        mutate(bad);
+        assert.throws(() => validateA3S1Metadata(historicalContext, bad), /complete reserved A3 plan drifted/);
+    }
+    assert.equal(JSON.stringify(manifest.plan.maps), mapsBefore);
+    assert.equal(JSON.stringify(plan), currentBefore);
+});
+
 test("S1 A4 reserves all A3 definitions and rejects altered terminal history metadata", () => {
     const old = buildA3S1Plan(plan.maps),
         cells = [...old.cases, ...old.canaries, old.smoke],
