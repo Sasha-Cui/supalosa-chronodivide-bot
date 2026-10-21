@@ -23,7 +23,7 @@ import { verifySubmission } from "./submit-strategic-s1.mjs";
 import { sourceMismatchFailureFields } from "../runtime/strategic-s1-source-diagnostics.mjs";
 export async function runPure() {
     const out = path.resolve(required("OUT_DIR"));
-    if (out !== path.join(STUDY, "pure-v2") || fs.existsSync(out))
+    if (out !== path.join(STUDY, "pure-v3") || fs.existsSync(out))
         throw new Error("S1 pure already attempted or wrong output");
     const before = assertSource("pure");
     verifySubmission("pure", before, verifyRuntime(), schedulerIdentity("pure"));
@@ -122,7 +122,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     runPure().catch((error) => {
         const metadata = sourceMismatchFailureFields(error);
         if (Object.keys(metadata).length > 0) {
-            const failure = path.join(STUDY, "pure-v2-startup-FAILURE.json");
+            const failure = path.join(STUDY, "pure-v3-startup-FAILURE.json");
             writeExclusive(failure, encode({complete: false, passed: false, technicalOnly: true, stage: "pure",
                 sourceCommit: process.env.SOURCE_COMMIT ?? null, jobId: process.env.SLURM_JOB_ID ?? null,
                 errorType: String(error.name), errorMessageSha256: hash(String(error.message)), ...metadata}));

@@ -20,7 +20,7 @@ import { VITEST_NAMES, VITEST_PASSED, NODE_TESTS, NODE_PASSED, TOTAL_PASSED } fr
 import { descriptor, validateScheduler, stageRequest } from "./strategic-s1-stages.mjs";
 // A4 pure-v1/29143994 retains the old source's 443-check evidence.
 // The approved historical-plan key repair requires wholly fresh current-source gates.
-export const PURE_DIRECTORY = path.join(STUDY, "pure-v2");
+export const PURE_DIRECTORY = path.join(STUDY, "pure-v3");
 export const PURE_PATH = path.join(PURE_DIRECTORY, "pure.json");
 export const VERIFICATION_SCOPES = {
     pure: "independent-pure-metadata",
@@ -183,7 +183,7 @@ export function readPure(source, runtime, { accounting = true } = {}) {
 export const verificationPath = (stage, root = STUDY) => {
     requireTrue(Object.hasOwn(VERIFICATION_SCOPES, stage), "verification stage");
     requireTrue(path.resolve(root) === root && (root === STUDY || root.startsWith(STUDY + "/")), "verification root");
-    return path.join(root, "verification-" + stage + "-v2.json");
+    return path.join(root, "verification-" + stage + "-v3.json");
 };
 /** Independent work is external to production code; this reader verifies its immutable
  * receipt/program/output/accounting bindings, not the scientific independence by assertion. */
