@@ -153,5 +153,7 @@ test("S1 A4 production mismatch capture precedes stage execution and both generi
     assert.ok(runner.includes("...sourceMismatchFailureFields(error)"));
     const pure = fs.readFileSync(path.join(REPO, "research/scripts/strategic-s1-pure.mjs"), "utf8");
     assert.ok(pure.indexOf('verifySubmission("pure"') < pure.indexOf('run("build"'));
-    assert.ok(pure.includes("pure-startup-FAILURE.json")); assert.ok(pure.includes("sourceMismatchFailureFields(error)"));
+    assert.ok(pure.includes('"pure-v3-startup-FAILURE.json"')); assert.ok(pure.includes("sourceMismatchFailureFields(error)"));
+    assert.ok(!pure.includes('"pure-startup-FAILURE.json"'));
+    assert.ok(!pure.includes('"pure-v2-startup-FAILURE.json"'));
 });
